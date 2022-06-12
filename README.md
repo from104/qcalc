@@ -1,6 +1,12 @@
+<<<<<<< HEAD
 # Quasar App (qcalc)
 
 A Quasar Project
+=======
+# com.electron.qcalc (qcalc)
+
+Simple Calc by quasar
+>>>>>>> e81e1e8 (first commit)
 
 ## Install the dependencies
 ```bash
@@ -39,4 +45,7 @@ quasar build
 
 ### Customize the configuration
 See [Configuring quasar.config.js](https://v2.quasar.dev/quasar-cli-vite/quasar-config-js).
+<<<<<<< HEAD
 # qcalc
+=======
+>>>>>>> e81e1e8 (first commit)
