@@ -1,51 +1,27 @@
-<<<<<<< HEAD
-# Quasar App (qcalc)
-
-A Quasar Project
-=======
 # com.electron.qcalc (qcalc)
 
-Simple Calc by quasar
->>>>>>> e81e1e8 (first commit)
+## 퀘이사를 이용해 만든 간단한 계산기
 
-## Install the dependencies
+예전에 졸업과제로 만들었던 안드로이드용 계산가의 소스를 활용해 만든 간단한 계산기 입니다.
+
+## 필요한 node.js 모듈 설치
+
+기본적으로 필요한 모듈 설치법은 다음과 같습니다.
+
 ```bash
 yarn
 # or
 npm install
 ```
 
-### Start the app in development mode (hot-code reloading, error reporting, etc.)
+### 개발 모드로 실행하기 (실시간 리로딩, 에러 체크 등)
+
 ```bash
-quasar dev
+quasar dev -m electron
 ```
 
+### 배포 패키지 빌드 (윈도우용)
 
-### Lint the files
 ```bash
-yarn lint
-# or
-npm run lint
+quasar build -m electron [-T win32]
 ```
-
-
-### Format the files
-```bash
-yarn format
-# or
-npm run format
-```
-
-
-
-### Build the app for production
-```bash
-quasar build
-```
-
-### Customize the configuration
-See [Configuring quasar.config.js](https://v2.quasar.dev/quasar-cli-vite/quasar-config-js).
-<<<<<<< HEAD
-# qcalc
-=======
->>>>>>> e81e1e8 (first commit)
