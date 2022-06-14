@@ -53,7 +53,7 @@ onMounted(() => {
   });
 });
 
-const toBlur = (e: { target: { blur: () => void; }; }) => {
+const toBlur = (e: any) => {
   e.target.blur()
 }
 </script>
@@ -67,7 +67,7 @@ const toBlur = (e: { target: { blur: () => void; }; }) => {
       </q-card-section>
 
       <q-card-section class="col-3 q-pa-sm" v-for="(button, index) in buttons" :key="index">
-        <q-btn class="text-h6 full-width" :label="button[0]" :color="button[1]" @click="button[2]()" v-on:mouseup="toBlur" />
+        <q-btn class="text-h6 full-width" :label="button[0]" :color="button[1]" @click="button[2]()" @focus="toBlur" manualFocus />
       </q-card-section>
     </q-card>
   </q-page>
