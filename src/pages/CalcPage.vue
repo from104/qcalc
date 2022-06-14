@@ -1,9 +1,11 @@
 <script setup lang="ts">
-import { onMounted, reactive, ref, watch } from 'vue';
-import { Calculator } from '../Calculator';
+import { useCalcStore } from 'src/stores/calc-store';
+import { onMounted, ref, watch } from 'vue';
+// import { Calculator } from '../Calculator';
 
-const number = ref('0');
-const calc = reactive(new Calculator());
+// const calc = reactive(new Calculator());
+const calc = useCalcStore().$state.calc;
+const number = ref(calc.getShownNumber());
 
 watch(calc, () => {
   number.value = calc.getShownNumber();
@@ -37,18 +39,23 @@ const buttons: Button = [
 onMounted(() => {
   // Support keyboard entry
   window.addEventListener('keyup', (event) => {
-    if (event.key.match(/^[\d]$/)) return calc.addDigit(event.key);
-    if (event.key.match(/^[pP%]$/)) return calc.percent();
     if (event.key === '+') return calc.plus();
     if (event.key === '-') return calc.minus();
     if (event.key === '*') return calc.mul();
     if (event.key === '/') return calc.div();
     if (event.key === '_') return calc.changeSign();
+    if (event.key === '=') return calc.equal();
     if (event.key === 'Delete') return calc.clear();
     if (event.key === 'Backspace') return calc.deleteDigitOrDot();
     if (event.key === 'Enter') return calc.equal();
+    if (event.key.match(/^[\d]$/)) return calc.addDigit(event.key);
+    if (event.key.match(/^[pP%]$/)) return calc.percent();
   });
 });
+
+const toBlur = (e: { target: { blur: () => void; }; }) => {
+  e.target.blur()
+}
 </script>
 
 <template>
@@ -60,7 +67,7 @@ onMounted(() => {
       </q-card-section>
 
       <q-card-section class="col-3 q-pa-sm" v-for="(button, index) in buttons" :key="index">
-        <q-btn class="text-h6 full-width" :label="button[0]" :color="button[1]" @click="button[2]()" />
+        <q-btn class="text-h6 full-width" :label="button[0]" :color="button[1]" @click="button[2]()" v-on:mouseup="toBlur" />
       </q-card-section>
     </q-card>
   </q-page>
