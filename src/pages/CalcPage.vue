@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { useCalcStore } from 'src/stores/calc-store';
 import { onMounted, ref, watch } from 'vue';
-// import { Calculator } from '../Calculator';
+import tinykeys, { KeyBindingMap } from 'tinykeys'
 
 // const calc = reactive(new Calculator());
 const calc = useCalcStore().$state.calc;
@@ -9,53 +9,47 @@ const number = ref(calc.getShownNumber());
 
 watch(calc, () => {
   number.value = calc.getShownNumber();
-})
+});
 
-type Button = [string, string, () => void][];
+// 버튼 레이블, 버튼 컬러, 버튼에 해당하는 키, 버튼 클릭 이벤트 핸들러
+type Button = [string, string, string[], () => void][];
 
 const buttons: Button = [
-  ['%', 'secondary', () => calc.percent()],
-  ['±', 'secondary', () => calc.changeSign()],
-  ['C', 'dark', () => calc.clear()],
-  ['←', 'dark', () => calc.deleteDigitOrDot()],
-  ['7', 'primary', () => calc.addDigit(7)],
-  ['8', 'primary', () => calc.addDigit(8)],
-  ['9', 'primary', () => calc.addDigit(9)],
-  ['÷', 'secondary', () => calc.div()],
-  ['4', 'primary', () => calc.addDigit(4)],
-  ['5', 'primary', () => calc.addDigit(5)],
-  ['6', 'primary', () => calc.addDigit(6)],
-  ['×', 'secondary', () => calc.mul()],
-  ['1', 'primary', () => calc.addDigit(1)],
-  ['2', 'primary', () => calc.addDigit(2)],
-  ['3', 'primary', () => calc.addDigit(3)],
-  ['-', 'secondary', () => calc.minus()],
-  ['0', 'primary', () => calc.addDigit(0)],
-  ['.', 'primary', () => calc.addDot()],
-  ['=', 'secondary', () => calc.equal()],
-  ['+', 'secondary', () => calc.plus()],
+  ['%', 'secondary', ['%', 'p', 'P'], () => calc.percent()],
+  ['±', 'secondary', ['_'], () => calc.changeSign()],
+  ['C', 'dark', ['Delete', 'Escape', 'c', 'C'], () => calc.clear()],
+  ['←', 'dark', ['Backspace'], () => calc.deleteDigitOrDot()],
+  ['7', 'primary', ['7'], () => calc.addDigit(7)],
+  ['8', 'primary', ['8'], () => calc.addDigit(8)],
+  ['9', 'primary', ['9'], () => calc.addDigit(9)],
+  ['÷', 'secondary', ['/'], () => calc.div()],
+  ['4', 'primary', ['4'], () => calc.addDigit(4)],
+  ['5', 'primary', ['5'], () => calc.addDigit(5)],
+  ['6', 'primary', ['6'], () => calc.addDigit(6)],
+  ['×', 'secondary', ['*'], () => calc.mul()],
+  ['1', 'primary', ['1'], () => calc.addDigit(1)],
+  ['2', 'primary', ['2'], () => calc.addDigit(2)],
+  ['3', 'primary', ['3'], () => calc.addDigit(3)],
+  ['-', 'secondary', ['-'], () => calc.minus()],
+  ['0', 'primary', ['0'], () => calc.addDigit(0)],
+  ['.', 'primary', ['.'], () => calc.addDot()],
+  ['=', 'secondary', ['='], () => calc.equal()],
+  ['+', 'secondary', ['+'], () => calc.plus()],
 ];
 
 onMounted(() => {
   // Support keyboard entry
-  window.addEventListener('keyup', (event) => {
-    if (event.key === '+') return calc.plus();
-    if (event.key === '-') return calc.minus();
-    if (event.key === '*') return calc.mul();
-    if (event.key === '/') return calc.div();
-    if (event.key === '_') return calc.changeSign();
-    if (event.key === '=') return calc.equal();
-    if (event.key === 'Delete') return calc.clear();
-    if (event.key === 'Backspace') return calc.deleteDigitOrDot();
-    if (event.key === 'Enter') return calc.equal();
-    if (event.key.match(/^[\d]$/)) return calc.addDigit(event.key);
-    if (event.key.match(/^[pP%]$/)) return calc.percent();
-  });
-});
+  const keyBindingMaps: KeyBindingMap = {};
 
-const toBlur = (e: any) => {
-  e.target.blur()
-}
+  buttons.forEach(button => {
+    const [, , keys, handler] = button;
+    keys.forEach(key => {
+      keyBindingMaps[key] = handler;
+    })
+  });
+
+  tinykeys(window, keyBindingMaps);
+});
 </script>
 
 <template>
@@ -67,7 +61,7 @@ const toBlur = (e: any) => {
       </q-card-section>
 
       <q-card-section class="col-3 q-pa-sm" v-for="(button, index) in buttons" :key="index">
-        <q-btn class="text-h6 full-width" :label="button[0]" :color="button[1]" @click="button[2]()" @keyup.="button[2]()" @focus="toBlur" manualFocus />
+        <q-btn class="text-h6 full-width" :label="button[0]" :color="button[1]" @click="button[3]()" />
       </q-card-section>
     </q-card>
   </q-page>
