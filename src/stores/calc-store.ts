@@ -5,6 +5,7 @@ export const useCalcStore = defineStore('calc', {
   state: () => ({
     calc: new Calculator(),
   }),
-  getters: {  },
-  actions: {  },
+  getters: {},
+  actions: {},
+  persist: true,
 });

@@ -15,9 +15,9 @@ watch(calc, () => {
 type Button = [string, string, string[], () => void][];
 
 const buttons: Button = [
-  ['%', 'secondary', ['%', 'p', 'P'], () => calc.percent()],
-  ['±', 'secondary', ['_'], () => calc.changeSign()],
-  ['C', 'dark', ['Delete', 'Escape', 'c', 'C'], () => calc.clear()],
+  ['%', 'secondary', ['%', 'p'], () => calc.percent()],
+  ['±', 'secondary', ['Shift+Minus','s'], () => calc.changeSign()],
+  ['C', 'dark', ['Delete', 'Escape', 'c'], () => calc.clear()],
   ['←', 'dark', ['Backspace'], () => calc.deleteDigitOrDot()],
   ['7', 'primary', ['7'], () => calc.addDigit(7)],
   ['8', 'primary', ['8'], () => calc.addDigit(8)],
