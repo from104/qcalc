@@ -62,7 +62,11 @@ onMounted(() => {
 
       <q-card-section class="col-3 q-pa-sm" v-for="(button, index) in buttons" :key="index">
         <q-btn class="text-h6 full-width" :label="button[0]" :color="button[1]" @click="button[3]()"
-          @focusin="($event.target as HTMLInputElement).blur()" />
+          @focusin="($event.target as HTMLInputElement).blur()">
+          <q-tooltip anchor="top middle" self="bottom middle" v-if="button[2].length > 0">
+            Click or {{ button[2].join(' / ') }} key to use
+          </q-tooltip>
+        </q-btn>
       </q-card-section>
     </q-card>
   </q-page>
