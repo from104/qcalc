@@ -16,7 +16,7 @@ type Button = [string, string, string[], () => void][];
 
 const buttons: Button = [
   ['%', 'secondary', ['%', 'p'], () => calc.percent()],
-  ['±', 'secondary', ['Shift+Minus','s'], () => calc.changeSign()],
+  ['±', 'secondary', ['Shift+Minus', 's'], () => calc.changeSign()],
   ['C', 'dark', ['Delete', 'Escape', 'c'], () => calc.clear()],
   ['←', 'dark', ['Backspace'], () => calc.deleteDigitOrDot()],
   ['7', 'primary', ['7'], () => calc.addDigit(7)],
@@ -33,7 +33,7 @@ const buttons: Button = [
   ['-', 'secondary', ['-'], () => calc.minus()],
   ['0', 'primary', ['0'], () => calc.addDigit(0)],
   ['.', 'primary', ['.'], () => calc.addDot()],
-  ['=', 'secondary', ['='], () => calc.equal()],
+  ['=', 'secondary', ['=', 'Enter'], () => calc.equal()],
   ['+', 'secondary', ['+'], () => calc.plus()],
 ];
 
@@ -61,7 +61,8 @@ onMounted(() => {
       </q-card-section>
 
       <q-card-section class="col-3 q-pa-sm" v-for="(button, index) in buttons" :key="index">
-        <q-btn class="text-h6 full-width" :label="button[0]" :color="button[1]" @click="button[3]()" />
+        <q-btn class="text-h6 full-width" :label="button[0]" :color="button[1]" @click="button[3]()"
+          @focusin="($event.target as HTMLInputElement).blur()" />
       </q-card-section>
     </q-card>
   </q-page>
