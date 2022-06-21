@@ -70,11 +70,13 @@ onMounted(() => {
         <q-input v-model="number" type="number" readonly color="primary" input-class="text-right" class="col-12 text-h4"
           outlined>
           <template v-slot:prepend>
-            <q-icon name="content_copy" @click="toCopy()" />
+            <q-btn flat class="q-ma-none q-ma-none" @click="toCopy()">
+              <q-icon name="content_copy" />
+            </q-btn>
           </template>
         </q-input>
       </q-card-section>
-      
+
       <q-card-section class="col-3 q-pa-sm" v-for="(button, index) in buttons" :key="index">
         <q-btn class="text-h6 full-width" :label="button[0]" :color="button[1]" @click="button[3]()"
           @focusin="($event.target as HTMLInputElement).blur()">
