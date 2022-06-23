@@ -7,14 +7,16 @@ import { copyToClipboard, useQuasar } from 'quasar';
 // const calc = reactive(new Calculator());
 const calc = useCalcStore().$state.calc;
 const number = ref(calc.getShownNumber());
+const operator = ref(calc.getOperatorString());
 
 watch(calc, () => {
   number.value = calc.getShownNumber();
+  operator.value = calc.getOperatorString();
 });
 
 const $q = useQuasar();
 
-const toCopy = (): void => {
+const doCopy = (): void => {
   copyToClipboard(number.value)
     .then(() => {
       $q.notify({
@@ -36,6 +38,27 @@ const toCopy = (): void => {
     });
 };
 
+const doPaste = (): void => {
+  navigator.clipboard
+    .readText()
+    .then((text) => {
+      calc.setShownNumber(text);
+      $q.notify({
+        position: 'top',
+        message: 'Pasted from clipboard',
+        type: 'positive',
+        timeout: 2000,
+      });
+    })
+    .catch(() => {
+      $q.notify({
+        position: 'top',
+        message: 'Failed to paste from clipboard',
+        type: 'negative',
+        timeout: 2000,
+      });
+    });
+};
 // 버튼 레이블, 버튼 컬러, 버튼에 해당하는 키, 버튼 클릭 이벤트 핸들러
 type Button = [string, string, string[], () => void][];
 
@@ -80,21 +103,55 @@ onMounted(() => {
 <template>
   <q-page>
     <q-card flat class="row wrap q-pa-md">
-      <q-card-section class="col-12 text-h4 q-pa-sm">
+      <q-card-section class="col-12 row justify-end q-py-none q-px-md">
+        <q-btn class="q-pl-sm" flat v-if="operator" :label="operator" />
+        <q-btn
+          flat
+          icon="content_copy"
+          class="q-ma-none q-pa-none q-pl-xs"
+          @click="doCopy()"
+          @focusin="($event.target as HTMLInputElement).blur()"
+        >
+          <q-tooltip
+            class="text-dark bg-yellow text-body2 fa-border-all"
+            anchor="top middle"
+            self="bottom middle"
+            style="border: 1px solid black"
+            :delay="500"
+          >
+            Click to copy
+          </q-tooltip>
+        </q-btn>
+        <q-btn
+          flat
+          icon="content_paste"
+          class="q-ma-none q-pa-none q-pl-xs q-pr-xs"
+          @click="doPaste()"
+          @focusin="($event.target as HTMLInputElement).blur()"
+        >
+          <q-tooltip
+            class="text-dark bg-yellow text-body2 fa-border-all"
+            anchor="top middle"
+            self="bottom middle"
+            style="border: 1px solid black"
+            :delay="500"
+          >
+            Click to paste
+          </q-tooltip>
+        </q-btn>
+      </q-card-section>
+      <q-card-section class="col-12 q-px-sm q-pt-none q-pb-sm">
         <q-input
           v-model="number"
           type="number"
           readonly
-          color="primary"
-          input-class="text-right"
-          class="col-12 text-h4"
+          class="q-ma-none q-pa-none"
+          input-class="q-pt-none text-right text-h4"
+          input-style="padding-top: 6px; line-height: 1.1"
+          autogrow
           outlined
+          @paste="doPaste()"
         >
-          <template v-slot:prepend>
-            <q-btn flat class="q-ma-none q-ma-none" @click="toCopy()">
-              <q-icon name="content_copy" />
-            </q-btn>
-          </template>
         </q-input>
       </q-card-section>
 
