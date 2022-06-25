@@ -85,6 +85,13 @@ const buttons: Button = [
   ['+', 'secondary', ['+'], () => calc.plus()],
 ];
 
+type Shortcut = [string[], () => void][];
+
+const shortcuts: Shortcut = [
+  [['Control+c', 'Control+Insert', 'Copy'], doCopy],
+  [['Control+v', 'Shift+Insert', 'Paste'], doPaste],
+];
+
 onMounted(() => {
   // Support keyboard entry
   const keyBindingMaps: KeyBindingMap = {};
@@ -95,13 +102,20 @@ onMounted(() => {
       keyBindingMaps[key] = handler;
     });
   });
+  shortcuts.forEach((shortcut) => {
+    const [keys, handler] = shortcut;
+    keys.forEach((key) => {
+      keyBindingMaps[key] = handler;
+    });
+  });
 
-  tinykeys(window, keyBindingMaps);
+  // 키바인딩하고 제거할 수 있는 메서드 백업;
+  useCalcStore().$state.keybindingRemoveFromCalc = tinykeys(window, keyBindingMaps);
 });
 </script>
 
 <template>
-  <q-page>
+  <q-page id="qcalc">
     <q-card flat class="row wrap q-pa-md">
       <q-card-section class="col-12 row justify-end q-py-none q-px-md">
         <q-btn class="q-pl-sm" flat v-if="operator" :label="operator" />
@@ -150,7 +164,6 @@ onMounted(() => {
           input-style="padding-top: 6px; line-height: 1.1"
           autogrow
           outlined
-          @paste="doPaste()"
         >
         </q-input>
       </q-card-section>

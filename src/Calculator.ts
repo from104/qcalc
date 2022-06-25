@@ -196,7 +196,11 @@ export class Calculator {
         // 초기화 예정이고 연산자가 반복이 아니면
         this.repeatNumber = 0; // 반복 숫자 0
       } // 아니면 표시 숫자를 반복 숫자로
-      else this.repeatNumber = Number(this.shownNumber);
+      else {
+        if (this.repeatNumber==0)
+          this.repeatNumber = Number(this.shownNumber);
+          
+      }
 
       this.preCalc(); // 계산
 
@@ -250,6 +254,7 @@ export class Calculator {
       (key) => operatorMap[key] === this.mOperator
     );
   }
+
   // % 버튼 처리
   public percent(): void {
     if (this.mOperator == Operator.Div) {
