@@ -164,8 +164,7 @@ onMounted(() => {
           input-style="padding-top: 6px; line-height: 1.1"
           autogrow
           outlined
-        >
-        </q-input>
+        />
       </q-card-section>
 
       <q-card-section
