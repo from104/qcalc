@@ -1,4 +1,4 @@
-import { app, BrowserWindow, nativeTheme } from 'electron';
+import { app, BrowserWindow, nativeTheme, ipcMain } from 'electron';
 import path from 'path';
 import os from 'os';
 
@@ -50,7 +50,13 @@ function createWindow() {
   });
 }
 
-app.whenReady().then(createWindow);
+app.whenReady().then(() => {
+  createWindow();
+  ipcMain.on('toggle-always-on-top', (_event, res) => {
+    mainWindow.setAlwaysOnTop(res);
+    // console.log('ipcMain: ' + res);
+  });
+});
 
 app.on('window-all-closed', () => {
   if (platform !== 'darwin') {

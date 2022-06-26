@@ -15,3 +15,11 @@
  *     doAThing: () => {}
  *   })
  */
+import { contextBridge, ipcRenderer } from 'electron';
+
+contextBridge.exposeInMainWorld('myAPI', {
+  setAlwaysOnTop: (arg) => {
+    ipcRenderer.send('toggle-always-on-top', arg);
+    // console.log('preload: ' + arg);
+  },
+});
