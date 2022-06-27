@@ -3216,47 +3216,10 @@ pinia-plugin-persistedstate@^1.6.1:
   resolved "https://registry.yarnpkg.com/pinia-plugin-persistedstate/-/pinia-plugin-persistedstate-1.6.1.tgz#0faca66e2c7b8ba8c3813dbf8fb3f7743b6fa951"
   integrity sha512-4re0ZO5KgqDnSNWX2RhJVIsIYvH+uaEGTN+UOx34mb7fVoE8A3CfB9QhbMT3Zn7ZSBXTfT2cgI/w7cLq2zNQMw==
 
-<<<<<<< HEAD
-"pend@~1.2.0":
-  "integrity" "sha512-F3asv42UuXchdzt+xXqfW1OGlVBe+mxa2mqI0pg5yAHZPvFmY3Y6drSf/GQ1A86WgWEN9Kzh/WrgKa6iGcHXLg=="
-  "resolved" "https://registry.npmjs.org/pend/-/pend-1.2.0.tgz"
-  "version" "1.2.0"
-
-"picocolors@^1.0.0":
-  "integrity" "sha512-1fygroTLlHu66zi26VoTDv8yRgm0Fccecssto+MhsZ0D/DGW2sm8E8AjW7NU5VVTRt5GxbeZ5qBuJr+HyLYkjQ=="
-  "resolved" "https://registry.npmjs.org/picocolors/-/picocolors-1.0.0.tgz"
-  "version" "1.0.0"
-
-"picomatch@^2.0.4", "picomatch@^2.2.1", "picomatch@^2.2.2", "picomatch@^2.3.1":
-  "integrity" "sha512-JU3teHTNjmE2VCGFzuY8EXzCDVwEqB2a8fsIvwaStHhAWJEeVd1o1QD80CU6+ZdEXXSLbSsuLwJjkCBWqRQUVA=="
-  "resolved" "https://registry.npmjs.org/picomatch/-/picomatch-2.3.1.tgz"
-  "version" "2.3.1"
-
-"pify@^2.0.0":
-  "integrity" "sha512-udgsAY+fTnvv7kI7aaxbqwWNb0AHiB0qBO89PZKPkoTmGOgdbrHDKD+0B2X4uTfJ/FT1R09r9gTsjUjNJotuog=="
-  "resolved" "https://registry.npmjs.org/pify/-/pify-2.3.0.tgz"
-  "version" "2.3.0"
-
-"pify@^3.0.0":
-  "integrity" "sha512-C3FsVNH1udSEX48gGX1xfvwTWfsYWj5U+8/uK15BGzIGrKoUpghX8hWZwa/OFnakBiiVNmBvemTJR5mcy7iPcg=="
-  "resolved" "https://registry.npmjs.org/pify/-/pify-3.0.0.tgz"
-  "version" "3.0.0"
-
-"pinia-plugin-persistedstate@^1.6.1":
-  "integrity" "sha512-4re0ZO5KgqDnSNWX2RhJVIsIYvH+uaEGTN+UOx34mb7fVoE8A3CfB9QhbMT3Zn7ZSBXTfT2cgI/w7cLq2zNQMw=="
-  "resolved" "https://registry.npmjs.org/pinia-plugin-persistedstate/-/pinia-plugin-persistedstate-1.6.1.tgz"
-  "version" "1.6.1"
-
-"pinia@^2.0.0", "pinia@^2.0.11":
-  "integrity" "sha512-0nPuZR4TetT/WcLN+feMSjWJku3SQU7dBbXC6uw+R6FLQJCsg+/0pzXyD82T1FmAYe0lsx+jnEDQ1BLgkRKlxA=="
-  "resolved" "https://registry.npmjs.org/pinia/-/pinia-2.0.14.tgz"
-  "version" "2.0.14"
-=======
 pinia@^2.0.11:
   version "2.0.14"
   resolved "https://registry.yarnpkg.com/pinia/-/pinia-2.0.14.tgz#0837898c20291ebac982bbfca95c8d3c6099925f"
   integrity sha512-0nPuZR4TetT/WcLN+feMSjWJku3SQU7dBbXC6uw+R6FLQJCsg+/0pzXyD82T1FmAYe0lsx+jnEDQ1BLgkRKlxA==
->>>>>>> b79fa3fc05d6662a4af7038a8a0b18b49eca9000
   dependencies:
     "@vue/devtools-api" "^6.1.4"
     vue-demi "*"
