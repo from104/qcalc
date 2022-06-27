@@ -2779,7 +2779,12 @@
   "resolved" "https://registry.npmjs.org/pify/-/pify-3.0.0.tgz"
   "version" "3.0.0"
 
-"pinia@^2.0.11":
+"pinia-plugin-persistedstate@^1.6.1":
+  "integrity" "sha512-4re0ZO5KgqDnSNWX2RhJVIsIYvH+uaEGTN+UOx34mb7fVoE8A3CfB9QhbMT3Zn7ZSBXTfT2cgI/w7cLq2zNQMw=="
+  "resolved" "https://registry.npmjs.org/pinia-plugin-persistedstate/-/pinia-plugin-persistedstate-1.6.1.tgz"
+  "version" "1.6.1"
+
+"pinia@^2.0.0", "pinia@^2.0.11":
   "integrity" "sha512-0nPuZR4TetT/WcLN+feMSjWJku3SQU7dBbXC6uw+R6FLQJCsg+/0pzXyD82T1FmAYe0lsx+jnEDQ1BLgkRKlxA=="
   "resolved" "https://registry.npmjs.org/pinia/-/pinia-2.0.14.tgz"
   "version" "2.0.14"
