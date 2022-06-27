@@ -39,13 +39,13 @@ npm install -g yarn
 yarn install
 ```
 
-## 개발 모드로 실행하기 (실시간 리로딩, 에러 체크 등)
+### 개발 모드로 실행하기 (실시간 리로딩, 에러 체크 등)
 
 ```bash
 quasar dev -m electron
 ```
 
-## 설치 패키지 빌드 [윈도우]
+### 설치 패키지 빌드 [윈도우]
 
 ```bash
 quasar build -m electron [-T win32]
