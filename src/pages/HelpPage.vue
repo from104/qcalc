@@ -1,15 +1,37 @@
 <script setup lang="ts">
+import { onMounted } from 'vue';
+import { useCalcStore } from 'src/stores/calc-store';
 
-const title = 'Help for Calc';
+const title = 'Help for QCalc';
 const author = 'Seo Kihyun';
 const content = `
-Here's a quick tip.
-You can use basic arithmetic operations.
-If you press the '+-*/' buttons consecutively, the calculation is repeated.
-The '%' button calculates the percentage.
-(Example: Pressing 2 / 10 % in sequence gives 20.)
-`.trim().replace(/\n/g, '<br>');
+This is a simple calculator made using the source of the calculator
+for Android that I made as a graduation assignment in the past.
+You can do arithmetic and percentage calculations.
+If you press the arithmetic operation button (key) successively,
+it repeats the calculation with the last number.
+All input can be done with mouse and keyboard.
+You can also copy and paste.
 
+# Shortcuts
+
+[0-9\.]: numbers and dots
++, -, *, /: addition, subtraction, multiplication, division respectively
+Enter, =: output the last calculation result
+s, _: change sign
+p, %: Calculate percentage (enter in the following order: number, /, number, p (or %))
+Backspace: Erase each character
+Escape, Delete, c: Reset the calculator
+
+Control-c, Control-Insert: copy result to clipboard
+Control-v, Shift-Insert: Paste from clipboard into app`
+  .trim()
+  .replace(/\n/g, '<br>');
+
+// 계산기 키바인딩 제거
+onMounted(() => {
+  useCalcStore().$state.keybindingRemoveFromCalc();
+});
 </script>
 
 <template>

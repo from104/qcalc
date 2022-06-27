@@ -107,7 +107,7 @@ module.exports = configure(function( /* ctx */ ) {
             // directives: [],
 
             // Quasar plugins
-            plugins: []
+            plugins: ['Notify']
         },
 
         // animations: 'all', // --- includes all animations
@@ -177,7 +177,7 @@ module.exports = configure(function( /* ctx */ ) {
 
             inspectPort: 5858,
 
-            bundler: 'packager', // 'packager' or 'builder'
+            bundler: 'builder', // 'packager' or 'builder'
 
             packager: {
                 // https://github.com/electron-userland/electron-packager/blob/master/docs/api.md#options

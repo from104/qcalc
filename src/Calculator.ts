@@ -1,4 +1,19 @@
-enum Operator { None, Plus, Minus, Mul, Div }
+enum Operator {
+  None,
+  Plus,
+  Minus,
+  Mul,
+  Div,
+}
+
+// 연산자와 문자열을 매핑하는 객체
+const operatorMap: { [key: string]: Operator } = {
+  '': Operator.None,
+  '+': Operator.Plus,
+  '-': Operator.Minus,
+  '×': Operator.Mul,
+  '÷': Operator.Div,
+};
 
 export class Calculator {
   // 연산자가 눌렸을 때 임시로 숫자를 저장
@@ -26,6 +41,30 @@ export class Calculator {
     this.repeatNumber = 0;
     this.shownNumber = '0';
     this.mOperator = Operator.None;
+  }
+
+  // 문자열에서 숫자 문자열만 추출
+  private getNumberString(s: string): string {
+    let r = '';
+    let doIncDot = false;
+
+    for (let i = 0; i < s.length; i++) {
+      if (s[i] >= '0' && s[i] <= '9') {
+        r += s[i];
+      } else if (s[i] == '.' && !doIncDot) {
+        r += s[i];
+        doIncDot = true;
+      }
+    }
+    r = r.trim();
+    return r.length == 0 || r == '.' ? '0' : r;
+  }
+
+  // shownNumber를 문자열로 셋팅
+  public setShownNumber(s: string): void {
+    this.shownNumber = this.getNumberString(
+      s.substring(0, s.length < 53 ? s.length : 53)
+    );
   }
 
   // 표시 숫자 얻기
@@ -157,7 +196,11 @@ export class Calculator {
         // 초기화 예정이고 연산자가 반복이 아니면
         this.repeatNumber = 0; // 반복 숫자 0
       } // 아니면 표시 숫자를 반복 숫자로
-      else this.repeatNumber = Number(this.shownNumber);
+      else {
+        if (this.repeatNumber==0)
+          this.repeatNumber = Number(this.shownNumber);
+          
+      }
 
       this.preCalc(); // 계산
 
@@ -203,6 +246,13 @@ export class Calculator {
       this.mOperator = Operator.None; // 연산자 리셋
     }
     this.willReset = true; // 숫자 입력 초기화 예정
+  }
+
+  // 연산자 문자열로 얻기
+  public getOperatorString(): string | undefined {
+    return Object.keys(operatorMap).find(
+      (key) => operatorMap[key] === this.mOperator
+    );
   }
 
   // % 버튼 처리
