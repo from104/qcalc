@@ -1,6 +1,6 @@
 {
   "name": "qcalc",
-  "version": "0.0.6",
+  "version": "0.0.7",
   "description": "com.electron.qcalc",
   "productName": "Simple Calculator",
   "author": "Seo Kihyun <from104@gmail.com>",
@@ -27,7 +27,6 @@
     "@typescript-eslint/parser": "^5.10.0",
     "autoprefixer": "^10.4.2",
     "electron": "^19.0.6",
-    "electron-builder": "^22.4.0",
     "eslint": "^8.10.0",
     "eslint-config-prettier": "^8.1.0",
     "eslint-plugin-vue": "^8.5.0",
