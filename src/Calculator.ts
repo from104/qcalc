@@ -44,26 +44,27 @@ export class Calculator {
   }
 
   // 문자열에서 숫자 문자열만 추출
-  private getNumberString(s: string): string {
-    let r = '';
-    let doIncDot = false;
+  private getNumberString(originalString: string): string {
+    let onlyNumber = originalString.replace(/[^0-9.\-]/gm, ''); // 숫자, 부호, 소수점 남기고 제거
+    const isMinus = onlyNumber.match(/^-/); // 부호 체크
 
-    for (let i = 0; i < s.length; i++) {
-      if (s[i] >= '0' && s[i] <= '9') {
-        r += s[i];
-      } else if (s[i] == '.' && !doIncDot) {
-        r += s[i];
-        doIncDot = true;
-      }
+    onlyNumber = onlyNumber.replace(/-/g, ''); // 부호 제거
+
+    const splitedNumberByDot = onlyNumber.split('.'); // 소수점으로 나누기
+    let result = splitedNumberByDot.shift(); // 첫번째 숫자만 추출
+    if (splitedNumberByDot.length > 0) {
+      // 소수점이 있으면
+      result += '.' + splitedNumberByDot.join(''); // 소수점 추가
     }
-    r = r.trim();
-    return r.length == 0 || r == '.' ? '0' : r;
+    return Number(
+      (isMinus ? '-' : '') + (result == '' ? '0' : result)
+    ).toString(); // 부호와 숫자만 리턴
   }
 
   // shownNumber를 문자열로 셋팅
   public setShownNumber(s: string): void {
     this.shownNumber = this.getNumberString(
-      s.substring(0, s.length < 53 ? s.length : 53)
+      s.substring(0, s.length < 53 ? s.length : 53) // 최대 표시 숫자 갯수는 53
     );
   }
 
@@ -74,7 +75,7 @@ export class Calculator {
 
   // 숫자 1개씩 추가
   public addDigit(digit: number | string): void {
-    if (typeof digit === 'string') {
+    if (typeof digit === 'string') { 
       try {
         digit = Number.parseInt(digit.charAt(0)); // 첫번째 숫자만 정수로 변환후 추가
       } catch (e: unknown) {
@@ -197,9 +198,8 @@ export class Calculator {
         this.repeatNumber = 0; // 반복 숫자 0
       } // 아니면 표시 숫자를 반복 숫자로
       else {
-        if (this.repeatNumber==0)
+        if (this.repeatNumber == 0)
           this.repeatNumber = Number(this.shownNumber);
-          
       }
 
       this.preCalc(); // 계산
