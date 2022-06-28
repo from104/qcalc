@@ -12,6 +12,7 @@ If you press the arithmetic operation button (key) successively,
 it repeats the calculation with the last number.
 All input can be done with mouse and keyboard.
 You can also copy and paste.
+You can make the window always on top with the toggle switch on the top right.
 
 # Shortcuts
 

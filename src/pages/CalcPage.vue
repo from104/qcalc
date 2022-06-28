@@ -119,74 +119,32 @@ onMounted(() => {
     <q-card flat class="row wrap q-pa-md">
       <q-card-section class="col-12 row justify-end q-py-none q-px-md">
         <q-btn class="q-pl-sm" flat v-if="operator" :label="operator" />
-        <q-btn
-          flat
-          icon="content_copy"
-          class="q-ma-none q-pa-none q-pl-xs"
-          @click="doCopy()"
-          @focusin="($event.target as HTMLInputElement).blur()"
-        >
-          <q-tooltip
-            class="text-dark bg-yellow text-body2 fa-border-all"
-            anchor="top middle"
-            self="bottom middle"
-            style="border: 1px solid black"
-            :delay="500"
-          >
+        <q-btn flat icon="content_copy" class="q-ma-none q-pa-none q-pl-xs" @click="doCopy()"
+          @focusin="($event.target as HTMLInputElement).blur()">
+          <q-tooltip class="text-dark bg-yellow text-body2 fa-border-all" anchor="top middle" self="bottom middle"
+            style="border: 1px solid black" :delay="500">
             Click to copy
           </q-tooltip>
         </q-btn>
-        <q-btn
-          flat
-          icon="content_paste"
-          class="q-ma-none q-pa-none q-pl-xs q-pr-xs"
-          @click="doPaste()"
-          @focusin="($event.target as HTMLInputElement).blur()"
-        >
-          <q-tooltip
-            class="text-dark bg-yellow text-body2 fa-border-all"
-            anchor="top middle"
-            self="bottom middle"
-            style="border: 1px solid black"
-            :delay="500"
-          >
+        <q-btn flat icon="content_paste" class="q-ma-none q-pa-none q-pl-xs q-pr-xs" @click="doPaste()"
+          @focusin="($event.target as HTMLInputElement).blur()">
+          <q-tooltip class="text-dark bg-yellow text-body2 fa-border-all" anchor="top middle" self="bottom middle"
+            style="border: 1px solid black" :delay="500">
             Click to paste
           </q-tooltip>
         </q-btn>
       </q-card-section>
       <q-card-section class="col-12 q-px-sm q-pt-none q-pb-sm">
-        <q-input
-          v-model="number"
-          type="number"
-          readonly
-          class="q-ma-none q-pa-none"
-          input-class="q-pt-none text-right text-h4"
-          input-style="padding-top: 6px; line-height: 1.1"
-          autogrow
-          outlined
-        />
+        <q-input v-model="number" type="number" readonly class="q-ma-none q-pa-none"
+          input-class="q-pt-none text-right text-h4" input-style="padding-top: 6px; line-height: 1.1" autogrow
+          outlined />
       </q-card-section>
 
-      <q-card-section
-        class="col-3 q-pa-sm"
-        v-for="(button, index) in buttons"
-        :key="index"
-      >
-        <q-btn
-          class="text-h6 full-width"
-          :label="button[0]"
-          :color="button[1]"
-          @click="button[3]()"
-          @focusin="($event.target as HTMLInputElement).blur()"
-        >
-          <q-tooltip
-            class="text-dark bg-yellow text-body2 fa-border-all"
-            anchor="top middle"
-            self="bottom middle"
-            style="border: 1px solid black"
-            :delay="500"
-            v-if="button[2].length > 0"
-          >
+      <q-card-section class="col-3 q-pa-sm" v-for="(button, index) in buttons" :key="index">
+        <q-btn class="text-h6 full-width" :label="button[0]" :color="button[1]" @click="button[3]()"
+          @focusin="($event.target as HTMLInputElement).blur()">
+          <q-tooltip class="text-dark bg-yellow text-body2 fa-border-all" anchor="top middle" self="bottom middle"
+            style="border: 1px solid black" :delay="500" v-if="button[2].length > 0">
             {{ button[2].join(', ') }} key to use
           </q-tooltip>
         </q-btn>
