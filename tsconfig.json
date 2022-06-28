@@ -2,6 +2,7 @@
   "extends": "@quasar/app-vite/tsconfig-preset",
   "compilerOptions": {
     "esModuleInterop": true,
+    "moduleResolution": "node",
     "baseUrl": ".",
     "paths": {
       "src/*": ["src/*"],
@@ -23,5 +24,9 @@
     "src-pwa/*.d.ts",
     "src-bex/*.d.ts",
     "src-ssr/*.d.ts"
-  ]
+  ],
+  "exclude": ["node_modules"],
+  "ts-node": {
+    "esm": true
+  }
 }
