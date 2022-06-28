@@ -48,15 +48,16 @@ onMounted(() => {
   <q-layout view="lHh Lpr lFf">
     <q-header elevated>
       <q-toolbar>
-        <q-btn flat dense round icon="menu" aria-label="Menu" @click="toggleLeftDrawer" />
+        <q-btn flat dense round icon="menu" aria-label="Menu" @click="toggleLeftDrawer"
+          @focusin="($event.target as HTMLInputElement).blur()" />
 
-        <q-toolbar-title> Simple Calc </q-toolbar-title>
+        <q-toolbar-title> Simple Calculator </q-toolbar-title>
 
         <!-- <div>Quasar v{{ $q.version }}</div> -->
         <!-- <div>{{ $q.screen.width+"x"+$q.screen.height }}</div> -->
-        <!-- -->
         <q-toggle v-model="alwaysOnTop" label="on top" left-label keep-color color="info"
-          :disable="!$q.platform.is.desktop" @click="toggleAlwaysOnTop()" />
+          :disable="!$q.platform.is.desktop" @click="toggleAlwaysOnTop()"
+          @focusin="($event.target as HTMLInputElement).blur()" />
       </q-toolbar>
 
     </q-header>
@@ -64,7 +65,6 @@ onMounted(() => {
     <q-drawer v-model="leftDrawerOpen" show-if-above bordered>
       <q-list>
         <q-item-label header> Essential Links </q-item-label>
-
         <PathRoute v-for="path in paths" :key="path.title" v-bind="path" />
       </q-list>
     </q-drawer>
@@ -72,8 +72,5 @@ onMounted(() => {
     <q-page-container>
       <router-view />
     </q-page-container>
-
   </q-layout>
-
 </template>
-
