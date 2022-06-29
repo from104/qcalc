@@ -66,6 +66,7 @@ export class Calculator {
     this.shownNumber = this.getNumberString(
       s.substring(0, s.length < 53 ? s.length : 53) // 최대 표시 숫자 갯수는 53
     );
+    this.willReset = false; // 초기화 예정 끄기
   }
 
   // 표시 숫자 얻기
@@ -75,7 +76,7 @@ export class Calculator {
 
   // 숫자 1개씩 추가
   public addDigit(digit: number | string): void {
-    if (typeof digit === 'string') { 
+    if (typeof digit === 'string') {
       try {
         digit = Number.parseInt(digit.charAt(0)); // 첫번째 숫자만 정수로 변환후 추가
       } catch (e: unknown) {
