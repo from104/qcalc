@@ -1,7 +1,10 @@
 <script setup lang="ts">
 import { onMounted, ref } from 'vue';
+import { useQuasar } from 'quasar';
 import { useCalcStore } from 'src/stores/calc-store';
 import PathRoute from 'components/PathRoute.vue';
+
+const $q = useQuasar();
 
 const paths = [
   { title: 'Calculator', caption: 'Simple calculator', icon: 'calculate', path: '/', },
@@ -17,13 +20,16 @@ const toggleLeftDrawer = () => {
 }
 
 const toggleAlwaysOnTop = () => {
-  useCalcStore().$state.alwaysOnTop = alwaysOnTop.value;
-  window.myAPI.setAlwaysOnTop(alwaysOnTop.value);
-  // console.log('alwaysOnTop: ' + alwaysOnTop.value);
+  if ($q.platform.is.electron) {
+    useCalcStore().$state.alwaysOnTop = alwaysOnTop.value;
+    window.myAPI.setAlwaysOnTop(alwaysOnTop.value);
+  }
 }
 
 onMounted(() => {
-  window.myAPI.setAlwaysOnTop(useCalcStore().$state.alwaysOnTop);
+  if ($q.platform.is.electron) {
+    window.myAPI.setAlwaysOnTop(useCalcStore().$state.alwaysOnTop);
+  };
 });
 </script>
 
@@ -37,7 +43,7 @@ onMounted(() => {
         <!-- <div>Quasar v{{ $q.version }}</div> -->
         <!-- <div>{{ $q.screen.width+"x"+$q.screen.height }}</div> -->
         <q-toggle v-model="alwaysOnTop" label="on top" left-label keep-color color="info"
-          :disable="!$q.platform.is.desktop" @click="toggleAlwaysOnTop()"
+          :disable="!$q.platform.is.electron" @click="toggleAlwaysOnTop()"
           @focusin="($event.target as HTMLInputElement).blur()" />
       </q-toolbar>
     </q-header>
