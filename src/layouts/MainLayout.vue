@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { onMounted, ref } from 'vue';
 import { useQuasar } from 'quasar';
+import tinykeys from 'tinykeys';
 import { useCalcStore } from 'src/stores/calc-store';
 import PathRoute from 'components/PathRoute.vue';
 
@@ -19,8 +20,11 @@ const toggleLeftDrawer = () => {
   leftDrawerOpen.value = !leftDrawerOpen.value;
 }
 
-const toggleAlwaysOnTop = () => {
+const toggleAlwaysOnTop = (byManual = false) => {
   if ($q.platform.is.electron) {
+    if (byManual) { // 수동으로 토글
+      alwaysOnTop.value = !alwaysOnTop.value;
+    }
     useCalcStore().$state.alwaysOnTop = alwaysOnTop.value;
     window.myAPI.setAlwaysOnTop(alwaysOnTop.value);
   }
@@ -30,6 +34,11 @@ onMounted(() => {
   if ($q.platform.is.electron) {
     window.myAPI.setAlwaysOnTop(useCalcStore().$state.alwaysOnTop);
   };
+  tinykeys(window, {
+    't': () => {
+      toggleAlwaysOnTop(true); // 수동으로 토글
+    }
+  });
 });
 </script>
 

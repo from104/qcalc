@@ -12,7 +12,7 @@ If you press the arithmetic operation button (key) successively,
 it repeats the calculation with the last number.
 All input can be done with mouse and keyboard.
 You can also copy and paste.
-You can make the window always on top with the toggle switch on the top right.
+You can make the window always on top with the toggle switch on the top right or keyboard.
 
 # Shortcuts
 
@@ -23,6 +23,7 @@ s, _: change sign
 p, %: Calculate percentage (enter in the following order: number, /, number, p (or %))
 Backspace: Erase each character
 Escape, Delete, c: Reset the calculator
+t: Toggle the window always on top
 
 Control-c, Control-Insert: copy result to clipboard
 Control-v, Shift-Insert: Paste from clipboard into app`
