@@ -1,17 +1,50 @@
 <script setup lang="ts">
 import { useCalcStore } from 'src/stores/calc-store';
-import { onMounted, ref, watch } from 'vue';
+import MyTooltip from 'components/MyTooltip.vue';
+import { onMounted, reactive, ref, watch } from 'vue';
 import tinykeys, { KeyBindingMap } from 'tinykeys';
 import { copyToClipboard, useQuasar } from 'quasar';
 
+const locale = navigator.language
+
 // const calc = reactive(new Calculator());
 const calc = useCalcStore().$state.calc;
-const number = ref(calc.getShownNumber());
+
+const localeOptions: Intl.NumberFormatOptions = reactive({
+  style: 'decimal',
+  useGrouping: false,
+  minimumFractionDigits: 0,
+  maximumFractionDigits: 20,
+})
+
+const fixedPointFormat = ref(0);
+
+const setFixedPointFormat = () => {
+  if (fixedPointFormat.value === 0) {
+    localeOptions.minimumFractionDigits = 0;
+    localeOptions.maximumFractionDigits = 20;
+  } else {
+    localeOptions.minimumFractionDigits = fixedPointFormat.value;
+    localeOptions.maximumFractionDigits = fixedPointFormat.value;
+  }
+}
+const getDisplayNumber = () => {
+  return Number(calc.getShownNumber()).toLocaleString(locale, localeOptions);
+}
+
+const number = ref(getDisplayNumber());
 const operator = ref(calc.getOperatorString());
 
+const setDisplayNumber = () => {
+  number.value = getDisplayNumber();
+}
+
 watch(calc, () => {
-  number.value = calc.getShownNumber();
+  setDisplayNumber();
   operator.value = calc.getOperatorString();
+});
+watch(localeOptions, () => {
+  setDisplayNumber();
 });
 
 const $q = useQuasar();
@@ -59,6 +92,7 @@ const doPaste = (): void => {
       });
     });
 };
+
 // 버튼 레이블, 버튼 컬러, 버튼에 해당하는 키, 버튼 클릭 이벤트 핸들러
 type Button = [string, string, string[], () => void][];
 
@@ -117,21 +151,28 @@ onMounted(() => {
 <template>
   <q-page id="qcalc">
     <q-card flat class="row wrap q-pa-md">
-      <q-card-section class="col-12 row justify-end q-py-none q-px-md">
+      <q-card-section class="col-2 row justify-start q-py-none q-px-sm">
+        <q-checkbox v-model="localeOptions.useGrouping" checked-icon="mdi-comma-circle"
+          unchecked-icon="mdi-comma-circle-outline" @focusin="($event.target as HTMLInputElement).blur()">
+          <my-tooltip>use grouping</my-tooltip>
+        </q-checkbox>
+      </q-card-section>
+
+      <q-card-section class="col-3 row justify-start q-py-none q-px-sm">
+        <my-tooltip>select fixed point format</my-tooltip>
+        <q-slider v-model="fixedPointFormat" :min="0" :step="2" :max="6" marker-labels @change='setFixedPointFormat'
+          @focusin="($event.target as HTMLInputElement).blur()" />
+      </q-card-section>
+
+      <q-card-section class="col-7 row justify-end q-py-none q-px-sm">
         <q-btn class="q-pl-sm" flat v-if="operator" :label="operator" />
         <q-btn flat icon="content_copy" class="q-ma-none q-pa-none q-pl-xs" @click="doCopy()"
           @focusin="($event.target as HTMLInputElement).blur()">
-          <q-tooltip class="text-dark bg-yellow text-body2 fa-border-all" anchor="top middle" self="bottom middle"
-            style="border: 1px solid black" :delay="500">
-            Click to copy
-          </q-tooltip>
+          <my-tooltip>Click to copy</my-tooltip>
         </q-btn>
         <q-btn flat icon="content_paste" class="q-ma-none q-pa-none q-pl-xs q-pr-xs" @click="doPaste()"
           @focusin="($event.target as HTMLInputElement).blur()">
-          <q-tooltip class="text-dark bg-yellow text-body2 fa-border-all" anchor="top middle" self="bottom middle"
-            style="border: 1px solid black" :delay="500">
-            Click to paste
-          </q-tooltip>
+          <my-tooltip>Click to paste</my-tooltip>
         </q-btn>
       </q-card-section>
       <q-card-section class="col-12 q-px-sm q-pt-none q-pb-sm">
@@ -143,10 +184,9 @@ onMounted(() => {
       <q-card-section class="col-3 q-pa-sm" v-for="(button, index) in buttons" :key="index">
         <q-btn class="text-h6 full-width" :label="button[0]" :color="button[1]" @click="button[3]()"
           @focusin="($event.target as HTMLInputElement).blur()">
-          <q-tooltip class="text-dark bg-yellow text-body2 fa-border-all" anchor="top middle" self="bottom middle"
-            style="border: 1px solid black" :delay="500" v-if="button[2].length > 0">
+          <my-tooltip v-if="button[2].length > 0">
             {{ button[2].join(', ') }} key to use
-          </q-tooltip>
+          </my-tooltip>
         </q-btn>
       </q-card-section>
     </q-card>
