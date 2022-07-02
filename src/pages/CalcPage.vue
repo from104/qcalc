@@ -19,7 +19,13 @@ const localeOptions: Intl.NumberFormatOptions = reactive({
 
 const fixedPointFormat = ref(0);
 
-const setFixedPointFormat = () => {
+const setFixedPointFormat = (fixedPointDecEdit=0) => {
+  if (fixedPointDecEdit != 0) {
+    fixedPointFormat.value = fixedPointDecEdit < 0 ?
+      Math.max(0, fixedPointFormat.value + fixedPointDecEdit) :
+      Math.min(fixedPointFormat.value + fixedPointDecEdit, 6);
+  }
+
   if (fixedPointFormat.value === 0) {
     localeOptions.minimumFractionDigits = 0;
     localeOptions.maximumFractionDigits = 20;
@@ -28,6 +34,7 @@ const setFixedPointFormat = () => {
     localeOptions.maximumFractionDigits = fixedPointFormat.value;
   }
 }
+
 const getDisplayNumber = () => {
   return Number(calc.getShownNumber()).toLocaleString(locale, localeOptions);
 }
@@ -124,6 +131,9 @@ type Shortcut = [string[], () => void][];
 const shortcuts: Shortcut = [
   [['Control+c', 'Control+Insert', 'Copy'], doCopy],
   [['Control+v', 'Shift+Insert', 'Paste'], doPaste],
+  [[','], () => localeOptions.useGrouping = !localeOptions.useGrouping],
+  [['['], () => setFixedPointFormat(-2)],
+  [[']'], () => setFixedPointFormat(2)],
 ];
 
 onMounted(() => {
