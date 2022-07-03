@@ -12,14 +12,14 @@ const calc = useCalcStore().$state.calc;
 
 const localeOptions: Intl.NumberFormatOptions = reactive({
   style: 'decimal',
-  useGrouping: false,
+  useGrouping: true,
   minimumFractionDigits: 0,
   maximumFractionDigits: 20,
 })
 
 const fixedPointFormat = ref(0);
 
-const setFixedPointFormat = (fixedPointDecEdit=0) => {
+const setFixedPointFormat = (fixedPointDecEdit = 0) => {
   if (fixedPointDecEdit != 0) {
     fixedPointFormat.value = fixedPointDecEdit < 0 ?
       Math.max(0, fixedPointFormat.value + fixedPointDecEdit) :
@@ -61,7 +61,7 @@ const doCopy = (): void => {
     .then(() => {
       $q.notify({
         position: 'top',
-        message: 'Copied to clipboard',
+        message: '결과를 클립보드에 복사했습니다.',
         type: 'positive',
         timeout: 2000,
       });
@@ -70,7 +70,7 @@ const doCopy = (): void => {
     .catch(() => {
       $q.notify({
         position: 'top',
-        message: 'Failed to copy to clipboard',
+        message: '결과를 클립보드에 복사하지 못했습니다.',
         type: 'negative',
         timeout: 2000,
       });
@@ -85,7 +85,7 @@ const doPaste = (): void => {
       calc.setShownNumber(text);
       $q.notify({
         position: 'top',
-        message: 'Pasted from clipboard',
+        message: '클립보드로부터 숫자를 붙여넣었습니다.',
         type: 'positive',
         timeout: 2000,
       });
@@ -93,7 +93,7 @@ const doPaste = (): void => {
     .catch(() => {
       $q.notify({
         position: 'top',
-        message: 'Failed to paste from clipboard',
+        message: '클립보드로부터 숫자를 붙여넣지 못했습니다.',
         type: 'negative',
         timeout: 2000,
       });
@@ -161,28 +161,30 @@ onMounted(() => {
 <template>
   <q-page id="qcalc">
     <q-card flat class="row wrap q-pa-md">
-      <q-card-section class="col-2 row justify-start q-py-none q-px-sm">
-        <q-checkbox v-model="localeOptions.useGrouping" checked-icon="mdi-comma-circle"
+      <q-card-section class="col-2 row justify-start q-py-none q-px-xs">
+        <q-checkbox v-model="localeOptions.useGrouping" checked-icon="mdi-comma-circle" size="xl"
           unchecked-icon="mdi-comma-circle-outline" @focusin="($event.target as HTMLInputElement).blur()">
-          <my-tooltip>use grouping</my-tooltip>
+          <my-tooltip>천 단위 구분</my-tooltip>
         </q-checkbox>
       </q-card-section>
 
       <q-card-section class="col-3 row justify-start q-py-none q-px-sm">
-        <my-tooltip>select fixed point format</my-tooltip>
+        <my-tooltip>소수점 고정값 선택</my-tooltip>
         <q-slider v-model="fixedPointFormat" :min="0" :step="2" :max="6" marker-labels @change='setFixedPointFormat'
           @focusin="($event.target as HTMLInputElement).blur()" />
       </q-card-section>
 
       <q-card-section class="col-7 row justify-end q-py-none q-px-sm">
-        <q-btn class="q-pl-sm" flat v-if="operator" :label="operator" />
-        <q-btn flat icon="content_copy" class="q-ma-none q-pa-none q-pl-xs" @click="doCopy()"
-          @focusin="($event.target as HTMLInputElement).blur()">
-          <my-tooltip>Click to copy</my-tooltip>
+        <q-btn class="q-pl-sm" flat v-if="operator" :label="operator">
+          <my-tooltip>현재 연산자</my-tooltip>
         </q-btn>
-        <q-btn flat icon="content_paste" class="q-ma-none q-pa-none q-pl-xs q-pr-xs" @click="doPaste()"
+        <q-btn flat icon="content_copy" class="q-ma-none q-pa-none q-pl-xs" @click="doCopy"
           @focusin="($event.target as HTMLInputElement).blur()">
-          <my-tooltip>Click to paste</my-tooltip>
+          <my-tooltip>클릭하면 결과가 복사됩니다.</my-tooltip>
+        </q-btn>
+        <q-btn flat icon="content_paste" class="q-ma-none q-pa-none q-pl-xs q-pr-xs" @click="doPaste"
+          @focusin="($event.target as HTMLInputElement).blur()">
+          <my-tooltip>클릭하면 숫자를 붙혀넣습니다.</my-tooltip>
         </q-btn>
       </q-card-section>
       <q-card-section class="col-12 q-px-sm q-pt-none q-pb-sm">
@@ -192,10 +194,10 @@ onMounted(() => {
       </q-card-section>
 
       <q-card-section class="col-3 q-pa-sm" v-for="(button, index) in buttons" :key="index">
-        <q-btn class="text-h6 full-width" :label="button[0]" :color="button[1]" @click="button[3]()"
+        <q-btn class="text-h6 full-width" :label="button[0]" :color="button[1]" @click="button[3]"
           @focusin="($event.target as HTMLInputElement).blur()">
           <my-tooltip v-if="button[2].length > 0">
-            {{ button[2].join(', ') }} key to use
+            {{ button[2].join(', ') }} 키
           </my-tooltip>
         </q-btn>
       </q-card-section>
