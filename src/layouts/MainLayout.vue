@@ -8,9 +8,9 @@ import PathRoute from 'components/PathRoute.vue';
 const $q = useQuasar();
 
 const paths = [
-  { title: 'Calculator', caption: 'Simple calculator', icon: 'calculate', path: '/', },
-  { title: 'Help', caption: 'How to use', icon: 'help', path: '/help', },
-  { title: 'About', caption: 'About this app', icon: 'info', path: '/about', },
+  { title: '계산기', caption: '간단한 계산기', icon: 'calculate', path: '/', },
+  { title: '도움말', caption: '기능과 사용법', icon: 'help', path: '/help', },
+  { title: '소개', caption: '앱에 대한 소개', icon: 'info', path: '/about', },
 ];
 
 const leftDrawerOpen = ref(false);
@@ -48,10 +48,10 @@ onMounted(() => {
       <q-toolbar>
         <q-btn flat dense round icon="menu" aria-label="Menu" @click="toggleLeftDrawer"
           @focusin="($event.target as HTMLInputElement).blur()" />
-        <q-toolbar-title> Simple Calculator </q-toolbar-title>
+        <q-toolbar-title> 간단한 계산기 </q-toolbar-title>
         <!-- <div>Quasar v{{ $q.version }}</div> -->
         <!-- <div>{{ $q.screen.width+"x"+$q.screen.height }}</div> -->
-        <q-toggle v-model="alwaysOnTop" label="on top" left-label keep-color color="info"
+        <q-toggle v-model="alwaysOnTop" label="항상 위" left-label keep-color color="info"
           :disable="!$q.platform.is.electron" @click="toggleAlwaysOnTop()"
           @focusin="($event.target as HTMLInputElement).blur()" />
       </q-toolbar>
@@ -59,7 +59,7 @@ onMounted(() => {
 
     <q-drawer v-model="leftDrawerOpen" show-if-above bordered>
       <q-list>
-        <q-item-label header> Menus </q-item-label>
+        <q-item-label header> 메뉴 </q-item-label>
         <PathRoute v-for="path in paths" :key="path.title" v-bind="path" />
       </q-list>
     </q-drawer>
