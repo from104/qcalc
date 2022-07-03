@@ -1,10 +1,12 @@
 <script setup lang="ts">
 import { useCalcStore } from 'src/stores/calc-store';
 import MyTooltip from 'components/MyTooltip.vue';
-import { onMounted, reactive, ref, watch } from 'vue';
+import { onMounted, onBeforeUnmount, reactive, ref, watch } from 'vue';
 import tinykeys, { KeyBindingMap } from 'tinykeys';
 import { copyToClipboard, useQuasar } from 'quasar';
 
+// 계산기 키바인딩 제거하기위한 변수 선언
+let keybindingRemoveAtUmount = tinykeys(window, {} as KeyBindingMap);
 const locale = navigator.language
 
 // const calc = reactive(new Calculator());
@@ -154,7 +156,12 @@ onMounted(() => {
   });
 
   // 키바인딩하고 제거할 수 있는 메서드 백업;
-  useCalcStore().$state.keybindingRemoveFromCalc = tinykeys(window, keyBindingMaps);
+  keybindingRemoveAtUmount = tinykeys(window, keyBindingMaps);
+});
+
+// 키바인딩 제거
+onBeforeUnmount(() => {
+  keybindingRemoveAtUmount();
 });
 </script>
 
@@ -162,13 +169,13 @@ onMounted(() => {
   <q-page id="qcalc">
     <q-card flat class="row wrap q-pa-md">
       <q-card-section class="col-2 row justify-start q-py-none q-px-xs">
-        <q-checkbox v-model="localeOptions.useGrouping" checked-icon="mdi-comma-circle" size="xl"
+        <q-checkbox v-model="localeOptions.useGrouping" checked-icon="mdi-comma-circle" size="xl" class="q-pt-none"
           unchecked-icon="mdi-comma-circle-outline" @focusin="($event.target as HTMLInputElement).blur()">
           <my-tooltip>천 단위 구분</my-tooltip>
         </q-checkbox>
       </q-card-section>
 
-      <q-card-section class="col-3 row justify-start q-py-none q-px-sm">
+      <q-card-section class="col-3 row justify-start self-center q-py-none q-px-sm">
         <my-tooltip>소수점 고정값 선택</my-tooltip>
         <q-slider v-model="fixedPointFormat" :min="0" :step="2" :max="6" marker-labels @change='setFixedPointFormat'
           @focusin="($event.target as HTMLInputElement).blur()" />
@@ -178,11 +185,11 @@ onMounted(() => {
         <q-btn class="q-pl-sm" flat v-if="operator" :label="operator">
           <my-tooltip>현재 연산자</my-tooltip>
         </q-btn>
-        <q-btn flat icon="content_copy" class="q-ma-none q-pa-none q-pl-xs" @click="doCopy"
+        <q-btn flat icon="content_copy" color="primary" class="q-ma-none q-pa-none q-pl-xs" @click="doCopy"
           @focusin="($event.target as HTMLInputElement).blur()">
           <my-tooltip>클릭하면 결과가 복사됩니다.</my-tooltip>
         </q-btn>
-        <q-btn flat icon="content_paste" class="q-ma-none q-pa-none q-pl-xs q-pr-xs" @click="doPaste"
+        <q-btn flat icon="content_paste" color="primary" class="q-ma-none q-pa-none q-pl-xs q-pr-xs" @click="doPaste"
           @focusin="($event.target as HTMLInputElement).blur()">
           <my-tooltip>클릭하면 숫자를 붙혀넣습니다.</my-tooltip>
         </q-btn>
