@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { version } from '../../package.json';
 import { onMounted, ref } from 'vue';
 import { useQuasar } from 'quasar';
 import tinykeys from 'tinykeys';
@@ -59,7 +60,7 @@ onMounted(() => {
 
     <q-drawer v-model="leftDrawerOpen" show-if-above bordered>
       <q-list>
-        <q-item-label header> 메뉴 </q-item-label>
+        <q-item-label class="text-h5" header> 메뉴 (v {{ version }}) </q-item-label>
         <PathRoute v-for="path in paths" :key="path.title" v-bind="path" />
       </q-list>
     </q-drawer>
