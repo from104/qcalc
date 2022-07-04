@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import AboutPageMD from './AboutPage.md';
-
 </script>
 
 <template>

@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import HelpPageMD from './HelpPage.md';
-
 </script>
 
 <template>
