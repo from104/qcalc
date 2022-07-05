@@ -12,4 +12,3 @@
 <!-- Links -->
 [keep a changelog]: https://keepachangelog.com/ko/1.0.0/
 [semantic versioning (korean)]: https://semver.org/lang/ko/
-
