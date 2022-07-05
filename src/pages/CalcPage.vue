@@ -19,7 +19,7 @@ const localeOptions: Intl.NumberFormatOptions = reactive({
   maximumFractionDigits: 20,
 });
 
-const fixedPointFormat = ref(0);
+const fixedPointFormat = ref(-2);
 
 const setFixedPointFormat = (fixedPointDecEdit = 0) => {
   if (fixedPointDecEdit != 0) {
