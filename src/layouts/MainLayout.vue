@@ -6,6 +6,8 @@ import tinykeys from 'tinykeys';
 import { useCalcStore } from 'src/stores/calc-store';
 import PathRoute from 'components/PathRoute.vue';
 
+const calcStore = useCalcStore();
+
 const $q = useQuasar();
 
 const paths = [
@@ -15,7 +17,6 @@ const paths = [
 ];
 
 const leftDrawerOpen = ref(false);
-const alwaysOnTop = ref(useCalcStore().$state.alwaysOnTop);
 
 const toggleLeftDrawer = () => {
   leftDrawerOpen.value = !leftDrawerOpen.value;
@@ -25,10 +26,9 @@ const toggleAlwaysOnTop = (byManual = false) => {
   if ($q.platform.is.electron) {
     if (byManual) {
       // 수동으로 토글
-      alwaysOnTop.value = !alwaysOnTop.value;
+      calcStore.toggleAlwaysOnTop();
     }
-    useCalcStore().$state.alwaysOnTop = alwaysOnTop.value;
-    window.myAPI.setAlwaysOnTop(alwaysOnTop.value);
+    window.myAPI.setAlwaysOnTop(calcStore.alwaysOnTop);
   }
 };
 
@@ -61,7 +61,7 @@ onMounted(() => {
         <!-- <div>Quasar v{{ $q.version }}</div> -->
         <!-- <div>{{ $q.screen.width+"x"+$q.screen.height }}</div> -->
         <q-toggle
-          v-model="alwaysOnTop"
+          v-model="calcStore.alwaysOnTop"
           label="항상 위"
           left-label
           keep-color
