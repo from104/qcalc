@@ -5,36 +5,35 @@ import { onMounted, onBeforeUnmount, reactive, ref, watch } from 'vue';
 import tinykeys, { KeyBindingMap } from 'tinykeys';
 import { copyToClipboard, useQuasar } from 'quasar';
 
+const calcStore = useCalcStore();
+
 // 계산기 키바인딩 제거하기위한 변수 선언
 let keybindingRemoveAtUmount = tinykeys(window, {} as KeyBindingMap);
 const locale = navigator.language;
 
-// const calc = reactive(new Calculator());
-const calc = useCalcStore().$state.calc;
+const calc = calcStore.calc;
 
 const localeOptions: Intl.NumberFormatOptions = reactive({
   style: 'decimal',
-  useGrouping: true,
+  useGrouping: calcStore.useGrouping,
   minimumFractionDigits: 0,
   maximumFractionDigits: 20,
 });
 
-const fixedPointFormat = ref(-2);
+const setUseGrouping = () => {
+  localeOptions.useGrouping = calcStore.useGrouping;
+};
 
-const setFixedPointFormat = (fixedPointDecEdit = 0) => {
-  if (fixedPointDecEdit != 0) {
-    fixedPointFormat.value =
-      fixedPointDecEdit < 0
-        ? Math.max(-2, fixedPointFormat.value + fixedPointDecEdit)
-        : Math.min(fixedPointFormat.value + fixedPointDecEdit, 6);
+const setDecimalPlaces = (decimalPlaces: number | undefined = undefined) => {
+  if (decimalPlaces !== undefined) {
+    calcStore.setDecimalPlaces(decimalPlaces);
   }
-
-  if (fixedPointFormat.value === -2) {
+  if (calcStore.decimalPlaces === -2) {
     localeOptions.minimumFractionDigits = 0;
     localeOptions.maximumFractionDigits = 20;
   } else {
-    localeOptions.minimumFractionDigits = fixedPointFormat.value;
-    localeOptions.maximumFractionDigits = fixedPointFormat.value;
+    localeOptions.minimumFractionDigits = calcStore.decimalPlaces;
+    localeOptions.maximumFractionDigits = calcStore.decimalPlaces;
   }
 };
 
@@ -134,9 +133,27 @@ type Shortcut = [string[], () => void][];
 const shortcuts: Shortcut = [
   [['Control+c', 'Control+Insert', 'Copy'], doCopy],
   [['Control+v', 'Shift+Insert', 'Paste'], doPaste],
-  [[','], () => (localeOptions.useGrouping = !localeOptions.useGrouping)],
-  [['['], () => setFixedPointFormat(-2)],
-  [[']'], () => setFixedPointFormat(2)],
+  [
+    [','],
+    () => {
+      calcStore.toggleUseGrouping();
+      setUseGrouping();
+    },
+  ],
+  [
+    ['['],
+    () => {
+      calcStore.decDecimalPlaces();
+      setDecimalPlaces();
+    },
+  ],
+  [
+    [']'],
+    () => {
+      calcStore.incDecimalPlaces();
+      setDecimalPlaces();
+    },
+  ],
 ];
 
 onMounted(() => {
@@ -171,11 +188,12 @@ onBeforeUnmount(() => {
     <q-card flat class="row wrap q-pa-md">
       <q-card-section class="col-2 row justify-start q-py-none q-px-xs">
         <q-checkbox
-          v-model="localeOptions.useGrouping"
+          v-model="calcStore.useGrouping"
           checked-icon="mdi-comma-circle"
           size="xl"
           class="q-pt-none"
           unchecked-icon="mdi-comma-circle-outline"
+          @click="setUseGrouping()"
           @focusin="($event.target as HTMLInputElement).blur()"
         >
           <my-tooltip>천 단위 구분</my-tooltip>
@@ -185,24 +203,25 @@ onBeforeUnmount(() => {
       <q-card-section class="col-3 row justify-start self-center q-py-none q-px-sm">
         <my-tooltip>소수점 고정값 선택</my-tooltip>
         <q-slider
-          v-model="fixedPointFormat"
+          v-model="calcStore.decimalPlaces"
           :min="-2"
           :step="2"
           :max="6"
           marker-labels
-          @change="setFixedPointFormat"
+          @change="setDecimalPlaces()"
           @focusin="($event.target as HTMLInputElement).blur()"
         >
           <template v-slot:marker-label-group="{ markerList }">
             <q-icon
               v-for="val in [0]"
               :key="val"
+              class="cursor-pointer"
               :class="(markerList[val] as any).classes"
               :style="
               (markerList[val] as any).style"
               size="17px"
               name="mdi-minus-circle-outline"
-              @click="fixedPointFormat = (markerList[val] as any).value"
+              @click="setDecimalPlaces((markerList[val] as any).value)"
             />
             <div
               v-for="val in [1, 2, 3, 4]"
@@ -210,7 +229,7 @@ onBeforeUnmount(() => {
               class="cursor-pointer"
               :class="(markerList[val] as any).classes"
               :style="(markerList[val] as any).style"
-              @click="fixedPointFormat = (markerList[val] as any).value"
+              @click="setDecimalPlaces((markerList[val] as any).value)"
             >
               {{ (markerList[val] as any).value }}
             </div>
@@ -244,16 +263,16 @@ onBeforeUnmount(() => {
         </q-btn>
       </q-card-section>
       <q-card-section class="col-12 q-px-sm q-pt-none q-pb-sm">
-        <q-input
-          v-model="number"
-          type="number"
-          readonly
-          class="q-ma-none q-pa-none"
-          input-class="q-pt-none text-right text-h4"
-          input-style="padding-top: 6px; line-height: 1.1"
-          autogrow
-          outlined
-        />
+        <q-field :model-value="number" class="shadow-2" filled dense>
+          <template v-slot:control>
+            <div
+              class="self-center full-width no-outline text-h4 text-right"
+              style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis"
+            >
+              {{ number }}
+            </div>
+          </template>
+        </q-field>
       </q-card-section>
 
       <q-card-section
