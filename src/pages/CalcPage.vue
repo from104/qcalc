@@ -1,21 +1,25 @@
 <script setup lang="ts">
-import { useCalcStore } from 'src/stores/calc-store';
-import MyTooltip from 'components/MyTooltip.vue';
 import { onMounted, onBeforeUnmount, reactive, ref, watch } from 'vue';
 import tinykeys, { KeyBindingMap } from 'tinykeys';
 import { copyToClipboard, useQuasar } from 'quasar';
 
+import { useCalcStore } from 'stores/calc-store';
+import MyTooltip from 'components/MyTooltip.vue';
+
+// 스토어 가져오기
 const calcStore = useCalcStore();
 
 // 계산기 키바인딩 제거하기위한 변수 선언
 let keybindingRemoveAtUmount = tinykeys(window, {} as KeyBindingMap);
+// 시스템 로케일
 const locale = navigator.language;
 
+// 계산기 오브젝트를 스토어에서 가져오기 위한 변수 선언
 const calc = calcStore.calc;
 
 const localeOptions: Intl.NumberFormatOptions = reactive({
   style: 'decimal',
-  useGrouping: calcStore.useGrouping,
+  useGrouping: true,
   minimumFractionDigits: 0,
   maximumFractionDigits: 20,
 });
@@ -175,6 +179,10 @@ onMounted(() => {
 
   // 키바인딩하고 제거할 수 있는 메서드 백업;
   keybindingRemoveAtUmount = tinykeys(window, keyBindingMaps);
+
+  //초기 state 에 의한 설정
+  setUseGrouping();
+  setDecimalPlaces();
 });
 
 // 키바인딩 제거
