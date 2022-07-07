@@ -9,8 +9,6 @@ import MyTooltip from 'components/MyTooltip.vue';
 // 스토어 가져오기
 const calcStore = useCalcStore();
 
-// 계산기 키바인딩 제거하기위한 변수 선언
-let keybindingRemoveAtUmount = tinykeys(window, {} as KeyBindingMap);
 // 시스템 로케일
 const locale = navigator.language;
 
@@ -160,6 +158,12 @@ const shortcuts: Shortcut = [
   ],
 ];
 
+// 계산기 키바인딩 제거하기위한 변수 선언
+let keybindingRemoveAtUmount = tinykeys(window, {} as KeyBindingMap);
+
+// dom 요소가 마운트 되었을 때
+// 1. 계산기 키바인딩 설정하기
+// 2. 스토어에서 값을 가져와서 계산기에 설정하기
 onMounted(() => {
   // Support keyboard entry
   const keyBindingMaps: KeyBindingMap = {};
@@ -185,7 +189,7 @@ onMounted(() => {
   setDecimalPlaces();
 });
 
-// 키바인딩 제거
+// dom 요소가 언마운트되기 전에 키바인딩 제거
 onBeforeUnmount(() => {
   keybindingRemoveAtUmount();
 });
