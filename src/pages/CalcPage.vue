@@ -54,6 +54,7 @@ watch(calc, () => {
   setDisplayNumber();
   operator.value = calc.getOperatorString();
 });
+
 watch(localeOptions, () => {
   setDisplayNumber();
 });
@@ -104,6 +105,21 @@ const doPaste = (): void => {
     });
 };
 
+const toggleUseGrouping = (): void => {
+  calcStore.toggleUseGrouping();
+  setUseGrouping();
+};
+
+const incDecimalPlaces = (): void => {
+  calcStore.incDecimalPlaces();
+  setDecimalPlaces();
+};
+
+const decDecimalPlaces = (): void => {
+  calcStore.decDecimalPlaces();
+  setDecimalPlaces();
+};
+
 // 버튼 레이블, 버튼 컬러, 버튼에 해당하는 키, 버튼 클릭 이벤트 핸들러
 type Button = [string, string, string[], () => void][];
 
@@ -135,27 +151,9 @@ type Shortcut = [string[], () => void][];
 const shortcuts: Shortcut = [
   [['Control+c', 'Control+Insert', 'Copy'], doCopy],
   [['Control+v', 'Shift+Insert', 'Paste'], doPaste],
-  [
-    [','],
-    () => {
-      calcStore.toggleUseGrouping();
-      setUseGrouping();
-    },
-  ],
-  [
-    ['['],
-    () => {
-      calcStore.decDecimalPlaces();
-      setDecimalPlaces();
-    },
-  ],
-  [
-    [']'],
-    () => {
-      calcStore.incDecimalPlaces();
-      setDecimalPlaces();
-    },
-  ],
+  [[','], toggleUseGrouping],
+  [['['], decDecimalPlaces],
+  [[']'], incDecimalPlaces],
 ];
 
 // 계산기 키바인딩 제거하기위한 변수 선언
@@ -196,7 +194,7 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-  <q-page id="qcalc">
+  <q-page id="qcalc" @focusin="($event.target as HTMLInputElement).blur()">
     <q-card flat class="row wrap q-pa-md">
       <q-card-section class="col-2 row justify-start q-py-none q-px-xs">
         <q-checkbox
@@ -206,14 +204,13 @@ onBeforeUnmount(() => {
           class="q-pt-none"
           unchecked-icon="mdi-comma-circle-outline"
           @click="setUseGrouping()"
-          @focusin="($event.target as HTMLInputElement).blur()"
         >
-          <my-tooltip>천 단위 구분</my-tooltip>
+          <my-tooltip>천 단위 구분 (,)</my-tooltip>
         </q-checkbox>
       </q-card-section>
 
       <q-card-section class="col-3 row justify-start self-center q-py-none q-px-sm">
-        <my-tooltip>소수점 고정값 선택</my-tooltip>
+        <my-tooltip>소수점 고정값 선택 ('[',']')</my-tooltip>
         <q-slider
           v-model="calcStore.decimalPlaces"
           :min="-2"
@@ -221,7 +218,6 @@ onBeforeUnmount(() => {
           :max="6"
           marker-labels
           @change="setDecimalPlaces()"
-          @focusin="($event.target as HTMLInputElement).blur()"
         >
           <template v-slot:marker-label-group="{ markerList }">
             <q-icon
@@ -229,8 +225,7 @@ onBeforeUnmount(() => {
               :key="val"
               class="cursor-pointer"
               :class="(markerList[val] as any).classes"
-              :style="
-              (markerList[val] as any).style"
+              :style="(markerList[val] as any).style"
               size="17px"
               name="mdi-minus-circle-outline"
               @click="setDecimalPlaces((markerList[val] as any).value)"
@@ -259,7 +254,6 @@ onBeforeUnmount(() => {
           color="primary"
           class="q-ma-none q-pa-none q-pl-xs"
           @click="doCopy"
-          @focusin="($event.target as HTMLInputElement).blur()"
         >
           <my-tooltip>클릭하면 결과가 복사됩니다.</my-tooltip>
         </q-btn>
@@ -269,7 +263,6 @@ onBeforeUnmount(() => {
           color="primary"
           class="q-ma-none q-pa-none q-pl-xs q-pr-xs"
           @click="doPaste"
-          @focusin="($event.target as HTMLInputElement).blur()"
         >
           <my-tooltip>클릭하면 숫자를 붙혀넣습니다.</my-tooltip>
         </q-btn>
@@ -297,7 +290,6 @@ onBeforeUnmount(() => {
           :label="button[0]"
           :color="button[1]"
           @click="button[3]"
-          @focusin="($event.target as HTMLInputElement).blur()"
         >
           <my-tooltip v-if="button[2].length > 0">
             {{ button[2].join(', ') }} 키
