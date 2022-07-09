@@ -4,6 +4,12 @@
 
 형식은 [Keep a Changelog]를 기반으로 하며 이 프로젝트는 [Semantic Versioning (korean)]을 따릅니다.
 
+## [0.1.3] - 2022-07-09
+
+### Added
+
+- 왼쪽 메뉴 관련 바로가기 추가 (README.md 참조)
+
 ## [0.1.2a] - 2022-07-07
 
 ### Fixed
