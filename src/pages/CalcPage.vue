@@ -195,57 +195,59 @@ onBeforeUnmount(() => {
 
 <template>
   <q-page id="qcalc" @focusin="($event.target as HTMLInputElement).blur()">
-    <q-card flat class="row wrap q-pa-md">
-      <q-card-section class="col-2 row justify-start q-py-none q-px-xs">
+    <q-card flat class="row wrap q-px-md q-py-xs">
+      <q-card-section
+        class="col-9 row no-wrap items-center justify-start q-py-none q-px-xs"
+      >
         <q-checkbox
           v-model="calcStore.useGrouping"
-          checked-icon="mdi-comma-circle"
-          size="xl"
-          class="q-pt-none"
-          unchecked-icon="mdi-comma-circle-outline"
+          label="쉼표: "
+          left-label
+          class="q-ml-sm"
           @click="setUseGrouping()"
         >
           <my-tooltip>천 단위 구분 (,)</my-tooltip>
         </q-checkbox>
+        <div class="col-7 row no-wrap items-center">
+          <my-tooltip>소수점 고정값 선택 ('[',']')</my-tooltip>
+          <div>소수점:</div>
+          <q-slider
+            v-model="calcStore.decimalPlaces"
+            :min="-2"
+            :step="2"
+            :max="6"
+            marker-labels
+            class="col-6 q-ml-md"
+            @change="setDecimalPlaces()"
+          >
+            <template v-slot:marker-label-group="{ markerList }">
+              <q-icon
+                v-for="val in [0]"
+                :key="val"
+                class="cursor-pointer"
+                :class="(markerList[val] as any).classes"
+                :style="(markerList[val] as any).style"
+                size="17px"
+                name="mdi-minus-circle-outline"
+                @click="setDecimalPlaces((markerList[val] as any).value)"
+              />
+              <div
+                v-for="val in [1, 2, 3, 4]"
+                :key="val"
+                class="cursor-pointer"
+                :class="(markerList[val] as any).classes"
+                :style="(markerList[val] as any).style"
+                @click="setDecimalPlaces((markerList[val] as any).value)"
+              >
+                {{ (markerList[val] as any).value }}
+              </div>
+            </template>
+          </q-slider>
+        </div>
       </q-card-section>
 
-      <q-card-section class="col-3 row justify-start self-center q-py-none q-px-sm">
-        <my-tooltip>소수점 고정값 선택 ('[',']')</my-tooltip>
-        <q-slider
-          v-model="calcStore.decimalPlaces"
-          :min="-2"
-          :step="2"
-          :max="6"
-          marker-labels
-          @change="setDecimalPlaces()"
-        >
-          <template v-slot:marker-label-group="{ markerList }">
-            <q-icon
-              v-for="val in [0]"
-              :key="val"
-              class="cursor-pointer"
-              :class="(markerList[val] as any).classes"
-              :style="(markerList[val] as any).style"
-              size="17px"
-              name="mdi-minus-circle-outline"
-              @click="setDecimalPlaces((markerList[val] as any).value)"
-            />
-            <div
-              v-for="val in [1, 2, 3, 4]"
-              :key="val"
-              class="cursor-pointer"
-              :class="(markerList[val] as any).classes"
-              :style="(markerList[val] as any).style"
-              @click="setDecimalPlaces((markerList[val] as any).value)"
-            >
-              {{ (markerList[val] as any).value }}
-            </div>
-          </template>
-        </q-slider>
-      </q-card-section>
-
-      <q-card-section class="col-7 row justify-end q-py-none q-px-sm">
-        <q-btn class="q-pl-sm" flat v-if="operator" :label="operator">
+      <q-card-section class="col-3 row no-wrap justify-end q-py-none q-px-sm">
+        <q-btn class="q-pr-xs" flat v-if="operator" :label="operator">
           <my-tooltip>현재 연산자</my-tooltip>
         </q-btn>
         <q-btn
