@@ -2,28 +2,19 @@
 
 이 프로젝트에 대한 모든 주목할만한 변경 사항은 이 파일에 기록됩니다.
 
-형식은 [Keep a Changelog]를 기반으로 하며 이 프로젝트는 [Semantic Versioning (korean)]을 따릅니다.
+형식은 [Keep a Changelog (korean)]를 기반으로 하며 이 프로젝트는 [Semantic Versioning (korean)]을 따릅니다.
+
+## [0.2.0] - 2022-07-11
+
+- 쉼표 표시, 소수점 표시 제어 요소 한글 표시
 
 ## [0.1.3] - 2022-07-09
 
-### Added
-
-- 왼쪽 메뉴 관련 바로가기 추가 (README.md 참조)
-
-## [0.1.2a] - 2022-07-07
-
-### Fixed
-
-- 앱 시작 시 소수점 자릿수, 천단위 구분 상태 적용 안 됨 수정
+- 왼쪽 메뉴 관련 바로가기 키 추가 (README.md 참조)
 
 ## [0.1.2] - 2022-07-07
 
-### Changed
-
 - 결과 폼을 input->field 변경
-
-### Added
-
 - 소수점 자릿수, 천단위 구분 상태를 창을 닫아도 기억하도록 수정
 
 ## [0.1.1] - 2022-07-05
@@ -32,5 +23,5 @@
 - 소수점 고정 기능, 모양 개선
 
 <!-- Links -->
-[keep a changelog]: https://keepachangelog.com/ko/1.0.0/
+[keep a changelog (korean)]: https://keepachangelog.com/ko/1.0.0/
 [semantic versioning (korean)]: https://semver.org/lang/ko/
