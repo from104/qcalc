@@ -67,7 +67,7 @@ onMounted(() => {
 
 <template>
   <q-layout view="lHh Lpr lFf">
-    <q-header elevated>
+    <q-header class="noselect" elevated>
       <q-toolbar @focusin="($event.target as HTMLInputElement).blur()">
         <q-btn flat dense round icon="menu" aria-label="Menu" @click="toggleLeftDrawer" />
         <q-toolbar-title> 간단한 계산기 </q-toolbar-title>
@@ -84,7 +84,7 @@ onMounted(() => {
       </q-toolbar>
     </q-header>
 
-    <q-drawer v-model="leftDrawerOpen" show-if-above bordered>
+    <q-drawer class="noselect" v-model="leftDrawerOpen" show-if-above bordered>
       <q-list>
         <q-item-label class="text-h5" header> 메뉴 (M) </q-item-label>
         <PathRoute v-for="path in paths" :key="path.title" v-bind="path" />

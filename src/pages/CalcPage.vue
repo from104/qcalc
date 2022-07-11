@@ -195,7 +195,7 @@ onBeforeUnmount(() => {
 
 <template>
   <q-page id="qcalc" @focusin="($event.target as HTMLInputElement).blur()">
-    <q-card flat class="row wrap q-px-md q-py-xs">
+    <q-card flat class="noselect row wrap q-px-md q-py-xs">
       <q-card-section
         class="col-9 row no-wrap items-center justify-start q-py-none q-px-xs"
       >
