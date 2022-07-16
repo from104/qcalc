@@ -1,6 +1,7 @@
 {
   "extends": "@quasar/app-vite/tsconfig-preset",
   "compilerOptions": {
+    "module": "commonjs",
     "esModuleInterop": true,
     "moduleResolution": "node",
     "baseUrl": ".",
@@ -28,5 +29,5 @@
   "exclude": ["node_modules"],
   "ts-node": {
     "esm": true
-  }
+  },
 }
