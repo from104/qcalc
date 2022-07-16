@@ -267,6 +267,13 @@ export class Calculator {
     this.repeatNumber = 0;
     this.willReset = true;
   }
+
+  // 역수 계산
+  public reciprocal() {
+    if (Number(this.shownNumber) != 0) {
+      this.shownNumber = this.numberToString(1 / Number(this.shownNumber));
+    }
+  }
 }
 
 export default Calculator;
