@@ -284,6 +284,11 @@ export class Calculator {
   public squared() {
     this.shownNumber = this.numberToString(Number(this.shownNumber) ** 2);
   }
+
+  // 제곱근 계산
+  public squareRoot() {
+    this.shownNumber = this.numberToString(Math.sqrt(Number(this.shownNumber)));
+  }
 }
 
 export default Calculator;
