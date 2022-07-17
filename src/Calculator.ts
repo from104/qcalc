@@ -74,6 +74,11 @@ export class Calculator {
     return this.shownNumber;
   }
 
+  // 콘솔로 결과 출력
+  public resultToConsole() {
+    console.log(this.shownNumber);
+  }
+
   // 숫자 1개씩 추가
   public addDigit(digit: number | string): void {
     if (typeof digit === 'string') {
@@ -266,6 +271,23 @@ export class Calculator {
     }
     this.repeatNumber = 0;
     this.willReset = true;
+  }
+
+  // 역수 계산
+  public reciprocal() {
+    if (Number(this.shownNumber) != 0) {
+      this.shownNumber = this.numberToString(1 / Number(this.shownNumber));
+    }
+  }
+
+  // 제곱 계산
+  public squared() {
+    this.shownNumber = this.numberToString(Number(this.shownNumber) ** 2);
+  }
+
+  // 제곱근 계산
+  public squareRoot() {
+    this.shownNumber = this.numberToString(Math.sqrt(Number(this.shownNumber)));
   }
 }
 
