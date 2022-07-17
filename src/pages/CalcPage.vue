@@ -15,6 +15,7 @@ const locale = navigator.language;
 // 계산기 오브젝트를 스토어에서 가져오기 위한 변수 선언
 const calc = calcStore.calc;
 
+// 쉼표, 소수점 표시를 위한 옵션
 const localeOptions: Intl.NumberFormatOptions = reactive({
   style: 'decimal',
   useGrouping: true,
@@ -22,15 +23,19 @@ const localeOptions: Intl.NumberFormatOptions = reactive({
   maximumFractionDigits: 20,
 });
 
+// 쉼표 표시를 위한 옵션을 설정하는 함수
 const setUseGrouping = () => {
   localeOptions.useGrouping = calcStore.useGrouping;
 };
 
+// 소수점 표시를 위한 옵션을 설정하는 함수
+// 인자가 있으면 인자로 설정하고 없으면 스토어에서 가져온 값으로 설정한다.
 const setDecimalPlaces = (decimalPlaces: number | undefined = undefined) => {
   if (decimalPlaces !== undefined) {
     calcStore.setDecimalPlaces(decimalPlaces);
   }
   if (calcStore.decimalPlaces === -2) {
+    // -2은 소수점 표시 제한 없음을 의미한다.
     localeOptions.minimumFractionDigits = 0;
     localeOptions.maximumFractionDigits = 20;
   } else {
@@ -39,24 +44,41 @@ const setDecimalPlaces = (decimalPlaces: number | undefined = undefined) => {
   }
 };
 
-const getDisplayNumber = () => {
-  return Number(calc.getShownNumber()).toLocaleString(locale, localeOptions);
+// 계산 결과를 표시하는 변수 선언
+const number = ref('');
+
+// 연산자를 표시하는 변수 선언
+const operator = ref('');
+
+// 계산 결과가 길 경우 툴팁 표시 상태 변수 선언
+const needNumberTooltip = ref(false);
+
+const setNeedNumberTooltip = () => {
+  // 원래 결과 칸 길이
+  const ow = (document.getElementById('number') as HTMLElement).offsetWidth;
+  // 결과 문자열의 크기
+  // (원래 칸에 결과 길이가 넘치면 스크롤 해야하는데 ...로 대체 시킨 경우 스크롤해야할 폭 값만 커진다.)
+  const sw = (document.getElementById('number') as HTMLElement).scrollWidth;
+  // 원래의 칸 크기보다 결과 문자열 길이가 길면 툴팁을 표시
+  needNumberTooltip.value = ow < sw;
 };
 
-const number = ref(getDisplayNumber());
-const operator = ref(calc.getOperatorString());
+// 계산 결과, 연산자, 툴팁을 갱신하는 함수
+const refreshDisplay = () => {
+  operator.value = calc.getOperatorString() as string;
+  number.value = Number(calc.getShownNumber()).toLocaleString(locale, localeOptions);
 
-const setDisplayNumber = () => {
-  number.value = getDisplayNumber();
+  // 계산 결과가 칸에서 넘치면 툴팁으로 보이게 한다.
+  // 이렇게 지연시키지 않으면 툴팁 표시가 한 스텝 늦게 갱신됨
+  // TODO: setTimeout 을 사용하지 않는 방법을 찾아보자. 정상 작동은 하지만 불안하다.
+  setTimeout(() => {
+    setNeedNumberTooltip();
+  }, 1);
 };
 
-watch(calc, () => {
-  setDisplayNumber();
-  operator.value = calc.getOperatorString();
-});
-
-watch(localeOptions, () => {
-  setDisplayNumber();
+// 두 변수를 감시하여 달라지면 결과를 갱신하여 표시
+watch([calc, localeOptions], () => {
+  refreshDisplay();
 });
 
 const $q = useQuasar();
@@ -124,26 +146,38 @@ const decDecimalPlaces = (): void => {
 type Button = [string, string, string[], () => void][];
 
 const buttons: Button = [
-  ['%', 'secondary', ['%', 'p'], () => calc.percent()],
+  ['x²', 'secondary', ['u'], () => calc.squared()],
+  ['√x', 'secondary', ['r'], () => calc.squareRoot()],
+  ['C', 'deep-orange', ['Delete', 'Escape', 'c'], () => calc.clear()],
+  ['←', 'deep-orange', ['Backspace'], () => calc.deleteDigitOrDot()],
   ['±', 'secondary', ['Shift+Minus', 's'], () => calc.changeSign()],
-  ['C', 'dark', ['Delete', 'Escape', 'c'], () => calc.clear()],
-  ['←', 'dark', ['Backspace'], () => calc.deleteDigitOrDot()],
+  ['%', 'secondary', ['%', 'p'], () => calc.percent()],
+  ['1/x', 'secondary', ['i'], () => calc.reciprocal()],
+  ['÷', 'secondary', ['/'], () => calc.div()],
   ['7', 'primary', ['7'], () => calc.addDigit(7)],
   ['8', 'primary', ['8'], () => calc.addDigit(8)],
   ['9', 'primary', ['9'], () => calc.addDigit(9)],
-  ['÷', 'secondary', ['/'], () => calc.div()],
+  ['×', 'secondary', ['*'], () => calc.mul()],
   ['4', 'primary', ['4'], () => calc.addDigit(4)],
   ['5', 'primary', ['5'], () => calc.addDigit(5)],
   ['6', 'primary', ['6'], () => calc.addDigit(6)],
-  ['×', 'secondary', ['*'], () => calc.mul()],
+  ['-', 'secondary', ['-'], () => calc.minus()],
   ['1', 'primary', ['1'], () => calc.addDigit(1)],
   ['2', 'primary', ['2'], () => calc.addDigit(2)],
   ['3', 'primary', ['3'], () => calc.addDigit(3)],
-  ['-', 'secondary', ['-'], () => calc.minus()],
+  ['+', 'secondary', ['+'], () => calc.plus()],
+  [
+    '00',
+    'primary',
+    [],
+    () => {
+      calc.addDigit(0);
+      calc.addDigit(0);
+    },
+  ],
   ['0', 'primary', ['0'], () => calc.addDigit(0)],
   ['.', 'primary', ['.'], () => calc.addDot()],
   ['=', 'secondary', ['=', 'Enter'], () => calc.equal()],
-  ['+', 'secondary', ['+'], () => calc.plus()],
 ];
 
 type Shortcut = [string[], () => void][];
@@ -185,6 +219,9 @@ onMounted(() => {
   //초기 state 에 의한 설정
   setUseGrouping();
   setDecimalPlaces();
+
+  // 초기 화면 갱신
+  refreshDisplay();
 });
 
 // dom 요소가 언마운트되기 전에 키바인딩 제거
@@ -209,7 +246,16 @@ onBeforeUnmount(() => {
           <my-tooltip>천 단위 구분 (,)</my-tooltip>
         </q-checkbox>
         <div class="col-7 row no-wrap items-center">
-          <my-tooltip>소수점 고정값 선택 ('[',']')</my-tooltip>
+          <my-tooltip>
+            소수점 고정값 선택 ('[',']')
+            <br />
+            소수점 고정 상태:
+            {{
+              calcStore.decimalPlaces == -2
+                ? '제한 없음'
+                : `${calcStore.decimalPlaces} 자리`
+            }}
+          </my-tooltip>
           <div>소수점:</div>
           <q-slider
             v-model="calcStore.decimalPlaces"
@@ -221,16 +267,14 @@ onBeforeUnmount(() => {
             @change="setDecimalPlaces()"
           >
             <template v-slot:marker-label-group="{ markerList }">
-              <q-icon
-                v-for="val in [0]"
-                :key="val"
+              <div
                 class="cursor-pointer"
-                :class="(markerList[val] as any).classes"
-                :style="(markerList[val] as any).style"
-                size="17px"
-                name="mdi-minus-circle-outline"
-                @click="setDecimalPlaces((markerList[val] as any).value)"
-              />
+                :class="(markerList[0] as any).classes"
+                :style="(markerList[0] as any).style"
+                @click="setDecimalPlaces((markerList[0] as any).value)"
+              >
+                x
+              </div>
               <div
                 v-for="val in [1, 2, 3, 4]"
                 :key="val"
@@ -270,13 +314,15 @@ onBeforeUnmount(() => {
         </q-btn>
       </q-card-section>
       <q-card-section class="col-12 q-px-sm q-pt-none q-pb-sm">
-        <q-field :model-value="number" class="shadow-2" filled dense>
+        <q-field :model-value="number" class="shadow-4" filled dense>
           <template v-slot:control>
             <div
+              id="number"
               class="self-center full-width no-outline text-h4 text-right"
               style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis"
             >
               {{ number }}
+              <my-tooltip v-if="needNumberTooltip">{{ number }}</my-tooltip>
             </div>
           </template>
         </q-field>
@@ -288,7 +334,9 @@ onBeforeUnmount(() => {
         :key="index"
       >
         <q-btn
-          class="text-h6 full-width"
+          class="glossy shadow-4 text-h5 full-width"
+          style="overflow: auto; min-height: 44px; max-height: 44px"
+          no-caps
           :label="button[0]"
           :color="button[1]"
           @click="button[3]"
