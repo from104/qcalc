@@ -24,13 +24,13 @@ const localeOptions: Intl.NumberFormatOptions = reactive({
 });
 
 // 쉼표 표시를 위한 옵션을 설정하는 함수
-const setUseGrouping = () => {
+function setUseGrouping() {
   localeOptions.useGrouping = calcStore.useGrouping;
-};
+}
 
 // 소수점 표시를 위한 옵션을 설정하는 함수
 // 인자가 있으면 인자로 설정하고 없으면 스토어에서 가져온 값으로 설정한다.
-const setDecimalPlaces = (decimalPlaces: number | undefined = undefined) => {
+function setDecimalPlaces(decimalPlaces: number | undefined = undefined) {
   if (decimalPlaces !== undefined) {
     calcStore.setDecimalPlaces(decimalPlaces);
   }
@@ -42,7 +42,7 @@ const setDecimalPlaces = (decimalPlaces: number | undefined = undefined) => {
     localeOptions.minimumFractionDigits = calcStore.decimalPlaces;
     localeOptions.maximumFractionDigits = calcStore.decimalPlaces;
   }
-};
+}
 
 // 계산 결과를 표시하는 변수 선언
 const number = ref('');
@@ -53,7 +53,7 @@ const operator = ref('');
 // 계산 결과가 길 경우 툴팁 표시 상태 변수 선언
 const needNumberTooltip = ref(false);
 
-const setNeedNumberTooltip = () => {
+function setNeedNumberTooltip() {
   // 원래 결과 칸 길이
   const ow = (document.getElementById('number') as HTMLElement).offsetWidth;
   // 결과 문자열의 크기
@@ -61,12 +61,18 @@ const setNeedNumberTooltip = () => {
   const sw = (document.getElementById('number') as HTMLElement).scrollWidth;
   // 원래의 칸 크기보다 결과 문자열 길이가 길면 툴팁을 표시
   needNumberTooltip.value = ow < sw;
-};
+}
 
 // 계산 결과, 연산자, 툴팁을 갱신하는 함수
-const refreshDisplay = () => {
+function refreshDisplay() {
+  // 소수점 고정이 아니고 결과에 수소점이 있으면 소수점 표시를 해야한다.
+  if (calcStore.decimalPlaces === -2 && calc.getShownNumber().indexOf('.') !== -1) {
+    const [integer, decimal] = calc.getShownNumber().split('.');
+    number.value = `${Number(integer).toLocaleString(locale, localeOptions)}.${decimal}`;
+  } else {
+    number.value = Number(calc.getShownNumber()).toLocaleString(locale, localeOptions);
+  }
   operator.value = calc.getOperatorString() as string;
-  number.value = Number(calc.getShownNumber()).toLocaleString(locale, localeOptions);
 
   // 계산 결과가 칸에서 넘치면 툴팁으로 보이게 한다.
   // 이렇게 지연시키지 않으면 툴팁 표시가 한 스텝 늦게 갱신됨
@@ -74,7 +80,7 @@ const refreshDisplay = () => {
   setTimeout(() => {
     setNeedNumberTooltip();
   }, 1);
-};
+}
 
 // 두 변수를 감시하여 달라지면 결과를 갱신하여 표시
 watch([calc, localeOptions], () => {
@@ -83,7 +89,7 @@ watch([calc, localeOptions], () => {
 
 const $q = useQuasar();
 
-const doCopy = (): void => {
+function doCopy(): void {
   copyToClipboard(number.value)
     .then(() => {
       $q.notify({
@@ -103,9 +109,9 @@ const doCopy = (): void => {
       });
       // console.log('failed');
     });
-};
+}
 
-const doPaste = (): void => {
+function doPaste(): void {
   navigator.clipboard
     .readText()
     .then((text) => {
@@ -125,22 +131,22 @@ const doPaste = (): void => {
         timeout: 2000,
       });
     });
-};
+}
 
-const toggleUseGrouping = (): void => {
+function toggleUseGrouping(): void {
   calcStore.toggleUseGrouping();
   setUseGrouping();
-};
+}
 
-const incDecimalPlaces = (): void => {
+function incDecimalPlaces(): void {
   calcStore.incDecimalPlaces();
   setDecimalPlaces();
-};
+}
 
-const decDecimalPlaces = (): void => {
+function decDecimalPlaces(): void {
   calcStore.decDecimalPlaces();
   setDecimalPlaces();
-};
+}
 
 // 버튼 레이블, 버튼 컬러, 버튼에 해당하는 키, 버튼 클릭 이벤트 핸들러
 type Button = [string, string, string[], () => void][];
