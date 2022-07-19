@@ -45,22 +45,22 @@ function setDecimalPlaces(decimalPlaces: number | undefined = undefined) {
 }
 
 // 계산 결과를 표시하는 변수 선언
-const number = ref('');
+const result = ref('');
 
 // 연산자를 표시하는 변수 선언
 const operator = ref('');
 
 // 계산 결과가 길 경우 툴팁 표시 상태 변수 선언
-const needNumberTooltip = ref(false);
+const needResultTooltip = ref(false);
 
-function setNeedNumberTooltip() {
+function setNeedResultTooltip() {
   // 원래 결과 칸 길이
-  const ow = (document.getElementById('number') as HTMLElement).offsetWidth;
+  const ow = (document.getElementById('result') as HTMLElement).offsetWidth;
   // 결과 문자열의 크기
   // (원래 칸에 결과 길이가 넘치면 스크롤 해야하는데 ...로 대체 시킨 경우 스크롤해야할 폭 값만 커진다.)
-  const sw = (document.getElementById('number') as HTMLElement).scrollWidth;
+  const sw = (document.getElementById('result') as HTMLElement).scrollWidth;
   // 원래의 칸 크기보다 결과 문자열 길이가 길면 툴팁을 표시
-  needNumberTooltip.value = ow < sw;
+  needResultTooltip.value = ow < sw;
 }
 
 // 계산 결과, 연산자, 툴팁을 갱신하는 함수
@@ -68,9 +68,9 @@ function refreshDisplay() {
   // 소수점 고정이 아니고 결과에 수소점이 있으면 소수점 표시를 해야한다.
   if (calcStore.decimalPlaces === -2 && calc.getShownNumber().indexOf('.') !== -1) {
     const [integer, decimal] = calc.getShownNumber().split('.');
-    number.value = `${Number(integer).toLocaleString(locale, localeOptions)}.${decimal}`;
+    result.value = `${Number(integer).toLocaleString(locale, localeOptions)}.${decimal}`;
   } else {
-    number.value = Number(calc.getShownNumber()).toLocaleString(locale, localeOptions);
+    result.value = Number(calc.getShownNumber()).toLocaleString(locale, localeOptions);
   }
   operator.value = calc.getOperatorString() as string;
 
@@ -78,7 +78,7 @@ function refreshDisplay() {
   // 이렇게 지연시키지 않으면 툴팁 표시가 한 스텝 늦게 갱신됨
   // TODO: setTimeout 을 사용하지 않는 방법을 찾아보자. 정상 작동은 하지만 불안하다.
   setTimeout(() => {
-    setNeedNumberTooltip();
+    setNeedResultTooltip();
   }, 1);
 }
 
@@ -90,7 +90,7 @@ watch([calc, localeOptions], () => {
 const $q = useQuasar();
 
 function doCopy(): void {
-  copyToClipboard(number.value)
+  copyToClipboard(result.value)
     .then(() => {
       $q.notify({
         position: 'top',
@@ -320,15 +320,15 @@ onBeforeUnmount(() => {
         </q-btn>
       </q-card-section>
       <q-card-section class="col-12 q-px-sm q-pt-none q-pb-sm">
-        <q-field :model-value="number" class="shadow-4" filled dense>
+        <q-field :model-value="result" class="shadow-4" filled dense>
           <template v-slot:control>
             <div
-              id="number"
+              id="result"
               class="self-center full-width no-outline text-h4 text-right"
               style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis"
             >
-              {{ number }}
-              <my-tooltip v-if="needNumberTooltip">{{ number }}</my-tooltip>
+              {{ result }}
+              <my-tooltip v-if="needResultTooltip">{{ result }}</my-tooltip>
             </div>
           </template>
         </q-field>
