@@ -46,6 +46,7 @@ function setDecimalPlaces(decimalPlaces: number | undefined = undefined) {
 
 // 계산 결과를 표시하는 변수 선언
 const result = ref('');
+const resultElement = ref<HTMLDivElement | null>(null);
 
 // 연산자를 표시하는 변수 선언
 const operator = ref('');
@@ -55,10 +56,10 @@ const needResultTooltip = ref(false);
 
 function setNeedResultTooltip() {
   // 원래 결과 칸 길이
-  const ow = (document.getElementById('result') as HTMLElement).offsetWidth;
+  const ow = resultElement.value?.offsetWidth as number;
   // 결과 문자열의 크기
   // (원래 칸에 결과 길이가 넘치면 스크롤 해야하는데 ...로 대체 시킨 경우 스크롤해야할 폭 값만 커진다.)
-  const sw = (document.getElementById('result') as HTMLElement).scrollWidth;
+  const sw = resultElement.value?.scrollWidth as number;
   // 원래의 칸 크기보다 결과 문자열 길이가 길면 툴팁을 표시
   needResultTooltip.value = ow < sw;
 }
@@ -77,9 +78,9 @@ function refreshDisplay() {
   // 계산 결과가 칸에서 넘치면 툴팁으로 보이게 한다.
   // 이렇게 지연시키지 않으면 툴팁 표시가 한 스텝 늦게 갱신됨
   // TODO: setTimeout 을 사용하지 않는 방법을 찾아보자. 정상 작동은 하지만 불안하다.
-  setTimeout(() => {
-    setNeedResultTooltip();
-  }, 1);
+  // setTimeout(() => {
+  //   setNeedResultTooltip();
+  // }, 1);
 }
 
 // 두 변수를 감시하여 달라지면 결과를 갱신하여 표시
@@ -155,23 +156,23 @@ const buttons: Button = [
   ['x²', 'secondary', ['u'], () => calc.squared()],
   ['√x', 'secondary', ['r'], () => calc.squareRoot()],
   ['C', 'deep-orange', ['Delete', 'Escape', 'c'], () => calc.clear()],
-  ['←', 'deep-orange', ['Backspace'], () => calc.deleteDigitOrDot()],
-  ['±', 'secondary', ['Shift+Minus', 's'], () => calc.changeSign()],
+  ['@mdi-backspace', 'deep-orange', ['Backspace'], () => calc.deleteDigitOrDot()],
+  ['@mdi-plus-minus-variant', 'secondary', ['Shift+Minus', 's'], () => calc.changeSign()],
   ['%', 'secondary', ['%', 'p'], () => calc.percent()],
   ['1/x', 'secondary', ['i'], () => calc.reciprocal()],
-  ['÷', 'secondary', ['/'], () => calc.div()],
+  ['@mdi-division', 'secondary', ['/'], () => calc.div()],
   ['7', 'primary', ['7'], () => calc.addDigit(7)],
   ['8', 'primary', ['8'], () => calc.addDigit(8)],
   ['9', 'primary', ['9'], () => calc.addDigit(9)],
-  ['×', 'secondary', ['*'], () => calc.mul()],
+  ['@mdi-close', 'secondary', ['*'], () => calc.mul()],
   ['4', 'primary', ['4'], () => calc.addDigit(4)],
   ['5', 'primary', ['5'], () => calc.addDigit(5)],
   ['6', 'primary', ['6'], () => calc.addDigit(6)],
-  ['-', 'secondary', ['-'], () => calc.minus()],
+  ['@mdi-minus', 'secondary', ['-'], () => calc.minus()],
   ['1', 'primary', ['1'], () => calc.addDigit(1)],
   ['2', 'primary', ['2'], () => calc.addDigit(2)],
   ['3', 'primary', ['3'], () => calc.addDigit(3)],
-  ['+', 'secondary', ['+'], () => calc.plus()],
+  ['@mdi-plus', 'secondary', ['+'], () => calc.plus()],
   [
     '00',
     'primary',
@@ -182,8 +183,8 @@ const buttons: Button = [
     },
   ],
   ['0', 'primary', ['0'], () => calc.addDigit(0)],
-  ['.', 'primary', ['.'], () => calc.addDot()],
-  ['=', 'secondary', ['=', 'Enter'], () => calc.equal()],
+  ['@mdi-circle-small', 'primary', ['.'], () => calc.addDot()],
+  ['@mdi-equal', 'secondary', ['=', 'Enter'], () => calc.equal()],
 ];
 
 type Shortcut = [string[], () => void][];
@@ -320,10 +321,18 @@ onBeforeUnmount(() => {
         </q-btn>
       </q-card-section>
       <q-card-section class="col-12 q-px-sm q-pt-none q-pb-sm">
-        <q-field :model-value="result" class="shadow-4" filled dense>
+        <q-field
+          :model-value="result"
+          class="shadow-4"
+          filled
+          dense
+          :bg-color="needResultTooltip ? 'amber-2' : 'grey-2'"
+        >
           <template v-slot:control>
             <div
-              id="result"
+              ref="resultElement"
+              v-mutation="setNeedResultTooltip"
+              v-mutation.characterData
               class="self-center full-width no-outline text-h4 text-right"
               style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis"
             >
@@ -343,15 +352,18 @@ onBeforeUnmount(() => {
           class="glossy shadow-4 text-h5 full-width"
           style="overflow: auto; min-height: 44px; max-height: 44px"
           no-caps
-          :label="button[0]"
+          :label="button[0].charAt(0) != '@' ? button[0] : undefined"
+          :icon="button[0].charAt(0) == '@' ? button[0].slice(1) : undefined"
           :color="button[1]"
           @click="button[3]"
-        >
-          <my-tooltip v-if="button[2].length > 0">
-            {{ button[2].join(', ') }} 키
-          </my-tooltip>
-        </q-btn>
+        />
       </q-card-section>
     </q-card>
   </q-page>
 </template>
+
+<style scoped>
+.q-btn >>> .q-icon {
+  font-size: 24px;
+}
+</style>
