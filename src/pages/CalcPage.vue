@@ -153,13 +153,13 @@ function decDecimalPlaces(): void {
 type Button = [string, string, string[], () => void][];
 
 const buttons: Button = [
-  ['x²', 'secondary', ['u'], () => calc.squared()],
-  ['√x', 'secondary', ['r'], () => calc.squareRoot()],
+  ['x²', 'secondary', ['u'], () => calc.pow2()],
+  ['√x', 'secondary', ['r'], () => calc.sqrt()],
   ['C', 'deep-orange', ['Delete', 'Escape', 'c'], () => calc.clear()],
   ['@mdi-backspace', 'deep-orange', ['Backspace'], () => calc.deleteDigitOrDot()],
   ['@mdi-plus-minus-variant', 'secondary', ['Shift+Minus', 's'], () => calc.changeSign()],
   ['%', 'secondary', ['%', 'p'], () => calc.percent()],
-  ['1/x', 'secondary', ['i'], () => calc.reciprocal()],
+  ['1/x', 'secondary', ['i'], () => calc.rec()],
   ['@mdi-division', 'secondary', ['/'], () => calc.div()],
   ['7', 'primary', ['7'], () => calc.addDigit(7)],
   ['8', 'primary', ['8'], () => calc.addDigit(8)],
