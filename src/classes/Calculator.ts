@@ -1,3 +1,5 @@
+import console from 'console';
+
 enum Operator {
   None,
   Plus,
@@ -7,8 +9,8 @@ enum Operator {
   Rec,
   Sqrt,
   Pow,
-  Percent,
-};
+  Percent
+}
 
 // 연산자와 문자열을 매핑하는 객체
 const operatorMap: { [key: string]: Operator } = {
@@ -20,13 +22,13 @@ const operatorMap: { [key: string]: Operator } = {
   '^': Operator.Pow,
   '√': Operator.Sqrt,
   '%': Operator.Percent,
-  'rec': Operator.Rec,
+  rec: Operator.Rec
 };
 
 interface History {
   preNumber: number;
   operator: string;
-  argNumber: number|null;
+  argNumber: number | null;
   resultNumber: number;
 };
 
@@ -45,7 +47,6 @@ export class Calculator {
 
   // 표시 숫자가 앞으로 리셋 될지 여부
   private willReset!: boolean;
-
 
   // 계산 히스토리 저장 배열
   private history: History[] = [];
@@ -196,44 +197,36 @@ export class Calculator {
     // 사전에 정해진 연산자에 따라 실제 계산
     switch (this.mOperator) {
       case Operator.Plus:
-        this.addHistory({
+        this.number = this.addHistory({
           preNumber: this.number,
           operator: this.getOperatorString() as string,
           argNumber: n,
           resultNumber: this.number + n
         });
-        this.number += n;
         break;
       case Operator.Minus:
-        this.addHistory({
+        this.number = this.addHistory({
           preNumber: this.number,
           operator: this.getOperatorString() as string,
           argNumber: n,
           resultNumber: this.number - n
         });
-        this.number -= n;
         break;
       case Operator.Mul:
-        this.addHistory({
+        this.number = this.addHistory({
           preNumber: this.number,
           operator: this.getOperatorString() as string,
           argNumber: n,
           resultNumber: this.number * n
         });
-        this.number *= n;
         break;
       case Operator.Div:
-        this.addHistory({
+        this.number = this.addHistory({
           preNumber: this.number,
           operator: this.getOperatorString() as string,
           argNumber: n,
           resultNumber: this.number / n
         });
-        try {
-          // 0으로 나누는 등 에러 처리
-          this.number /= n;
-          // eslint-disable-next-line no-empty
-        } catch (e: unknown) {}
         break;
       default:
         break;
@@ -241,13 +234,13 @@ export class Calculator {
   }
 
   // 연산자 공동 함수
-  private operationCommon(o: Operator) {
+  private operationCommon(operator: Operator) {
     if (this.mOperator == Operator.None) {
       // 전 연산자가 없을 경우 표시 숫자를 백업
       this.shownToNumber();
     } else {
       // 전 연산자가 있을 경우
-      if (this.willReset && this.mOperator != o) {
+      if (this.willReset && this.mOperator != operator) {
         // 초기화 예정이고 연산자가 반복이 아니면
         this.repeatNumber = 0; // 반복 숫자 0
       } // 아니면 표시 숫자를 반복 숫자로
@@ -261,7 +254,7 @@ export class Calculator {
       this.numberToShown(); // 저장 숫자를 표시 숫자로
     }
 
-    this.mOperator = o; // 다음 연산자 셋팅
+    this.mOperator = operator; // 다음 연산자 셋팅
     this.willReset = true; // 다음 숫자 입력 시 1번째 자리부터
   }
 
@@ -304,7 +297,9 @@ export class Calculator {
   }
 
   // 연산자 문자열로 얻기
-  public getOperatorString(operator: Operator = this.mOperator): string | undefined {
+  public getOperatorString(
+    operator: Operator = this.mOperator
+  ): string | undefined {
     return Object.keys(operatorMap).find(
       (key) => operatorMap[key] === operator
     );
@@ -315,7 +310,7 @@ export class Calculator {
     if (this.mOperator == Operator.Div) {
       // 전 연산자가 나누기였다면
       this.preCalc(); // 계산한 결과에
-      const {preNumber, argNumber} = this.history.shift() as History;
+      const { preNumber, argNumber } = this.history.shift() as History;
       this.number = this.addHistory({
         preNumber: preNumber,
         operator: this.getOperatorString(Operator.Percent) as string,
@@ -331,50 +326,56 @@ export class Calculator {
   // 역수 계산
   public rec() {
     if (Number(this.shownNumber) != 0) {
-      this.shownNumber = this.numberToString(this.addHistory({
-        preNumber: Number(this.shownNumber),
-        operator: this.getOperatorString(Operator.Rec) as string,
-        argNumber: null,
-        resultNumber: 1 / Number(this.shownNumber),
-    }));
+      this.shownNumber = this.numberToString(
+        this.addHistory({
+          preNumber: Number(this.shownNumber),
+          operator: this.getOperatorString(Operator.Rec) as string,
+          argNumber: null,
+          resultNumber: 1 / Number(this.shownNumber)
+        })
+      );
     }
   }
 
   // 제곱 계산
   public pow2() {
-    this.shownNumber = this.numberToString(this.addHistory({
-      preNumber: Number(this.shownNumber),
-      operator: this.getOperatorString(Operator.Pow) as string,
-      argNumber: null,
-      resultNumber: Number(this.shownNumber) ** 2
-    }));
+    this.shownNumber = this.numberToString(
+      this.addHistory({
+        preNumber: Number(this.shownNumber),
+        operator: this.getOperatorString(Operator.Pow) as string,
+        argNumber: null,
+        resultNumber: Number(this.shownNumber) ** 2
+      })
+    );
   }
 
   // 제곱근 계산
   public sqrt() {
-    this.shownNumber = this.numberToString(this.addHistory({
-      preNumber: Number(this.shownNumber),
-      operator: this.getOperatorString(Operator.Sqrt) as string,
-      argNumber: null,
-      resultNumber: Math.sqrt(Number(this.shownNumber))
-    }));
+    this.shownNumber = this.numberToString(
+      this.addHistory({
+        preNumber: Number(this.shownNumber),
+        operator: this.getOperatorString(Operator.Sqrt) as string,
+        argNumber: null,
+        resultNumber: Math.sqrt(Number(this.shownNumber))
+      })
+    );
   }
 
-    // 히스토리 추가
+  // 히스토리 추가
   private addHistory(history: History): number {
     // 배열 앞에 히스토리 추가
     this.history.unshift(history);
 
     // 히스토리 크기가 최대 크기를 넘어서면 제일 뒤의 것을 제거
-    if (this.history.length > Calculator.HISTORY_MAX_SIZE)
-      this.history.pop();
-    //
+    if (this.history.length > Calculator.HISTORY_MAX_SIZE) this.history.pop();
+
+    // 최종적으로 계산 결과를 반환
     return history.resultNumber;
   }
 
-  // 히스토리 배열 얻기
-  public getHistory(): History[] {
-    return this.history;
+  // 히스토리 얻기
+  public getHistory(idx = -1): History[] | History | undefined {
+    return idx == -1 ? this.history : this.history[idx];
   }
 
   // 히스토리 초기화
@@ -384,20 +385,5 @@ export class Calculator {
 }
 
 export default Calculator;
-
-const c = new Calculator();
-
-c.addDigit(1);
-c.addDigit(2);
-c.plus();
-c.addDigit(3);
-c.minus();
-c.addDigit(4);
-c.equal();
-c.rec();
-c.clear();
-c.addDigit(2);
-c.div();
-c.addDigit(2);
-c.percent();
-console.log(c.getHistory());
+export { Operator };
+export type { History };
