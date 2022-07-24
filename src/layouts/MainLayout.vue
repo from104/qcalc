@@ -45,8 +45,8 @@ onMounted(() => {
   const shortcuts: Shortcut = [
     [['t'], () => toggleAlwaysOnTop(true)],
     [['F3', 'm'], () => toggleLeftDrawer()],
-    [['q'], () => router.push({ path: '/' })],
-    [['F1', 'h', '?'], () => router.push({ path: '/help' })],
+    [['F2'], () => router.push({ path: '/' })],
+    [['F1', '?'], () => router.push({ path: '/help' })],
     [['a'], () => router.push({ path: '/about' })],
   ];
 
@@ -84,7 +84,13 @@ onMounted(() => {
       </q-toolbar>
     </q-header>
 
-    <q-drawer class="noselect" v-model="leftDrawerOpen" show-if-above bordered>
+    <q-drawer
+      class="noselect"
+      style="z-index: 20"
+      v-model="leftDrawerOpen"
+      show-if-above
+      bordered
+    >
       <q-list>
         <q-item-label class="text-h5" header> 메뉴 (M) </q-item-label>
         <PathRoute v-for="path in paths" :key="path.title" v-bind="path" />
