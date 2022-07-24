@@ -8,7 +8,7 @@ enum Operator {
   Div,
   Rec,
   Sqrt,
-  Pow,
+  Pow2,
   Percent
 }
 
@@ -19,10 +19,10 @@ const operatorMap: { [key: string]: Operator } = {
   '-': Operator.Minus,
   '×': Operator.Mul,
   '÷': Operator.Div,
-  '^': Operator.Pow,
-  '√': Operator.Sqrt,
+  'pow2': Operator.Pow2,
+  'sqrt': Operator.Sqrt,
   '%': Operator.Percent,
-  rec: Operator.Rec
+  'rec': Operator.Rec
 };
 
 interface History {
@@ -342,7 +342,7 @@ export class Calculator {
     this.shownNumber = this.numberToString(
       this.addHistory({
         preNumber: Number(this.shownNumber),
-        operator: this.getOperatorString(Operator.Pow) as string,
+        operator: this.getOperatorString(Operator.Pow2) as string,
         argNumber: null,
         resultNumber: Number(this.shownNumber) ** 2
       })
