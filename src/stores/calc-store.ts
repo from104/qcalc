@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia';
-import { Calculator } from '../Calculator';
+import { Calculator } from 'classes/Calculator';
 
 export const useCalcStore = defineStore('calc', {
   state: () => ({

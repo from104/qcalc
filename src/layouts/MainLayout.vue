@@ -16,9 +16,9 @@ const calcStore = useCalcStore();
 const $q = useQuasar();
 
 const paths = [
-  { title: '계산기', caption: '간단한 계산기 (Q)', icon: 'calculate', path: '/' },
-  { title: '도움말', caption: '기능과 사용법 (H)', icon: 'help', path: '/help' },
-  { title: '소개', caption: '앱에 대한 소개 (A)', icon: 'info', path: '/about' },
+  { title: '계산기', caption: '간단한 계산기 (F2)', icon: 'calculate', path: '/' },
+  { title: '도움말', caption: '기능과 사용법 (F1)', icon: 'help', path: '/help' },
+  { title: '소개', caption: '앱에 대한 소개 (F3)', icon: 'info', path: '/about' },
 ];
 
 const leftDrawerOpen = ref(false);
@@ -44,10 +44,10 @@ onMounted(() => {
 
   const shortcuts: Shortcut = [
     [['t'], () => toggleAlwaysOnTop(true)],
-    [['F3', 'm'], () => toggleLeftDrawer()],
-    [['q'], () => router.push({ path: '/' })],
-    [['F1', 'h', '?'], () => router.push({ path: '/help' })],
-    [['a'], () => router.push({ path: '/about' })],
+    [['m'], () => toggleLeftDrawer()],
+    [['F1', '?'], () => router.push({ path: '/help' })],
+    [['F2'], () => router.push({ path: '/' })],
+    [['F3'], () => router.push({ path: '/about' })],
   ];
 
   if ($q.platform.is.electron) {
@@ -84,7 +84,13 @@ onMounted(() => {
       </q-toolbar>
     </q-header>
 
-    <q-drawer class="noselect" v-model="leftDrawerOpen" show-if-above bordered>
+    <q-drawer
+      class="noselect"
+      style="z-index: 20"
+      v-model="leftDrawerOpen"
+      show-if-above
+      bordered
+    >
       <q-list>
         <q-item-label class="text-h5" header> 메뉴 (M) </q-item-label>
         <PathRoute v-for="path in paths" :key="path.title" v-bind="path" />
