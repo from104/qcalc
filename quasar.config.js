@@ -53,7 +53,7 @@ module.exports = configure(function( /* ctx */ ) {
       build: {
         // import folder alias
         alias: {
-          'classes': 'src/classes',
+          'classes': [__dirname, 'src/classes'].join('/'),
         },
         target: {
           browser: ['es2019', 'edge88', 'firefox78', 'chrome87', 'safari13.1'],

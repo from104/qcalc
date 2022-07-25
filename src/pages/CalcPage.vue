@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onMounted, onBeforeUnmount, reactive, ref, watch, computed } from 'vue';
+import { onMounted, onBeforeUnmount, reactive, ref, watch, computed, onBeforeMount } from 'vue';
 import tinykeys, { KeyBindingMap } from 'tinykeys';
 import { copyToClipboard, useQuasar } from 'quasar';
 
@@ -52,7 +52,7 @@ function toLocale (value: number): string {
 
 // 계산 결과를 표시하는 변수 선언
 const result = ref('');
-const resultElement = ref<HTMLDivElement | null>(null);
+const resultRef = ref<HTMLDivElement | null>(null);
 
 // 연산자를 표시하는 변수 선언
 const operator = ref('');
@@ -62,10 +62,10 @@ const needResultTooltip = ref(false);
 
 function setNeedResultTooltip () {
   // 원래 결과 칸 길이
-  const ow = resultElement.value?.offsetWidth as number;
+  const ow = resultRef.value?.offsetWidth as number;
   // 결과 문자열의 크기
   // (원래 칸에 결과 길이가 넘치면 스크롤 해야하는데 ...로 대체 시킨 경우 스크롤해야할 폭 값만 커진다.)
-  const sw = resultElement.value?.scrollWidth as number;
+  const sw = resultRef.value?.scrollWidth as number;
   // 원래의 칸 크기보다 결과 문자열 길이가 길면 툴팁을 표시
   needResultTooltip.value = ow < sw;
 }
@@ -263,6 +263,30 @@ const operatorIcon: { [key: string]: string } = {
   '×': 'mdi-close-box',
   '÷': 'mdi-division-box',
 }
+
+onBeforeMount(() => {
+  // eslint-disable-next-line @typescript-eslint/no-empty-function
+  Element.prototype.scrollTo = () => { };
+});
+
+// const historyRef = ref<HTMLDivElement | null>(null);
+const historyRef = ref<HTMLDivElement | null>(null);
+
+const isGoTopInHistory = ref(false);
+
+function onScroll (evt: Event) {
+  // console.log((evt.target as HTMLDivElement).scrollTop);
+  if ((evt.target as HTMLDivElement).scrollTop > 80) {
+    isGoTopInHistory.value = true;
+  } else {
+    isGoTopInHistory.value = false;
+  }
+}
+
+function goTopInHistory () {
+  // historyRef.value?.scrollTo({ top: 0, behavior: 'smooth' });
+  console.log(historyRef.value?.scrollTop);
+}
 </script>
 
 <template>
@@ -321,7 +345,7 @@ const operatorIcon: { [key: string]: string } = {
             </div>
           </template>
           <template v-slot:control>
-            <div ref="resultElement" v-mutation="setNeedResultTooltip" v-mutation.characterData
+            <div ref="resultRef" v-mutation="setNeedResultTooltip" v-mutation.characterData
               class="self-center full-width no-outline ellipsis text-h4 text-right">
               {{ result }}
               <my-tooltip v-if="needResultTooltip">{{ result }}</my-tooltip>
@@ -345,12 +369,11 @@ const operatorIcon: { [key: string]: string } = {
 
       <q-space />
 
+      <q-btn dense flat icon="publish" v-if="isGoTopInHistory" @click="goTopInHistory" />
       <q-btn dense flat icon="delete_outline" @click="doDeleteHistory = true" />
-      <!-- <q-btn dense flat icon="publish" /> -->
       <q-btn dense flat icon="close" @click="showHistory = false" />
     </q-bar>
-
-    <q-card id="history">
+    <q-card @scroll="onScroll" class='scroll' ref="historyRef" id="history">
       <q-card-section>
         <q-list separator>
           <q-item v-for="(item, index) in resultHistory" :key="index" class="text-right q-pa-sm">

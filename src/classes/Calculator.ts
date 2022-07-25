@@ -9,7 +9,7 @@ enum Operator {
   Rec,
   Sqrt,
   Pow2,
-  Percent
+  Percent,
 }
 
 // 연산자와 문자열을 매핑하는 객체
@@ -19,10 +19,10 @@ const operatorMap: { [key: string]: Operator } = {
   '-': Operator.Minus,
   '×': Operator.Mul,
   '÷': Operator.Div,
-  'pow2': Operator.Pow2,
-  'sqrt': Operator.Sqrt,
+  pow2: Operator.Pow2,
+  sqrt: Operator.Sqrt,
   '%': Operator.Percent,
-  'rec': Operator.Rec
+  rec: Operator.Rec,
 };
 
 interface History {
@@ -30,7 +30,7 @@ interface History {
   operator: string;
   argNumber: number | null;
   resultNumber: number;
-};
+}
 
 export class Calculator {
   // 연산자가 눌렸을 때 임시로 숫자를 저장
@@ -151,7 +151,7 @@ export class Calculator {
     // 아니면 P의 숫자 지우기
     else this.shownNumber = this.shownNumber.substring(0, l - 1);
 
-    this.shownToNumber(); // 표시 숫자를 백업
+    // this.shownToNumber(); // 표시 숫자를 백업
   }
 
   // 부동소수점 숫자를 문자열로
@@ -188,11 +188,14 @@ export class Calculator {
   private preCalc() {
     let n; // 계산에 쓰일 숫자
 
-    if (this.willReset)
+    if (this.willReset) {
       // 초기화 예정이면 반복 계산될 숫자를
       n = this.repeatNumber;
-    // 아니면 표시 숫자를 계산에 사용
-    else n = Number(this.shownNumber);
+    } else {
+      // 아니면 표시 숫자를 계산에 사용
+      n = Number(this.shownNumber);
+      this.repeatNumber = n;
+    }
 
     // 사전에 정해진 연산자에 따라 실제 계산
     switch (this.mOperator) {
@@ -201,7 +204,7 @@ export class Calculator {
           preNumber: this.number,
           operator: this.getOperatorString() as string,
           argNumber: n,
-          resultNumber: this.number + n
+          resultNumber: this.number + n,
         });
         break;
       case Operator.Minus:
@@ -209,7 +212,7 @@ export class Calculator {
           preNumber: this.number,
           operator: this.getOperatorString() as string,
           argNumber: n,
-          resultNumber: this.number - n
+          resultNumber: this.number - n,
         });
         break;
       case Operator.Mul:
@@ -217,7 +220,7 @@ export class Calculator {
           preNumber: this.number,
           operator: this.getOperatorString() as string,
           argNumber: n,
-          resultNumber: this.number * n
+          resultNumber: this.number * n,
         });
         break;
       case Operator.Div:
@@ -225,7 +228,7 @@ export class Calculator {
           preNumber: this.number,
           operator: this.getOperatorString() as string,
           argNumber: n,
-          resultNumber: this.number / n
+          resultNumber: this.number / n,
         });
         break;
       default:
@@ -239,16 +242,6 @@ export class Calculator {
       // 전 연산자가 없을 경우 표시 숫자를 백업
       this.shownToNumber();
     } else {
-      // 전 연산자가 있을 경우
-      if (this.willReset && this.mOperator != operator) {
-        // 초기화 예정이고 연산자가 반복이 아니면
-        this.repeatNumber = 0; // 반복 숫자 0
-      } // 아니면 표시 숫자를 반복 숫자로
-      else {
-        if (this.repeatNumber == 0)
-          this.repeatNumber = Number(this.shownNumber);
-      }
-
       this.preCalc(); // 계산
 
       this.numberToShown(); // 저장 숫자를 표시 숫자로
@@ -315,7 +308,7 @@ export class Calculator {
         preNumber: preNumber,
         operator: this.getOperatorString(Operator.Percent) as string,
         argNumber: argNumber,
-        resultNumber: this.number * 100 // 100을 곱하여 퍼센트를 계산
+        resultNumber: this.number * 100, // 100을 곱하여 퍼센트를 계산
       });
       this.numberToShown();
     }
@@ -331,7 +324,7 @@ export class Calculator {
           preNumber: Number(this.shownNumber),
           operator: this.getOperatorString(Operator.Rec) as string,
           argNumber: null,
-          resultNumber: 1 / Number(this.shownNumber)
+          resultNumber: 1 / Number(this.shownNumber),
         })
       );
     }
@@ -344,7 +337,7 @@ export class Calculator {
         preNumber: Number(this.shownNumber),
         operator: this.getOperatorString(Operator.Pow2) as string,
         argNumber: null,
-        resultNumber: Number(this.shownNumber) ** 2
+        resultNumber: Number(this.shownNumber) ** 2,
       })
     );
   }
@@ -356,7 +349,7 @@ export class Calculator {
         preNumber: Number(this.shownNumber),
         operator: this.getOperatorString(Operator.Sqrt) as string,
         argNumber: null,
-        resultNumber: Math.sqrt(Number(this.shownNumber))
+        resultNumber: Math.sqrt(Number(this.shownNumber)),
       })
     );
   }
