@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onMounted, onBeforeUnmount, reactive, ref, watch, computed, onBeforeMount } from 'vue';
+import { onMounted, onBeforeUnmount, reactive, ref, watch, computed } from 'vue';
 import tinykeys, { KeyBindingMap } from 'tinykeys';
 import { copyToClipboard, useQuasar } from 'quasar';
 
@@ -68,7 +68,7 @@ function setNeedResultTooltip () {
   const sw = resultRef.value?.scrollWidth as number;
   // 원래의 칸 크기보다 결과 문자열 길이가 길면 툴팁을 표시
   needResultTooltip.value = ow < sw;
-  if (ow < sw) console.log(historyRef.value)
+  // if (ow < sw) console.log(historyRef.value)
 }
 
 // 계산 결과, 연산자, 툴팁을 갱신하는 함수
@@ -265,14 +265,6 @@ const operatorIcon: { [key: string]: string } = {
   '÷': 'mdi-division-box',
 }
 
-// onBeforeMount(() => {
-//   // eslint-disable-next-line @typescript-eslint/no-empty-function
-//   Element.prototype.scrollTo = () => { };
-// });
-
-// const historyRef = ref<HTMLDivElement | null>(null);
-const historyRef = ref<HTMLDivElement | null>(null);
-
 const isGoTopInHistory = ref(false);
 
 function onScroll (evt: Event) {
@@ -285,12 +277,6 @@ function onScroll (evt: Event) {
 }
 
 function goTopInHistory () {
-  // historyRef.value?.scrollTo({ top: 0, behavior: 'smooth' });
-  // console.log(historyRef.value?.scrollTop);
-  // console.log(historyRef);
-  // console.log(resultRef);
-  // console.log(document.getElementById('history'));
-  console.log(document.getElementById('history')?.scrollTo);
   document.getElementById('history')?.scrollTo({ top: 0, behavior: 'smooth' });
 }
 </script>
@@ -298,28 +284,52 @@ function goTopInHistory () {
 <template>
   <q-page id="qcalc" @focusin="($event.target as HTMLElement).blur()">
     <q-card flat class="row wrap q-px-md q-py-xs">
-      <q-card-section class="noselect col-9 row no-wrap items-center justify-start q-py-none q-px-xs">
-        <q-checkbox v-model="calcStore.useGrouping" label="쉼표: " left-label class="q-ml-sm" @click="setUseGrouping()" />
+      <q-card-section
+        class="noselect col-9 row no-wrap items-center justify-start q-py-none q-px-xs"
+      >
+        <q-checkbox
+          v-model="calcStore.useGrouping"
+          label="쉼표: "
+          left-label
+          class="q-ml-sm"
+          @click="setUseGrouping()"
+        />
         <div class="col-7 row no-wrap items-center">
           <my-tooltip>
             소수점 고정 상태:
             {{
-                calcStore.decimalPlaces == -2
-                  ? '제한 없음'
-                  : `${calcStore.decimalPlaces} 자리`
+              calcStore.decimalPlaces == -2
+                ? '제한 없음'
+                : `${calcStore.decimalPlaces} 자리`
             }}
           </my-tooltip>
           <div>소수점:</div>
-          <q-slider v-model="calcStore.decimalPlaces" :min="-2" :step="2" :max="6" marker-labels class="col-6 q-ml-md"
-            @change="setDecimalPlaces()">
+          <q-slider
+            v-model="calcStore.decimalPlaces"
+            :min="-2"
+            :step="2"
+            :max="6"
+            marker-labels
+            class="col-6 q-ml-md"
+            @change="setDecimalPlaces()"
+          >
             <template v-slot:marker-label-group="{ markerList }">
-              <div class="cursor-pointer" :class="(markerList[0] as any).classes" :style="(markerList[0] as any).style"
-                @click="setDecimalPlaces((markerList[0] as any).value)">
+              <div
+                class="cursor-pointer"
+                :class="(markerList[0] as any).classes"
+                :style="(markerList[0] as any).style"
+                @click="setDecimalPlaces((markerList[0] as any).value)"
+              >
                 x
               </div>
-              <div v-for="val in [1, 2, 3, 4]" :key="val" class="cursor-pointer"
-                :class="(markerList[val] as any).classes" :style="(markerList[val] as any).style"
-                @click="setDecimalPlaces((markerList[val] as any).value)">
+              <div
+                v-for="val in [1, 2, 3, 4]"
+                :key="val"
+                class="cursor-pointer"
+                :class="(markerList[val] as any).classes"
+                :style="(markerList[val] as any).style"
+                @click="setDecimalPlaces((markerList[val] as any).value)"
+              >
                 {{ (markerList[val] as any).value }}
               </div>
             </template>
@@ -327,32 +337,60 @@ function goTopInHistory () {
         </div>
       </q-card-section>
 
-      <q-card-section class="noselect col-3 row no-wrap justify-end q-py-none q-px-sm">
+      <q-card-section
+        class="noselect col-3 row no-wrap justify-end q-py-none q-px-sm"
+      >
         <!-- <q-btn class="q-pr-xs" flat v-if="operator" :label="operator">
           <my-tooltip>현재 연산자</my-tooltip>
         </q-btn> -->
-        <q-btn flat icon="content_copy" color="primary" class="q-ma-none q-pa-none q-pl-xs" @click="doCopy">
+        <q-btn
+          flat
+          icon="content_copy"
+          color="primary"
+          class="q-ma-none q-pa-none q-pl-xs"
+          @click="doCopy"
+        >
           <my-tooltip>클릭하면 결과가 복사됩니다.</my-tooltip>
         </q-btn>
-        <q-btn flat icon="content_paste" color="primary" class="q-ma-none q-pa-none q-pl-xs" @click="doPaste">
+        <q-btn
+          flat
+          icon="content_paste"
+          color="primary"
+          class="q-ma-none q-pa-none q-pl-xs"
+          @click="doPaste"
+        >
           <my-tooltip>클릭하면 숫자를 붙혀넣습니다.</my-tooltip>
         </q-btn>
-        <q-btn flat icon="history" color="primary" class="q-ma-none q-pa-none q-pl-xs q-pr-xs"
-          @click="showHistory = true">
+        <q-btn
+          flat
+          icon="history"
+          color="primary"
+          class="q-ma-none q-pa-none q-pl-xs q-pr-xs"
+          @click="showHistory = true"
+        >
           <my-tooltip>클릭하면 계산 결과 기록을 봅니다.</my-tooltip>
         </q-btn>
       </q-card-section>
       <q-card-section class="col-12 q-px-sm q-pt-none q-pb-sm">
-        <q-field :model-value="result" class="shadow-4 self-center" filled dense
-          :bg-color="needResultTooltip ? 'amber-2' : 'grey-2'">
+        <q-field
+          :model-value="result"
+          class="shadow-4 self-center"
+          filled
+          dense
+          :bg-color="needResultTooltip ? 'amber-2' : 'grey-2'"
+        >
           <template v-slot:prepend v-if="operator != ''">
             <div class="full-height q-mt-xs q-pt-xs">
               <q-icon :name="operatorIcon[operator]" />
             </div>
           </template>
           <template v-slot:control>
-            <div ref="resultRef" v-mutation="setNeedResultTooltip" v-mutation.characterData
-              class="self-center full-width no-outline ellipsis text-h4 text-right">
+            <div
+              ref="resultRef"
+              v-mutation="setNeedResultTooltip"
+              v-mutation.characterData
+              class="self-center full-width no-outline ellipsis text-h4 text-right"
+            >
               {{ result }}
               <my-tooltip v-if="needResultTooltip">{{ result }}</my-tooltip>
             </div>
@@ -360,39 +398,74 @@ function goTopInHistory () {
         </q-field>
       </q-card-section>
 
-      <q-card-section class="noselect col-3 q-pa-sm" v-for="(button, index) in buttons" :key="index">
-        <q-btn class="glossy shadow-4 text-h5 full-width" style="overflow: auto; min-height: 44px; max-height: 44px"
-          no-caps :label="button[0].charAt(0) != '@' ? button[0] : undefined"
-          :icon="button[0].charAt(0) == '@' ? button[0].slice(1) : undefined" :color="button[1]" @click="button[3]" />
+      <q-card-section
+        class="noselect col-3 q-pa-sm"
+        v-for="(button, index) in buttons"
+        :key="index"
+      >
+        <q-btn
+          class="glossy shadow-4 text-h5 full-width"
+          style="overflow: auto; min-height: 44px; max-height: 44px"
+          no-caps
+          :label="button[0].charAt(0) != '@' ? button[0] : undefined"
+          :icon="button[0].charAt(0) == '@' ? button[0].slice(1) : undefined"
+          :color="button[1]"
+          @click="button[3]"
+        />
       </q-card-section>
     </q-card>
   </q-page>
 
-  <q-dialog v-model="showHistory" style="z-index: 10" position="bottom" transition-duration="300">
-    <q-bar dark class="noselect bg-primary text-white" @focusin="($event.target as HTMLElement).blur()">
+  <q-dialog
+    v-model="showHistory"
+    style="z-index: 10"
+    position="bottom"
+    transition-duration="300"
+  >
+    <q-bar
+      dark
+      class="noselect bg-primary text-white"
+      @focusin="($event.target as HTMLElement).blur()"
+    >
       <q-icon name="history" />
       <div>계산 결과</div>
 
       <q-space />
 
-      <q-btn dense flat icon="publish" v-if="isGoTopInHistory" @click="goTopInHistory" />
       <q-btn dense flat icon="delete_outline" @click="doDeleteHistory = true" />
       <q-btn dense flat icon="close" @click="showHistory = false" />
     </q-bar>
-    <q-card @scroll="onScroll" class='scroll' ref="historyRef" id="history">
+    <q-card @scroll="onScroll" class="scroll relative-position" id="history">
+      <q-bar
+        id="goTop"
+        class="row justify-around full-width fixed dark bg-teal text-white cursor-pointer"
+        v-show="isGoTopInHistory"
+        style="z-index: 12"
+        @click="goTopInHistory"
+      >
+        <q-btn dense flat icon="publish" />
+      </q-bar>
       <q-card-section>
         <q-list separator>
-          <q-item v-for="(item, index) in resultHistory" :key="index" class="text-right q-pa-sm">
+          <q-item
+            v-for="(item, index) in resultHistory"
+            :key="index"
+            class="text-right q-pa-sm"
+          >
             <q-item-section>
               <q-item-label>
                 {{
-                    ['+', '-', '×', '÷'].includes(item.operator) ?
-                      `${toLocale(item.preNumber)} ${item.operator} ${toLocale(item.argNumber as number)}`
-                      : ['%'].includes(item.operator) ?
-                        `${toLocale(item.preNumber)} / ${toLocale(item.argNumber as number)} * 100`
-                        : ['rec', 'pow2', 'sqrt'].includes(item.operator) ?
-                          `${item.operator} ( ${toLocale(item.preNumber)} )`
-                          : toLocale(item.preNumber)
+                  ['+', '-', '×', '÷'].includes(item.operator)
+                    ? `${toLocale(item.preNumber)} ${item.operator} ${toLocale(
+                        item.argNumber as number
+                      )}`
+                    : ['%'].includes(item.operator)
+                    ? `${toLocale(item.preNumber)} / ${toLocale(
+                        item.argNumber as number
+                      )} * 100`
+                    : ['rec', 'pow2', 'sqrt'].includes(item.operator)
+                    ? `${item.operator} ( ${toLocale(item.preNumber)} )`
+                    : toLocale(item.preNumber)
                 }}
               </q-item-label>
               <q-item-label>
@@ -406,20 +479,32 @@ function goTopInHistory () {
     </q-card>
   </q-dialog>
 
-  <q-dialog v-model="doDeleteHistory" persistent transition-show="scale" transition-hide="scale" style="z-index: 15">
+  <q-dialog
+    v-model="doDeleteHistory"
+    persistent
+    transition-show="scale"
+    transition-hide="scale"
+    style="z-index: 15"
+  >
     <q-card class="noselect bg-teal text-white" style="width: 200px">
       <q-card-section> 계산 기록을 지우겠어요? </q-card-section>
 
-      <q-card-actions align="right" class="bg-white text-teal">
+      <q-card-actions align="center" class="bg-white text-teal">
         <q-btn flat label="아니" v-close-popup />
-        <q-btn flat label="ㅇㅇ" @click="calc.clearHistory()" autofocus v-close-popup />
+        <q-btn
+          flat
+          label="ㅇㅇ"
+          @click="calc.clearHistory()"
+          autofocus
+          v-close-popup
+        />
       </q-card-actions>
     </q-card>
   </q-dialog>
 </template>
 
 <style scoped>
-.q-btn>>>.q-icon {
+.q-btn >>> .q-icon {
   font-size: 24px;
 }
 
