@@ -68,6 +68,7 @@ function setNeedResultTooltip () {
   const sw = resultRef.value?.scrollWidth as number;
   // 원래의 칸 크기보다 결과 문자열 길이가 길면 툴팁을 표시
   needResultTooltip.value = ow < sw;
+  if (ow < sw) console.log(historyRef.value)
 }
 
 // 계산 결과, 연산자, 툴팁을 갱신하는 함수
@@ -264,10 +265,10 @@ const operatorIcon: { [key: string]: string } = {
   '÷': 'mdi-division-box',
 }
 
-onBeforeMount(() => {
-  // eslint-disable-next-line @typescript-eslint/no-empty-function
-  Element.prototype.scrollTo = () => { };
-});
+// onBeforeMount(() => {
+//   // eslint-disable-next-line @typescript-eslint/no-empty-function
+//   Element.prototype.scrollTo = () => { };
+// });
 
 // const historyRef = ref<HTMLDivElement | null>(null);
 const historyRef = ref<HTMLDivElement | null>(null);
@@ -285,7 +286,12 @@ function onScroll (evt: Event) {
 
 function goTopInHistory () {
   // historyRef.value?.scrollTo({ top: 0, behavior: 'smooth' });
-  console.log(historyRef.value?.scrollTop);
+  // console.log(historyRef.value?.scrollTop);
+  // console.log(historyRef);
+  // console.log(resultRef);
+  // console.log(document.getElementById('history'));
+  console.log(document.getElementById('history')?.scrollTo);
+  document.getElementById('history')?.scrollTo({ top: 0, behavior: 'smooth' });
 }
 </script>
 
