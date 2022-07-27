@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onMounted, onBeforeUnmount, reactive, ref, watch, computed, onBeforeMount } from 'vue';
+import { onMounted, onBeforeUnmount, reactive, ref, watch, computed } from 'vue';
 import tinykeys, { KeyBindingMap } from 'tinykeys';
 import { copyToClipboard, useQuasar } from 'quasar';
 
@@ -68,7 +68,6 @@ function setNeedResultTooltip () {
   const sw = resultRef.value?.scrollWidth as number;
   // 원래의 칸 크기보다 결과 문자열 길이가 길면 툴팁을 표시
   needResultTooltip.value = ow < sw;
-  if (ow < sw) console.log(historyRef.value)
 }
 
 // 계산 결과, 연산자, 툴팁을 갱신하는 함수
@@ -265,13 +264,7 @@ const operatorIcon: { [key: string]: string } = {
   '÷': 'mdi-division-box',
 }
 
-// onBeforeMount(() => {
-//   // eslint-disable-next-line @typescript-eslint/no-empty-function
-//   Element.prototype.scrollTo = () => { };
-// });
-
 // const historyRef = ref<HTMLDivElement | null>(null);
-const historyRef = ref<HTMLDivElement | null>(null);
 
 const isGoTopInHistory = ref(false);
 
@@ -285,12 +278,6 @@ function onScroll (evt: Event) {
 }
 
 function goTopInHistory () {
-  // historyRef.value?.scrollTo({ top: 0, behavior: 'smooth' });
-  // console.log(historyRef.value?.scrollTop);
-  // console.log(historyRef);
-  // console.log(resultRef);
-  // console.log(document.getElementById('history'));
-  console.log(document.getElementById('history')?.scrollTo);
   document.getElementById('history')?.scrollTo({ top: 0, behavior: 'smooth' });
 }
 </script>
@@ -375,14 +362,17 @@ function goTopInHistory () {
 
       <q-space />
 
-      <q-btn dense flat icon="publish" v-if="isGoTopInHistory" @click="goTopInHistory" />
       <q-btn dense flat icon="delete_outline" @click="doDeleteHistory = true" />
       <q-btn dense flat icon="close" @click="showHistory = false" />
     </q-bar>
-    <q-card @scroll="onScroll" class='scroll' ref="historyRef" id="history">
+    <q-card @scroll="onScroll" class="scroll relative-position" id="history">
+      <q-bar id='goTop' class="row justify-around full-width fixed dark bg-teal text-white cursor-pointer"
+        v-show="isGoTopInHistory" style="z-index: 12" @click="goTopInHistory">
+        <q-btn dense flat icon="publish" />
+      </q-bar>
       <q-card-section>
         <q-list separator>
-          <q-item v-for="(item, index) in resultHistory" :key="index" class="text-right q-pa-sm">
+          <q-item v-for=" (item, index) in resultHistory" :key="index" class="text-right q-pa-sm">
             <q-item-section>
               <q-item-label>
                 {{
@@ -410,7 +400,7 @@ function goTopInHistory () {
     <q-card class="noselect bg-teal text-white" style="width: 200px">
       <q-card-section> 계산 기록을 지우겠어요? </q-card-section>
 
-      <q-card-actions align="right" class="bg-white text-teal">
+      <q-card-actions align="center" class="bg-white text-teal">
         <q-btn flat label="아니" v-close-popup />
         <q-btn flat label="ㅇㅇ" @click="calc.clearHistory()" autofocus v-close-popup />
       </q-card-actions>
