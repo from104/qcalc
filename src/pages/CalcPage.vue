@@ -90,6 +90,8 @@ watch([calc, localeOptions], () => {
 
 const $q = useQuasar();
 
+// TODO: 창에서 선택한 내용이 있으면 선택한 내용을 클립보드에 복사하고
+//       아니면 계산 결과를 클립보드에 복사하는 기능으로 수정 필요
 function doCopy (): void {
   copyToClipboard(result.value)
     .then(() => {
