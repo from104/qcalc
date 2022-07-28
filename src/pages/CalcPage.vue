@@ -52,7 +52,7 @@ function toLocale (value: number): string {
 
 // 계산 결과를 표시하는 변수 선언
 const result = ref('');
-const resultRef = ref<HTMLDivElement | null>(null);
+// const resultRef = ref<HTMLDivElement | null>(null);
 
 // 연산자를 표시하는 변수 선언
 const operator = ref('');
@@ -62,10 +62,10 @@ const needResultTooltip = ref(false);
 
 function setNeedResultTooltip () {
   // 원래 결과 칸 길이
-  const ow = resultRef.value?.offsetWidth as number;
+  const ow = document.getElementById('result')?.offsetWidth ?? 0;
   // 결과 문자열의 크기
   // (원래 칸에 결과 길이가 넘치면 스크롤 해야하는데 ...로 대체 시킨 경우 스크롤해야할 폭 값만 커진다.)
-  const sw = resultRef.value?.scrollWidth as number;
+  const sw = document.getElementById('result')?.scrollWidth ?? 0;
   // 원래의 칸 크기보다 결과 문자열 길이가 길면 툴팁을 표시
   needResultTooltip.value = ow < sw;
   // if (ow < sw) console.log(historyRef.value)
@@ -269,7 +269,7 @@ const isGoTopInHistory = ref(false);
 
 function onScroll (evt: Event) {
   // console.log((evt.target as HTMLDivElement).scrollTop);
-  if ((evt.target as HTMLDivElement).scrollTop > 80) {
+  if ((evt.target as HTMLDivElement).scrollTop > 50) {
     isGoTopInHistory.value = true;
   } else {
     isGoTopInHistory.value = false;
@@ -385,12 +385,17 @@ function goTopInHistory () {
             </div>
           </template>
           <template v-slot:control>
+<<<<<<< HEAD
             <div
               ref="resultRef"
               v-mutation="setNeedResultTooltip"
               v-mutation.characterData
               class="self-center full-width no-outline ellipsis text-h4 text-right"
             >
+=======
+            <div id="result" ref="resultRef" v-mutation="setNeedResultTooltip" v-mutation.characterData
+              class="self-center full-width no-outline ellipsis text-h4 text-right">
+>>>>>>> ff3fbca (히스토리에서 맨위로 가기 기능 추가)
               {{ result }}
               <my-tooltip v-if="needResultTooltip">{{ result }}</my-tooltip>
             </div>
@@ -435,6 +440,7 @@ function goTopInHistory () {
       <q-btn dense flat icon="delete_outline" @click="doDeleteHistory = true" />
       <q-btn dense flat icon="close" @click="showHistory = false" />
     </q-bar>
+<<<<<<< HEAD
     <q-card @scroll="onScroll" class="scroll relative-position" id="history">
       <q-bar
         id="goTop"
@@ -452,6 +458,28 @@ function goTopInHistory () {
             :key="index"
             class="text-right q-pa-sm"
           >
+=======
+    <q-card @scroll="onScroll" class="row justify-center items-start scroll relative-position" id="history">
+      <!-- <q-bar id='goTop' class="row justify-around full-width fixed dark bg-teal text-white cursor-pointer"
+        v-show="isGoTopInHistory" style="z-index: 12" @click="goTopInHistory">
+        <q-btn dense flat icon="publish" />
+      </q-bar> -->
+      <transition name="slide-fade">
+        <q-btn round glossy color="secondary" icon="publish" id="goTop" class="fixed q-ma-md" v-if="isGoTopInHistory"
+          style="z-index: 12" @click="goTopInHistory" transition-show="slide-down" transition-hide="slide-down" />
+      </transition>
+      <q-card-section class='full-width'>
+        <q-item v-if="resultHistory.length == 0" class="text-center">
+          <q-item-section>
+            <q-item-label>
+              <span>계산 결과가 없습니다.</span>
+            </q-item-label>
+          </q-item-section>
+        </q-item>
+        <q-list v-else separator>
+          <q-separator />
+          <q-item v-for=" (item, index) in resultHistory" :key="index" class="text-right q-pa-sm">
+>>>>>>> ff3fbca (히스토리에서 맨위로 가기 기능 추가)
             <q-item-section>
               <q-item-label>
                 {{
@@ -516,5 +544,16 @@ function goTopInHistory () {
 
 .q-bar {
   max-width: calc(100vw - 45px);
+}
+
+.slide-fade-enter-active,
+.slide-fade-leave-active {
+  transition: all 0.2s ease-out;
+}
+
+.slide-fade-enter-from,
+.slide-fade-leave-to {
+  opacity: 0;
+  transform: translateY(-20px);
 }
 </style>
