@@ -1,6 +1,6 @@
 {
   "name": "qcalc",
-  "version": "0.4.1",
+  "version": "0.4.2",
   "description": "com.electron.qcalc",
   "productName": "Simple Calculator",
   "author": "Seo Kihyun <from104@gmail.com>",

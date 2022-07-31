@@ -26,6 +26,7 @@ const operatorMap: { [key: string]: Operator } = {
 };
 
 interface History {
+  id?: number;
   preNumber: number;
   operator: string;
   argNumber: number | null;
@@ -327,6 +328,8 @@ export class Calculator {
           resultNumber: 1 / Number(this.shownNumber),
         })
       );
+      this.repeatNumber = 0;
+      this.willReset = true;
     }
   }
 
@@ -340,6 +343,8 @@ export class Calculator {
         resultNumber: Number(this.shownNumber) ** 2,
       })
     );
+    this.repeatNumber = 0;
+    this.willReset = true;
   }
 
   // 제곱근 계산
@@ -352,10 +357,18 @@ export class Calculator {
         resultNumber: Math.sqrt(Number(this.shownNumber)),
       })
     );
+    this.repeatNumber = 0;
+    this.willReset = true;
   }
 
   // 히스토리 추가
   private addHistory(history: History): number {
+    // console.log(history);
+    if (this.history.length == 0) {
+      history.id = 1;
+    } else {
+      history.id = Math.max(...(this.history.map((h) => h.id) as number[])) + 1;
+    }
     // 배열 앞에 히스토리 추가
     this.history.unshift(history);
 
