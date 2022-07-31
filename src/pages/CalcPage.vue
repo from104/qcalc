@@ -102,8 +102,8 @@ const $q = useQuasar();
 // 창에서 선택한 내용이 있으면 선택한 내용을 클립보드에 복사하고
 // 아니면 계산 결과를 클립보드에 복사한다.
 function doCopy (): void {
-  const selectedText = document.getSelection()?.toString();
-  const textToClipboard = selectedText == '' ? selectedText : result.value;
+  const selectedText = document.getSelection()?.toString() ?? '';
+  const textToClipboard = selectedText == '' ? result.value : selectedText;
   const targetToBeCopied = selectedText == '' ? '계산 결과를' : '선택한 내용을';
   copyToClipboard(textToClipboard)
     .then(() => {
@@ -278,6 +278,7 @@ const resultHistory = computed(() => (calc.getHistory() as unknown) as History[]
 const doDeleteHistory = ref(false);
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 const operatorIcon: { [key: string]: string } = {
   '+': 'mdi-plus-box',
   '-': 'mdi-minus-box',
@@ -289,18 +290,45 @@ const operatorIcon: { [key: string]: string } = {
 >>>>>>> 0deaf1f (계산 결과 기록 복사 가능하도록 수정)
 
 const isGoTopInHistory = ref(false);
+=======
+// 계산 결과 맨 위로 가는 아이콘 표시 여부
+const isGoToTopInHistory = ref(false);
+>>>>>>> a4135c6 (계산 결과 히스토리 표시 일부 수정)
 
+// 계산 결과 창 스크롤 위치에 따라 아이콘 표시 설정
 function onScroll (evt: Event) {
-  // console.log((evt.target as HTMLDivElement).scrollTop);
   if ((evt.target as HTMLDivElement).scrollTop > 50) {
-    isGoTopInHistory.value = true;
+    isGoToTopInHistory.value = true;
   } else {
-    isGoTopInHistory.value = false;
+    isGoToTopInHistory.value = false;
   }
 }
 
-function goTopInHistory () {
+// 계산 결과 창 스크롤 위치를 최상단으로 이동
+function goToTopInHistory () {
   document.getElementById('history')?.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// 계산 결과 중 좌변
+function getLeftSideInHistory (h: History) {
+  if (['+', '-', '×', '÷'].includes(h.operator)) {
+    return `${toLocale(h.preNumber)} ${h.operator} ${toLocale(h.argNumber as number)}`
+  } else if (h.operator == '%') {
+    return `${toLocale(h.preNumber)} ÷ ${toLocale(h.argNumber as number)} × 100`
+  } else if (h.operator == 'rec') {
+    return `1 ÷ ${toLocale(h.preNumber)}`
+  } else if (h.operator == 'pow2') {
+    return `${toLocale(h.preNumber)} × ${toLocale(h.preNumber)}`
+  } else if (['sqrt'].includes(h.operator)) {
+    return `${h.operator} ( ${toLocale(h.preNumber)} )`
+  } else {
+    return toLocale(h.preNumber)
+  }
+}
+
+// 계산 결과 중 우변
+function getRightSideInHistory (h: History) {
+  return '= ' + toLocale(h.resultNumber);
 }
 </script>
 
@@ -360,6 +388,7 @@ function goTopInHistory () {
         </div>
       </q-card-section>
 
+<<<<<<< HEAD
       <q-card-section
         class="noselect col-3 row no-wrap justify-end q-py-none q-px-sm"
       >
@@ -373,6 +402,10 @@ function goTopInHistory () {
           class="q-ma-none q-pa-none q-pl-xs"
           @click="doCopy"
         >
+=======
+      <q-card-section class="noselect col-3 row no-wrap justify-end q-py-none q-px-sm">
+        <q-btn flat icon="content_copy" color="primary" class="q-ma-none q-pa-none q-pl-xs" @click="doCopy">
+>>>>>>> a4135c6 (계산 결과 히스토리 표시 일부 수정)
           <my-tooltip>클릭하면 결과가 복사됩니다.</my-tooltip>
         </q-btn>
         <q-btn
@@ -394,6 +427,7 @@ function goTopInHistory () {
           <my-tooltip>클릭하면 계산 결과 기록을 봅니다.</my-tooltip>
         </q-btn>
       </q-card-section>
+
       <q-card-section class="col-12 q-px-sm q-pt-none q-pb-sm">
 <<<<<<< HEAD
         <q-field
@@ -436,6 +470,7 @@ function goTopInHistory () {
         </q-field>
       </q-card-section>
 
+<<<<<<< HEAD
       <q-card-section
         class="noselect col-3 q-pa-sm"
         v-for="(button, index) in buttons"
@@ -450,6 +485,12 @@ function goTopInHistory () {
           :color="button[1]"
           @click="button[3]"
         />
+=======
+      <q-card-section class="noselect col-3 q-pa-sm" v-for="(button, index) in buttons" :key="index">
+        <q-btn class="glossy shadow-4 text-h5 full-width" id="calc-button" no-caps
+          :label="button[0].charAt(0) != '@' ? button[0] : undefined"
+          :icon="button[0].charAt(0) == '@' ? button[0].slice(1) : undefined" :color="button[1]" @click="button[3]" />
+>>>>>>> a4135c6 (계산 결과 히스토리 표시 일부 수정)
       </q-card-section>
     </q-card>
   </q-page>
@@ -467,12 +508,11 @@ function goTopInHistory () {
     >
       <q-icon name="history" />
       <div>계산 결과</div>
-
       <q-space />
-
       <q-btn dense flat icon="delete_outline" @click="doDeleteHistory = true" />
       <q-btn dense flat icon="close" @click="showHistory = false" />
     </q-bar>
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
     <q-card @scroll="onScroll" class="scroll relative-position" id="history">
@@ -499,11 +539,14 @@ function goTopInHistory () {
         <q-btn dense flat icon="publish" />
       </q-bar> -->
 =======
+=======
+
+>>>>>>> a4135c6 (계산 결과 히스토리 표시 일부 수정)
     <q-card @scroll="onScroll" square class="row justify-center items-start scroll relative-position" id="history">
 >>>>>>> 0deaf1f (계산 결과 기록 복사 가능하도록 수정)
       <transition name="slide-fade">
-        <q-btn round glossy color="secondary" icon="publish" id="goTop" class="fixed q-ma-md" v-if="isGoTopInHistory"
-          style="z-index: 12" @click="goTopInHistory" transition-show="slide-down" transition-hide="slide-down" />
+        <q-btn round glossy color="secondary" icon="publish" class="fixed q-ma-md" v-if="isGoToTopInHistory"
+          style="z-index: 12" @click="goToTopInHistory" />
       </transition>
       <q-card-section class='full-width'>
         <q-item v-if="resultHistory.length == 0" class="text-center">
@@ -545,18 +588,10 @@ function goTopInHistory () {
             <q-item v-for="h in resultHistory" :key="h.id" class="history-list-item text-right q-pa-sm">
               <q-item-section>
                 <q-item-label>
-                  {{
-                      ['+', '-', '×', '÷'].includes(h.operator) ?
-                        `${toLocale(h.preNumber)} ${h.operator} ${toLocale(h.argNumber as number)}`
-                        : ['%'].includes(h.operator) ?
-                          `${toLocale(h.preNumber)} / ${toLocale(h.argNumber as number)} * 100`
-                          : ['rec', 'pow2', 'sqrt'].includes(h.operator) ?
-                            `${h.operator} ( ${toLocale(h.preNumber)} )`
-                            : toLocale(h.preNumber)
-                  }}
+                  {{ getLeftSideInHistory(h) }}
                 </q-item-label>
                 <q-item-label>
-                  {{ `= ${toLocale(h.resultNumber)}` }}
+                  {{ getRightSideInHistory(h) }}
                 </q-item-label>
               </q-item-section>
             </q-item>
@@ -576,7 +611,6 @@ function goTopInHistory () {
   >
     <q-card class="noselect bg-teal text-white" style="width: 200px">
       <q-card-section> 계산 기록을 지우겠어요? </q-card-section>
-
       <q-card-actions align="center" class="bg-white text-teal">
 <<<<<<< HEAD
         <q-btn flat label="아니" v-close-popup />
@@ -599,6 +633,12 @@ function goTopInHistory () {
 <style scoped>
 .q-btn >>> .q-icon {
   font-size: 24px;
+}
+
+#calc-button {
+  overflow: auto;
+  min-height: 44px;
+  max-height: 44px;
 }
 
 .q-bar {
