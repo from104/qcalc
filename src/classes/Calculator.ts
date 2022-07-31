@@ -26,6 +26,7 @@ const operatorMap: { [key: string]: Operator } = {
 };
 
 interface History {
+  id?: number;
   preNumber: number;
   operator: string;
   argNumber: number | null;
@@ -356,6 +357,12 @@ export class Calculator {
 
   // 히스토리 추가
   private addHistory(history: History): number {
+    // console.log(history);
+    if (this.history.length == 0) {
+      history.id = 1;
+    } else {
+      history.id = Math.max(...(this.history.map((h) => h.id) as number[])) + 1;
+    }
     // 배열 앞에 히스토리 추가
     this.history.unshift(history);
 
