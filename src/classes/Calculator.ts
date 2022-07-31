@@ -328,6 +328,8 @@ export class Calculator {
           resultNumber: 1 / Number(this.shownNumber),
         })
       );
+      this.repeatNumber = 0;
+      this.willReset = true;
     }
   }
 
@@ -341,6 +343,8 @@ export class Calculator {
         resultNumber: Number(this.shownNumber) ** 2,
       })
     );
+    this.repeatNumber = 0;
+    this.willReset = true;
   }
 
   // 제곱근 계산
@@ -353,6 +357,8 @@ export class Calculator {
         resultNumber: Math.sqrt(Number(this.shownNumber)),
       })
     );
+    this.repeatNumber = 0;
+    this.willReset = true;
   }
 
   // 히스토리 추가
