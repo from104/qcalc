@@ -43,7 +43,7 @@
 
 ### 클립보드
 
-- Control-c, Control-Insert: 결과를 클립보드로 복사
+- Control-c, Control-Insert: 계산 결과 또는 선택한 내용을 클립보드로 복사
 - Control-v, Shift-Insert: 클립보드로부터 앱에 붙혀넣기
 
 ## 앱 테스트 및 빌드 방법
