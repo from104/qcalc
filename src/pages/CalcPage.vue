@@ -325,9 +325,9 @@ function getRightSideInHistory (h: History) {
           <my-tooltip>
             소수점 고정 상태:
             {{
-                calcStore.decimalPlaces == -2
-                  ? '제한 없음'
-                  : `${calcStore.decimalPlaces} 자리`
+            calcStore.decimalPlaces == -2
+            ? '제한 없음'
+            : `${calcStore.decimalPlaces} 자리`
             }}
           </my-tooltip>
           <div>소수점:</div>
@@ -402,27 +402,29 @@ function getRightSideInHistory (h: History) {
           style="z-index: 12" @click="goToTopInHistory" />
       </transition>
       <q-card-section class='full-width'>
-        <q-item v-if="resultHistory.length == 0" class="text-center">
-          <q-item-section>
-            <q-item-label>
-              <span>계산 결과가 없습니다.</span>
-            </q-item-label>
-          </q-item-section>
-        </q-item>
-        <q-list v-else separator>
-          <transition-group name="history-list">
-            <q-item v-for="h in resultHistory" :key="h.id" class="history-list-item text-right q-pa-sm">
-              <q-item-section>
-                <q-item-label>
-                  {{ getLeftSideInHistory(h) }}
-                </q-item-label>
-                <q-item-label>
-                  {{ getRightSideInHistory(h) }}
-                </q-item-label>
-              </q-item-section>
-            </q-item>
-          </transition-group>
-        </q-list>
+        <transition name="slide-fade" mode="out-in">
+          <q-item v-if="resultHistory.length == 0" class="text-center">
+            <q-item-section>
+              <q-item-label>
+                <span>계산 결과가 없습니다.</span>
+              </q-item-label>
+            </q-item-section>
+          </q-item>
+          <q-list v-else separator>
+            <transition-group name="history-list">
+              <q-item v-for="h in resultHistory" :key="h.id" class="history-list-item text-right q-pa-sm">
+                <q-item-section>
+                  <q-item-label>
+                    {{ getLeftSideInHistory(h) }}
+                  </q-item-label>
+                  <q-item-label>
+                    {{ getRightSideInHistory(h) }}
+                  </q-item-label>
+                </q-item-section>
+              </q-item>
+            </transition-group>
+          </q-list>
+        </transition>
       </q-card-section>
     </q-card>
   </q-dialog>
