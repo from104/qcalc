@@ -71,26 +71,13 @@ onMounted(() => {
       <q-toolbar @focusin="($event.target as HTMLInputElement).blur()">
         <q-btn flat dense round icon="menu" aria-label="Menu" @click="toggleLeftDrawer" />
         <q-toolbar-title> 간단한 계산기 </q-toolbar-title>
-        <q-toggle
-          v-if="$q.platform.is.electron"
-          v-model="calcStore.alwaysOnTop"
-          label="항상 위 (T)"
-          left-label
-          keep-color
-          color="info"
-          @click="toggleAlwaysOnTop()"
-        />
+        <q-toggle v-if="$q.platform.is.electron" v-model="calcStore.alwaysOnTop" label="항상 위 (T)" left-label keep-color
+          color="info" @click="toggleAlwaysOnTop()" />
         <!-- :disable="!$q.platform.is.electron" -->
       </q-toolbar>
     </q-header>
 
-    <q-drawer
-      class="noselect"
-      style="z-index: 20"
-      v-model="leftDrawerOpen"
-      show-if-above
-      bordered
-    >
+    <q-drawer class="noselect" style="z-index: 20" v-model="leftDrawerOpen" show-if-above bordered>
       <q-list>
         <q-item-label class="text-h5" header> 메뉴 (M) </q-item-label>
         <PathRoute v-for="path in paths" :key="path.title" v-bind="path" />
@@ -99,7 +86,30 @@ onMounted(() => {
     </q-drawer>
 
     <q-page-container style="padding-bottom: 0px">
-      <router-view />
+      <!-- 트랜지션 적용 전 -->
+      <!-- <router-view /> -->
+      ㅣ
+      <!-- 트랜지션 적용 후 -->
+      <router-view v-slot="{ Component }">
+        <transition name="slide-fade" mode="out-in" appear>
+          <div :key="$route.path">
+            <component :is="Component"/>
+          </div>
+        </transition>
+      </router-view>
     </q-page-container>
   </q-layout>
 </template>
+
+<style lang="scss" scoped>
+.slide-fade-enter-active,
+.slide-fade-leave-active {
+  transition: all 0.2s ease;
+}
+
+.slide-fade-enter-from,
+.slide-fade-leave-to {
+  opacity: 0;
+  transform: translateX(-200px);
+}
+</style>
