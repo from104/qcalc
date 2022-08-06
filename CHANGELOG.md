@@ -4,10 +4,15 @@
 
 형식은 [Keep a Changelog (korean)]를 기반으로 하며 이 프로젝트는 [Semantic Versioning (korean)]을 따릅니다.
 
+## [0.4.3] - 2022-08-06
+
+- 마지막 계산 결과를 화면에 표시
+- 주 화면 전환 효과 추가
+
 ## [0.4.2] - 2022-07-31
 
 - 계산 결과 기록 화면 효과 추가
-- 계산 경과 기록 복사 가능하도록 수정
+- 계산 결과 기록 복사 가능하도록 수정
 
 ## [0.4.0] - 2022-07-25
 
@@ -43,5 +48,6 @@
 - 소수점 고정 기능, 모양 개선
 
 <!-- Links -->
+
 [keep a changelog (korean)]: https://keepachangelog.com/ko/1.0.0/
 [semantic versioning (korean)]: https://semver.org/lang/ko/
