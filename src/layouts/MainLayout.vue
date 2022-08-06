@@ -16,9 +16,24 @@ const calcStore = useCalcStore();
 const $q = useQuasar();
 
 const paths = [
-  { title: '계산기', caption: '간단한 계산기 (F2)', icon: 'calculate', path: '/' },
-  { title: '도움말', caption: '기능과 사용법 (F1)', icon: 'help', path: '/help' },
-  { title: '소개', caption: '앱에 대한 소개 (F3)', icon: 'info', path: '/about' },
+  {
+    title: '계산기',
+    caption: '간단한 계산기 (F2)',
+    icon: 'calculate',
+    path: '/',
+  },
+  {
+    title: '도움말',
+    caption: '기능과 사용법 (F1)',
+    icon: 'help',
+    path: '/help',
+  },
+  {
+    title: '소개',
+    caption: '앱에 대한 소개 (F3)',
+    icon: 'info',
+    path: '/about',
+  },
 ];
 
 const leftDrawerOpen = ref(false);
@@ -69,15 +84,35 @@ onMounted(() => {
   <q-layout view="lHh Lpr lFf">
     <q-header class="noselect" elevated>
       <q-toolbar @focusin="($event.target as HTMLInputElement).blur()">
-        <q-btn flat dense round icon="menu" aria-label="Menu" @click="toggleLeftDrawer" />
+        <q-btn
+          flat
+          dense
+          round
+          icon="menu"
+          aria-label="Menu"
+          @click="toggleLeftDrawer"
+        />
         <q-toolbar-title> 간단한 계산기 </q-toolbar-title>
-        <q-toggle v-if="$q.platform.is.electron" v-model="calcStore.alwaysOnTop" label="항상 위 (T)" left-label keep-color
-          color="info" @click="toggleAlwaysOnTop()" />
+        <q-toggle
+          v-if="$q.platform.is.electron"
+          v-model="calcStore.alwaysOnTop"
+          label="항상 위 (T)"
+          left-label
+          keep-color
+          color="info"
+          @click="toggleAlwaysOnTop()"
+        />
         <!-- :disable="!$q.platform.is.electron" -->
       </q-toolbar>
     </q-header>
 
-    <q-drawer class="noselect" style="z-index: 20" v-model="leftDrawerOpen" show-if-above bordered>
+    <q-drawer
+      class="noselect"
+      style="z-index: 20"
+      v-model="leftDrawerOpen"
+      show-if-above
+      bordered
+    >
       <q-list>
         <q-item-label class="text-h5" header> 메뉴 (M) </q-item-label>
         <PathRoute v-for="path in paths" :key="path.title" v-bind="path" />
@@ -92,7 +127,7 @@ onMounted(() => {
       <router-view v-slot="{ Component }">
         <transition name="slide-fade" mode="out-in" appear>
           <div :key="$route.path">
-            <component :is="Component"/>
+            <component :is="Component" />
           </div>
         </transition>
       </router-view>
