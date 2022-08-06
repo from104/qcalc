@@ -1,8 +1,13 @@
 <script setup lang="ts" />
 
 <template>
-  <q-tooltip class="text-dark bg-yellow text-center text-body2 fa-border-all" anchor="top middle" self="bottom middle"
-    style="border: 1px solid black; word-break: keep-all; word-wrap: break-word;" :delay="500">
+  <q-tooltip
+    class="text-dark bg-yellow text-center text-body2 fa-border-all"
+    anchor="top middle"
+    self="bottom middle"
+    style="border: 1px solid black; word-break: keep-all; word-wrap: break-word"
+    :delay="500"
+  >
     <slot />
   </q-tooltip>
 </template>

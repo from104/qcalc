@@ -1,5 +1,12 @@
 <script setup lang="ts">
-import { onMounted, onBeforeUnmount, reactive, ref, watch, computed } from 'vue';
+import {
+  onMounted,
+  onBeforeUnmount,
+  reactive,
+  ref,
+  watch,
+  computed,
+} from 'vue';
 import tinykeys, { KeyBindingMap } from 'tinykeys';
 import { copyToClipboard, useQuasar } from 'quasar';
 
@@ -25,13 +32,13 @@ const localeOptions: Intl.NumberFormatOptions = reactive({
 });
 
 // 쉼표 표시를 위한 옵션을 설정하는 함수
-function setUseGrouping () {
+function setUseGrouping() {
   localeOptions.useGrouping = calcStore.useGrouping;
 }
 
 // 소수점 표시를 위한 옵션을 설정하는 함수
 // 인자가 있으면 인자로 설정하고 없으면 스토어에서 가져온 값으로 설정한다.
-function setDecimalPlaces (decimalPlaces: number | undefined = undefined) {
+function setDecimalPlaces(decimalPlaces: number | undefined = undefined) {
   if (decimalPlaces !== undefined) {
     calcStore.setDecimalPlaces(decimalPlaces);
   }
@@ -46,7 +53,7 @@ function setDecimalPlaces (decimalPlaces: number | undefined = undefined) {
 }
 
 // 숫자를 표준 로케일 문자열로 변환하는 함수
-function toLocale (value: number): string {
+function toLocale(value: number): string {
   return value.toLocaleString(locale, localeOptions);
 }
 
@@ -62,13 +69,13 @@ const operatorIcons: { [key: string]: string } = {
   '-': 'mdi-minus-box',
   '×': 'mdi-close-box',
   '÷': 'mdi-division-box',
-}
+};
 
 // 계산 결과 툴팁 표시 상태 변수
 const needResultTooltip = ref(false);
 
 // 계산 결과가 길 경우 툴팁 표시 상태 셋팅
-function setNeedResultTooltip () {
+function setNeedResultTooltip() {
   // 원래 결과 칸 길이
   const ow = document.getElementById('result')?.offsetWidth ?? 0;
   // 결과 문자열의 크기
@@ -79,9 +86,12 @@ function setNeedResultTooltip () {
 }
 
 // 계산 결과, 연산자, 툴팁을 갱신하는 함수
-function refreshDisplay () {
+function refreshDisplay() {
   // 소수점 고정이 아니고 결과에 수소점이 있으면 소수점 표시를 해야한다.
-  if (calcStore.decimalPlaces === -2 && calc.getShownNumber().indexOf('.') !== -1) {
+  if (
+    calcStore.decimalPlaces === -2 &&
+    calc.getShownNumber().indexOf('.') !== -1
+  ) {
     const [integer, decimal] = calc.getShownNumber().split('.');
     result.value = `${toLocale(Number(integer))}.${decimal}`;
   } else {
@@ -100,7 +110,7 @@ const $q = useQuasar();
 
 // 창에서 선택한 내용이 있으면 선택한 내용을 클립보드에 복사하고
 // 아니면 계산 결과를 클립보드에 복사한다.
-function doCopy (): void {
+function doCopy(): void {
   const selectedText = document.getSelection()?.toString() ?? '';
   const textToClipboard = selectedText == '' ? result.value : selectedText;
   const targetToBeCopied = selectedText == '' ? '계산 결과를' : '선택한 내용을';
@@ -124,7 +134,7 @@ function doCopy (): void {
 }
 
 // 클립보드에 있는 숫자를 계산 결과에 추가하는 함수
-function doPaste (): void {
+function doPaste(): void {
   navigator.clipboard
     .readText()
     .then((text) => {
@@ -147,19 +157,19 @@ function doPaste (): void {
 }
 
 // 쉼표 표시 상태를 토글하는 함수
-function toggleUseGrouping (): void {
+function toggleUseGrouping(): void {
   calcStore.toggleUseGrouping();
   setUseGrouping();
 }
 
 // 소수점 표시 상태를 증가시키는 함수
-function incDecimalPlaces (): void {
+function incDecimalPlaces(): void {
   calcStore.incDecimalPlaces();
   setDecimalPlaces();
 }
 
 // 소수점 표시 상태를 감소시키는 함수
-function decDecimalPlaces (): void {
+function decDecimalPlaces(): void {
   calcStore.decDecimalPlaces();
   setDecimalPlaces();
 }
@@ -171,8 +181,8 @@ const buttons: Button = [
   ['x²', 'secondary', ['u'], () => calc.pow2()],
   ['√x', 'secondary', ['r'], () => calc.sqrt()],
   ['C', 'deep-orange', ['Delete', 'Escape', 'c'], () => calc.clear()],
-  ['@mdi-backspace', 'deep-orange', ['Backspace'], () => calc.deleteDigitOrDot()],
-  ['@mdi-plus-minus-variant', 'secondary', ['Shift+Minus', 's'], () => calc.changeSign()],
+  [ '@mdi-backspace', 'deep-orange', [ 'Backspace' ], () => calc.deleteDigitOrDot(), ],
+  [ '@mdi-plus-minus-variant', 'secondary', ['Shift+Minus', 's'], () => calc.changeSign(), ],
   ['%', 'secondary', ['%', 'p'], () => calc.percent()],
   ['1/x', 'secondary', ['i'], () => calc.rec()],
   ['@mdi-division', 'secondary', ['/'], () => calc.div()],
@@ -188,15 +198,7 @@ const buttons: Button = [
   ['2', 'primary', ['2'], () => calc.addDigit(2)],
   ['3', 'primary', ['3'], () => calc.addDigit(3)],
   ['@mdi-plus', 'secondary', ['+'], () => calc.plus()],
-  [
-    '00',
-    'primary',
-    [],
-    () => {
-      calc.addDigit(0);
-      calc.addDigit(0);
-    },
-  ],
+  ['00', 'primary', [], () => { calc.addDigit(0); calc.addDigit(0); }, ],
   ['0', 'primary', ['0'], () => calc.addDigit(0)],
   ['@mdi-circle-small', 'primary', ['.'], () => calc.addDot()],
   ['@mdi-equal', 'secondary', ['=', 'Enter'], () => calc.equal()],
@@ -210,22 +212,8 @@ const shortcuts: Shortcut = [
   [[','], toggleUseGrouping],
   [['['], decDecimalPlaces],
   [[']'], incDecimalPlaces],
-  [
-    ['h'],
-    () => {
-      if (!doDeleteHistory.value) {
-        showHistory.value = !showHistory.value;
-      }
-    },
-  ],
-  [
-    ['d'],
-    () => {
-      if (showHistory.value) {
-        doDeleteHistory.value = true;
-      }
-    },
-  ],
+  [['h'], () => { if (!doDeleteHistory.value) { showHistory.value = !showHistory.value; } }, ],
+  [['d'], () => { if (showHistory.value) { doDeleteHistory.value = true; } }, ],
 ];
 
 // 계산기 키바인딩 제거하기위한 변수 선언
@@ -271,7 +259,7 @@ onBeforeUnmount(() => {
 const showHistory = ref(false);
 
 // 계산 결과 배열
-const resultHistory = computed(() => (calc.getHistory() as unknown) as History[]);
+const resultHistory = computed(() => calc.getHistory() as unknown as History[]);
 
 // 계산 결과를 지울지 묻는 다이얼로그 표시 여부
 const doDeleteHistory = ref(false);
@@ -280,7 +268,7 @@ const doDeleteHistory = ref(false);
 const isGoToTopInHistory = ref(false);
 
 // 계산 결과 창 스크롤 위치에 따라 아이콘 표시 설정
-function onScroll (evt: Event) {
+function onScroll(evt: Event) {
   if ((evt.target as HTMLDivElement).scrollTop > 50) {
     isGoToTopInHistory.value = true;
   } else {
@@ -289,58 +277,85 @@ function onScroll (evt: Event) {
 }
 
 // 계산 결과 창 스크롤 위치를 최상단으로 이동
-function goToTopInHistory () {
+function goToTopInHistory() {
   document.getElementById('history')?.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
 // 계산 결과 중 좌변
-function getLeftSideInHistory (h: History) {
+function getLeftSideInHistory(h: History, lf = false) {
+  const br = lf ? '<br />' : '';
   if (['+', '-', '×', '÷'].includes(h.operator)) {
-    return `${toLocale(h.preNumber)} ${h.operator} ${toLocale(h.argNumber as number)}`
+    return `${toLocale(h.preNumber)} ${br} ${h.operator} ${toLocale( h.argNumber as number )}`;
   } else if (h.operator == '%') {
-    return `${toLocale(h.preNumber)} ÷ ${toLocale(h.argNumber as number)} × 100`
+    return `${toLocale(h.preNumber)} ${br} ÷ ${toLocale( h.argNumber as number )} ${br} × 100`;
   } else if (h.operator == 'rec') {
-    return `1 ÷ ${toLocale(h.preNumber)}`
+    return `1 ${br} ÷ ${toLocale(h.preNumber)}`;
   } else if (h.operator == 'pow2') {
-    return `${toLocale(h.preNumber)} × ${toLocale(h.preNumber)}`
+    return `${toLocale(h.preNumber)} ${br} × ${toLocale(h.preNumber)}`;
   } else if (['sqrt'].includes(h.operator)) {
-    return `${h.operator} ( ${toLocale(h.preNumber)} )`
+    return `${h.operator} ( ${toLocale(h.preNumber)} )`;
   } else {
-    return toLocale(h.preNumber)
+    return toLocale(h.preNumber);
   }
 }
 
 // 계산 결과 중 우변
-function getRightSideInHistory (h: History) {
-  return '= ' + toLocale(h.resultNumber);
+function getRightSideInHistory(h: History) {
+  return toLocale(h.resultNumber);
 }
+
+const willReset = computed(() => calc.getWillReset());
 </script>
 
 <template>
   <q-page id="qcalc" @focusin="($event.target as HTMLElement).blur()">
     <q-card flat class="row wrap q-px-md q-py-xs">
-      <q-card-section class="noselect col-9 row no-wrap items-center justify-start q-py-none q-px-xs">
-        <q-checkbox v-model="calcStore.useGrouping" label="쉼표: " left-label class="q-ml-sm" @click="setUseGrouping()" />
+      <q-card-section
+        class="noselect col-9 row no-wrap items-center justify-start q-py-none q-px-xs"
+      >
+        <q-checkbox
+          v-model="calcStore.useGrouping"
+          label="쉼표: "
+          left-label
+          class="q-ml-sm"
+          @click="setUseGrouping()"
+        />
         <div class="col-7 row no-wrap items-center">
           <my-tooltip>
             소수점 고정 상태:
             {{
-            calcStore.decimalPlaces == -2
-            ? '제한 없음'
-            : `${calcStore.decimalPlaces} 자리`
+              calcStore.decimalPlaces == -2
+                ? '제한 없음'
+                : `${calcStore.decimalPlaces} 자리`
             }}
           </my-tooltip>
           <div>소수점:</div>
-          <q-slider v-model="calcStore.decimalPlaces" :min="-2" :step="2" :max="6" marker-labels class="col-6 q-ml-md"
-            @change="setDecimalPlaces()">
+          <q-slider
+            v-model="calcStore.decimalPlaces"
+            :min="-2"
+            :step="2"
+            :max="6"
+            marker-labels
+            class="col-6 q-ml-md"
+            @change="setDecimalPlaces()"
+          >
             <template v-slot:marker-label-group="{ markerList }">
-              <div class="cursor-pointer" :class="(markerList[0] as any).classes" :style="(markerList[0] as any).style"
-                @click="setDecimalPlaces((markerList[0] as any).value)">
+              <div
+                class="cursor-pointer"
+                :class=" ( markerList[ 0 ] as any ).classes "
+                :style=" ( markerList[ 0 ] as any ).style "
+                @click="setDecimalPlaces((markerList[0] as any).value)"
+              >
                 x
               </div>
-              <div v-for="val in [1, 2, 3, 4]" :key="val" class="cursor-pointer"
-                :class="(markerList[val] as any).classes" :style="(markerList[val] as any).style"
-                @click="setDecimalPlaces((markerList[val] as any).value)">
+              <div
+                v-for="val in [1, 2, 3, 4]"
+                :key="val"
+                class="cursor-pointer"
+                :class=" ( markerList[ val ] as any ).classes "
+                :style=" ( markerList[ val ] as any ).style "
+                @click="setDecimalPlaces((markerList[val] as any).value)"
+              >
                 {{ (markerList[val] as any).value }}
               </div>
             </template>
@@ -348,30 +363,71 @@ function getRightSideInHistory (h: History) {
         </div>
       </q-card-section>
 
-      <q-card-section class="noselect col-3 row no-wrap justify-end q-py-none q-px-sm">
-        <q-btn flat icon="content_copy" color="primary" class="q-ma-none q-pa-none q-pl-xs" @click="doCopy">
+      <q-card-section
+        class="noselect col-3 row no-wrap justify-end q-py-none q-px-sm"
+      >
+        <q-btn
+          flat
+          icon="content_copy"
+          color="primary"
+          class="q-ma-none q-pa-none q-pl-xs"
+          @click="doCopy"
+        >
           <my-tooltip>클릭하면 결과가 복사됩니다.</my-tooltip>
         </q-btn>
-        <q-btn flat icon="content_paste" color="primary" class="q-ma-none q-pa-none q-pl-xs" @click="doPaste">
+        <q-btn
+          flat
+          icon="content_paste"
+          color="primary"
+          class="q-ma-none q-pa-none q-pl-xs"
+          @click="doPaste"
+        >
           <my-tooltip>클릭하면 숫자를 붙혀넣습니다.</my-tooltip>
         </q-btn>
-        <q-btn flat icon="history" color="primary" class="q-ma-none q-pa-none q-pl-xs q-pr-xs"
-          @click="showHistory = true">
+        <q-btn
+          flat
+          icon="history"
+          color="primary"
+          class="q-ma-none q-pa-none q-pl-xs q-pr-xs"
+          @click="showHistory = true"
+        >
           <my-tooltip>클릭하면 계산 결과 기록을 봅니다.</my-tooltip>
         </q-btn>
       </q-card-section>
 
       <q-card-section class="col-12 q-px-sm q-pt-none q-pb-sm">
-        <q-field :model-value="result" class="shadow-4 self-center" filled dense
-          :bg-color="needResultTooltip ? 'amber-2' : 'grey-2'">
+        <q-field
+          :model-value="result"
+          class="shadow-4 justify-end self-center"
+          filled
+          dense
+          :bg-color="needResultTooltip ? 'amber-2' : 'grey-2'"
+          label-slot
+          stack-label
+        >
           <template v-slot:prepend v-if="operator.length > 0">
             <div class="full-height q-mt-xs q-pt-xs">
               <q-icon :name="operatorIcons[operator]" />
             </div>
           </template>
+          <template v-slot:label>
+            <div>
+              {{
+                resultHistory.length &&
+                willReset &&
+                result == toLocale(resultHistory[0].resultNumber)
+                  ? [getLeftSideInHistory(resultHistory[0]), '='].join(' ')
+                  : ' '
+              }}
+            </div>
+          </template>
           <template v-slot:control>
-            <div id="result" v-mutation="setNeedResultTooltip" v-mutation.characterData
-              class="self-center full-width no-outline ellipsis text-h4 text-right">
+            <div
+              id="result"
+              v-mutation="setNeedResultTooltip"
+              v-mutation.characterData
+              class="self-center full-width no-outline ellipsis text-h4 text-right"
+            >
               {{ result }}
               <my-tooltip v-if="needResultTooltip">{{ result }}</my-tooltip>
             </div>
@@ -379,29 +435,68 @@ function getRightSideInHistory (h: History) {
         </q-field>
       </q-card-section>
 
-      <q-card-section class="noselect col-3 q-pa-sm" v-for="(button, index) in buttons" :key="index">
-        <q-btn class="glossy shadow-4 text-h5 full-width" id="calc-button" no-caps
+      <q-card-section
+        class="noselect col-3 q-pa-sm"
+        v-for="(button, index) in buttons"
+        :key="index"
+      >
+        <q-btn
+          class="glossy shadow-4 text-h5 full-width"
+          id="calc-button"
+          no-caps
           :label="button[0].charAt(0) != '@' ? button[0] : undefined"
-          :icon="button[0].charAt(0) == '@' ? button[0].slice(1) : undefined" :color="button[1]" @click="button[3]" />
+          :icon="button[0].charAt(0) == '@' ? button[0].slice(1) : undefined"
+          :size="button[0].charAt(0) == '@' ? 'md' : 'lg'"
+          :color="button[1]"
+          @click="button[3];"
+        />
       </q-card-section>
     </q-card>
   </q-page>
 
-  <q-dialog v-model="showHistory" style="z-index: 10" position="bottom" transition-duration="300">
-    <q-bar dark class="noselect bg-primary text-white" @focusin="($event.target as HTMLElement).blur()">
-      <q-icon name="history" />
+  <q-dialog
+    v-model="showHistory"
+    style="z-index: 10"
+    position="bottom"
+    transition-duration="300"
+  >
+    <q-bar
+      dark
+      class="noselect bg-primary text-white"
+      @focusin="($event.target as HTMLElement).blur()"
+    >
+      <q-icon name="history" size="sm" />
       <div>계산 결과</div>
       <q-space />
-      <q-btn dense flat icon="delete_outline" @click="doDeleteHistory = true" />
-      <q-btn dense flat icon="close" @click="showHistory = false" />
+      <q-btn
+        dense
+        flat
+        icon="delete_outline"
+        size="md"
+        @click="doDeleteHistory = true"
+      />
+      <q-btn dense flat icon="close" size="md" @click="showHistory = false" />
     </q-bar>
 
-    <q-card @scroll="onScroll" square class="row justify-center items-start scroll relative-position" id="history">
+    <q-card
+      @scroll="onScroll"
+      square
+      class="row justify-center items-start scroll relative-position"
+      id="history"
+    >
       <transition name="slide-fade">
-        <q-btn round glossy color="secondary" icon="publish" class="fixed q-ma-md" v-if="isGoToTopInHistory"
-          style="z-index: 12" @click="goToTopInHistory" />
+        <q-btn
+          round
+          glossy
+          color="secondary"
+          icon="publish"
+          class="fixed q-ma-md"
+          v-if="isGoToTopInHistory"
+          style="z-index: 12"
+          @click="goToTopInHistory"
+        />
       </transition>
-      <q-card-section class='full-width'>
+      <q-card-section class="full-width">
         <transition name="slide-fade" mode="out-in">
           <q-item v-if="resultHistory.length == 0" class="text-center">
             <q-item-section>
@@ -412,13 +507,15 @@ function getRightSideInHistory (h: History) {
           </q-item>
           <q-list v-else separator>
             <transition-group name="history-list">
-              <q-item v-for="h in resultHistory" :key="h.id" class="history-list-item text-right q-pa-sm">
+              <q-item
+                v-for="h in resultHistory"
+                :key="h.id"
+                class="history-list-item text-right q-pa-sm"
+              >
                 <q-item-section>
+                  <q-item-label v-html="getLeftSideInHistory(h, true)"></q-item-label>
                   <q-item-label>
-                    {{ getLeftSideInHistory(h) }}
-                  </q-item-label>
-                  <q-item-label>
-                    {{ getRightSideInHistory(h) }}
+                    {{ '= ' + getRightSideInHistory(h) }}
                   </q-item-label>
                 </q-item-section>
               </q-item>
@@ -429,22 +526,30 @@ function getRightSideInHistory (h: History) {
     </q-card>
   </q-dialog>
 
-  <q-dialog v-model="doDeleteHistory" persistent transition-show="scale" transition-hide="scale" style="z-index: 15">
+  <q-dialog
+    v-model="doDeleteHistory"
+    persistent
+    transition-show="scale"
+    transition-hide="scale"
+    style="z-index: 15"
+  >
     <q-card class="noselect bg-teal text-white" style="width: 200px">
       <q-card-section> 계산 기록을 지우겠어요? </q-card-section>
       <q-card-actions align="center" class="bg-white text-teal">
         <q-btn flat label="아니오" v-close-popup />
-        <q-btn flat label="예" @click="calc.clearHistory()" autofocus v-close-popup />
+        <q-btn
+          flat
+          label="예"
+          @click="calc.clearHistory()"
+          autofocus
+          v-close-popup
+        />
       </q-card-actions>
     </q-card>
   </q-dialog>
 </template>
 
-<style scoped>
-.q-btn>>>.q-icon {
-  font-size: 24px;
-}
-
+<style scoped lang="scss">
 #calc-button {
   overflow: auto;
   min-height: 44px;
@@ -456,8 +561,8 @@ function getRightSideInHistory (h: History) {
 }
 
 #history {
-  max-height: calc(100vh - 195px);
-  min-height: calc(100vh - 195px);
+  max-height: calc(100vh - 200px);
+  min-height: calc(100vh - 200px);
   max-width: calc(100vw - 45px);
   overflow: overlay;
 }
@@ -484,5 +589,16 @@ function getRightSideInHistory (h: History) {
 
 .history-list-leave-active {
   position: absolute;
+}
+
+.q-field {
+  &::v-deep {
+    .q-field__label {
+      right: -90px;
+      text-align: right;
+      font-size: 20px;
+      top: 8px;
+    }
+  }
 }
 </style>

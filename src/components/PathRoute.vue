@@ -1,5 +1,4 @@
 <script lang="ts" setup>
-
 defineProps({
   title: { type: String, required: true },
   caption: { type: String, default: '' },

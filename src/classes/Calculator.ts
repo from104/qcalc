@@ -109,7 +109,7 @@ export class Calculator {
   public getWillReset (): boolean {
     return this.willReset;
   }
-  
+
   // 숫자 1개씩 추가
   public addDigit(digit: number | string): void {
     if (typeof digit === 'string') {
