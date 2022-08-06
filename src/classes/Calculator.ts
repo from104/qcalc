@@ -105,6 +105,11 @@ export class Calculator {
     console.log(this.shownNumber);
   }
 
+  // 초기화 예정 여부 얻기
+  public getWillReset (): boolean {
+    return this.willReset;
+  }
+  
   // 숫자 1개씩 추가
   public addDigit(digit: number | string): void {
     if (typeof digit === 'string') {
