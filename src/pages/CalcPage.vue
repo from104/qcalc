@@ -83,7 +83,6 @@ function setNeedResultTooltip() {
   const sw = document.getElementById('result')?.scrollWidth ?? 0;
   // 원래의 칸 크기보다 결과 문자열 길이가 길면 툴팁을 표시
   needResultTooltip.value = ow < sw;
-  // if (ow < sw) console.log(historyRef.value)
 }
 
 // 계산 결과, 연산자, 툴팁을 갱신하는 함수
@@ -265,13 +264,6 @@ const resultHistory = computed(() => calc.getHistory() as unknown as History[]);
 // 계산 결과를 지울지 묻는 다이얼로그 표시 여부
 const doDeleteHistory = ref(false);
 
-const operatorIcon: { [key: string]: string } = {
-  '+': 'mdi-plus-box',
-  '-': 'mdi-minus-box',
-  '×': 'mdi-close-box',
-  '÷': 'mdi-division-box',
-}
-
 // 계산 결과 맨 위로 가는 아이콘 표시 여부
 const isGoToTopInHistory = ref(false);
 
@@ -350,8 +342,8 @@ const willReset = computed(() => calc.getWillReset());
             <template v-slot:marker-label-group="{ markerList }">
               <div
                 class="cursor-pointer"
-                :class="(markerList[0] as any).classes"
-                :style="(markerList[0] as any).style"
+                :class=" ( markerList[ 0 ] as any ).classes "
+                :style=" ( markerList[ 0 ] as any ).style "
                 @click="setDecimalPlaces((markerList[0] as any).value)"
               >
                 x
@@ -360,8 +352,8 @@ const willReset = computed(() => calc.getWillReset());
                 v-for="val in [1, 2, 3, 4]"
                 :key="val"
                 class="cursor-pointer"
-                :class="(markerList[val] as any).classes"
-                :style="(markerList[val] as any).style"
+                :class=" ( markerList[ val ] as any ).classes "
+                :style=" ( markerList[ val ] as any ).style "
                 @click="setDecimalPlaces((markerList[val] as any).value)"
               >
                 {{ (markerList[val] as any).value }}
@@ -413,9 +405,7 @@ const willReset = computed(() => calc.getWillReset());
           label-slot
           stack-label
         >
->>>>>>> ad59f1b (prettier 적용)
           <template v-slot:prepend v-if="operator.length > 0">
->>>>>>> 0deaf1f (계산 결과 기록 복사 가능하도록 수정)
             <div class="full-height q-mt-xs q-pt-xs">
               <q-icon :name="operatorIcons[operator]" />
             </div>
@@ -432,29 +422,12 @@ const willReset = computed(() => calc.getWillReset());
             </div>
           </template>
           <template v-slot:control>
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-            <div
-              ref="resultRef"
-=======
             <div
               id="result"
->>>>>>> ad59f1b (prettier 적용)
               v-mutation="setNeedResultTooltip"
               v-mutation.characterData
               class="self-center full-width no-outline ellipsis text-h4 text-right"
             >
-<<<<<<< HEAD
-=======
-            <div id="result" ref="resultRef" v-mutation="setNeedResultTooltip" v-mutation.characterData
-=======
-            <div id="result" v-mutation="setNeedResultTooltip" v-mutation.characterData
->>>>>>> 0deaf1f (계산 결과 기록 복사 가능하도록 수정)
-              class="self-center full-width no-outline ellipsis text-h4 text-right">
->>>>>>> ff3fbca (히스토리에서 맨위로 가기 기능 추가)
-=======
->>>>>>> ad59f1b (prettier 적용)
               {{ result }}
               <my-tooltip v-if="needResultTooltip">{{ result }}</my-tooltip>
             </div>
@@ -462,10 +435,6 @@ const willReset = computed(() => calc.getWillReset());
         </q-field>
       </q-card-section>
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> ad59f1b (prettier 적용)
       <q-card-section
         class="noselect col-3 q-pa-sm"
         v-for="(button, index) in buttons"
@@ -473,21 +442,6 @@ const willReset = computed(() => calc.getWillReset());
       >
         <q-btn
           class="glossy shadow-4 text-h5 full-width"
-<<<<<<< HEAD
-          style="overflow: auto; min-height: 44px; max-height: 44px"
-          no-caps
-          :label="button[0].charAt(0) != '@' ? button[0] : undefined"
-          :icon="button[0].charAt(0) == '@' ? button[0].slice(1) : undefined"
-          :color="button[1]"
-          @click="button[3]"
-        />
-=======
-      <q-card-section class="noselect col-3 q-pa-sm" v-for="(button, index) in buttons" :key="index">
-        <q-btn class="glossy shadow-4 text-h5 full-width" id="calc-button" no-caps
-          :label="button[0].charAt(0) != '@' ? button[0] : undefined"
-          :icon="button[0].charAt(0) == '@' ? button[0].slice(1) : undefined" :color="button[1]" @click="button[3]" />
->>>>>>> a4135c6 (계산 결과 히스토리 표시 일부 수정)
-=======
           id="calc-button"
           no-caps
           :label="button[0].charAt(0) != '@' ? button[0] : undefined"
@@ -496,7 +450,6 @@ const willReset = computed(() => calc.getWillReset());
           :color="button[1]"
           @click="button[3]"
         />
->>>>>>> ad59f1b (prettier 적용)
       </q-card-section>
     </q-card>
   </q-page>
@@ -512,11 +465,7 @@ const willReset = computed(() => calc.getWillReset());
       class="noselect bg-primary text-white"
       @focusin="($event.target as HTMLElement).blur()"
     >
-<<<<<<< HEAD
-      <q-icon name="history" />
-=======
       <q-icon name="history" size="sm" />
->>>>>>> ad59f1b (prettier 적용)
       <div>계산 결과</div>
       <q-space />
       <q-btn
@@ -528,6 +477,7 @@ const willReset = computed(() => calc.getWillReset());
       />
       <q-btn dense flat icon="close" size="md" @click="showHistory = false" />
     </q-bar>
+
     <q-card
       @scroll="onScroll"
       square
