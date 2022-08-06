@@ -265,23 +265,15 @@ const resultHistory = computed(() => calc.getHistory() as unknown as History[]);
 // 계산 결과를 지울지 묻는 다이얼로그 표시 여부
 const doDeleteHistory = ref(false);
 
-<<<<<<< HEAD
-<<<<<<< HEAD
 const operatorIcon: { [key: string]: string } = {
   '+': 'mdi-plus-box',
   '-': 'mdi-minus-box',
   '×': 'mdi-close-box',
   '÷': 'mdi-division-box',
 }
-=======
-// const historyRef = ref<HTMLDivElement | null>(null);
->>>>>>> 0deaf1f (계산 결과 기록 복사 가능하도록 수정)
 
-const isGoTopInHistory = ref(false);
-=======
 // 계산 결과 맨 위로 가는 아이콘 표시 여부
 const isGoToTopInHistory = ref(false);
->>>>>>> a4135c6 (계산 결과 히스토리 표시 일부 수정)
 
 // 계산 결과 창 스크롤 위치에 따라 아이콘 표시 설정
 function onScroll(evt: Event) {
@@ -340,21 +332,9 @@ const willReset = computed(() => calc.getWillReset());
           <my-tooltip>
             소수점 고정 상태:
             {{
-<<<<<<< HEAD
-<<<<<<< HEAD
               calcStore.decimalPlaces == -2
                 ? '제한 없음'
                 : `${calcStore.decimalPlaces} 자리`
-=======
-            calcStore.decimalPlaces == -2
-            ? '제한 없음'
-            : `${calcStore.decimalPlaces} 자리`
->>>>>>> 6139567 (계산 결과 기록이 없을 때와 있을 때 화면 전환 효과 추가)
-=======
-              calcStore.decimalPlaces == -2
-                ? '제한 없음'
-                : `${calcStore.decimalPlaces} 자리`
->>>>>>> ad59f1b (prettier 적용)
             }}
           </my-tooltip>
           <div>소수점:</div>
@@ -370,13 +350,8 @@ const willReset = computed(() => calc.getWillReset());
             <template v-slot:marker-label-group="{ markerList }">
               <div
                 class="cursor-pointer"
-<<<<<<< HEAD
                 :class="(markerList[0] as any).classes"
                 :style="(markerList[0] as any).style"
-=======
-                :class=" ( markerList[ 0 ] as any ).classes "
-                :style=" ( markerList[ 0 ] as any ).style "
->>>>>>> ad59f1b (prettier 적용)
                 @click="setDecimalPlaces((markerList[0] as any).value)"
               >
                 x
@@ -385,13 +360,8 @@ const willReset = computed(() => calc.getWillReset());
                 v-for="val in [1, 2, 3, 4]"
                 :key="val"
                 class="cursor-pointer"
-<<<<<<< HEAD
                 :class="(markerList[val] as any).classes"
                 :style="(markerList[val] as any).style"
-=======
-                :class=" ( markerList[ val ] as any ).classes "
-                :style=" ( markerList[ val ] as any ).style "
->>>>>>> ad59f1b (prettier 적용)
                 @click="setDecimalPlaces((markerList[val] as any).value)"
               >
                 {{ (markerList[val] as any).value }}
@@ -401,19 +371,9 @@ const willReset = computed(() => calc.getWillReset());
         </div>
       </q-card-section>
 
-<<<<<<< HEAD
-<<<<<<< HEAD
       <q-card-section
         class="noselect col-3 row no-wrap justify-end q-py-none q-px-sm"
       >
-        <!-- <q-btn class="q-pr-xs" flat v-if="operator" :label="operator">
-          <my-tooltip>현재 연산자</my-tooltip>
-        </q-btn> -->
-=======
-      <q-card-section
-        class="noselect col-3 row no-wrap justify-end q-py-none q-px-sm"
-      >
->>>>>>> ad59f1b (prettier 적용)
         <q-btn
           flat
           icon="content_copy"
@@ -421,13 +381,6 @@ const willReset = computed(() => calc.getWillReset());
           class="q-ma-none q-pa-none q-pl-xs"
           @click="doCopy"
         >
-<<<<<<< HEAD
-=======
-      <q-card-section class="noselect col-3 row no-wrap justify-end q-py-none q-px-sm">
-        <q-btn flat icon="content_copy" color="primary" class="q-ma-none q-pa-none q-pl-xs" @click="doCopy">
->>>>>>> a4135c6 (계산 결과 히스토리 표시 일부 수정)
-=======
->>>>>>> ad59f1b (prettier 적용)
           <my-tooltip>클릭하면 결과가 복사됩니다.</my-tooltip>
         </q-btn>
         <q-btn
@@ -451,20 +404,6 @@ const willReset = computed(() => calc.getWillReset());
       </q-card-section>
 
       <q-card-section class="col-12 q-px-sm q-pt-none q-pb-sm">
-<<<<<<< HEAD
-<<<<<<< HEAD
-        <q-field
-          :model-value="result"
-          class="shadow-4 self-center"
-          filled
-          dense
-          :bg-color="needResultTooltip ? 'amber-2' : 'grey-2'"
-        >
-          <template v-slot:prepend v-if="operator != ''">
-=======
-        <q-field :model-value="result" class="shadow-4 self-center" filled dense
-          :bg-color="needResultTooltip ? 'amber-2' : 'grey-2'">
-=======
         <q-field
           :model-value="result"
           class="shadow-4 justify-end self-center"
@@ -589,47 +528,12 @@ const willReset = computed(() => calc.getWillReset());
       />
       <q-btn dense flat icon="close" size="md" @click="showHistory = false" />
     </q-bar>
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-    <q-card @scroll="onScroll" class="scroll relative-position" id="history">
-      <q-bar
-        id="goTop"
-        class="row justify-around full-width fixed dark bg-teal text-white cursor-pointer"
-        v-show="isGoTopInHistory"
-        style="z-index: 12"
-        @click="goTopInHistory"
-      >
-        <q-btn dense flat icon="publish" />
-      </q-bar>
-      <q-card-section>
-        <q-list separator>
-          <q-item
-            v-for="(item, index) in resultHistory"
-            :key="index"
-            class="text-right q-pa-sm"
-          >
-=======
-    <q-card @scroll="onScroll" class="row justify-center items-start scroll relative-position" id="history">
-      <!-- <q-bar id='goTop' class="row justify-around full-width fixed dark bg-teal text-white cursor-pointer"
-        v-show="isGoTopInHistory" style="z-index: 12" @click="goTopInHistory">
-        <q-btn dense flat icon="publish" />
-      </q-bar> -->
-=======
-=======
-
-<<<<<<< HEAD
->>>>>>> a4135c6 (계산 결과 히스토리 표시 일부 수정)
-    <q-card @scroll="onScroll" square class="row justify-center items-start scroll relative-position" id="history">
->>>>>>> 0deaf1f (계산 결과 기록 복사 가능하도록 수정)
-=======
     <q-card
       @scroll="onScroll"
       square
       class="row justify-center items-start scroll relative-position"
       id="history"
     >
->>>>>>> ad59f1b (prettier 적용)
       <transition name="slide-fade">
         <q-btn
           round
@@ -642,62 +546,7 @@ const willReset = computed(() => calc.getWillReset());
           @click="goToTopInHistory"
         />
       </transition>
-<<<<<<< HEAD
-      <q-card-section class='full-width'>
-<<<<<<< HEAD
-        <q-item v-if="resultHistory.length == 0" class="text-center">
-          <q-item-section>
-            <q-item-label>
-              <span>계산 결과가 없습니다.</span>
-            </q-item-label>
-          </q-item-section>
-        </q-item>
-        <q-list v-else separator>
-<<<<<<< HEAD
-          <q-separator />
-          <q-item v-for=" (item, index) in resultHistory" :key="index" class="text-right q-pa-sm">
->>>>>>> ff3fbca (히스토리에서 맨위로 가기 기능 추가)
-            <q-item-section>
-              <q-item-label>
-                {{
-                  ['+', '-', '×', '÷'].includes(item.operator)
-                    ? `${toLocale(item.preNumber)} ${item.operator} ${toLocale(
-                        item.argNumber as number
-                      )}`
-                    : ['%'].includes(item.operator)
-                    ? `${toLocale(item.preNumber)} / ${toLocale(
-                        item.argNumber as number
-                      )} * 100`
-                    : ['rec', 'pow2', 'sqrt'].includes(item.operator)
-                    ? `${item.operator} ( ${toLocale(item.preNumber)} )`
-                    : toLocale(item.preNumber)
-                }}
-              </q-item-label>
-              <q-item-label>
-                {{ `= ${toLocale(item.resultNumber)}` }}
-              </q-item-label>
-            </q-item-section>
-          </q-item>
-          <q-separator />
-=======
-          <transition-group name="history-list">
-            <q-item v-for="h in resultHistory" :key="h.id" class="history-list-item text-right q-pa-sm">
-              <q-item-section>
-                <q-item-label>
-                  {{ getLeftSideInHistory(h) }}
-                </q-item-label>
-                <q-item-label>
-                  {{ getRightSideInHistory(h) }}
-                </q-item-label>
-              </q-item-section>
-            </q-item>
-          </transition-group>
->>>>>>> 0deaf1f (계산 결과 기록 복사 가능하도록 수정)
-        </q-list>
-=======
-=======
       <q-card-section class="full-width">
->>>>>>> ad59f1b (prettier 적용)
         <transition name="slide-fade" mode="out-in">
           <q-item v-if="resultHistory.length == 0" class="text-center">
             <q-item-section>
@@ -723,7 +572,6 @@ const willReset = computed(() => calc.getWillReset());
             </transition-group>
           </q-list>
         </transition>
->>>>>>> 6139567 (계산 결과 기록이 없을 때와 있을 때 화면 전환 효과 추가)
       </q-card-section>
     </q-card>
   </q-dialog>
@@ -738,21 +586,7 @@ const willReset = computed(() => calc.getWillReset());
     <q-card class="noselect bg-teal text-white" style="width: 200px">
       <q-card-section> 계산 기록을 지우겠어요? </q-card-section>
       <q-card-actions align="center" class="bg-white text-teal">
-<<<<<<< HEAD
-        <q-btn flat label="아니" v-close-popup />
-        <q-btn
-          flat
-          label="ㅇㅇ"
-          @click="calc.clearHistory()"
-          autofocus
-          v-close-popup
-        />
-=======
         <q-btn flat label="아니오" v-close-popup />
-<<<<<<< HEAD
-        <q-btn flat label="예" @click="calc.clearHistory()" autofocus v-close-popup />
->>>>>>> 0deaf1f (계산 결과 기록 복사 가능하도록 수정)
-=======
         <q-btn
           flat
           label="예"
@@ -760,21 +594,12 @@ const willReset = computed(() => calc.getWillReset());
           autofocus
           v-close-popup
         />
->>>>>>> ad59f1b (prettier 적용)
       </q-card-actions>
     </q-card>
   </q-dialog>
 </template>
 
-<<<<<<< HEAD
-<style scoped>
-.q-btn >>> .q-icon {
-  font-size: 24px;
-}
-
-=======
 <style scoped lang="scss">
->>>>>>> ad59f1b (prettier 적용)
 #calc-button {
   overflow: auto;
   min-height: 44px;
