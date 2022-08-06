@@ -88,7 +88,6 @@ onMounted(() => {
     <q-page-container style="padding-bottom: 0px">
       <!-- 트랜지션 적용 전 -->
       <!-- <router-view /> -->
-      ㅣ
       <!-- 트랜지션 적용 후 -->
       <router-view v-slot="{ Component }">
         <transition name="slide-fade" mode="out-in" appear>
@@ -110,6 +109,5 @@ onMounted(() => {
 .slide-fade-enter-from,
 .slide-fade-leave-to {
   opacity: 0;
-  transform: translateX(-200px);
 }
 </style>
