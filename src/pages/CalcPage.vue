@@ -555,7 +555,7 @@ const willReset = computed(() => calc.getWillReset());
           :icon="button[0].charAt(0) == '@' ? button[0].slice(1) : undefined"
           :size="button[0].charAt(0) == '@' ? 'md' : 'lg'"
           :color="button[1]"
-          @click="button[3];"
+          @click="button[3]"
         />
 >>>>>>> ad59f1b (prettier 적용)
       </q-card-section>
