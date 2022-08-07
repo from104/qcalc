@@ -49,7 +49,7 @@ onMounted(() => {
 
   const shortcuts: Shortcut = [
     [
-      ['h'],
+      ['history'],
       () => {
         if (!doDeleteHistory.value) {
           store.showHistory = !store.showHistory;
@@ -147,16 +147,16 @@ onBeforeUnmount(() => {
           <q-list v-else separator>
             <transition-group name="history-list">
               <q-item
-                v-for="h in resultHistory"
-                :key="h.id"
+                v-for="history in resultHistory"
+                :key="history.id"
                 class="history-list-item text-right q-pa-sm"
               >
                 <q-item-section>
                   <q-item-label
-                    v-html="store.getLeftSideInHistory(h, true)"
+                    v-html="store.getLeftSideInHistory(history, true)"
                   ></q-item-label>
                   <q-item-label>
-                    {{ '= ' + store.getRightSideInHistory(h) }}
+                    {{ ['=', store.getRightSideInHistory(history)].join(' ') }}
                   </q-item-label>
                 </q-item-section>
               </q-item>

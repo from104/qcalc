@@ -17,8 +17,18 @@ const buttons: Button = [
   ['x²', 'secondary', ['u'], () => calc.pow2()],
   ['√x', 'secondary', ['r'], () => calc.sqrt()],
   ['C', 'deep-orange', ['Delete', 'Escape', 'c'], () => calc.clear()],
-  [ '@mdi-backspace', 'deep-orange', [ 'Backspace' ], () => calc.deleteDigitOrDot(), ],
-  [ '@mdi-plus-minus-variant', 'secondary', ['Shift+Minus', 's'], () => calc.changeSign(), ],
+  [
+    '@mdi-backspace',
+    'deep-orange',
+    ['Backspace'],
+    () => calc.deleteDigitOrDot(),
+  ],
+  [
+    '@mdi-plus-minus-variant',
+    'secondary',
+    ['Shift+Minus', 's'],
+    () => calc.changeSign(),
+  ],
   ['%', 'secondary', ['%', 'p'], () => calc.percent()],
   ['1/x', 'secondary', ['i'], () => calc.rec()],
   ['@mdi-division', 'secondary', ['/'], () => calc.div()],
@@ -34,7 +44,15 @@ const buttons: Button = [
   ['2', 'primary', ['2'], () => calc.addDigit(2)],
   ['3', 'primary', ['3'], () => calc.addDigit(3)],
   ['@mdi-plus', 'secondary', ['+'], () => calc.plus()],
-  ['00', 'primary', [], () => { calc.addDigit(0); calc.addDigit(0); }, ],
+  [
+    '00',
+    'primary',
+    [],
+    () => {
+      calc.addDigit(0);
+      calc.addDigit(0);
+    },
+  ],
   ['0', 'primary', ['0'], () => calc.addDigit(0)],
   ['@mdi-circle-small', 'primary', ['.'], () => calc.addDot()],
   ['@mdi-equal', 'secondary', ['=', 'Enter'], () => calc.equal()],
@@ -43,9 +61,7 @@ const buttons: Button = [
 // 계산기 키바인딩 제거하기위한 변수 선언
 let keybindingRemoveAtUmount = tinykeys(window, {} as KeyBindingMap);
 
-// dom 요소가 마운트 되었을 때
-// 1. 계산기 키바인딩 설정하기
-// 2. 스토어에서 값을 가져와서 계산기에 설정하기
+// dom 요소가 마운트 되었을 때 계산기 키바인딩 설정하기
 onMounted(() => {
   // Support keyboard entry
   const keyBindingMaps: KeyBindingMap = {};
@@ -68,22 +84,22 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-      <q-card-section
-        class="noselect col-3 q-pa-sm"
-        v-for="(button, index) in buttons"
-        :key="index"
-      >
-        <q-btn
-          class="glossy shadow-4 text-h5 full-width"
-          id="calc-button"
-          no-caps
-          :label="button[0].charAt(0) != '@' ? button[0] : undefined"
-          :icon="button[0].charAt(0) == '@' ? button[0].slice(1) : undefined"
-          :size="button[0].charAt(0) == '@' ? 'md' : 'lg'"
-          :color="button[1]"
-          @click="button[3]"
-        />
-      </q-card-section>
+  <q-card-section
+    class="noselect col-3 q-pa-sm"
+    v-for="(button, index) in buttons"
+    :key="index"
+  >
+    <q-btn
+      class="glossy shadow-4 text-h5 full-width"
+      id="calc-button"
+      no-caps
+      :label="button[0].charAt(0) != '@' ? button[0] : undefined"
+      :icon="button[0].charAt(0) == '@' ? button[0].slice(1) : undefined"
+      :size="button[0].charAt(0) == '@' ? 'md' : 'lg'"
+      :color="button[1]"
+      @click="button[3]"
+    />
+  </q-card-section>
 </template>
 
 <style scoped lang="scss">

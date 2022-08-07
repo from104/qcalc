@@ -13,11 +13,9 @@ const store = useCalcStore();
 // 계산기 오브젝트를 스토어에서 가져오기 위한 변수 선언
 const calc = store.calc;
 
-// 숫자를 표준 로케일 문자열로 변환하는 함수
-const toLocale = store.toLocale;
 
 const result = computed(() => {
-  return toLocale(Number(calc.getShownNumber()));
+  return store.toLocale(Number(calc.getShownNumber()));
 });
 
 // quasar 유틸 변수 선언

@@ -49,9 +49,9 @@ export const useCalcStore = defineStore('calc', {
     getLeftSideInHistory(h: History, lf = false) {
       const br = lf ? '<br />' : '';
       if (['+', '-', '×', '÷'].includes(h.operator)) {
-        return `${this.toLocale(h.preNumber)} ${br} ${h.operator} ${this.toLocale(
-          h.argNumber as number
-        )}`;
+        return `${this.toLocale(h.preNumber)} ${br} ${
+          h.operator
+        } ${this.toLocale(h.argNumber as number)}`;
       } else if (h.operator == '%') {
         return `${this.toLocale(h.preNumber)} ${br} ÷ ${this.toLocale(
           h.argNumber as number
@@ -59,7 +59,9 @@ export const useCalcStore = defineStore('calc', {
       } else if (h.operator == 'rec') {
         return `1 ${br} ÷ ${this.toLocale(h.preNumber)}`;
       } else if (h.operator == 'pow2') {
-        return `${this.toLocale(h.preNumber)} ${br} × ${this.toLocale(h.preNumber)}`;
+        return `${this.toLocale(h.preNumber)} ${br} × ${this.toLocale(
+          h.preNumber
+        )}`;
       } else if (['sqrt'].includes(h.operator)) {
         return `${h.operator} ( ${this.toLocale(h.preNumber)} )`;
       } else {
@@ -69,7 +71,7 @@ export const useCalcStore = defineStore('calc', {
     // 계산 결과 중 우변
     getRightSideInHistory(h: History) {
       return this.toLocale(h.resultNumber);
-    }
+    },
   },
   persist: true,
 });
