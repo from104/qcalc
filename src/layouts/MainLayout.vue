@@ -11,7 +11,10 @@ import PathRoute from 'components/PathRoute.vue';
 
 const router = useRouter();
 
-const calcStore = useCalcStore();
+const store = useCalcStore();
+
+// 시스템 로케일
+store.locale = navigator.language;
 
 const $q = useQuasar();
 
@@ -46,9 +49,9 @@ const toggleAlwaysOnTop = (byManual = false) => {
   if ($q.platform.is.electron) {
     if (byManual) {
       // 수동으로 토글
-      calcStore.toggleAlwaysOnTop();
+      store.toggleAlwaysOnTop();
     }
-    window.myAPI.setAlwaysOnTop(calcStore.alwaysOnTop);
+    window.myAPI.setAlwaysOnTop(store.alwaysOnTop);
   }
 };
 
@@ -65,10 +68,6 @@ onMounted(() => {
     [['F3'], () => router.push({ path: '/about' })],
   ];
 
-  if ($q.platform.is.electron) {
-    window.myAPI.setAlwaysOnTop(calcStore.alwaysOnTop);
-  }
-
   shortcuts.forEach((shortcut) => {
     const [keys, handler] = shortcut;
     keys.forEach((key) => {
@@ -77,13 +76,17 @@ onMounted(() => {
   });
 
   tinykeys(window, keyBindingMaps);
+
+  if ($q.platform.is.electron) {
+    window.myAPI.setAlwaysOnTop(store.alwaysOnTop);
+  }
 });
 </script>
 
 <template>
   <q-layout view="lHh Lpr lFf">
     <q-header class="noselect" elevated>
-      <q-toolbar @focusin="($event.target as HTMLInputElement).blur()">
+      <q-toolbar @focusin="($event.target as HTMLElement).blur()">
         <q-btn
           flat
           dense
@@ -95,7 +98,7 @@ onMounted(() => {
         <q-toolbar-title> 간단한 계산기 </q-toolbar-title>
         <q-toggle
           v-if="$q.platform.is.electron"
-          v-model="calcStore.alwaysOnTop"
+          v-model="store.alwaysOnTop"
           label="항상 위 (T)"
           left-label
           keep-color
