@@ -1,32 +1,74 @@
 import { defineStore } from 'pinia';
 import { Calculator } from 'classes/Calculator';
+import type { History } from 'classes/Calculator';
 
 export const useCalcStore = defineStore('calc', {
   state: () => ({
     alwaysOnTop: false,
     calc: new Calculator(),
     useGrouping: true,
-    decimalPlaces: -2
+    decimalPlaces: -2,
+    showHistory: false,
+    // 시스템 로케일
+    locale: '',
   }),
   getters: {},
   actions: {
-    toggleAlwaysOnTop () {
+    toggleAlwaysOnTop() {
       this.alwaysOnTop = !this.alwaysOnTop;
     },
-    toggleUseGrouping () {
+    toggleUseGrouping() {
       this.useGrouping = !this.useGrouping;
     },
-    setDecimalPlaces (decimalPlaces: number) {
-      const allowValues = [-2, 0, 2, 4, 6];
-      if (allowValues.includes(decimalPlaces)) {
+    setDecimalPlaces(decimalPlaces: number) {
+      if ([-2, 0, 2, 4, 6].includes(decimalPlaces)) {
         this.decimalPlaces = decimalPlaces;
       }
     },
-    incDecimalPlaces () {
+    incDecimalPlaces() {
       this.setDecimalPlaces(this.decimalPlaces + 2);
     },
-    decDecimalPlaces () {
+    decDecimalPlaces() {
       this.setDecimalPlaces(this.decimalPlaces - 2);
+    },
+    toggleShowHistory() {
+      this.showHistory = !this.showHistory;
+    },
+    // 숫자를 표준 로케일 문자열로 변환하는 함수
+    toLocale(number: number): string {
+      return number.toLocaleString(this.locale, {
+        style: 'decimal',
+        useGrouping: this.useGrouping,
+        minimumFractionDigits:
+          this.decimalPlaces == -2 ? 0 : this.decimalPlaces,
+        maximumFractionDigits:
+          this.decimalPlaces == -2 ? 20 : this.decimalPlaces,
+      });
+    },
+    // 계산 결과 중 좌변
+    getLeftSideInHistory(h: History, lf = false) {
+      const br = lf ? '<br />' : '';
+      if (['+', '-', '×', '÷'].includes(h.operator)) {
+        return `${this.toLocale(h.preNumber)} ${br} ${h.operator} ${this.toLocale(
+          h.argNumber as number
+        )}`;
+      } else if (h.operator == '%') {
+        return `${this.toLocale(h.preNumber)} ${br} ÷ ${this.toLocale(
+          h.argNumber as number
+        )} ${br} × 100`;
+      } else if (h.operator == 'rec') {
+        return `1 ${br} ÷ ${this.toLocale(h.preNumber)}`;
+      } else if (h.operator == 'pow2') {
+        return `${this.toLocale(h.preNumber)} ${br} × ${this.toLocale(h.preNumber)}`;
+      } else if (['sqrt'].includes(h.operator)) {
+        return `${h.operator} ( ${this.toLocale(h.preNumber)} )`;
+      } else {
+        return this.toLocale(h.preNumber);
+      }
+    },
+    // 계산 결과 중 우변
+    getRightSideInHistory(h: History) {
+      return this.toLocale(h.resultNumber);
     }
   },
   persist: true,
