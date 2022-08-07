@@ -49,7 +49,7 @@ onMounted(() => {
 
   const shortcuts: Shortcut = [
     [
-      ['history'],
+      ['h'],
       () => {
         if (!doDeleteHistory.value) {
           store.showHistory = !store.showHistory;
