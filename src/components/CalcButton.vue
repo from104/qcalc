@@ -88,6 +88,7 @@ onBeforeUnmount(() => {
     class="noselect col-3 q-pa-sm"
     v-for="(button, index) in buttons"
     :key="index"
+    @focusin="($event.target as HTMLElement).blur()"
   >
     <q-btn
       class="glossy shadow-4 text-h5 full-width"

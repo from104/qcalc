@@ -1,14 +1,17 @@
 <script setup lang="ts">
-import CalcPanel from 'components/CalcPanel.vue';
+import CalcPanelSwitches from 'components/CalcPanelSwitches.vue';
+import CalcPanelIcons from 'components/CalcPanelIcons.vue';
+import CalcPanelResult from 'components/CalcPanelResult.vue';
 import CalcButton from 'components/CalcButton.vue';
 import CalcHistory from 'components/CalcHistory.vue';
-
 </script>
 
 <template>
   <q-page>
     <q-card flat class="row wrap q-px-md q-py-xs">
-      <CalcPanel />
+      <CalcPanelSwitches />
+      <CalcPanelIcons />
+      <CalcPanelResult />
 
       <CalcButton />
     </q-card>
