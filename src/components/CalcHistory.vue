@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onMounted, onBeforeUnmount, ref, computed } from 'vue';
+import { onMounted, onBeforeUnmount, ref, computed, watch } from 'vue';
 import tinykeys, { KeyBindingMap } from 'tinykeys';
 
 import type { History } from 'classes/Calculator';
@@ -37,6 +37,13 @@ function goToTopInHistory() {
     behavior: 'smooth',
   });
 }
+
+// 최상단으로 가는 아이콘을 히스토리 숨길 때 함께 숨김
+watch (() => store.showHistory, (showHistory) => {
+  if (!showHistory) {
+    isGoToTopInHistory.value = false;
+  }
+});
 
 // 계산기 키바인딩 제거하기위한 변수 선언
 let keybindingRemoveAtUmount = tinykeys(window, {} as KeyBindingMap);
