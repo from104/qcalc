@@ -6,6 +6,8 @@ import type { History } from 'classes/Calculator';
 
 import { useCalcStore } from 'stores/calc-store';
 
+import MyTooltip from 'components/MyTooltip.vue';
+
 // 스토어 가져오기
 const store = useCalcStore();
 
@@ -97,6 +99,23 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
+  <div class="absolute-bottom justify-center row">
+    <transition name="fade">
+      <q-btn
+        v-if="!store.showHistory"
+        id="show-history"
+        class="self-center shadow-4 q-ma-sm"
+        padding="xs sm"
+        round
+        color="primary"
+        size="md"
+        icon="mdi-eject"
+        @click="store.showHistory = !store.showHistory"
+      >
+        <my-tooltip>클릭하면 계산 결과 기록을 봅니다.</my-tooltip>
+      </q-btn>
+    </transition>
+  </div>
   <q-dialog
     v-model="store.showHistory"
     style="z-index: 10"
@@ -223,6 +242,16 @@ onBeforeUnmount(() => {
   transform: translateY(-20px);
 }
 
+.fade-enter-active,
+.fade-leave-active {
+  transition: all 0.2s ease-out;
+}
+
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
+}
+
 .history-list-item {
   transition: all 0.3s ease;
 }
@@ -234,5 +263,11 @@ onBeforeUnmount(() => {
 
 .history-list-leave-active {
   position: absolute;
+}
+
+#show-history {
+  z-index: 14;
+  position: fixed;
+  bottom: -22px;
 }
 </style>
