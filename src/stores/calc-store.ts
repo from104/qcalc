@@ -1,9 +1,11 @@
 import { defineStore } from 'pinia';
+import { Dark } from 'quasar';
 import { Calculator } from 'classes/Calculator';
 import type { History } from 'classes/Calculator';
 
 export const useCalcStore = defineStore('calc', {
   state: () => ({
+    darkMode: false,
     alwaysOnTop: false,
     calc: new Calculator(),
     useGrouping: true,
@@ -14,6 +16,14 @@ export const useCalcStore = defineStore('calc', {
   }),
   getters: {},
   actions: {
+    setDarkMode(darkMode: boolean) {
+      this.darkMode = darkMode;
+      Dark.set(this.darkMode);
+    },
+    toggleDarkMode() {
+      this.darkMode = !this.darkMode;
+      Dark.set(this.darkMode);
+    },
     toggleAlwaysOnTop() {
       this.alwaysOnTop = !this.alwaysOnTop;
     },

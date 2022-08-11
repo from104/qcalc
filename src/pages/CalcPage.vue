@@ -8,7 +8,7 @@ import CalcHistory from 'components/CalcHistory.vue';
 
 <template>
   <q-page>
-    <q-card flat class="row wrap q-px-md q-py-xs">
+    <q-card flat class="row wrap q-px-md q-pt-xs q-pb-md">
       <CalcPanelSwitches />
       <CalcPanelIcons />
       <CalcPanelResult />

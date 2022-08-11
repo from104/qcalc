@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onMounted, ref } from 'vue';
+import { onMounted, onBeforeMount, ref } from 'vue';
 import { useQuasar } from 'quasar';
 import tinykeys, { KeyBindingMap } from 'tinykeys';
 import { useRouter } from 'vue-router';
@@ -12,9 +12,6 @@ import PathRoute from 'components/PathRoute.vue';
 const router = useRouter();
 
 const store = useCalcStore();
-
-// 시스템 로케일
-store.locale = navigator.language;
 
 const $q = useQuasar();
 
@@ -63,6 +60,7 @@ onMounted(() => {
   const shortcuts: Shortcut = [
     [['t'], () => toggleAlwaysOnTop(true)],
     [['m'], () => toggleLeftDrawer()],
+    [['k'], () => store.toggleDarkMode()],
     [['F1', '?'], () => router.push({ path: '/help' })],
     [['F2'], () => router.push({ path: '/' })],
     [['F3'], () => router.push({ path: '/about' })],
@@ -80,6 +78,10 @@ onMounted(() => {
   if ($q.platform.is.electron) {
     window.myAPI.setAlwaysOnTop(store.alwaysOnTop);
   }
+});
+
+onBeforeMount(() => {
+  store.setDarkMode(store.darkMode);
 });
 </script>
 
@@ -120,7 +122,18 @@ onMounted(() => {
         <q-item-label class="text-h5" header> 메뉴 (M) </q-item-label>
         <PathRoute v-for="path in paths" :key="path.title" v-bind="path" />
       </q-list>
-      <q-footer class="q-pa-sm"> 버전 : {{ version }} </q-footer>
+      <q-footer class="row items-center q-pa-sm">
+        버전 : {{ version }}
+        <q-space />
+        <q-toggle
+          v-model="store.darkMode"
+          label="다크 모드 (K)"
+          left-label
+          keep-color
+          color="info"
+          @click="store.setDarkMode(store.darkMode)"
+        />
+      </q-footer>
     </q-drawer>
 
     <q-page-container style="padding-bottom: 0px">

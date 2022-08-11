@@ -1,10 +1,14 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue';
+import { useQuasar } from 'quasar';
+
 import type { History } from 'classes/Calculator';
 
 import { useCalcStore } from 'stores/calc-store';
 
 import MyTooltip from 'components/MyTooltip.vue';
+
+const $q = useQuasar();
 
 // 스토어 가져오기
 const store = useCalcStore();
@@ -57,7 +61,13 @@ const operatorIcons: { [key: string]: string } = {
       filled
       dense
       readonly
-      :bg-color="needResultTooltip ? 'amber-2' : 'grey-2'"
+      :bg-color="
+        needResultTooltip
+          ? store.darkMode
+            ? 'blue-grey-9'
+            : 'amber-2'
+          : undefined
+      "
       label-slot
       stack-label
     >
