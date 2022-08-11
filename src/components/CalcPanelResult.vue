@@ -1,14 +1,11 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue';
-import { useQuasar } from 'quasar';
 
 import type { History } from 'classes/Calculator';
 
 import { useCalcStore } from 'stores/calc-store';
 
 import MyTooltip from 'components/MyTooltip.vue';
-
-const $q = useQuasar();
 
 // 스토어 가져오기
 const store = useCalcStore();
