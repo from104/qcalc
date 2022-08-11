@@ -2,7 +2,7 @@
   "name": "qcalc",
   "version": "0.4.4",
   "description": "com.electron.qcalc",
-  "productName": "Simple Calculator",
+  "productName": "Quasar Calculator",
   "author": "Seo Kihyun <from104@gmail.com>",
   "private": true,
   "type": "commonjs",

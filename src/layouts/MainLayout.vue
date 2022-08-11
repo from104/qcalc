@@ -18,7 +18,7 @@ const $q = useQuasar();
 const paths = [
   {
     title: '계산기',
-    caption: '간단한 계산기 (F2)',
+    caption: '퀘이사 계산기 (F2)',
     icon: 'calculate',
     path: '/',
   },
@@ -97,7 +97,7 @@ onBeforeMount(() => {
           aria-label="Menu"
           @click="toggleLeftDrawer"
         />
-        <q-toolbar-title> 간단한 계산기 </q-toolbar-title>
+        <q-toolbar-title> 퀘이사 계산기 </q-toolbar-title>
         <q-toggle
           v-if="$q.platform.is.electron"
           v-model="store.alwaysOnTop"
