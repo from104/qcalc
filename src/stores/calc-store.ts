@@ -10,7 +10,6 @@ export const useCalcStore = defineStore('calc', {
     calc: new Calculator(),
     useGrouping: true,
     decimalPlaces: -2,
-    showHistory: false,
     // 시스템 로케일
     locale: '',
   }),
@@ -53,9 +52,6 @@ export const useCalcStore = defineStore('calc', {
     },
     decDecimalPlaces() {
       this.setDecimalPlaces(this.decimalPlaces - 2);
-    },
-    toggleShowHistory() {
-      this.showHistory = !this.showHistory;
     },
     // 숫자를 표준 로케일 문자열로 변환하는 함수
     toLocale(number: number): string {

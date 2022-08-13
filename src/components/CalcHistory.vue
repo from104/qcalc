@@ -5,7 +5,6 @@ import {
   ref,
   computed,
   watch,
-  onBeforeMount,
 } from 'vue';
 import tinykeys, { KeyBindingMap } from 'tinykeys';
 
@@ -23,6 +22,9 @@ const calc = store.calc;
 
 // 계산 결과 배열
 const resultHistory = computed(() => calc.getHistory() as unknown as History[]);
+
+// 계산 결과 기록 열기 여부
+const isHistoryOpen = ref( false );
 
 // 계산 결과를 지울지 묻는 다이얼로그 표시 여부
 const doDeleteHistory = ref(false);
@@ -49,18 +51,13 @@ function goToTopInHistory() {
 
 // 최상단으로 가는 아이콘을 히스토리 숨길 때 함께 숨김
 watch(
-  () => store.showHistory,
-  (showHistory) => {
-    if (!showHistory) {
+  () => isHistoryOpen,
+  (isHistoryOpen) => {
+    if (!isHistoryOpen.value) {
       isGoToTopInHistory.value = false;
     }
   }
 );
-
-// dom 요소가 언마운트되기 전에 키바인딩 제거
-onBeforeMount(() => {
-  store.showHistory = false;
-});
 
 // 계산기 키바인딩 제거하기위한 변수 선언
 let keybindingRemoveAtUmount = tinykeys(window, {} as KeyBindingMap);
@@ -76,14 +73,14 @@ onMounted(() => {
       ['h'],
       () => {
         if (!doDeleteHistory.value) {
-          store.showHistory = !store.showHistory;
+          isHistoryOpen.value = !isHistoryOpen.value;
         }
       },
     ],
     [
       ['d'],
       () => {
-        if (store.showHistory) {
+        if (isHistoryOpen.value) {
           doDeleteHistory.value = true;
         }
       },
@@ -114,7 +111,7 @@ onBeforeUnmount(() => {
   <div class="absolute-bottom justify-center row">
     <transition name="fade">
       <q-btn
-        v-if="!store.showHistory"
+        v-if="!isHistoryOpen"
         id="show-history-icon"
         class="self-center shadow-4 q-ma-sm"
         padding="sm"
@@ -123,7 +120,7 @@ onBeforeUnmount(() => {
         :color="store.getDarkColor('info')"
         size="md"
         icon="mdi-arrow-up-bold"
-        @click="store.showHistory = true"
+        @click="isHistoryOpen = true"
       >
         <my-tooltip>클릭하면 계산 결과 기록을 엽니다.</my-tooltip>
       </q-btn>
@@ -137,14 +134,14 @@ onBeforeUnmount(() => {
         :color="store.getDarkColor('info')"
         size="md"
         icon="mdi-arrow-down-bold"
-        @click="store.showHistory = false"
+        @click="isHistoryOpen = false"
       >
         <my-tooltip>클릭하면 계산 결과 기록을 숨깁니다.</my-tooltip>
       </q-btn>
     </transition>
   </div>
   <q-dialog
-    v-model="store.showHistory"
+    v-model="isHistoryOpen"
     style="z-index: 10"
     position="bottom"
     transition-duration="300"
@@ -170,7 +167,7 @@ onBeforeUnmount(() => {
         flat
         icon="close"
         size="md"
-        @click="store.showHistory = false"
+        @click="isHistoryOpen = false"
       />
     </q-bar>
 
