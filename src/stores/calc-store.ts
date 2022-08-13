@@ -21,8 +21,21 @@ export const useCalcStore = defineStore('calc', {
       Dark.set(this.darkMode);
     },
     toggleDarkMode() {
-      this.darkMode = !this.darkMode;
-      Dark.set(this.darkMode);
+      this.setDarkMode(!this.darkMode);
+    },
+    getDarkColor(color: string): string | undefined {
+      const darkColors: { [key: string]: string } = {
+        primary: 'brown-4',
+        secondary: 'blue-grey-5',
+        accent: 'purple-5',
+        positive: 'green-5',
+        negative: 'pink-4',
+        info: 'light-blue-3',
+        warning: 'indigo-5',
+      };
+      if (Object.keys(darkColors).includes(color)) {
+        return this.darkMode ? darkColors[color] : color;
+      }
     },
     toggleAlwaysOnTop() {
       this.alwaysOnTop = !this.alwaysOnTop;

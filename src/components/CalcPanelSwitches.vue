@@ -15,16 +15,15 @@ let keybindingRemoveAtUmount = tinykeys(window, {} as KeyBindingMap);
 // dom 요소가 마운트 되었을 때
 // 1. 계산기 키바인딩 설정하기
 // 2. 스토어에서 값을 가져와서 계산기에 설정하기
-onMounted( () =>
-{
-  type Shortcut = [ string[], () => void ][];
+onMounted(() => {
+  type Shortcut = [string[], () => void][];
 
   const shortcuts: Shortcut = [
-    [ [ ',' ], store.toggleUseGrouping ],
-    [ [ '[' ], store.decDecimalPlaces ],
-    [ [ ']' ], store.incDecimalPlaces ],
+    [[','], store.toggleUseGrouping],
+    [['['], store.decDecimalPlaces],
+    [[']'], store.incDecimalPlaces],
   ];
-// Support keyboard entry
+  // Support keyboard entry
   const keyBindingMaps: KeyBindingMap = {};
 
   shortcuts.forEach((shortcut) => {
@@ -54,6 +53,7 @@ onBeforeUnmount(() => {
       label="쉼표: "
       left-label
       class="q-ml-sm"
+      :color="store.getDarkColor('primary')"
     />
     <div class="col-7 row no-wrap items-center">
       <my-tooltip>
@@ -72,6 +72,7 @@ onBeforeUnmount(() => {
         :max="6"
         marker-labels
         class="col-6 q-ml-md"
+        :color="store.getDarkColor('primary')"
         @change="store.setDecimalPlaces(store.decimalPlaces)"
       >
         <template v-slot:marker-label-group="{ markerList }">

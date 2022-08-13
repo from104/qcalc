@@ -87,7 +87,11 @@ onBeforeMount(() => {
 
 <template>
   <q-layout view="lHh Lpr lFf">
-    <q-header class="noselect" elevated>
+    <q-header
+      :class="'bg-' + store.getDarkColor('primary')"
+      class="noselect"
+      elevated
+    >
       <q-toolbar @focusin="($event.target as HTMLElement).blur()">
         <q-btn
           flat
@@ -104,7 +108,7 @@ onBeforeMount(() => {
           label="항상 위 (T)"
           left-label
           keep-color
-          color="info"
+          :color="store.getDarkColor('info')"
           @click="toggleAlwaysOnTop()"
         />
         <!-- :disable="!$q.platform.is.electron" -->
@@ -122,7 +126,10 @@ onBeforeMount(() => {
         <q-item-label class="text-h5" header> 메뉴 (M) </q-item-label>
         <PathRoute v-for="path in paths" :key="path.title" v-bind="path" />
       </q-list>
-      <q-footer class="row items-center q-pa-sm">
+      <q-footer
+        :class="'bg-' + store.getDarkColor('primary')"
+        class="row items-center q-pa-sm"
+      >
         버전 : {{ version }}
         <q-space />
         <q-toggle
@@ -130,7 +137,7 @@ onBeforeMount(() => {
           label="다크 모드 (K)"
           left-label
           keep-color
-          color="info"
+          :color="store.getDarkColor('info')"
           @click="store.setDarkMode(store.darkMode)"
         />
       </q-footer>

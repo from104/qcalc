@@ -111,7 +111,7 @@ onBeforeUnmount(() => {
     <q-btn
       flat
       icon="content_copy"
-      color="primary"
+      :color="store.getDarkColor('primary')"
       class="q-ma-none q-pa-none q-pl-xs"
       @click="doCopy"
     >
@@ -120,7 +120,7 @@ onBeforeUnmount(() => {
     <q-btn
       flat
       icon="content_paste"
-      color="primary"
+      :color="store.getDarkColor('primary')"
       class="q-ma-none q-pa-none q-pl-xs"
       @click="doPaste"
     >

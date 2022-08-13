@@ -1,5 +1,12 @@
 <script setup lang="ts">
-import { onMounted, onBeforeUnmount, ref, computed, watch } from 'vue';
+import {
+  onMounted,
+  onBeforeUnmount,
+  ref,
+  computed,
+  watch,
+  onBeforeMount,
+} from 'vue';
 import tinykeys, { KeyBindingMap } from 'tinykeys';
 
 import type { History } from 'classes/Calculator';
@@ -49,6 +56,11 @@ watch(
     }
   }
 );
+
+// dom 요소가 언마운트되기 전에 키바인딩 제거
+onBeforeMount(() => {
+  store.showHistory = false;
+});
 
 // 계산기 키바인딩 제거하기위한 변수 선언
 let keybindingRemoveAtUmount = tinykeys(window, {} as KeyBindingMap);
@@ -103,16 +115,31 @@ onBeforeUnmount(() => {
     <transition name="fade">
       <q-btn
         v-if="!store.showHistory"
-        id="show-history"
+        id="show-history-icon"
         class="self-center shadow-4 q-ma-sm"
-        padding="xs sm"
+        padding="sm"
         round
-        color="primary"
+        glossy
+        :color="store.getDarkColor('info')"
         size="md"
-        icon="mdi-eject"
-        @click="store.showHistory = !store.showHistory"
+        icon="mdi-arrow-up-bold"
+        @click="store.showHistory = true"
       >
-        <my-tooltip>클릭하면 계산 결과 기록을 봅니다.</my-tooltip>
+        <my-tooltip>클릭하면 계산 결과 기록을 엽니다.</my-tooltip>
+      </q-btn>
+      <q-btn
+        v-else
+        id="hide-history-icon"
+        class="self-center shadow-4 q-ma-sm"
+        padding="sm"
+        round
+        glossy
+        :color="store.getDarkColor('info')"
+        size="md"
+        icon="mdi-arrow-down-bold"
+        @click="store.showHistory = false"
+      >
+        <my-tooltip>클릭하면 계산 결과 기록을 숨깁니다.</my-tooltip>
       </q-btn>
     </transition>
   </div>
@@ -124,7 +151,8 @@ onBeforeUnmount(() => {
   >
     <q-bar
       dark
-      class="noselect bg-primary text-white"
+      class="noselect text-white"
+      :class="'bg-' + store.getDarkColor('primary')"
       @focusin="($event.target as HTMLElement).blur()"
     >
       <q-icon name="history" size="sm" />
@@ -149,14 +177,14 @@ onBeforeUnmount(() => {
     <q-card
       @scroll="onScroll"
       square
-      class="row justify-center items-start scroll relative-position"
+      class="row justify-center items-start relative-position scrollbar-custom"
       id="history"
     >
       <transition name="slide-fade">
         <q-btn
           round
           glossy
-          color="secondary"
+          :color="store.getDarkColor('secondary')"
           icon="publish"
           class="fixed q-ma-md"
           v-if="isGoToTopInHistory"
@@ -203,9 +231,17 @@ onBeforeUnmount(() => {
     transition-hide="scale"
     style="z-index: 15"
   >
-    <q-card class="noselect bg-teal text-white" style="width: 200px">
+    <q-card
+      class="noselect text-center text-white"
+      :class="'bg-' + store.getDarkColor('negative')"
+      style="width: 200px"
+    >
       <q-card-section> 계산 기록을 지우겠어요? </q-card-section>
-      <q-card-actions align="center" class="bg-white text-teal">
+      <q-card-actions
+        align="center"
+        :class="'text-' + store.getDarkColor('negative')"
+        class="bg-white"
+      >
         <q-btn flat label="아니오" v-close-popup />
         <q-btn
           flat
@@ -249,7 +285,7 @@ onBeforeUnmount(() => {
 
 .fade-enter-from,
 .fade-leave-to {
-  opacity: 0;
+  transform: translateY(22px);
 }
 
 .history-list-item {
@@ -265,9 +301,21 @@ onBeforeUnmount(() => {
   position: absolute;
 }
 
-#show-history {
+@mixin history-icon {
   z-index: 14;
   position: fixed;
-  bottom: -22px;
+}
+
+#show-history-icon {
+  @include history-icon;
+  bottom: -28px;
+}
+
+#hide-history-icon {
+  @include history-icon;
+  bottom: -14px;
+  &:hover {
+    opacity: 50%;
+  }
 }
 </style>

@@ -8,3 +8,21 @@
   -ms-user-select: none;
   user-select: none;
 }
+
+.scrollbar-custom {
+  &::-webkit-scrollbar {
+    width: 12px;
+  }
+  &::-webkit-scrollbar-thumb {
+    background-color: rgba(128, 128, 128, 0.267);
+    @media (prefers-color-scheme: dark) {
+      background-color: rgba(128, 128, 128, 0.503);
+    }
+  }
+  &::-webkit-scrollbar-track {
+    background-color: rgba(85, 85, 85, 0.112);
+    @media (prefers-color-scheme: dark) {
+      background-color: rgba(124, 124, 124, 0.439);
+    }
+  }
+}
