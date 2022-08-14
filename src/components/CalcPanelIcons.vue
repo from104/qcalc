@@ -111,7 +111,7 @@ onBeforeUnmount(() => {
     <q-btn
       flat
       icon="content_copy"
-      color="primary"
+      :color="store.getDarkColor('primary')"
       class="q-ma-none q-pa-none q-pl-xs"
       @click="doCopy"
     >
@@ -120,20 +120,11 @@ onBeforeUnmount(() => {
     <q-btn
       flat
       icon="content_paste"
-      color="primary"
+      :color="store.getDarkColor('primary')"
       class="q-ma-none q-pa-none q-pl-xs"
       @click="doPaste"
     >
       <my-tooltip>클릭하면 숫자를 붙혀넣습니다.</my-tooltip>
-    </q-btn>
-    <q-btn
-      flat
-      icon="history"
-      color="primary"
-      class="q-ma-none q-pa-none q-pl-xs q-pr-xs"
-      @click="store.showHistory = true"
-    >
-      <my-tooltip>클릭하면 계산 결과 기록을 봅니다.</my-tooltip>
     </q-btn>
   </q-card-section>
 </template>

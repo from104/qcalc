@@ -1,10 +1,18 @@
 <script setup lang="ts">
-import { onMounted, onBeforeUnmount, ref, computed } from 'vue';
+import {
+  onMounted,
+  onBeforeUnmount,
+  ref,
+  computed,
+  watch,
+} from 'vue';
 import tinykeys, { KeyBindingMap } from 'tinykeys';
 
 import type { History } from 'classes/Calculator';
 
 import { useCalcStore } from 'stores/calc-store';
+
+import MyTooltip from 'components/MyTooltip.vue';
 
 // 스토어 가져오기
 const store = useCalcStore();
@@ -14,6 +22,9 @@ const calc = store.calc;
 
 // 계산 결과 배열
 const resultHistory = computed(() => calc.getHistory() as unknown as History[]);
+
+// 계산 결과 기록 열기 여부
+const isHistoryOpen = ref( false );
 
 // 계산 결과를 지울지 묻는 다이얼로그 표시 여부
 const doDeleteHistory = ref(false);
@@ -38,6 +49,16 @@ function goToTopInHistory() {
   });
 }
 
+// 최상단으로 가는 아이콘을 히스토리 숨길 때 함께 숨김
+watch(
+  () => isHistoryOpen,
+  (isHistoryOpen) => {
+    if (!isHistoryOpen.value) {
+      isGoToTopInHistory.value = false;
+    }
+  }
+);
+
 // 계산기 키바인딩 제거하기위한 변수 선언
 let keybindingRemoveAtUmount = tinykeys(window, {} as KeyBindingMap);
 
@@ -52,14 +73,14 @@ onMounted(() => {
       ['h'],
       () => {
         if (!doDeleteHistory.value) {
-          store.showHistory = !store.showHistory;
+          isHistoryOpen.value = !isHistoryOpen.value;
         }
       },
     ],
     [
       ['d'],
       () => {
-        if (store.showHistory) {
+        if (isHistoryOpen.value) {
           doDeleteHistory.value = true;
         }
       },
@@ -87,15 +108,48 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
+  <div class="absolute-bottom justify-center row">
+    <transition name="fade">
+      <q-btn
+        v-if="!isHistoryOpen"
+        id="show-history-icon"
+        class="self-center shadow-4 q-ma-sm"
+        padding="sm"
+        round
+        glossy
+        :color="store.getDarkColor('info')"
+        size="md"
+        icon="mdi-arrow-up-bold"
+        @click="isHistoryOpen = true"
+      >
+        <my-tooltip>클릭하면 계산 결과 기록을 엽니다.</my-tooltip>
+      </q-btn>
+      <q-btn
+        v-else
+        id="hide-history-icon"
+        class="self-center shadow-4 q-ma-sm"
+        padding="sm"
+        round
+        glossy
+        :color="store.getDarkColor('info')"
+        size="md"
+        icon="mdi-arrow-down-bold"
+        @click="isHistoryOpen = false"
+      >
+        <my-tooltip>클릭하면 계산 결과 기록을 숨깁니다.</my-tooltip>
+      </q-btn>
+    </transition>
+  </div>
   <q-dialog
-    v-model="store.showHistory"
+    v-model="isHistoryOpen"
     style="z-index: 10"
     position="bottom"
     transition-duration="300"
   >
     <q-bar
       dark
-      class="noselect bg-primary text-white"
+      class="noselect text-white"
+      :class="'bg-' + store.getDarkColor('primary')"
       @focusin="($event.target as HTMLElement).blur()"
     >
       <q-icon name="history" size="sm" />
@@ -113,21 +167,21 @@ onBeforeUnmount(() => {
         flat
         icon="close"
         size="md"
-        @click="store.showHistory = false"
+        @click="isHistoryOpen = false"
       />
     </q-bar>
 
     <q-card
       @scroll="onScroll"
       square
-      class="row justify-center items-start scroll relative-position"
+      class="row justify-center items-start relative-position scrollbar-custom"
       id="history"
     >
       <transition name="slide-fade">
         <q-btn
           round
           glossy
-          color="secondary"
+          :color="store.getDarkColor('secondary')"
           icon="publish"
           class="fixed q-ma-md"
           v-if="isGoToTopInHistory"
@@ -174,9 +228,17 @@ onBeforeUnmount(() => {
     transition-hide="scale"
     style="z-index: 15"
   >
-    <q-card class="noselect bg-teal text-white" style="width: 200px">
+    <q-card
+      class="noselect text-center text-white"
+      :class="'bg-' + store.getDarkColor('negative')"
+      style="width: 200px"
+    >
       <q-card-section> 계산 기록을 지우겠어요? </q-card-section>
-      <q-card-actions align="center" class="bg-white text-teal">
+      <q-card-actions
+        align="center"
+        :class="'text-' + store.getDarkColor('negative')"
+        class="bg-white"
+      >
         <q-btn flat label="아니오" v-close-popup />
         <q-btn
           flat
@@ -213,6 +275,16 @@ onBeforeUnmount(() => {
   transform: translateY(-20px);
 }
 
+.fade-enter-active,
+.fade-leave-active {
+  transition: all 0.2s ease-out;
+}
+
+.fade-enter-from,
+.fade-leave-to {
+  transform: translateY(22px);
+}
+
 .history-list-item {
   transition: all 0.3s ease;
 }
@@ -224,5 +296,23 @@ onBeforeUnmount(() => {
 
 .history-list-leave-active {
   position: absolute;
+}
+
+@mixin history-icon {
+  z-index: 14;
+  position: fixed;
+}
+
+#show-history-icon {
+  @include history-icon;
+  bottom: -28px;
+}
+
+#hide-history-icon {
+  @include history-icon;
+  bottom: -14px;
+  &:hover {
+    opacity: 50%;
+  }
 }
 </style>

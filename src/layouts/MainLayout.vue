@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onMounted, ref } from 'vue';
+import { onMounted, onBeforeMount, ref } from 'vue';
 import { useQuasar } from 'quasar';
 import tinykeys, { KeyBindingMap } from 'tinykeys';
 import { useRouter } from 'vue-router';
@@ -13,15 +13,12 @@ const router = useRouter();
 
 const store = useCalcStore();
 
-// 시스템 로케일
-store.locale = navigator.language;
-
 const $q = useQuasar();
 
 const paths = [
   {
     title: '계산기',
-    caption: '간단한 계산기 (F2)',
+    caption: '퀘이사 계산기 (F2)',
     icon: 'calculate',
     path: '/',
   },
@@ -63,6 +60,7 @@ onMounted(() => {
   const shortcuts: Shortcut = [
     [['t'], () => toggleAlwaysOnTop(true)],
     [['m'], () => toggleLeftDrawer()],
+    [['k'], () => store.toggleDarkMode()],
     [['F1', '?'], () => router.push({ path: '/help' })],
     [['F2'], () => router.push({ path: '/' })],
     [['F3'], () => router.push({ path: '/about' })],
@@ -81,11 +79,20 @@ onMounted(() => {
     window.myAPI.setAlwaysOnTop(store.alwaysOnTop);
   }
 });
+
+onBeforeMount(() => {
+  store.setDarkMode(store.darkMode);
+  store.locale = navigator.language;
+});
 </script>
 
 <template>
   <q-layout view="lHh Lpr lFf">
-    <q-header class="noselect" elevated>
+    <q-header
+      :class="'bg-' + store.getDarkColor('primary')"
+      class="noselect"
+      elevated
+    >
       <q-toolbar @focusin="($event.target as HTMLElement).blur()">
         <q-btn
           flat
@@ -95,14 +102,14 @@ onMounted(() => {
           aria-label="Menu"
           @click="toggleLeftDrawer"
         />
-        <q-toolbar-title> 간단한 계산기 </q-toolbar-title>
+        <q-toolbar-title> 퀘이사 계산기 </q-toolbar-title>
         <q-toggle
           v-if="$q.platform.is.electron"
           v-model="store.alwaysOnTop"
           label="항상 위 (T)"
           left-label
           keep-color
-          color="info"
+          :color="store.getDarkColor('info')"
           @click="toggleAlwaysOnTop()"
         />
         <!-- :disable="!$q.platform.is.electron" -->
@@ -120,7 +127,21 @@ onMounted(() => {
         <q-item-label class="text-h5" header> 메뉴 (M) </q-item-label>
         <PathRoute v-for="path in paths" :key="path.title" v-bind="path" />
       </q-list>
-      <q-footer class="q-pa-sm"> 버전 : {{ version }} </q-footer>
+      <q-footer
+        :class="'bg-' + store.getDarkColor('primary')"
+        class="row items-center q-pa-sm"
+      >
+        버전 : {{ version }}
+        <q-space />
+        <q-toggle
+          v-model="store.darkMode"
+          label="다크 모드 (K)"
+          left-label
+          keep-color
+          :color="store.getDarkColor('info')"
+          @click="store.setDarkMode(store.darkMode)"
+        />
+      </q-footer>
     </q-drawer>
 
     <q-page-container style="padding-bottom: 0px">

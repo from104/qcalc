@@ -1,19 +1,41 @@
 import { defineStore } from 'pinia';
+import { Dark } from 'quasar';
 import { Calculator } from 'classes/Calculator';
 import type { History } from 'classes/Calculator';
 
 export const useCalcStore = defineStore('calc', {
   state: () => ({
+    darkMode: false,
     alwaysOnTop: false,
     calc: new Calculator(),
     useGrouping: true,
     decimalPlaces: -2,
-    showHistory: false,
     // 시스템 로케일
     locale: '',
   }),
   getters: {},
   actions: {
+    setDarkMode(darkMode: boolean) {
+      this.darkMode = darkMode;
+      Dark.set(this.darkMode);
+    },
+    toggleDarkMode() {
+      this.setDarkMode(!this.darkMode);
+    },
+    getDarkColor(color: string): string | undefined {
+      const darkColors: { [key: string]: string } = {
+        primary: 'brown-4',
+        secondary: 'blue-grey-5',
+        accent: 'purple-5',
+        positive: 'green-5',
+        negative: 'pink-4',
+        info: 'light-blue-3',
+        warning: 'indigo-5',
+      };
+      if (Object.keys(darkColors).includes(color)) {
+        return this.darkMode ? darkColors[color] : color;
+      }
+    },
     toggleAlwaysOnTop() {
       this.alwaysOnTop = !this.alwaysOnTop;
     },
@@ -30,9 +52,6 @@ export const useCalcStore = defineStore('calc', {
     },
     decDecimalPlaces() {
       this.setDecimalPlaces(this.decimalPlaces - 2);
-    },
-    toggleShowHistory() {
-      this.showHistory = !this.showHistory;
     },
     // 숫자를 표준 로케일 문자열로 변환하는 함수
     toLocale(number: number): string {
