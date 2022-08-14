@@ -1,10 +1,29 @@
 {
   "name": "qcalc",
-  "version": "0.4.4",
+  "version": "0.5.0",
   "description": "com.electron.qcalc",
   "productName": "Quasar Calculator",
-  "author": "Seo Kihyun <from104@gmail.com>",
-  "private": true,
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/from104/qcalc.git"
+  },
+  "author": {
+    "name": "Seo Kihyun",
+    "email": "from104@gmail.com",
+    "url": "https://github.com/from104"
+  },
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/from104/qcalc/issues"
+  },
+  "homepage": "https://github.com/from104/qcalc#readme",
+  "keywords": [
+    "calculator",
+    "quasar",
+    "vue",
+    "electron",
+    "typescript"
+  ],
   "type": "commonjs",
   "scripts": {
     "lint": "eslint --ext .js,.ts,.vue ./",

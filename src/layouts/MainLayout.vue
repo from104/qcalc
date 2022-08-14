@@ -82,6 +82,7 @@ onMounted(() => {
 
 onBeforeMount(() => {
   store.setDarkMode(store.darkMode);
+  store.locale = navigator.language;
 });
 </script>
 

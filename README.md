@@ -48,6 +48,18 @@
 - Control-c, Control-Insert: 계산 결과 또는 선택한 내용을 클립보드로 복사
 - Control-v, Shift-Insert: 클립보드로부터 앱에 붙혀넣기
 
+# 기술과 정보
+
+## 사용된 기술, 프래임워크, 프로그램
+
+- typescript
+- nodeJS
+- electron
+- vue 3
+- quasar 2
+- markdown
+- tinykeys
+
 ## 앱 테스트 및 빌드 방법
 
 기본적으로 nodeJS, vscode 환경에서 yarn을 아래와 같이 설치해줍니다.
