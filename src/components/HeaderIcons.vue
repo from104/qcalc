@@ -103,7 +103,7 @@ onMounted(() => {
     class="q-ma-none q-pa-none q-pl-xs"
     @click="doCopy"
   >
-    <MyTooltip>클릭하면 결과가 복사됩니다.</MyTooltip>
+    <MyTooltip>결과/선택이 복사됩니다.</MyTooltip>
   </q-btn>
   <q-btn
     flat
@@ -111,6 +111,6 @@ onMounted(() => {
     class="q-ma-none q-pa-none q-pl-xs"
     @click="doPaste"
   >
-    <MyTooltip>클릭하면 숫자를 붙혀넣습니다.</MyTooltip>
+    <MyTooltip>숫자를 붙혀넣습니다.</MyTooltip>
   </q-btn>
 </template>

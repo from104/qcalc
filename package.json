@@ -1,6 +1,6 @@
 {
   "name": "qcalc",
-  "version": "0.5.0",
+  "version": "0.6.0rc1",
   "description": "com.electron.qcalc",
   "productName": "Quasar Calculator",
   "repository": {
