@@ -87,7 +87,7 @@ onBeforeMount(() => {
 </script>
 
 <template>
-  <q-layout view="lHh Lpr lFf">
+  <q-layout view="hHh lpr fFf">
     <q-header
       :class="'bg-' + store.getDarkColor('primary')"
       class="noselect"
@@ -118,10 +118,10 @@ onBeforeMount(() => {
 
     <q-drawer
       class="noselect"
-      style="z-index: 20"
       v-model="leftDrawerOpen"
-      show-if-above
-      bordered
+      side="left"
+      overlay
+      elevated
     >
       <q-list>
         <q-item-label class="text-h5" header> 메뉴 (M) </q-item-label>
