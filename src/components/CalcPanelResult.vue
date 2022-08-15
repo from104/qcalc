@@ -51,7 +51,7 @@ const operatorIcons: { [key: string]: string } = {
 </script>
 
 <template>
-  <q-card-section class="col-12 q-px-sm q-pt-none q-pb-sm">
+  <q-card-section class="col-12 q-px-sm q-pt-lg q-pb-sm">
     <q-field
       :model-value="result"
       class="shadow-4 justify-end self-center"
@@ -95,7 +95,7 @@ const operatorIcons: { [key: string]: string } = {
           class="self-center full-width no-outline ellipsis text-h4 text-right"
         >
           {{ result }}
-          <my-tooltip v-if="needResultTooltip">{{ result }}</my-tooltip>
+          <MyTooltip v-if="needResultTooltip">{{ result }}</MyTooltip>
         </div>
       </template>
     </q-field>
