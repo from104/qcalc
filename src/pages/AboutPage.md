@@ -4,4 +4,4 @@
 
 연락처: 서기현 &lt;from104@gmail.com&gt;,
 
-Copyright © 2022 Seo Kihyun. All rights reserved.
+Copyright © 2022 Seo Kihyun. MIT License.

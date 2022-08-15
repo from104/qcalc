@@ -2,6 +2,10 @@
 
 예전에 졸업과제로 만들었던 안드로이드용 계산기의 소스를 활용해 만든 간단한 계산기 입니다. vue3(quasar v2), typescript, electron 등을 이용해 만들었습니다.
 
+## 스크린샷
+
+![Screenshot](https://github.com/from104/qcalc/raw/main/assets/screenshot.png)
+
 ## 기능
 
 - 사칙연산과 퍼센트 계산을 할 수 있습니다.
@@ -35,10 +39,11 @@
 ### 그 외 기능
 
 - m: 왼쪽 메뉴 열고 닫기
+- e: 오른쪽 설정 열고 닫기
 - F1: 도움말 열기
 - F2: 계산기 열기
 - F3: 앱 정보 열기
-- t: always on top 키능 토글
+- t: 항상 위 기능 토글
 - k: 다크 모드 토글
 - ,: 천단위 , 표시
 - [, ]: 소수점 고정 조정 (제한없음~6자리)
@@ -57,8 +62,13 @@
 - electron
 - vue 3
 - quasar 2
-- markdown
+- q-markdown
 - tinykeys
+
+## 패키지 설치 방법
+
+- 릴리즈 페이지 또는 assets 폴더에서 해당 플랫폼에 맞는 파일을 받아서 설치하면 됩니다.
+- 리눅스는 appimage파일을 단독으로 쓰거나 snap파일을 --dangerous 옵션을 사용하여 설치하세요.
 
 ## 앱 테스트 및 빌드 방법
 
