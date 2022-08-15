@@ -4,10 +4,11 @@ import { useQuasar } from 'quasar';
 import tinykeys, { KeyBindingMap } from 'tinykeys';
 import { useRouter } from 'vue-router';
 
-import { version } from '../../package.json';
-
 import { useCalcStore } from 'src/stores/calc-store';
-import PathRoute from 'components/PathRoute.vue';
+
+import MenuPanel from 'components/MenuPanel.vue';
+import SettingPanel from 'components/SettingPanel.vue';
+import HeaderIcons from 'components/HeaderIcons.vue';
 
 const router = useRouter();
 
@@ -15,41 +16,18 @@ const store = useCalcStore();
 
 const $q = useQuasar();
 
-const paths = [
-  {
-    title: '계산기',
-    caption: '퀘이사 계산기 (F2)',
-    icon: 'calculate',
-    path: '/',
-  },
-  {
-    title: '도움말',
-    caption: '기능과 사용법 (F1)',
-    icon: 'help',
-    path: '/help',
-  },
-  {
-    title: '소개',
-    caption: '앱에 대한 소개 (F3)',
-    icon: 'info',
-    path: '/about',
-  },
-];
-
 const leftDrawerOpen = ref(false);
 
 const toggleLeftDrawer = () => {
   leftDrawerOpen.value = !leftDrawerOpen.value;
+  rightDrawerOpen.value = false;
 };
 
-const toggleAlwaysOnTop = (byManual = false) => {
-  if ($q.platform.is.electron) {
-    if (byManual) {
-      // 수동으로 토글
-      store.toggleAlwaysOnTop();
-    }
-    window.myAPI.setAlwaysOnTop(store.alwaysOnTop);
-  }
+const rightDrawerOpen = ref(false);
+
+const toggleRightDrawer = () => {
+  rightDrawerOpen.value = !rightDrawerOpen.value;
+  leftDrawerOpen.value = false;
 };
 
 onMounted(() => {
@@ -58,9 +36,8 @@ onMounted(() => {
   type Shortcut = [string[], () => void][];
 
   const shortcuts: Shortcut = [
-    [['t'], () => toggleAlwaysOnTop(true)],
     [['m'], () => toggleLeftDrawer()],
-    [['k'], () => store.toggleDarkMode()],
+    [['e'], () => toggleRightDrawer()],
     [['F1', '?'], () => router.push({ path: '/help' })],
     [['F2'], () => router.push({ path: '/' })],
     [['F3'], () => router.push({ path: '/about' })],
@@ -87,10 +64,10 @@ onBeforeMount(() => {
 </script>
 
 <template>
-  <q-layout view="hHh lpr fFf">
+  <q-layout view="hHh lpr fff">
     <q-header
       :class="'bg-' + store.getDarkColor('primary')"
-      class="noselect"
+      class="z-top noselect"
       elevated
     >
       <q-toolbar @focusin="($event.target as HTMLElement).blur()">
@@ -103,51 +80,44 @@ onBeforeMount(() => {
           @click="toggleLeftDrawer"
         />
         <q-toolbar-title> 퀘이사 계산기 </q-toolbar-title>
-        <q-toggle
-          v-if="$q.platform.is.electron"
-          v-model="store.alwaysOnTop"
-          label="항상 위 (T)"
-          left-label
-          keep-color
-          :color="store.getDarkColor('info')"
-          @click="toggleAlwaysOnTop()"
+        <HeaderIcons />
+        <q-btn
+          class="q-ml-sm"
+          flat
+          dense
+          round
+          icon="settings"
+          aria-label="Settings"
+          @click="toggleRightDrawer"
         />
-        <!-- :disable="!$q.platform.is.electron" -->
       </q-toolbar>
     </q-header>
 
     <q-drawer
-      class="noselect"
       v-model="leftDrawerOpen"
+      :width="200"
+      class="noselect"
       side="left"
-      overlay
       elevated
+      overlay
+      show-if-above
     >
-      <q-list>
-        <q-item-label class="text-h5" header> 메뉴 (M) </q-item-label>
-        <PathRoute v-for="path in paths" :key="path.title" v-bind="path" />
-      </q-list>
-      <q-footer
-        :class="'bg-' + store.getDarkColor('primary')"
-        class="row items-center q-pa-sm"
-      >
-        버전 : {{ version }}
-        <q-space />
-        <q-toggle
-          v-model="store.darkMode"
-          label="다크 모드 (K)"
-          left-label
-          keep-color
-          :color="store.getDarkColor('info')"
-          @click="store.setDarkMode(store.darkMode)"
-        />
-      </q-footer>
+      <MenuPanel />
+    </q-drawer>
+
+    <q-drawer
+      v-model="rightDrawerOpen"
+      :width="200"
+      class="noselect"
+      side="right"
+      elevated
+      overlay
+      show-if-above
+    >
+      <SettingPanel />
     </q-drawer>
 
     <q-page-container style="padding-bottom: 0px">
-      <!-- 트랜지션 적용 전 -->
-      <!-- <router-view /> -->
-      <!-- 트랜지션 적용 후 -->
       <router-view v-slot="{ Component }">
         <transition name="slide-fade" mode="out-in" appear>
           <div :key="$route.path">
