@@ -48,6 +48,23 @@ const operatorIcons: { [key: string]: string } = {
   '×': 'mdi-close-box',
   '÷': 'mdi-division-box',
 };
+
+let prevHistoryId = 0;
+
+const preResult = computed(() => {
+  const history = resultHistory.value;
+  if (history.length > 0 && calc.getWillReset()) {
+    if (prevHistoryId != history[0].id as number) {
+      if (result.value == store.toLocale(history[0].resultNumber)) {
+        prevHistoryId = history[0].id as number;
+        return [store.getLeftSideInHistory(history[0]), '='].join(' ');
+      }
+    }
+  } else if (operator.value != '' && !calc.getWillReset()) {
+    return [store.toLocale(calc.getBackupNumber()), operator.value].join(' ');
+  }
+  return ' ';
+});
 </script>
 
 <template>
@@ -68,7 +85,7 @@ const operatorIcons: { [key: string]: string } = {
       label-slot
       stack-label
     >
-      <template v-slot:prepend v-if="operator.length > 0">
+      <template v-slot:prepend v-if="operator != '' && calc.getWillReset()">
         <div
           class="noselect full-height q-mt-xs q-pt-xs"
           @focusin="($event.target as HTMLElement).blur()"
@@ -78,13 +95,15 @@ const operatorIcons: { [key: string]: string } = {
       </template>
       <template v-slot:label>
         <div class="noselect" @focusin="($event.target as HTMLElement).blur()">
-          {{
+          <!-- {{
             resultHistory.length &&
             calc.getWillReset() &&
+            prevHistoryId != (prevHistoryId = resultHistory[0].id as number) &&
             result == store.toLocale(resultHistory[0].resultNumber)
               ? [store.getLeftSideInHistory(resultHistory[0]), '='].join(' ')
               : ' '
-          }}
+          }} -->
+          {{ preResult }}
         </div>
       </template>
       <template v-slot:control>

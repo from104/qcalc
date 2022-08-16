@@ -35,7 +35,7 @@ interface History {
 
 export class Calculator {
   // 연산자가 눌렸을 때 임시로 숫자를 저장
-  private number!: number;
+  private backupNumber!: number;
 
   // 연산자를 반복적으로 눌렀을 때 연산되는 숫자
   private repeatNumber!: number;
@@ -62,7 +62,7 @@ export class Calculator {
 
   // 초기화
   public clear() {
-    this.number = 0;
+    this.backupNumber = 0;
     this.repeatNumber = 0;
     this.shownNumber = '0';
     this.mOperator = Operator.None;
@@ -100,6 +100,11 @@ export class Calculator {
     return this.shownNumber;
   }
 
+  // 백업 숫자 얻기
+  public getBackupNumber(): number {
+    return this.backupNumber;
+  }
+  
   // 콘솔로 결과 출력
   public resultToConsole() {
     console.log(this.shownNumber);
@@ -178,15 +183,15 @@ export class Calculator {
 
   // 임시 숫자를 표시 숫자로
   private numberToShown() {
-    this.shownNumber = this.numberToString(this.number);
+    this.shownNumber = this.numberToString(this.backupNumber);
   }
 
   // 표시 숫자를 임시 숫자로
   private shownToNumber() {
     try {
-      this.number = Number(this.shownNumber);
+      this.backupNumber = Number(this.shownNumber);
     } catch (e: unknown) {
-      this.number = 0;
+      this.backupNumber = 0;
     }
   }
 
@@ -195,6 +200,8 @@ export class Calculator {
     let n; // 계산에 쓰일 숫자
 
     if (this.willReset) {
+      // 반복 계산 숫자가 0이면 아무것도 안함
+      if (this.repeatNumber == 0) return;
       // 초기화 예정이면 반복 계산될 숫자를
       n = this.repeatNumber;
     } else {
@@ -206,35 +213,35 @@ export class Calculator {
     // 사전에 정해진 연산자에 따라 실제 계산
     switch (this.mOperator) {
       case Operator.Plus:
-        this.number = this.addHistory({
-          preNumber: this.number,
+        this.backupNumber = this.addHistory({
+          preNumber: this.backupNumber,
           operator: this.getOperatorString() as string,
           argNumber: n,
-          resultNumber: this.number + n,
+          resultNumber: this.backupNumber + n,
         });
         break;
       case Operator.Minus:
-        this.number = this.addHistory({
-          preNumber: this.number,
+        this.backupNumber = this.addHistory({
+          preNumber: this.backupNumber,
           operator: this.getOperatorString() as string,
           argNumber: n,
-          resultNumber: this.number - n,
+          resultNumber: this.backupNumber - n,
         });
         break;
       case Operator.Mul:
-        this.number = this.addHistory({
-          preNumber: this.number,
+        this.backupNumber = this.addHistory({
+          preNumber: this.backupNumber,
           operator: this.getOperatorString() as string,
           argNumber: n,
-          resultNumber: this.number * n,
+          resultNumber: this.backupNumber * n,
         });
         break;
       case Operator.Div:
-        this.number = this.addHistory({
-          preNumber: this.number,
+        this.backupNumber = this.addHistory({
+          preNumber: this.backupNumber,
           operator: this.getOperatorString() as string,
           argNumber: n,
-          resultNumber: this.number / n,
+          resultNumber: this.backupNumber / n,
         });
         break;
       default:
@@ -279,7 +286,6 @@ export class Calculator {
 
   // = 버튼 처리
   public equal() {
-    this.repeatNumber = 0; // 반복 숫자 초기화
     if (this.mOperator == Operator.None) {
       // 전 연산자가 없었다면
       this.shownToNumber(); // 표시 숫자를 백업
@@ -292,6 +298,8 @@ export class Calculator {
       this.mOperator = Operator.None; // 연산자 리셋
 
       this.willReset = true; // 숫자 입력 초기화 예정
+
+      this.repeatNumber = 0; // 반복 숫자 초기화
     }
   }
 
@@ -310,11 +318,11 @@ export class Calculator {
       // 전 연산자가 나누기였다면
       this.preCalc(); // 계산한 결과에
       const { preNumber, argNumber } = this.history.shift() as History;
-      this.number = this.addHistory({
+      this.backupNumber = this.addHistory({
         preNumber: preNumber,
         operator: this.getOperatorString(Operator.Percent) as string,
         argNumber: argNumber,
-        resultNumber: this.number * 100, // 100을 곱하여 퍼센트를 계산
+        resultNumber: this.backupNumber * 100, // 100을 곱하여 퍼센트를 계산
       });
       this.numberToShown();
     }
