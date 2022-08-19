@@ -61,9 +61,9 @@ const preResult = computed(() => {
       }
     }
   } else if (operator.value != '' && !calc.getWillReset()) {
-    return [store.toLocale(calc.getBackupNumber()), operator.value].join(' ');
+    return store.toLocale(calc.getBackupNumber());
   }
-  return ' ';
+  return '';
 });
 </script>
 
@@ -85,7 +85,7 @@ const preResult = computed(() => {
       label-slot
       stack-label
     >
-      <template v-slot:prepend v-if="operator != '' && calc.getWillReset()">
+      <template v-slot:prepend v-if="operator != ''">
         <div
           class="noselect full-height q-mt-xs q-pt-xs"
           @focusin="($event.target as HTMLElement).blur()"
@@ -95,14 +95,6 @@ const preResult = computed(() => {
       </template>
       <template v-slot:label>
         <div class="noselect" @focusin="($event.target as HTMLElement).blur()">
-          <!-- {{
-            resultHistory.length &&
-            calc.getWillReset() &&
-            prevHistoryId != (prevHistoryId = resultHistory[0].id as number) &&
-            result == store.toLocale(resultHistory[0].resultNumber)
-              ? [store.getLeftSideInHistory(resultHistory[0]), '='].join(' ')
-              : ' '
-          }} -->
           {{ preResult }}
         </div>
       </template>
