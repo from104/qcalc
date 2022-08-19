@@ -258,8 +258,8 @@ onBeforeUnmount(() => {
 }
 
 #history {
-  max-height: calc(100vh - 200px);
-  min-height: calc(100vh - 200px);
+  max-height: calc(100vh - 170px);
+  min-height: calc(100vh - 170px);
   max-width: calc(100vw - 45px);
   overflow: overlay;
 }
