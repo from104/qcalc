@@ -79,7 +79,7 @@ onBeforeMount(() => {
           aria-label="Menu"
           @click="toggleLeftDrawer"
         />
-        <q-toolbar-title> 퀘이사 계산기 </q-toolbar-title>
+        <q-toolbar-title> {{ $t('appTitle') }} </q-toolbar-title>
         <HeaderIcons />
         <q-btn
           class="q-ml-sm"
