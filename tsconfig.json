@@ -26,7 +26,7 @@
     "src-pwa/*.d.ts",
     "src-bex/*.d.ts",
     "src-ssr/*.d.ts"
-  ],
+, "src-electron/electron-main.js"  ],
   "exclude": ["node_modules"],
   "ts-node": {
     "esm": true

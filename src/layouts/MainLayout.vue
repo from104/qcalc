@@ -4,6 +4,8 @@ import { useQuasar } from 'quasar';
 import tinykeys, { KeyBindingMap } from 'tinykeys';
 import { useRouter } from 'vue-router';
 
+import {useI18n} from 'vue-i18n';
+
 import { useCalcStore } from 'src/stores/calc-store';
 
 import MenuPanel from 'components/MenuPanel.vue';
@@ -15,6 +17,7 @@ const router = useRouter();
 const store = useCalcStore();
 
 const $q = useQuasar();
+const {t} = useI18n();
 
 const leftDrawerOpen = ref(false);
 
@@ -79,7 +82,7 @@ onBeforeMount(() => {
           aria-label="Menu"
           @click="toggleLeftDrawer"
         />
-        <q-toolbar-title> {{ $t('appTitle') }} </q-toolbar-title>
+        <q-toolbar-title> {{ t('title') }} </q-toolbar-title>
         <HeaderIcons />
         <q-btn
           class="q-ml-sm"
@@ -87,7 +90,7 @@ onBeforeMount(() => {
           dense
           round
           icon="settings"
-          aria-label="Settings"
+          :aria-label="t('settings')"
           @click="toggleRightDrawer"
         />
       </q-toolbar>
@@ -128,6 +131,15 @@ onBeforeMount(() => {
     </q-page-container>
   </q-layout>
 </template>
+
+<i18n lang="yml">
+ko:
+  title: "퀘이사 계산기"
+  settings: "설정"
+en:
+  title: "Quasar Calculator"
+  settings: "Settings"
+</i18n>
 
 <style lang="scss" scoped>
 .slide-fade-enter-active,

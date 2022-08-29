@@ -1,18 +1,16 @@
 <script setup lang="ts">
-import {
-  onMounted,
-  onBeforeUnmount,
-  ref,
-  computed,
-  watch,
-} from 'vue';
+import { onMounted, onBeforeUnmount, ref, computed, watch } from 'vue';
 import tinykeys, { KeyBindingMap } from 'tinykeys';
+
+import { useI18n } from 'vue-i18n';
 
 import type { History } from 'classes/Calculator';
 
 import { useCalcStore } from 'stores/calc-store';
 
 import MyTooltip from 'components/MyTooltip.vue';
+
+const { t } = useI18n();
 
 // 스토어 가져오기
 const store = useCalcStore();
@@ -24,7 +22,7 @@ const calc = store.calc;
 const resultHistory = computed(() => calc.getHistory() as unknown as History[]);
 
 // 계산 결과 기록 열기 여부
-const isHistoryOpen = ref( false );
+const isHistoryOpen = ref(false);
 
 // 계산 결과를 지울지 묻는 다이얼로그 표시 여부
 const doDeleteHistory = ref(false);
@@ -122,7 +120,7 @@ onBeforeUnmount(() => {
         icon="mdi-arrow-up-bold"
         @click="isHistoryOpen = true"
       >
-        <my-tooltip>클릭하면 계산 결과 기록을 엽니다.</my-tooltip>
+        <my-tooltip>{{ t('onClickShowMsg') }}</my-tooltip>
       </q-btn>
       <q-btn
         v-else
@@ -136,7 +134,7 @@ onBeforeUnmount(() => {
         icon="mdi-arrow-down-bold"
         @click="isHistoryOpen = false"
       >
-        <my-tooltip>클릭하면 계산 결과 기록을 숨깁니다.</my-tooltip>
+        <my-tooltip>{{ t('onClickHideMsg') }}</my-tooltip>
       </q-btn>
     </transition>
   </div>
@@ -162,13 +160,7 @@ onBeforeUnmount(() => {
         size="md"
         @click="doDeleteHistory = true"
       />
-      <q-btn
-        dense
-        flat
-        icon="close"
-        size="md"
-        @click="isHistoryOpen = false"
-      />
+      <q-btn dense flat icon="close" size="md" @click="isHistoryOpen = false" />
     </q-bar>
 
     <q-card
@@ -251,6 +243,15 @@ onBeforeUnmount(() => {
     </q-card>
   </q-dialog>
 </template>
+
+<i18n lang="yml">
+ko:
+  onClickShowMsg: '클릭하면 계산 결과 기록을 엽니다.'
+  onClickHideMsg: '클릭하면 계산 결과 기록을 숨깁니다.'
+en:
+  onClickShowMsg: 'Click to show the history of calculation results.'
+  onClickHideMsg: 'Click to hide the history of calculation results.'
+</i18n>
 
 <style scoped lang="scss">
 .q-bar {
