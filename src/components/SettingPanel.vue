@@ -4,9 +4,17 @@ import { useQuasar } from 'quasar';
 
 import tinykeys, { KeyBindingMap } from 'tinykeys';
 
+import { useI18n } from 'vue-i18n';
+
 import { useCalcStore } from 'src/stores/calc-store';
 
 import MyTooltip from 'components/MyTooltip.vue';
+
+const { locale } = useI18n({ useScope: 'global' });
+const localeOptions = [
+  { value: 'ko', label: '한국어' },
+  { value: 'en', label: '영어' },
+];
 
 const store = useCalcStore();
 
@@ -133,6 +141,22 @@ onMounted(() => {
           </div>
         </template>
       </q-slider>
+    </q-item>
+
+    <q-separator spaced="md" />
+
+    <q-item>
+      <q-item-label class="self-center"> 언어 선택 </q-item-label>
+      <q-space />
+      <q-select
+        v-model="locale"
+        :options="localeOptions"
+        :color="store.getDarkColor('primary')"
+        dense
+        emit-value
+        map-options
+        options-dense
+      />
     </q-item>
   </q-list>
 </template>
