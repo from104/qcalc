@@ -13,7 +13,7 @@ try {
   }
 } catch (_) {}
 
-let mainWindow;
+let mainWindow: BrowserWindow | undefined;
 
 function createWindow() {
   /**
@@ -27,8 +27,8 @@ function createWindow() {
     resizable: false,
     webPreferences: {
       contextIsolation: true,
-      // More info: /quasar-cli/developing-electron-apps/electron-preload-script
-      preload: path.resolve( __dirname, process.env.QUASAR_ELECTRON_PRELOAD ),
+      // More info: https://v2.quasar.dev/quasar-cli-vite/developing-electron-apps/electron-preload-script
+      preload: path.resolve(__dirname, process.env.QUASAR_ELECTRON_PRELOAD),
     },
   });
 
@@ -41,19 +41,20 @@ function createWindow() {
   } else {
     // we're on production; no access to devtools pls
     mainWindow.webContents.on('devtools-opened', () => {
-      mainWindow.webContents.closeDevTools();
+      mainWindow?.webContents.closeDevTools();
     });
   }
 
   mainWindow.on('closed', () => {
-    mainWindow = null;
+    mainWindow = undefined;
   });
 }
 
+// app.whenReady().then(createWindow);
 app.whenReady().then(() => {
   createWindow();
   ipcMain.on('toggle-always-on-top', (_event, res) => {
-    mainWindow.setAlwaysOnTop(res);
+    mainWindow?.setAlwaysOnTop(res);
     // console.log('ipcMain: ' + res);
   });
 });
@@ -65,7 +66,7 @@ app.on('window-all-closed', () => {
 });
 
 app.on('activate', () => {
-  if (mainWindow === null) {
+  if (mainWindow === undefined) {
     createWindow();
   }
 });
