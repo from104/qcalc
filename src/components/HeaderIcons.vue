@@ -2,10 +2,13 @@
 import { onMounted, computed } from 'vue';
 import tinykeys, { KeyBindingMap } from 'tinykeys';
 import { copyToClipboard, useQuasar } from 'quasar';
+import { useI18n } from 'vue-i18n';
 
 import { useCalcStore } from 'stores/calc-store';
 
 import MyTooltip from 'components/MyTooltip.vue';
+
+const { t } = useI18n();
 
 // 스토어 가져오기
 const store = useCalcStore();
@@ -18,7 +21,7 @@ const result = computed(() => {
 });
 
 // quasar 유틸 변수 선언
-const $q = useQuasar();
+const q = useQuasar();
 
 // notify 표시 시간 설정 ㅜms0
 const notifyDuration = 500;
@@ -28,20 +31,23 @@ const notifyDuration = 500;
 function doCopy(): void {
   const selectedText = document.getSelection()?.toString() ?? '';
   const textToClipboard = selectedText == '' ? result.value : selectedText;
-  const targetToBeCopied = selectedText == '' ? '계산 결과를' : '선택한 내용을';
+  const targetToBeCopied =
+    selectedText == ''
+      ? t('targetToBeCopiedResult')
+      : t('targetToBeCopiedSelected');
   copyToClipboard(textToClipboard)
     .then(() => {
-      $q.notify({
+      q.notify({
         position: 'top',
-        message: targetToBeCopied + ' 클립보드에 복사했습니다.',
+        message: t('copiedToClipboard', { target: targetToBeCopied }),
         type: 'positive',
         timeout: notifyDuration,
       });
     })
     .catch(() => {
-      $q.notify({
+      q.notify({
         position: 'top',
-        message: targetToBeCopied + ' 클립보드에 복사하지 못했습니다.',
+        message: t('failedToCopyToClipboard', { target: targetToBeCopied }),
         type: 'negative',
         timeout: notifyDuration,
       });
@@ -54,17 +60,17 @@ function doPaste(): void {
     .readText()
     .then((text) => {
       calc.setShownNumber(text);
-      $q.notify({
+      q.notify({
         position: 'top',
-        message: '클립보드로부터 숫자를 붙여넣었습니다.',
+        message: t('pastedFromClipboard'),
         type: 'positive',
         timeout: notifyDuration,
       });
     })
     .catch(() => {
-      $q.notify({
+      q.notify({
         position: 'top',
-        message: '클립보드로부터 숫자를 붙여넣지 못했습니다.',
+        message: t('failedToPasteFromClipboard'),
         type: 'negative',
         timeout: notifyDuration,
       });
@@ -103,7 +109,7 @@ onMounted(() => {
     class="q-ma-none q-pa-none q-pl-xs"
     @click="doCopy"
   >
-    <MyTooltip>결과/선택이 복사됩니다.</MyTooltip>
+    <MyTooltip>{{ t('tooltipCopy') }}</MyTooltip>
   </q-btn>
   <q-btn
     flat
@@ -111,6 +117,27 @@ onMounted(() => {
     class="q-ma-none q-pa-none q-pl-xs"
     @click="doPaste"
   >
-    <MyTooltip>숫자를 붙혀넣습니다.</MyTooltip>
+    <MyTooltip>{{ t('tooltipPaste') }}</MyTooltip>
   </q-btn>
 </template>
+
+<i18n lang="yml">
+ko:
+  targetToBeCopiedResult: '계산 결과를'
+  targetToBeCopiedSelected: '선택한 내용을'
+  copiedToClipboard: '{target} 클립보드에 복사했습니다.'
+  failedToCopyToClipboard: '{target} 클립보드에 복사하지 못했습니다.'
+  pasteToClipboard: '클립보드로부터 숫자를 붙여넣었습니다.'
+  failedToPasteToClipboard: '클립보드로부터 숫자를 붙여넣지 못했습니다.'
+  tooltipCopy: '결과/선택을 복사합니다.'
+  tooltipPaste: '숫자를 붙혀넣습니다.'
+en:
+  targetToBeCopiedResult: 'the calculation result'
+  targetToBeCopiedSelected: 'the selected content'
+  copiedToClipboard: 'Copied {target} to the clipboard.'
+  failedToCopyToClipboard: 'Failed to copy {target} to the clipboard.'
+  pasteToClipboard: 'Pasted the number from the clipboard.'
+  failedToPasteToClipboard: 'Failed to paste the number from the clipboard.'
+  tooltipCopy: 'Copy the result/selection.'
+  tooltipPaste: 'Paste the number.'
+</i18n>

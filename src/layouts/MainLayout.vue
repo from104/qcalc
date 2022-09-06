@@ -4,7 +4,7 @@ import { useQuasar } from 'quasar';
 import tinykeys, { KeyBindingMap } from 'tinykeys';
 import { useRouter } from 'vue-router';
 
-import {useI18n} from 'vue-i18n';
+import { useI18n } from 'vue-i18n';
 
 import { useCalcStore } from 'src/stores/calc-store';
 
@@ -16,8 +16,8 @@ const router = useRouter();
 
 const store = useCalcStore();
 
-const $q = useQuasar();
-const {t} = useI18n();
+const q = useQuasar();
+const { t } = useI18n();
 
 const leftDrawerOpen = ref(false);
 
@@ -55,7 +55,7 @@ onMounted(() => {
 
   tinykeys(window, keyBindingMaps);
 
-  if ($q.platform.is.electron) {
+  if (q.platform.is.electron) {
     window.myAPI.setAlwaysOnTop(store.alwaysOnTop);
   }
 });
@@ -63,6 +63,7 @@ onMounted(() => {
 onBeforeMount(() => {
   store.setDarkMode(store.darkMode);
   store.locale = navigator.language;
+  console.log(store.locale);
 });
 </script>
 
@@ -134,11 +135,11 @@ onBeforeMount(() => {
 
 <i18n lang="yml">
 ko:
-  title: "퀘이사 계산기"
-  settings: "설정"
+  title: '퀘이사 계산기'
+  settings: '설정'
 en:
-  title: "Quasar Calculator"
-  settings: "Settings"
+  title: 'Quasar Calculator'
+  settings: 'Settings'
 </i18n>
 
 <style lang="scss" scoped>

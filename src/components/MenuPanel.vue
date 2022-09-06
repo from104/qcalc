@@ -1,8 +1,12 @@
 <script setup lang="ts">
+import { useI18n } from 'vue-i18n';
+
 import { version } from '../../package.json';
 
 import PathRoute from 'components/PathRoute.vue';
 import { useCalcStore } from 'src/stores/calc-store';
+
+const { t } = useI18n();
 
 const store = useCalcStore();
 
@@ -30,14 +34,24 @@ const paths = [
 
 <template>
   <q-list>
-    <q-item-label class="q-mt-xl text-h5" header> 메뉴 (M) </q-item-label>
+    <q-item-label class="q-mt-xl text-h5" header> {{ t('menu') }} (M) </q-item-label>
     <PathRoute v-for="path in paths" :key="path.title" v-bind="path" />
   </q-list>
   <q-footer
     :class="'bg-' + store.getDarkColor('primary')"
     class="row items-center q-pa-sm"
   >
-    버전 : {{ version }}
+    {{ `${t('version')} : ${version}`}}
     <q-space />
   </q-footer>
 </template>
+
+<i18n>
+ko:
+  menu: '메뉴'
+  version: '버전'
+en:
+  menu: 'Menu'
+  version: 'Version'
+
+</i18n>

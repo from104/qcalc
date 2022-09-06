@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { onMounted } from 'vue';
+import { onMounted, reactive, watch } from 'vue';
 import { useQuasar } from 'quasar';
 
 import tinykeys, { KeyBindingMap } from 'tinykeys';
@@ -11,17 +11,25 @@ import { useCalcStore } from 'src/stores/calc-store';
 import MyTooltip from 'components/MyTooltip.vue';
 
 const { locale } = useI18n({ useScope: 'global' });
-const localeOptions = [
-  { value: 'ko', label: '한국어' },
-  { value: 'en', label: '영어' },
-];
+const { t } = useI18n();
+
+const localeOptions = reactive([
+  { value: 'ko', label: t('ko') },
+  { value: 'en', label: t('en') },
+]);
+
+watch(locale, () => {
+  localeOptions.forEach((option) => {
+    option.label = t(option.value);
+  });
+});
 
 const store = useCalcStore();
 
-const $q = useQuasar();
+const q = useQuasar();
 
 const toggleAlwaysOnTop = (byManual = false) => {
-  if ($q.platform.is.electron) {
+  if (q.platform.is.electron) {
     if (byManual) {
       // 수동으로 토글
       store.toggleAlwaysOnTop();
@@ -52,7 +60,7 @@ onMounted(() => {
 
   tinykeys(window, keyBindingMaps);
 
-  if ($q.platform.is.electron) {
+  if (q.platform.is.electron) {
     window.myAPI.setAlwaysOnTop(store.alwaysOnTop);
   }
 });
@@ -60,9 +68,9 @@ onMounted(() => {
 
 <template>
   <q-list @focusin="($event.target as HTMLElement).blur()" dense>
-    <q-item-label class="q-mt-xl text-h5" header> 설정 (E) </q-item-label>
+    <q-item-label class="q-mt-xl text-h5" header>{{ t('settings') }} (E)</q-item-label>
     <q-item class="q-py-none" v-if="$q.platform.is.electron">
-      <q-item-label class="self-center"> 항상 위 (T) </q-item-label>
+      <q-item-label class="self-center">{{ t('alwaysOnTop') }} (T)</q-item-label>
       <q-space />
       <q-toggle
         v-model="store.alwaysOnTop"
@@ -74,7 +82,7 @@ onMounted(() => {
     </q-item>
 
     <q-item class="q-py-none">
-      <q-item-label class="self-center"> 다크 모드 (K) </q-item-label>
+      <q-item-label class="self-center">{{ t('darkMode') }} (K)</q-item-label>
       <q-space />
       <q-toggle
         v-model="store.darkMode"
@@ -88,7 +96,7 @@ onMounted(() => {
     <q-separator spaced="md" />
 
     <q-item class="q-py-none">
-      <q-item-label class="self-center"> 천단위 표시 (,) </q-item-label>
+      <q-item-label class="self-center">{{ t('useGrouping') }} (,)</q-item-label>
       <q-space />
       <q-toggle
         v-model="store.useGrouping"
@@ -100,14 +108,14 @@ onMounted(() => {
 
     <q-item class="q-py-none">
       <MyTooltip>
-        소수점 고정 상태:
+        {{ t('decimalPlacesStat') }}:
         {{
           store.decimalPlaces == -2
-            ? '제한 없음'
-            : `${store.decimalPlaces} 자리`
+            ? t('noLimit')
+            : `${store.decimalPlaces} ${t('toNDecimalPlaces')}`
         }}
       </MyTooltip>
-      <q-item-label class="q-pt-xs self-start"> 소수점 ([,]) </q-item-label>
+      <q-item-label class="q-pt-xs self-start">{{ t('decimalPlaces') }} ([,])</q-item-label>
       <q-space />
       <q-slider
         v-model="store.decimalPlaces"
@@ -146,7 +154,7 @@ onMounted(() => {
     <q-separator spaced="md" />
 
     <q-item>
-      <q-item-label class="self-center"> 언어 선택 </q-item-label>
+      <q-item-label class="self-center"> {{ t('language') }} </q-item-label>
       <q-space />
       <q-select
         v-model="locale"
@@ -160,3 +168,30 @@ onMounted(() => {
     </q-item>
   </q-list>
 </template>
+
+<i18n lang="yml">
+ko:
+  settings: '설정'
+  alwaysOnTop: '항상 위'
+  darkMode: '다크 모드'
+  useGrouping: '천단위 표시'
+  decimalPlaces: '소수점'
+  decimalPlacesStat: '소수점 자리수'
+  noLimit: '제한 없음'
+  toNDecimalPlaces: '자리'
+  language: '언어'
+  en: '영어'
+  ko: '한국어'
+en:
+  settings: 'Settings'
+  alwaysOnTop: 'Always on top'
+  darkMode: 'Dark mode'
+  useGrouping: 'Use grouping'
+  decimalPlaces: 'Decimal'
+  decimalPlacesStat: 'Decimal places (stat)'
+  noLimit: 'No limit'
+  toNDecimalPlaces: 'decimal places'
+  language: 'Language'
+  en: 'English'
+  ko: 'Korean'
+</i18n>
