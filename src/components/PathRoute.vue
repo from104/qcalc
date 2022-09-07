@@ -13,7 +13,7 @@ defineProps({
 
 <template>
   <q-item :active-class="'text-'+store.getDarkColor('primary')" clickable :to="path">
-    <q-item-section v-if="icon" avatar>
+    <q-item-section class="col-3" v-if="icon" avatar>
       <q-icon :name="icon" />
     </q-item-section>
 

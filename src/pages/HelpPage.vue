@@ -4,7 +4,7 @@ import HelpPageMD from './HelpPage.md';
 </script>
 
 <template>
-  <q-page class="scrollbar-custom scroll" style="height: 500px">
+  <q-page class="scrollbar-custom scroll" style="height: 47kk0px">
     <q-card flat class="q-pa-lg">
       <q-markdown :src="HelpPageMD" no-linkify no-heading-anchor-links />
     </q-card>

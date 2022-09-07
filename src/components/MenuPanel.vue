@@ -5,31 +5,43 @@ import { version } from '../../package.json';
 
 import PathRoute from 'components/PathRoute.vue';
 import { useCalcStore } from 'src/stores/calc-store';
+import { reactive, watch } from 'vue';
 
 const { t } = useI18n();
 
 const store = useCalcStore();
 
-const paths = [
+const paths = reactive([
   {
-    title: '계산기',
-    caption: '퀘이사 계산기 (F2)',
+    title: t('path.title.계산기'),
+    caption: t('path.caption.계산기')+' (F2)',
     icon: 'calculate',
     path: '/',
   },
   {
-    title: '도움말',
-    caption: '기능과 사용법 (F1)',
+    title: t('path.title.도움말'),
+    caption: t('path.caption.도움말')+' (F1)',
     icon: 'help',
     path: '/help',
   },
   {
-    title: '소개',
-    caption: '앱에 대한 소개 (F3)',
+    title: t('path.title.소개'),
+    caption: t('path.caption.소개')+' (F3)',
     icon: 'info',
     path: '/about',
   },
-];
+]);
+
+const { locale } = useI18n({ useScope: 'global' });
+
+watch(locale, () => {
+  paths[0].title = t('path.title.계산기');
+  paths[0].caption = t('path.caption.계산기')+' (F2)';
+  paths[1].title = t('path.title.도움말');
+  paths[1].caption = t('path.caption.도움말')+' (F1)';
+  paths[2].title = t('path.title.소개');
+  paths[2].caption = t('path.caption.소개')+' (F3)';
+});
 </script>
 
 <template>
@@ -49,9 +61,27 @@ const paths = [
 <i18n>
 ko:
   menu: '메뉴'
+  path:
+    title:
+      계산기: '계산기'
+      도움말: '도움말'
+      소개: '소개'
+    caption:
+      계산기: '퀘이사 계산기)'
+      도움말: '기능과 사용법'
+      소개: '앱에 대한 소개'
   version: '버전'
 en:
   menu: 'Menu'
+  path:
+    title:
+      계산기: 'Calculator'
+      도움말: 'Help'
+      소개: 'About'
+    caption:
+      계산기: 'Quasar Calculator'
+      도움말: 'Features and Usage'
+      소개: 'About this app'
   version: 'Version'
 
 </i18n>
