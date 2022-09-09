@@ -120,7 +120,9 @@ onBeforeUnmount(() => {
         icon="mdi-arrow-up-bold"
         @click="isHistoryOpen = true"
       >
-        <my-tooltip>{{ t('onClickShowMsg') }}</my-tooltip>
+        <my-tooltip>
+          {{ t('onClickMsg', { act: t('actShow') }) }}
+        </my-tooltip>
       </q-btn>
       <q-btn
         v-else
@@ -134,7 +136,9 @@ onBeforeUnmount(() => {
         icon="mdi-arrow-down-bold"
         @click="isHistoryOpen = false"
       >
-        <my-tooltip>{{ t('onClickHideMsg') }}</my-tooltip>
+        <my-tooltip>
+          {{ t('onClickMsg', { act: t('actHide') }) }}
+        </my-tooltip>
       </q-btn>
     </transition>
   </div>
@@ -151,7 +155,7 @@ onBeforeUnmount(() => {
       @focusin="($event.target as HTMLElement).blur()"
     >
       <q-icon name="history" size="sm" />
-      <div>{{t('history')}}</div>
+      <div>{{ t('history') }}</div>
       <q-space />
       <q-btn
         dense
@@ -186,7 +190,7 @@ onBeforeUnmount(() => {
           <q-item v-if="resultHistory.length == 0" class="text-center">
             <q-item-section>
               <q-item-label>
-                <span>{{t('noHistory')}}</span>
+                <span>{{ t('noHistory') }}</span>
               </q-item-label>
             </q-item-section>
           </q-item>
@@ -225,7 +229,7 @@ onBeforeUnmount(() => {
       :class="'bg-' + store.getDarkColor('negative')"
       style="width: 200px"
     >
-      <q-card-section>{{t('doYouDeleteHistory')}} </q-card-section>
+      <q-card-section>{{ t('doYouDeleteHistory') }} </q-card-section>
       <q-card-actions
         align="center"
         :class="'text-' + store.getDarkColor('negative')"
@@ -246,16 +250,18 @@ onBeforeUnmount(() => {
 
 <i18n lang="yml">
 ko:
-  onClickShowMsg: '클릭하면 계산 결과 기록을 엽니다.'
-  onClickHideMsg: '클릭하면 계산 결과 기록을 숨깁니다.'
+  onClickMsg: '클릭하면 계산 결과 기록을 {act}.'
+  actShow: '보여줍니다'
+  actHide: '숨깁니다'
   history: '계산 결과'
   noHistory: '계산 결과가 없습니다.'
   doYouDeleteHistory: '계산 기록을 지우겠어요?'
   no: '아니오'
   yes: '예'
 en:
-  onClickShowMsg: 'Click to show the history of calculation results.'
-  onClickHideMsg: 'Click to hide the history of calculation results.'
+  onClickMsg: 'Click to {act} calculation history.'
+  actShow: 'show'
+  actHide: 'hide'
   history: 'History'
   noHistory: 'No history.'
   doYouDeleteHistory: 'Do you want to delete the history?'
