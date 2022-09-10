@@ -152,7 +152,7 @@ onBeforeUnmount(() => {
       dark
       class="noselect text-white"
       :class="'bg-' + store.getDarkColor('primary')"
-      @focusin="($event.target as HTMLElement).blur()"
+      v-blur
     >
       <q-icon name="history" size="sm" />
       <div>{{ t('history') }}</div>

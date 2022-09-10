@@ -54,7 +54,7 @@ watch(locale, () => {
 </script>
 
 <template>
-  <q-list>
+  <q-list v-blur>
     <q-item-label class="q-mt-xl text-h5" header>
       {{ t('menu') }} (M)
     </q-item-label>

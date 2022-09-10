@@ -73,13 +73,13 @@ onBeforeMount(() => {
       class="z-top noselect"
       elevated
     >
-      <q-toolbar @focusin="($event.target as HTMLElement).blur()">
+      <q-toolbar v-blur>
         <q-btn
           flat
           dense
           round
           icon="menu"
-          aria-label="Menu"
+          :aria-label="t('menu')"
           @click="toggleLeftDrawer"
         />
         <q-toolbar-title> {{ t('title') }} </q-toolbar-title>
@@ -132,12 +132,14 @@ onBeforeMount(() => {
   </q-layout>
 </template>
 
-<i18n lang="yml">
+<i18n>
 ko:
   title: '퀘이사 계산기'
+  menu: '메뉴'
   settings: '설정'
 en:
   title: 'Quasar Calculator'
+  menu: 'Menu'
   settings: 'Settings'
 </i18n>
 
