@@ -256,8 +256,6 @@ ko:
   history: '계산 결과'
   noHistory: '계산 결과가 없습니다.'
   doYouDeleteHistory: '계산 기록을 지우겠어요?'
-  no: '아니오'
-  yes: '예'
 en:
   onClickMsg: 'Click to {act} calculation history.'
   actShow: 'show'
@@ -265,8 +263,6 @@ en:
   history: 'History'
   noHistory: 'No history.'
   doYouDeleteHistory: 'Do you want to delete the history?'
-  no: 'No'
-  yes: 'Yes'
 </i18n>
 
 <style scoped lang="scss">

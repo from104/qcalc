@@ -9,6 +9,8 @@
 // https://v2.quasar.dev/quasar-cli-vite/quasar-config-js
 
 const { configure } = require('quasar/wrappers');
+const ViteYaml = require('@modyfi/vite-plugin-yaml');
+
 const path = require('path');
 
 module.exports = configure(function (/* ctx */) {
@@ -82,12 +84,13 @@ module.exports = configure(function (/* ctx */) {
           '@intlify/vite-plugin-vue-i18n',
           {
             // if you want to use Vue I18n Legacy API, you need to set `compositionOnly: false`
-             compositionOnly: true,
+            compositionOnly: true,
 
             // you need to set i18n resource including paths !
             include: path.resolve(__dirname, './src/i18n/**'),
           },
         ],
+        ViteYaml,
       ],
     },
 
@@ -213,5 +216,5 @@ module.exports = configure(function (/* ctx */) {
       // extendBexScriptsConf (esbuildConf) {}
       // extendBexManifestJson (json) {}
     },
-  }
+  };
 });

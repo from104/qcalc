@@ -16,6 +16,10 @@
       "stores/*": ["src/stores/*"],
       "classes/*": ["src/classes/*"]
     },
+    "types": [
+      "@intlify/vite-plugin-vue-i18n/client",
+      "@modyfi/vite-plugin-yaml/modules"
+    ],
   },
   "include": [
     "./**/*.ts",
@@ -32,5 +36,4 @@
   "ts-node": {
     "esm": true
   },
-  "types": ["@intlify/vite-plugin-vue-i18n/client"]
 }
