@@ -248,7 +248,7 @@ onBeforeUnmount(() => {
   </q-dialog>
 </template>
 
-<i18n lang="yml">
+<i18n>
 ko:
   onClickMsg: '클릭하면 계산 결과 기록을 {act}.'
   actShow: '보여줍니다'

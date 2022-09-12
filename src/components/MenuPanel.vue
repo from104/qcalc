@@ -1,11 +1,17 @@
 <script setup lang="ts">
+import tinykeys, { KeyBindingMap } from 'tinykeys';
+import { useRouter } from 'vue-router';
+
 import { useI18n } from 'vue-i18n';
 
 import { version } from '../../package.json';
 
-import PathRoute from 'components/PathRoute.vue';
 import { useCalcStore } from 'src/stores/calc-store';
-import { reactive, watch } from 'vue';
+import { onMounted, reactive, watch } from 'vue';
+
+import PathRoute from 'components/PathRoute.vue';
+
+const router = useRouter();
 
 const { t } = useI18n();
 
@@ -51,6 +57,28 @@ watch(locale, () => {
     paths[path].caption = t(`path.${path}.caption`);
   });
 });
+
+onMounted(() => {
+  const keyBindingMaps: KeyBindingMap = {};
+
+  type Shortcut = [string[], () => void][];
+
+  const shortcuts: Shortcut = [
+    [['F1', '?'], () => router.push({ path: '/help' })],
+    [['F2'], () => router.push({ path: '/' })],
+    [['F3'], () => router.push({ path: '/about' })],
+  ];
+
+  shortcuts.forEach((shortcut) => {
+    const [keys, handler] = shortcut;
+    keys.forEach((key) => {
+      keyBindingMaps[key] = handler;
+    });
+  });
+
+  tinykeys(window, keyBindingMaps);
+});
+
 </script>
 
 <template>
@@ -71,7 +99,6 @@ watch(locale, () => {
 
 <i18n>
 ko:
-  menu: '메뉴'
   path:
     help:
       title: '도움말'
@@ -82,9 +109,7 @@ ko:
     about:
       title: '소개'
       caption: '앱에 대한 소개'
-  version: '버전'
 en:
-  menu: 'Menu'
   path:
     help:
       title: 'Help'
@@ -95,5 +120,4 @@ en:
     about:
       title: 'About'
       caption: 'About the app'
-  version: 'Version'
 </i18n>

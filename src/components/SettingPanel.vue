@@ -1,14 +1,20 @@
 <script lang="ts" setup>
-import { onMounted, reactive, watch } from 'vue';
+import { onMounted, onBeforeMount, reactive, watch } from 'vue';
 import { useQuasar } from 'quasar';
-
 import tinykeys, { KeyBindingMap } from 'tinykeys';
-
 import { useI18n } from 'vue-i18n';
 
 import { useCalcStore } from 'src/stores/calc-store';
 
 import MyTooltip from 'components/MyTooltip.vue';
+
+import { useNotify } from 'src/components/UseNotify.vue';
+
+const { notifyMsg } = useNotify();
+
+const store = useCalcStore();
+
+const q = useQuasar();
 
 const { locale } = useI18n({ useScope: 'global' });
 const { t } = useI18n();
@@ -22,17 +28,29 @@ watch(locale, () => {
   localeOptions.forEach((option) => {
     option.label = t(option.value);
   });
+  store.locale = locale.value as string;
 });
 
-const store = useCalcStore();
-
-const q = useQuasar();
+const setLocale = () => {
+  if (store.useSystemLocale) {
+    // store.userLocale = locale.value as string;
+    locale.value = navigator.language;
+  } else {
+    locale.value = store.userLocale;
+  }
+};
 
 const toggleAlwaysOnTop = (byManual = false) => {
   if (q.platform.is.electron) {
     if (byManual) {
       // 수동으로 토글
       store.toggleAlwaysOnTop();
+
+      if (store.alwaysOnTop) {
+        notifyMsg(t('alwaysOnTopOn'));
+      } else {
+        notifyMsg(t('alwaysOnTopOff'));
+      }
     }
     window.myAPI.setAlwaysOnTop(store.alwaysOnTop);
   }
@@ -64,13 +82,28 @@ onMounted(() => {
     window.myAPI.setAlwaysOnTop(store.alwaysOnTop);
   }
 });
+
+onBeforeMount(() => {
+  store.setDarkMode(store.darkMode);
+
+  setLocale();
+
+  if (store.locale == '') {
+    store.locale = navigator.language;
+    store.userLocale = navigator.language;
+  }
+});
 </script>
 
 <template>
   <q-list v-blur dense>
-    <q-item-label class="q-mt-xl text-h5" header>{{ t('settings') }} (E)</q-item-label>
+    <q-item-label class="q-mt-xl text-h5" header
+      >{{ t('settings') }} (E)</q-item-label
+    >
     <q-item class="q-py-none" v-if="$q.platform.is.electron">
-      <q-item-label class="self-center">{{ t('alwaysOnTop') }} (T)</q-item-label>
+      <q-item-label class="self-center"
+        >{{ t('alwaysOnTop') }} (T)</q-item-label
+      >
       <q-space />
       <q-toggle
         v-model="store.alwaysOnTop"
@@ -96,7 +129,9 @@ onMounted(() => {
     <q-separator spaced="md" />
 
     <q-item class="q-py-none">
-      <q-item-label class="self-center">{{ t('useGrouping') }} (,)</q-item-label>
+      <q-item-label class="self-center"
+        >{{ t('useGrouping') }} (,)</q-item-label
+      >
       <q-space />
       <q-toggle
         v-model="store.useGrouping"
@@ -115,7 +150,9 @@ onMounted(() => {
             : `${store.decimalPlaces} ${t('toNDecimalPlaces')}`
         }}
       </MyTooltip>
-      <q-item-label class="q-pt-xs self-start">{{ t('decimalPlaces') }} ([,])</q-item-label>
+      <q-item-label class="q-pt-xs self-start"
+        >{{ t('decimalPlaces') }} ([,])</q-item-label
+      >
       <q-space />
       <q-slider
         v-model="store.decimalPlaces"
@@ -153,45 +190,61 @@ onMounted(() => {
 
     <q-separator spaced="md" />
 
+    <q-item class="q-py-none">
+      <q-item-label class="self-center"
+        >{{ t('useSystemLocale') }}</q-item-label
+      >
+      <q-space />
+      <q-toggle
+        v-model="store.useSystemLocale"
+        :color="store.getDarkColor('primary')"
+        keep-color
+        dense
+        @click="setLocale()"
+      />
+    </q-item>
+
     <q-item>
       <q-item-label class="self-center"> {{ t('language') }} </q-item-label>
       <q-space />
       <q-select
-        v-model="locale"
+        :disable="store.useSystemLocale"
+        v-model="store.userLocale"
         :options="localeOptions"
         :color="store.getDarkColor('primary')"
         dense
         emit-value
         map-options
         options-dense
+        @update:model-value="setLocale()"
       />
     </q-item>
   </q-list>
 </template>
 
-<i18n lang="yml">
+<i18n>
 ko:
-  settings: '설정'
   alwaysOnTop: '항상 위'
+  alwaysOnTopOn: '항상 위 켜짐'
+  alwaysOnTopOff: '항상 위 꺼짐'
   darkMode: '다크 모드'
   useGrouping: '천단위 표시'
   decimalPlaces: '소수점'
   decimalPlacesStat: '소수점 자리수'
   noLimit: '제한 없음'
   toNDecimalPlaces: '자리'
+  useSystemLocale: '시스템 언어 사용'
   language: '언어'
-  en: '영어'
-  ko: '한국어'
 en:
-  settings: 'Settings'
   alwaysOnTop: 'Always on top'
+  alwaysOnTopOn: 'Always on top ON'
+  alwaysOnTopOff: 'Always on top OFF'
   darkMode: 'Dark mode'
   useGrouping: 'Use grouping'
   decimalPlaces: 'Decimal'
   decimalPlacesStat: 'Decimal places (stat)'
   noLimit: 'No limit'
   toNDecimalPlaces: 'decimal places'
+  useSystemLocale: 'Use system locale'
   language: 'Language'
-  en: 'English'
-  ko: 'Korean'
 </i18n>

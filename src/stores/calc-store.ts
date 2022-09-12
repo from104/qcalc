@@ -10,8 +10,11 @@ export const useCalcStore = defineStore('calc', {
     calc: new Calculator(),
     useGrouping: true,
     decimalPlaces: -2,
+    useSystemLocale: true,
     // 시스템 로케일
     locale: '',
+    // 사용자 로케일
+    userLocale: '',
   }),
   getters: {},
   actions: {
