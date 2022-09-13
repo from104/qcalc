@@ -88,8 +88,10 @@ onBeforeMount(() => {
 
   setLocale();
 
-  if (store.locale == '') {
+  if (store.locale == '') { // 처음 실행시
     store.locale = navigator.language;
+  }
+  if (store.userLocale == '') { // 처음 실행시
     store.userLocale = navigator.language;
   }
 });
