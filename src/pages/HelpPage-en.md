@@ -12,6 +12,7 @@
 - It is possible to fix the number of digits after the decimal point (no limit to 6 digits).
 - You can view the history of calculation results. (up to 20)
 - Support dark mode.
+- You can choose English or Korean.
 
 ## Shortcut Keys
 

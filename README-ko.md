@@ -1,4 +1,10 @@
-# 기능과 사용법
+# 퀘이사를 이용해 만든 간단한 계산기
+
+예전에 졸업과제로 만들었던 안드로이드용 계산기의 소스를 활용해 만든 간단한 계산기 입니다. vue3(quasar v2), typescript, electron 등을 이용해 만들었습니다.
+
+## 스크린샷
+
+![Screenshot](https://github.com/from104/qcalc/raw/main/assets/screenshot.png)
 
 ## 기능
 
@@ -47,3 +53,47 @@
 
 - Control-c, Control-Insert: 계산 결과 또는 선택한 내용을 클립보드로 복사
 - Control-v, Shift-Insert: 클립보드로부터 앱에 붙혀넣기
+
+# 기술과 정보
+
+## 사용된 기술, 프래임워크, 프로그램
+
+- typescript
+- nodeJS
+- electron
+- vue 3
+- quasar 2
+- q-markdown
+- tinykeys
+
+## 패키지 설치 방법
+
+- 릴리즈 페이지에서 해당 플랫폼에 맞는 파일을 받아서 설치하면 됩니다.
+- 리눅스는 appimage파일을 단독으로 쓰거나 snap파일을 --dangerous 옵션을 사용하여 설치하세요.
+- 맥OS는 사용하지 않고 테스트할 방법이 없어서 패키지가 없습니다.
+
+## 앱 테스트 및 빌드 방법
+
+기본적으로 nodeJS, vscode 환경에서 yarn을 아래와 같이 설치해줍니다.
+
+```bash
+npm install -g yarn
+```
+
+### 필요한 모듈 설치
+
+```bash
+yarn install
+```
+
+### 개발 모드로 실행하기 (실시간 리로딩, 에러 체크 등)
+
+```bash
+quasar dev -m electron
+```
+
+### 설치 패키지 빌드 [윈도우]
+
+```bash
+quasar build -m electron [-T win32]
+```

@@ -1,61 +1,62 @@
-# 퀘이사를 이용해 만든 간단한 계산기
+A simple calculator made using quasars
 
-예전에 졸업과제로 만들었던 안드로이드용 계산기의 소스를 활용해 만든 간단한 계산기 입니다. vue3(quasar v2), typescript, electron 등을 이용해 만들었습니다.
+This is a simple calculator made using the source of the calculator for Android that I made as a graduation assignment in the past. It was made using vue3 (quasar v2), typescript, electron, etc.
 
-## 스크린샷
+## screenshot
 
 ![Screenshot](https://github.com/from104/qcalc/raw/main/assets/screenshot.png)
 
-## 기능
+## function
 
-- 사칙연산과 퍼센트 계산을 할 수 있습니다.
-- 사칙연산 버튼(키)를 연속해서 누르면 마지막 숫자로 반복 계산 합니다.
-- 역수, 제곱, 제곱근을 구할 수 있습니다.
-- 마우스와 키보드로 모든 입력을 할 수 있습니다.
-- 복사와 붙혀넣기도 가능합니다.
-- 우상단의 토글 스위치나 키보드로 창을 always on top 상태로 만들 수 있습니다.
-- 천단위 쉼표 표시 가능합니다.
-- 소수점 아래 자리 고정(제한없음~6자리) 가능합니다.
-- 계산 결과 기록을 볼 수 있습니다. (최대 20개)
-- 다크 모드를 지원합니다.
+- You can do arithmetic operations and percentage calculations.
+- If you press the arithmetic operation button (key) in succession, the last number is repeatedly calculated.
+- You can find the reciprocal, square, and square root.
+- All input can be done with mouse and keyboard.
+- You can also copy and paste.
+- You can make the window always on top with the toggle switch on the top right or the keyboard.
+- Thousand commas can be displayed.
+- It is possible to fix the number of digits after the decimal point (no limit to 6 digits).
+- You can view the history of calculation results. (up to 20)
+- Support dark mode.
+- You can choose English or Korean.
 
-## 바로가기 키
+## Shortcut Keys
 
-### 계산기
+### A calculator
 
-- [0-9\.]: 숫자와 점
-- +, -, \*, /: 각각 더하기, 빼기, 곱하기, 나누기
-- Enter, =: 마지막 계산 결과 출력
-- s, \_: 부호 바꾸기
-- p, %: 퍼센트 계산 (숫자, /, 숫자, p(또는 %) 순으로 입력)
-- u: 제곱 계산
-- r: 제곱근 계산
-- i: 역수(1/x) 계산
-- Backspace: 한글자씩 지우기
-- Escape, Delete, c: 계산기 리셋
-- h: 계산 결과 기록 열기 (최대 20개)
-- d: 계산 결과 기록을 지우기
+- [0-9\.]: numbers and dots
+- +, -, \*, /: addition, subtraction, multiplication, division respectively
+- Enter, =: output the last calculation result
+- s, \_: change sign
+- p, %: Calculate percentage (enter in the order of number, /, number, p (or %))
+- u: square calculation
+- r: square root calculation
+- i: Calculate the reciprocal (1/x)
+- Backspace: Erase each Korean character
+- Escape, Delete, c: Reset calculator
+- h: open calculation result record (up to 20)
+- d: clear calculation result record
 
-### 그 외 기능
+### Other features
 
-- m: 왼쪽 메뉴 열고 닫기
-- e: 오른쪽 설정 열고 닫기
-- F1: 도움말 열기
-- F2: 계산기 열기
-- F3: 앱 정보 열기
-- t: 항상 위 기능 토글
-- k: 다크 모드 토글
-- ,: 천단위 , 표시
-- [, ]: 소수점 고정 조정 (제한없음~6자리)
+- m: open and close the left menu
+- e: open and close right settings
+- F1: Open Help
+- F2: open calculator
+- F3: Open app info
+- t: toggle always on top function
+-k: dark mode toggle
+- ,: Thousands, display
+- [, ]: Decimal point fixed adjustment (no limit to 6 digits)
 
-### 클립보드
+### Clipboard
 
-- Control-c, Control-Insert: 계산 결과 또는 선택한 내용을 클립보드로 복사
-- Control-v, Shift-Insert: 클립보드로부터 앱에 붙혀넣기
+- Control-c, Control-Insert: Copy calculation result or selection to clipboard
+- Control-v, Shift-Insert: Paste from clipboard into app
 
-# 기술과 정보
+# Skills and information
 
-## 사용된 기술, 프래임워크, 프로그램
+## Technologies, frameworks, programs used
 
 - typescript
 - nodeJS
@@ -65,33 +66,33 @@
 - q-markdown
 - tinykeys
 
-## 패키지 설치 방법
+## How to install packages
 
-- 릴리즈 페이지에서 해당 플랫폼에 맞는 파일을 받아서 설치하면 됩니다.
-- 리눅스는 appimage파일을 단독으로 쓰거나 snap파일을 --dangerous 옵션을 사용하여 설치하세요.
-- 맥OS는 사용하지 않고 테스트할 방법이 없어서 패키지가 없습니다.
+- Just download the appropriate file for the platform from the release page and install it.
+- For Linux, use the appimage file alone or install the snap file using the --dangerous option.
+- MacOS does not have a package because there is no way to test it without using it.
 
-## 앱 테스트 및 빌드 방법
+## How to test and build your app
 
-기본적으로 nodeJS, vscode 환경에서 yarn을 아래와 같이 설치해줍니다.
+Basically, in nodeJS and vscode environment, install yarn as follows.
 
 ```bash
 npm install -g yarn
 ```
 
-### 필요한 모듈 설치
+### Install required modules
 
 ```bash
 yarn install
 ```
 
-### 개발 모드로 실행하기 (실시간 리로딩, 에러 체크 등)
+### Running in development mode (real-time reloading, error checking, etc.)
 
 ```bash
 quasar dev -m electron
 ```
 
-### 설치 패키지 빌드 [윈도우]
+### Build the installation package [Windows]
 
 ```bash
 quasar build -m electron [-T win32]
