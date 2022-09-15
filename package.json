@@ -39,11 +39,11 @@
     "quasar": "^2.7.7",
     "tinykeys": "^1.4.0",
     "vue": "^3.0.0",
-    "vue-i18n": "^9.2.0",
+    "vue-i18n": "9.2.2",
     "vue-router": "^4.0.0"
   },
   "devDependencies": {
-    "@intlify/vite-plugin-vue-i18n": "^3.4.0",
+    "@intlify/vite-plugin-vue-i18n": "6.0.1",
     "@modyfi/vite-plugin-yaml": "^1.0.3",
     "@quasar/app-vite": "^1.0.6",
     "@quasar/quasar-app-extension-qmarkdown": "^2.0.0-beta.7",

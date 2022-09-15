@@ -24,7 +24,7 @@ const localeOptions = reactive([
   { value: 'en', label: t('en') },
 ]);
 
-watch(locale, () => {
+watch([()=>store.useSystemLocale, ()=>store.userLocale], () => {
   localeOptions.forEach((option) => {
     option.label = t(option.value);
   });

@@ -13,9 +13,9 @@ import PathRoute from 'components/PathRoute.vue';
 
 const router = useRouter();
 
-const { t } = useI18n();
-
 const store = useCalcStore();
+
+const { t } = useI18n();
 
 interface Path {
   title: string;
@@ -49,9 +49,7 @@ const paths: {[key: string]: Path} = reactive({
   },
 });
 
-const { locale } = useI18n({ useScope: 'global' });
-
-watch(locale, () => {
+watch([()=>store.useSystemLocale, ()=>store.userLocale], () => {
   Object.keys(paths).forEach((path) => {
     paths[path].title = t(`path.${path}.title`);
     paths[path].caption = t(`path.${path}.caption`);
@@ -99,6 +97,7 @@ onMounted(() => {
 
 <i18n>
 ko:
+  ttt: '티티티'
   path:
     help:
       title: '도움말'
@@ -110,6 +109,7 @@ ko:
       title: '소개'
       caption: '앱에 대한 소개'
 en:
+  ttt: 'TTT'
   path:
     help:
       title: 'Help'
