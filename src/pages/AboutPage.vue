@@ -11,14 +11,7 @@ const { locale } = useI18n({ useScope: 'global' });
   <q-page>
     <q-card flat class="q-pa-lg">
       <q-markdown
-        v-if="locale == 'ko'"
-        :src="AboutPageMD_ko"
-        no-linkify
-        no-heading-anchor-links
-      />
-      <q-markdown
-        v-else
-        :src="AboutPageMD_en"
+        :src="locale == 'ko' ? AboutPageMD_ko : AboutPageMD_en"
         no-linkify
         no-heading-anchor-links
       />
