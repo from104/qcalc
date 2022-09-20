@@ -17,18 +17,8 @@ const buttons: Button = [
   ['x²', 'secondary', ['u'], () => calc.pow2()],
   ['√x', 'secondary', ['r'], () => calc.sqrt()],
   ['C', 'deep-orange', ['Delete', 'Escape', 'c'], () => calc.clear()],
-  [
-    '@mdi-backspace',
-    'deep-orange',
-    ['Backspace'],
-    () => calc.deleteDigitOrDot(),
-  ],
-  [
-    '@mdi-plus-minus-variant',
-    'secondary',
-    ['Shift+Minus', 's'],
-    () => calc.changeSign(),
-  ],
+  ['@mdi-backspace', 'deep-orange', ['Backspace'], () => calc.deleteDigitOrDot()],
+  ['@mdi-plus-minus-variant', 'secondary', ['Shift+Minus', 's'], () => calc.changeSign()],
   ['%', 'secondary', ['%', 'p'], () => calc.percent()],
   ['1/x', 'secondary', ['i'], () => calc.rec()],
   ['@mdi-division', 'secondary', ['/'], () => calc.div()],
@@ -44,15 +34,7 @@ const buttons: Button = [
   ['2', 'primary', ['2'], () => calc.addDigit(2)],
   ['3', 'primary', ['3'], () => calc.addDigit(3)],
   ['@mdi-plus', 'secondary', ['+'], () => calc.plus()],
-  [
-    '00',
-    'primary',
-    [],
-    () => {
-      calc.addDigit(0);
-      calc.addDigit(0);
-    },
-  ],
+  ['00', 'primary', [], () => { calc.addDigit(0); calc.addDigit(0); }],
   ['0', 'primary', ['0'], () => calc.addDigit(0)],
   ['@mdi-circle-small', 'primary', ['.'], () => calc.addDot()],
   ['@mdi-equal', 'secondary', ['=', 'Enter'], () => calc.equal()],
