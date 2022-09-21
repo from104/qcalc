@@ -1,8 +1,7 @@
 <script setup lang="ts">
-import { onMounted, onBeforeMount, ref } from 'vue';
-import { useQuasar } from 'quasar';
+import { onMounted, ref } from 'vue';
 import tinykeys, { KeyBindingMap } from 'tinykeys';
-import { useRouter } from 'vue-router';
+import { useI18n } from 'vue-i18n';
 
 import { useCalcStore } from 'src/stores/calc-store';
 
@@ -10,11 +9,9 @@ import MenuPanel from 'components/MenuPanel.vue';
 import SettingPanel from 'components/SettingPanel.vue';
 import HeaderIcons from 'components/HeaderIcons.vue';
 
-const router = useRouter();
-
 const store = useCalcStore();
 
-const $q = useQuasar();
+const { t } = useI18n();
 
 const leftDrawerOpen = ref(false);
 
@@ -38,9 +35,6 @@ onMounted(() => {
   const shortcuts: Shortcut = [
     [['m'], () => toggleLeftDrawer()],
     [['e'], () => toggleRightDrawer()],
-    [['F1', '?'], () => router.push({ path: '/help' })],
-    [['F2'], () => router.push({ path: '/' })],
-    [['F3'], () => router.push({ path: '/about' })],
   ];
 
   shortcuts.forEach((shortcut) => {
@@ -51,15 +45,6 @@ onMounted(() => {
   });
 
   tinykeys(window, keyBindingMaps);
-
-  if ($q.platform.is.electron) {
-    window.myAPI.setAlwaysOnTop(store.alwaysOnTop);
-  }
-});
-
-onBeforeMount(() => {
-  store.setDarkMode(store.darkMode);
-  store.locale = navigator.language;
 });
 </script>
 
@@ -70,16 +55,16 @@ onBeforeMount(() => {
       class="z-top noselect"
       elevated
     >
-      <q-toolbar @focusin="($event.target as HTMLElement).blur()">
+      <q-toolbar v-blur>
         <q-btn
           flat
           dense
           round
           icon="menu"
-          aria-label="Menu"
+          :aria-label="t('menu')"
           @click="toggleLeftDrawer"
         />
-        <q-toolbar-title> 퀘이사 계산기 </q-toolbar-title>
+        <q-toolbar-title> {{ t('appTitle') }} </q-toolbar-title>
         <HeaderIcons />
         <q-btn
           class="q-ml-sm"
@@ -87,7 +72,7 @@ onBeforeMount(() => {
           dense
           round
           icon="settings"
-          aria-label="Settings"
+          :aria-label="t('settings')"
           @click="toggleRightDrawer"
         />
       </q-toolbar>

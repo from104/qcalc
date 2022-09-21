@@ -1,10 +1,4 @@
-A simple calculator made using quasars
-
-This is a simple calculator made using the source of the calculator for Android that I made as a graduation assignment in the past. It was made using vue3 (quasar v2), typescript, electron, etc.
-
-## screenshot
-
-![Screenshot](https://github.com/from104/qcalc/raw/main/assets/screenshot.png)
+# Functions and usage
 
 ## function
 
@@ -45,7 +39,7 @@ This is a simple calculator made using the source of the calculator for Android 
 - F2: open calculator
 - F3: Open app info
 - t: toggle always on top function
--k: dark mode toggle
+- k: dark mode toggle
 - ,: Thousands, display
 - [, ]: Decimal point fixed adjustment (no limit to 6 digits)
 
@@ -53,47 +47,3 @@ This is a simple calculator made using the source of the calculator for Android 
 
 - Control-c, Control-Insert: Copy calculation result or selection to clipboard
 - Control-v, Shift-Insert: Paste from clipboard into app
-
-# Skills and information
-
-## Technologies, frameworks, programs used
-
-- typescript
-- nodeJS
-- electron
-- vue 3
-- quasar 2
-- q-markdown
-- tinykeys
-
-## How to install packages
-
-- Just download the appropriate file for the platform from the release page and install it.
-- For Linux, use the appimage file alone or install the snap file using the --dangerous option.
-- MacOS does not have a package because there is no way to test it without using it.
-
-## How to test and build your app
-
-Basically, in nodeJS and vscode environment, install yarn as follows.
-
-```bash
-npm install -g yarn
-```
-
-### Install required modules
-
-```bash
-yarn install
-```
-
-### Running in development mode (real-time reloading, error checking, etc.)
-
-```bash
-quasar dev -m electron
-```
-
-### Build the installation package [Windows]
-
-```bash
-quasar build -m electron [-T win32]
-```

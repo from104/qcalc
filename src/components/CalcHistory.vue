@@ -1,18 +1,16 @@
 <script setup lang="ts">
-import {
-  onMounted,
-  onBeforeUnmount,
-  ref,
-  computed,
-  watch,
-} from 'vue';
+import { onMounted, onBeforeUnmount, ref, computed, watch } from 'vue';
 import tinykeys, { KeyBindingMap } from 'tinykeys';
+
+import { useI18n } from 'vue-i18n';
 
 import type { History } from 'classes/Calculator';
 
 import { useCalcStore } from 'stores/calc-store';
 
 import MyTooltip from 'components/MyTooltip.vue';
+
+const { t } = useI18n();
 
 // 스토어 가져오기
 const store = useCalcStore();
@@ -24,7 +22,7 @@ const calc = store.calc;
 const resultHistory = computed(() => calc.getHistory() as unknown as History[]);
 
 // 계산 결과 기록 열기 여부
-const isHistoryOpen = ref( false );
+const isHistoryOpen = ref(false);
 
 // 계산 결과를 지울지 묻는 다이얼로그 표시 여부
 const doDeleteHistory = ref(false);
@@ -122,7 +120,9 @@ onBeforeUnmount(() => {
         icon="mdi-arrow-up-bold"
         @click="isHistoryOpen = true"
       >
-        <my-tooltip>클릭하면 계산 결과 기록을 엽니다.</my-tooltip>
+        <my-tooltip>
+          {{ t('onClickMsg', { act: t('actShow') }) }}
+        </my-tooltip>
       </q-btn>
       <q-btn
         v-else
@@ -136,7 +136,9 @@ onBeforeUnmount(() => {
         icon="mdi-arrow-down-bold"
         @click="isHistoryOpen = false"
       >
-        <my-tooltip>클릭하면 계산 결과 기록을 숨깁니다.</my-tooltip>
+        <my-tooltip>
+          {{ t('onClickMsg', { act: t('actHide') }) }}
+        </my-tooltip>
       </q-btn>
     </transition>
   </div>
@@ -150,10 +152,10 @@ onBeforeUnmount(() => {
       dark
       class="noselect text-white"
       :class="'bg-' + store.getDarkColor('primary')"
-      @focusin="($event.target as HTMLElement).blur()"
+      v-blur
     >
       <q-icon name="history" size="sm" />
-      <div>계산 결과</div>
+      <div>{{ t('history') }}</div>
       <q-space />
       <q-btn
         dense
@@ -162,13 +164,7 @@ onBeforeUnmount(() => {
         size="md"
         @click="doDeleteHistory = true"
       />
-      <q-btn
-        dense
-        flat
-        icon="close"
-        size="md"
-        @click="isHistoryOpen = false"
-      />
+      <q-btn dense flat icon="close" size="md" @click="isHistoryOpen = false" />
     </q-bar>
 
     <q-card
@@ -194,7 +190,7 @@ onBeforeUnmount(() => {
           <q-item v-if="resultHistory.length == 0" class="text-center">
             <q-item-section>
               <q-item-label>
-                <span>계산 결과가 없습니다.</span>
+                <span>{{ t('noHistory') }}</span>
               </q-item-label>
             </q-item-section>
           </q-item>
@@ -233,16 +229,16 @@ onBeforeUnmount(() => {
       :class="'bg-' + store.getDarkColor('negative')"
       style="width: 200px"
     >
-      <q-card-section> 계산 기록을 지우겠어요? </q-card-section>
+      <q-card-section>{{ t('doYouDeleteHistory') }} </q-card-section>
       <q-card-actions
         align="center"
         :class="'text-' + store.getDarkColor('negative')"
         class="bg-white"
       >
-        <q-btn flat label="아니오" v-close-popup />
+        <q-btn flat :label="t('no')" v-close-popup />
         <q-btn
           flat
-          label="예"
+          :label="t('yes')"
           @click="calc.clearHistory()"
           autofocus
           v-close-popup
@@ -251,6 +247,23 @@ onBeforeUnmount(() => {
     </q-card>
   </q-dialog>
 </template>
+
+<i18n>
+ko:
+  onClickMsg: '클릭하면 계산 결과 기록을 {act}.'
+  actShow: '보여줍니다'
+  actHide: '숨깁니다'
+  history: '계산 결과'
+  noHistory: '계산 결과가 없습니다.'
+  doYouDeleteHistory: '계산 기록을 지우겠어요?'
+en:
+  onClickMsg: 'Click to {act} calculation history.'
+  actShow: 'show'
+  actHide: 'hide'
+  history: 'History'
+  noHistory: 'No history.'
+  doYouDeleteHistory: 'Do you want to delete the history?'
+</i18n>
 
 <style scoped lang="scss">
 .q-bar {

@@ -88,7 +88,7 @@ const preResult = computed(() => {
       <template v-slot:prepend v-if="operator != ''">
         <div
           class="noselect full-height q-mt-xs q-pt-xs"
-          @focusin="($event.target as HTMLElement).blur()"
+          v-blur
         >
           <q-icon :name="operatorIcons[operator]" />
         </div>

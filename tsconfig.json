@@ -15,7 +15,11 @@
       "boot/*": ["src/boot/*"],
       "stores/*": ["src/stores/*"],
       "classes/*": ["src/classes/*"]
-    }
+    },
+    "types": [
+      "@intlify/vite-plugin-vue-i18n/client",
+      "@modyfi/vite-plugin-yaml/modules"
+    ],
   },
   "include": [
     "./**/*.ts",
@@ -25,7 +29,8 @@
     "src/**/*.vue",
     "src-pwa/*.d.ts",
     "src-bex/*.d.ts",
-    "src-ssr/*.d.ts"
+    "src-ssr/*.d.ts",
+    "src-electron/electron-main.js"
   ],
   "exclude": ["node_modules"],
   "ts-node": {
