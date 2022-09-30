@@ -94,7 +94,7 @@ const preResult = computed(() => {
         </div>
       </template>
       <template v-slot:label>
-        <div class="noselect" @focusin="($event.target as HTMLElement).blur()">
+        <div class="noselect" v-blur>
           {{ preResult }}
         </div>
       </template>
@@ -117,7 +117,7 @@ const preResult = computed(() => {
 .q-field {
   &::v-deep {
     .q-field__label {
-      right: -90px;
+      right: -100%;
       text-align: right;
       font-size: 20px;
       top: 8px;
