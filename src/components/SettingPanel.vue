@@ -8,10 +8,6 @@ import { useCalcStore } from 'src/stores/calc-store';
 
 import MyTooltip from 'components/MyTooltip.vue';
 
-import { useNotify } from 'src/components/UseNotify.vue';
-
-const { notifyMsg } = useNotify();
-
 const store = useCalcStore();
 
 const q = useQuasar();
@@ -24,7 +20,7 @@ const localeOptions = reactive([
   { value: 'en', label: t('en') },
 ]);
 
-watch([()=>store.useSystemLocale, ()=>store.userLocale], () => {
+watch([() => store.useSystemLocale, () => store.userLocale], () => {
   localeOptions.forEach((option) => {
     option.label = t(option.value);
   });
@@ -40,19 +36,16 @@ const setLocale = () => {
   }
 };
 
-const toggleAlwaysOnTop = (byManual = false) => {
+const toggleAlwaysOnTopWithNotify = () => {
   if (q.platform.is.electron) {
-    if (byManual) {
-      // 수동으로 토글
-      store.toggleAlwaysOnTop();
+    // 수동으로 토글
+    store.toggleAlwaysOnTop();
 
-      if (store.alwaysOnTop) {
-        notifyMsg(t('alwaysOnTopOn'));
-      } else {
-        notifyMsg(t('alwaysOnTopOff'));
-      }
+    if (store.alwaysOnTop) {
+      store.notifyMsg(t('alwaysOnTopOn'));
+    } else {
+      store.notifyMsg(t('alwaysOnTopOff'));
     }
-    window.myAPI.setAlwaysOnTop(store.alwaysOnTop);
   }
 };
 
@@ -62,7 +55,8 @@ onMounted(() => {
   type Shortcut = [string[], () => void][];
 
   const shortcuts: Shortcut = [
-    [['t'], () => toggleAlwaysOnTop(true)],
+    [['t'], toggleAlwaysOnTopWithNotify],
+
     [['k'], store.toggleDarkMode],
     [[','], store.toggleUseGrouping],
     [['['], store.decDecimalPlaces],
@@ -77,10 +71,6 @@ onMounted(() => {
   });
 
   tinykeys(window, keyBindingMaps);
-
-  if (q.platform.is.electron) {
-    window.myAPI.setAlwaysOnTop(store.alwaysOnTop);
-  }
 });
 
 onBeforeMount(() => {
@@ -88,10 +78,12 @@ onBeforeMount(() => {
 
   setLocale();
 
-  if (store.locale == '') { // 처음 실행시
+  if (store.locale == '') {
+    // 처음 실행시
     store.locale = navigator.language;
   }
-  if (store.userLocale == '') { // 처음 실행시
+  if (store.userLocale == '') {
+    // 처음 실행시
     store.userLocale = navigator.language;
   }
 });
@@ -110,7 +102,7 @@ onBeforeMount(() => {
       <q-toggle
         v-model="store.alwaysOnTop"
         :color="store.getDarkColor('primary')"
-        @click="toggleAlwaysOnTop()"
+        @click="store.setAlwaysOnTop(store.alwaysOnTop)"
         keep-color
         dense
       />
@@ -193,9 +185,9 @@ onBeforeMount(() => {
     <q-separator spaced="md" />
 
     <q-item class="q-py-none">
-      <q-item-label class="self-center"
-        >{{ t('useSystemLocale') }}</q-item-label
-      >
+      <q-item-label class="self-center">{{
+        t('useSystemLocale')
+      }}</q-item-label>
       <q-space />
       <q-toggle
         v-model="store.useSystemLocale"

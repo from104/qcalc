@@ -6,12 +6,10 @@ import CalcHistory from 'components/CalcHistory.vue';
 
 <template>
   <q-page>
-    <q-card flat class="row wrap q-px-md q-pt-xs q-pb-md">
+    <q-card flat class="q-px-md q-pt-xs q-pb-md">
       <CalcPanelResult />
-
       <CalcButton />
     </q-card>
   </q-page>
-
   <CalcHistory />
 </template>
