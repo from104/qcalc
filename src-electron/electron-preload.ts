@@ -15,11 +15,15 @@
  *     doAThing: () => {}
  *   })
  */
- import { contextBridge, ipcRenderer } from 'electron';
+import { contextBridge, ipcRenderer } from 'electron';
 
- contextBridge.exposeInMainWorld('myAPI', {
-   setAlwaysOnTop: (args: unknown[]) => {
-     ipcRenderer.send('toggle-always-on-top', args);
-     // console.log('preload: ' + arg);
-   },
- });
+contextBridge.exposeInMainWorld('myAPI', {
+  setAlwaysOnTop: (alwaysOnTop: boolean) => {
+    ipcRenderer.send('toggle-always-on-top', alwaysOnTop);
+    // console.log('preload: ' + arg);
+  },
+  resizeWindow: (width: number, height: number) => {
+    ipcRenderer.send('resize-window', width, height);
+    // console.log('preload: ' + width + ', ' + height);
+  },
+});

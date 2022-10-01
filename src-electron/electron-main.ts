@@ -22,9 +22,11 @@ function createWindow() {
   mainWindow = new BrowserWindow({
     icon: path.resolve(__dirname, 'icons/icon.png'), // tray icon
     width: 360,
-    height: platform === 'win32' ? 540 : 520,
+    height: 540,
+    minWidth: 352,
+    minHeight: 455,
     useContentSize: true,
-    resizable: false,
+    resizable: true,
     webPreferences: {
       contextIsolation: true,
       // More info: https://v2.quasar.dev/quasar-cli-vite/developing-electron-apps/electron-preload-script
@@ -56,6 +58,10 @@ app.whenReady().then(() => {
   ipcMain.on('toggle-always-on-top', (_event, res) => {
     mainWindow?.setAlwaysOnTop(res);
     // console.log('ipcMain: ' + res);
+  });
+  ipcMain.on('resize-window', (_event, width, height) => {
+    mainWindow?.setSize(width, height);
+    // console.log('ipcMain: ' + width + ', ' + height);
   });
 });
 

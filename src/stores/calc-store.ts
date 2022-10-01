@@ -1,5 +1,6 @@
 import { defineStore } from 'pinia';
 import { Dark } from 'quasar';
+import { Notify } from 'quasar';
 import { Calculator } from 'classes/Calculator';
 import type { History } from 'classes/Calculator';
 
@@ -15,6 +16,10 @@ export const useCalcStore = defineStore('calc', {
     locale: '',
     // 사용자 로케일
     userLocale: '',
+    // 윈도우 폭
+    windowWidth: 360,
+    // 윈도우 높이
+    windowHeight: 540,
   }),
   getters: {},
   actions: {
@@ -39,8 +44,12 @@ export const useCalcStore = defineStore('calc', {
         return this.darkMode ? darkColors[color] : color;
       }
     },
+    setAlwaysOnTop(alwaysOnTop: boolean) {
+      this.alwaysOnTop = alwaysOnTop;
+      window.myAPI.setAlwaysOnTop(this.alwaysOnTop);
+    },
     toggleAlwaysOnTop() {
-      this.alwaysOnTop = !this.alwaysOnTop;
+      this.setAlwaysOnTop(!this.alwaysOnTop);
     },
     toggleUseGrouping() {
       this.useGrouping = !this.useGrouping;
@@ -93,6 +102,30 @@ export const useCalcStore = defineStore('calc', {
     // 계산 결과 중 우변
     getRightSideInHistory(h: History) {
       return this.toLocale(h.resultNumber);
+    },
+    // 윈도우 크기를 설정하는 함수
+    resizeWindow(width: number, height: number) {
+      this.windowWidth = width;
+      this.windowHeight = height;
+      window.myAPI.resizeWindow(width, height);
+    },
+    // 알림을 띄우는 함수 - 메시지
+    notifyMsg(msg: string, timeout = 500) {
+      Notify.create({
+        message: msg,
+        position: 'top',
+        timeout: timeout,
+        color: 'positive',
+      });
+    },
+    // 알림을 띄우는 함수 - 에러
+    notifyError(msg: string, timeout = 500) {
+      Notify.create({
+        message: msg,
+        position: 'top',
+        timeout: timeout,
+        color: 'negative',
+      });
     },
   },
   persist: true,
