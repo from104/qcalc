@@ -13,7 +13,6 @@ declare global {
   interface Window {
     myAPI: {
       setAlwaysOnTop: (alwaysOnTop: boolean) => void;
-      resizeWindow: (width: number, height: number) => void;
     };
   }
 }

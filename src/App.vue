@@ -9,13 +9,13 @@ const store = useCalcStore();
 
 const { locale } = useI18n({ useScope: 'global' });
 const { t } = useI18n();
+
 const q = useQuasar();
 
 const title = ref(t('appTitle'));
 
 if (q.platform.is.electron) {
   store.setAlwaysOnTop(store.alwaysOnTop);
-  store.resizeWindow(store.windowWidth, store.windowHeight);
 }
 
 useMeta(() => {

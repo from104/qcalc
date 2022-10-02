@@ -22,8 +22,4 @@ contextBridge.exposeInMainWorld('myAPI', {
     ipcRenderer.send('toggle-always-on-top', alwaysOnTop);
     // console.log('preload: ' + arg);
   },
-  resizeWindow: (width: number, height: number) => {
-    ipcRenderer.send('resize-window', width, height);
-    // console.log('preload: ' + width + ', ' + height);
-  },
 });
