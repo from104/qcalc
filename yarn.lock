@@ -1816,6 +1816,7 @@ electron-window-state@^5.0.3:
     jsonfile "^4.0.0"
     mkdirp "^0.5.1"
 
+<<<<<<< HEAD
 electron@^12.0.6:
   version "12.2.3"
   resolved "https://registry.yarnpkg.com/electron/-/electron-12.2.3.tgz#d426a7861e3c722f92c32153f11f7bbedf65b000"
@@ -1825,6 +1826,8 @@ electron@^12.0.6:
     jsonfile "^4.0.0"
     mkdirp "^0.5.1"
 
+=======
+>>>>>>> 984103e (v0.5.4 기타 작업)
 electron@^19.0.6:
   version "19.1.1"
   resolved "https://registry.yarnpkg.com/electron/-/electron-19.1.1.tgz#f2b7b0dbc02701091a451e2f807097f387231455"
