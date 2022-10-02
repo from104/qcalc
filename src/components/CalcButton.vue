@@ -67,34 +67,42 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-  <q-card-section
-    class="full-height row wrap justify-center q-py-xs q-px-none"
-    v-blur
-  >
+  <q-card-section class="row wrap justify-center q-py-xs q-px-none" v-blur>
     <div
       class="col-3 row wrap justify-center q-pa-sm"
       v-for="(button, index) in buttons"
       :key="index"
     >
       <q-btn
-        class="glossy shadow-4 noselect col-12"
-        id="calc-button"
+        class="glossy shadow-4 noselect col-12 button"
         no-caps
         :label="button[0].charAt(0) != '@' ? button[0] : undefined"
         :icon="button[0].charAt(0) == '@' ? button[0].slice(1) : undefined"
-        :size="button[0].charAt(0) == '@' ? '1rem' : '1.2rem'"
+        :id="button[0].charAt(0) == '@' ? 'icon' : 'char'"
         :color="button[1]"
         @click="button[3]"
       />
+      <!-- :size="button[0].charAt(0) == '@' ? '1rem' : '1.2rem'" -->
     </div>
   </q-card-section>
 </template>
 
 <style scoped lang="scss">
-#calc-button {
+.button {
   border-radius: 0.5rem;
-  min-height: calc((100vh - 142px)/6 - 20px);
-  max-height: calc((100vh - 142px)/6 - 20px);
+  min-height: calc((100vh - 142px) / 6 - 20px);
+  max-height: calc((100vh - 142px) / 6 - 20px);
   font-weight: 700;
+}
+
+#icon {
+  font-size: calc(
+    min(calc((100vh - 142px) / 6 * 0.25), calc((100vw - 40px) / 4 * 0.3)) * 0.9
+  );
+}
+#char {
+  font-size: calc(
+    min(calc((100vh - 142px) / 6 * 0.26), calc((100vw - 40px) / 4 * 0.3)) * 1.2
+  );
 }
 </style>
