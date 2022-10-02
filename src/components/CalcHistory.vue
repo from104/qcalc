@@ -150,7 +150,7 @@ onBeforeUnmount(() => {
   >
     <q-bar
       dark
-      class="noselect text-white"
+      class="full-width noselect text-white"
       :class="'bg-' + store.getDarkColor('primary')"
       v-blur
     >
@@ -170,7 +170,7 @@ onBeforeUnmount(() => {
     <q-card
       @scroll="onScroll"
       square
-      class="row justify-center items-start relative-position scrollbar-custom"
+      class="full-width row justify-center items-start relative-position scrollbar-custom"
       id="history"
     >
       <transition name="slide-fade">
