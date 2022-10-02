@@ -13,6 +13,7 @@ const calc = calcStore.calc;
 // 버튼 레이블, 버튼 컬러, 버튼에 해당하는 키, 버튼 클릭 이벤트 핸들러
 type Button = [string, string, string[], () => void][];
 
+// prettier-ignore
 const buttons: Button = [
   ['x²', 'secondary', ['u'], () => calc.pow2()],
   ['√x', 'secondary', ['r'], () => calc.sqrt()],
@@ -66,29 +67,42 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-  <q-card-section
-    class="noselect col-3 q-pa-sm"
-    v-for="(button, index) in buttons"
-    :key="index"
-    v-blur
-  >
-    <q-btn
-      class="glossy shadow-4 text-h5 full-width"
-      id="calc-button"
-      no-caps
-      :label="button[0].charAt(0) != '@' ? button[0] : undefined"
-      :icon="button[0].charAt(0) == '@' ? button[0].slice(1) : undefined"
-      :size="button[0].charAt(0) == '@' ? 'md' : 'lg'"
-      :color="button[1]"
-      @click="button[3]"
-    />
+  <q-card-section class="row wrap justify-center q-py-xs q-px-none" v-blur>
+    <div
+      class="col-3 row wrap justify-center q-pa-sm"
+      v-for="(button, index) in buttons"
+      :key="index"
+    >
+      <q-btn
+        class="glossy shadow-4 noselect col-12 button"
+        no-caps
+        :label="button[0].charAt(0) != '@' ? button[0] : undefined"
+        :icon="button[0].charAt(0) == '@' ? button[0].slice(1) : undefined"
+        :id="button[0].charAt(0) == '@' ? 'icon' : 'char'"
+        :color="button[1]"
+        @click="button[3]"
+      />
+      <!-- :size="button[0].charAt(0) == '@' ? '1rem' : '1.2rem'" -->
+    </div>
   </q-card-section>
 </template>
 
 <style scoped lang="scss">
-#calc-button {
-  overflow: auto;
-  min-height: 44px;
-  max-height: 44px;
+.button {
+  border-radius: 0.5rem;
+  min-height: calc((100vh - 142px) / 6 - 20px);
+  max-height: calc((100vh - 142px) / 6 - 20px);
+  font-weight: 700;
+}
+
+#icon {
+  font-size: calc(
+    min(calc((100vh - 142px) / 6 * 0.25), calc((100vw - 40px) / 4 * 0.3)) * 0.9
+  );
+}
+#char {
+  font-size: calc(
+    min(calc((100vh - 142px) / 6 * 0.26), calc((100vw - 40px) / 4 * 0.3)) * 1.2
+  );
 }
 </style>

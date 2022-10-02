@@ -1,5 +1,6 @@
 import { defineStore } from 'pinia';
 import { Dark } from 'quasar';
+import { Notify } from 'quasar';
 import { Calculator } from 'classes/Calculator';
 import type { History } from 'classes/Calculator';
 
@@ -39,8 +40,12 @@ export const useCalcStore = defineStore('calc', {
         return this.darkMode ? darkColors[color] : color;
       }
     },
+    setAlwaysOnTop(alwaysOnTop: boolean) {
+      this.alwaysOnTop = alwaysOnTop;
+      window.myAPI.setAlwaysOnTop(this.alwaysOnTop);
+    },
     toggleAlwaysOnTop() {
-      this.alwaysOnTop = !this.alwaysOnTop;
+      this.setAlwaysOnTop(!this.alwaysOnTop);
     },
     toggleUseGrouping() {
       this.useGrouping = !this.useGrouping;
@@ -93,6 +98,24 @@ export const useCalcStore = defineStore('calc', {
     // 계산 결과 중 우변
     getRightSideInHistory(h: History) {
       return this.toLocale(h.resultNumber);
+    },
+    // 알림을 띄우는 함수 - 메시지
+    notifyMsg(msg: string, timeout = 500) {
+      Notify.create({
+        message: msg,
+        position: 'top',
+        timeout: timeout,
+        color: 'positive',
+      });
+    },
+    // 알림을 띄우는 함수 - 에러
+    notifyError(msg: string, timeout = 500) {
+      Notify.create({
+        message: msg,
+        position: 'top',
+        timeout: timeout,
+        color: 'negative',
+      });
     },
   },
   persist: true,

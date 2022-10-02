@@ -8,10 +8,6 @@ import { useCalcStore } from 'stores/calc-store';
 
 import MyTooltip from 'components/MyTooltip.vue';
 
-import { useNotify } from 'src/components/UseNotify.vue';
-
-const { notifyMsg, notifyError } = useNotify();
-
 const { t } = useI18n();
 
 // 스토어 가져오기
@@ -35,10 +31,10 @@ function doCopy(): void {
       : t('targetToBeCopiedSelected');
   copyToClipboard(textToClipboard)
     .then(() => {
-      notifyMsg(t('copiedToClipboard', { target: targetToBeCopied }));
+     store.notifyMsg(t('copiedToClipboard', { target: targetToBeCopied }));
     })
     .catch(() => {
-      notifyError(t('failedToCopyToClipboard', { target: targetToBeCopied }));
+      store.notifyError(t('failedToCopyToClipboard', { target: targetToBeCopied }));
     });
 }
 
@@ -48,10 +44,10 @@ function doPaste(): void {
     .readText()
     .then((text) => {
       calc.setShownNumber(text);
-      notifyMsg(t('pastedFromClipboard'));
+      store.notifyMsg(t('pastedFromClipboard'));
     })
     .catch(() => {
-      notifyError(t('failedToPasteFromClipboard'));
+      store.notifyError(t('failedToPasteFromClipboard'));
     });
 }
 

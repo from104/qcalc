@@ -12,7 +12,7 @@ export {};
 declare global {
   interface Window {
     myAPI: {
-      setAlwaysOnTop: (arg: any) => void;
+      setAlwaysOnTop: (alwaysOnTop: boolean) => void;
     };
   }
 }

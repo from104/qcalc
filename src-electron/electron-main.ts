@@ -13,24 +13,36 @@ try {
   }
 } catch (_) {}
 
+const windowState = require('electron-window-state');
+
 let mainWindow: BrowserWindow | undefined;
 
 function createWindow() {
+  const mainWindowState = windowState({
+    defaultWidth: 360,
+    defaultHeight: 540,
+  });
   /**
    * Initial window options
    */
   mainWindow = new BrowserWindow({
     icon: path.resolve(__dirname, 'icons/icon.png'), // tray icon
-    width: 360,
-    height: platform === 'win32' ? 540 : 520,
+    x: mainWindowState.x,
+    y: mainWindowState.y,
+    width: mainWindowState.width,
+    height: mainWindowState.height,
+    minWidth: 352,
+    minHeight: 455,
     useContentSize: true,
-    resizable: false,
+    resizable: true,
     webPreferences: {
       contextIsolation: true,
       // More info: https://v2.quasar.dev/quasar-cli-vite/developing-electron-apps/electron-preload-script
       preload: path.resolve(__dirname, process.env.QUASAR_ELECTRON_PRELOAD),
     },
   });
+
+  mainWindowState.manage(mainWindow);
 
   mainWindow.removeMenu();
   mainWindow.loadURL(process.env.APP_URL);
