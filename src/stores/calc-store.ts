@@ -16,10 +16,6 @@ export const useCalcStore = defineStore('calc', {
     locale: '',
     // 사용자 로케일
     userLocale: '',
-    // 윈도우 폭
-    windowWidth: 360,
-    // 윈도우 높이
-    windowHeight: 540,
   }),
   getters: {},
   actions: {
