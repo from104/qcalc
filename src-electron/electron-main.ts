@@ -69,10 +69,6 @@ app.whenReady().then(() => {
     mainWindow?.setAlwaysOnTop(res);
     // console.log('ipcMain: ' + res);
   });
-  ipcMain.on('resize-window', (_event, width, height) => {
-    mainWindow?.setSize(width, height);
-    // console.log('ipcMain: ' + width + ', ' + height);
-  });
 });
 
 app.on('window-all-closed', () => {
