@@ -13,16 +13,24 @@ try {
   }
 } catch (_) {}
 
+const windowState = require('electron-window-state');
+
 let mainWindow: BrowserWindow | undefined;
 
 function createWindow() {
+  const mainWindowState = windowState({
+    defaultWidth: 360,
+    defaultHeight: 540,
+  });
   /**
    * Initial window options
    */
   mainWindow = new BrowserWindow({
     icon: path.resolve(__dirname, 'icons/icon.png'), // tray icon
-    width: 360,
-    height: 540,
+    x: mainWindowState.x,
+    y: mainWindowState.y,
+    width: mainWindowState.width,
+    height: mainWindowState.height,
     minWidth: 352,
     minHeight: 455,
     useContentSize: true,
@@ -33,6 +41,8 @@ function createWindow() {
       preload: path.resolve(__dirname, process.env.QUASAR_ELECTRON_PRELOAD),
     },
   });
+
+  mainWindowState.manage(mainWindow);
 
   mainWindow.removeMenu();
   mainWindow.loadURL(process.env.APP_URL);
@@ -58,10 +68,6 @@ app.whenReady().then(() => {
   ipcMain.on('toggle-always-on-top', (_event, res) => {
     mainWindow?.setAlwaysOnTop(res);
     // console.log('ipcMain: ' + res);
-  });
-  ipcMain.on('resize-window', (_event, width, height) => {
-    mainWindow?.setSize(width, height);
-    // console.log('ipcMain: ' + width + ', ' + height);
   });
 });
 
