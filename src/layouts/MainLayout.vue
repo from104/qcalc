@@ -1,6 +1,5 @@
 <script setup lang="ts">
-import { computed, onMounted, ref, watch } from 'vue';
-import { useQuasar } from 'quasar';
+import { onMounted, ref } from 'vue';
 import tinykeys, { KeyBindingMap } from 'tinykeys';
 import { useI18n } from 'vue-i18n';
 
@@ -13,8 +12,6 @@ import HeaderIcons from 'components/HeaderIcons.vue';
 const store = useCalcStore();
 
 const { t } = useI18n();
-
-const q = useQuasar();
 
 const leftDrawerOpen = ref(false);
 
@@ -48,15 +45,6 @@ onMounted(() => {
   });
 
   tinykeys(window, keyBindingMaps);
-});
-
-const windowWidth = computed(() => q.screen.width);
-const windowHeight = computed(() => q.screen.height);
-
-watch([windowWidth, windowHeight], () => {
-  store.windowWidth = q.screen.width;
-  store.windowHeight = q.screen.height;
-  // console.log('watch', q.screen.width, q.screen.height);
 });
 </script>
 
