@@ -19,8 +19,8 @@ let mainWindow: BrowserWindow | undefined;
 
 function createWindow() {
   const mainWindowState = windowState({
-    defaultWidth: 360,
-    defaultHeight: 540,
+    defaultWidth: 352,
+    defaultHeight: 455,
   });
   /**
    * Initial window options
