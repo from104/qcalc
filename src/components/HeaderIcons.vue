@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onMounted, computed } from 'vue';
+import { onMounted, computed, ref } from 'vue';
 import tinykeys, { KeyBindingMap } from 'tinykeys';
 import { copyToClipboard } from 'quasar';
 import { useI18n } from 'vue-i18n';
@@ -7,11 +7,14 @@ import { useI18n } from 'vue-i18n';
 import { useCalcStore } from 'stores/calc-store';
 
 import MyTooltip from 'components/MyTooltip.vue';
+import UnitPanelResult from 'components/UnitPanelResult.vue';
 
 const { t } = useI18n();
 
 // 스토어 가져오기
 const store = useCalcStore();
+
+const isUnitOpen = ref(false);
 
 // 계산기 오브젝트를 스토어에서 가져오기 위한 변수 선언
 const calc = store.calc;
@@ -92,6 +95,14 @@ onMounted(() => {
     @click="doPaste"
   >
     <MyTooltip>{{ t('tooltipPaste') }}</MyTooltip>
+  </q-btn>
+  <q-btn
+    flat
+    icon="swap_vert"
+    class="q-ma-none q-pa-none q-pl-xs"
+    @click="() => isUnitOpen = !isUnitOpen"
+  >
+    <MyTooltip>단위 변환 패널을 엽니다.</MyTooltip>
   </q-btn>
 </template>
 

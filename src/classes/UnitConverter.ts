@@ -1,12 +1,13 @@
 interface Unit {
-  [key: string]: number | ((value: number, toRev?: boolean) => number);
+  [unit: string]: number | ((value: number, toRev?: boolean) => number);
 }
 
+//
 type UnitBaseData = Record<string, Unit>;
 
 // 단위 변환 범주 목록별 단위 목록
 const unitBaseData: UnitBaseData = {
-  length: {
+  길이: {
     m: 1,
     km: 1e-3,
     cm: 100,
@@ -23,7 +24,7 @@ const unitBaseData: UnitBaseData = {
     au: 6.684587122268445e-12,
     nmi: 0.0005399568034557235,
   },
-  area: {
+  넓이: {
     m2: 1,
     km2: 1e-6,
     cm2: 10000,
@@ -39,7 +40,7 @@ const unitBaseData: UnitBaseData = {
     a: 1e-2,
     ac: 2.471053814671653e-4,
   },
-  volume: {
+  부피: {
     m3: 1,
     km3: 1e-9,
     cm3: 1e6,
@@ -61,7 +62,7 @@ const unitBaseData: UnitBaseData = {
     tbsp: 67628.04540368685,
     tsp: 202884.1362110605,
   },
-  weight: {
+  무게: {
     kg: 1,
     g: 1000,
     mg: 1e6,
@@ -76,13 +77,13 @@ const unitBaseData: UnitBaseData = {
     ton: 0.001,
     cwt: 0.019684130552220097,
   },
-  temperature: {
+  온도: {
     C: 1,
     K: (t: number, r = false) => (r ? t - 273.15 : t + 273.15),
     F: (t: number, r = false) => (r ? ((t - 32) * (5 / 9)) : t * (9 / 5) + 32),
     R: (t: number, r = false) => (r ? ((t - 491.67) * (5 / 9)) : t * (9 / 5) + 491.67),
   },
-  speed: {
+  속도: {
     'm/s': 1,
     'km/h': 0.2777777777777778,
     'km/s': 1e-3,
@@ -97,7 +98,7 @@ const unitBaseData: UnitBaseData = {
     knot: 0.0005399568034557235,
     mach: 340.003,
   },
-  pressure: {
+  압력: {
     Pa: 1,
     kPa: 0.001,
     MPa: 1e-6,
@@ -111,7 +112,7 @@ const unitBaseData: UnitBaseData = {
 };
 
 // 단위 변환기 클래스
-export default class UnitConverter {
+class UnitConverter {
   // 단위 변환 범주 목록
   static get categories() {
     return Object.keys(unitBaseData);
@@ -122,11 +123,27 @@ export default class UnitConverter {
     return unitBaseData;
   }
 
+  // 범주 별 단위 목록
+  static getUnitLists(category: string) {
+    // 예외 처리
+    if (!this.categories.includes(category)) {
+      throw new Error(`Invalid category: ${category}`);
+    }
+    return Object.keys(this.units[category]);
+  }
+
   // 단위 변환 범주 목록별 단위 목록에서
   // 단위를 찾아서 반환 typescript
 
   static getUnit(category: string, unit: string) {
-    return unitBaseData[category][unit];
+    // 예외 처리
+    if (!this.categories.includes(category)) {
+      throw new Error(`Invalid category: ${category}`);
+    }
+    if (!this.getUnitLists(category).includes(unit)) {
+      throw new Error(`Invalid unit: ${unit}`);
+    }
+    return this.units[category][unit];
   }
 
   // 단위 변환 범주 목록별 단위 목록에서
@@ -137,22 +154,44 @@ export default class UnitConverter {
     from: string,
     to: string
   ): number {
-    const base = UnitConverter.getUnit(category, from);
-    const target = UnitConverter.getUnit(category, to);
+    // fromUnit과 toUnit이 유효한 단위인지 확인
+    const fromUnitInfo = this.getUnit(category, from);
+    if (!fromUnitInfo) {
+      throw new Error(`Invalid fromUnit: ${from}`);
+    }
+    const toUnitInfo = this.getUnit(category, to);
+    if (!toUnitInfo) {
+      throw new Error(`Invalid toUnit: ${to}`);
+    }
 
-    if (typeof base === 'function') {
-      value = base(value, true);
+    // fromUnit에서 fromUnit의 기준 단위로 값 변환
+    let baseValue = value;
+    if (typeof fromUnitInfo === 'function') {
+      baseValue = fromUnitInfo(value, true);
+    } else {
+      baseValue *= fromUnitInfo;
     }
-    if (typeof target === 'function') {
-      return target(value);
+
+    // 기준 단위에서 toUnit으로 값 변환
+    let convertedValue = baseValue;
+    if (typeof toUnitInfo === 'function') {
+      convertedValue = toUnitInfo(convertedValue);
+    } else {
+      convertedValue /= toUnitInfo;
     }
-    return (value * (typeof base === 'function' ? 1 : base)) / target;
+
+    return convertedValue;
   }
 }
+export default UnitConverter;
 
-console.log(UnitConverter.categories);
-console.log(UnitConverter.units);
-console.log(UnitConverter.getUnit('speed', 'm/s'));
-console.log(UnitConverter.getUnit('speed', 'km/h'));
-console.log(UnitConverter.convert('speed', 100, 'km/h', 'm/s'));
-console.log(UnitConverter.convert('temperature', 100, 'F', 'K'));
+// console.log(UnitConverter.categories);
+// UnitConverter.categories.forEach(category => {
+//   console.log(category);
+//   console.log(UnitConverter.getUnitLists(category));
+// });
+// //console.log(UnitConverter.units);
+// console.log(UnitConverter.getUnit('속도', 'm/s'));
+// console.log(UnitConverter.getUnit('속도', 'km/h'));
+// console.log(UnitConverter.convert('속도', 100, 'km/h', 'm/s'));
+// console.log(UnitConverter.convert('온도', 100, 'F', 'K'));

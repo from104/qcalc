@@ -16,6 +16,11 @@ export const useCalcStore = defineStore('calc', {
     locale: '',
     // 사용자 로케일
     userLocale: '',
+    // 최근 단위 변환 범주
+    recentCategory: '',
+    // 최근 단위 변환 단위
+    recentUnitFrom: {} as { [key: string]: string },
+    recentUnitTo: {} as { [key: string]: string },
   }),
   getters: {},
   actions: {
@@ -63,6 +68,10 @@ export const useCalcStore = defineStore('calc', {
     },
     // 숫자를 표준 로케일 문자열로 변환하는 함수
     toLocale(number: number): string {
+      console.log(this.locale);
+      console.log(this.useGrouping);
+      console.log(this.decimalPlaces);
+      
       return number.toLocaleString(this.locale, {
         style: 'decimal',
         useGrouping: this.useGrouping,
