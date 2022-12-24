@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onMounted, computed, ref } from 'vue';
+import { onMounted, computed } from 'vue';
 import tinykeys, { KeyBindingMap } from 'tinykeys';
 import { copyToClipboard } from 'quasar';
 import { useI18n } from 'vue-i18n';
@@ -7,14 +7,11 @@ import { useI18n } from 'vue-i18n';
 import { useCalcStore } from 'stores/calc-store';
 
 import MyTooltip from 'components/MyTooltip.vue';
-import UnitPanelResult from 'components/UnitPanelResult.vue';
 
 const { t } = useI18n();
 
 // 스토어 가져오기
 const store = useCalcStore();
-
-const isUnitOpen = ref(false);
 
 // 계산기 오브젝트를 스토어에서 가져오기 위한 변수 선언
 const calc = store.calc;
@@ -34,10 +31,12 @@ function doCopy(): void {
       : t('targetToBeCopiedSelected');
   copyToClipboard(textToClipboard)
     .then(() => {
-     store.notifyMsg(t('copiedToClipboard', { target: targetToBeCopied }));
+      store.notifyMsg(t('copiedToClipboard', { target: targetToBeCopied }));
     })
     .catch(() => {
-      store.notifyError(t('failedToCopyToClipboard', { target: targetToBeCopied }));
+      store.notifyError(
+        t('failedToCopyToClipboard', { target: targetToBeCopied })
+      );
     });
 }
 
@@ -54,9 +53,6 @@ function doPaste(): void {
     });
 }
 
-// dom 요소가 마운트 되었을 때
-// 1. 계산기 키바인딩 설정하기
-// 2. 스토어에서 값을 가져와서 계산기에 설정하기
 onMounted(() => {
   type Shortcut = [string[], () => void][];
 
@@ -92,6 +88,7 @@ onMounted(() => {
     flat
     icon="content_paste"
     class="q-ma-none q-pa-none q-pl-xs"
+    :disable="$route.path != '/'"
     @click="doPaste"
   >
     <MyTooltip>{{ t('tooltipPaste') }}</MyTooltip>
@@ -100,9 +97,11 @@ onMounted(() => {
     flat
     icon="swap_vert"
     class="q-ma-none q-pa-none q-pl-xs"
-    @click="() => isUnitOpen = !isUnitOpen"
+    :color="store.unitPanel ? (store.darkMode ? 'brown-2' : 'light-blue-3') : ''"
+    :disable="$route.path != '/'"
+    @click="store.unitPanelToggle()"
   >
-    <MyTooltip>단위 변환 패널을 엽니다.</MyTooltip>
+  <MyTooltip>{{ t('UnitConverter') }}</MyTooltip>
   </q-btn>
 </template>
 
@@ -116,6 +115,7 @@ ko:
   failedToPasteFromClipboard: '클립보드로부터 숫자를 붙여넣지 못했습니다.'
   tooltipCopy: '내용을 복사합니다.'
   tooltipPaste: '숫자를 붙혀넣습니다.'
+  UnitConverter: '단위 변환기 열기'
 en:
   targetToBeCopiedResult: 'the calculation result'
   targetToBeCopiedSelected: 'the selected content'
@@ -125,4 +125,5 @@ en:
   failedToPasteFromClipboard: 'Failed to paste the number from the clipboard.'
   tooltipCopy: 'Copy the content.'
   tooltipPaste: 'Paste the number.'
+  UnitConverter: 'Open Unit Converter'
 </i18n>
