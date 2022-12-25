@@ -27,19 +27,25 @@ const calc = store.calc;
 
 // 단위 이름과 값을 바꾸기 위한 함수
 function swapUnitValue() {
+  // 변환 결과를 원본 값으로 바꾸기
+  // (computed로 선언된 unitResult로 인해 값이 바뀌면 자동으로 변환 결과가 바뀜)
   calc.setShownNumber(unitResult.value);
 
+  // 단위도 바꾸기
   const temp = store.recentUnitFrom[store.recentCategory];
   store.recentUnitFrom[store.recentCategory] =
     store.recentUnitTo[store.recentCategory];
   store.recentUnitTo[store.recentCategory] = temp;
 }
 
+// 범주와 단위를 초기화
 function initRecentCategoryAndUnit() {
+  // 범주 초기화
   if (!UnitConverter.categories.includes(store.recentCategory)) {
     store.recentCategory = UnitConverter.categories[0];
   }
 
+  // 단위 초기화
   if (
     !UnitConverter.getUnitLists(store.recentCategory).includes(
       store.recentUnitFrom[store.recentCategory]
@@ -61,6 +67,7 @@ function initRecentCategoryAndUnit() {
   }
 }
 
+// 범주 이름을 언어에 맞게 초기화
 const categories = reactive(
   UnitConverter.categories.map((category) => ({
     value: category,
@@ -68,16 +75,17 @@ const categories = reactive(
   }))
 );
 
+// 범주 이름을 언어에 맞게 바꾸기 위한 감시
 watch([() => store.useSystemLocale, () => store.userLocale], () => {
   categories.forEach((category) => {
     category.label = t(`categories.${category.value}`);
   });
 });
 
-// 계산 결과 툴팁 표시 상태 변수
+// 변환 결과 툴팁 표시 상태 변수
 const needUnitResultTooltip = ref(false);
 
-// 계산 결과가 길 경우 툴팁 표시 상태 셋팅
+// 변환 결과가 길 경우 툴팁 표시 상태 셋팅
 function setNeedUnitResultTooltip() {
   // 원래 결과 칸 길이
   const ow = document.getElementById('unitResult')?.offsetWidth ?? 0;
@@ -88,9 +96,12 @@ function setNeedUnitResultTooltip() {
   needUnitResultTooltip.value = ow < sw;
 }
 
+// 변환 결과 계산 (computed로 선언하여 값이 바뀔 때마다 자동으로 계산)
 const unitResult = computed(() => {
+  // 저장된 범주와 단위가 잘못됐으면 초기화
   initRecentCategoryAndUnit();
 
+  // 변환 결과를 반환
   return store.toLocale(
     UnitConverter.convert(
       store.recentCategory,
@@ -101,11 +112,12 @@ const unitResult = computed(() => {
   );
 });
 
+// 라우팅 위치가 달라지면 변환 패널 닫기
 onBeforeMount(() => {
   store.unitPanel = false;
 });
 
-// 계산기 키바인딩 제거하기위한 변수 선언
+// 키바인딩 제거하기위한 변수 선언
 let keybindingRemoveAtUmount = tinykeys(window, {} as KeyBindingMap);
 
 onMounted(() => {
@@ -238,6 +250,7 @@ ko:
     volume: '부피'
     weight: '무게'
     temp: '온도'
+    time: '시간'
     speed: '속도'
     pressure: '압력'
     bytes: '바이트'
@@ -252,6 +265,7 @@ en:
     volume: 'Volume'
     weight: 'Weight'
     temp: 'Temp'
+    time: 'Time'
     speed: 'Speed'
     pressure: 'Pressure'
     bytes: 'Bytes'
