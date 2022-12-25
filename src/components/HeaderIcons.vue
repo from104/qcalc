@@ -31,10 +31,12 @@ function doCopy(): void {
       : t('targetToBeCopiedSelected');
   copyToClipboard(textToClipboard)
     .then(() => {
-     store.notifyMsg(t('copiedToClipboard', { target: targetToBeCopied }));
+      store.notifyMsg(t('copiedToClipboard', { target: targetToBeCopied }));
     })
     .catch(() => {
-      store.notifyError(t('failedToCopyToClipboard', { target: targetToBeCopied }));
+      store.notifyError(
+        t('failedToCopyToClipboard', { target: targetToBeCopied })
+      );
     });
 }
 
@@ -51,9 +53,6 @@ function doPaste(): void {
     });
 }
 
-// dom 요소가 마운트 되었을 때
-// 1. 계산기 키바인딩 설정하기
-// 2. 스토어에서 값을 가져와서 계산기에 설정하기
 onMounted(() => {
   type Shortcut = [string[], () => void][];
 
@@ -89,9 +88,20 @@ onMounted(() => {
     flat
     icon="content_paste"
     class="q-ma-none q-pa-none q-pl-xs"
+    :disable="$route.path != '/'"
     @click="doPaste"
   >
     <MyTooltip>{{ t('tooltipPaste') }}</MyTooltip>
+  </q-btn>
+  <q-btn
+    flat
+    icon="swap_vert"
+    class="q-ma-none q-pa-none q-pl-xs"
+    :color="store.unitPanel ? (store.darkMode ? 'brown-2' : 'light-blue-3') : ''"
+    :disable="$route.path != '/'"
+    @click="store.unitPanelToggle()"
+  >
+  <MyTooltip>{{ t('UnitConverter') }}</MyTooltip>
   </q-btn>
 </template>
 
@@ -105,6 +115,7 @@ ko:
   failedToPasteFromClipboard: '클립보드로부터 숫자를 붙여넣지 못했습니다.'
   tooltipCopy: '내용을 복사합니다.'
   tooltipPaste: '숫자를 붙혀넣습니다.'
+  UnitConverter: '단위 변환기 열기'
 en:
   targetToBeCopiedResult: 'the calculation result'
   targetToBeCopiedSelected: 'the selected content'
@@ -114,4 +125,5 @@ en:
   failedToPasteFromClipboard: 'Failed to paste the number from the clipboard.'
   tooltipCopy: 'Copy the content.'
   tooltipPaste: 'Paste the number.'
+  UnitConverter: 'Open Unit Converter'
 </i18n>

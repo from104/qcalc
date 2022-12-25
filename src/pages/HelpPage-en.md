@@ -2,17 +2,17 @@
 
 ## function
 
-- You can do arithmetic operations and percentage calculations.
-- If you press the arithmetic operation button (key) in succession, the last number is repeatedly calculated.
-- You can find the reciprocal, square, and square root.
-- All input can be done with mouse and keyboard.
-- You can also copy and paste.
-- You can make the window always on top with the toggle switch on the top right or the keyboard.
-- Thousand commas can be displayed.
-- It is possible to fix the number of digits after the decimal point (no limit to 6 digits).
-- You can view the history of calculation results. (up to 20)
-- Support dark mode.
-- You can choose English or Korean.
+- Four arithmetic operations and percent calculation
+- Reciprocal, square, square root calculation
+- Unit conversion function
+- All functions operated with mouse and keyboard.
+- Copy and paste calculation results, etc.
+- Toggle window always on top
+- Thousand comma display
+- Fixed digits below the decimal point (no limit to 6 digits)
+- Records calculation results (up to 20)
+- dark mode
+- Supports English and Korean
 
 ## Shortcut Keys
 
@@ -28,6 +28,8 @@
 - i: Calculate the reciprocal (1/x)
 - Backspace: Erase each Korean character
 - Escape, Delete, c: Reset calculator
+- v: open units conversion panel
+- Shift-v: Reverse unit target.
 - h: open calculation result record (up to 20)
 - d: clear calculation result record
 
