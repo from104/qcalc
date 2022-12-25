@@ -71,20 +71,28 @@ export class Calculator {
 
   // 문자열에서 숫자 문자열만 추출
   private getNumberString(originalString: string): string {
-    let onlyNumber = originalString.replace(/[^0-9.\-]/gm, ''); // 숫자, 부호, 소수점 남기고 제거
-    const isMinus = onlyNumber.match(/^-/); // 부호 체크
+    // 숫자, 부호, 소수점만 남김
+    let onlyNumber = originalString.replace(/[^0-9.\ -]/gm, '');
 
-    onlyNumber = onlyNumber.replace(/-/g, ''); // 부호 제거
+    // 부호 체크
+    const isMinus = onlyNumber.match(/^-/);
 
-    const splitedNumberByDot = onlyNumber.split('.'); // 소수점으로 나누기
-    let result = splitedNumberByDot.shift(); // 첫번째 숫자만 추출
+    // 부호 제거
+    onlyNumber = onlyNumber.replace(/-/g, '');
+
+    // 소수점으로 나누기
+    const splitedNumberByDot = onlyNumber.split('.');
+    let result = splitedNumberByDot.shift();
+
+    // 소수점이 있으면 추가
     if (splitedNumberByDot.length > 0) {
-      // 소수점이 있으면
-      result += '.' + splitedNumberByDot.join(''); // 소수점 추가
+      result += '.' + splitedNumberByDot.join('');
     }
+
+    // 부호와 숫자만 리턴
     return Number(
       (isMinus ? '-' : '') + (result == '' ? '0' : result)
-    ).toString(); // 부호와 숫자만 리턴
+    ).toString();
   }
 
   // shownNumber를 문자열로 셋팅
@@ -104,14 +112,14 @@ export class Calculator {
   public getBackupNumber(): number {
     return this.backupNumber;
   }
-  
+
   // 콘솔로 결과 출력
   public resultToConsole() {
     console.log(this.shownNumber);
   }
 
   // 초기화 예정 여부 얻기
-  public getWillReset (): boolean {
+  public getWillReset(): boolean {
     return this.willReset;
   }
 
@@ -146,23 +154,21 @@ export class Calculator {
       // 초기화 예정이면 (숫자에 앞서 .만 입력할 시)
       this.shownNumber = '0.';
       this.willReset = false;
-    } else if (this.shownNumber.indexOf('.') == -1)
+    } else if (!this.shownNumber.match(/\./))
       // 표시 숫자에 .이 없으면 . 추가
       this.shownNumber += '.';
   }
 
   // 숫자 또는 소수점 지우기
   public deleteDigitOrDot() {
-    const l = this.shownNumber.length;
-    const fc = this.shownNumber.substring(0, 1);
-
-    if (l == 1 || (l == 2 && fc == '-'))
-      // 표시 숫자가 1개면 "0"으로
+    // 표시 숫자가 1개이거나, 표시 숫자가 '-'로 시작하고 길이가 2인 경우
+    if (this.shownNumber.match(/^-?\d$/)) {
+      // 표시 숫자를 '0'으로 설정
       this.shownNumber = '0';
-    // 아니면 P의 숫자 지우기
-    else this.shownNumber = this.shownNumber.substring(0, l - 1);
-
-    // this.shownToNumber(); // 표시 숫자를 백업
+    } else {
+      // 그 외의 경우 표시 숫자의 마지막 글자 제거
+      this.shownNumber = this.shownNumber.slice(0, -1);
+    }
   }
 
   // 부동소수점 숫자를 문자열로

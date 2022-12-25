@@ -1,8 +1,8 @@
 {
   "name": "qcalc",
-  "version": "0.5.4fix1",
+  "version": "0.6.0",
   "description": "com.electron.qcalc",
-  "productName": "Quasar Calculator",
+  "productName": "Q Calc",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/from104/qcalc.git"
