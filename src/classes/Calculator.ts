@@ -71,22 +71,30 @@ export class Calculator {
 
   // 문자열에서 숫자 문자열만 추출
   private getNumberString(originalString: string): string {
-    let onlyNumber = originalString.replace(/[^0-9.\-]/gm, ''); // 숫자, 부호, 소수점 남기고 제거
-    const isMinus = onlyNumber.match(/^-/); // 부호 체크
+    // 숫자, 부호, 소수점만 남김
+    let onlyNumber = originalString.replace(/[^0-9.\-]/gm, '');
 
-    onlyNumber = onlyNumber.replace(/-/g, ''); // 부호 제거
+    // 부호 체크
+    const isMinus = onlyNumber.match(/^-/);
 
-    const splitedNumberByDot = onlyNumber.split('.'); // 소수점으로 나누기
-    let result = splitedNumberByDot.shift(); // 첫번째 숫자만 추출
+    // 부호 제거
+    onlyNumber = onlyNumber.replace(/-/g, '');
+
+    // 소수점으로 나누기
+    const splitedNumberByDot = onlyNumber.split('.');
+    let result = splitedNumberByDot.shift();
+
+    // 소수점이 있으면 추가
     if (splitedNumberByDot.length > 0) {
-      // 소수점이 있으면
-      result += '.' + splitedNumberByDot.join(''); // 소수점 추가
+      result += '.' + splitedNumberByDot.join('');
     }
+
+    // 부호와 숫자만 리턴
     return Number(
       (isMinus ? '-' : '') + (result == '' ? '0' : result)
-    ).toString(); // 부호와 숫자만 리턴
+    ).toString();
   }
-
+  
   // shownNumber를 문자열로 셋팅
   public setShownNumber(s: string): void {
     this.shownNumber = this.getNumberString(
@@ -104,14 +112,14 @@ export class Calculator {
   public getBackupNumber(): number {
     return this.backupNumber;
   }
-  
+
   // 콘솔로 결과 출력
   public resultToConsole() {
     console.log(this.shownNumber);
   }
 
   // 초기화 예정 여부 얻기
-  public getWillReset (): boolean {
+  public getWillReset(): boolean {
     return this.willReset;
   }
 
