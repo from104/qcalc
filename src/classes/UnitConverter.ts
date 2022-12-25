@@ -2,12 +2,11 @@ interface Unit {
   [unit: string]: number | ((value: number, toRev?: boolean) => number);
 }
 
-//
 type UnitBaseData = Record<string, Unit>;
 
-// 단위 변환 범주 목록별 단위 목록
+// 단위 범주 목록별 단위 목록
 const unitBaseData: UnitBaseData = {
-  길이: {
+  length: {
     m: 1,
     km: 1e-3,
     cm: 100,
@@ -17,7 +16,7 @@ const unitBaseData: UnitBaseData = {
     yd: 1.0936132983377078,
     mi: 0.000621371192237334,
   },
-  넓이: {
+  area: {
     'm²': 1,
     'km²': 1e-6,
     'cm²': 10000,
@@ -31,7 +30,7 @@ const unitBaseData: UnitBaseData = {
     a: 1e-2,
     ac: 2.471053814671653e-4,
   },
-  부피: {
+  volume: {
     'm³': 1,
     'km³': 1e-9,
     'cm³': 1e6,
@@ -45,7 +44,7 @@ const unitBaseData: UnitBaseData = {
     kl: 1,
     gal: 264.1720523581484,
   },
-  무게: {
+  weight: {
     kg: 1,
     g: 1000,
     mg: 1e6,
@@ -53,20 +52,21 @@ const unitBaseData: UnitBaseData = {
     lb: 2.2046226218487757,
     ton: 0.001,
   },
-  온도: {
+  temp: {
     C: 1,
+    F: (t: number, r = false) => (r ? (t - 32) * (5 / 9) : t * (9 / 5) + 32),
     K: (t: number, r = false) => (r ? t - 273.15 : t + 273.15),
-    F: (t: number, r = false) => (r ? ((t - 32) * (5 / 9)) : t * (9 / 5) + 32),
-    R: (t: number, r = false) => (r ? ((t - 491.67) * (5 / 9)) : t * (9 / 5) + 491.67),
+    R: (t: number, r = false) =>
+      r ? (t - 491.67) * (5 / 9) : t * (9 / 5) + 491.67,
   },
-  속도: {
+  speed: {
     'km/h': 1,
     'm/s': 0.277778,
     'ft/s': 0.91134514435653324327,
     'mi/h': 0.6213716893348046,
-    knot: 0.53995723588740196508
+    knot: 0.53995723588740196508,
   },
-  압력: {
+  pressure: {
     Pa: 1,
     kPa: 0.001,
     MPa: 1e-6,
@@ -75,7 +75,7 @@ const unitBaseData: UnitBaseData = {
     psi: 0.0001450377377302092,
     ksi: 1.450377377302092e-7,
   },
-  자료: {
+  bytes: {
     B: 1125899906842624,
     KB: 1099511627776,
     MB: 1073741824,
@@ -120,8 +120,7 @@ class UnitConverter {
     return this.units[category][unit];
   }
 
-  // 단위 변환 범주 목록별 단위 목록에서
-  // 단위 변환을 수행
+  // 단위 변환
   static convert<T extends keyof UnitBaseData>(
     category: T,
     value: number,
@@ -138,7 +137,7 @@ class UnitConverter {
       throw new Error(`Invalid toUnit: ${to}`);
     }
 
-    // fromUnit에서 fromUnit의 기준 단위로 값 변환
+    // fromUnit의 기준 단위로 값 변환
     let baseValue = value;
     if (typeof fromUnitInfo === 'function') {
       baseValue = fromUnitInfo(value, true);
@@ -160,13 +159,5 @@ class UnitConverter {
 export default UnitConverter;
 export {};
 
-// console.log(UnitConverter.categories);
-// UnitConverter.categories.forEach(category => {
-//   console.log(category);
-//   console.log(UnitConverter.getUnitLists(category));
-// });
-// //console.log(UnitConverter.units);
-// console.log(UnitConverter.getUnit('속도', 'm/s'));
-// console.log(UnitConverter.getUnit('속도', 'km/h'));
 // console.log(UnitConverter.convert('길이', 1, 'm', 'km'));
 // console.log(UnitConverter.convert('온도', 100, 'F', 'K'));
