@@ -1,12 +1,23 @@
 <script setup lang="ts">
-import { ref, computed, onMounted, onBeforeMount, onBeforeUnmount } from 'vue';
+import {
+  ref,
+  computed,
+  onMounted,
+  onBeforeMount,
+  onBeforeUnmount,
+  reactive,
+  watch,
+} from 'vue';
 import tinykeys, { KeyBindingMap } from 'tinykeys';
+import { useI18n } from 'vue-i18n';
 
 import UnitConverter from 'classes/UnitConverter';
 
 import { useCalcStore } from 'stores/calc-store';
 
 import MyTooltip from 'components/MyTooltip.vue';
+
+const { t } = useI18n();
 
 // 스토어 가져오기
 const store = useCalcStore();
@@ -49,6 +60,19 @@ function initRecentCategoryAndUnit() {
     )[0];
   }
 }
+
+const categories = reactive(
+  UnitConverter.categories.map((category) => ({
+    value: category,
+    label: t(`categories.${category}`),
+  }))
+);
+
+watch([() => store.useSystemLocale, () => store.userLocale], () => {
+  categories.forEach((category) => {
+    category.label = t(`categories.${category.value}`);
+  });
+});
 
 // 계산 결과 툴팁 표시 상태 변수
 const needUnitResultTooltip = ref(false);
@@ -106,7 +130,6 @@ onMounted(() => {
 
   // 키바인딩하고 제거할 수 있는 메서드 백업;
   keybindingRemoveAtUmount = tinykeys(window, keyBindingMaps);
-
 });
 
 onBeforeUnmount(() => {
@@ -130,22 +153,24 @@ onBeforeUnmount(() => {
         <q-select
           v-model="store.recentUnitFrom[store.recentCategory]"
           :options="UnitConverter.getUnitLists(store.recentCategory)"
+          :label="t('src')"
+          stack-label
           dense
           options-dense
           filled
-          class="col-4 shadow-4"
-        >
-          <template v-slot:before>
-            <q-icon name="arrow_upward" class="q-ml-sm" @click.stop.prevent />
-          </template>
-        </q-select>
+          class="col-3 shadow-4"
+        />
         <q-select
           v-model="store.recentCategory"
-          :options="UnitConverter.categories"
+          :options="categories"
+          :label="t('category')"
+          stack-label
           dense
           options-dense
           filled
-          class="col-4 shadow-4 text-no-wrap"
+          emit-value
+          map-options
+          class="col-6 shadow-4 text-no-wrap"
         >
           <template v-slot:after>
             <q-icon
@@ -153,21 +178,21 @@ onBeforeUnmount(() => {
               class="q-mr-sm cursor-pointer"
               @click="swapUnitValue"
               @click.stop.prevent
-            />
+            >
+              <MyTooltip>{{ t('tooltipSwap') }}</MyTooltip>
+            </q-icon>
           </template>
         </q-select>
         <q-select
           v-model="store.recentUnitTo[store.recentCategory]"
           :options="UnitConverter.getUnitLists(store.recentCategory)"
+          :label="t('dest')"
+          stack-label
           dense
           options-dense
           filled
-          class="col-4 shadow-4"
-        >
-          <template v-slot:after>
-            <q-icon name="arrow_downward" class="q-mr-sm" @click.stop.prevent />
-          </template>
-        </q-select>
+          class="col-3 shadow-4"
+        />
       </q-card-section>
 
       <q-card-section class="q-pt-none q-pb-md">
@@ -203,6 +228,37 @@ onBeforeUnmount(() => {
     </q-card>
   </q-dialog>
 </template>
+
+<i18n>
+ko:
+  category: '범주'
+  categories:
+    length: '길이'
+    area: '넓이'
+    volume: '부피'
+    weight: '무게'
+    temp: '온도'
+    speed: '속도'
+    pressure: '압력'
+    bytes: '바이트'
+  src: '원본'
+  dest: '대상'
+  tooltipSwap: '원본과 대상을 바꿉니다.'
+en:
+  category: 'Category'
+  categories:
+    length: 'Length'
+    area: 'Area'
+    volume: 'Volume'
+    weight: 'Weight'
+    temp: 'Temp'
+    speed: 'Speed'
+    pressure: 'Pressure'
+    bytes: 'Bytes'
+  src: 'src'
+  dest: 'dest'
+  tooltipSwap: 'Swap source and destination.'
+</i18n>
 
 <style scoped lang="scss">
 #unit {
