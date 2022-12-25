@@ -72,7 +72,7 @@ export class Calculator {
   // 문자열에서 숫자 문자열만 추출
   private getNumberString(originalString: string): string {
     // 숫자, 부호, 소수점만 남김
-    let onlyNumber = originalString.replace(/[^0-9.\-]/gm, '');
+    let onlyNumber = originalString.replace(/[^0-9.\ -]/gm, '');
 
     // 부호 체크
     const isMinus = onlyNumber.match(/^-/);
@@ -94,7 +94,7 @@ export class Calculator {
       (isMinus ? '-' : '') + (result == '' ? '0' : result)
     ).toString();
   }
-  
+
   // shownNumber를 문자열로 셋팅
   public setShownNumber(s: string): void {
     this.shownNumber = this.getNumberString(
