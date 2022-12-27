@@ -20,7 +20,7 @@ let mainWindow: BrowserWindow | undefined;
 function createWindow() {
   const mainWindowState = windowState({
     defaultWidth: 352,
-    defaultHeight: 455,
+    defaultHeight: 505,
   });
   /**
    * Initial window options
@@ -32,7 +32,7 @@ function createWindow() {
     width: mainWindowState.width,
     height: mainWindowState.height,
     minWidth: 352,
-    minHeight: 455,
+    minHeight: 505,
     useContentSize: true,
     resizable: true,
     webPreferences: {
