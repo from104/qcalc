@@ -153,15 +153,9 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-  <q-dialog
-    v-model="store.unitPanel"
-    style="z-index: 5"
-    seamless
-    transition-show="slide-down"
-    transition-hide="slide-up"
-  >
-    <q-card id="unit" class="full-width q-px-none q-mx-sm" v-blur>
-      <q-card-section class="row q-pt-sm">
+  <transition name="slide-fade" mode="out-in">
+    <div v-if="store.unitPanel">
+      <q-card-section class="row q-px-sm q-pt-none q-pb-none" v-blur>
         <q-select
           v-model="store.recentUnitFrom[store.recentCategory]"
           :options="UnitConverter.getUnitLists(store.recentCategory)"
@@ -207,7 +201,7 @@ onBeforeUnmount(() => {
         />
       </q-card-section>
 
-      <q-card-section class="q-pt-none q-pb-md">
+      <q-card-section class="q-px-sm q-pt-none q-pb-none" v-blur>
         <q-field
           :model-value="unitResult"
           class="shadow-4 justify-end self-center"
@@ -237,8 +231,8 @@ onBeforeUnmount(() => {
           </template>
         </q-field>
       </q-card-section>
-    </q-card>
-  </q-dialog>
+    </div>
+  </transition>
 </template>
 
 <i18n>
@@ -275,9 +269,13 @@ en:
 </i18n>
 
 <style scoped lang="scss">
-#unit {
-  max-width: calc(100vw - 15px);
-  position: fixed;
-  top: 140px;
+.slide-fade-enter-active,
+.slide-fade-leave-active {
+  transition: all 0.2s ease-out;
+}
+.slide-fade-enter-from,
+.slide-fade-leave-to {
+  opacity: 0;
+  transform: translateY(-100%);
 }
 </style>
