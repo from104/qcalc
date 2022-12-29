@@ -3,7 +3,6 @@ import {
   ref,
   computed,
   onMounted,
-  onBeforeMount,
   onBeforeUnmount,
   reactive,
   watch,
@@ -112,11 +111,6 @@ const unitResult = computed(() => {
   );
 });
 
-// 라우팅 위치가 달라지면 변환 패널 닫기
-onBeforeMount(() => {
-  store.unitPanel = false;
-});
-
 // 키바인딩 제거하기위한 변수 선언
 let keybindingRemoveAtUmount = tinykeys(window, {} as KeyBindingMap);
 
@@ -126,7 +120,6 @@ onMounted(() => {
   type Shortcut = [string[], () => void][];
 
   const shortcuts: Shortcut = [
-    [['v'], () => store.unitPanelToggle()],
     [['Shift+v'], () => (store.unitPanel ? swapUnitValue() : null)],
   ];
 
@@ -145,94 +138,86 @@ onMounted(() => {
 });
 
 onBeforeUnmount(() => {
-  store.unitPanel = false;
-
   // dom 요소가 언마운트되기 전에 키바인딩 제거
   keybindingRemoveAtUmount();
 });
 </script>
 
 <template>
-  <transition name="slide-fade" mode="out-in">
-    <div v-if="store.unitPanel">
-      <q-card-section class="row q-px-sm q-pt-none q-pb-none" v-blur>
-        <q-select
-          v-model="store.recentUnitFrom[store.recentCategory]"
-          :options="UnitConverter.getUnitLists(store.recentCategory)"
-          :label="t('src')"
-          stack-label
-          dense
-          options-dense
-          filled
-          class="col-3 shadow-4"
-        />
-        <q-select
-          v-model="store.recentCategory"
-          :options="categories"
-          :label="t('category')"
-          stack-label
-          dense
-          options-dense
-          filled
-          emit-value
-          map-options
-          class="col-6 shadow-4 text-no-wrap"
+  <q-card-section class="row q-px-sm q-pt-none q-pb-none" v-blur>
+    <q-select
+      v-model="store.recentUnitFrom[store.recentCategory]"
+      :options="UnitConverter.getUnitLists(store.recentCategory)"
+      :label="t('src')"
+      stack-label
+      dense
+      options-dense
+      filled
+      class="col-3 shadow-4"
+    />
+    <q-select
+      v-model="store.recentCategory"
+      :options="categories"
+      :label="t('category')"
+      stack-label
+      dense
+      options-dense
+      filled
+      emit-value
+      map-options
+      class="col-6 shadow-4 text-no-wrap"
+    >
+      <template v-slot:after>
+        <q-icon
+          name="swap_vert"
+          class="q-mr-sm cursor-pointer"
+          @click="swapUnitValue"
+          @click.stop.prevent
         >
-          <template v-slot:after>
-            <q-icon
-              name="swap_vert"
-              class="q-mr-sm cursor-pointer"
-              @click="swapUnitValue"
-              @click.stop.prevent
-            >
-              <MyTooltip>{{ t('tooltipSwap') }}</MyTooltip>
-            </q-icon>
-          </template>
-        </q-select>
-        <q-select
-          v-model="store.recentUnitTo[store.recentCategory]"
-          :options="UnitConverter.getUnitLists(store.recentCategory)"
-          :label="t('dest')"
-          stack-label
-          dense
-          options-dense
-          filled
-          class="col-3 shadow-4"
-        />
-      </q-card-section>
+          <MyTooltip>{{ t('tooltipSwap') }}</MyTooltip>
+        </q-icon>
+      </template>
+    </q-select>
+    <q-select
+      v-model="store.recentUnitTo[store.recentCategory]"
+      :options="UnitConverter.getUnitLists(store.recentCategory)"
+      :label="t('dest')"
+      stack-label
+      dense
+      options-dense
+      filled
+      class="col-3 shadow-4"
+    />
+  </q-card-section>
 
-      <q-card-section class="q-px-sm q-pt-none q-pb-none" v-blur>
-        <q-field
-          :model-value="unitResult"
-          class="shadow-4 justify-end self-center"
-          filled
-          dense
-          readonly
-          :bg-color="
-            needUnitResultTooltip
-              ? store.darkMode
-                ? 'blue-grey-9'
-                : 'amber-2'
-              : undefined
-          "
+  <q-card-section class="q-px-sm q-pt-none q-pb-none" v-blur>
+    <q-field
+      :model-value="unitResult"
+      class="shadow-4 justify-end self-center"
+      filled
+      dense
+      readonly
+      :bg-color="
+        needUnitResultTooltip
+          ? store.darkMode
+            ? 'blue-grey-9'
+            : 'amber-2'
+          : undefined
+      "
+    >
+      <template v-slot:control>
+        <div
+          id="unitResult"
+          v-mutation="setNeedUnitResultTooltip"
+          v-mutation.characterData
+          class="self-center full-width no-outline ellipsis text-h4 text-right"
         >
-          <template v-slot:control>
-            <div
-              id="unitResult"
-              v-mutation="setNeedUnitResultTooltip"
-              v-mutation.characterData
-              class="self-center full-width no-outline ellipsis text-h4 text-right"
-            >
-              {{ unitResult }}
-              <MyTooltip v-if="needUnitResultTooltip">{{
-                unitResult
-              }}</MyTooltip>
-            </div>
-          </template>
-        </q-field>
-      </q-card-section>
-    </div>
-  </transition>
+          {{ unitResult }}
+          <MyTooltip v-if="needUnitResultTooltip">{{ unitResult }}</MyTooltip>
+        </div>
+      </template>
+    </q-field>
+  </q-card-section>
 </template>
 
 <i18n>
@@ -269,13 +254,13 @@ en:
 </i18n>
 
 <style scoped lang="scss">
-.slide-fade-enter-active,
-.slide-fade-leave-active {
-  transition: all 0.2s ease-out;
-}
-.slide-fade-enter-from,
-.slide-fade-leave-to {
-  opacity: 0;
-  transform: translateY(-100%);
-}
+// .slide-fade-enter-active,
+// .slide-fade-leave-active {
+//   transition: all 0.2s ease-out;
+// }
+// .slide-fade-enter-from,
+// .slide-fade-leave-to {
+//   opacity: 0;
+//   transform: translateY(-100%);
+// }
 </style>

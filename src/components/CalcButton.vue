@@ -1,10 +1,9 @@
 <script setup lang="ts">
-import { onMounted, onBeforeUnmount, ref, watch } from 'vue';
+import { onMounted, onBeforeUnmount, ref } from 'vue';
 
 import tinykeys, { KeyBindingMap } from 'tinykeys';
 
 import { useCalcStore } from 'stores/calc-store';
-import { QCardSection, QBtn } from 'quasar';
 
 const store = useCalcStore();
 
@@ -66,20 +65,16 @@ onBeforeUnmount(() => {
   keybindingRemoveAtUmount();
 });
 
-const baseHeight = ref('142px');
+const props = withDefaults(defineProps<{ type?: string }>(), {
+  type: 'normal',
+});
 
-watch(
-  () => store.unitPanel,
-  () => {
-    if (store.unitPanel) {
-      baseHeight.value = '224px';
-    } else {
-      setTimeout(() => {
-        baseHeight.value = '142px';
-      }, 220);
-    }
-  }
-);
+const baseHeight = ref('132px');
+
+
+if (props.type === 'unit') {
+  baseHeight.value = '224px';
+}
 </script>
 
 <template>
@@ -129,14 +124,5 @@ watch(
         calc((100vw - 40px) / 4 * 0.3)
       ) * 1.2
   );
-}
-.slide-fade-enter-active,
-.slide-fade-leave-active {
-  transition: all 2.8s ease-in;
-}
-.slide-fade-enter-from,
-.slide-fade-leave-to {
-  opacity: 0;
-  transform: translateY(-100%);
 }
 </style>
