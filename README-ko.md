@@ -4,7 +4,7 @@
 
 ## 스크린샷
 
-![Screenshot](https://github.com/from104/qcalc/raw/main/assets/screenshot%20v0.6.1.png)
+![Screenshot](https://github.com/from104/qcalc/raw/main/assets/screenshot_v0.6.1.png)
 
 ## 기능
 
