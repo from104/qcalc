@@ -4,7 +4,7 @@ This is a simple calculator made using the source of the calculator for Android 
 
 ## screenshot
 
-![Screenshot](https://github.com/from104/qcalc/raw/main/assets/screenshot%20v0.6.1.png)
+![Screenshot](https://github.com/from104/qcalc/raw/main/assets/screenshot_v0.6.1.png)
 
 ## function
 
