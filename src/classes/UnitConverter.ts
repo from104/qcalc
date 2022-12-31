@@ -17,6 +17,7 @@ const unitBaseData: UnitBaseData = {
     mi: 1609.344,
   },
   area: {
+    py: 3.3025,
     'm²': 1,
     'km²': 1000000,
     'cm²': 0.0001,
@@ -28,7 +29,6 @@ const unitBaseData: UnitBaseData = {
     ha: 10000,
     a: 100,
     ac: 4046.8564224,
-    py: 3.3025,
   },
   volume: {
     'm³': 1,
@@ -53,10 +53,10 @@ const unitBaseData: UnitBaseData = {
     ton: 1000000,
   },
   temp: {
-    C: 1,
-    F: (t: number, r = false) => (r ? (t - 32) * (5 / 9) : t * (9 / 5) + 32),
+    '°C': 1,
+    '°F': (t: number, r = false) => (r ? (t - 32) * (5 / 9) : t * (9 / 5) + 32),
     K: (t: number, r = false) => (r ? t - 273.15 : t + 273.15),
-    R: (t: number, r = false) =>
+    '°R': (t: number, r = false) =>
       r ? (t - 491.67) * (5 / 9) : t * (9 / 5) + 491.67,
   },
   time: {
@@ -84,7 +84,7 @@ const unitBaseData: UnitBaseData = {
     psi: 6894.75729316836,
     ksi: 6894757.29316836,
   },
-  bytes: {
+  data: {
     B: 1,
     KB: 1024,
     MB: 1048576,
