@@ -63,8 +63,19 @@ function initRecentCategoryAndUnit() {
     store.recentUnitTo[store.recentCategory] = UnitConverter.getUnitLists(
       store.recentCategory
     )[0];
+    if (
+      store.recentUnitTo[store.recentCategory] ==
+      store.recentUnitFrom[store.recentCategory]
+    ) {
+      store.recentUnitTo[store.recentCategory] = UnitConverter.getUnitLists(
+        store.recentCategory
+      )[1];
+    }
   }
 }
+
+// 단위 초기화
+initRecentCategoryAndUnit();
 
 // 범주 이름을 언어에 맞게 초기화
 const categories = reactive(
@@ -141,20 +152,47 @@ onBeforeUnmount(() => {
   // dom 요소가 언마운트되기 전에 키바인딩 제거
   keybindingRemoveAtUmount();
 });
+
+type UnitOptions = {
+  value: string;
+  label: string;
+  disable?: boolean;
+};
+
+type ReactiveUnitOptions = {
+  values: UnitOptions[];
+};
+
+const fromUnitOptions = reactive({ values: [] } as ReactiveUnitOptions);
+const toUnitOptions = reactive({ values: [] } as ReactiveUnitOptions);
+
+watch(
+  [
+    () => store.recentUnitFrom[store.recentCategory],
+    () => store.recentUnitTo[store.recentCategory],
+  ],
+  () => {
+    const unitList = UnitConverter.getUnitLists(store.recentCategory);
+
+    fromUnitOptions.values = unitList.map((unit) => ({
+      value: unit,
+      label: unit,
+      disable: store.recentUnitTo[store.recentCategory] === unit,
+    }));
+
+    toUnitOptions.values = unitList.map((unit) => ({
+      value: unit,
+      label: unit,
+      disable: store.recentUnitFrom[store.recentCategory] === unit,
+    }));
+  },
+  { immediate: true }
+);
 </script>
 
 <template>
-  <q-card-section class="row q-px-sm q-pt-none q-pb-none" v-blur>
-    <q-select
-      v-model="store.recentUnitFrom[store.recentCategory]"
-      :options="UnitConverter.getUnitLists(store.recentCategory)"
-      :label="t('src')"
-      stack-label
-      dense
-      options-dense
-      filled
-      class="col-3 shadow-4"
-    />
+  <q-card-section class="row q-px-sm q-pt-none q-pb-sm" v-blur>
+    <!-- 카테고리 -->
     <q-select
       v-model="store.recentCategory"
       :options="categories"
@@ -162,35 +200,67 @@ onBeforeUnmount(() => {
       stack-label
       dense
       options-dense
-      filled
       emit-value
       map-options
-      class="col-6 shadow-4 text-no-wrap"
+      class="col-3 q-pl-sm shadow-4"
+      :class="store.darkMode ? 'bg-grey-9' : 'bg-grey-3'"
+    />
+
+    <!-- 원본 방향 -->
+    <q-icon name="keyboard_double_arrow_up" class="col-1" />
+
+    <!-- 원본 단위 -->
+    <q-select
+      v-model="store.recentUnitFrom[store.recentCategory]"
+      :options="fromUnitOptions.values"
+      :label="t('src')"
+      stack-label
+      dense
+      options-dense
+      emit-value
+      map-options
+      class="col-3 q-pl-sm shadow-4"
+      :class="store.darkMode ? 'bg-grey-9' : 'bg-grey-3'"
+    />
+
+    <!-- 원본, 대상 단위 바꾸기 버튼 -->
+    <q-btn
+      dense
+      round
+      flat
+      icon="swap_horiz"
+      size="md"
+      class="col-1 q-mx-none q-px-sm"
+      :color="store.getDarkColor('primary')"
+      @click="swapUnitValue"
     >
-      <template v-slot:after>
-        <q-icon
-          name="swap_vert"
-          class="q-mr-sm cursor-pointer"
-          @click="swapUnitValue"
-          @click.stop.prevent
-        >
-          <MyTooltip>{{ t('tooltipSwap') }}</MyTooltip>
-        </q-icon>
-      </template>
-    </q-select>
+      <MyTooltip>{{ t('tooltipSwap') }}</MyTooltip>
+    </q-btn>
+
+    <!-- 대상 단위 -->
     <q-select
       v-model="store.recentUnitTo[store.recentCategory]"
-      :options="UnitConverter.getUnitLists(store.recentCategory)"
+      :options="toUnitOptions.values"
       :label="t('dest')"
       stack-label
       dense
       options-dense
-      filled
-      class="col-3 shadow-4"
+      emit-value
+      map-options
+      class="col-3 q-pl-sm shadow-4"
+      :class="store.darkMode ? 'bg-grey-9' : 'bg-grey-3'"
+    />
+
+    <!-- 대상 방향 -->
+    <q-icon
+      name="keyboard_double_arrow_down"
+      size="xs"
+      class="col-1 q-px-none"
     />
   </q-card-section>
 
-  <q-card-section class="q-px-sm q-pt-none q-pb-none" v-blur>
+  <q-card-section class="col-12 q-px-sm q-pt-none q-pb-none">
+    <!-- 대상 값 -->
     <q-field
       :model-value="unitResult"
       class="shadow-4 justify-end self-center"
@@ -232,7 +302,7 @@ ko:
     time: '시간'
     speed: '속도'
     pressure: '압력'
-    bytes: '바이트'
+    data: '데이터'
   src: '원본'
   dest: '대상'
   tooltipSwap: '원본과 대상을 바꿉니다.'
@@ -247,20 +317,9 @@ en:
     time: 'Time'
     speed: 'Speed'
     pressure: 'Pressure'
-    bytes: 'Bytes'
+    data: 'Data'
+
   src: 'src'
   dest: 'dest'
   tooltipSwap: 'Swap source and destination.'
 </i18n>
-
-<style scoped lang="scss">
-// .slide-fade-enter-active,
-// .slide-fade-leave-active {
-//   transition: all 0.2s ease-out;
-// }
-// .slide-fade-enter-from,
-// .slide-fade-leave-to {
-//   opacity: 0;
-//   transform: translateY(-100%);
-// }
-</style>
