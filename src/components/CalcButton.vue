@@ -73,7 +73,7 @@ const baseHeight = ref('132px');
 
 
 if (props.type === 'unit') {
-  baseHeight.value = '224px';
+  baseHeight.value = '230px';
 }
 </script>
 
