@@ -1,20 +1,20 @@
 <script setup lang="ts">
-  import { onMounted, onBeforeUnmount } from 'vue';
+import { onMounted, onBeforeUnmount, ref } from 'vue';
 
-  import tinykeys, { KeyBindingMap } from 'tinykeys';
+import tinykeys, { KeyBindingMap } from 'tinykeys';
 
-  import { useCalcStore } from 'stores/calc-store';
+import { useCalcStore } from 'stores/calc-store';
 
-  const calcStore = useCalcStore();
+const store = useCalcStore();
 
-  // 계산기 오브젝트를 스토어에서 가져오기 위한 변수 선언
-  const calc = calcStore.calc;
+// 계산기 오브젝트를 스토어에서 가져오기 위한 변수 선언
+const calc = store.calc;
 
-  // 버튼 레이블, 버튼 컬러, 버튼에 해당하는 키, 버튼 클릭 이벤트 핸들러
-  type Button = [string, string, string[], () => void][];
+// 버튼 레이블, 버튼 컬러, 버튼에 해당하는 키, 버튼 클릭 이벤트 핸들러
+type Button = [string, string, string[], () => void][];
 
-  // prettier-ignore
-  const buttons: Button = [
+// prettier-ignore
+const buttons: Button = [
     ['x²', 'secondary', ['u'], () => calc.pow2()],
     ['√x', 'secondary', ['r'], () => calc.sqrt()],
     ['C', 'deep-orange', ['Delete', 'Escape', 'c'], () => calc.clear()],
@@ -41,68 +41,88 @@
     ['@mdi-equal', 'secondary', ['=', 'Enter'], () => calc.equal()],
   ];
 
-  // 계산기 키바인딩 제거하기위한 변수 선언
-  let keybindingRemoveAtUmount = tinykeys(window, {} as KeyBindingMap);
+// 계산기 키바인딩 제거하기위한 변수 선언
+let keybindingRemoveAtUmount = tinykeys(window, {} as KeyBindingMap);
 
-  // dom 요소가 마운트 되었을 때 계산기 키바인딩 설정하기
-  onMounted(() => {
-    // Support keyboard entry
-    const keyBindingMaps: KeyBindingMap = {};
+// dom 요소가 마운트 되었을 때 계산기 키바인딩 설정하기
+onMounted(() => {
+  // Support keyboard entry
+  const keyBindingMaps: KeyBindingMap = {};
 
-    buttons.forEach((button) => {
-      const [, , keys, handler] = button;
-      keys.forEach((key) => {
-        keyBindingMaps[key] = handler;
-      });
+  buttons.forEach((button) => {
+    const [, , keys, handler] = button;
+    keys.forEach((key) => {
+      keyBindingMaps[key] = handler;
     });
-
-    // 키바인딩하고 제거할 수 있는 메서드 백업;
-    keybindingRemoveAtUmount = tinykeys(window, keyBindingMaps);
   });
 
-  // dom 요소가 언마운트되기 전에 키바인딩 제거
-  onBeforeUnmount(() => {
-    keybindingRemoveAtUmount();
-  });
-  </script>
+  // 키바인딩하고 제거할 수 있는 메서드 백업;
+  keybindingRemoveAtUmount = tinykeys(window, keyBindingMaps);
+});
 
-  <template>
-    <q-card-section class="row wrap justify-center q-py-xs q-px-none" v-blur>
-      <div
-        class="col-3 row wrap justify-center q-pa-sm"
-        v-for="(button, index) in buttons"
-        :key="index"
-      >
-        <q-btn
-          class="glossy shadow-4 noselect col-12 button"
-          no-caps
-          :label="button[0].charAt(0) != '@' ? button[0] : undefined"
-          :icon="button[0].charAt(0) == '@' ? button[0].slice(1) : undefined"
-          :id="button[0].charAt(0) == '@' ? 'icon' : 'char'"
-          :color="button[1]"
-          @click="button[3]"
-        />
-        <!-- :size="button[0].charAt(0) == '@' ? '1rem' : '1.2rem'" -->
-      </div>
-    </q-card-section>
-  </template>
+// dom 요소가 언마운트되기 전에 키바인딩 제거
+onBeforeUnmount(() => {
+  keybindingRemoveAtUmount();
+});
 
-  <style scoped lang="scss">
-  .button {
-    border-radius: 0.5rem;
-    min-height: calc((100vh - 142px) / 6 - 20px);
-    max-height: calc((100vh - 142px) / 6 - 20px);
-    font-weight: 700;
-  }
+const props = withDefaults(defineProps<{ type?: string }>(), {
+  type: 'normal',
+});
 
-  #icon {
-    font-size: calc(
-      min(calc((100vh - 142px) / 6 * 0.25), calc((100vw - 40px) / 4 * 0.3)) * 0.9
-    );
-  }
-  #char {
-    font-size: calc(
-      min(calc((100vh - 142px) / 6 * 0.26), calc((100vw - 40px) / 4 * 0.3)) * 1.2
-    );
-  }
-  </style>
+const baseHeight = ref('132px');
+
+
+if (props.type === 'unit') {
+  baseHeight.value = '230px';
+}
+</script>
+
+<template>
+  <q-card-section
+    class="row wrap justify-center q-pt-xs q-pb-none q-px-none"
+    v-blur
+  >
+    <div
+      class="col-3 row wrap justify-center q-pa-sm"
+      v-for="(button, index) in buttons"
+      :key="index"
+    >
+      <q-btn
+        class="glossy shadow-4 noselect col-12 button"
+        no-caps
+        :label="button[0].charAt(0) != '@' ? button[0] : undefined"
+        :icon="button[0].charAt(0) == '@' ? button[0].slice(1) : undefined"
+        :id="button[0].charAt(0) == '@' ? 'icon' : 'char'"
+        :color="button[1]"
+        @click="button[3]"
+      />
+      <!-- :size="button[0].charAt(0) == '@' ? '1rem' : '1.2rem'" -->
+    </div>
+  </q-card-section>
+</template>
+
+<style scoped lang="scss">
+.button {
+  border-radius: 0.5rem;
+  min-height: calc((100vh - v-bind('baseHeight')) / 6 - 20px);
+  max-height: calc((100vh - v-bind('baseHeight')) / 6 - 20px);
+  font-weight: 700;
+}
+
+#icon {
+  font-size: calc(
+    min(
+        calc((100vh - v-bind('baseHeight')) / 6 * 0.25),
+        calc((100vw - 40px) / 4 * 0.3)
+      ) * 0.9
+  );
+}
+#char {
+  font-size: calc(
+    min(
+        calc((100vh - v-bind('baseHeight')) / 6 * 0.26),
+        calc((100vw - 40px) / 4 * 0.3)
+      ) * 1.2
+  );
+}
+</style>
