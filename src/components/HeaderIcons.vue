@@ -3,6 +3,7 @@ import { onMounted, computed } from 'vue';
 import tinykeys, { KeyBindingMap } from 'tinykeys';
 import { copyToClipboard } from 'quasar';
 import { useI18n } from 'vue-i18n';
+import { useRoute } from 'vue-router';
 
 import { useCalcStore } from 'stores/calc-store';
 
@@ -15,6 +16,8 @@ const store = useCalcStore();
 
 // 계산기 오브젝트를 스토어에서 가져오기 위한 변수 선언
 const calc = store.calc;
+
+const route = useRoute();
 
 const result = computed(() => {
   return store.toLocale(Number(calc.getShownNumber()));
@@ -59,6 +62,12 @@ onMounted(() => {
   const shortcuts: Shortcut = [
     [['Control+c', 'Control+Insert', 'Copy'], doCopy],
     [['Control+v', 'Shift+Insert', 'Paste'], doPaste],
+    [
+      ['v'],
+      () => {
+        if (route.path == '/') store.unitPanelToggle();
+      },
+    ],
   ];
 
   // Support keyboard entry
@@ -97,11 +106,13 @@ onMounted(() => {
     flat
     icon="swap_vert"
     class="q-ma-none q-pa-none q-pl-xs"
-    :color="store.unitPanel ? (store.darkMode ? 'brown-2' : 'light-blue-3') : ''"
+    :color="
+      store.unitPanel ? (store.darkMode ? 'brown-2' : 'light-blue-3') : ''
+    "
     :disable="$route.path != '/'"
     @click="store.unitPanelToggle()"
   >
-  <MyTooltip>{{ t('UnitConverter') }}</MyTooltip>
+    <MyTooltip>{{ t('UnitConverter') }}</MyTooltip>
   </q-btn>
 </template>
 

@@ -68,7 +68,7 @@ const preResult = computed(() => {
 </script>
 
 <template>
-  <q-card-section class="col-12 q-px-sm q-pt-lg q-pb-sm">
+  <q-card-section class="col-12 q-px-sm q-pt-md q-pb-sm">
     <q-field
       :model-value="result"
       class="shadow-4 justify-end self-center"
