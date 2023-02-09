@@ -33,7 +33,7 @@
     "build:win32": "quasar build -m electron -T win32"
   },
   "dependencies": {
-    "@quasar/extras": "^1.15.1",
+    "@quasar/extras": "^1.15.10",
     "electron-window-state": "^5.0.3",
     "pinia": "^2.0.11",
     "pinia-plugin-persistedstate": "^1.6.1",
