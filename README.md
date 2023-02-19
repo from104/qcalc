@@ -1,4 +1,4 @@
-A simple calculator made using quasars
+# A simple calculator made using quasars
 
 This is a simple calculator made using the source of the calculator for Android that I made as a graduation assignment in the past. It was made using vue3 (quasar v2), typescript, electron, etc.
 
@@ -8,7 +8,8 @@ This is a simple calculator made using the source of the calculator for Android 
 
 ## function
 
-- Four arithmetic operations and percent calculation
+- Simple arithmetic operations
+- Percent calculation (either as percentage or percentage multiplication)
 - Reciprocal, square, square root calculation
 - Unit conversion function
 - All functions operated with mouse and keyboard.
@@ -28,7 +29,7 @@ This is a simple calculator made using the source of the calculator for Android 
 - +, -, \*, /: addition, subtraction, multiplication, division respectively
 - Enter, =: output the last calculation result
 - s, \_: change sign
-- p, %: Calculate percentage (enter in the order of number, /, number, p (or %))
+- p, %: Calculate percentage (enter in the order of number, /(or \*), number, p (or %))
 - u: square calculation
 - r: square root calculation
 - i: Calculate the reciprocal (1/x)

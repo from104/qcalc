@@ -86,10 +86,14 @@ export const useCalcStore = defineStore('calc', {
         return `${this.toLocale(h.preNumber)} ${br} ${
           h.operator
         } ${this.toLocale(h.argNumber as number)}`;
-      } else if (h.operator == '%') {
-        return `${this.toLocale(h.preNumber)} ${br} ÷ ${this.toLocale(
+      } else if (h.operator == '÷%') { // 퍼센트를 구하는 경우
+        return `(${this.toLocale(h.preNumber)} ÷ ${this.toLocale(
           h.argNumber as number
-        )} ${br} × 100`;
+        )}) ${br} × 100`;
+      } else if (h.operator == '×%') { // 퍼센트로 곱하는 경우
+        return `${this.toLocale(h.preNumber)} ${br} × (${this.toLocale(
+          h.argNumber as number
+        )} ÷ 100)`;
       } else if (h.operator == 'rec') {
         return `1 ${br} ÷ ${this.toLocale(h.preNumber)}`;
       } else if (h.operator == 'pow2') {
