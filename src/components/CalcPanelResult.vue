@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue';
+import { ref, computed, onBeforeMount, onMounted } from 'vue';
 
 import type { History } from 'classes/Calculator';
 
@@ -64,6 +64,17 @@ const preResult = computed(() => {
     return store.toLocale(calc.getBackupNumber());
   }
   return '';
+});
+
+onBeforeMount(() => {
+  window.addEventListener('resize', setNeedResultTooltip);
+  if (store.initPanel) {
+    calc.clear();
+  }
+});
+
+onMounted(() => {
+  setNeedResultTooltip();
 });
 </script>
 

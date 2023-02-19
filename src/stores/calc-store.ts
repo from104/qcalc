@@ -23,6 +23,8 @@ export const useCalcStore = defineStore('calc', {
     // 최근 단위 변환 단위
     recentUnitFrom: {} as { [key: string]: string },
     recentUnitTo: {} as { [key: string]: string },
+    // 시작시 패널 초기화 여부
+    initPanel: false,
   }),
   getters: {},
   actions: {
@@ -51,8 +53,14 @@ export const useCalcStore = defineStore('calc', {
       this.alwaysOnTop = alwaysOnTop;
       window.myAPI.setAlwaysOnTop(this.alwaysOnTop);
     },
+    setInitPanel(initPanel: boolean) {
+      this.initPanel = initPanel;
+    },
     toggleAlwaysOnTop() {
       this.setAlwaysOnTop(!this.alwaysOnTop);
+    },
+    toggleInitPanel() {
+      this.setInitPanel(!this.initPanel);
     },
     toggleUseGrouping() {
       this.useGrouping = !this.useGrouping;

@@ -15,6 +15,7 @@ This is a simple calculator made using the source of the calculator for Android 
 - All functions operated with mouse and keyboard.
 - Copy and paste calculation results, etc.
 - Toggle window always on top
+- Choose whether to initialize the panel at startup
 - Thousand comma display
 - Fixed digits below the decimal point (no limit to 6 digits)
 - Records calculation results (up to 20)
@@ -48,7 +49,8 @@ This is a simple calculator made using the source of the calculator for Android 
 - F2: open calculator
 - F3: Open app info
 - t: toggle always on top function
--k: dark mode toggle
+- n: Toggle panel initialization on startup
+- k: dark mode toggle
 - ,: Thousands, display
 - [, ]: Decimal point fixed adjustment (no limit to 6 digits)
 
