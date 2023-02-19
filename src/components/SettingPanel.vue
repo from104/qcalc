@@ -56,7 +56,7 @@ onMounted(() => {
 
   const shortcuts: Shortcut = [
     [['t'], toggleAlwaysOnTopWithNotify],
-
+    [['n'], store.toggleInitPanel],
     [['k'], store.toggleDarkMode],
     [[','], store.toggleUseGrouping],
     [['['], store.decDecimalPlaces],
@@ -103,6 +103,18 @@ onBeforeMount(() => {
         v-model="store.alwaysOnTop"
         :color="store.getDarkColor('primary')"
         @click="store.setAlwaysOnTop(store.alwaysOnTop)"
+        keep-color
+        dense
+      />
+    </q-item>
+
+    <q-item class="q-py-none" v-if="$q.platform.is.electron">
+      <q-item-label class="self-center">{{ t('initPanel') }} (N)</q-item-label>
+      <q-space />
+      <q-toggle
+        v-model="store.initPanel"
+        :color="store.getDarkColor('primary')"
+        @click="store.setInitPanel(store.initPanel)"
         keep-color
         dense
       />
@@ -221,6 +233,7 @@ ko:
   alwaysOnTop: '항상 위'
   alwaysOnTopOn: '항상 위 켜짐'
   alwaysOnTopOff: '항상 위 꺼짐'
+  initPanel: '시작 시 패널 초기화'
   darkMode: '다크 모드'
   useGrouping: '천단위 표시'
   decimalPlaces: '소수점'
@@ -233,6 +246,7 @@ en:
   alwaysOnTop: 'Always on top'
   alwaysOnTopOn: 'Always on top ON'
   alwaysOnTopOff: 'Always on top OFF'
+  initPanel: 'Init panel at startup'
   darkMode: 'Dark mode'
   useGrouping: 'Use grouping'
   decimalPlaces: 'Decimal'

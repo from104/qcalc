@@ -310,28 +310,39 @@ export class Calculator {
   }
 
   // 연산자 문자열로 얻기
-  public getOperatorString(
-    operator: Operator = this.mOperator
-  ): string | undefined {
-    return Object.keys(operatorMap).find(
-      (key) => operatorMap[key] === operator
+  public getOperatorString(operator: Operator = this.mOperator): string {
+    return (
+      Object.keys(operatorMap).find((key) => operatorMap[key] === operator) ||
+      ''
     );
   }
 
-  // % 버튼 처리
+  // % 처리
+  // 나누기와 곱하기만 처리
+  // 나누기면 퍼센트를 구하기
+  // 곱하기면 퍼센트로 곱하기
   public percent(): void {
-    if (this.mOperator == Operator.Div) {
-      // 전 연산자가 나누기였다면
-      this.preCalc(); // 계산한 결과에
-      const { preNumber, argNumber } = this.history.shift() as History;
+    if (this.mOperator == Operator.Div || this.mOperator == Operator.Mul) {
+      this.preCalc(); // 사전 계산
+
+      const { preNumber, argNumber } = this.history.shift() as History; // 계산 결과를 빼냄
+      const operator =
+        this.getOperatorString() + this.getOperatorString(Operator.Percent); // 연산자를 %로
+      const resultNumber =
+        this.mOperator == Operator.Div
+          ? this.backupNumber * 100
+          : this.backupNumber / 100; // 나누기면 곱하기 100, 곱하기면 나누기 100
+
       this.backupNumber = this.addHistory({
         preNumber: preNumber,
-        operator: this.getOperatorString(Operator.Percent) as string,
+        operator: operator,
         argNumber: argNumber,
-        resultNumber: this.backupNumber * 100, // 100을 곱하여 퍼센트를 계산
+        resultNumber: resultNumber,
       });
+
       this.numberToShown();
     }
+
     this.repeatNumber = 0;
     this.willReset = true;
   }

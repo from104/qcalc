@@ -23,6 +23,8 @@ export const useCalcStore = defineStore('calc', {
     // 최근 단위 변환 단위
     recentUnitFrom: {} as { [key: string]: string },
     recentUnitTo: {} as { [key: string]: string },
+    // 시작시 패널 초기화 여부
+    initPanel: false,
   }),
   getters: {},
   actions: {
@@ -51,8 +53,14 @@ export const useCalcStore = defineStore('calc', {
       this.alwaysOnTop = alwaysOnTop;
       window.myAPI.setAlwaysOnTop(this.alwaysOnTop);
     },
+    setInitPanel(initPanel: boolean) {
+      this.initPanel = initPanel;
+    },
     toggleAlwaysOnTop() {
       this.setAlwaysOnTop(!this.alwaysOnTop);
+    },
+    toggleInitPanel() {
+      this.setInitPanel(!this.initPanel);
     },
     toggleUseGrouping() {
       this.useGrouping = !this.useGrouping;
@@ -86,10 +94,14 @@ export const useCalcStore = defineStore('calc', {
         return `${this.toLocale(h.preNumber)} ${br} ${
           h.operator
         } ${this.toLocale(h.argNumber as number)}`;
-      } else if (h.operator == '%') {
-        return `${this.toLocale(h.preNumber)} ${br} ÷ ${this.toLocale(
+      } else if (h.operator == '÷%') { // 퍼센트를 구하는 경우
+        return `(${this.toLocale(h.preNumber)} ÷ ${this.toLocale(
           h.argNumber as number
-        )} ${br} × 100`;
+        )}) ${br} × 100`;
+      } else if (h.operator == '×%') { // 퍼센트로 곱하는 경우
+        return `${this.toLocale(h.preNumber)} ${br} × (${this.toLocale(
+          h.argNumber as number
+        )} ÷ 100)`;
       } else if (h.operator == 'rec') {
         return `1 ${br} ÷ ${this.toLocale(h.preNumber)}`;
       } else if (h.operator == 'pow2') {

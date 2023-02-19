@@ -1,17 +1,17 @@
 # qcalc of TODO.md
 
-이 문서는 qcalc (Quasar Calculator)의 TODO.md 입니다.
+이 문서는 qcalc (Q Calc)의 TODO.md 입니다.
 
 포맷을 이해하려면 이 파일의 원래 내용을 보세요.
 
-### Todo
+## Todo
 
 - [ ] 프로그래머 계산기
 - [ ] 통화 변환 계산기
 
-### In Progress
+## In Progress
 
-### Done ✓
+## Done ✓
 
 - [ ] 다크모드 추가
 - [ ] 설정 패널 만들기
