@@ -1,6 +1,0 @@
---2023-07-18 00:35:45--  http://api.exchangeratesapi.io/v1/lastes?access_key=a761d5c309cf3d8f67106700be92c857&base=USD
-api.exchangeratesapi.io (api.exchangeratesapi.io) 해석 중... 104.26.8.91, 104.26.9.91, 172.67.74.213, ...
-다음으로 연결 중: api.exchangeratesapi.io (api.exchangeratesapi.io)|104.26.8.91|:80... 연결했습니다.
-HTTP 요청을 보냈습니다. 응답 기다리는 중... 400 Bad Request
-2023-07-18 00:35:45 오류 400: Bad Request.
-
