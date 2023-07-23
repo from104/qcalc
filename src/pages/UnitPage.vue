@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import UnitPanelResult from 'src/components/UnitPanelResult.vue.js';
+import UnitPanelResult from 'components/UnitPanelResult.vue';
 import CalcButton from 'components/CalcButton.vue';
 import CalcHistory from 'components/CalcHistory.vue';
 </script>
