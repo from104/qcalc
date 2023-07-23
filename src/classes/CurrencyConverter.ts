@@ -265,6 +265,7 @@ class ExchangeRatesAPI {
       );
       // 환율 정보를 반환합니다.
       return response.data.rates;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
       // console.error(error.response.data); // 에러 응답의 내용을 출력합니다.
       return error.response.data;
@@ -273,7 +274,7 @@ class ExchangeRatesAPI {
 }
 
 // 환율 정보를 사용하는 클래스
-class ConverterCurrency {
+class CurrencyConverter {
   private api = new ExchangeRatesAPI(); // 환율 정보를 가져오는 API
   private updatedTimeOfRates = 0; // 환율 정보를 업데이트한 시간
   private baseRates: Rates = {}; // 기본 환율 정보 (EUR)
@@ -413,11 +414,12 @@ class ConverterCurrency {
   }
 }
 
-export default ConverterCurrency;
+// export default CurrencyConverter;
+export { CurrencyConverter };
 
 // (async () => {
 //   // 지연 전에 실행할 코드
-//   const converter =  new ConverterCurrency();
+//   const converter =  new CurrencyConverter();
 //   await converter.updateRates();
 
 //   // 지연 후에 실행할 코드

@@ -3,6 +3,7 @@ import { Dark } from 'quasar';
 import { Notify } from 'quasar';
 import { Calculator } from 'classes/Calculator';
 import type { History } from 'classes/Calculator';
+import { CurrencyConverter } from 'classes/CurrencyConverter';
 
 export const useCalcStore = defineStore('calc', {
   state: () => ({
@@ -25,6 +26,8 @@ export const useCalcStore = defineStore('calc', {
     recentUnitTo: {} as { [key: string]: string },
     // 시작시 패널 초기화 여부
     initPanel: false,
+    // 환율 계산기
+    currencyConverter: new CurrencyConverter(),
   }),
   getters: {},
   actions: {
