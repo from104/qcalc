@@ -41,7 +41,7 @@
     "tinykeys": "^1.4.0",
     "vue": "^3.0.0",
     "vue-i18n": "9.2.2",
-    "vue-router": "^4.0.0"
+    "vue-router": "^4.2.2"
   },
   "devDependencies": {
     "@intlify/vite-plugin-vue-i18n": "6.0.1",
