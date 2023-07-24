@@ -36,8 +36,7 @@ This is a simple calculator made using the source of the calculator for Android 
 - i: Calculate the reciprocal (1/x)
 - Backspace: Erase each Korean character
 - Escape, Delete, c: Reset calculator
-- v: open units conversion panel
-- Shift-v: Reverse unit target.
+- v: Reverse unit target.
 - h: open calculation result record (up to 20)
 - d: clear calculation result record
 
@@ -47,7 +46,8 @@ This is a simple calculator made using the source of the calculator for Android 
 - e: open and close right settings
 - F1: Open Help
 - F2: open calculator
-- F3: Open app info
+- F3: Open unit converter
+- F5: Open app info
 - t: toggle always on top function
 - n: Toggle panel initialization on startup
 - k: dark mode toggle

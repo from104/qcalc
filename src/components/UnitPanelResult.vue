@@ -131,7 +131,7 @@ onMounted(() => {
   type Shortcut = [string[], () => void][];
 
   const shortcuts: Shortcut = [
-    [['Shift+v'], () => (store.unitPanel ? swapUnitValue() : null)],
+    [['v'], () => swapUnitValue()],
   ];
 
   // Support keyboard entry

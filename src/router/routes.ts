@@ -5,7 +5,10 @@ const routes: RouteRecordRaw[] = [
     path: '/',
     component: () => import('layouts/MainLayout.vue'),
     children: [
-      { path: '', component: () => import('pages/CalcPage.vue') },
+      { path: '', redirect: '/calc' },
+      { path: '/calc', component: () => import('pages/CalcPage.vue') },
+      { path: '/unit', component: () => import('pages/UnitPage.vue') },
+      { path: '/currency', component: () => import('pages/CurrencyPage.vue') },
       { path: '/help', component: () => import('pages/HelpPage.vue') },
       { path: '/about', component: () => import('pages/AboutPage.vue') },
     ],

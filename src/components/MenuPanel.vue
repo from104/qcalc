@@ -38,12 +38,19 @@ const paths: {[key: string]: Path} = reactive({
     caption: t('path.calc.caption'),
     shortcut: 'F2',
     icon: 'calculate',
-    path: '/',
+    path: '/calc',
+  },
+  unit: {
+    title: t('path.unit.title'),
+    caption: t('path.unit.caption'),
+    shortcut: 'F3',
+    icon: 'swap_vert',
+    path: '/unit',
   },
   about: {
     title: t('path.about.title'),
     caption: t('path.about.caption'),
-    shortcut: 'F3',
+    shortcut: 'F5',
     icon: 'info',
     path: '/about',
   },
@@ -63,8 +70,9 @@ onMounted(() => {
 
   const shortcuts: Shortcut = [
     [['F1', '?'], () => router.push({ path: '/help' })],
-    [['F2'], () => router.push({ path: '/' })],
-    [['F3'], () => router.push({ path: '/about' })],
+    [['F2'], () => router.push({ path: '/calc' })],
+    [['F3'], () => router.push({ path: '/unit' })],
+    [['F5'], () => router.push({ path: '/about' })],
   ];
 
   shortcuts.forEach((shortcut) => {
@@ -97,7 +105,6 @@ onMounted(() => {
 
 <i18n>
 ko:
-  ttt: '티티티'
   path:
     help:
       title: '도움말'
@@ -105,11 +112,13 @@ ko:
     calc:
       title: '계산기'
       caption: '퀘이사 계산기'
+    unit:
+      title: '단위 변환'
+      caption: '단위 변환 계산기'
     about:
       title: '소개'
       caption: '앱에 대한 소개'
 en:
-  ttt: 'TTT'
   path:
     help:
       title: 'Help'
@@ -117,6 +126,9 @@ en:
     calc:
       title: 'Calculator'
       caption: 'Quasar Calculator'
+    unit:
+      title: 'Unit Conversion'
+      caption: 'Unit Conversion Calculator'
     about:
       title: 'About'
       caption: 'About the app'

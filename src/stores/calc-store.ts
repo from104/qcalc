@@ -17,8 +17,6 @@ export const useCalcStore = defineStore('calc', {
     locale: '',
     // 사용자 로케일
     userLocale: '',
-    // 단위 변환 패널 열림 여부
-    unitPanel: false,
     // 최근 단위 변환 범주
     recentCategory: '',
     // 최근 단위 변환 단위
@@ -138,9 +136,6 @@ export const useCalcStore = defineStore('calc', {
         timeout: timeout,
         color: 'negative',
       });
-    },
-    unitPanelToggle() {
-      this.unitPanel = !this.unitPanel;
     },
   },
   persist: true,
