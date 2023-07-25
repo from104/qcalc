@@ -46,7 +46,7 @@ let keybindingRemoveAtUmount = tinykeys(window, {} as KeyBindingMap);
 
 // dom 요소가 마운트 되었을 때 계산기 키바인딩 설정하기
 onMounted(() => {
-  // Support keyboard entry
+  // 키바인딩 맵 생성
   const keyBindingMaps: KeyBindingMap = {};
 
   buttons.forEach((button) => {
@@ -65,14 +65,16 @@ onBeforeUnmount(() => {
   keybindingRemoveAtUmount();
 });
 
+// props의 기본값 설정
 const props = withDefaults(defineProps<{ type?: string }>(), {
   type: 'normal',
 });
 
+// 계산기 버튼의 높이를 계산하기 위한 변수 선언
 const baseHeight = ref('132px');
 
-
-if (props.type === 'unit') {
+// 계산기 타입에 따라 버튼 높이를 다르게 설정
+if (props.type === 'unit' || props.type === 'currency') {
   baseHeight.value = '230px';
 }
 </script>

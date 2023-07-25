@@ -26,6 +26,9 @@ export const useCalcStore = defineStore('calc', {
     initPanel: false,
     // 환율 계산기
     currencyConverter: new CurrencyConverter(),
+    // 환율 계산기 - 최근 '환율 계산' 탭에서 선택한 통화
+    recentCurrencyFrom: '',
+    recentCurrencyTo: '',
   }),
   getters: {},
   actions: {
@@ -91,11 +94,11 @@ export const useCalcStore = defineStore('calc', {
     // 계산 결과 중 좌변
     getLeftSideInHistory(h: History, lf = false) {
       const br = lf ? '<br />' : '';
-      if (['+', '-', '×', '÷'].includes(h.operator)) {
+      if (['+', '-', '×', '÷'].includes(h.operator)) { // 사칙연산
         return `${this.toLocale(h.preNumber)} ${br} ${
           h.operator
         } ${this.toLocale(h.argNumber as number)}`;
-      } else if (h.operator == '÷%') { // 퍼센트를 구하는 경우
+      } else if (h.operator == '÷%') { // 퍼센트로 나누는 경우
         return `(${this.toLocale(h.preNumber)} ÷ ${this.toLocale(
           h.argNumber as number
         )}) ${br} × 100`;
@@ -103,15 +106,15 @@ export const useCalcStore = defineStore('calc', {
         return `${this.toLocale(h.preNumber)} ${br} × (${this.toLocale(
           h.argNumber as number
         )} ÷ 100)`;
-      } else if (h.operator == 'rec') {
+      } else if (h.operator == 'rec') { // 역수
         return `1 ${br} ÷ ${this.toLocale(h.preNumber)}`;
-      } else if (h.operator == 'pow2') {
+      } else if (h.operator == 'pow2') { // 제곱
         return `${this.toLocale(h.preNumber)} ${br} × ${this.toLocale(
           h.preNumber
         )}`;
-      } else if (['sqrt'].includes(h.operator)) {
+      } else if (['sqrt'].includes(h.operator)) { // 제곱근
         return `${h.operator} ( ${this.toLocale(h.preNumber)} )`;
-      } else {
+      } else { // 그 외
         return this.toLocale(h.preNumber);
       }
     },

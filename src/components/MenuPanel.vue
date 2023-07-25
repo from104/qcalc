@@ -47,6 +47,13 @@ const paths: {[key: string]: Path} = reactive({
     icon: 'swap_vert',
     path: '/unit',
   },
+  currency: {
+    title: t('path.currency.title'),
+    caption: t('path.currency.caption'),
+    shortcut: 'F4',
+    icon: 'currency_exchange',
+    path: '/currency',
+  },
   about: {
     title: t('path.about.title'),
     caption: t('path.about.caption'),
@@ -72,6 +79,7 @@ onMounted(() => {
     [['F1', '?'], () => router.push({ path: '/help' })],
     [['F2'], () => router.push({ path: '/calc' })],
     [['F3'], () => router.push({ path: '/unit' })],
+    [['F4'], () => router.push({ path: '/currency' })],
     [['F5'], () => router.push({ path: '/about' })],
   ];
 
@@ -115,6 +123,9 @@ ko:
     unit:
       title: '단위 변환'
       caption: '단위 변환 계산기'
+    currency:
+      title: '환율 변환'
+      caption: '환율 변환 계산기'
     about:
       title: '소개'
       caption: '앱에 대한 소개'
@@ -129,6 +140,9 @@ en:
     unit:
       title: 'Unit Conversion'
       caption: 'Unit Conversion Calculator'
+    currency:
+      title: 'Currency Conversion'
+      caption: 'Currency Conversion Calculator'
     about:
       title: 'About'
       caption: 'About the app'
