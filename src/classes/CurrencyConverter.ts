@@ -3,9 +3,8 @@ import axios from 'axios';
 // 환율 정보를 저장하는 인터페이스
 interface Currency {
   [currency: string]: {
-    name: string;
+    desc: string;
     symbol: string;
-    country: string;
   };
 }
 
@@ -19,235 +18,176 @@ type CurrencyData = Currency;
 
 // 환율에 대한 기본 데이터
 const currencyBaseData: CurrencyData = {
-  USD: { name: 'United States Dollar', symbol: '$', country: 'United States' },
-  KRW: { name: 'South Korean Won', symbol: '₩', country: 'South Korea' },
-  EUR: { name: 'Euro', symbol: '€', country: 'European Union' },
-  GBP: {
-    name: 'British Pound Sterling',
-    symbol: '£',
-    country: 'United Kingdom',
-  },
-  JPY: { name: 'Japanese Yen', symbol: '¥', country: 'Japan' },
-  CNY: { name: 'Chinese Yuan', symbol: '¥', country: 'China' },
-  AED: {
-    name: 'United Arab Emirates Dirham',
-    symbol: 'د.إ',
-    country: 'United Arab Emirates',
-  },
-  AFN: { name: 'Afghan Afghani', symbol: '؋', country: 'Afghanistan' },
-  ALL: { name: 'Albanian Lek', symbol: 'L', country: 'Albania' },
-  AMD: { name: 'Armenian Dram', symbol: '֏', country: 'Armenia' },
-  ANG: {
-    name: 'Netherlands Antillean Guilder',
-    symbol: 'ƒ',
-    country: 'Curaçao and Sint Maarten',
-  },
-  AOA: { name: 'Angolan Kwanza', symbol: 'Kz', country: 'Angola' },
-  ARS: { name: 'Argentine Peso', symbol: '$', country: 'Argentina' },
-  AWG: { name: 'Aruban Florin', symbol: 'ƒ', country: 'Aruba' },
-  AZN: { name: 'Azerbaijani Manat', symbol: '₼', country: 'Azerbaijan' },
-  BAM: {
-    name: 'Bosnia-Herzegovina Convertible Mark',
-    symbol: 'KM',
-    country: 'Bosnia and Herzegovina',
-  },
-  BBD: { name: 'Barbadian Dollar', symbol: 'Bds$', country: 'Barbados' },
-  BDT: { name: 'Bangladeshi Taka', symbol: '৳', country: 'Bangladesh' },
-  BGN: { name: 'Bulgarian Lev', symbol: 'лв', country: 'Bulgaria' },
-  BHD: { name: 'Bahraini Dinar', symbol: 'ب.د', country: 'Bahrain' },
-  BIF: { name: 'Burundian Franc', symbol: 'FBu', country: 'Burundi' },
-  BMD: { name: 'Bermudan Dollar', symbol: 'BD$', country: 'Bermuda' },
-  BND: { name: 'Brunei Dollar', symbol: 'B$', country: 'Brunei' },
-  BOB: { name: 'Bolivian Boliviano', symbol: 'Bs', country: 'Bolivia' },
-  BRL: { name: 'Brazilian Real', symbol: 'R$', country: 'Brazil' },
-  BSD: { name: 'Bahamian Dollar', symbol: 'B$', country: 'Bahamas' },
-  BTC: { name: 'Bitcoin', symbol: '₿', country: 'Virtual Currency' },
-  BTN: { name: 'Bhutanese Ngultrum', symbol: 'Nu.', country: 'Bhutan' },
-  BWP: { name: 'Botswanan Pula', symbol: 'P', country: 'Botswana' },
-  BYN: { name: 'New Belarusian Ruble', symbol: 'Br', country: 'Belarus' },
-  BYR: { name: 'Belarusian Ruble', symbol: 'Br', country: 'Belarus' },
-  BZD: { name: 'Belize Dollar', symbol: 'BZ$', country: 'Belize' },
-  CDF: {
-    name: 'Congolese Franc',
-    symbol: 'FC',
-    country: 'Democratic Republic of the Congo',
-  },
-  CLF: { name: 'Chilean Unit of Account (UF)', symbol: 'UF', country: 'Chile' },
-  CLP: { name: 'Chilean Peso', symbol: '$', country: 'Chile' },
-  COP: { name: 'Colombian Peso', symbol: 'COL$', country: 'Colombia' },
-  CRC: { name: 'Costa Rican Colón', symbol: '₡', country: 'Costa Rica' },
-  CUC: { name: 'Cuban Convertible Peso', symbol: '$', country: 'Cuba' },
-  CUP: { name: 'Cuban Peso', symbol: '₱', country: 'Cuba' },
-  CVE: { name: 'Cape Verdean Escudo', symbol: 'Esc', country: 'Cape Verde' },
-  CZK: {
-    name: 'Czech Republic Koruna',
-    symbol: 'Kč',
-    country: 'Czech Republic',
-  },
-  DJF: { name: 'Djiboutian Franc', symbol: 'Fdj', country: 'Djibouti' },
-  DKK: { name: 'Danish Krone', symbol: 'kr', country: 'Denmark' },
-  DOP: { name: 'Dominican Peso', symbol: 'RD$', country: 'Dominican Republic' },
-  DZD: { name: 'Algerian Dinar', symbol: 'د.ج', country: 'Algeria' },
-  EGP: { name: 'Egyptian Pound', symbol: '£', country: 'Egypt' },
-  ERN: { name: 'Eritrean Nakfa', symbol: 'Nfk', country: 'Eritrea' },
-  ETB: { name: 'Ethiopian Birr', symbol: 'Br', country: 'Ethiopia' },
-  FJD: { name: 'Fijian Dollar', symbol: 'FJ$', country: 'Fiji' },
-  FKP: {
-    name: 'Falkland Islands Pound',
-    symbol: '£',
-    country: 'Falkland Islands',
-  },
-  GEL: { name: 'Georgian Lari', symbol: '₾', country: 'Georgia' },
-  GHS: { name: 'Ghanaian Cedi', symbol: 'GH₵', country: 'Ghana' },
-  GIP: { name: 'Gibraltar Pound', symbol: '£', country: 'Gibraltar' },
-  GMD: { name: 'Gambian Dalasi', symbol: 'D', country: 'Gambia' },
-  GNF: { name: 'Guinean Franc', symbol: 'FG', country: 'Guinea' },
-  GTQ: { name: 'Guatemalan Quetzal', symbol: 'Q', country: 'Guatemala' },
-  GYD: { name: 'Guyanaese Dollar', symbol: 'GY$', country: 'Guyana' },
-  HKD: { name: 'Hong Kong Dollar', symbol: 'HK$', country: 'Hong Kong' },
-  HNL: { name: 'Honduran Lempira', symbol: 'L', country: 'Honduras' },
-  HRK: { name: 'Croatian Kuna', symbol: 'kn', country: 'Croatia' },
-  HTG: { name: 'Haitian Gourde', symbol: 'G', country: 'Haiti' },
-  HUF: { name: 'Hungarian Forint', symbol: 'Ft', country: 'Hungary' },
-  IDR: { name: 'Indonesian Rupiah', symbol: 'Rp', country: 'Indonesia' },
-  ILS: { name: 'Israeli New Sheqel', symbol: '₪', country: 'Israel' },
-  IMP: { name: 'Manx Pound', symbol: '£', country: 'Isle of Man' },
-  IQD: { name: 'Iraqi Dinar', symbol: 'ع.د', country: 'Iraq' },
-  IRR: { name: 'Iranian Rial', symbol: '﷼', country: 'Iran' },
-  ISK: { name: 'Icelandic Króna', symbol: 'kr', country: 'Iceland' },
-  JEP: { name: 'Jersey Pound', symbol: '£', country: 'Jersey' },
-  JMD: { name: 'Jamaican Dollar', symbol: 'J$', country: 'Jamaica' },
-  JOD: { name: 'Jordanian Dinar', symbol: 'د.ا', country: 'Jordan' },
-  KES: { name: 'Kenyan Shilling', symbol: 'KSh', country: 'Kenya' },
-  KGS: { name: 'Kyrgystani Som', symbol: 'с', country: 'Kyrgyzstan' },
-  KHR: { name: 'Cambodian Riel', symbol: '៛', country: 'Cambodia' },
-  KMF: { name: 'Comorian Franc', symbol: 'CF', country: 'Comoros' },
-  KPW: { name: 'North Korean Won', symbol: '₩', country: 'North Korea' },
-  KWD: { name: 'Kuwaiti Dinar', symbol: 'د.ك', country: 'Kuwait' },
-  KYD: {
-    name: 'Cayman Islands Dollar',
-    symbol: 'CI$',
-    country: 'Cayman Islands',
-  },
-  KZT: { name: 'Kazakhstani Tenge', symbol: '₸', country: 'Kazakhstan' },
-  LAK: { name: 'Laotian Kip', symbol: '₭', country: 'Laos' },
-  LBP: { name: 'Lebanese Pound', symbol: 'ل.ل', country: 'Lebanon' },
-  LKR: { name: 'Sri Lankan Rupee', symbol: '₨', country: 'Sri Lanka' },
-  LRD: { name: 'Liberian Dollar', symbol: 'L$', country: 'Liberia' },
-  LSL: { name: 'Lesotho Loti', symbol: 'L', country: 'Lesotho' },
-  LTL: { name: 'Lithuanian Litas', symbol: 'Lt', country: 'Lithuania' },
-  LVL: { name: 'Latvian Lats', symbol: 'Ls', country: 'Latvia' },
-  LYD: { name: 'Libyan Dinar', symbol: 'ل.د', country: 'Libya' },
-  MAD: { name: 'Moroccan Dirham', symbol: 'د.م.', country: 'Morocco' },
-  MDL: { name: 'Moldovan Leu', symbol: 'L', country: 'Moldova' },
-  MGA: { name: 'Malagasy Ariary', symbol: 'Ar', country: 'Madagascar' },
-  MKD: { name: 'Macedonian Denar', symbol: 'ден', country: 'North Macedonia' },
-  MMK: { name: 'Myanma Kyat', symbol: 'K', country: 'Myanmar' },
-  MNT: { name: 'Mongolian Tugrik', symbol: '₮', country: 'Mongolia' },
-  MOP: { name: 'Macanese Pataca', symbol: 'MOP$', country: 'Macau' },
-  MRO: { name: 'Mauritanian Ouguiya', symbol: 'UM', country: 'Mauritania' },
-  MUR: { name: 'Mauritian Rupee', symbol: '₨', country: 'Mauritius' },
-  MVR: { name: 'Maldivian Rufiyaa', symbol: 'Rf', country: 'Maldives' },
-  MWK: { name: 'Malawian Kwacha', symbol: 'MK', country: 'Malawi' },
-  MXN: { name: 'Mexican Peso', symbol: 'MX$', country: 'Mexico' },
-  MYR: { name: 'Malaysian Ringgit', symbol: 'RM', country: 'Malaysia' },
-  MZN: { name: 'Mozambican Metical', symbol: 'MT', country: 'Mozambique' },
-  NAD: { name: 'Namibian Dollar', symbol: 'N$', country: 'Namibia' },
-  NGN: { name: 'Nigerian Naira', symbol: '₦', country: 'Nigeria' },
-  NIO: { name: 'Nicaraguan Córdoba', symbol: 'C$', country: 'Nicaragua' },
-  NOK: { name: 'Norwegian Krone', symbol: 'kr', country: 'Norway' },
-  NPR: { name: 'Nepalese Rupee', symbol: '₨', country: 'Nepal' },
-  NZD: { name: 'New Zealand Dollar', symbol: 'NZ$', country: 'New Zealand' },
-  OMR: { name: 'Omani Rial', symbol: 'ر.ع.', country: 'Oman' },
-  PAB: { name: 'Panamanian Balboa', symbol: 'B/.', country: 'Panama' },
-  PEN: { name: 'Peruvian Nuevo Sol', symbol: 'S/.', country: 'Peru' },
-  PGK: {
-    name: 'Papua New Guinean Kina',
-    symbol: 'K',
-    country: 'Papua New Guinea',
-  },
-  PHP: { name: 'Philippine Peso', symbol: '₱', country: 'Philippines' },
-  PKR: { name: 'Pakistani Rupee', symbol: '₨', country: 'Pakistan' },
-  PLN: { name: 'Polish Zloty', symbol: 'zł', country: 'Poland' },
-  PYG: { name: 'Paraguayan Guarani', symbol: '₲', country: 'Paraguay' },
-  QAR: { name: 'Qatari Rial', symbol: '﷼', country: 'Qatar' },
-  RON: { name: 'Romanian Leu', symbol: 'lei', country: 'Romania' },
-  RSD: { name: 'Serbian Dinar', symbol: 'дин.', country: 'Serbia' },
-  RUB: { name: 'Russian Ruble', symbol: '₽', country: 'Russia' },
-  RWF: { name: 'Rwandan Franc', symbol: 'FRw', country: 'Rwanda' },
-  SAR: { name: 'Saudi Riyal', symbol: '﷼', country: 'Saudi Arabia' },
-  SBD: {
-    name: 'Solomon Islands Dollar',
-    symbol: 'SI$',
-    country: 'Solomon Islands',
-  },
-  SCR: { name: 'Seychellois Rupee', symbol: '₨', country: 'Seychelles' },
-  SDG: { name: 'Sudanese Pound', symbol: 'ج.س.', country: 'Sudan' },
-  SEK: { name: 'Swedish Krona', symbol: 'kr', country: 'Sweden' },
-  SGD: { name: 'Singapore Dollar', symbol: 'S$', country: 'Singapore' },
-  SHP: { name: 'Saint Helena Pound', symbol: '£', country: 'Saint Helena' },
-  SLE: { name: 'Sierra Leonean Leone', symbol: 'Le', country: 'Sierra Leone' },
-  SLL: { name: 'Sierra Leonean Leone', symbol: 'Le', country: 'Sierra Leone' },
-  SOS: { name: 'Somali Shilling', symbol: 'S', country: 'Somalia' },
-  SRD: { name: 'Surinamese Dollar', symbol: 'SR$', country: 'Suriname' },
-  STD: {
-    name: 'São Tomé and Príncipe Dobra',
-    symbol: 'Db',
-    country: 'São Tomé and Príncipe',
-  },
-  SVC: { name: 'Salvadoran Colón', symbol: '$', country: 'El Salvador' },
-  SYP: { name: 'Syrian Pound', symbol: '£', country: 'Syria' },
-  SZL: { name: 'Swazi Lilangeni', symbol: 'E', country: 'Eswatini' },
-  THB: { name: 'Thai Baht', symbol: '฿', country: 'Thailand' },
-  TJS: { name: 'Tajikistani Somoni', symbol: 'TJS', country: 'Tajikistan' },
-  TMT: { name: 'Turkmenistani Manat', symbol: 'TMT', country: 'Turkmenistan' },
-  TND: { name: 'Tunisian Dinar', symbol: 'TND', country: 'Tunisia' },
-  TOP: { name: 'Tongan Paʻanga', symbol: 'TOP', country: 'Tonga' },
-  TRY: { name: 'Turkish Lira', symbol: 'TRY', country: 'Turkey' },
-  TTD: {
-    name: 'Trinidad and Tobago Dollar',
-    symbol: 'TT$',
-    country: 'Trinidad and Tobago',
-  },
-  TWD: { name: 'New Taiwan Dollar', symbol: 'NT$', country: 'Taiwan' },
-  TZS: { name: 'Tanzanian Shilling', symbol: 'TZS', country: 'Tanzania' },
-  UAH: { name: 'Ukrainian Hryvnia', symbol: '₴', country: 'Ukraine' },
-  UGX: { name: 'Ugandan Shilling', symbol: 'UGX', country: 'Uganda' },
-  UYU: { name: 'Uruguayan Peso', symbol: 'UY$', country: 'Uruguay' },
-  UZS: { name: 'Uzbekistan Som', symbol: 'UZS', country: 'Uzbekistan' },
-  VEF: {
-    name: 'Venezuelan Bolívar Fuerte',
-    symbol: 'VEF',
-    country: 'Venezuela',
-  },
-  VES: { name: 'Sovereign Bolivar', symbol: 'VES', country: 'Venezuela' },
-  VND: { name: 'Vietnamese Dong', symbol: '₫', country: 'Vietnam' },
-  VUV: { name: 'Vanuatu Vatu', symbol: 'Vt', country: 'Vanuatu' },
-  WST: { name: 'Samoan Tala', symbol: 'WS$', country: 'Samoa' },
-  XAF: {
-    name: 'CFA Franc BEAC',
-    symbol: 'FCFA',
-    country: 'Central African CFA',
-  },
-  XAG: { name: 'Silver (troy ounce)', symbol: 'XAG', country: 'N/A' },
-  XAU: { name: 'Gold (troy ounce)', symbol: 'XAU', country: 'N/A' },
-  XCD: {
-    name: 'East Caribbean Dollar',
-    symbol: 'EC$',
-    country: 'Eastern Caribbean',
-  },
-  XDR: {
-    name: 'Special Drawing Rights',
-    symbol: 'SDR',
-    country: 'International Monetary Fund',
-  },
-  XOF: { name: 'CFA Franc BCEAO', symbol: 'CFA', country: 'West African CFA' },
-  XPF: { name: 'CFP Franc', symbol: 'CFPF', country: 'French Polynesia' },
-  YER: { name: 'Yemeni Rial', symbol: '﷼', country: 'Yemen' },
-  ZAR: { name: 'South African Rand', symbol: 'R', country: 'South Africa' },
-  ZMK: { name: 'Zambian Kwacha (pre-2013)', symbol: 'ZMK', country: 'Zambia' },
-  ZMW: { name: 'Zambian Kwacha', symbol: 'ZMW', country: 'Zambia' },
-  ZWL: { name: 'Zimbabwean Dollar', symbol: 'ZWL', country: 'Zimbabwe' },
+  EUR: { desc: 'Euro', symbol: '€' },
+  USD: { desc: 'United States Dollar', symbol: '$' },
+  KRW: { desc: 'South Korean Won', symbol: '₩' },
+  GBP: { desc: 'British Pound Sterling', symbol: '£' },
+  JPY: { desc: 'Japanese Yen', symbol: '¥' },
+  CNY: { desc: 'Chinese Yuan', symbol: '¥' },
+  AED: { desc: 'United Arab Emirates Dirham', symbol: 'د.إ' },
+  AFN: { desc: 'Afghan Afghani', symbol: '؋' },
+  ALL: { desc: 'Albanian Lek', symbol: 'L' },
+  AMD: { desc: 'Armenian Dram', symbol: '֏' },
+  ANG: { desc: 'Netherlands Antillean Guilder', symbol: 'ƒ' },
+  AOA: { desc: 'Angolan Kwanza', symbol: 'Kz' },
+  ARS: { desc: 'Argentine Peso', symbol: '$' },
+  AUD: { desc: 'Australian Dollar', symbol: 'A$' },
+  AWG: { desc: 'Aruban Florin', symbol: 'ƒ' },
+  AZN: { desc: 'Azerbaijani Manat', symbol: '₼' },
+  BAM: { desc: 'Bosnia-Herzegovina Convertible Mark', symbol: 'KM' },
+  BBD: { desc: 'Barbadian Dollar', symbol: 'Bds$' },
+  BDT: { desc: 'Bangladeshi Taka', symbol: '৳' },
+  BGN: { desc: 'Bulgarian Lev', symbol: 'лв' },
+  BHD: { desc: 'Bahraini Dinar', symbol: 'ب.د' },
+  BIF: { desc: 'Burundian Franc', symbol: 'FBu' },
+  BMD: { desc: 'Bermudan Dollar', symbol: 'BD$' },
+  BND: { desc: 'Brunei Dollar', symbol: 'B$' },
+  BOB: { desc: 'Bolivian Boliviano', symbol: 'Bs' },
+  BRL: { desc: 'Brazilian Real', symbol: 'R$' },
+  BSD: { desc: 'Bahamian Dollar', symbol: 'B$' },
+  BTC: { desc: 'Bitcoin', symbol: '₿' },
+  BTN: { desc: 'Bhutanese Ngultrum', symbol: 'Nu.' },
+  BWP: { desc: 'Botswanan Pula', symbol: 'P' },
+  BYN: { desc: 'New Belarusian Ruble', symbol: 'Br' },
+  BYR: { desc: 'Belarusian Ruble', symbol: 'Br' },
+  BZD: { desc: 'Belize Dollar', symbol: 'BZ$' },
+  CAD: { desc: 'Canadian Dollar', symbol: 'CA$' },
+  CDF: { desc: 'Congolese Franc', symbol: 'FC' },
+  CHF: { desc: 'Swiss Franc', symbol: 'CHF' },
+  CLF: { desc: 'Chilean Unit of Account (UF)', symbol: 'UF' },
+  CLP: { desc: 'Chilean Peso', symbol: '$' },
+  COP: { desc: 'Colombian Peso', symbol: 'COL$' },
+  CRC: { desc: 'Costa Rican Colón', symbol: '₡' },
+  CUC: { desc: 'Cuban Convertible Peso', symbol: '$' },
+  CUP: { desc: 'Cuban Peso', symbol: '₱' },
+  CVE: { desc: 'Cape Verdean Escudo', symbol: 'Esc' },
+  CZK: { desc: 'Czech Republic Koruna', symbol: 'Kč' },
+  DJF: { desc: 'Djiboutian Franc', symbol: 'Fdj' },
+  DKK: { desc: 'Danish Krone', symbol: 'kr' },
+  DOP: { desc: 'Dominican Peso', symbol: 'RD$' },
+  DZD: { desc: 'Algerian Dinar', symbol: 'د.ج' },
+  EGP: { desc: 'Egyptian Pound', symbol: '£' },
+  ERN: { desc: 'Eritrean Nakfa', symbol: 'Nfk' },
+  ETB: { desc: 'Ethiopian Birr', symbol: 'Br' },
+  FJD: { desc: 'Fijian Dollar', symbol: 'FJ$' },
+  FKP: { desc: 'Falkland Islands Pound', symbol: '£' },
+  GEL: { desc: 'Georgian Lari', symbol: '₾' },
+  GGP: { desc: 'Guernsey Pound', symbol: '£' },
+  GHS: { desc: 'Ghanaian Cedi', symbol: 'GH₵' },
+  GIP: { desc: 'Gibraltar Pound', symbol: '£' },
+  GMD: { desc: 'Gambian Dalasi', symbol: 'D' },
+  GNF: { desc: 'Guinean Franc', symbol: 'FG' },
+  GTQ: { desc: 'Guatemalan Quetzal', symbol: 'Q' },
+  GYD: { desc: 'Guyanaese Dollar', symbol: 'GY$' },
+  HKD: { desc: 'Hong Kong Dollar', symbol: 'HK$' },
+  HNL: { desc: 'Honduran Lempira', symbol: 'L' },
+  HRK: { desc: 'Croatian Kuna', symbol: 'kn' },
+  HTG: { desc: 'Haitian Gourde', symbol: 'G' },
+  HUF: { desc: 'Hungarian Forint', symbol: 'Ft' },
+  IDR: { desc: 'Indonesian Rupiah', symbol: 'Rp' },
+  ILS: { desc: 'Israeli New Sheqel', symbol: '₪' },
+  IMP: { desc: 'Manx Pound', symbol: '£' },
+  INR: { desc: 'Indian Rupee', symbol: '₹' },
+  IQD: { desc: 'Iraqi Dinar', symbol: 'ع.د' },
+  IRR: { desc: 'Iranian Rial', symbol: '﷼' },
+  ISK: { desc: 'Icelandic Króna', symbol: 'kr' },
+  JEP: { desc: 'Jersey Pound', symbol: '£' },
+  JMD: { desc: 'Jamaican Dollar', symbol: 'J$' },
+  JOD: { desc: 'Jordanian Dinar', symbol: 'د.ا' },
+  KES: { desc: 'Kenyan Shilling', symbol: 'KSh' },
+  KGS: { desc: 'Kyrgystani Som', symbol: 'с' },
+  KHR: { desc: 'Cambodian Riel', symbol: '៛' },
+  KMF: { desc: 'Comorian Franc', symbol: 'CF' },
+  KPW: { desc: 'North Korean Won', symbol: '₩' },
+  KWD: { desc: 'Kuwaiti Dinar', symbol: 'د.ك' },
+  KYD: { desc: 'Cayman Islands Dollar', symbol: 'CI$' },
+  KZT: { desc: 'Kazakhstani Tenge', symbol: '₸' },
+  LAK: { desc: 'Laotian Kip', symbol: '₭' },
+  LBP: { desc: 'Lebanese Pound', symbol: 'ل.ل' },
+  LKR: { desc: 'Sri Lankan Rupee', symbol: '₨' },
+  LRD: { desc: 'Liberian Dollar', symbol: 'L$' },
+  LSL: { desc: 'Lesotho Loti', symbol: 'L' },
+  LTL: { desc: 'Lithuanian Litas', symbol: 'Lt' },
+  LVL: { desc: 'Latvian Lats', symbol: 'Ls' },
+  LYD: { desc: 'Libyan Dinar', symbol: 'ل.د' },
+  MAD: { desc: 'Moroccan Dirham', symbol: 'د.م.' },
+  MDL: { desc: 'Moldovan Leu', symbol: 'L' },
+  MGA: { desc: 'Malagasy Ariary', symbol: 'Ar' },
+  MKD: { desc: 'Macedonian Denar', symbol: 'ден' },
+  MMK: { desc: 'Myanma Kyat', symbol: 'K' },
+  MNT: { desc: 'Mongolian Tugrik', symbol: '₮' },
+  MOP: { desc: 'Macanese Pataca', symbol: 'MOP$' },
+  MRO: { desc: 'Mauritanian Ouguiya', symbol: 'UM' },
+  MUR: { desc: 'Mauritian Rupee', symbol: '₨' },
+  MVR: { desc: 'Maldivian Rufiyaa', symbol: 'Rf' },
+  MWK: { desc: 'Malawian Kwacha', symbol: 'MK' },
+  MXN: { desc: 'Mexican Peso', symbol: 'MX$' },
+  MYR: { desc: 'Malaysian Ringgit', symbol: 'RM' },
+  MZN: { desc: 'Mozambican Metical', symbol: 'MT' },
+  NAD: { desc: 'Namibian Dollar', symbol: 'N$' },
+  NGN: { desc: 'Nigerian Naira', symbol: '₦' },
+  NIO: { desc: 'Nicaraguan Córdoba', symbol: 'C$' },
+  NOK: { desc: 'Norwegian Krone', symbol: 'kr' },
+  NPR: { desc: 'Nepalese Rupee', symbol: '₨' },
+  NZD: { desc: 'New Zealand Dollar', symbol: 'NZ$' },
+  OMR: { desc: 'Omani Rial', symbol: 'ر.ع.' },
+  PAB: { desc: 'Panamanian Balboa', symbol: 'B/.' },
+  PEN: { desc: 'Peruvian Nuevo Sol', symbol: 'S/.' },
+  PGK: { desc: 'Papua New Guinean Kina', symbol: 'K' },
+  PHP: { desc: 'Philippine Peso', symbol: '₱' },
+  PKR: { desc: 'Pakistani Rupee', symbol: '₨' },
+  PLN: { desc: 'Polish Zloty', symbol: 'zł' },
+  PYG: { desc: 'Paraguayan Guarani', symbol: '₲' },
+  QAR: { desc: 'Qatari Rial', symbol: '﷼' },
+  RON: { desc: 'Romanian Leu', symbol: 'lei' },
+  RSD: { desc: 'Serbian Dinar', symbol: 'дин.' },
+  RUB: { desc: 'Russian Ruble', symbol: '₽' },
+  RWF: { desc: 'Rwandan Franc', symbol: 'FRw' },
+  SAR: { desc: 'Saudi Riyal', symbol: '﷼' },
+  SBD: { desc: 'Solomon Islands Dollar', symbol: 'SI$' },
+  SCR: { desc: 'Seychellois Rupee', symbol: '₨' },
+  SDG: { desc: 'Sudanese Pound', symbol: 'ج.س.' },
+  SEK: { desc: 'Swedish Krona', symbol: 'kr' },
+  SGD: { desc: 'Singapore Dollar', symbol: 'S$' },
+  SHP: { desc: 'Saint Helena Pound', symbol: '£' },
+  SLE: { desc: 'Sierra Leonean Leone', symbol: 'Le' },
+  SLL: { desc: 'Sierra Leonean Leone', symbol: 'Le' },
+  SOS: { desc: 'Somali Shilling', symbol: 'S' },
+  SRD: { desc: 'Surinamese Dollar', symbol: 'SR$' },
+  STD: { desc: 'São Tomé and Príncipe Dobra', symbol: 'Db' },
+  SVC: { desc: 'Salvadoran Colón', symbol: '$' },
+  SYP: { desc: 'Syrian Pound', symbol: '£' },
+  SZL: { desc: 'Swazi Lilangeni', symbol: 'E' },
+  THB: { desc: 'Thai Baht', symbol: '฿' },
+  TJS: { desc: 'Tajikistani Somoni', symbol: 'TJS' },
+  TMT: { desc: 'Turkmenistani Manat', symbol: 'TMT' },
+  TND: { desc: 'Tunisian Dinar', symbol: 'TND' },
+  TOP: { desc: 'Tongan Paʻanga', symbol: 'TOP' },
+  TRY: { desc: 'Turkish Lira', symbol: 'TRY' },
+  TTD: { desc: 'Trinidad and Tobago Dollar', symbol: 'TT$' },
+  TWD: { desc: 'New Taiwan Dollar', symbol: 'NT$' },
+  TZS: { desc: 'Tanzanian Shilling', symbol: 'TZS' },
+  UAH: { desc: 'Ukrainian Hryvnia', symbol: '₴' },
+  UGX: { desc: 'Ugandan Shilling', symbol: 'UGX' },
+  UYU: { desc: 'Uruguayan Peso', symbol: 'UY$' },
+  UZS: { desc: 'Uzbekistan Som', symbol: 'UZS' },
+  VEF: { desc: 'Venezuelan Bolívar Fuerte', symbol: 'VEF' },
+  VES: { desc: 'Sovereign Bolivar', symbol: 'VES' },
+  VND: { desc: 'Vietnamese Dong', symbol: '₫' },
+  VUV: { desc: 'Vanuatu Vatu', symbol: 'Vt' },
+  WST: { desc: 'Samoan Tala', symbol: 'WS$' },
+  XAF: { desc: 'CFA Franc BEAC', symbol: 'FCFA' },
+  XAG: { desc: 'Silver (troy ounce)', symbol: 'XAG' },
+  XAU: { desc: 'Gold (troy ounce)', symbol: 'XAU' },
+  XCD: { desc: 'East Caribbean Dollar', symbol: 'EC$' },
+  XDR: { desc: 'Special Drawing Rights', symbol: 'SDR' },
+  XOF: { desc: 'CFA Franc BCEAO', symbol: 'CFA' },
+  XPF: { desc: 'CFP Franc', symbol: 'CFPF' },
+  YER: { desc: 'Yemeni Rial', symbol: '﷼' },
+  ZAR: { desc: 'South African Rand', symbol: 'R' },
+  ZMK: { desc: 'Zambian Kwacha (pre-2013)', symbol: 'ZMK' },
+  ZMW: { desc: 'Zambian Kwacha', symbol: 'ZMW' },
+  ZWL: { desc: 'Zimbabwean Dollar', symbol: 'ZWL' },
 };
 
 // 환율 정보를 가져오는 API 클래스
@@ -265,7 +205,7 @@ class ExchangeRatesAPI {
       );
       // 환율 정보를 반환합니다.
       return response.data.rates;
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
       // console.error(error.response.data); // 에러 응답의 내용을 출력합니다.
       return error.response.data;
@@ -275,16 +215,19 @@ class ExchangeRatesAPI {
 
 // 환율 정보를 사용하는 클래스
 class CurrencyConverter {
-  private api = new ExchangeRatesAPI(); // 환율 정보를 가져오는 API
+  private api = new ExchangeRatesAPI(); // 환율 정보를 가져오는 APIx
+  private intervalToUpdate = 1000 * 60 * 60 * 24; // 환율 정보를 업데이트하는 주기
   private updatedTimeOfRates = 0; // 환율 정보를 업데이트한 시간
   private baseRates: Rates = {}; // 기본 환율 정보 (EUR)
   private base = 'EUR'; // 환율 정보의 기준 통화
   private rates: Rates = {}; // 환율 정보
   private currencies: CurrencyData = currencyBaseData; // 환율 정보를 사용하는 통화 데이터
 
-  // constructor() {
-  //   this.updateRates();
-  // }
+  // 생성자
+  constructor() {
+    // 환율 정보를 업데이트합니다.
+    this.updateRates();
+  }
 
   // baseRates가 비어있는지 확인하는 메소드
   isRatesEmpty() {
@@ -294,10 +237,10 @@ class CurrencyConverter {
 
   // 환율 정보를 업데이트하는 메소드
   async updateRates(force = false) {
-    // 환율 정보가 없거나, 24시간이 지났거나, 경과 시간과 무관하게 업데이트를 강제하려는 경우
+    // 환율 정보가 없거나, 업데이트 주기가 지났거나, 경과 시간과 무관하게 업데이트를 강제하려는 경우
     if (
       this.isRatesEmpty() ||
-      Date.now() - this.updatedTimeOfRates > 1000 * 60 * 60 * 24 ||
+      Date.now() - this.updatedTimeOfRates > this.intervalToUpdate ||
       force
     ) {
       try {
@@ -315,6 +258,14 @@ class CurrencyConverter {
     }
   }
 
+  // 통화 목록을 가져오는 메소드
+  getCurrencyLists(): string[] {
+    if (this.isRatesEmpty()) {
+      return [];
+    } else {
+      return Object.keys(this.baseRates);
+    }
+  }
   // 기준 통화를 설정하는 메소드
   setBase(base: string) {
     // baseRates가 비어있지 않고, baseRates에 base 통화가 있는 경우
@@ -348,10 +299,19 @@ class CurrencyConverter {
     return {}; // baseRates가 비어있는 경우 빈 객체를 반환
   }
 
+  // 두 통화 간의 환율을 가져오는 메소드 오버로딩
+  getRate(from: string, to: string): number; // 두 통화 간의 환율을 가져오는 메소드
+  getRate(to: string): number; // 통화의 환율을 가져오는 메소드
+
   // 두 통화 간의 환율을 가져오는 메소드
-  getRate(from: string, to: string): number {
+  getRate(from: string, to?: string): number {
     // 먼저 환율 정보가 있는지 확인합니다. 정보가 없다면 0 반환
     if (!this.isRatesEmpty()) {
+      // 'to'가 없는 경우, 'from'을 기준 통화로 설정하고, 'to'를 'from'으로 설정합니다.
+      if (to === undefined) {
+        to = from;
+        from = this.base;
+      }
       // 'to'와 'from'이 rates 오브젝트에 있는지 확인
       // 둘 다 있다면 'to'를 'from'으로 나눈 값을 반환
       if (this.rates.hasOwnProperty(to) && this.rates.hasOwnProperty(from)) {
