@@ -7,11 +7,10 @@ import {
   reactive,
   watch,
 } from 'vue';
-import tinykeys, { KeyBindingMap } from 'tinykeys';
 import { useI18n } from 'vue-i18n';
 
 import UnitConverter from 'classes/UnitConverter';
-
+import { KeyBinding } from 'classes/KeyBinding';
 import { useCalcStore } from 'stores/calc-store';
 
 import MyTooltip from 'components/MyTooltip.vue';
@@ -122,38 +121,22 @@ const unitResult = computed(() => {
   );
 });
 
-// 키바인딩 제거하기위한 변수 선언
-let keybindingRemoveAtUmount = tinykeys(window, {} as KeyBindingMap);
+const keyBinding = new KeyBinding([
+  [['v'], () => swapUnitValue()],
+]);
 
 onMounted(() => {
   initRecentCategoryAndUnit();
 
-  type Shortcut = [string[], () => void][];
-
-  const shortcuts: Shortcut = [
-    [['v'], () => swapUnitValue()],
-  ];
-
-  // Support keyboard entry
-  const keyBindingMaps: KeyBindingMap = {};
-
-  shortcuts.forEach((shortcut) => {
-    const [keys, handler] = shortcut;
-    keys.forEach((key) => {
-      keyBindingMaps[key] = handler;
-    });
-  });
-
-  // 키바인딩하고 제거할 수 있는 메서드 백업;
-  keybindingRemoveAtUmount = tinykeys(window, keyBindingMaps);
-
+  // 키바인딩 추가
+  keyBinding.subscribe();
   // 변환 결과 툴팁 표시 상태 셋팅
   setNeedUnitResultTooltip();
 });
 
 onBeforeUnmount(() => {
-  // dom 요소가 언마운트되기 전에 키바인딩 제거
-  keybindingRemoveAtUmount();
+  // 키바인딩 제거
+  keyBinding.unsubscribe();
 });
 
 type UnitOptions = {

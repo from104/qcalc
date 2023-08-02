@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import { onMounted, onBeforeUnmount, ref } from 'vue';
+import { onMounted, onBeforeUnmount, ref, watch } from 'vue';
 
-import tinykeys, { KeyBindingMap } from 'tinykeys';
 
+import { KeyBinding, KeyBindings } from 'classes/KeyBinding';
 import { useCalcStore } from 'stores/calc-store';
 
 const store = useCalcStore();
@@ -41,29 +41,38 @@ const buttons: Button = [
     ['@mdi-equal', 'secondary', ['=', 'Enter'], () => calc.equal()],
   ];
 
-// 계산기 키바인딩 제거하기위한 변수 선언
-let keybindingRemoveAtUmount = tinykeys(window, {} as KeyBindingMap);
+const keyBindings: KeyBindings = [];
+
+buttons.forEach((button) => {
+  const [, , keys, handler] = button;
+  keyBindings.push([keys, handler])
+});
+
+const keyBinding = new KeyBinding(keyBindings);
 
 // dom 요소가 마운트 되었을 때 계산기 키바인딩 설정하기
 onMounted(() => {
-  // 키바인딩 맵 생성
-  const keyBindingMaps: KeyBindingMap = {};
-
-  buttons.forEach((button) => {
-    const [, , keys, handler] = button;
-    keys.forEach((key) => {
-      keyBindingMaps[key] = handler;
-    });
-  });
-
-  // 키바인딩하고 제거할 수 있는 메서드 백업;
-  keybindingRemoveAtUmount = tinykeys(window, keyBindingMaps);
+  keyBinding.subscribe();
 });
 
 // dom 요소가 언마운트되기 전에 키바인딩 제거
 onBeforeUnmount(() => {
-  keybindingRemoveAtUmount();
+  keyBinding.unsubscribe();
 });
+
+// inputFocused 값이 바뀌면 키바인딩을 추가하거나 제거합니다.
+watch(
+  () => store.inputFocused,
+  () => {
+    // console.log('buttons inputFocused', store.inputFocused);
+    if (store.inputFocused) {
+      keyBinding.unsubscribe();
+    } else {
+      keyBinding.subscribe();
+    }
+  },
+  { immediate: true }
+);
 
 // props의 기본값 설정
 const props = withDefaults(defineProps<{ type?: string }>(), {

@@ -1,11 +1,11 @@
 <script setup lang="ts">
 import { onMounted, onBeforeUnmount, ref, computed, watch } from 'vue';
-import tinykeys, { KeyBindingMap } from 'tinykeys';
 
 import { useI18n } from 'vue-i18n';
 
 import type { History } from 'classes/Calculator';
 
+import { KeyBinding } from 'classes/KeyBinding';
 import { useCalcStore } from 'stores/calc-store';
 
 import MyTooltip from 'components/MyTooltip.vue';
@@ -57,51 +57,32 @@ watch(
   }
 );
 
-// 계산기 키바인딩 제거하기위한 변수 선언
-let keybindingRemoveAtUmount = tinykeys(window, {} as KeyBindingMap);
+const keyBinding = new KeyBinding([
+  [['h'], () => { !doDeleteHistory.value && (isHistoryOpen.value = !isHistoryOpen.value); }],
+  [['d'], () => { isHistoryOpen.value && (doDeleteHistory.value = true); }]
+]);
+
+// inputFocused 값이 바뀌면 키바인딩을 추가하거나 제거합니다.
+watch(
+  () => store.inputFocused,
+  () => {
+    if (store.inputFocused) {
+      keyBinding.unsubscribe();
+    } else {
+      keyBinding.subscribe();
+    }
+  },
+  { immediate: true }
+);
 
 // dom 요소가 마운트 되었을 때
-// 1. 계산기 키바인딩 설정하기
-// 2. 스토어에서 값을 가져와서 계산기에 설정하기
 onMounted(() => {
-  type Shortcut = [string[], () => void][];
-
-  const shortcuts: Shortcut = [
-    [
-      ['h'],
-      () => {
-        if (!doDeleteHistory.value) {
-          isHistoryOpen.value = !isHistoryOpen.value;
-        }
-      },
-    ],
-    [
-      ['d'],
-      () => {
-        if (isHistoryOpen.value) {
-          doDeleteHistory.value = true;
-        }
-      },
-    ],
-  ];
-
-  // Support keyboard entry
-  const keyBindingMaps: KeyBindingMap = {};
-
-  shortcuts.forEach((shortcut) => {
-    const [keys, handler] = shortcut;
-    keys.forEach((key) => {
-      keyBindingMaps[key] = handler;
-    });
-  });
-
-  // 키바인딩하고 제거할 수 있는 메서드 백업;
-  keybindingRemoveAtUmount = tinykeys(window, keyBindingMaps);
+  keyBinding.subscribe();
 });
 
 // dom 요소가 언마운트되기 전에 키바인딩 제거
 onBeforeUnmount(() => {
-  keybindingRemoveAtUmount();
+  keyBinding.unsubscribe();
 });
 </script>
 
@@ -202,9 +183,7 @@ onBeforeUnmount(() => {
                 class="history-list-item text-right q-pa-sm"
               >
                 <q-item-section>
-                  <q-item-label
-                    v-html="store.getLeftSideInHistory(history, true)"
-                  ></q-item-label>
+                  <q-item-label style="white-space: pre-wrap;">{{ store.getLeftSideInHistory(history, true) }}</q-item-label>
                   <q-item-label>
                     {{ ['=', store.getRightSideInHistory(history)].join(' ') }}
                   </q-item-label>

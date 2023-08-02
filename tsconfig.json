@@ -1,7 +1,7 @@
 {
   "extends": "@quasar/app-vite/tsconfig-preset.json",
   "compilerOptions": {
-    "module": "commonjs",
+    "module": "esnext",
     "esModuleInterop": true,
     "moduleResolution": "node",
     "baseUrl": ".",
@@ -19,7 +19,7 @@
     "types": [
       "@intlify/vite-plugin-vue-i18n/client",
       "@modyfi/vite-plugin-yaml/modules"
-    ],
+    ]
   },
   "include": [
     "./**/*.ts",
@@ -27,6 +27,7 @@
     "src/**/*.d.ts",
     "src/**/*.tsx",
     "src/**/*.vue",
+    "src/**/*.ext",
     "src-pwa/*.d.ts",
     "src-bex/*.d.ts",
     "src-ssr/*.d.ts",
@@ -35,5 +36,5 @@
   "exclude": ["node_modules"],
   "ts-node": {
     "esm": true
-  },
+  }
 }

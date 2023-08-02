@@ -41,6 +41,7 @@
 - F1: Open Help
 - F2: open calculator
 - F3: Open unit converter
+- F4: Open currency converter
 - F5: Open app info
 - t: toggle always on top function
 - n: Toggle panel initialization on startup

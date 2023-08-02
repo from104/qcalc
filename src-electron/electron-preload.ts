@@ -21,5 +21,5 @@ contextBridge.exposeInMainWorld('myAPI', {
   setAlwaysOnTop: (alwaysOnTop: boolean) => {
     ipcRenderer.send('toggle-always-on-top', alwaysOnTop);
     // console.log('preload: ' + arg);
-  },
+  }
 });

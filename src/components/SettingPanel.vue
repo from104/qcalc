@@ -1,9 +1,9 @@
 <script lang="ts" setup>
-import { onMounted, onBeforeMount, reactive, watch } from 'vue';
+import { onMounted, onBeforeMount, reactive, watch,  onBeforeUnmount } from 'vue';
 import { useQuasar } from 'quasar';
-import tinykeys, { KeyBindingMap } from 'tinykeys';
 import { useI18n } from 'vue-i18n';
 
+import { KeyBinding } from 'classes/KeyBinding';
 import { useCalcStore } from 'src/stores/calc-store';
 
 import MyTooltip from 'components/MyTooltip.vue';
@@ -49,29 +49,29 @@ const toggleAlwaysOnTopWithNotify = () => {
   }
 };
 
-onMounted(() => {
-  const keyBindingMaps: KeyBindingMap = {};
+const keyBinding = new KeyBinding([
+  [['t'], toggleAlwaysOnTopWithNotify],
+  [['n'], store.toggleInitPanel],
+  [['k'], store.toggleDarkMode],
+  [[','], store.toggleUseGrouping],
+  [['['], store.decDecimalPlaces],
+  [[']'], store.incDecimalPlaces]
+]);
 
-  type Shortcut = [string[], () => void][];
 
-  const shortcuts: Shortcut = [
-    [['t'], toggleAlwaysOnTopWithNotify],
-    [['n'], store.toggleInitPanel],
-    [['k'], store.toggleDarkMode],
-    [[','], store.toggleUseGrouping],
-    [['['], store.decDecimalPlaces],
-    [[']'], store.incDecimalPlaces],
-  ];
-
-  shortcuts.forEach((shortcut) => {
-    const [keys, handler] = shortcut;
-    keys.forEach((key) => {
-      keyBindingMaps[key] = handler;
-    });
-  });
-
-  tinykeys(window, keyBindingMaps);
-});
+// inputFocused 값이 바뀌면 키바인딩을 추가하거나 제거합니다.
+watch(
+  () => store.inputFocused,
+  () => {
+    // console.log('setting inputFocused', store.inputFocused);
+    if (store.inputFocused) {
+      keyBinding.unsubscribe();
+    } else {
+      keyBinding.subscribe();
+    }
+  },
+  { immediate: true }
+);
 
 onBeforeMount(() => {
   store.setDarkMode(store.darkMode);
@@ -86,6 +86,15 @@ onBeforeMount(() => {
     // 처음 실행시
     store.userLocale = navigator.language;
   }
+});
+
+onMounted(() => {
+  keyBinding.subscribe();
+});
+
+// dom 요소가 언마운트되기 전에 키바인딩 제거
+onBeforeUnmount(() => {
+  keyBinding.unsubscribe();
 });
 </script>
 

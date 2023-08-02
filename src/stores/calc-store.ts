@@ -29,6 +29,10 @@ export const useCalcStore = defineStore('calc', {
     // 환율 계산기 - 최근 '환율 계산' 탭에서 선택한 통화
     recentCurrencyFrom: '',
     recentCurrencyTo: '',
+    // 입력 필드가 포커스를 받았는지 여부
+    inputFocused: false,
+    // 단우 및 통화 표시할 때 기호를 표시할지 여부
+    showSymbol: false,
   }),
   getters: {},
   actions: {
@@ -93,23 +97,23 @@ export const useCalcStore = defineStore('calc', {
     },
     // 계산 결과 중 좌변
     getLeftSideInHistory(h: History, lf = false) {
-      const br = lf ? '<br />' : '';
+      const br = lf ? '\n' : '';
       if (['+', '-', '×', '÷'].includes(h.operator)) { // 사칙연산
-        return `${this.toLocale(h.preNumber)} ${br} ${
+        return `${this.toLocale(h.preNumber)}${br} ${
           h.operator
         } ${this.toLocale(h.argNumber as number)}`;
       } else if (h.operator == '÷%') { // 퍼센트로 나누는 경우
-        return `(${this.toLocale(h.preNumber)} ÷ ${this.toLocale(
+        return `${this.toLocale(h.preNumber)}${br} ÷ ${this.toLocale(
           h.argNumber as number
-        )}) ${br} × 100`;
+        )}${br} × 100`;
       } else if (h.operator == '×%') { // 퍼센트로 곱하는 경우
-        return `${this.toLocale(h.preNumber)} ${br} × (${this.toLocale(
+        return `${this.toLocale(h.preNumber)}${br} × ${this.toLocale(
           h.argNumber as number
-        )} ÷ 100)`;
+        )}${br} ÷ 100`;
       } else if (h.operator == 'rec') { // 역수
-        return `1 ${br} ÷ ${this.toLocale(h.preNumber)}`;
+        return `1${br} ÷ ${this.toLocale(h.preNumber)}`;
       } else if (h.operator == 'pow2') { // 제곱
-        return `${this.toLocale(h.preNumber)} ${br} × ${this.toLocale(
+        return `${this.toLocale(h.preNumber)}${br} × ${this.toLocale(
           h.preNumber
         )}`;
       } else if (['sqrt'].includes(h.operator)) { // 제곱근
@@ -139,6 +143,24 @@ export const useCalcStore = defineStore('calc', {
         timeout: timeout,
         color: 'negative',
       });
+    },
+    // 요소의 포커스를 해제하는 함수
+    blurElement() {
+      const el = document.activeElement as HTMLElement;
+      el?.blur();
+    },
+    // 입력 필드가 포커스를 받았다고 셋팅하는 함수
+    setInputFocused() {
+      setTimeout(() => {
+        this.inputFocused = true;
+        console.log('setInputFocused', this.inputFocused);
+      }, 10);
+    },
+    // 입력 필드가 포커스를 잃었다고 셋팅하는 함수
+    setInputBlurred() {
+      this.inputFocused = false;
+      console.log('setInputBlurred', this.inputFocused);
+
     },
   },
   persist: true,

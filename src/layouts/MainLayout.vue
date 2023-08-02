@@ -1,6 +1,5 @@
 <script setup lang="ts">
-import { onMounted, ref } from 'vue';
-import tinykeys, { KeyBindingMap } from 'tinykeys';
+import { onMounted, ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 
 import { useCalcStore } from 'src/stores/calc-store';
@@ -27,24 +26,28 @@ const toggleRightDrawer = () => {
   leftDrawerOpen.value = false;
 };
 
+import { KeyBinding } from 'classes/KeyBinding';
+
+const keyBinding = new KeyBinding([
+  [['m'], toggleLeftDrawer],
+  [['e'], toggleRightDrawer],
+]);
+
+// inputFocused 값이 바뀌면 키바인딩을 추가하거나 제거합니다.
+watch(
+  () => store.inputFocused,
+  () => {
+    if (store.inputFocused) {
+      keyBinding.unsubscribe();
+    } else {
+      keyBinding.subscribe();
+    }
+  },
+  { immediate: true }
+);
+
 onMounted(() => {
-  const keyBindingMaps: KeyBindingMap = {};
-
-  type Shortcut = [string[], () => void][];
-
-  const shortcuts: Shortcut = [
-    [['m'], () => toggleLeftDrawer()],
-    [['e'], () => toggleRightDrawer()],
-  ];
-
-  shortcuts.forEach((shortcut) => {
-    const [keys, handler] = shortcut;
-    keys.forEach((key) => {
-      keyBindingMaps[key] = handler;
-    });
-  });
-
-  tinykeys(window, keyBindingMaps);
+  keyBinding.subscribe();
 });
 </script>
 

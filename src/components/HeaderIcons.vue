@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { onMounted, computed } from 'vue';
-import tinykeys, { KeyBindingMap } from 'tinykeys';
 import { copyToClipboard } from 'quasar';
 import { useI18n } from 'vue-i18n';
 
@@ -53,25 +52,15 @@ function doPaste(): void {
     });
 }
 
+import { KeyBinding } from 'classes/KeyBinding';
+
+const keyBinding = new KeyBinding([
+  [['Control+c', 'Control+Insert', 'Copy'], doCopy],
+  [['Control+v', 'Shift+Insert', 'Paste'], doPaste],
+]);
+
 onMounted(() => {
-  type Shortcut = [string[], () => void][];
-
-  const shortcuts: Shortcut = [
-    [['Control+c', 'Control+Insert', 'Copy'], doCopy],
-    [['Control+v', 'Shift+Insert', 'Paste'], doPaste],
-  ];
-
-  // Support keyboard entry
-  const keyBindingMaps: KeyBindingMap = {};
-
-  shortcuts.forEach((shortcut) => {
-    const [keys, handler] = shortcut;
-    keys.forEach((key) => {
-      keyBindingMaps[key] = handler;
-    });
-  });
-
-  tinykeys(window, keyBindingMaps);
+  keyBinding.subscribe();
 });
 </script>
 

@@ -54,13 +54,17 @@ let prevHistoryId = 0;
 const preResult = computed(() => {
   const history = resultHistory.value;
   if (history.length > 0 && calc.getWillReset()) {
+    // 이전 결과가 있고, 계산기가 리셋될 예정이면
     if (prevHistoryId != history[0].id as number) {
+      // 이전 결과의 id와 현재 결과의 id가 다르면
       if (result.value == store.toLocale(history[0].resultNumber)) {
+        // 현재 결과가 이전 결과와 같으면
         prevHistoryId = history[0].id as number;
         return [store.getLeftSideInHistory(history[0]), '='].join(' ');
       }
     }
   } else if (operator.value != '' && !calc.getWillReset()) {
+    // 연산자가 있고, 계산기가 리셋되지 않을 예정이면
     return store.toLocale(calc.getBackupNumber());
   }
   return '';

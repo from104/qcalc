@@ -343,8 +343,9 @@ export class Calculator {
       this.numberToShown();
     }
 
-    this.repeatNumber = 0;
-    this.willReset = true;
+    this.mOperator = Operator.None // 연산자 리셋
+    this.repeatNumber = 0; // 반복 숫자 초기화
+    this.willReset = true; // 숫자 입력 초기화 예정
   }
 
   // 역수 계산

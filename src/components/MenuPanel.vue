@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import tinykeys, { KeyBindingMap } from 'tinykeys';
 import { useRouter } from 'vue-router';
 
 import { useI18n } from 'vue-i18n';
@@ -70,27 +69,17 @@ watch([()=>store.useSystemLocale, ()=>store.userLocale], () => {
   });
 });
 
+import { KeyBinding } from 'classes/KeyBinding';
+
+const keyBinding = new KeyBinding([
+  [['F1'], () => router.push({ path: '/help' })],
+  [['F2'], () => router.push({ path: '/calc' })],
+  [['F3'], () => router.push({ path: '/unit' })],
+  [['F4'], () => router.push({ path: '/currency' })],
+  [['F5'], () => router.push({ path: '/about' })],
+]);
 onMounted(() => {
-  const keyBindingMaps: KeyBindingMap = {};
-
-  type Shortcut = [string[], () => void][];
-
-  const shortcuts: Shortcut = [
-    [['F1', '?'], () => router.push({ path: '/help' })],
-    [['F2'], () => router.push({ path: '/calc' })],
-    [['F3'], () => router.push({ path: '/unit' })],
-    [['F4'], () => router.push({ path: '/currency' })],
-    [['F5'], () => router.push({ path: '/about' })],
-  ];
-
-  shortcuts.forEach((shortcut) => {
-    const [keys, handler] = shortcut;
-    keys.forEach((key) => {
-      keyBindingMaps[key] = handler;
-    });
-  });
-
-  tinykeys(window, keyBindingMaps);
+  keyBinding.subscribe();
 });
 
 </script>
@@ -122,10 +111,10 @@ ko:
       caption: '퀘이사 계산기'
     unit:
       title: '단위 변환'
-      caption: '단위 변환 계산기'
+      caption: '단위 변환기'
     currency:
-      title: '환율 변환'
-      caption: '환율 변환 계산기'
+      title: '통화 변환'
+      caption: '통화 변환기'
     about:
       title: '소개'
       caption: '앱에 대한 소개'
@@ -138,11 +127,11 @@ en:
       title: 'Calculator'
       caption: 'Quasar Calculator'
     unit:
-      title: 'Unit Conversion'
-      caption: 'Unit Conversion Calculator'
+      title: 'Unit Converter'
+      caption: 'Unit Converter'
     currency:
-      title: 'Currency Conversion'
-      caption: 'Currency Conversion Calculator'
+      title: 'Currency Converter'
+      caption: 'Currency Converter'
     about:
       title: 'About'
       caption: 'About the app'

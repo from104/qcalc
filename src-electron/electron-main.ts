@@ -1,6 +1,8 @@
-import { app, BrowserWindow, nativeTheme, ipcMain } from 'electron';
 import path from 'path';
 import os from 'os';
+import {
+  app, BrowserWindow, nativeTheme, ipcMain,
+} from 'electron';
 
 // needed in case process is undefined under Linux
 const platform = process.platform || os.platform();
@@ -8,10 +10,10 @@ const platform = process.platform || os.platform();
 try {
   if (platform === 'win32' && nativeTheme.shouldUseDarkColors === true) {
     require('fs').unlinkSync(
-      path.join(app.getPath('userData'), 'DevTools Extensions')
+      path.join(app.getPath('userData'), 'DevTools Extensions'),
     );
   }
-} catch (_) {}
+} catch (_) { /* empty */ }
 
 const windowState = require('electron-window-state');
 
