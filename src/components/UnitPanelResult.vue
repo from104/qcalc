@@ -123,6 +123,7 @@ const unitResult = computed(() => {
 
 const keyBinding = new KeyBinding([
   [['v'], () => swapUnitValue()],
+  [['b'], () => store.showSymbolToggle()],
 ]);
 
 onMounted(() => {

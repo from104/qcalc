@@ -162,6 +162,9 @@ export const useCalcStore = defineStore('calc', {
       console.log('setInputBlurred', this.inputFocused);
 
     },
+    showSymbolToggle() {
+      this.showSymbol = !this.showSymbol;
+    },
   },
   persist: true,
 });

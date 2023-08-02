@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { onMounted, onBeforeMount, reactive, watch,  onBeforeUnmount } from 'vue';
+import { onMounted, onBeforeMount, reactive, watch,  onBeforeUnmount, computed } from 'vue';
 import { useQuasar } from 'quasar';
 import { useI18n } from 'vue-i18n';
 
@@ -7,6 +7,11 @@ import { KeyBinding } from 'classes/KeyBinding';
 import { useCalcStore } from 'src/stores/calc-store';
 
 import MyTooltip from 'components/MyTooltip.vue';
+
+import { useRoute } from 'vue-router';
+
+const route = useRoute();
+const urlInside = computed(() => route.fullPath.split('/').pop());
 
 const store = useCalcStore();
 
@@ -202,7 +207,22 @@ onBeforeUnmount(() => {
         </template>
       </q-slider>
     </q-item>
+    <template v-if="urlInside == 'unit' || urlInside == 'currency'">
+      <q-separator spaced="md" />
 
+      <q-item class="q-py-none">
+        <q-item-label class="self-center"
+          >{{ t('showSymbol') }} (b)</q-item-label
+        >
+        <q-space />
+        <q-toggle
+          v-model="store.showSymbol"
+          :color="store.getDarkColor('primary')"
+          keep-color
+          dense
+        />
+      </q-item>
+    </template>
     <q-separator spaced="md" />
 
     <q-item class="q-py-none">
@@ -249,6 +269,7 @@ ko:
   decimalPlacesStat: '소수점 자리수'
   noLimit: '제한 없음'
   toNDecimalPlaces: '자리'
+  showSymbol: '기호 표시'
   useSystemLocale: '시스템 언어 사용'
   language: '언어'
 en:
@@ -262,6 +283,7 @@ en:
   decimalPlacesStat: 'Decimal places (stat)'
   noLimit: 'No limit'
   toNDecimalPlaces: 'decimal places'
+  showSymbol: 'Show symbol'
   useSystemLocale: 'Use system locale'
   language: 'Language'
 </i18n>

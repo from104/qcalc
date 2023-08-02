@@ -49,8 +49,9 @@ const currencyResult = computed(() => {
   // 저장된 범주와 단위가 잘못됐으면 초기화
   initRecentCurrency();
 
+  const symbol = store.showSymbol ? currencyConverter.getSymbol(store.recentCurrencyTo) : '';
   // 변환 결과를 반환
-  return store.toLocale(
+  return symbol+' '+store.toLocale(
     currencyConverter.convert(
       Number(calc.getShownNumber()),
       store.recentCurrencyFrom,
@@ -113,6 +114,7 @@ function setNeedCurrencyResultTooltip() {
 // 키바인딩 생성
 const keyBinding = new KeyBinding([
   [['v'], () => swapCurrencyValue()],
+  [['b'], () => store.showSymbolToggle()],
 ]);
 
 // inputFocused 값이 바뀌면 키바인딩을 추가하거나 제거합니다.

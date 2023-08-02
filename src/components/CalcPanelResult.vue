@@ -7,6 +7,10 @@ import { useCalcStore } from 'stores/calc-store';
 
 import MyTooltip from 'components/MyTooltip.vue';
 
+const props = withDefaults(defineProps<{ symbol?: string }>(), {
+  symbol: 'none',
+});
+
 // 스토어 가져오기
 const store = useCalcStore();
 
@@ -28,12 +32,24 @@ function setNeedResultTooltip() {
 }
 
 const result = computed(() => {
+  let baseResult = '';
   if (store.decimalPlaces == -2 && calc.getShownNumber().indexOf('.') !== -1) {
     const [integer, decimal] = calc.getShownNumber().split('.');
-    return `${store.toLocale(Number(integer))}.${decimal}`;
+    baseResult = `${store.toLocale(Number(integer))}.${decimal}`;
   } else {
-    return store.toLocale(Number(calc.getShownNumber()));
+    baseResult = store.toLocale(Number(calc.getShownNumber()));
   }
+  if (store.showSymbol) {
+    if (props.symbol == 'currency') {
+      const symbol = store.currencyConverter?.getSymbol(store.recentCurrencyFrom) ?? '';
+      return [symbol,baseResult].join(' ');
+    } else {
+      return baseResult
+    }
+  } else {
+    return baseResult;
+  }
+
 });
 
 // 계산 결과 배열

@@ -187,7 +187,7 @@ const currencyBaseData: CurrencyData = {
   ZAR: { desc: 'South African Rand', symbol: 'R' },
   ZMK: { desc: 'Zambian Kwacha (pre-2013)', symbol: 'ZMK' },
   ZMW: { desc: 'Zambian Kwacha', symbol: 'ZMW' },
-  ZWL: { desc: 'Zimbabwean Dollar', symbol: 'ZWL' },
+  ZWL: { desc: 'Zimbabwean Dollar', symbol: 'ZWL' }
 };
 
 // 환율 정보를 가져오는 API 클래스
@@ -238,11 +238,7 @@ class CurrencyConverter {
   // 환율 정보를 업데이트하는 메소드
   async updateRates(force = false) {
     // 환율 정보가 없거나, 업데이트 주기가 지났거나, 경과 시간과 무관하게 업데이트를 강제하려는 경우
-    if (
-      this.isRatesEmpty() ||
-      Date.now() - this.updatedTimeOfRates > this.intervalToUpdate ||
-      force
-    ) {
+    if (this.isRatesEmpty() || Date.now() - this.updatedTimeOfRates > this.intervalToUpdate || force) {
       try {
         // API로 부터 환율 정보를 가져옵니다.
         this.baseRates = await this.api.getRates();
@@ -355,21 +351,24 @@ class CurrencyConverter {
     }
   }
 
-  getCurrencyInfo(currency: string): object {
-    // 이 메서드는 특정 통화에 대한 정보를 가져오는 기능을 합니다.
-    // 첫째, 환율 정보가 비어있는지 검사합니다. 'isRatesEmpty' 메서드를 통해 확인합니다.
-    // 둘째, 원하는 통화의 정보가 존재하는지 확인합니다. 'hasOwnProperty' 메서드를 통해 통화 데이터에 해당 통화가 있는지 확인할 수 있습니다.
-    // 셋째, 원하는 통화의 환율 정보가 존재하는지 확인합니다. 마찬가지로 'hasOwnProperty' 메서드를 통해 환율 정보에 해당 통화가 있는지 확인합니다.
-    if (
-      !this.isRatesEmpty() &&
-      this.currencies.hasOwnProperty(currency) &&
-      this.rates.hasOwnProperty(currency)
-    ) {
-      // 위의 세 조건을 모두 만족하는 경우, 해당 통화 정보를 반환합니다.
-      return this.currencies[currency];
+
+  getSymbol(currency: string): string {
+    // 통화 정보가 비어있지 않다면, 통화 기호를 반환합니다.
+    if (!this.isRatesEmpty() && this.currencies.hasOwnProperty(currency) && this.rates.hasOwnProperty(currency)) {
+      return this.currencies[currency].symbol;
     } else {
-      // 위의 세 조건 중 하나라도 만족하지 않는 경우, 비어있는 객체를 반환합니다.
-      return {};
+      // 통화 정보가 비어있다면, 빈 문자열을 반환합니다.
+      return '';
+    }
+  }
+
+  getDesc(currency: string): string {
+    // 통화 정보가 비어있지 않다면, 통화 설명을 반환합니다.
+    if (!this.isRatesEmpty() && this.currencies.hasOwnProperty(currency) && this.rates.hasOwnProperty(currency)) {
+      return this.currencies[currency].desc;
+    } else {
+      // 통화 정보가 비어있다면, 빈 문자열을 반환합니다.
+      return '';
     }
   }
 }
