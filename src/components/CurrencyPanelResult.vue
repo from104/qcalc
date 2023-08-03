@@ -51,13 +51,12 @@ const currencyResult = computed(() => {
 
   const symbol = store.showSymbol ? currencyConverter.getSymbol(store.recentCurrencyTo) : '';
   // 변환 결과를 반환
-  return symbol+' '+store.toLocale(
-    currencyConverter.convert(
-      Number(calc.getShownNumber()),
-      store.recentCurrencyFrom,
-      store.recentCurrencyTo,
-    ),
-  );
+  return [
+    symbol,
+    store.toLocale(
+      currencyConverter.convert(Number(calc.getShownNumber()), store.recentCurrencyFrom, store.recentCurrencyTo)
+    )
+  ].join(' ');
 });
 
 // 단위 이름과 값을 바꾸기 위한 함수
@@ -130,6 +129,7 @@ watch(
   },
   // { immediate: true }
 );
+let updateRatesTimer: number | undefined;
 
 onMounted(() => {
   initRecentCurrency();
@@ -143,12 +143,18 @@ onMounted(() => {
   (async () => {
     await currencyConverter.updateRates();
   })();
+
+  // 환율 정보 업데이트 주기마다 환율 정보 업데이트
+  updateRatesTimer = window.setInterval(async () => {
+    await currencyConverter.updateRates();
+  }, 1000 * 60 * 60 * 1);
 });
 
 // dom 요소가 언마운트되기 전에 키바인딩 제거
 onBeforeUnmount(() => {
   keyBinding.unsubscribe();
   store.setInputBlurred();
+  clearInterval(updateRatesTimer);
 });
 
 type CurrencyOptions = {
@@ -371,4 +377,4 @@ const filterFnTo = createFilterFn(toFilteredCurrencyOptions, toCurrencyOptions);
   </q-card-section>
 </template>
 
-<i18n lang="yaml5" src="./CurrencyPanelResult_i18n.yaml5" />
+<i18n lang="yaml5" src="./CurrencyPanelResult_i18n.yaml" />

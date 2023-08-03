@@ -7,8 +7,8 @@ import { useCalcStore } from 'stores/calc-store';
 
 import MyTooltip from 'components/MyTooltip.vue';
 
-const props = withDefaults(defineProps<{ symbol?: string }>(), {
-  symbol: 'none',
+const props = withDefaults(defineProps<{ addon?: string }>(), {
+  addon: 'none',
 });
 
 // 스토어 가져오기
@@ -31,27 +31,39 @@ function setNeedResultTooltip() {
   needResultTooltip.value = ow < sw;
 }
 
+// 이 코드는 계산한 결과를 나타내는 상수입니다.
 const result = computed(() => {
-  let baseResult = '';
-  if (store.decimalPlaces == -2 && calc.getShownNumber().indexOf('.') !== -1) {
-    const [integer, decimal] = calc.getShownNumber().split('.');
-    baseResult = `${store.toLocale(Number(integer))}.${decimal}`;
-  } else {
-    baseResult = store.toLocale(Number(calc.getShownNumber()));
+  // 표시된 숫자를 받아옵니다.
+  const shownNumber = calc.getShownNumber();
+
+  // integer는 정수 부분, decimal은 소수 부분으로 shownNumber를 분리합니다.
+  const [integer, decimal] = shownNumber.split('.');
+
+  // baseResult는 조건에 따라 두가지 형식 중 하나로 표시된 숫자를 변환합니다.
+  // 만약 store의 decimalPlaces가 -2이며, decimal 부분이 있으면 소수점 표현으로, 그 외의 경우는 일반적으로 소수 변환으로 표현합니다.
+  const baseResult =
+    store.decimalPlaces == -2 && decimal
+      ? `${store.toLocale(Number(integer))}.${decimal}`
+      : store.toLocale(Number(shownNumber));
+
+  // store에서 단위 표시가 활성화되어 있고, 애드온이 'unit'일 경우
+  if (store.showUnit && props.addon == 'unit') {
+    // 사용할 단위를 결정합니다.
+    const unit = store.recentUnitFrom[store.recentCategory];
+    // 이 단위와 baseResult를 결합하여 반환합니다.
+    return [baseResult, unit].join(' ');
   }
-  if (store.showSymbol) {
-    if (props.symbol == 'currency') {
-      const symbol = store.currencyConverter?.getSymbol(store.recentCurrencyFrom) ?? '';
-      return [symbol,baseResult].join(' ');
-    } else {
-      return baseResult
-    }
+  // store에서 기호 표시가 활성화되어 있고, 애드온이 'currency'일 경우
+  else if (store.showSymbol && props.addon == 'currency') {
+    // 기호를 가져옵니다. 또한 현재 환율로부터 해당 기호를 찾을 수 없는 경우에 대비하여 기본값을 설정합니다.
+    const symbol = store.currencyConverter?.getSymbol(store.recentCurrencyFrom) ?? '';
+    // 이 기호와 baseResult를 결합하여 반환합니다.
+    return [symbol, baseResult].join(' ');
   } else {
+    // 둘 다 아닌 경우, 조건에 해당하는 'else'에서는 baseResult를 그대로 반환합니다.
     return baseResult;
   }
-
 });
-
 // 계산 결과 배열
 const resultHistory = computed(() => calc.getHistory() as History[]);
 

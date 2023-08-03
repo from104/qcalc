@@ -216,7 +216,7 @@ class ExchangeRatesAPI {
 // 환율 정보를 사용하는 클래스
 class CurrencyConverter {
   private api = new ExchangeRatesAPI(); // 환율 정보를 가져오는 APIx
-  private intervalToUpdate = 1000 * 60 * 60 * 24; // 환율 정보를 업데이트하는 주기
+  private intervalToUpdate = 1000 * 60 * 60 * 12; // 환율 정보를 업데이트하는 주기
   private updatedTimeOfRates = 0; // 환율 정보를 업데이트한 시간
   private baseRates: Rates = {}; // 기본 환율 정보 (EUR)
   private base = 'EUR'; // 환율 정보의 기준 통화

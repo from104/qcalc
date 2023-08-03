@@ -8,7 +8,7 @@ import CalcHistory from 'components/CalcHistory.vue';
 <template>
   <q-page>
     <q-card flat class="q-px-md q-pt-xs q-pb-md">
-      <CalcPanelResult symbol="currency" />
+      <CalcPanelResult addon="currency" />
       <CurrencyPanelResult />
       <CalcButton type="currency"/>
     </q-card>

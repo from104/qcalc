@@ -108,13 +108,13 @@ ko:
       caption: '기능과 사용법'
     calc:
       title: '계산기'
-      caption: '퀘이사 계산기'
+      caption: '계산기'
     unit:
       title: '단위 변환'
       caption: '단위 변환기'
     currency:
-      title: '통화 변환'
-      caption: '통화 변환기'
+      title: '통화 환전'
+      caption: '통화 환전기'
     about:
       title: '소개'
       caption: '앱에 대한 소개'
@@ -125,7 +125,7 @@ en:
       caption: 'Features and Usage'
     calc:
       title: 'Calculator'
-      caption: 'Quasar Calculator'
+      caption: 'Calculator'
     unit:
       title: 'Unit Converter'
       caption: 'Unit Converter'

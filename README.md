@@ -12,6 +12,7 @@ This is a simple calculator made using the source of the calculator for Android 
 - Percent calculation (either as percentage or percentage multiplication)
 - Reciprocal, square, square root calculation
 - Unit conversion function
+- Currency conversion function
 - All functions operated with mouse and keyboard.
 - Copy and paste calculation results, etc.
 - Toggle window always on top
@@ -19,7 +20,7 @@ This is a simple calculator made using the source of the calculator for Android 
 - Thousand comma display
 - Fixed digits below the decimal point (no limit to 6 digits)
 - Records calculation results (up to 20)
-- dark mode
+- Dark mode
 - Supports English and Korean
 
 ## Shortcut Keys
@@ -30,13 +31,14 @@ This is a simple calculator made using the source of the calculator for Android 
 - +, -, \*, /: addition, subtraction, multiplication, division respectively
 - Enter, =: output the last calculation result
 - s, \_: change sign
-- p, %: Calculate percentage (enter in the order of number, /(or \*), number, p (or %))
+- p, %: calculate percentage (enter in the order of number, /(or \*), number, p (or %))
 - u: square calculation
 - r: square root calculation
-- i: Calculate the reciprocal (1/x)
-- Backspace: Erase each Korean character
-- Escape, Delete, c: Reset calculator
-- v: Reverse unit target.
+- i: calculate the reciprocal (1/x)
+- Backspace: erase each number.
+- Escape, Delete, c: reset calculator
+- v: reverse unit or currency target.
+- b: toggle display of units or currency symbols
 - h: open calculation result record (up to 20)
 - d: clear calculation result record
 
@@ -44,16 +46,16 @@ This is a simple calculator made using the source of the calculator for Android 
 
 - m: open and close the left menu
 - e: open and close right settings
-- F1: Open Help
+- F1: open help
 - F2: open calculator
-- F3: Open unit converter
-- F4: Open currency converter
-- F5: Open app info
+- F3: open unit converter
+- F4: open currency converter
+- F5: open app info
 - t: toggle always on top function
-- n: Toggle panel initialization on startup
+- n: toggle panel initialization on startup
 - k: dark mode toggle
-- ,: Thousands, display
-- [, ]: Decimal point fixed adjustment (no limit to 6 digits)
+- ,: thousands, display
+- [, ]: decimal point fixed adjustment (no limit to 6 digits)
 
 ### Clipboard
 

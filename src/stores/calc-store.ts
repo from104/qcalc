@@ -31,8 +31,10 @@ export const useCalcStore = defineStore('calc', {
     recentCurrencyTo: '',
     // 입력 필드가 포커스를 받았는지 여부
     inputFocused: false,
-    // 단우 및 통화 표시할 때 기호를 표시할지 여부
-    showSymbol: false,
+    // 단위 변환기에서 단위를 표시할지 여부
+    showUnit: true,
+    // 통화 변환기에서 통화 기호를 표시할지 여부
+    showSymbol: true,
   }),
   getters: {},
   actions: {
@@ -161,6 +163,9 @@ export const useCalcStore = defineStore('calc', {
       this.inputFocused = false;
       console.log('setInputBlurred', this.inputFocused);
 
+    },
+    showUnitToggle() {
+      this.showUnit = !this.showUnit;
     },
     showSymbolToggle() {
       this.showSymbol = !this.showSymbol;

@@ -207,13 +207,30 @@ onBeforeUnmount(() => {
         </template>
       </q-slider>
     </q-item>
-    <template v-if="urlInside == 'unit' || urlInside == 'currency'">
+
+    <template v-if="urlInside == 'unit'">
       <q-separator spaced="md" />
 
       <q-item class="q-py-none">
-        <q-item-label class="self-center"
-          >{{ t('showSymbol') }} (b)</q-item-label
-        >
+        <q-item-label class="self-center" >
+          {{ t('showUnit') }} (b)
+        </q-item-label>
+        <q-space />
+        <q-toggle
+          v-model="store.showUnit"
+          :color="store.getDarkColor('primary')"
+          keep-color
+          dense
+        />
+      </q-item>
+    </template>
+    <template v-else-if="urlInside == 'currency'">
+      <q-separator spaced="md" />
+
+      <q-item class="q-py-none">
+        <q-item-label class="self-center">
+          {{ t('showSymbol') }} (b)
+        </q-item-label>
         <q-space />
         <q-toggle
           v-model="store.showSymbol"
@@ -223,6 +240,7 @@ onBeforeUnmount(() => {
         />
       </q-item>
     </template>
+
     <q-separator spaced="md" />
 
     <q-item class="q-py-none">
@@ -269,6 +287,7 @@ ko:
   decimalPlacesStat: '소수점 자리수'
   noLimit: '제한 없음'
   toNDecimalPlaces: '자리'
+  showUnit: '단위 표시'
   showSymbol: '기호 표시'
   useSystemLocale: '시스템 언어 사용'
   language: '언어'
@@ -283,6 +302,7 @@ en:
   decimalPlacesStat: 'Decimal places (stat)'
   noLimit: 'No limit'
   toNDecimalPlaces: 'decimal places'
+  showUnit: 'Show unit'
   showSymbol: 'Show symbol'
   useSystemLocale: 'Use system locale'
   language: 'Language'
