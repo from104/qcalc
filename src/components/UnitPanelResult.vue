@@ -103,6 +103,8 @@ function setNeedUnitResultTooltip() {
   const sw = document.getElementById('unitResult')?.scrollWidth ?? 0;
   // 원래의 칸 크기보다 결과 문자열 길이가 길면 툴팁을 표시
   needUnitResultTooltip.value = ow < sw;
+
+  return true;
 }
 
 // 변환 결과 계산 (computed로 선언하여 값이 바뀔 때마다 자동으로 계산)
@@ -309,4 +311,185 @@ watch(
   </q-card-section>
 </template>
 
-<i18n lang="yaml5" src="./UnitPanelResult_i18n.yaml" />
+<i18n lang="yaml5">
+ko:
+  category: '범주'
+  categories:
+    length: '길이'
+    area: '넓이'
+    volume: '부피'
+    weight: '무게'
+    temp: '온도'
+    time: '시간'
+    speed: '속도'
+    pressure: '압력'
+    data: '데이터'
+  unitDesc:
+    length:
+      m: '미터'
+      km: '킬로미터'
+      cm: '센티미터'
+      mm: '밀리미터'
+      in: '인치'
+      ft: '피트'
+      yd: '야드'
+      mi: '마일'
+    area:
+      py: '평'
+      'm²': '제곱미터'
+      'km²': '제곱킬로미터'
+      'cm²': '제곱센티미터'
+      'mm²': '제곱밀리미터'
+      'in²': '제곱인치'
+      'ft²': '제곱피트'
+      'yd²': '제곱야드'
+      'mi²': '제곱마일'
+      ha: '헥타르'
+      a: '아르'
+      ac: '에이커'
+    volume:
+      'm³': '큐브미터'
+      'km³': '큐브킬로미터'
+      'cm³': '큐브센티미터'
+      'mm³': '큐브밀리미터'
+      'in³': '큐브인치'
+      'ft³': '큐브피트'
+      'yd³': '큐브야드'
+      'mi³': '큐브마일'
+      l: '리터'
+      ml: '밀리리터'
+      kl: '킬로리터'
+      gal: '갤런'
+    weight:
+      g: '그램'
+      kg: '킬로그램'
+      mg: '밀리그램'
+      oz: '온스'
+      lb: '파운드'
+      ton: '톤'
+    temp:
+      '°C': '섭씨'
+      '°F': '화씨'
+      K: '켈빈'
+      '°R': '랭킨'
+    time:
+      sec: '초'
+      min: '분'
+      hour: '시간'
+      day: '일'
+      week: '주'
+      month: '월'
+      year: '년'
+    speed:
+      'km/h': '시간당 킬로미터'
+      'm/s': '시간당 미터'
+      'ft/s': '시간당 피트'
+      'mi/h': '시간당 마일'
+      knot: '노트'
+    pressure:
+      Pa: '파스칼'
+      kPa: '킬로파스칼'
+      MPa: '메가파스칼'
+      hPa: '헥토파스칼'
+      bar: '바'
+      psi: '파운드당 제곱인치'
+      ksi: '킬로파운드당 제곱인치'
+    data:
+      B: '바이트'
+      KB: '킬로바이트'
+      MB: '메가바이트'
+      GB: '기가바이트'
+      TB: '테라바이트'
+      PB: '페타바이트'
+  tooltipSwap: '원본과 대상을 바꿉니다.'
+en:
+  category: 'Category'
+  categories:
+    length: 'Length'
+    area: 'Area'
+    volume: 'Volume'
+    weight: 'Weight'
+    temp: 'Temp'
+    time: 'Time'
+    speed: 'Speed'
+    pressure: 'Pressure'
+    data: 'Data'
+  unitDesc:
+    length:
+      m: 'Meter'
+      km: 'Kilometer'
+      cm: 'Centimeter'
+      mm: 'Millimeter'
+      in: 'Inch'
+      ft: 'Foot'
+      yd: 'Yard'
+      mi: 'Mile'
+    area:
+      py: 'Pyeong'
+      'm²': 'Square Meter'
+      'km²': 'Square Kilometer'
+      'cm²': 'Square Centimeter'
+      'mm²': 'Square Millimeter'
+      'in²': 'Square Inch'
+      'ft²': 'Square Foot'
+      'yd²': 'Square Yard'
+      'mi²': 'Square Mile'
+      ha: 'Hectare'
+      a: 'Are'
+      ac: 'Acre'
+    volume:
+      'm³': 'Cubic Meter'
+      'km³': 'Cubic Kilometer'
+      'cm³': 'Cubic Centimeter'
+      'mm³': 'Cubic Millimeter'
+      'in³': 'Cubic Inch'
+      'ft³': 'Cubic Foot'
+      'yd³': 'Cubic Yard'
+      'mi³': 'Cubic Mile'
+      l: 'Liter'
+      ml: 'Milliliter'
+      kl: 'Kiloliter'
+      gal: 'Gallon'
+    weight:
+      g: 'Gram'
+      kg: 'Kilogram'
+      mg: 'Milligram'
+      oz: 'Ounce'
+      lb: 'Pound'
+      ton: 'Ton'
+    temp:
+      '°C': 'Celsius'
+      '°F': 'Fahrenheit'
+      K: 'Kelvin'
+      '°R': 'Rankine'
+    time:
+      sec: 'Second'
+      min: 'Minute'
+      hour: 'Hour'
+      day: 'Day'
+      week: 'Week'
+      month: 'Month'
+      year: 'Year'
+    speed:
+      'km/h': 'Kilometer per Hour'
+      'm/s': 'Meter per Second'
+      'ft/s': 'Foot per Second'
+      'mi/h': 'Mile per Hour'
+      knot: 'Knot'
+    pressure:
+      Pa: 'Pascal'
+      kPa: 'Kilopascal'
+      MPa: 'Megapascal'
+      hPa: 'Hectopascal'
+      bar: 'Bar'
+      psi: 'Pound per Square Inch'
+      ksi: 'Kilopound per Square Inch'
+    data:
+      B: 'Byte'
+      KB: 'Kilobyte'
+      MB: 'Megabyte'
+      GB: 'Gigabyte'
+      TB: 'Terabyte'
+      PB: 'Petabyte'
+  tooltipSwap: 'Swap source and destination.'
+</i18n>

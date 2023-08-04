@@ -91,36 +91,33 @@ export const useCalcStore = defineStore('calc', {
       return number.toLocaleString(this.locale, {
         style: 'decimal',
         useGrouping: this.useGrouping,
-        minimumFractionDigits:
-          this.decimalPlaces == -2 ? 0 : this.decimalPlaces,
-        maximumFractionDigits:
-          this.decimalPlaces == -2 ? 20 : this.decimalPlaces,
+        minimumFractionDigits: this.decimalPlaces == -2 ? 0 : this.decimalPlaces,
+        maximumFractionDigits: this.decimalPlaces == -2 ? 20 : this.decimalPlaces,
       });
     },
     // 계산 결과 중 좌변
     getLeftSideInHistory(h: History, lf = false) {
       const br = lf ? '\n' : '';
-      if (['+', '-', '×', '÷'].includes(h.operator)) { // 사칙연산
-        return `${this.toLocale(h.preNumber)}${br} ${
-          h.operator
-        } ${this.toLocale(h.argNumber as number)}`;
-      } else if (h.operator == '÷%') { // 퍼센트로 나누는 경우
-        return `${this.toLocale(h.preNumber)}${br} ÷ ${this.toLocale(
-          h.argNumber as number
-        )}${br} × 100`;
-      } else if (h.operator == '×%') { // 퍼센트로 곱하는 경우
-        return `${this.toLocale(h.preNumber)}${br} × ${this.toLocale(
-          h.argNumber as number
-        )}${br} ÷ 100`;
-      } else if (h.operator == 'rec') { // 역수
+      if (['+', '-', '×', '÷'].includes(h.operator)) {
+        // 사칙연산
+        return `${this.toLocale(h.preNumber)}${br} ${h.operator} ${this.toLocale(h.argNumber as number)}`;
+      } else if (h.operator == '÷%') {
+        // 퍼센트로 나누는 경우
+        return `${this.toLocale(h.preNumber)}${br} ÷ ${this.toLocale(h.argNumber as number)}${br} × 100`;
+      } else if (h.operator == '×%') {
+        // 퍼센트로 곱하는 경우
+        return `${this.toLocale(h.preNumber)}${br} × ${this.toLocale(h.argNumber as number)}${br} ÷ 100`;
+      } else if (h.operator == 'rec') {
+        // 역수
         return `1${br} ÷ ${this.toLocale(h.preNumber)}`;
-      } else if (h.operator == 'pow2') { // 제곱
-        return `${this.toLocale(h.preNumber)}${br} × ${this.toLocale(
-          h.preNumber
-        )}`;
-      } else if (['sqrt'].includes(h.operator)) { // 제곱근
+      } else if (h.operator == 'pow2') {
+        // 제곱
+        return `${this.toLocale(h.preNumber)}${br} × ${this.toLocale(h.preNumber)}`;
+      } else if (['sqrt'].includes(h.operator)) {
+        // 제곱근
         return `${h.operator} ( ${this.toLocale(h.preNumber)} )`;
-      } else { // 그 외
+      } else {
+        // 그 외
         return this.toLocale(h.preNumber);
       }
     },
@@ -138,7 +135,7 @@ export const useCalcStore = defineStore('calc', {
       });
     },
     // 알림을 띄우는 함수 - 에러
-    notifyError(msg: string, timeout = 500) {
+    notifyError(msg: string, timeout = 500): void {
       Notify.create({
         message: msg,
         position: 'top',
@@ -147,27 +144,25 @@ export const useCalcStore = defineStore('calc', {
       });
     },
     // 요소의 포커스를 해제하는 함수
-    blurElement() {
+    blurElement(): void {
       const el = document.activeElement as HTMLElement;
       el?.blur();
     },
     // 입력 필드가 포커스를 받았다고 셋팅하는 함수
-    setInputFocused() {
+    setInputFocused(): void {
       setTimeout(() => {
         this.inputFocused = true;
-        console.log('setInputFocused', this.inputFocused);
       }, 10);
     },
     // 입력 필드가 포커스를 잃었다고 셋팅하는 함수
-    setInputBlurred() {
+    setInputBlurred(): void {
       this.inputFocused = false;
       console.log('setInputBlurred', this.inputFocused);
-
     },
-    showUnitToggle() {
+    showUnitToggle(): void {
       this.showUnit = !this.showUnit;
     },
-    showSymbolToggle() {
+    showSymbolToggle(): void {
       this.showSymbol = !this.showSymbol;
     },
   },

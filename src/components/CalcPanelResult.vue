@@ -21,7 +21,7 @@ const calc = store.calc;
 const needResultTooltip = ref(false);
 
 // 계산 결과가 길 경우 툴팁 표시 상태 셋팅
-function setNeedResultTooltip() {
+const setNeedResultTooltip = () => {
   // 원래 결과 칸 길이
   const ow = document.getElementById('result')?.offsetWidth ?? 0;
   // 결과 문자열의 크기
@@ -29,10 +29,11 @@ function setNeedResultTooltip() {
   const sw = document.getElementById('result')?.scrollWidth ?? 0;
   // 원래의 칸 크기보다 결과 문자열 길이가 길면 툴팁을 표시
   needResultTooltip.value = ow < sw;
+
+  return true;
 }
 
-// 이 코드는 계산한 결과를 나타내는 상수입니다.
-const result = computed(() => {
+const baseResult = computed(() => {
   // 표시된 숫자를 받아옵니다.
   const shownNumber = calc.getShownNumber();
 
@@ -41,27 +42,29 @@ const result = computed(() => {
 
   // baseResult는 조건에 따라 두가지 형식 중 하나로 표시된 숫자를 변환합니다.
   // 만약 store의 decimalPlaces가 -2이며, decimal 부분이 있으면 소수점 표현으로, 그 외의 경우는 일반적으로 소수 변환으로 표현합니다.
-  const baseResult =
-    store.decimalPlaces == -2 && decimal
-      ? `${store.toLocale(Number(integer))}.${decimal}`
-      : store.toLocale(Number(shownNumber));
+  return store.decimalPlaces == -2 && decimal
+    ? `${store.toLocale(Number(integer))}.${decimal}`
+    : store.toLocale(Number(shownNumber));
+});
 
+// 이 코드는 계산한 결과를 나타내는 상수입니다.
+const result = computed(() => {
   // store에서 단위 표시가 활성화되어 있고, 애드온이 'unit'일 경우
   if (store.showUnit && props.addon == 'unit') {
     // 사용할 단위를 결정합니다.
     const unit = store.recentUnitFrom[store.recentCategory];
     // 이 단위와 baseResult를 결합하여 반환합니다.
-    return [baseResult, unit].join(' ');
+    return [baseResult.value, unit].join(' ');
   }
   // store에서 기호 표시가 활성화되어 있고, 애드온이 'currency'일 경우
   else if (store.showSymbol && props.addon == 'currency') {
     // 기호를 가져옵니다. 또한 현재 환율로부터 해당 기호를 찾을 수 없는 경우에 대비하여 기본값을 설정합니다.
     const symbol = store.currencyConverter?.getSymbol(store.recentCurrencyFrom) ?? '';
     // 이 기호와 baseResult를 결합하여 반환합니다.
-    return [symbol, baseResult].join(' ');
+    return [symbol, baseResult.value].join(' ');
   } else {
     // 둘 다 아닌 경우, 조건에 해당하는 'else'에서는 baseResult를 그대로 반환합니다.
-    return baseResult;
+    return baseResult.value;
   }
 });
 // 계산 결과 배열
@@ -80,22 +83,33 @@ const operatorIcons: { [key: string]: string } = {
 let prevHistoryId = 0;
 
 const preResult = computed(() => {
+  // 'history'는 계산의 직전 결과 기록을 가져옵니다.
   const history = resultHistory.value;
-  if (history.length > 0 && calc.getWillReset()) {
-    // 이전 결과가 있고, 계산기가 리셋될 예정이면
-    if (prevHistoryId != history[0].id as number) {
-      // 이전 결과의 id와 현재 결과의 id가 다르면
-      if (result.value == store.toLocale(history[0].resultNumber)) {
-        // 현재 결과가 이전 결과와 같으면
-        prevHistoryId = history[0].id as number;
-        return [store.getLeftSideInHistory(history[0]), '='].join(' ');
-      }
-    }
-  } else if (operator.value != '' && !calc.getWillReset()) {
-    // 연산자가 있고, 계산기가 리셋되지 않을 예정이면
-    return store.toLocale(calc.getBackupNumber());
+  // 'willReset'은 다음 입력시 계산기가 초기화 될지 판단합니다.
+  const willReset = calc.getWillReset();
+
+  // 'operatorExists'는 현재 입력된 연산자의 존재 여부를 확인합니다.
+  const operatorExists = operator.value != '';
+
+  // 계산 기록이 있고, 초기화 될 예정이며, 이전 history의 ID가 현재의 결과와 같다면
+  if (
+    history.length > 0 &&
+    willReset &&
+    prevHistoryId != (history[0].id as number) &&
+    baseResult.value == store.toLocale(history[0].resultNumber)
+  ) {
+    // 이전 이력의 ID를 현재 이력의 ID로 설정하고 계산 이력의 왼쪽 값을 가져온 후 '='으로 결합해서 출력합니다.
+    prevHistoryId = history[0].id as number;
+    return [store.getLeftSideInHistory(history[0]), '='].join(' ');
   }
-  return '';
+  // 입력된 연산자가 있고 초기화 예정이 아니라면
+  else if (operatorExists && !willReset) {
+    // 백업된 숫자를 현재 지역의 표기법으로 변환하여 반환합니다.
+    return store.toLocale(calc.getBackupNumber());
+  } else {
+    // 위의 조건에 해당하지 않는 경우, 빈 문자열을 반환합니다.
+    return '';
+  }
 });
 
 onBeforeMount(() => {
@@ -118,21 +132,12 @@ onMounted(() => {
       filled
       dense
       readonly
-      :bg-color="
-        needResultTooltip
-          ? store.darkMode
-            ? 'blue-grey-9'
-            : 'amber-2'
-          : undefined
-      "
+      :bg-color="needResultTooltip ? (store.darkMode ? 'blue-grey-9' : 'amber-2') : undefined"
       label-slot
       stack-label
     >
       <template v-slot:prepend v-if="operator != ''">
-        <div
-          class="noselect full-height q-mt-xs q-pt-xs"
-          v-blur
-        >
+        <div class="noselect full-height q-mt-xs q-pt-xs" v-blur>
           <q-icon :name="operatorIcons[operator]" />
         </div>
       </template>

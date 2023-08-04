@@ -31,21 +31,17 @@ const doDeleteHistory = ref(false);
 const isGoToTopInHistory = ref(false);
 
 // 계산 결과 창 스크롤 위치에 따라 아이콘 표시 설정
-function onScroll(evt: Event) {
-  if ((evt.target as HTMLDivElement).scrollTop > 50) {
-    isGoToTopInHistory.value = true;
-  } else {
-    isGoToTopInHistory.value = false;
-  }
-}
+const onScroll = (evt: Event) => {
+  isGoToTopInHistory.value = (evt.target as HTMLDivElement).scrollTop > 50;
+};
 
 // 계산 결과 창 스크롤 위치를 최상단으로 이동
-function goToTopInHistory() {
+const goToTopInHistory = () => {
   document.getElementById('history')?.scrollTo({
     top: 0,
     behavior: 'smooth',
   });
-}
+};
 
 // 최상단으로 가는 아이콘을 히스토리 숨길 때 함께 숨김
 watch(

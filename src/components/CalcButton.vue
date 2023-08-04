@@ -41,12 +41,7 @@ const buttons: Button = [
     ['@mdi-equal', 'secondary', ['=', 'Enter'], () => calc.equal()],
   ];
 
-const keyBindings: KeyBindings = [];
-
-buttons.forEach((button) => {
-  const [, , keys, handler] = button;
-  keyBindings.push([keys, handler])
-});
+const keyBindings: KeyBindings = buttons.map(([, , keys, handler]) => [keys, handler]);
 
 const keyBinding = new KeyBinding(keyBindings);
 
@@ -107,7 +102,6 @@ if (props.type === 'unit' || props.type === 'currency') {
         :color="button[1]"
         @click="button[3]"
       />
-      <!-- :size="button[0].charAt(0) == '@' ? '1rem' : '1.2rem'" -->
     </div>
   </q-card-section>
 </template>
