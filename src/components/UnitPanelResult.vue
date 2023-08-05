@@ -218,15 +218,15 @@ watch(
       <template v-slot:option="scope">
         <q-item v-bind="scope.itemProps">
           <q-item-section>
+            <q-item-label caption>
+              {{ t(`unitDesc.${store.recentCategory}.${scope.opt.label}`) }}
+            </q-item-label>
             <q-item-label>{{ scope.opt.label }}</q-item-label>
-            <q-item-label caption>{{
-              t(`unitDesc.${store.recentCategory}.${scope.opt.label}`)
-            }}</q-item-label>
           </q-item-section>
         </q-item>
       </template>
       <MyTooltip>
-        {{  t(`unitDesc.${store.recentCategory}.${store.recentUnitFrom[store.recentCategory]}`) }}
+        {{ t(`unitDesc.${store.recentCategory}.${store.recentUnitFrom[store.recentCategory]}`) }}
       </MyTooltip>
     </q-select>
 
@@ -260,10 +260,10 @@ watch(
       <template v-slot:option="scope">
         <q-item v-bind="scope.itemProps">
           <q-item-section>
+            <q-item-label caption>
+              {{ t(`unitDesc.${store.recentCategory}.${scope.opt.label}`) }}
+            </q-item-label>
             <q-item-label>{{ scope.opt.label }}</q-item-label>
-            <q-item-label caption>{{
-              t(`unitDesc.${store.recentCategory}.${scope.opt.label}`)
-            }}</q-item-label>
           </q-item-section>
         </q-item>
       </template>

@@ -33,7 +33,7 @@
     "build:win32": "quasar build -m electron -T win32"
   },
   "dependencies": {
-    "@everapi/freecurrencyapi-js": "^1.0.0",
+    "@everapi/freecurrencyapi-js": "^1.0.1",
     "@quasar/extras": "^1.15.1",
     "axios": "^1.4.0",
     "electron-window-state": "^5.0.3",
@@ -57,8 +57,8 @@
     "@vue/devtools": "^6.2.0",
     "@vue/eslint-config-airbnb": "^7.0.0",
     "autoprefixer": "^10.4.2",
-    "electron": "^19.0.6",
-    "electron-builder": "^22.4.0",
+    "electron": "^25.4.0",
+    "electron-builder": "^24.3.0",
     "eslint": "^8.46.0",
     "eslint-config-airbnb-base": "^15.0.0",
     "eslint-config-prettier": "^8.1.0",
@@ -66,7 +66,8 @@
     "eslint-plugin-vue": "^9.16.1",
     "prettier": "^2.5.1",
     "ts-node": "^10.9.1",
-    "typescript": "^4.5.4"
+    "typescript": "^4.5.4",
+    "vite": "2.9.14"
   },
   "engines": {
     "node": "^18 || ^16 || ^14.19",

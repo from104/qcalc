@@ -157,7 +157,6 @@ export const useCalcStore = defineStore('calc', {
     // 입력 필드가 포커스를 잃었다고 셋팅하는 함수
     setInputBlurred(): void {
       this.inputFocused = false;
-      console.log('setInputBlurred', this.inputFocused);
     },
     showUnitToggle(): void {
       this.showUnit = !this.showUnit;

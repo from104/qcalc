@@ -25,21 +25,22 @@ const { currencyConverter } = store;
 
 // 선택할 통화 초기화
 function initRecentCurrency() {
-  const [currency0, currency1] = currencyConverter.getCurrencyLists();
+  const defaultCurrency = ['USD', 'KRW'];
+
 
   // 저장된 원본 통화가 잘못됐으면 초기화
   if (!currencyConverter.getCurrencyLists().includes(store.recentCurrencyFrom)) {
-    store.recentCurrencyFrom = currency0;
+    store.recentCurrencyFrom = defaultCurrency[0];
     if (store.recentCurrencyFrom === store.recentCurrencyTo) {
-      store.recentCurrencyFrom = currency1;
+      store.recentCurrencyFrom = defaultCurrency[1];
     }
   }
 
   // 저장된 대상 통화가 잘못됐으면 초기화
   if (!currencyConverter.getCurrencyLists().includes(store.recentCurrencyTo)) {
-    store.recentCurrencyTo = currency1;
+    store.recentCurrencyTo = defaultCurrency[1];
     if (store.recentCurrencyTo === store.recentCurrencyFrom) {
-      store.recentCurrencyTo = currency0;
+      store.recentCurrencyTo = defaultCurrency[0];
     }
   }
 }

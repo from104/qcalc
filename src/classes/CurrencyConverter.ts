@@ -1,5 +1,4 @@
-import axios from 'axios';
-
+import Freecurrencyapi from '@everapi/freecurrencyapi-js';
 // 환율 정보를 저장하는 인터페이스
 interface Currency {
   [currency: string]: {
@@ -187,35 +186,37 @@ const currencyBaseData: CurrencyData = {
   ZAR: { desc: 'South African Rand', symbol: 'R' },
   ZMK: { desc: 'Zambian Kwacha (pre-2013)', symbol: 'ZMK' },
   ZMW: { desc: 'Zambian Kwacha', symbol: 'ZMW' },
-  ZWL: { desc: 'Zimbabwean Dollar', symbol: 'ZWL' }
+  ZWL: { desc: 'Zimbabwean Dollar', symbol: 'ZWL' },
 };
 
 // 환율 정보를 가져오는 API 클래스
-class ExchangeRatesAPI {
-  //
-  private static API_URL = 'http://api.exchangeratesapi.io/v1';
-  private static ACCESS_KEY = 'a761d5c309cf3d8f67106700be92c857';
+// class ExchangeRatesAPI {
+//   //
+//   private static API_URL = 'https://api.exchangeratesapi.io/v1';
+//   private static ACCESS_KEY = 'a761d5c309cf3d8f67106700be92c857';
 
-  // API에서 모든 환율 정보를 가져오는 메소드
-  async getRates(base = 'EUR'): Promise<Rates> {
-    try {
-      // API로부터 환율 정보를 가져옵니다.
-      const response = await axios.get(
-        `${ExchangeRatesAPI.API_URL}/latest?access_key=${ExchangeRatesAPI.ACCESS_KEY}&base=${base}`
-      );
-      // 환율 정보를 반환합니다.
-      return response.data.rates;
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    } catch (error: any) {
-      // console.error(error.response.data); // 에러 응답의 내용을 출력합니다.
-      return error.response.data;
-    }
-  }
-}
+//   // API에서 모든 환율 정보를 가져오는 메소드
+//   async getRates(base = 'EUR'): Promise<Rates> {
+//     try {
+//       // API로부터 환율 정보를 가져옵니다.
+//       const response = await axios.get(
+//         `${ExchangeRatesAPI.API_URL}/latest?access_key=${ExchangeRatesAPI.ACCESS_KEY}&base=${base}`
+//       );
+//       // 환율 정보를 반환합니다.
+//       return response.data.rates;
+//       // eslint-disable-next-line @typescript-eslint/no-explicit-any
+//     } catch (error: any) {
+//       // console.error(error.response.data); // 에러 응답의 내용을 출력합니다.
+//       return error.response.data;
+//     }
+//   }
+// }
 
 // 환율 정보를 사용하는 클래스
 class CurrencyConverter {
-  private api = new ExchangeRatesAPI(); // 환율 정보를 가져오는 APIx
+  // https://app.freecurrencyapi.com/dashboard
+  private accessKey = 'fca_live_8Oa4U4LV01lAXhfi2lyhatGvOQnp0MYCZheLXxof'; // API 접근 키
+
   private intervalToUpdate = 1000 * 60 * 60 * 12; // 환율 정보를 업데이트하는 주기
   private updatedTimeOfRates = 0; // 환율 정보를 업데이트한 시간
   private baseRates: Rates = {}; // 기본 환율 정보 (EUR)
@@ -238,19 +239,21 @@ class CurrencyConverter {
   // 환율 정보를 업데이트하는 메소드
   async updateRates(force = false) {
     // 환율 정보가 없거나, 업데이트 주기가 지났거나, 경과 시간과 무관하게 업데이트를 강제하려는 경우
-    if (this.isRatesEmpty() || Date.now() - this.updatedTimeOfRates > this.intervalToUpdate || force) {
-      try {
+    try {
+      if (this.isRatesEmpty() || Date.now() - this.updatedTimeOfRates > this.intervalToUpdate || force) {
         // API로 부터 환율 정보를 가져옵니다.
-        this.baseRates = await this.api.getRates();
+        const api = new Freecurrencyapi(this.accessKey);
+        const data = await api.latest({ base_currency: 'EUR' });
+        this.baseRates = data.data;
         // 기준 통화에 대한 환율 정보를 설정합니다.
         this.rates = this.getRates(this.base);
         // 마지막 업데이트 시간을 현재 시간으로 갱신합니다.
         this.updatedTimeOfRates = Date.now();
         // console.log('환율 정보를 업데이트 했습니다.');
-      } catch (error) {
-        this.rates = {};
-        console.error(error);
       }
+    } catch (error) {
+      this.rates = {};
+      console.log(error);
     }
   }
 
@@ -350,7 +353,6 @@ class CurrencyConverter {
       return {};
     }
   }
-
 
   getSymbol(currency: string): string {
     // 통화 정보가 비어있지 않다면, 통화 기호를 반환합니다.
