@@ -94,8 +94,9 @@ if (props.type === 'unit' || props.type === 'currency') {
       :key="index"
     >
       <q-btn
-        class="glossy shadow-4 noselect col-12 button"
+        class="shadow-4 noselect col-12 button"
         no-caps
+        push
         :label="button[0].charAt(0) != '@' ? button[0] : undefined"
         :icon="button[0].charAt(0) == '@' ? button[0].slice(1) : undefined"
         :id="button[0].charAt(0) == '@' ? 'icon' : 'char'"
@@ -108,7 +109,6 @@ if (props.type === 'unit' || props.type === 'currency') {
 
 <style scoped lang="scss">
 .button {
-  border-radius: 0.5rem;
   min-height: calc((100vh - v-bind('baseHeight')) / 6 - 20px);
   max-height: calc((100vh - v-bind('baseHeight')) / 6 - 20px);
   font-weight: 700;

@@ -91,7 +91,6 @@ onBeforeUnmount(() => {
         class="self-center shadow-4 q-ma-sm"
         padding="sm"
         round
-        glossy
         :color="store.getDarkColor('info')"
         size="md"
         icon="mdi-arrow-up-bold"
@@ -107,7 +106,6 @@ onBeforeUnmount(() => {
         class="self-center shadow-4 q-ma-sm"
         padding="sm"
         round
-        glossy
         :color="store.getDarkColor('info')"
         size="md"
         icon="mdi-arrow-down-bold"
