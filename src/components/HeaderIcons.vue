@@ -62,6 +62,8 @@ const keyBinding = new KeyBinding([
 onMounted(() => {
   keyBinding.subscribe();
 });
+
+const pasteDisabledPath = ['/', '/help', '/about'];
 </script>
 
 <template>
@@ -77,7 +79,7 @@ onMounted(() => {
     flat
     icon="content_paste"
     class="q-ma-none q-pa-none q-pl-xs"
-    :disable="$route.path != '/'"
+    :disable="pasteDisabledPath.includes($route.path)"
     @click="doPaste"
   >
     <MyTooltip>{{ t('tooltipPaste') }}</MyTooltip>
