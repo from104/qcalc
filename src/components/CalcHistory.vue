@@ -54,8 +54,8 @@ watch(
 );
 
 const keyBinding = new KeyBinding([
-  [['h'], () => { !doDeleteHistory.value && (isHistoryOpen.value = !isHistoryOpen.value); }],
-  [['d'], () => { isHistoryOpen.value && (doDeleteHistory.value = true); }]
+  [['h'], () => { !doDeleteHistory.value && store.clickButtonById('btn-history'); }],
+  [['d'], () => { isHistoryOpen.value && store.clickButtonById('btn-delete-history'); }]
 ]);
 
 // inputFocused 값이 바뀌면 키바인딩을 추가하거나 제거합니다.
@@ -87,8 +87,8 @@ onBeforeUnmount(() => {
     <transition name="fade">
       <q-btn
         v-if="!isHistoryOpen"
-        id="show-history-icon"
-        class="self-center shadow-4 q-ma-sm"
+        id="history-icon"
+        class="self-center shadow-4 q-ma-sm show-history-icon"
         padding="sm"
         round
         :color="store.getDarkColor('info')"
@@ -102,8 +102,8 @@ onBeforeUnmount(() => {
       </q-btn>
       <q-btn
         v-else
-        id="hide-history-icon"
-        class="self-center shadow-4 q-ma-sm"
+        id="btn-history"
+        class="self-center shadow-4 q-ma-sm hide-history-icon"
         padding="sm"
         round
         :color="store.getDarkColor('info')"
@@ -133,10 +133,12 @@ onBeforeUnmount(() => {
       <div>{{ t('history') }}</div>
       <q-space />
       <q-btn
+        id="btn-delete-history"
         dense
         flat
         icon="delete_outline"
         size="md"
+        :disable="doDeleteHistory || resultHistory.length == 0"
         @click="doDeleteHistory = true"
       />
       <q-btn dense flat icon="close" size="md" @click="isHistoryOpen = false" />
@@ -289,12 +291,12 @@ en:
   position: fixed;
 }
 
-#show-history-icon {
+.show-history-icon {
   @include history-icon;
   bottom: -28px;
 }
 
-#hide-history-icon {
+.hide-history-icon {
   @include history-icon;
   bottom: -14px;
   &:hover {

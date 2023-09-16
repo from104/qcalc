@@ -164,6 +164,13 @@ export const useCalcStore = defineStore('calc', {
     showSymbolToggle(): void {
       this.showSymbol = !this.showSymbol;
     },
+    // id가 있는 버튼의 클릭 이벤트를 에뮬레이트 하기 위한 함수
+    clickButtonById(id: string): void {
+      const button = document.getElementById(id);
+      if (button) {
+        button.click();
+      }
+    },
   },
   persist: true,
 });

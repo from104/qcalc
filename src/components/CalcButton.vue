@@ -11,37 +11,37 @@ const store = useCalcStore();
 const calc = store.calc;
 
 // 버튼 레이블, 버튼 컬러, 버튼에 해당하는 키, 버튼 클릭 이벤트 핸들러
-type Button = [string, string, string[], () => void][];
+type Button = [id: string, label: string, color: string, keys: string[], handler: () => void][];
 
 // prettier-ignore
 const buttons: Button = [
-    ['x²', 'secondary', ['u'], () => calc.pow2()],
-    ['√x', 'secondary', ['r'], () => calc.sqrt()],
-    ['C', 'deep-orange', ['Delete', 'Escape', 'c'], () => calc.clear()],
-    ['@mdi-backspace', 'deep-orange', ['Backspace'], () => calc.deleteDigitOrDot()],
-    ['@mdi-plus-minus-variant', 'secondary', ['Shift+Minus', 's'], () => calc.changeSign()],
-    ['%', 'secondary', ['%', 'p'], () => calc.percent()],
-    ['1/x', 'secondary', ['i'], () => calc.rec()],
-    ['@mdi-division', 'secondary', ['/'], () => calc.div()],
-    ['7', 'primary', ['7'], () => calc.addDigit(7)],
-    ['8', 'primary', ['8'], () => calc.addDigit(8)],
-    ['9', 'primary', ['9'], () => calc.addDigit(9)],
-    ['@mdi-close', 'secondary', ['*'], () => calc.mul()],
-    ['4', 'primary', ['4'], () => calc.addDigit(4)],
-    ['5', 'primary', ['5'], () => calc.addDigit(5)],
-    ['6', 'primary', ['6'], () => calc.addDigit(6)],
-    ['@mdi-minus', 'secondary', ['-'], () => calc.minus()],
-    ['1', 'primary', ['1'], () => calc.addDigit(1)],
-    ['2', 'primary', ['2'], () => calc.addDigit(2)],
-    ['3', 'primary', ['3'], () => calc.addDigit(3)],
-    ['@mdi-plus', 'secondary', ['+'], () => calc.plus()],
-    ['00', 'primary', [], () => { calc.addDigit(0); calc.addDigit(0); }],
-    ['0', 'primary', ['0'], () => calc.addDigit(0)],
-    ['@mdi-circle-small', 'primary', ['.'], () => calc.addDot()],
-    ['@mdi-equal', 'secondary', ['=', 'Enter'], () => calc.equal()],
-  ];
+  ['power', 'x²', 'secondary', ['u'], () => calc.pow2()],
+  ['root', '√x', 'secondary', ['r'], () => calc.sqrt()],
+  ['clear', 'C', 'deep-orange', ['Delete', 'Escape', 'c'], () => calc.clear()],
+  ['backspace', '@mdi-backspace', 'deep-orange', ['Backspace'], () => calc.deleteDigitOrDot()],
+  ['plusMinus', '@mdi-plus-minus-variant', 'secondary', ['Shift+Minus', 's'], () => calc.changeSign()],
+  ['percent', '%', 'secondary', ['%', 'p'], () => calc.percent()],
+  ['reciprocal', '1/x', 'secondary', ['i'], () => calc.rec()],
+  ['divide', '@mdi-division', 'secondary', ['/'], () => calc.div()],
+  ['seven', '7', 'primary', ['7'], () => calc.addDigit(7)],
+  ['eight', '8', 'primary', ['8'], () => calc.addDigit(8)],
+  ['nine', '9', 'primary', ['9'], () => calc.addDigit(9)],
+  ['multiply', '@mdi-close', 'secondary', ['*'], () => calc.mul()],
+  ['four', '4', 'primary', ['4'], () => calc.addDigit(4)],
+  ['five', '5', 'primary', ['5'], () => calc.addDigit(5)],
+  ['six', '6', 'primary', ['6'], () => calc.addDigit(6)],
+  ['minus', '@mdi-minus', 'secondary', ['-'], () => calc.minus()],
+  ['one', '1', 'primary', ['1'], () => calc.addDigit(1)],
+  ['two', '2', 'primary', ['2'], () => calc.addDigit(2)],
+  ['three', '3', 'primary', ['3'], () => calc.addDigit(3)],
+  ['plus', '@mdi-plus', 'secondary', ['+'], () => calc.plus()],
+  ['doubleZero', '00', 'primary', [], () => { calc.addDigit(0); calc.addDigit(0); }],
+  ['zero', '0', 'primary', ['0'], () => calc.addDigit(0)],
+  ['dot', '@mdi-circle-small', 'primary', ['.'], () => calc.addDot()],
+  ['equals', '@mdi-equal', 'secondary', ['=', 'Enter'], () => calc.equal()],
+];
 
-const keyBindings: KeyBindings = buttons.map(([, , keys, handler]) => [keys, handler]);
+const keyBindings: KeyBindings = buttons.map(([id, , , keys, ]) => [keys, () => store.clickButtonById('btn-'+id)]);
 
 const keyBinding = new KeyBinding(keyBindings);
 
@@ -94,14 +94,15 @@ if (props.type === 'unit' || props.type === 'currency') {
       :key="index"
     >
       <q-btn
+        :id="'btn-'+button[0]"
         class="shadow-4 noselect col-12 button"
         no-caps
         push
-        :label="button[0].charAt(0) != '@' ? button[0] : undefined"
-        :icon="button[0].charAt(0) == '@' ? button[0].slice(1) : undefined"
-        :id="button[0].charAt(0) == '@' ? 'icon' : 'char'"
-        :color="button[1]"
-        @click="button[3]"
+        :label="button[1].charAt(0) != '@' ? button[1] : undefined"
+        :icon="button[1].charAt(0) == '@' ? button[1].slice(1) : undefined"
+        :class="button[1].charAt(0) == '@' ? 'icon' : 'char'"
+        :color="button[2]"
+        @click="button[4]"
       />
     </div>
   </q-card-section>
@@ -114,7 +115,7 @@ if (props.type === 'unit' || props.type === 'currency') {
   font-weight: 700;
 }
 
-#icon {
+.icon {
   font-size: calc(
     min(
         calc((100vh - v-bind('baseHeight')) / 6 * 0.25),
@@ -122,7 +123,7 @@ if (props.type === 'unit' || props.type === 'currency') {
       ) * 0.9
   );
 }
-#char {
+.char {
   font-size: calc(
     min(
         calc((100vh - v-bind('baseHeight')) / 6 * 0.26),

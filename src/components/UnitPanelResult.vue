@@ -125,7 +125,7 @@ const unitResult = computed(() => {
 });
 
 const keyBinding = new KeyBinding([
-  [['v'], () => swapUnitValue()],
+  [['v'], () => store.clickButtonById('btn-swap-unit')],
   [['b'], () => store.showUnitToggle()],
 ]);
 
@@ -232,6 +232,7 @@ watch(
 
     <!-- 원본, 대상 단위 바꾸기 버튼 -->
     <q-btn
+      id="btn-swap-unit"
       dense
       round
       flat

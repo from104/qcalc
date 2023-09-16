@@ -55,8 +55,8 @@ function doPaste(): void {
 import { KeyBinding } from 'classes/KeyBinding';
 
 const keyBinding = new KeyBinding([
-  [['Control+c', 'Control+Insert', 'Copy'], doCopy],
-  [['Control+v', 'Shift+Insert', 'Paste'], doPaste],
+  [['Control+c', 'Control+Insert', 'Copy'], () => store.clickButtonById('btn-copy')],
+  [['Control+v', 'Shift+Insert', 'Paste'], () => store.clickButtonById('btn-paste')],
 ]);
 
 onMounted(() => {
@@ -68,6 +68,7 @@ const pasteDisabledPath = ['/', '/help', '/about'];
 
 <template>
   <q-btn
+    id="btn-copy"
     flat
     icon="content_copy"
     class="q-ma-none q-pa-none q-pl-xs"
@@ -76,6 +77,7 @@ const pasteDisabledPath = ['/', '/help', '/about'];
     <MyTooltip>{{ t('tooltipCopy') }}</MyTooltip>
   </q-btn>
   <q-btn
+    id="btn-paste"
     flat
     icon="content_paste"
     class="q-ma-none q-pa-none q-pl-xs"

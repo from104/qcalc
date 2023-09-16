@@ -115,7 +115,7 @@ function setNeedCurrencyResultTooltip() {
 
 // 키바인딩 생성
 const keyBinding = new KeyBinding([
-  [['v'], () => swapCurrencyValue()],
+  [['v'], () => store.clickButtonById('btn-swap-currency')],
   [['b'], () => store.showSymbolToggle()],
 ]);
 
@@ -287,6 +287,7 @@ const filterFnTo = createFilterFn(toFilteredCurrencyOptions, toCurrencyOptions);
 
     <!-- 원본, 대상 통화 바꾸기 버튼 -->
     <q-btn
+      id="btn-swap-currency"
       dense
       round
       flat
