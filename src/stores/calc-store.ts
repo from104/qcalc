@@ -4,6 +4,12 @@ import { Notify } from 'quasar';
 import { Calculator } from 'classes/Calculator';
 import type { History } from 'classes/Calculator';
 import { CurrencyConverter } from 'classes/CurrencyConverter';
+import { create, all } from 'mathjs';
+
+const MathB = create(all, {
+  number: 'BigNumber',
+  precision: 64,
+}) as math.MathJsStatic;
 
 export const useCalcStore = defineStore('calc', {
   state: () => ({
@@ -86,39 +92,55 @@ export const useCalcStore = defineStore('calc', {
     decDecimalPlaces() {
       this.setDecimalPlaces(this.decimalPlaces - 2);
     },
+    // 숫자를 구분자로 그루핑하는 함수
+    numberGrouping(number: string, grouping: number = 3, separator: string = ',') {
+      const [integer, decimal] = number.split('.'),
+        regex = new RegExp(`\\B(?=(\\d{${grouping}})+(?!\\d))`, 'g');
+      return integer.replace(regex, separator) + (decimal ? `.${decimal}` : '');
+    },
     // 숫자를 표준 로케일 문자열로 변환하는 함수
-    toLocale(number: number): string {
-      return number.toLocaleString(this.locale, {
-        style: 'decimal',
-        useGrouping: this.useGrouping,
-        minimumFractionDigits: this.decimalPlaces == -2 ? 0 : this.decimalPlaces,
-        maximumFractionDigits: this.decimalPlaces == -2 ? 20 : this.decimalPlaces,
+    // toLocale(number: number): string {
+    //   return number.toLocaleString(this.locale, {
+    //     style: 'decimal',
+    //     useGrouping: this.useGrouping,
+    //     minimumFractionDigits: this.decimalPlaces == -2 ? 0 : this.decimalPlaces,
+    //     maximumFractionDigits: this.decimalPlaces == -2 ? 20 : this.decimalPlaces,
+    //   });
+    // },
+    // 숫자를 표준 로케일 문자열로 변환하는 함수
+    toLocale(number: string): string {
+      const n = MathB.bignumber(number);
+      const s = MathB.format(n, {
+        precision: this.decimalPlaces === -2 ? 20 : this.decimalPlaces,
+        notation: this.decimalPlaces === -2 ? 'auto' : 'fixed',
+        upperExp: 20,
       });
+      return this.useGrouping ? this.numberGrouping(s) : s;
     },
     // 계산 결과 중 좌변
     getLeftSideInHistory(h: History, lf = false) {
       const br = lf ? '\n' : '';
       if (['+', '-', '×', '÷'].includes(h.operator)) {
         // 사칙연산
-        return `${this.toLocale(h.preNumber)}${br} ${h.operator} ${this.toLocale(h.argNumber as number)}`;
+        return `${this.toLocale(h.previousNumber)}${br} ${h.operator} ${this.toLocale(h.argumentNumber ?? '')}`;
       } else if (h.operator == '÷%') {
         // 퍼센트로 나누는 경우
-        return `${this.toLocale(h.preNumber)}${br} ÷ ${this.toLocale(h.argNumber as number)}${br} × 100`;
+        return `${this.toLocale(h.previousNumber)}${br} ÷ ${this.toLocale(h.argumentNumber ?? '')}${br} × 100`;
       } else if (h.operator == '×%') {
         // 퍼센트로 곱하는 경우
-        return `${this.toLocale(h.preNumber)}${br} × ${this.toLocale(h.argNumber as number)}${br} ÷ 100`;
+        return `${this.toLocale(h.previousNumber)}${br} × ${this.toLocale(h.argumentNumber ?? '')}${br} ÷ 100`;
       } else if (h.operator == 'rec') {
         // 역수
-        return `1${br} ÷ ${this.toLocale(h.preNumber)}`;
+        return `1${br} ÷ ${this.toLocale(h.previousNumber)}`;
       } else if (h.operator == 'pow2') {
         // 제곱
-        return `${this.toLocale(h.preNumber)}${br} × ${this.toLocale(h.preNumber)}`;
+        return `${this.toLocale(h.previousNumber)} ^ 2`;
       } else if (['sqrt'].includes(h.operator)) {
         // 제곱근
-        return `${h.operator} ( ${this.toLocale(h.preNumber)} )`;
+        return `${h.operator} ( ${this.toLocale(h.previousNumber)} )`;
       } else {
         // 그 외
-        return this.toLocale(h.preNumber);
+        return this.toLocale(h.previousNumber);
       }
     },
     // 계산 결과 중 우변

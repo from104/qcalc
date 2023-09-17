@@ -73,6 +73,7 @@
 - quasar 2
 - q-markdown
 - tinykeys
+- MathJS
 
 ## 패키지 설치 방법
 

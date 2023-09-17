@@ -55,7 +55,7 @@ const currencyResult = computed(() => {
   return [
     symbol,
     store.toLocale(
-      currencyConverter.convert(Number(calc.getShownNumber()), store.recentCurrencyFrom, store.recentCurrencyTo)
+      currencyConverter.convert(Number(calc.getCurrentNumber()), store.recentCurrencyFrom, store.recentCurrencyTo).toString(),
     )
   ].join(' ');
 });
@@ -64,7 +64,7 @@ const currencyResult = computed(() => {
 function swapCurrencyValue() {
   // 변환 결과를 원본 값으로 바꾸기
   // (computed로 선언된 CurrencyResult로 인해 값이 바뀌면 자동으로 변환 결과가 바뀜)
-  calc.setShownNumber(currencyResult.value);
+  calc.setCurrentNumber(currencyResult.value);
 
   // 단위도 바꾸기
   const temp = store.recentCurrencyFrom;

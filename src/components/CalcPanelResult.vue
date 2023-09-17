@@ -33,40 +33,43 @@ const setNeedResultTooltip = () => {
   return true;
 }
 
-const baseResult = computed(() => {
-  // 표시된 숫자를 받아옵니다.
-  const shownNumber = calc.getShownNumber();
+// const baseResult = computed(() => {
+  // // 표시된 숫자를 받아옵니다.
+  // const shownNumber = calc.getShownNumber();
 
-  // integer는 정수 부분, decimal은 소수 부분으로 shownNumber를 분리합니다.
-  const [integer, decimal] = shownNumber.split('.');
+  // // integer는 정수 부분, decimal은 소수 부분으로 shownNumber를 분리합니다.
+  // const [integer, decimal] = shownNumber.split('.');
 
-  // baseResult는 조건에 따라 두가지 형식 중 하나로 표시된 숫자를 변환합니다.
-  // 만약 store의 decimalPlaces가 -2이며, decimal 부분이 있으면 소수점 표현으로, 그 외의 경우는 일반적으로 소수 변환으로 표현합니다.
-  return store.decimalPlaces == -2 && decimal
-    ? `${store.toLocale(Number(integer))}.${decimal}`
-    : store.toLocale(Number(shownNumber));
-});
+  // // baseResult는 조건에 따라 두가지 형식 중 하나로 표시된 숫자를 변환합니다.
+  // // 만약 store의 decimalPlaces가 -2이며, decimal 부분이 있으면 소수점 표현으로, 그 외의 경우는 일반적으로 소수 변환으로 표현합니다.
+  // return store.decimalPlaces == -2 && decimal
+  //   ? `${store.toLocale(Number(integer))}.${decimal}`
+  //   : store.toLocale(Number(shownNumber));
+//   return store.toLocale(calc.getCurrentNumber());
+// });
 
 // 이 코드는 계산한 결과를 나타내는 상수입니다.
 const result = computed(() => {
+  const baseResult = store.toLocale(calc.getCurrentNumber());
   // store에서 단위 표시가 활성화되어 있고, 애드온이 'unit'일 경우
   if (store.showUnit && props.addon == 'unit') {
     // 사용할 단위를 결정합니다.
     const unit = store.recentUnitFrom[store.recentCategory];
     // 이 단위와 baseResult를 결합하여 반환합니다.
-    return [baseResult.value, unit].join(' ');
+    return [baseResult, unit].join(' ');
   }
   // store에서 기호 표시가 활성화되어 있고, 애드온이 'currency'일 경우
   else if (store.showSymbol && props.addon == 'currency') {
     // 기호를 가져옵니다. 또한 현재 환율로부터 해당 기호를 찾을 수 없는 경우에 대비하여 기본값을 설정합니다.
     const symbol = store.currencyConverter?.getSymbol(store.recentCurrencyFrom) ?? '';
     // 이 기호와 baseResult를 결합하여 반환합니다.
-    return [symbol, baseResult.value].join(' ');
+    return [symbol, baseResult].join(' ');
   } else {
     // 둘 다 아닌 경우, 조건에 해당하는 'else'에서는 baseResult를 그대로 반환합니다.
-    return baseResult.value;
+    return baseResult;
   }
 });
+
 // 계산 결과 배열
 const resultHistory = computed(() => calc.getHistory() as History[]);
 
@@ -85,8 +88,8 @@ let prevHistoryId = 0;
 const preResult = computed(() => {
   // 'history'는 계산의 직전 결과 기록을 가져옵니다.
   const history = resultHistory.value;
-  // 'willReset'은 다음 입력시 계산기가 초기화 될지 판단합니다.
-  const willReset = calc.getWillReset();
+  // 'shouldReset'은 다음 입력시 계산기가 초기화 될지 판단합니다.
+  const shouldReset = calc.getShouldReset();
 
   // 'operatorExists'는 현재 입력된 연산자의 존재 여부를 확인합니다.
   const operatorExists = operator.value != '';
@@ -94,18 +97,18 @@ const preResult = computed(() => {
   // 계산 기록이 있고, 초기화 될 예정이며, 이전 history의 ID가 현재의 결과와 같다면
   if (
     history.length > 0 &&
-    willReset &&
+    shouldReset &&
     prevHistoryId != (history[0].id as number) &&
-    baseResult.value == store.toLocale(history[0].resultNumber)
+    calc.getCurrentNumber() == history[0].resultNumber
   ) {
     // 이전 이력의 ID를 현재 이력의 ID로 설정하고 계산 이력의 왼쪽 값을 가져온 후 '='으로 결합해서 출력합니다.
     prevHistoryId = history[0].id as number;
     return [store.getLeftSideInHistory(history[0]), '='].join(' ');
   }
   // 입력된 연산자가 있고 초기화 예정이 아니라면
-  else if (operatorExists && !willReset) {
+  else if (operatorExists && !shouldReset) {
     // 백업된 숫자를 현재 지역의 표기법으로 변환하여 반환합니다.
-    return store.toLocale(calc.getBackupNumber());
+    return store.toLocale(calc.getPreviousNumber());
   } else {
     // 위의 조건에 해당하지 않는 경우, 빈 문자열을 반환합니다.
     return '';

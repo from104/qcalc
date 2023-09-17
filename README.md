@@ -73,6 +73,7 @@ This is a simple calculator made using the source of the calculator for Android 
 - quasar 2
 - q-markdown
 - tinykeys
+- MathJS
 
 ## How to install packages
 

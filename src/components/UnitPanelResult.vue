@@ -27,7 +27,7 @@ const calc = store.calc;
 function swapUnitValue() {
   // 변환 결과를 원본 값으로 바꾸기
   // (computed로 선언된 unitResult로 인해 값이 바뀌면 자동으로 변환 결과가 바뀜)
-  calc.setShownNumber(unitResult.value);
+  calc.setCurrentNumber(unitResult.value);
 
   // 단위도 바꾸기
   const temp = store.recentUnitFrom[store.recentCategory];
@@ -117,10 +117,10 @@ const unitResult = computed(() => {
   return [store.toLocale(
     UnitConverter.convert(
       store.recentCategory,
-      Number(calc.getShownNumber()),
+      Number(calc.getCurrentNumber()),
       store.recentUnitFrom[store.recentCategory],
       store.recentUnitTo[store.recentCategory]
-    )
+    ).toString()
   ), unit].join(' ');
 });
 

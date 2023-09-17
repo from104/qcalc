@@ -87,7 +87,7 @@ onBeforeUnmount(() => {
     <transition name="fade">
       <q-btn
         v-if="!isHistoryOpen"
-        id="history-icon"
+        id="btn-history"
         class="self-center shadow-4 q-ma-sm show-history-icon"
         padding="sm"
         round
