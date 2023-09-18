@@ -1,14 +1,12 @@
 <script setup lang="ts">
 import {
   ref,
-  computed,
   onMounted,
   onBeforeUnmount,
   reactive,
   watch,
   Ref,
 } from 'vue';
-// import tinykeys, { KeyBindingMap } from 'tinykeys';
 import { useI18n } from 'vue-i18n';
 
 import { KeyBinding } from 'classes/KeyBinding';
@@ -45,8 +43,7 @@ function initRecentCurrency() {
   }
 }
 
-// 변환 결과 계산 (computed로 선언하여 값이 바뀔 때마다 자동으로 계산)
-const currencyResult = computed(() => {
+const getCurrencyResult = () => {
   // 저장된 범주와 단위가 잘못됐으면 초기화
   initRecentCurrency();
 
@@ -55,11 +52,28 @@ const currencyResult = computed(() => {
   return [
     symbol,
     store.toLocale(
-      currencyConverter.convert(Number(calc.getCurrentNumber()), store.recentCurrencyFrom, store.recentCurrencyTo).toString(),
+      currencyConverter
+        .convert(Number(calc.getCurrentNumber()), store.recentCurrencyFrom, store.recentCurrencyTo)
+        .toString()
     )
   ].join(' ');
-});
+};
 
+const currencyResult = ref(getCurrencyResult());
+
+watch(
+  [
+    calc,
+    () => store.useGrouping,
+    () => store.decimalPlaces,
+    () => store.recentCurrencyFrom,
+    () => store.recentCurrencyTo,
+    () => store.showSymbol
+  ],
+  () => {
+    currencyResult.value = getCurrencyResult();
+  }
+);
 // 단위 이름과 값을 바꾸기 위한 함수
 function swapCurrencyValue() {
   // 변환 결과를 원본 값으로 바꾸기

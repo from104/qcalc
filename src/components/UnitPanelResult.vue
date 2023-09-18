@@ -1,12 +1,5 @@
 <script setup lang="ts">
-import {
-  ref,
-  computed,
-  onMounted,
-  onBeforeUnmount,
-  reactive,
-  watch,
-} from 'vue';
+import { ref, onMounted, onBeforeUnmount, reactive, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 
 import UnitConverter from 'classes/UnitConverter';
@@ -31,8 +24,7 @@ function swapUnitValue() {
 
   // 단위도 바꾸기
   const temp = store.recentUnitFrom[store.recentCategory];
-  store.recentUnitFrom[store.recentCategory] =
-    store.recentUnitTo[store.recentCategory];
+  store.recentUnitFrom[store.recentCategory] = store.recentUnitTo[store.recentCategory];
   store.recentUnitTo[store.recentCategory] = temp;
 }
 
@@ -44,31 +36,14 @@ function initRecentCategoryAndUnit() {
   }
 
   // 단위 초기화
-  if (
-    !UnitConverter.getUnitLists(store.recentCategory).includes(
-      store.recentUnitFrom[store.recentCategory]
-    )
-  ) {
-    store.recentUnitFrom[store.recentCategory] = UnitConverter.getUnitLists(
-      store.recentCategory
-    )[0];
+  if (!UnitConverter.getUnitLists(store.recentCategory).includes(store.recentUnitFrom[store.recentCategory])) {
+    store.recentUnitFrom[store.recentCategory] = UnitConverter.getUnitLists(store.recentCategory)[0];
   }
 
-  if (
-    !UnitConverter.getUnitLists(store.recentCategory).includes(
-      store.recentUnitTo[store.recentCategory]
-    )
-  ) {
-    store.recentUnitTo[store.recentCategory] = UnitConverter.getUnitLists(
-      store.recentCategory
-    )[0];
-    if (
-      store.recentUnitTo[store.recentCategory] ==
-      store.recentUnitFrom[store.recentCategory]
-    ) {
-      store.recentUnitTo[store.recentCategory] = UnitConverter.getUnitLists(
-        store.recentCategory
-      )[1];
+  if (!UnitConverter.getUnitLists(store.recentCategory).includes(store.recentUnitTo[store.recentCategory])) {
+    store.recentUnitTo[store.recentCategory] = UnitConverter.getUnitLists(store.recentCategory)[0];
+    if (store.recentUnitTo[store.recentCategory] == store.recentUnitFrom[store.recentCategory]) {
+      store.recentUnitTo[store.recentCategory] = UnitConverter.getUnitLists(store.recentCategory)[1];
     }
   }
 }
@@ -80,7 +55,7 @@ initRecentCategoryAndUnit();
 const categories = reactive(
   UnitConverter.categories.map((category) => ({
     value: category,
-    label: t(`categories.${category}`),
+    label: t(`categories.${category}`)
   }))
 );
 
@@ -90,43 +65,67 @@ watch([() => store.useSystemLocale, () => store.userLocale], () => {
     category.label = t(`categories.${category.value}`);
   });
 });
-
 // 변환 결과 툴팁 표시 상태 변수
-const needUnitResultTooltip = ref(false);
+const needUnitResultTooltip = ref( false );
 
 // 변환 결과가 길 경우 툴팁 표시 상태 셋팅
 function setNeedUnitResultTooltip() {
   // 원래 결과 칸 길이
   const ow = document.getElementById('unitResult')?.offsetWidth ?? 0;
+
   // 결과 문자열의 크기
   // (원래 칸에 결과 길이가 넘치면 스크롤 해야하는데 ...로 대체 시킨 경우 스크롤해야할 폭 값만 커진다.)
   const sw = document.getElementById('unitResult')?.scrollWidth ?? 0;
+
   // 원래의 칸 크기보다 결과 문자열 길이가 길면 툴팁을 표시
   needUnitResultTooltip.value = ow < sw;
 
   return true;
 }
 
-// 변환 결과 계산 (computed로 선언하여 값이 바뀔 때마다 자동으로 계산)
-const unitResult = computed(() => {
+
+const getUnitResult = () => {
   // 저장된 범주와 단위가 잘못됐으면 초기화
   initRecentCategoryAndUnit();
 
   const unit = store.showUnit ? store.recentUnitTo[store.recentCategory] : '';
+
   // 변환 결과를 반환
-  return [store.toLocale(
-    UnitConverter.convert(
-      store.recentCategory,
-      Number(calc.getCurrentNumber()),
-      store.recentUnitFrom[store.recentCategory],
-      store.recentUnitTo[store.recentCategory]
-    ).toString()
-  ), unit].join(' ');
-});
+  return [
+    store.toLocale(
+      UnitConverter.convert(
+        store.recentCategory,
+        Number(calc.getCurrentNumber()),
+        store.recentUnitFrom[store.recentCategory],
+        store.recentUnitTo[store.recentCategory]
+      ).toString()
+    ),
+    unit
+  ].join(' ');
+};
+
+const unitResult = ref( getUnitResult() );
+
+// 계산 결과가 바뀌면 변환 결과도 바뀌도록 감시
+watch(
+  [
+    calc,
+    () => store.recentCategory,
+    () => store.recentUnitFrom[ store.recentCategory ],
+    () => store.recentUnitTo[ store.recentCategory ],
+    () => store.useGrouping,
+    () => store.decimalPlaces,
+    () => store.showUnit
+  ],
+  () =>
+  {
+    unitResult.value = getUnitResult();
+  }
+);
 
 const keyBinding = new KeyBinding([
   [['v'], () => store.clickButtonById('btn-swap-unit')],
-  [['b'], () => store.showUnitToggle()],
+  [['b'], () => store.showUnitToggle()]
 ]);
 
 onMounted(() => {
@@ -153,14 +152,11 @@ type ReactiveUnitOptions = {
   values: UnitOptions[];
 };
 
-const fromUnitOptions = reactive({ values: [] } as ReactiveUnitOptions);
-const toUnitOptions = reactive({ values: [] } as ReactiveUnitOptions);
+const fromUnitOptions = reactive( { values: [] } as ReactiveUnitOptions );
+const toUnitOptions = reactive( { values: [] } as ReactiveUnitOptions );
 
 watch(
-  [
-    () => store.recentUnitFrom[store.recentCategory],
-    () => store.recentUnitTo[store.recentCategory],
-  ],
+  [() => store.recentUnitFrom[store.recentCategory], () => store.recentUnitTo[store.recentCategory]],
   () => {
     const category = store.recentCategory;
     const unitList = UnitConverter.getUnitLists(category);
@@ -169,14 +165,14 @@ watch(
       value: unit,
       label: unit,
       desc: UnitConverter.getUnitDesc(category, unit),
-      disable: store.recentUnitTo[category] === unit,
+      disable: store.recentUnitTo[category] === unit
     }));
 
     toUnitOptions.values = unitList.map((unit) => ({
       value: unit,
       label: unit,
       desc: UnitConverter.getUnitDesc(category, unit),
-      disable: store.recentUnitFrom[category] === unit,
+      disable: store.recentUnitFrom[category] === unit
     }));
   },
   { immediate: true }
@@ -187,16 +183,16 @@ watch(
   <q-card-section class="row q-px-sm q-pt-none q-pb-sm" v-blur>
     <!-- 카테고리 -->
     <q-select
-      v-model="store.recentCategory"
-      :options="categories"
-      :label="t('category')"
+      v-model=" store.recentCategory "
+      :options=" categories "
+      :label=" t( 'category' ) "
       stack-label
       dense
       options-dense
       emit-value
       map-options
       class="col-3 q-pl-sm shadow-4"
-      :class="store.darkMode ? 'bg-grey-9' : 'bg-grey-3'"
+      :class=" store.darkMode ? 'bg-grey-9' : 'bg-grey-3' "
     />
 
     <!-- 원본 방향 -->
@@ -204,19 +200,19 @@ watch(
 
     <!-- 원본 단위 -->
     <q-select
-      v-model="store.recentUnitFrom[store.recentCategory]"
-      :options="fromUnitOptions.values"
-      :label="t(`unitDesc.${store.recentCategory}.${store.recentUnitFrom[store.recentCategory]}`)"
+      v-model=" store.recentUnitFrom[ store.recentCategory ] "
+      :options=" fromUnitOptions.values "
+      :label=" t( `unitDesc.${ store.recentCategory }.${ store.recentUnitFrom[ store.recentCategory ] }` ) "
       stack-label
       dense
       options-dense
       emit-value
       map-options
       class="col-3 q-pl-sm shadow-4"
-      :class="store.darkMode ? 'bg-grey-9' : 'bg-grey-3'"
+      :class=" store.darkMode ? 'bg-grey-9' : 'bg-grey-3' "
     >
-      <template v-slot:option="scope">
-        <q-item v-bind="scope.itemProps">
+      <template v-slot:option=" scope ">
+        <q-item v-bind=" scope.itemProps ">
           <q-item-section>
             <q-item-label caption>
               {{ t(`unitDesc.${store.recentCategory}.${scope.opt.label}`) }}
@@ -239,27 +235,27 @@ watch(
       icon="swap_horiz"
       size="md"
       class="col-1 q-mx-none q-px-sm"
-      :color="store.getDarkColor('primary')"
-      @click="swapUnitValue"
+      :color=" store.getDarkColor( 'primary' ) "
+      @click=" swapUnitValue "
     >
-      <MyTooltip>{{ t('tooltipSwap') }}</MyTooltip>
+      <MyTooltip>{{ t( 'tooltipSwap' ) }}</MyTooltip>
     </q-btn>
 
     <!-- 대상 단위 -->
     <q-select
-      v-model="store.recentUnitTo[store.recentCategory]"
-      :options="toUnitOptions.values"
-      :label="t(`unitDesc.${store.recentCategory}.${store.recentUnitTo[store.recentCategory]}`)"
+      v-model=" store.recentUnitTo[ store.recentCategory ] "
+      :options=" toUnitOptions.values "
+      :label=" t( `unitDesc.${ store.recentCategory }.${ store.recentUnitTo[ store.recentCategory ] }` ) "
       stack-label
       dense
       options-dense
       emit-value
       map-options
       class="col-3 q-pl-sm shadow-4"
-      :class="store.darkMode ? 'bg-grey-9' : 'bg-grey-3'"
+      :class=" store.darkMode ? 'bg-grey-9' : 'bg-grey-3' "
     >
-      <template v-slot:option="scope">
-        <q-item v-bind="scope.itemProps">
+      <template v-slot:option=" scope ">
+        <q-item v-bind=" scope.itemProps ">
           <q-item-section>
             <q-item-label caption>
               {{ t(`unitDesc.${store.recentCategory}.${scope.opt.label}`) }}
@@ -269,7 +265,7 @@ watch(
         </q-item>
       </template>
       <MyTooltip>
-        {{ t( `unitDesc.${store.recentCategory}.${ store.recentUnitTo[store.recentCategory] }` ) }}
+        {{ t(`unitDesc.${store.recentCategory}.${store.recentUnitTo[store.recentCategory]}`) }}
       </MyTooltip>
     </q-select>
 
@@ -284,28 +280,27 @@ watch(
   <q-card-section class="col-12 q-px-sm q-pt-none q-pb-none">
     <!-- 대상 값 -->
     <q-field
-      :model-value="unitResult"
+      :model-value=" unitResult "
       class="shadow-4 justify-end self-center"
       filled
       dense
       readonly
-      :bg-color="
-        needUnitResultTooltip
-          ? store.darkMode
-            ? 'blue-grey-9'
-            : 'amber-2'
-          : undefined
-      "
+      :bg-color=" needUnitResultTooltip
+        ? store.darkMode
+          ? 'blue-grey-9'
+          : 'amber-2'
+        : undefined
+        "
     >
       <template v-slot:control>
         <div
           id="unitResult"
-          v-mutation="setNeedUnitResultTooltip"
+          v-mutation=" setNeedUnitResultTooltip "
           v-mutation.characterData
           class="self-center full-width no-outline ellipsis text-h4 text-right"
         >
           {{ unitResult }}
-          <MyTooltip v-if="needUnitResultTooltip">{{ unitResult }}</MyTooltip>
+          <MyTooltip v-if=" needUnitResultTooltip ">{{ unitResult }}</MyTooltip>
         </div>
       </template>
     </q-field>
