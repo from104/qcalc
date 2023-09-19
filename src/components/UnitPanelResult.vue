@@ -17,7 +17,7 @@ const store = useCalcStore();
 const calc = store.calc;
 
 // 단위 이름과 값을 바꾸기 위한 함수
-function swapUnitValue() {
+const swapUnitValue = () => {
   // 변환 결과를 원본 값으로 바꾸기
   // (computed로 선언된 unitResult로 인해 값이 바뀌면 자동으로 변환 결과가 바뀜)
   calc.setCurrentNumber(unitResult.value);
@@ -27,9 +27,8 @@ function swapUnitValue() {
   store.recentUnitFrom[store.recentCategory] = store.recentUnitTo[store.recentCategory];
   store.recentUnitTo[store.recentCategory] = temp;
 }
-
 // 범주와 단위를 초기화
-function initRecentCategoryAndUnit() {
+const initRecentCategoryAndUnit = () => {
   // 범주 초기화
   if (!UnitConverter.categories.includes(store.recentCategory)) {
     store.recentCategory = UnitConverter.categories[0];
@@ -47,7 +46,6 @@ function initRecentCategoryAndUnit() {
     }
   }
 }
-
 // 단위 초기화
 initRecentCategoryAndUnit();
 
@@ -69,7 +67,7 @@ watch([() => store.useSystemLocale, () => store.userLocale], () => {
 const needUnitResultTooltip = ref( false );
 
 // 변환 결과가 길 경우 툴팁 표시 상태 셋팅
-function setNeedUnitResultTooltip() {
+const setNeedUnitResultTooltip = () => {
   // 원래 결과 칸 길이
   const ow = document.getElementById('unitResult')?.offsetWidth ?? 0;
 
@@ -235,8 +233,8 @@ watch(
       icon="swap_horiz"
       size="md"
       class="col-1 q-mx-none q-px-sm"
-      :color=" store.getDarkColor( 'primary' ) "
-      @click=" swapUnitValue "
+      :color="store.getDarkColor( 'primary' )"
+      @click="swapUnitValue()"
     >
       <MyTooltip>{{ t( 'tooltipSwap' ) }}</MyTooltip>
     </q-btn>
