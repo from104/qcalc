@@ -1,6 +1,13 @@
+import { create, all, BigNumber } from 'mathjs';
+
+const MathB = create(all, {
+  number: 'BigNumber',
+  precision: 64,
+}) as math.MathJsStatic;
+
 interface Unit {
   [unit: string]: {
-    value: number | ((originalValue: number, isReverse?: boolean) => number);
+    value: number | ((originalValue: number | string, isReverse?: boolean) => BigNumber);
     desc: string;
   };
 }
@@ -58,22 +65,33 @@ const unitBaseData: UnitBaseData = {
   temp: {
     '°C': { value: 1, desc: 'Celsius' },
     '°F': {
-      value: (originalValue: number, isReverse = false) =>
-        isReverse
-          ? (originalValue - 32) * (5 / 9)
-          : originalValue * (9 / 5) + 32,
+      value: (originalValue: number | string, isReverse = false): BigNumber => {
+        const value = MathB.bignumber(originalValue);
+
+        return isReverse
+          ? value.minus(32).times(5).dividedBy(9)   // (originalValue - 32) * (5 / 9)
+          : value.times(9).dividedBy(5).plus(32);   // originalValue * (9 / 5) + 32
+      },
       desc: 'Fahrenheit',
     },
     K: {
-      value: (originalValue: number, isReverse = false) =>
-        isReverse ? originalValue - 273.15 : originalValue + 273.15,
+      value: (originalValue: number | string, isReverse = false): BigNumber => {
+        const value = MathB.bignumber(originalValue);
+
+        return isReverse
+          ? value.minus(273.15)   // originalValue - 273.15 (From Kelvin to Celsius)
+          : value.plus(273.15);   // originalValue + 273.15 (From Celsius to Kelvin)
+    },
       desc: 'Kelvin',
     },
     '°R': {
-      value: (originalValue: number, isReverse = false) =>
-        isReverse
-          ? (originalValue - 491.67) * (5 / 9)
-          : originalValue * (9 / 5) + 491.67,
+      value: (originalValue: number | string, isReverse = false): BigNumber => {
+        const value = MathB.bignumber(originalValue);
+
+        return isReverse
+          ? value.minus(491.67).times(5).dividedBy(9)   // (originalValue - 491.67) * (5 / 9)
+          : value.times(9).dividedBy(5).plus(491.67);   // originalValue * (9 / 5) + 491.67
+      },
       desc: 'Rankine',
     },
   },
@@ -160,10 +178,10 @@ class UnitConverter {
   // 단위 변환
   static convert<T extends keyof UnitBaseData>(
     category: T,
-    originalValue: number,
+    originalValue: number | string,
     from: string,
     to: string
-  ): number {
+  ): string {
     // fromUnit과 toUnit이 유효한 단위인지 확인
     const fromUnitValue = this.getUnitValue(category, from);
     if (!fromUnitValue) {
@@ -175,22 +193,22 @@ class UnitConverter {
     }
 
     // fromUnit의 기준 단위로 값 변환
-    let baseValue = originalValue;
+    let baseValue = MathB.bignumber(originalValue);
     if (typeof fromUnitValue === 'function') {
       baseValue = fromUnitValue(originalValue, true);
     } else {
-      baseValue *= fromUnitValue;
+      baseValue = baseValue.mul(fromUnitValue);
     }
 
     // 기준 단위에서 toUnit으로 값 변환
     let convertedValue = baseValue;
     if (typeof toUnitValue === 'function') {
-      convertedValue = toUnitValue(convertedValue);
+      convertedValue = toUnitValue(convertedValue.toString());
     } else {
-      convertedValue /= toUnitValue;
+      convertedValue = convertedValue.div(toUnitValue);
     }
 
-    return convertedValue;
+    return convertedValue.toString();
   }
 }
 export default UnitConverter;
