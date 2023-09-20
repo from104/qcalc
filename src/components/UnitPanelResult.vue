@@ -26,7 +26,8 @@ const swapUnitValue = () => {
   const temp = store.recentUnitFrom[store.recentCategory];
   store.recentUnitFrom[store.recentCategory] = store.recentUnitTo[store.recentCategory];
   store.recentUnitTo[store.recentCategory] = temp;
-}
+};
+
 // 범주와 단위를 초기화
 const initRecentCategoryAndUnit = () => {
   // 범주 초기화
@@ -45,7 +46,7 @@ const initRecentCategoryAndUnit = () => {
       store.recentUnitTo[store.recentCategory] = UnitConverter.getUnitLists(store.recentCategory)[1];
     }
   }
-}
+};
 // 단위 초기화
 initRecentCategoryAndUnit();
 
@@ -64,7 +65,7 @@ watch([() => store.useSystemLocale, () => store.userLocale], () => {
   });
 });
 // 변환 결과 툴팁 표시 상태 변수
-const needUnitResultTooltip = ref( false );
+const needUnitResultTooltip = ref(false);
 
 // 변환 결과가 길 경우 툴팁 표시 상태 셋팅
 const setNeedUnitResultTooltip = () => {
@@ -79,8 +80,7 @@ const setNeedUnitResultTooltip = () => {
   needUnitResultTooltip.value = ow < sw;
 
   return true;
-}
-
+};
 
 const getUnitResult = () => {
   // 저장된 범주와 단위가 잘못됐으면 초기화
@@ -93,30 +93,29 @@ const getUnitResult = () => {
     store.toLocale(
       UnitConverter.convert(
         store.recentCategory,
-        Number(calc.getCurrentNumber()),
+        calc.getCurrentNumber(),
         store.recentUnitFrom[store.recentCategory],
         store.recentUnitTo[store.recentCategory]
-      ).toString()
+      )
     ),
     unit
   ].join(' ');
 };
 
-const unitResult = ref( getUnitResult() );
+const unitResult = ref(getUnitResult());
 
 // 계산 결과가 바뀌면 변환 결과도 바뀌도록 감시
 watch(
   [
     calc,
     () => store.recentCategory,
-    () => store.recentUnitFrom[ store.recentCategory ],
-    () => store.recentUnitTo[ store.recentCategory ],
+    () => store.recentUnitFrom[store.recentCategory],
+    () => store.recentUnitTo[store.recentCategory],
     () => store.useGrouping,
     () => store.decimalPlaces,
     () => store.showUnit
   ],
-  () =>
-  {
+  () => {
     unitResult.value = getUnitResult();
   }
 );
@@ -150,8 +149,8 @@ type ReactiveUnitOptions = {
   values: UnitOptions[];
 };
 
-const fromUnitOptions = reactive( { values: [] } as ReactiveUnitOptions );
-const toUnitOptions = reactive( { values: [] } as ReactiveUnitOptions );
+const fromUnitOptions = reactive({ values: [] } as ReactiveUnitOptions);
+const toUnitOptions = reactive({ values: [] } as ReactiveUnitOptions);
 
 watch(
   [() => store.recentUnitFrom[store.recentCategory], () => store.recentUnitTo[store.recentCategory]],
@@ -175,6 +174,7 @@ watch(
   },
   { immediate: true }
 );
+
 </script>
 
 <template>
@@ -213,14 +213,14 @@ watch(
         <q-item v-bind=" scope.itemProps ">
           <q-item-section>
             <q-item-label caption>
-              {{ t(`unitDesc.${store.recentCategory}.${scope.opt.label}`) }}
+              {{ t( `unitDesc.${ store.recentCategory }.${ scope.opt.label }` ) }}
             </q-item-label>
             <q-item-label>{{ scope.opt.label }}</q-item-label>
           </q-item-section>
         </q-item>
       </template>
       <MyTooltip>
-        {{ t(`unitDesc.${store.recentCategory}.${store.recentUnitFrom[store.recentCategory]}`) }}
+        {{ t( `unitDesc.${ store.recentCategory }.${ store.recentUnitFrom[ store.recentCategory ] }` ) }}
       </MyTooltip>
     </q-select>
 
@@ -233,7 +233,7 @@ watch(
       icon="swap_horiz"
       size="md"
       class="col-1 q-mx-none q-px-sm"
-      :color="store.getDarkColor( 'primary' )"
+      :color=" store.getDarkColor( 'primary' ) "
       @click="swapUnitValue()"
     >
       <MyTooltip>{{ t( 'tooltipSwap' ) }}</MyTooltip>
@@ -256,14 +256,14 @@ watch(
         <q-item v-bind=" scope.itemProps ">
           <q-item-section>
             <q-item-label caption>
-              {{ t(`unitDesc.${store.recentCategory}.${scope.opt.label}`) }}
+              {{ t( `unitDesc.${ store.recentCategory }.${ scope.opt.label }` ) }}
             </q-item-label>
             <q-item-label>{{ scope.opt.label }}</q-item-label>
           </q-item-section>
         </q-item>
       </template>
       <MyTooltip>
-        {{ t(`unitDesc.${store.recentCategory}.${store.recentUnitTo[store.recentCategory]}`) }}
+        {{ t( `unitDesc.${ store.recentCategory }.${ store.recentUnitTo[ store.recentCategory ] }` ) }}
       </MyTooltip>
     </q-select>
 

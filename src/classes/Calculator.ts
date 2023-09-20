@@ -1,4 +1,3 @@
-// import console from 'console';
 import { create, all } from 'mathjs';
 
 const MathB = create(all, {

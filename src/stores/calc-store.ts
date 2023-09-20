@@ -113,6 +113,7 @@ export const useCalcStore = defineStore('calc', {
       const s = MathB.format(n, {
         precision: this.decimalPlaces === -2 ? 20 : this.decimalPlaces,
         notation: this.decimalPlaces === -2 ? 'auto' : 'fixed',
+        lowerExp: -20,
         upperExp: 20,
       });
       return this.useGrouping ? this.numberGrouping(s) : s;

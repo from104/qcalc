@@ -1,4 +1,5 @@
 import Freecurrencyapi from '@everapi/freecurrencyapi-js';
+
 // 환율 정보를 저장하는 인터페이스
 interface Currency {
   [currency: string]: {
@@ -188,29 +189,6 @@ const currencyBaseData: CurrencyData = {
   ZMW: { desc: 'Zambian Kwacha', symbol: 'ZMW' },
   ZWL: { desc: 'Zimbabwean Dollar', symbol: 'ZWL' },
 };
-
-// 환율 정보를 가져오는 API 클래스
-// class ExchangeRatesAPI {
-//   //
-//   private static API_URL = 'https://api.exchangeratesapi.io/v1';
-//   private static ACCESS_KEY = 'a761d5c309cf3d8f67106700be92c857';
-
-//   // API에서 모든 환율 정보를 가져오는 메소드
-//   async getRates(base = 'EUR'): Promise<Rates> {
-//     try {
-//       // API로부터 환율 정보를 가져옵니다.
-//       const response = await axios.get(
-//         `${ExchangeRatesAPI.API_URL}/latest?access_key=${ExchangeRatesAPI.ACCESS_KEY}&base=${base}`
-//       );
-//       // 환율 정보를 반환합니다.
-//       return response.data.rates;
-//       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-//     } catch (error: any) {
-//       // console.error(error.response.data); // 에러 응답의 내용을 출력합니다.
-//       return error.response.data;
-//     }
-//   }
-// }
 
 // 환율 정보를 사용하는 클래스
 class CurrencyConverter {

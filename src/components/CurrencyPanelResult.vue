@@ -22,7 +22,7 @@ const { calc } = store;
 const { currencyConverter } = store;
 
 // 선택할 통화 초기화
-function initRecentCurrency() {
+const initRecentCurrency = () => {
   const defaultCurrency = ['USD', 'KRW'];
 
 
@@ -74,13 +74,13 @@ watch(
     currencyResult.value = getCurrencyResult();
   }
 );
+
 // 단위 이름과 값을 바꾸기 위한 함수
-function swapCurrencyValue() {
+const swapCurrencyValue = () => {
   // 변환 결과를 원본 값으로 바꾸기
-  // (computed로 선언된 CurrencyResult로 인해 값이 바뀌면 자동으로 변환 결과가 바뀜)
   calc.setCurrentNumber(currencyResult.value);
 
-  // 단위도 바꾸기
+  // 화폐도 바꾸기
   const temp = store.recentCurrencyFrom;
   store.recentCurrencyFrom = store.recentCurrencyTo;
   store.recentCurrencyTo = temp;
@@ -115,7 +115,7 @@ watch([() => store.useSystemLocale, () => store.userLocale], () => {
 const needCurrencyResultTooltip = ref(false);
 
 // 변환 결과가 길 경우 툴팁 표시 상태 셋팅
-function setNeedCurrencyResultTooltip() {
+const setNeedCurrencyResultTooltip = () => {
   // 원래 결과 칸 길이
   const ow = document.getElementById('currencyResult')?.offsetWidth ?? 0;
   // 결과 문자열의 크기
@@ -126,7 +126,6 @@ function setNeedCurrencyResultTooltip() {
 
   return true;
 }
-
 // 키바인딩 생성
 const keyBinding = new KeyBinding([
   [['v'], () => store.clickButtonById('btn-swap-currency')],
