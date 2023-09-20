@@ -33,45 +33,13 @@ const setNeedResultTooltip = () => {
   return true;
 }
 
-// const baseResult = computed(() => {
-  // // 표시된 숫자를 받아옵니다.
-  // const shownNumber = calc.getShownNumber();
-
-  // // integer는 정수 부분, decimal은 소수 부분으로 shownNumber를 분리합니다.
-  // const [integer, decimal] = shownNumber.split('.');
-
-  // // baseResult는 조건에 따라 두가지 형식 중 하나로 표시된 숫자를 변환합니다.
-  // // 만약 store의 decimalPlaces가 -2이며, decimal 부분이 있으면 소수점 표현으로, 그 외의 경우는 일반적으로 소수 변환으로 표현합니다.
-  // return store.decimalPlaces == -2 && decimal
-  //   ? `${store.toLocale(Number(integer))}.${decimal}`
-  //   : store.toLocale(Number(shownNumber));
-//   return store.toLocale(calc.getCurrentNumber());
-// });
-
-// 이 코드는 계산한 결과를 나타내는 상수입니다.
-// const result = computed(() => {
-//   const baseResult = store.toLocale(calc.getCurrentNumber());
-//   // store에서 단위 표시가 활성화되어 있고, 애드온이 'unit'일 경우
-//   if (store.showUnit && props.addon == 'unit') {
-//     // 사용할 단위를 결정합니다.
-//     const unit = store.recentUnitFrom[store.recentCategory];
-//     // 이 단위와 baseResult를 결합하여 반환합니다.
-//     return [baseResult, unit].join(' ');
-//   }
-//   // store에서 기호 표시가 활성화되어 있고, 애드온이 'currency'일 경우
-//   else if (store.showSymbol && props.addon == 'currency') {
-//     // 기호를 가져옵니다. 또한 현재 환율로부터 해당 기호를 찾을 수 없는 경우에 대비하여 기본값을 설정합니다.
-//     const symbol = store.currencyConverter?.getSymbol(store.recentCurrencyFrom) ?? '';
-//     // 이 기호와 baseResult를 결합하여 반환합니다.
-//     return [symbol, baseResult].join(' ');
-//   } else {
-//     // 둘 다 아닌 경우, 조건에 해당하는 'else'에서는 baseResult를 그대로 반환합니다.
-//     return baseResult;
-//   }
-// });
 
 const getResult = () => {
-  const baseResult = store.toLocale(calc.getCurrentNumber());
+  const currentNumbers = calc.getCurrentNumber().split('.');
+  const toLocaleNumbers = store.toLocale(currentNumbers.join('.')).split('.');
+  const baseResult = (store.decimalPlaces == -2 && currentNumbers.length > 1)
+    ? toLocaleNumbers[0]+'.'+currentNumbers[1]
+    : toLocaleNumbers.join('.');
   // store에서 단위 표시가 활성화되어 있고, 애드온이 'unit'일 경우
   if (store.showUnit && props.addon == 'unit') {
     // 사용할 단위를 결정합니다.

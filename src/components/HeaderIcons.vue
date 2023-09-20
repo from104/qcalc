@@ -16,12 +16,17 @@ const store = useCalcStore();
 const calc = store.calc;
 
 const result = computed(() => {
-  return store.toLocale(Number(calc.getShownNumber()));
+  const currentNumbers = calc.getCurrentNumber().split('.');
+  const toLocaleNumbers = store.toLocale(currentNumbers.join('.')).split('.');
+  const baseResult = (store.decimalPlaces == -2 && currentNumbers.length > 1)
+    ? toLocaleNumbers[0]+'.'+currentNumbers[1]
+    : toLocaleNumbers.join('.');
+  return baseResult;
 });
 
 // 창에서 선택한 내용이 있으면 선택한 내용을 클립보드에 복사하고
 // 아니면 계산 결과를 클립보드에 복사한다.
-function doCopy(): void {
+const doCopy = (): void => {
   const selectedText = document.getSelection()?.toString() ?? '';
   const textToClipboard = selectedText == '' ? result.value : selectedText;
   const targetToBeCopied =
@@ -40,11 +45,11 @@ function doCopy(): void {
 }
 
 // 클립보드에 있는 숫자를 계산 결과에 추가하는 함수
-function doPaste(): void {
+const doPaste = (): void => {
   navigator.clipboard
     .readText()
     .then((text) => {
-      calc.setShownNumber(text);
+      calc.setCurrentNumber(text);
       store.notifyMsg(t('pastedFromClipboard'));
     })
     .catch(() => {
