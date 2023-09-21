@@ -250,13 +250,16 @@ export class Calculator {
         });
         break;
       case Operator.Div:
+        if (numberForCalc === '0') {
+          throw new Error('Cannot divide by zero');
+        }
         this.previousNumber = this.addHistory({
           previousNumber: this.previousNumber,
           operator: this.getOperatorString() as string,
           argumentNumber: numberForCalc,
           resultNumber: MathB.bignumber(this.previousNumber).div(numberForCalc).toString(),
         });
-        break;
+        break;        break;
       default:
         break;
     }
@@ -384,6 +387,9 @@ export class Calculator {
 
   // 제곱근 계산
   public sqrt() {
+    if (this.currentNumber.charAt(0) === '-') {
+      throw new Error('The square root of a negative number is not allowed.');
+    }
     this.currentNumber = this.numberToString(
       this.addHistory({
         previousNumber: this.currentNumber,
