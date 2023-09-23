@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import {
   ref,
+  onBeforeMount,
   onMounted,
   onBeforeUnmount,
   reactive,
@@ -254,6 +255,11 @@ const filterFnFrom = createFilterFn(fromFilteredCurrencyOptions, fromCurrencyOpt
 const toFilteredCurrencyOptions = ref<CurrencyOptions[]>(toCurrencyOptions.values);
 // createFilterFn 함수를 사용하여 filterFnTo 함수를 생성합니다.
 const filterFnTo = createFilterFn(toFilteredCurrencyOptions, toCurrencyOptions);
+
+onBeforeMount(() => {
+  window.addEventListener('resize', setNeedCurrencyResultTooltip);
+});
+
 </script>
 
 <template>
