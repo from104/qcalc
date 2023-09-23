@@ -35,11 +35,16 @@ const setNeedResultTooltip = () => {
 
 
 const getResult = () => {
-  const currentNumbers = calc.getCurrentNumber().split('.');
-  const toLocaleNumbers = store.toLocale(currentNumbers.join('.')).split('.');
-  const baseResult = (store.decimalPlaces == -2 && currentNumbers.length > 1)
-    ? toLocaleNumbers[0]+'.'+currentNumbers[1]
-    : toLocaleNumbers.join('.');
+  const currentNumber = calc.getCurrentNumber();
+  const currentNumbers = currentNumber.split('.');
+  const toLocaleNumber = store.toLocale(currentNumber);
+  const toLocaleNumbers = toLocaleNumber.split('.');
+  const hasDecimalPlaces = store.decimalPlaces === -2 && currentNumbers.length > 1;
+  const baseResult =
+    hasDecimalPlaces
+      ? `${toLocaleNumbers[0]}.${currentNumbers[1]}`
+      : toLocaleNumbers.join('.');
+
   // store에서 단위 표시가 활성화되어 있고, 애드온이 'unit'일 경우
   if (store.showUnit && props.addon == 'unit') {
     // 사용할 단위를 결정합니다.
