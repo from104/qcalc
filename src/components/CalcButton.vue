@@ -1,15 +1,37 @@
 <script setup lang="ts">
 import { onMounted, onBeforeUnmount, ref, watch } from 'vue';
 
-
 import { KeyBinding, KeyBindings } from 'classes/KeyBinding';
 import { useCalcStore } from 'stores/calc-store';
+import { useI18n } from 'vue-i18n';
 
 const store = useCalcStore();
+
+const { t } = useI18n();
 
 // 계산기 오브젝트를 스토어에서 가져오기 위한 변수 선언
 const calc = store.calc;
 
+// 나눗샘의 에러처리를 위한 함수
+const funcWithError = (func: ()=>void) => {
+  try {
+    func();
+  } catch (e: unknown) {
+    if (e instanceof Error) {
+      // console.error(e.message);
+      switch (e.message) {
+        case 'Cannot divide by zero':
+          store.notifyError(t('cannotDivideByZero'), 1000);
+          break;
+        case 'The square root of a negative number is not allowed.':
+          store.notifyError(t('squareRootOfANegativeNumberIsNotAllowed'), 1000);
+          break;
+        default:
+          store.notifyError(e.message);
+      }
+    }
+  }
+};
 // 버튼 레이블, 버튼 컬러, 버튼에 해당하는 키, 버튼 클릭 이벤트 핸들러
 type Button = [id: string, label: string, color: string, keys: string[], handler: () => void][];
 
@@ -22,7 +44,7 @@ const buttons: Button = [
   ['plusMinus', '@mdi-plus-minus-variant', 'secondary', ['Shift+Minus', 's'], () => calc.changeSign()],
   ['percent', '%', 'secondary', ['%', 'p'], () => calc.percent()],
   ['reciprocal', '1/x', 'secondary', ['i'], () => calc.rec()],
-  ['divide', '@mdi-division', 'secondary', ['/'], () => calc.div()],
+  ['divide', '@mdi-division', 'secondary', ['/'], () => calc.div()  ],
   ['seven', '7', 'primary', ['7'], () => calc.addDigit(7)],
   ['eight', '8', 'primary', ['8'], () => calc.addDigit(8)],
   ['nine', '9', 'primary', ['9'], () => calc.addDigit(9)],
@@ -38,7 +60,7 @@ const buttons: Button = [
   ['doubleZero', '00', 'primary', [], () => { calc.addDigit(0); calc.addDigit(0); }],
   ['zero', '0', 'primary', ['0'], () => calc.addDigit(0)],
   ['dot', '@mdi-circle-small', 'primary', ['.'], () => calc.addDot()],
-  ['equals', '@mdi-equal', 'secondary', ['=', 'Enter'], () => calc.equal()],
+  ['equals', '@mdi-equal', 'secondary', ['=', 'Enter'], ()=>calc.equal()],
 ];
 
 const keyBindings: KeyBindings = buttons.map(([id, , , keys, ]) => [keys, () => store.clickButtonById('btn-'+id)]);
@@ -102,11 +124,20 @@ if (props.type === 'unit' || props.type === 'currency') {
         :icon="button[1].charAt(0) == '@' ? button[1].slice(1) : undefined"
         :class="button[1].charAt(0) == '@' ? 'icon' : 'char'"
         :color="button[2]"
-        @click="button[4]"
+        @click="() => funcWithError(button[4])"
       />
     </div>
   </q-card-section>
 </template>
+
+<i18n>
+  ko:
+    cannotDivideByZero: '0으로 나눌 수 없습니다.'
+    squareRootOfANegativeNumberIsNotAllowed: '음수의 제곱근은 허용되지 않습니다.'
+  en:
+    cannotDivideByZero: 'Cannot divide by zero'
+    squareRootOfANegativeNumberIsNotAllowed: 'The square root of a negative number is not allowed.'
+  </i18n>
 
 <style scoped lang="scss">
 .button {

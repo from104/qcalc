@@ -1,32 +1,21 @@
 <script setup lang="ts">
-import { ref, onMounted, onBeforeUnmount, reactive, watch } from 'vue';
-import { useI18n } from 'vue-i18n';
-
-import UnitConverter from 'classes/UnitConverter';
-import { KeyBinding } from 'classes/KeyBinding';
-import { useCalcStore } from 'stores/calc-store';
+import { ref, onBeforeMount, onMounted, onBeforeUnmount, reactive, watch } from 'vue';
 
 import MyTooltip from 'components/MyTooltip.vue';
+
+import { useI18n } from 'vue-i18n';
 
 const { t } = useI18n();
 
 // 스토어 가져오기
+import { useCalcStore } from 'stores/calc-store';
+
 const store = useCalcStore();
 
 // 계산기 오브젝트를 스토어에서 가져오기 위한 변수 선언
 const calc = store.calc;
 
-// 단위 이름과 값을 바꾸기 위한 함수
-const swapUnitValue = () => {
-  // 변환 결과를 원본 값으로 바꾸기
-  // (computed로 선언된 unitResult로 인해 값이 바뀌면 자동으로 변환 결과가 바뀜)
-  calc.setCurrentNumber(unitResult.value);
-
-  // 단위도 바꾸기
-  const temp = store.recentUnitFrom[store.recentCategory];
-  store.recentUnitFrom[store.recentCategory] = store.recentUnitTo[store.recentCategory];
-  store.recentUnitTo[store.recentCategory] = temp;
-};
+import UnitConverter from 'classes/UnitConverter';
 
 // 범주와 단위를 초기화
 const initRecentCategoryAndUnit = () => {
@@ -47,6 +36,19 @@ const initRecentCategoryAndUnit = () => {
     }
   }
 };
+
+// 단위 이름과 값을 바꾸기 위한 함수
+const swapUnitValue = () => {
+  // 변환 결과를 원본 값으로 바꾸기
+  // (computed로 선언된 unitResult로 인해 값이 바뀌면 자동으로 변환 결과가 바뀜)
+  calc.setCurrentNumber(unitResult.value);
+
+  // 단위도 바꾸기
+  const temp = store.recentUnitFrom[store.recentCategory];
+  store.recentUnitFrom[store.recentCategory] = store.recentUnitTo[store.recentCategory];
+  store.recentUnitTo[store.recentCategory] = temp;
+};
+
 // 단위 초기화
 initRecentCategoryAndUnit();
 
@@ -120,6 +122,8 @@ watch(
   }
 );
 
+import { KeyBinding } from 'classes/KeyBinding';
+
 const keyBinding = new KeyBinding([
   [['v'], () => store.clickButtonById('btn-swap-unit')],
   [['b'], () => store.showUnitToggle()]
@@ -174,6 +178,10 @@ watch(
   },
   { immediate: true }
 );
+
+onBeforeMount(() => {
+  window.addEventListener('resize', setNeedUnitResultTooltip);
+});
 
 </script>
 
@@ -317,7 +325,7 @@ ko:
     time: '시간'
     speed: '속도'
     pressure: '압력'
-    data: '데이터'
+    data: '자료'
   unitDesc:
     length:
       m: '미터'

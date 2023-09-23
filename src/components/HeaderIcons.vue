@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onMounted, computed } from 'vue';
+import { onMounted } from 'vue';
 import { copyToClipboard } from 'quasar';
 import { useI18n } from 'vue-i18n';
 
@@ -15,24 +15,22 @@ const store = useCalcStore();
 // 계산기 오브젝트를 스토어에서 가져오기 위한 변수 선언
 const calc = store.calc;
 
-const result = computed(() => {
-  const currentNumbers = calc.getCurrentNumber().split('.');
-  const toLocaleNumbers = store.toLocale(currentNumbers.join('.')).split('.');
-  const baseResult = (store.decimalPlaces == -2 && currentNumbers.length > 1)
-    ? toLocaleNumbers[0]+'.'+currentNumbers[1]
-    : toLocaleNumbers.join('.');
-  return baseResult;
-});
-
 // 창에서 선택한 내용이 있으면 선택한 내용을 클립보드에 복사하고
 // 아니면 계산 결과를 클립보드에 복사한다.
 const doCopy = (): void => {
+  // 계산 결과에 있는 내용을 가져온다.
+  const resultText = document.getElementById('result')?.textContent ?? '';
+  // 선택한 내용을 가져온다.
   const selectedText = document.getSelection()?.toString() ?? '';
-  const textToClipboard = selectedText == '' ? result.value : selectedText;
+  // 선택한 내용이 없으면 계산 결과에 있는 내용을 가져온다.
+  const textToClipboard = selectedText == '' ? resultText: selectedText;
+  // 복사할 대상이 디스플레이에 있는 내용인지 선택한 내용인지에 따라
+  // 복사할 대상을 표시한다.
   const targetToBeCopied =
     selectedText == ''
       ? t('targetToBeCopiedResult')
       : t('targetToBeCopiedSelected');
+  // 클립보드에 복사한다.
   copyToClipboard(textToClipboard)
     .then(() => {
       store.notifyMsg(t('copiedToClipboard', { target: targetToBeCopied }));
