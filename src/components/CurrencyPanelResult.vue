@@ -286,8 +286,9 @@ onBeforeMount(() => {
       @update:model-value="store.blurElement"
       @focus="store.setInputFocused"
       @blur="store.setInputBlurred"
-      class="col-4 q-pl-sm shadow-4"
-      :class="store.darkMode ? 'bg-grey-9' : 'bg-grey-3'"
+      class="col-4 q-pl-sm shadow-2"
+      :class="!store.darkMode ? 'bg-blue-grey-2' : 'bg-blue-grey-6' "
+      :popup-content-class="!store.darkMode ? 'bg-blue-grey-2' : 'bg-blue-grey-6' "
     >
       <template v-slot:option="scope">
         <q-item v-bind="scope.itemProps">
@@ -313,7 +314,6 @@ onBeforeMount(() => {
       icon="swap_horiz"
       size="md"
       class="col-2 q-mx-none q-px-sm"
-      :color="store.getDarkColor('primary')"
       @click="swapCurrencyValue"
     >
       <MyTooltip>{{ t('tooltipSwap') }}</MyTooltip>
@@ -338,8 +338,9 @@ onBeforeMount(() => {
       @update:model-value="store.blurElement"
       @focus="store.setInputFocused"
       @blur="store.setInputBlurred"
-      class="col-4 q-pl-sm shadow-4"
-      :class="store.darkMode ? 'bg-grey-9' : 'bg-grey-3'"
+      class="col-4 q-pl-sm shadow-2"
+      :class="!store.darkMode ? 'bg-blue-grey-2' : 'bg-blue-grey-6'"
+      :popup-content-class="!store.darkMode ? 'bg-blue-grey-2' : 'bg-blue-grey-6'"
     >
       <template v-slot:option="scope">
         <q-item v-bind="scope.itemProps">
@@ -370,24 +371,18 @@ onBeforeMount(() => {
     <!-- 대상 값 -->
     <q-field
       :model-value="currencyResult"
-      class="shadow-4 justify-end self-center"
+      class="shadow-2 justify-end self-center q-mt-none q-mb-xs"
       filled
       dense
       readonly
-      :bg-color="
-        needCurrencyResultTooltip
-          ? store.darkMode
-            ? 'blue-grey-9'
-            : 'amber-2'
-          : undefined
-      "
+      :bg-color="!needCurrencyResultTooltip ? 'light-green-3' : 'deep-orange-2'"
     >
       <template v-slot:control>
         <div
           id="currencyResult"
           v-mutation="setNeedCurrencyResultTooltip"
           v-mutation.characterData
-          class="self-center full-width no-outline ellipsis text-h4 text-right"
+          class="self-center full-width full-height no-outline ellipsis q-pt-xs text-right text-black"
         >
           {{ currencyResult }}
           <MyTooltip v-if="needCurrencyResultTooltip">{{
@@ -748,3 +743,16 @@ en:
     ZWL: 'Zimbabwean Dollar'
   tooltipSwap: 'Swap source and destination.'
 </i18n>
+
+<style scoped lang="scss">
+@font-face {
+  font-family: 'digital-7-mono-italic';
+    src: url('../../public/digital-7.monoitalic.ttf') format('truetype');
+}
+
+#currencyResult {
+  font-family: 'digital-7-mono-italic';
+  font-size: 40px;
+  min-height: 36px;
+}
+</style>

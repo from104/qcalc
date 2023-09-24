@@ -197,8 +197,9 @@ onBeforeMount(() => {
       options-dense
       emit-value
       map-options
-      class="col-3 q-pl-sm shadow-4"
-      :class=" store.darkMode ? 'bg-grey-9' : 'bg-grey-3' "
+      class="col-3 q-pl-sm shadow-2 text-black"
+      :class="!store.darkMode ? 'bg-blue-grey-2' : 'bg-blue-grey-6' "
+      :popup-content-class="!store.darkMode ? 'bg-blue-grey-2' : 'bg-blue-grey-6' "
     />
 
     <!-- 원본 방향 -->
@@ -214,8 +215,9 @@ onBeforeMount(() => {
       options-dense
       emit-value
       map-options
-      class="col-3 q-pl-sm shadow-4"
-      :class=" store.darkMode ? 'bg-grey-9' : 'bg-grey-3' "
+      class="col-3 q-pl-sm shadow-2"
+      :class="!store.darkMode ? 'bg-blue-grey-2' : 'bg-blue-grey-6' "
+      :popup-content-class="!store.darkMode ? 'bg-blue-grey-2' : 'bg-blue-grey-6' "
     >
       <template v-slot:option=" scope ">
         <q-item v-bind=" scope.itemProps ">
@@ -241,7 +243,6 @@ onBeforeMount(() => {
       icon="swap_horiz"
       size="md"
       class="col-1 q-mx-none q-px-sm"
-      :color=" store.getDarkColor( 'primary' ) "
       @click="swapUnitValue()"
     >
       <MyTooltip>{{ t( 'tooltipSwap' ) }}</MyTooltip>
@@ -257,8 +258,9 @@ onBeforeMount(() => {
       options-dense
       emit-value
       map-options
-      class="col-3 q-pl-sm shadow-4"
-      :class=" store.darkMode ? 'bg-grey-9' : 'bg-grey-3' "
+      class="col-3 q-pl-sm shadow-2"
+      :class="!store.darkMode ? 'bg-blue-grey-2' : 'bg-blue-grey-6' "
+      :popup-content-class="!store.darkMode ? 'bg-blue-grey-2' : 'bg-blue-grey-6' "
     >
       <template v-slot:option=" scope ">
         <q-item v-bind=" scope.itemProps ">
@@ -286,24 +288,18 @@ onBeforeMount(() => {
   <q-card-section class="col-12 q-px-sm q-pt-none q-pb-none">
     <!-- 대상 값 -->
     <q-field
-      :model-value=" unitResult "
-      class="shadow-4 justify-end self-center"
+      class="shadow-2 justify-end self-center q-mt-none q-mb-xs"
       filled
       dense
       readonly
-      :bg-color=" needUnitResultTooltip
-        ? store.darkMode
-          ? 'blue-grey-9'
-          : 'amber-2'
-        : undefined
-        "
+      :bg-color="!needUnitResultTooltip ? 'light-green-3' : 'deep-orange-2'"
     >
       <template v-slot:control>
         <div
           id="unitResult"
           v-mutation=" setNeedUnitResultTooltip "
           v-mutation.characterData
-          class="self-center full-width no-outline ellipsis text-h4 text-right"
+          class="self-center full-width full-height no-outline ellipsis q-pt-xs text-right text-black"
         >
           {{ unitResult }}
           <MyTooltip v-if=" needUnitResultTooltip ">{{ unitResult }}</MyTooltip>
@@ -495,3 +491,17 @@ en:
       PB: 'Petabyte'
   tooltipSwap: 'Swap source and destination.'
 </i18n>
+
+<style scoped lang="scss">
+@font-face {
+  font-family: 'digital-7-mono-italic';
+    src: url('../../public/digital-7.monoitalic.ttf') format('truetype');
+}
+
+#unitResult {
+  font-family: 'digital-7-mono-italic';
+  font-size: 40px;
+  min-height: 36px;
+}
+</style>
+

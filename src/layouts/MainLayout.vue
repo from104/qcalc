@@ -53,11 +53,7 @@ onMounted(() => {
 
 <template>
   <q-layout view="hHh lpr fff">
-    <q-header
-      :class="'bg-' + store.getDarkColor('primary')"
-      class="z-top noselect"
-      elevated
-    >
+    <q-header class="z-top noselect" elevated>
       <q-toolbar v-blur>
         <q-btn
           flat
@@ -104,7 +100,7 @@ onMounted(() => {
     >
       <SettingPanel />
     </q-drawer>
-    <q-page-container style="padding-bottom: 0px">
+    <q-page-container style="padding-bottom: 0px; background: #e0dfdf;">
       <router-view v-slot="{ Component }">
         <transition name="slide-fade" mode="out-in" appear>
           <div :key="$route.path">

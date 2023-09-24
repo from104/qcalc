@@ -37,30 +37,30 @@ type Button = [id: string, label: string, color: string, keys: string[], handler
 
 // prettier-ignore
 const buttons: Button = [
-  ['power', 'x²', 'secondary', ['u'], () => calc.pow2()],
-  ['root', '√x', 'secondary', ['r'], () => calc.sqrt()],
-  ['clear', 'C', 'deep-orange', ['Delete', 'Escape', 'c'], () => calc.clear()],
-  ['backspace', '@mdi-backspace', 'deep-orange', ['Backspace'], () => calc.deleteDigitOrDot()],
-  ['plusMinus', '@mdi-plus-minus-variant', 'secondary', ['Shift+Minus', 's'], () => calc.changeSign()],
-  ['percent', '%', 'secondary', ['%', 'p'], () => calc.percent()],
-  ['reciprocal', '1/x', 'secondary', ['i'], () => calc.rec()],
-  ['divide', '@mdi-division', 'secondary', ['/'], () => calc.div()  ],
-  ['seven', '7', 'primary', ['7'], () => calc.addDigit(7)],
-  ['eight', '8', 'primary', ['8'], () => calc.addDigit(8)],
-  ['nine', '9', 'primary', ['9'], () => calc.addDigit(9)],
-  ['multiply', '@mdi-close', 'secondary', ['*'], () => calc.mul()],
-  ['four', '4', 'primary', ['4'], () => calc.addDigit(4)],
-  ['five', '5', 'primary', ['5'], () => calc.addDigit(5)],
-  ['six', '6', 'primary', ['6'], () => calc.addDigit(6)],
-  ['minus', '@mdi-minus', 'secondary', ['-'], () => calc.minus()],
-  ['one', '1', 'primary', ['1'], () => calc.addDigit(1)],
-  ['two', '2', 'primary', ['2'], () => calc.addDigit(2)],
-  ['three', '3', 'primary', ['3'], () => calc.addDigit(3)],
-  ['plus', '@mdi-plus', 'secondary', ['+'], () => calc.plus()],
-  ['doubleZero', '00', 'primary', [], () => { calc.addDigit(0); calc.addDigit(0); }],
-  ['zero', '0', 'primary', ['0'], () => calc.addDigit(0)],
-  ['dot', '@mdi-circle-small', 'primary', ['.'], () => calc.addDot()],
-  ['equals', '@mdi-equal', 'secondary', ['=', 'Enter'], ()=>calc.equal()],
+  ['power', 'x²', 'function', ['u'], () => calc.pow2()],
+  ['root', '√x', 'function', ['r'], () => calc.sqrt()],
+  ['clear', 'C', 'important', ['Delete', 'Escape', 'c'], () => calc.clear()],
+  ['backspace', '@mdi-backspace', 'important', ['Backspace'], () => calc.deleteDigitOrDot()],
+  ['plusMinus', '@mdi-plus-minus-variant', 'function', ['Shift+Minus', 's'], () => calc.changeSign()],
+  ['percent', '%', 'function', ['%', 'p'], () => calc.percent()],
+  ['reciprocal', '1/x', 'function', ['i'], () => calc.rec()],
+  ['divide', '@mdi-division', 'function', ['/'], () => calc.div()],
+  ['seven', '7', 'normal', ['7'], () => calc.addDigit(7)],
+  ['eight', '8', 'normal', ['8'], () => calc.addDigit(8)],
+  ['nine', '9', 'normal', ['9'], () => calc.addDigit(9)],
+  ['multiply', '@mdi-close', 'function', ['*'], () => calc.mul()],
+  ['four', '4', 'normal', ['4'], () => calc.addDigit(4)],
+  ['five', '5', 'normal', ['5'], () => calc.addDigit(5)],
+  ['six', '6', 'normal', ['6'], () => calc.addDigit(6)],
+  ['minus', '@mdi-minus', 'function', ['-'], () => calc.minus()],
+  ['one', '1', 'normal', ['1'], () => calc.addDigit(1)],
+  ['two', '2', 'normal', ['2'], () => calc.addDigit(2)],
+  ['three', '3', 'normal', ['3'], () => calc.addDigit(3)],
+  ['plus', '@mdi-plus', 'function', ['+'], () => calc.plus()],
+  ['doubleZero', '00', 'normal', [], () => { calc.addDigit(0); calc.addDigit(0); }],
+  ['zero', '0', 'normal', ['0'], () => calc.addDigit(0)],
+  ['dot', '@mdi-circle-small', 'normal', ['.'], () => calc.addDot()],
+  ['equals', '@mdi-equal', 'function', ['=', 'Enter'], ()=>calc.equal()],
 ];
 
 const keyBindings: KeyBindings = buttons.map(([id, , , keys, ]) => [keys, () => store.clickButtonById('btn-'+id)]);
@@ -101,7 +101,7 @@ const baseHeight = ref('132px');
 
 // 계산기 타입에 따라 버튼 높이를 다르게 설정
 if (props.type === 'unit' || props.type === 'currency') {
-  baseHeight.value = '230px';
+  baseHeight.value = '232px';
 }
 </script>
 
@@ -117,13 +117,13 @@ if (props.type === 'unit' || props.type === 'currency') {
     >
       <q-btn
         :id="'btn-'+button[0]"
-        class="shadow-4 noselect col-12 button"
+        class="shadow-2 noselect col-12 button"
         no-caps
         push
         :label="button[1].charAt(0) != '@' ? button[1] : undefined"
         :icon="button[1].charAt(0) == '@' ? button[1].slice(1) : undefined"
         :class="button[1].charAt(0) == '@' ? 'icon' : 'char'"
-        :color="button[2]"
+        :color="`btn-${button[2]}`"
         @click="() => funcWithError(button[4])"
       />
     </div>
@@ -161,5 +161,14 @@ if (props.type === 'unit' || props.type === 'currency') {
         calc((100vw - 40px) / 4 * 0.3)
       ) * 1.2
   );
+}
+.bg-btn-important {
+  background: #D35400 !important;
+}
+.bg-btn-function {
+  background: #29709f !important;
+}
+.bg-btn-normal {
+  background: #5f5f5f !important;
 }
 </style>

@@ -131,22 +131,21 @@ onMounted(() => {
 <template>
   <q-card-section class="col-12 q-px-sm q-pt-md q-pb-sm">
     <q-field
-      :model-value="result"
-      class="shadow-4 justify-end self-center"
+      class="shadow-2 justify-end self-center"
       filled
       dense
       readonly
-      :bg-color="needResultTooltip ? (store.darkMode ? 'blue-grey-9' : 'amber-2') : undefined"
+      :bg-color="!needResultTooltip ? 'light-green-3' : 'deep-orange-2'"
       label-slot
       stack-label
     >
       <template v-slot:prepend v-if="operator != ''">
-        <div class="noselect full-height q-mt-xs q-pt-xs" v-blur>
+        <div class="text-black noselect full-height q-mt-xs q-pt-sm" v-blur>
           <q-icon :name="operatorIcons[operator]" />
         </div>
       </template>
       <template v-slot:label>
-        <div class="noselect" v-blur>
+        <div id="preResult" class="text-black noselect" v-blur>
           {{ preResult }}
         </div>
       </template>
@@ -155,7 +154,7 @@ onMounted(() => {
           id="result"
           v-mutation="setNeedResultTooltip"
           v-mutation.characterData
-          class="self-center full-width no-outline ellipsis text-h4 text-right"
+          class="self-center full-width no-outline ellipsis text-right text-h5 text-black"
         >
           {{ result }}
           <MyTooltip v-if="needResultTooltip">{{ result }}</MyTooltip>
@@ -166,14 +165,25 @@ onMounted(() => {
 </template>
 
 <style scoped lang="scss">
+@font-face {
+  font-family: 'digital-7-mono-italic';
+    src: url('../../public/digital-7.monoitalic.ttf') format('truetype');
+}
+
+#result {
+  font-family: 'digital-7-mono-italic';
+  font-size: 40px;
+  padding-bottom: 10px;
+}
 .q-field {
   &::v-deep {
     .q-field__label {
       right: -100%;
       text-align: right;
       font-size: 20px;
-      top: 8px;
+      top: 10px;
     }
   }
 }
+
 </style>

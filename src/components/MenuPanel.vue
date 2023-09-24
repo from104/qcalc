@@ -91,10 +91,7 @@ onMounted(() => {
     </q-item-label>
     <PathRoute v-for="path in paths" :key="path.title" v-bind="path" />
   </q-list>
-  <q-footer
-    :class="'bg-' + store.getDarkColor('primary')"
-    class="row items-center q-pa-sm"
-  >
+  <q-footer class="row items-center q-pa-sm bg-primary" >
     {{ `${t('version')} : ${version}` }}
     <q-space />
   </q-footer>
