@@ -88,20 +88,17 @@ const getUnitResult = () => {
   // 저장된 범주와 단위가 잘못됐으면 초기화
   initRecentCategoryAndUnit();
 
-  const unit = store.showUnit ? store.recentUnitTo[store.recentCategory] : '';
+  // const unit = store.showUnit ? store.recentUnitTo[store.recentCategory] : '';
 
   // 변환 결과를 반환
-  return [
-    store.toLocale(
+  return store.toLocale(
       UnitConverter.convert(
         store.recentCategory,
         calc.getCurrentNumber(),
         store.recentUnitFrom[store.recentCategory],
         store.recentUnitTo[store.recentCategory]
       )
-    ),
-    unit
-  ].join(' ');
+    );
 };
 
 const unitResult = ref(getUnitResult());
@@ -311,6 +308,12 @@ onBeforeMount(() => {
           <MyTooltip v-if=" needUnitResultTooltip ">{{ unitResult }}</MyTooltip>
         </div>
       </template>
+      <template v-slot:append v-if="store.showUnit">
+        <div class="text-black items-end q-mt-xs q-pt-md">
+          {{ store.recentUnitTo[store.recentCategory] }}
+        </div>
+      </template>
+
     </q-field>
   </q-card-section>
 </template>

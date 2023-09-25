@@ -67,9 +67,9 @@ watch(
     calc,
     () => store.useGrouping,
     () => store.decimalPlaces,
+    () => store.showSymbol,
     () => store.recentCurrencyFrom,
     () => store.recentCurrencyTo,
-    () => store.showSymbol
   ],
   () => {
     currencyResult.value = getCurrencyResult();
@@ -259,7 +259,6 @@ const filterFnTo = createFilterFn(toFilteredCurrencyOptions, toCurrencyOptions);
 onBeforeMount(() => {
   window.addEventListener('resize', setNeedCurrencyResultTooltip);
 });
-
 </script>
 
 <template>

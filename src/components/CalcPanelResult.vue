@@ -48,9 +48,9 @@ const getResult = () => {
   // store에서 단위 표시가 활성화되어 있고, 애드온이 'unit'일 경우
   if (store.showUnit && props.addon == 'unit') {
     // 사용할 단위를 결정합니다.
-    const unit = store.recentUnitFrom[store.recentCategory];
+    // const unit = store.recentUnitFrom[store.recentCategory];
     // 이 단위와 baseResult를 결합하여 반환합니다.
-    return [baseResult, unit].join(' ');
+    return baseResult;
   }
   // store에서 기호 표시가 활성화되어 있고, 애드온이 'currency'일 경우
   else if (store.showSymbol && props.addon == 'currency') {
@@ -110,11 +110,25 @@ const getPreResult = () => {
 
 const preResult = ref(getPreResult());
 
-watch([calc, () => store.useGrouping, () => store.decimalPlaces, () => store.showUnit, () => store.showSymbol], () => {
-  result.value = getResult();
-  preResult.value = getPreResult();
-  setNeedResultTooltip();
-});
+watch(
+  [
+    calc,
+    () => store.useGrouping,
+    () => store.decimalPlaces,
+    () => store.showUnit,
+    () => store.recentCategory,
+    () => store.recentUnitFrom[store.recentCategory],
+    () => store.recentUnitTo[store.recentCategory],
+    () => store.showSymbol,
+    () => store.recentCurrencyFrom,
+    () => store.recentCurrencyTo,
+  ],
+  () => {
+    result.value = getResult();
+    preResult.value = getPreResult();
+    setNeedResultTooltip();
+  }
+);
 
 onBeforeMount(() => {
   window.addEventListener('resize', setNeedResultTooltip);
@@ -139,7 +153,7 @@ onMounted(() => {
       label-slot
       stack-label
     >
-      <template v-slot:prepend v-if="operator != ''">
+    <template v-slot:prepend v-if="operator != ''">
         <div class="text-black noselect full-height q-mt-xs q-pt-sm" v-blur>
           <q-icon :name="operatorIcons[operator]" />
         </div>
@@ -158,6 +172,11 @@ onMounted(() => {
         >
           {{ result }}
           <MyTooltip v-if="needResultTooltip">{{ result }}</MyTooltip>
+        </div>
+      </template>
+      <template v-slot:append v-if="props.addon == 'unit' && store.showUnit">
+        <div class="text-black items-end q-mt-lg q-pt-md">
+          {{ store.recentUnitFrom[store.recentCategory] }}
         </div>
       </template>
     </q-field>
