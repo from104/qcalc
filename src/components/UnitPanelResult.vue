@@ -200,6 +200,8 @@ onBeforeMount(() => {
       class="col-3 q-pl-sm shadow-2 text-black"
       :class="!store.darkMode ? 'bg-blue-grey-2' : 'bg-blue-grey-6' "
       :popup-content-class="!store.darkMode ? 'bg-blue-grey-2' : 'bg-blue-grey-6' "
+      :options-selected-class="!store.darkMode ? 'text-primary' : 'text-grey-1'"
+      :label-color="!store.darkMode ? 'primary' : 'grey-1'"
     />
 
     <!-- 원본 방향 -->
@@ -218,6 +220,8 @@ onBeforeMount(() => {
       class="col-3 q-pl-sm shadow-2"
       :class="!store.darkMode ? 'bg-blue-grey-2' : 'bg-blue-grey-6' "
       :popup-content-class="!store.darkMode ? 'bg-blue-grey-2' : 'bg-blue-grey-6' "
+      :options-selected-class="!store.darkMode ? 'text-primary' : 'text-grey-1'"
+      :label-color="!store.darkMode ? 'primary' : 'grey-1'"
     >
       <template v-slot:option=" scope ">
         <q-item v-bind=" scope.itemProps ">
@@ -261,6 +265,8 @@ onBeforeMount(() => {
       class="col-3 q-pl-sm shadow-2"
       :class="!store.darkMode ? 'bg-blue-grey-2' : 'bg-blue-grey-6' "
       :popup-content-class="!store.darkMode ? 'bg-blue-grey-2' : 'bg-blue-grey-6' "
+      :options-selected-class="!store.darkMode ? 'text-primary' : 'text-grey-1'"
+      :label-color="!store.darkMode ? 'primary' : 'grey-1'"
     >
       <template v-slot:option=" scope ">
         <q-item v-bind=" scope.itemProps ">
