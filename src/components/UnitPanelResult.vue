@@ -91,7 +91,7 @@ const getUnitResult = () => {
   // const unit = store.showUnit ? store.recentUnitTo[store.recentCategory] : '';
 
   // 변환 결과를 반환
-  return store.toLocale(
+  return store.toFormattedNumber(
       UnitConverter.convert(
         store.recentCategory,
         calc.getCurrentNumber(),

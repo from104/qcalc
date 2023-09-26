@@ -52,7 +52,7 @@ const getCurrencyResult = () => {
   // 변환 결과를 반환
   return [
     symbol,
-    store.toLocale(
+    store.toFormattedNumber(
       currencyConverter
         .convert(Number(calc.getCurrentNumber()), store.recentCurrencyFrom, store.recentCurrencyTo)
         .toString()

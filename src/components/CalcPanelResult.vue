@@ -37,7 +37,7 @@ const setNeedResultTooltip = () => {
 const getResult = () => {
   const currentNumber = calc.getCurrentNumber();
   const currentNumbers = currentNumber.split('.');
-  const toLocaleNumber = store.toLocale(currentNumber);
+  const toLocaleNumber = store.toFormattedNumber(currentNumber);
   const toLocaleNumbers = toLocaleNumber.split('.');
   const hasDecimalPlaces = store.decimalPlaces === -2 && currentNumbers.length > 1;
   const baseResult =
@@ -101,7 +101,7 @@ const getPreResult = () => {
   // 입력된 연산자가 있고 초기화 예정이 아니라면
   else if (operatorExists && !shouldReset) {
     // 백업된 숫자를 현재 지역의 표기법으로 변환하여 반환합니다.
-    return store.toLocale(calc.getPreviousNumber());
+    return store.toFormattedNumber(calc.getPreviousNumber());
   } else {
     // 위의 조건에 해당하지 않는 경우, 빈 문자열을 반환합니다.
     return '';
@@ -153,14 +153,14 @@ onMounted(() => {
       label-slot
       stack-label
     >
-    <template v-slot:prepend v-if="operator != ''">
-        <div class="text-black noselect full-height q-mt-xs q-pt-sm" v-blur>
-          <q-icon :name="operatorIcons[operator]" />
-        </div>
-      </template>
       <template v-slot:label>
         <div id="preResult" class="text-black noselect" v-blur>
           {{ preResult }}
+        </div>
+      </template>
+      <template v-slot:prepend v-if="operator != ''">
+        <div class="text-black noselect full-height q-mt-xs q-pt-sm" v-blur>
+          <q-icon :name="operatorIcons[operator]" />
         </div>
       </template>
       <template v-slot:control>
