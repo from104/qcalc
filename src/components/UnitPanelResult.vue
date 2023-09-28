@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, onBeforeMount, onMounted, onBeforeUnmount, reactive, watch } from 'vue';
+import { ref, onBeforeMount, onMounted, onBeforeUnmount, reactive, watch, computed } from 'vue';
 
 import MyTooltip from 'components/MyTooltip.vue';
 
@@ -66,42 +66,40 @@ watch([() => store.useSystemLocale, () => store.userLocale], () => {
     category.label = t(`categories.${category.value}`);
   });
 });
+
 // 변환 결과 툴팁 표시 상태 변수
 const needUnitResultTooltip = ref(false);
 
 // 변환 결과가 길 경우 툴팁 표시 상태 셋팅
 const setNeedUnitResultTooltip = () => {
-  // 원래 결과 칸 길이
-  const ow = document.getElementById('unitResult')?.offsetWidth ?? 0;
+  const subField = document.getElementById('subField');
+  if (!subField) return false;
 
-  // 결과 문자열의 크기
-  // (원래 칸에 결과 길이가 넘치면 스크롤 해야하는데 ...로 대체 시킨 경우 스크롤해야할 폭 값만 커진다.)
-  const sw = document.getElementById('unitResult')?.scrollWidth ?? 0;
-
-  // 원래의 칸 크기보다 결과 문자열 길이가 길면 툴팁을 표시
-  needUnitResultTooltip.value = ow < sw;
-
+  needUnitResultTooltip.value = subField.offsetWidth < subField.scrollWidth;
   return true;
-};
+}
 
 const getUnitResult = () => {
   // 저장된 범주와 단위가 잘못됐으면 초기화
   initRecentCategoryAndUnit();
 
-  // const unit = store.showUnit ? store.recentUnitTo[store.recentCategory] : '';
-
   // 변환 결과를 반환
   return store.toFormattedNumber(
-      UnitConverter.convert(
-        store.recentCategory,
-        calc.getCurrentNumber(),
-        store.recentUnitFrom[store.recentCategory],
-        store.recentUnitTo[store.recentCategory]
-      )
-    );
+    UnitConverter.convert(
+      store.recentCategory,
+      calc.getCurrentNumber(),
+      store.recentUnitFrom[store.recentCategory],
+      store.recentUnitTo[store.recentCategory]
+    )
+  );
 };
 
 const unitResult = ref(getUnitResult());
+
+// 단위를 뒤에 붙일지 여부
+const unit = computed(() =>
+  store.showUnit ? ' '+store.recentUnitTo[store.recentCategory] ?? '' : ''
+);
 
 // 계산 결과가 바뀌면 변환 결과도 바뀌도록 감시
 watch(
@@ -299,21 +297,16 @@ onBeforeMount(() => {
     >
       <template v-slot:control>
         <div
-          id="unitResult"
+          id="subField"
           v-mutation=" setNeedUnitResultTooltip "
           v-mutation.characterData
           class="self-center full-width full-height no-outline ellipsis q-pt-xs text-right text-black"
         >
-          {{ unitResult }}
-          <MyTooltip v-if=" needUnitResultTooltip ">{{ unitResult }}</MyTooltip>
+          <span id="unitResult">{{ unitResult }}</span>
+          <span id="unit">{{ unit }}</span>
+          <MyTooltip v-if=" needUnitResultTooltip ">{{ unitResult+unit }}</MyTooltip>
         </div>
       </template>
-      <template v-slot:append v-if="store.showUnit">
-        <div class="text-black items-end q-mt-xs q-pt-md">
-          {{ store.recentUnitTo[store.recentCategory] }}
-        </div>
-      </template>
-
     </q-field>
   </q-card-section>
 </template>
@@ -511,6 +504,10 @@ en:
   font-family: 'digital-7-mono-italic';
   font-size: 40px;
   min-height: 36px;
+}
+
+#unit {
+  font-size: 22px;
 }
 </style>
 

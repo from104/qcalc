@@ -22,49 +22,34 @@ const needResultTooltip = ref(false);
 
 // 계산 결과가 길 경우 툴팁 표시 상태 셋팅
 const setNeedResultTooltip = () => {
-  // 원래 결과 칸 길이
-  const ow = document.getElementById('result')?.offsetWidth ?? 0;
-  // 결과 문자열의 크기
-  // (원래 칸에 결과 길이가 넘치면 스크롤 해야하는데 ...로 대체 시킨 경우 스크롤해야할 폭 값만 커진다.)
-  const sw = document.getElementById('result')?.scrollWidth ?? 0;
-  // 원래의 칸 크기보다 결과 문자열 길이가 길면 툴팁을 표시
-  needResultTooltip.value = ow < sw;
+  const mainField = document.getElementById('mainField');
+  if (!mainField) return false;
 
+  needResultTooltip.value = mainField.offsetWidth < mainField.scrollWidth;
   return true;
 }
 
-
 const getResult = () => {
   const currentNumber = calc.getCurrentNumber();
-  const currentNumbers = currentNumber.split('.');
-  const toLocaleNumber = store.toFormattedNumber(currentNumber);
-  const toLocaleNumbers = toLocaleNumber.split('.');
-  const hasDecimalPlaces = store.decimalPlaces === -2 && currentNumbers.length > 1;
-  const baseResult =
-    hasDecimalPlaces
-      ? `${toLocaleNumbers[0]}.${currentNumbers[1]}`
-      : toLocaleNumbers.join('.');
-
-  // store에서 단위 표시가 활성화되어 있고, 애드온이 'unit'일 경우
-  if (store.showUnit && props.addon == 'unit') {
-    // 사용할 단위를 결정합니다.
-    // const unit = store.recentUnitFrom[store.recentCategory];
-    // 이 단위와 baseResult를 결합하여 반환합니다.
-    return baseResult;
-  }
-  // store에서 기호 표시가 활성화되어 있고, 애드온이 'currency'일 경우
-  else if (store.showSymbol && props.addon == 'currency') {
-    // 기호를 가져옵니다. 또한 현재 환율로부터 해당 기호를 찾을 수 없는 경우에 대비하여 기본값을 설정합니다.
-    const symbol = store.currencyConverter?.getSymbol(store.recentCurrencyFrom) ?? '';
-    // 이 기호와 baseResult를 결합하여 반환합니다.
-    return [symbol, baseResult].join(' ');
-  } else {
-    // 둘 다 아닌 경우, 조건에 해당하는 'else'에서는 baseResult를 그대로 반환합니다.
-    return baseResult;
-  }
+  const toFormattedNumber = store.toFormattedNumber(currentNumber);
+  return store.decimalPlaces === -2 && currentNumber.includes('.')
+    ? `${toFormattedNumber.split('.')[0]}.${currentNumber.split('.')[1]}`
+    : toFormattedNumber;
 }
 
 const result = ref(getResult());
+
+// 화폐 기호를 앞에 붙일지 여부
+const symbol = computed(() =>
+  props.addon == 'currency' && store.showSymbol
+    ? store.currencyConverter?.getSymbol(store.recentCurrencyFrom) ?? ''
+    : ''
+);
+
+// 단위를 뒤에 붙일지 여부
+const unit = computed(() =>
+  props.addon == 'unit' && store.showUnit ? ' '+store.recentUnitFrom[store.recentCategory] ?? '' : ''
+);
 
 // 계산 결과 배열
 const resultHistory = computed(() => calc.getHistory() as History[]);
@@ -165,18 +150,15 @@ onMounted(() => {
       </template>
       <template v-slot:control>
         <div
-          id="result"
+          id="mainField"
           v-mutation="setNeedResultTooltip"
           v-mutation.characterData
-          class="self-center full-width no-outline ellipsis text-right text-h5 text-black"
+          class="self-center no-outline full-width ellipsis text-right text-h5 text-black"
         >
-          {{ result }}
-          <MyTooltip v-if="needResultTooltip">{{ result }}</MyTooltip>
-        </div>
-      </template>
-      <template v-slot:append v-if="props.addon == 'unit' && store.showUnit">
-        <div class="text-black items-end q-mt-lg q-pt-md">
-          {{ store.recentUnitFrom[store.recentCategory] }}
+        <span id="symbol">{{ symbol }}</span>
+        <span id="result">{{ result }}</span>
+        <span id="unit">{{ unit }}</span>
+          <MyTooltip v-if="needResultTooltip">{{ symbol+result+unit }}</MyTooltip>
         </div>
       </template>
     </q-field>
@@ -189,10 +171,18 @@ onMounted(() => {
     src: url('../../public/digital-7.monoitalic.ttf') format('truetype');
 }
 
+#symbol {
+  font-size: 35px;
+}
+
 #result {
   font-family: 'digital-7-mono-italic';
-  font-size: 40px;
-  padding-bottom: 10px;
+  font-size: 38px;
+  padding-bottom: 8px;
+}
+
+#unit {
+  font-size: 22px;
 }
 .q-field {
   &::v-deep {

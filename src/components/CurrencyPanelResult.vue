@@ -7,6 +7,7 @@ import {
   reactive,
   watch,
   Ref,
+  computed,
 } from 'vue';
 import { useI18n } from 'vue-i18n';
 
@@ -48,19 +49,23 @@ const getCurrencyResult = () => {
   // 저장된 범주와 단위가 잘못됐으면 초기화
   initRecentCurrency();
 
-  const symbol = store.showSymbol ? currencyConverter.getSymbol(store.recentCurrencyTo) : '';
   // 변환 결과를 반환
-  return [
-    symbol,
-    store.toFormattedNumber(
-      currencyConverter
-        .convert(Number(calc.getCurrentNumber()), store.recentCurrencyFrom, store.recentCurrencyTo)
-        .toString()
-    )
-  ].join(' ');
+  return store.toFormattedNumber(
+    currencyConverter
+      .convert(Number(calc.getCurrentNumber()), store.recentCurrencyFrom, store.recentCurrencyTo)
+      .toString()
+  );
 };
 
 const currencyResult = ref(getCurrencyResult());
+
+// 화폐 기호를 앞에 붙일지 여부
+const symbol = computed(() =>
+  store.showSymbol
+    ? store.currencyConverter?.getSymbol(store.recentCurrencyTo) ?? ''
+    : ''
+);
+
 
 watch(
   [
@@ -117,16 +122,13 @@ const needCurrencyResultTooltip = ref(false);
 
 // 변환 결과가 길 경우 툴팁 표시 상태 셋팅
 const setNeedCurrencyResultTooltip = () => {
-  // 원래 결과 칸 길이
-  const ow = document.getElementById('currencyResult')?.offsetWidth ?? 0;
-  // 결과 문자열의 크기
-  // (원래 칸에 결과 길이가 넘치면 스크롤 해야하는데 ...로 대체 시킨 경우 스크롤해야할 폭 값만 커진다.)
-  const sw = document.getElementById('currencyResult')?.scrollWidth ?? 0;
-  // 원래의 칸 크기보다 결과 문자열 길이가 길면 툴팁을 표시
-  needCurrencyResultTooltip.value = ow < sw;
+  const subField = document.getElementById('subField');
+  if (!subField) return false;
 
+  needCurrencyResultTooltip.value = subField.offsetWidth < subField.scrollWidth;
   return true;
 }
+
 // 키바인딩 생성
 const keyBinding = new KeyBinding([
   [['v'], () => store.clickButtonById('btn-swap-currency')],
@@ -382,15 +384,17 @@ onBeforeMount(() => {
     >
       <template v-slot:control>
         <div
-          id="currencyResult"
+          id="subField"
           v-mutation="setNeedCurrencyResultTooltip"
           v-mutation.characterData
           class="self-center full-width full-height no-outline ellipsis q-pt-xs text-right text-black"
         >
-          {{ currencyResult }}
-          <MyTooltip v-if="needCurrencyResultTooltip">{{
-            currencyResult
-          }}</MyTooltip>
+          <span id="symbol">{{ symbol }}</span>
+          <span id="currencyResult">{{ currencyResult }}</span>
+          <span id="unit"> </span>
+          <MyTooltip v-if="needCurrencyResultTooltip">
+            {{ symbol+currencyResult }}
+          </MyTooltip>
         </div>
       </template>
     </q-field>
@@ -753,9 +757,17 @@ en:
     src: url('../../public/digital-7.monoitalic.ttf') format('truetype');
 }
 
+#symbol {
+  font-size: 35px;
+}
+
 #currencyResult {
   font-family: 'digital-7-mono-italic';
   font-size: 40px;
   min-height: 36px;
+}
+
+#unit {
+  font-size: 22px;
 }
 </style>
