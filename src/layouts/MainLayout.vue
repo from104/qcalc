@@ -26,6 +26,12 @@ const toggleRightDrawer = () => {
   leftDrawerOpen.value = false;
 };
 
+const title = ref('');
+
+const updateTitle = (t: string) => {
+  title.value = t;
+};
+
 import { KeyBinding } from 'classes/KeyBinding';
 
 const keyBinding = new KeyBinding([
@@ -63,7 +69,7 @@ onMounted(() => {
           :aria-label="t('menu')"
           @click="toggleLeftDrawer"
         />
-        <q-toolbar-title> {{ t('appTitle') }} </q-toolbar-title>
+        <q-toolbar-title> {{ title }} </q-toolbar-title>
         <HeaderIcons />
         <q-btn
           class="q-ml-sm"
@@ -86,7 +92,7 @@ onMounted(() => {
       overlay
       show-if-above
     >
-      <MenuPanel />
+      <MenuPanel @updateTitle="updateTitle"/>
     </q-drawer>
 
     <q-drawer

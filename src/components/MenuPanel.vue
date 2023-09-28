@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { useRouter } from 'vue-router';
+import { useRouter,useRoute } from 'vue-router';
 
 import { useI18n } from 'vue-i18n';
 
@@ -11,6 +11,7 @@ import { onMounted, reactive, watch } from 'vue';
 import PathRoute from 'components/PathRoute.vue';
 
 const router = useRouter();
+const route = useRoute();
 
 const store = useCalcStore();
 
@@ -62,11 +63,22 @@ const paths: {[key: string]: Path} = reactive({
   },
 });
 
+const emits = defineEmits(['updateTitle']);
+
+const updateTitle = () => {
+  emits('updateTitle', paths[route.path.slice(1)].title);
+};
+
+watch(()=>route.path, () => {
+  updateTitle();
+});
+
 watch([()=>store.useSystemLocale, ()=>store.userLocale], () => {
   Object.keys(paths).forEach((path) => {
     paths[path].title = t(`path.${path}.title`);
     paths[path].caption = t(`path.${path}.caption`);
   });
+  updateTitle();
 });
 
 import { KeyBinding } from 'classes/KeyBinding';
@@ -78,8 +90,10 @@ const keyBinding = new KeyBinding([
   [['F4'], () => router.push({ path: '/currency' })],
   [['F5'], () => router.push({ path: '/about' })],
 ]);
+
 onMounted(() => {
   keyBinding.subscribe();
+  updateTitle();
 });
 
 </script>
