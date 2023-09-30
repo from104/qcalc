@@ -301,6 +301,7 @@ onBeforeMount(() => {
           v-mutation=" setNeedUnitResultTooltip "
           v-mutation.characterData
           class="self-center full-width full-height no-outline ellipsis q-pt-xs text-right text-black"
+          :style="`padding-top: ${store.paddingOnResult}px;`"
         >
           <span id="unitResult">{{ unitResult }}</span>
           <span id="unit">{{ unit }}</span>

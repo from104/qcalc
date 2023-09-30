@@ -97,11 +97,11 @@ const props = withDefaults(defineProps<{ type?: string }>(), {
 });
 
 // 계산기 버튼의 높이를 계산하기 위한 변수 선언
-const baseHeight = ref('132px');
+const baseHeight = ref('136px');
 
 // 계산기 타입에 따라 버튼 높이를 다르게 설정
 if (props.type === 'unit' || props.type === 'currency') {
-  baseHeight.value = '232px';
+  baseHeight.value = '234px';
 }
 </script>
 

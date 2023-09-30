@@ -13,11 +13,17 @@ const MathB = create(all, {
 
 export const useCalcStore = defineStore('calc', {
   state: () => ({
-    darkMode: false,
-    alwaysOnTop: false,
+    // 계산기 클래스
     calc: new Calculator(),
+    // 다크 모드 여부
+    darkMode: false,
+    // 항상 위 여부
+    alwaysOnTop: false,
+    // 숫자 그루핑 여부
     useGrouping: true,
+    // 소수점 자리 (-2: 제한 없음)
     decimalPlaces: -2,
+    // 시스템 로케일 사용 여부
     useSystemLocale: true,
     // 시스템 로케일
     locale: '',
@@ -41,6 +47,8 @@ export const useCalcStore = defineStore('calc', {
     showUnit: true,
     // 통화 변환기에서 통화 기호를 표시할지 여부
     showSymbol: true,
+    // 패널 숫자 위 여백
+    paddingOnResult: 20,
   }),
   getters: {},
   actions: {

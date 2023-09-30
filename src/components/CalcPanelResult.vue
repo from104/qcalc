@@ -154,6 +154,7 @@ onMounted(() => {
           v-mutation="setNeedResultTooltip"
           v-mutation.characterData
           class="self-center no-outline full-width ellipsis text-right text-h5 text-black"
+          :style="`padding-top: ${store.paddingOnResult}px;`"
         >
         <span id="symbol">{{ symbol }}</span>
         <span id="result">{{ result }}</span>

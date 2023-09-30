@@ -105,6 +105,16 @@ onMounted(() => {
     </q-item-label>
     <PathRoute v-for="path in paths" :key="path.title" v-bind="path" />
   </q-list>
+  <!-- 패널 높이 조절 -->
+  <!-- <q-input 
+    v-model.number="store.paddingOnResult"
+    type="number"
+    filled
+    dense
+    class="text-white"
+    style="max-width: 80px"
+  /> -->
+
   <q-footer class="row items-center q-pa-sm bg-primary" >
     {{ `${t('version')} : ${version}` }}
     <q-space />
