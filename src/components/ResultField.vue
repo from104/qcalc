@@ -241,7 +241,7 @@ onMounted(() => {
 }
 
 .q-field {
-  &::v-deep {
+  &:deep {
     .q-field__label {
       right: -100%;
       text-align: right;
@@ -250,5 +250,4 @@ onMounted(() => {
     }
   }
 }
-
 </style>
