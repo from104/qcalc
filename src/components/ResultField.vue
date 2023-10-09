@@ -225,7 +225,9 @@ onMounted(() => {
 }
 
 #symbol {
-  font-size: 35px;
+  font-size: 36px;
+  font-family: 'Courier New', Courier, monospace;
+  padding-right: 0.3rem ;
 }
 
 #result,#subResult {
