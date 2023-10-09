@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import UnitPanelResult from 'components/UnitPanelResult.vue';
-import CalcPanelResult from 'components/CalcPanelResult.vue';
+import UnitPanel from 'components/UnitPanel.vue';
+import ResultField from 'components/ResultField.vue';
 import CalcButton from 'components/CalcButton.vue';
 import CalcHistory from 'components/CalcHistory.vue';
 </script>
@@ -8,8 +8,9 @@ import CalcHistory from 'components/CalcHistory.vue';
 <template>
   <q-page>
     <q-card flat class="q-px-md q-pt-xs q-pb-md">
-      <CalcPanelResult addon="unit" />
-      <UnitPanelResult />
+      <ResultField field="main" addon="unit" />
+      <UnitPanel />
+      <ResultField field="sub" addon="unit" />
       <CalcButton type="unit"/>
     </q-card>
   </q-page>
