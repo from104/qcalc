@@ -16,7 +16,7 @@ const { t } = useI18n();
 const store = useCalcStore();
 
 // 계산기 오브젝트를 스토어에서 가져오기 위한 변수 선언
-const calc = store.calc;
+const { calc } = store;
 
 // 계산 결과 배열
 const resultHistory = computed(() => calc.getHistory() as unknown as History[]);
@@ -91,7 +91,7 @@ onBeforeUnmount(() => {
         class="self-center shadow-4 q-ma-sm show-history-icon"
         padding="sm"
         round
-        :color="store.getDarkColor('info')"
+        color="info"
         size="md"
         icon="mdi-arrow-up-bold"
         @click="isHistoryOpen = true"
@@ -106,7 +106,7 @@ onBeforeUnmount(() => {
         class="self-center shadow-4 q-ma-sm hide-history-icon"
         padding="sm"
         round
-        :color="store.getDarkColor('info')"
+        color="info"
         size="md"
         icon="mdi-arrow-down-bold"
         @click="isHistoryOpen = false"
@@ -125,8 +125,7 @@ onBeforeUnmount(() => {
   >
     <q-bar
       dark
-      class="full-width noselect text-white"
-      :class="'bg-' + store.getDarkColor('primary')"
+      class="full-width noselect text-white bg-primary"
       v-blur
     >
       <q-icon name="history" size="sm" />
@@ -154,7 +153,7 @@ onBeforeUnmount(() => {
         <q-btn
           round
           glossy
-          :color="store.getDarkColor('secondary')"
+          color="secondary"
           icon="publish"
           class="fixed q-ma-md"
           v-if="isGoToTopInHistory"
@@ -179,7 +178,9 @@ onBeforeUnmount(() => {
                 class="history-list-item text-right q-pa-sm"
               >
                 <q-item-section>
-                  <q-item-label style="white-space: pre-wrap;">{{ store.getLeftSideInHistory(history, true) }}</q-item-label>
+                  <q-item-label style="white-space: pre-wrap;">
+                    {{ store.getLeftSideInHistory(history, true) }}
+                  </q-item-label>
                   <q-item-label>
                     {{ ['=', store.getRightSideInHistory(history)].join(' ') }}
                   </q-item-label>
@@ -200,15 +201,13 @@ onBeforeUnmount(() => {
     style="z-index: 15"
   >
     <q-card
-      class="noselect text-center text-white"
-      :class="'bg-' + store.getDarkColor('negative')"
+      class="noselect text-center text-white bg-negative"
       style="width: 200px"
     >
       <q-card-section>{{ t('doYouDeleteHistory') }} </q-card-section>
       <q-card-actions
         align="center"
-        :class="'text-' + store.getDarkColor('negative')"
-        class="bg-white"
+        class="text-negative bg-white"
       >
         <q-btn flat :label="t('no')" v-close-popup />
         <q-btn

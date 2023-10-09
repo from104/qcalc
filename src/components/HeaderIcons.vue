@@ -13,7 +13,7 @@ const { t } = useI18n();
 const store = useCalcStore();
 
 // 계산기 오브젝트를 스토어에서 가져오기 위한 변수 선언
-const calc = store.calc;
+const { calc } = store;
 
 // 창에서 선택한 내용이 있으면 선택한 내용을 클립보드에 복사하고
 // 아니면 계산 결과를 클립보드에 복사한다.

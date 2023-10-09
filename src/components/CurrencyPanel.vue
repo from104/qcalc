@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import {
   ref,
-  onBeforeMount,
   onMounted,
   onBeforeUnmount,
   reactive,
@@ -18,68 +17,12 @@ const { t } = useI18n();
 
 const store = useCalcStore();
 
-const { calc } = store;
-
-const { currencyConverter } = store;
-
-// 선택할 통화 초기화
-const initRecentCurrency = () => {
-  const defaultCurrency = ['USD', 'KRW'];
-
-
-  // 저장된 원본 통화가 잘못됐으면 초기화
-  if (!currencyConverter.getCurrencyLists().includes(store.recentCurrencyFrom)) {
-    store.recentCurrencyFrom = defaultCurrency[0];
-    if (store.recentCurrencyFrom === store.recentCurrencyTo) {
-      store.recentCurrencyFrom = defaultCurrency[1];
-    }
-  }
-
-  // 저장된 대상 통화가 잘못됐으면 초기화
-  if (!currencyConverter.getCurrencyLists().includes(store.recentCurrencyTo)) {
-    store.recentCurrencyTo = defaultCurrency[1];
-    if (store.recentCurrencyTo === store.recentCurrencyFrom) {
-      store.recentCurrencyTo = defaultCurrency[0];
-    }
-  }
-}
-
-const getCurrencyResult = () => {
-  // 저장된 범주와 단위가 잘못됐으면 초기화
-  initRecentCurrency();
-
-  const symbol = store.showSymbol ? currencyConverter.getSymbol(store.recentCurrencyTo) : '';
-  // 변환 결과를 반환
-  return [
-    symbol,
-    store.toLocale(
-      currencyConverter
-        .convert(Number(calc.getCurrentNumber()), store.recentCurrencyFrom, store.recentCurrencyTo)
-        .toString()
-    )
-  ].join(' ');
-};
-
-const currencyResult = ref(getCurrencyResult());
-
-watch(
-  [
-    calc,
-    () => store.useGrouping,
-    () => store.decimalPlaces,
-    () => store.recentCurrencyFrom,
-    () => store.recentCurrencyTo,
-    () => store.showSymbol
-  ],
-  () => {
-    currencyResult.value = getCurrencyResult();
-  }
-);
+const { calc, currencyConverter } = store;
 
 // 단위 이름과 값을 바꾸기 위한 함수
 const swapCurrencyValue = () => {
   // 변환 결과를 원본 값으로 바꾸기
-  calc.setCurrentNumber(currencyResult.value);
+  calc.setCurrentNumber(document.getElementById('subResult')?.textContent ?? '0');
 
   // 화폐도 바꾸기
   const temp = store.recentCurrencyFrom;
@@ -88,7 +31,7 @@ const swapCurrencyValue = () => {
 }
 
 // 단위 초기화
-initRecentCurrency();
+store.initRecentCurrency();
 
 // 통화 이름을 언어에 맞게 초기화
 interface CurrencyDescription {
@@ -112,21 +55,6 @@ watch([() => store.useSystemLocale, () => store.userLocale], () => {
   });
 });
 
-// 변환 결과 툴팁 표시 상태 변수
-const needCurrencyResultTooltip = ref(false);
-
-// 변환 결과가 길 경우 툴팁 표시 상태 셋팅
-const setNeedCurrencyResultTooltip = () => {
-  // 원래 결과 칸 길이
-  const ow = document.getElementById('currencyResult')?.offsetWidth ?? 0;
-  // 결과 문자열의 크기
-  // (원래 칸에 결과 길이가 넘치면 스크롤 해야하는데 ...로 대체 시킨 경우 스크롤해야할 폭 값만 커진다.)
-  const sw = document.getElementById('currencyResult')?.scrollWidth ?? 0;
-  // 원래의 칸 크기보다 결과 문자열 길이가 길면 툴팁을 표시
-  needCurrencyResultTooltip.value = ow < sw;
-
-  return true;
-}
 // 키바인딩 생성
 const keyBinding = new KeyBinding([
   [['v'], () => store.clickButtonById('btn-swap-currency')],
@@ -148,12 +76,9 @@ watch(
 let updateRatesTimer: number | undefined;
 
 onMounted(() => {
-  initRecentCurrency();
+  store.initRecentCurrency();
 
   keyBinding.subscribe();
-
-  // 변환 결과 툴팁 표시 상태 셋팅
-  setNeedCurrencyResultTooltip();
 
   // 환율 정보 업데이트
   (async () => {
@@ -255,11 +180,6 @@ const filterFnFrom = createFilterFn(fromFilteredCurrencyOptions, fromCurrencyOpt
 const toFilteredCurrencyOptions = ref<CurrencyOptions[]>(toCurrencyOptions.values);
 // createFilterFn 함수를 사용하여 filterFnTo 함수를 생성합니다.
 const filterFnTo = createFilterFn(toFilteredCurrencyOptions, toCurrencyOptions);
-
-onBeforeMount(() => {
-  window.addEventListener('resize', setNeedCurrencyResultTooltip);
-});
-
 </script>
 
 <template>
@@ -286,8 +206,11 @@ onBeforeMount(() => {
       @update:model-value="store.blurElement"
       @focus="store.setInputFocused"
       @blur="store.setInputBlurred"
-      class="col-4 q-pl-sm shadow-4"
-      :class="store.darkMode ? 'bg-grey-9' : 'bg-grey-3'"
+      class="col-4 q-pl-sm shadow-2"
+      :class="!store.darkMode ? 'bg-blue-grey-2' : 'bg-blue-grey-6' "
+      :popup-content-class="!store.darkMode ? 'bg-blue-grey-2' : 'bg-blue-grey-6'"
+      :options-selected-class="!store.darkMode ? 'text-primary' : 'text-grey-1'"
+      :label-color="!store.darkMode ? 'primary' : 'grey-1'"
     >
       <template v-slot:option="scope">
         <q-item v-bind="scope.itemProps">
@@ -313,7 +236,6 @@ onBeforeMount(() => {
       icon="swap_horiz"
       size="md"
       class="col-2 q-mx-none q-px-sm"
-      :color="store.getDarkColor('primary')"
       @click="swapCurrencyValue"
     >
       <MyTooltip>{{ t('tooltipSwap') }}</MyTooltip>
@@ -338,8 +260,11 @@ onBeforeMount(() => {
       @update:model-value="store.blurElement"
       @focus="store.setInputFocused"
       @blur="store.setInputBlurred"
-      class="col-4 q-pl-sm shadow-4"
-      :class="store.darkMode ? 'bg-grey-9' : 'bg-grey-3'"
+      class="col-4 q-pl-sm shadow-2"
+      :class="!store.darkMode ? 'bg-blue-grey-2' : 'bg-blue-grey-6'"
+      :popup-content-class="!store.darkMode ? 'bg-blue-grey-2' : 'bg-blue-grey-6'"
+      :options-selected-class="!store.darkMode ? 'text-primary' : 'text-grey-1'"
+      :label-color="!store.darkMode ? 'primary' : 'grey-1'"
     >
       <template v-slot:option="scope">
         <q-item v-bind="scope.itemProps">
@@ -366,37 +291,6 @@ onBeforeMount(() => {
     />
   </q-card-section>
 
-  <q-card-section class="col-12 q-px-sm q-pt-none q-pb-none">
-    <!-- 대상 값 -->
-    <q-field
-      :model-value="currencyResult"
-      class="shadow-4 justify-end self-center"
-      filled
-      dense
-      readonly
-      :bg-color="
-        needCurrencyResultTooltip
-          ? store.darkMode
-            ? 'blue-grey-9'
-            : 'amber-2'
-          : undefined
-      "
-    >
-      <template v-slot:control>
-        <div
-          id="currencyResult"
-          v-mutation="setNeedCurrencyResultTooltip"
-          v-mutation.characterData
-          class="self-center full-width no-outline ellipsis text-h4 text-right"
-        >
-          {{ currencyResult }}
-          <MyTooltip v-if="needCurrencyResultTooltip">{{
-            currencyResult
-          }}</MyTooltip>
-        </div>
-      </template>
-    </q-field>
-  </q-card-section>
 </template>
 
 <i18n lang="yaml5">
@@ -748,3 +642,24 @@ en:
     ZWL: 'Zimbabwean Dollar'
   tooltipSwap: 'Swap source and destination.'
 </i18n>
+
+<style scoped lang="scss">
+@font-face {
+  font-family: 'digital-7-mono-italic';
+    src: url('../../public/digital-7.monoitalic.ttf') format('truetype');
+}
+
+#symbol {
+  font-size: 35px;
+}
+
+#currencyResult {
+  font-family: 'digital-7-mono-italic';
+  font-size: 40px;
+  min-height: 36px;
+}
+
+#unit {
+  font-size: 22px;
+}
+</style>

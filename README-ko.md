@@ -4,21 +4,14 @@
 
 ## 스크린샷
 
-![Screenshot](https://github.com/from104/qcalc/raw/main/assets/screenshot_v0.6.1.png)
+![Screenshot](https://github.com/from104/qcalc/raw/main/assets/screenshot_v0.7.2.png)
 
-## 기능
+## 특징
 
 - 간단한 산술 연산
-- 퍼센트(또는 퍼센트로 곱하기) 계산
-- 역수, 제곱, 제곱근 계산
 - 단위 변환 기능
 - 통화 변환 기능
-- 마우스와 키보드로 모든 기능 조작
 - 계산 결과 등 복사와 붙혀넣기
-- 창 항상 위 기늘 토글
-- 시작 시 패널 초기화 여부 선택
-- 천단위 쉼표 표시
-- 소수점 아래 자리 고정 (제한없음~6자리)
 - 계산 결과 기록 (최대 20개)
 - 다크 모드
 - 영어, 한국어 지원

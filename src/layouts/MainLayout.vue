@@ -26,6 +26,12 @@ const toggleRightDrawer = () => {
   leftDrawerOpen.value = false;
 };
 
+const title = ref('');
+
+const updateTitle = (t: string) => {
+  title.value = t;
+};
+
 import { KeyBinding } from 'classes/KeyBinding';
 
 const keyBinding = new KeyBinding([
@@ -53,11 +59,7 @@ onMounted(() => {
 
 <template>
   <q-layout view="hHh lpr fff">
-    <q-header
-      :class="'bg-' + store.getDarkColor('primary')"
-      class="z-top noselect"
-      elevated
-    >
+    <q-header class="z-top noselect" elevated>
       <q-toolbar v-blur>
         <q-btn
           flat
@@ -67,7 +69,7 @@ onMounted(() => {
           :aria-label="t('menu')"
           @click="toggleLeftDrawer"
         />
-        <q-toolbar-title> {{ t('appTitle') }} </q-toolbar-title>
+        <q-toolbar-title> {{ title }} </q-toolbar-title>
         <HeaderIcons />
         <q-btn
           class="q-ml-sm"
@@ -90,7 +92,7 @@ onMounted(() => {
       overlay
       show-if-above
     >
-      <MenuPanel />
+      <MenuPanel @updateTitle="updateTitle"/>
     </q-drawer>
 
     <q-drawer
@@ -104,7 +106,7 @@ onMounted(() => {
     >
       <SettingPanel />
     </q-drawer>
-    <q-page-container style="padding-bottom: 0px">
+    <q-page-container style="padding-bottom: 0px;">
       <router-view v-slot="{ Component }">
         <transition name="slide-fade" mode="out-in" appear>
           <div :key="$route.path">

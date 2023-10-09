@@ -1,8 +1,4 @@
 <script setup lang="ts">
-import { useCalcStore } from 'src/stores/calc-store';
-
-const store = useCalcStore();
-
 defineProps({
   title: { type: String, required: true },
   caption: { type: String, default: '' },
@@ -13,11 +9,7 @@ defineProps({
 </script>
 
 <template>
-  <q-item
-    :active-class="'text-' + store.getDarkColor('primary')"
-    clickable
-    :to="path"
-  >
+  <q-item active-class="text-primary" clickable :to="path" >
     <q-item-section class="col-3" v-if="icon" avatar>
       <q-icon :name="icon" />
     </q-item-section>

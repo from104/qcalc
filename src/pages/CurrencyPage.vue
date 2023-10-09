@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import CurrencyPanelResult from 'components/CurrencyPanelResult.vue';
-import CalcPanelResult from 'components/CalcPanelResult.vue';
+import CurrencyPanel from 'components/CurrencyPanel.vue';
+import ResultField from 'components/ResultField.vue';
 import CalcButton from 'components/CalcButton.vue';
 import CalcHistory from 'components/CalcHistory.vue';
 </script>
@@ -8,8 +8,9 @@ import CalcHistory from 'components/CalcHistory.vue';
 <template>
   <q-page>
     <q-card flat class="q-px-md q-pt-xs q-pb-md">
-      <CalcPanelResult addon="currency" />
-      <CurrencyPanelResult />
+      <ResultField field="main" addon="currency" />
+      <CurrencyPanel />
+      <ResultField field="sub" addon="currency" />
       <CalcButton type="currency"/>
     </q-card>
   </q-page>

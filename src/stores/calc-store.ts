@@ -1,10 +1,12 @@
 import { defineStore } from 'pinia';
-import { Dark } from 'quasar';
-import { Notify } from 'quasar';
+import { Dark, Notify } from 'quasar';
+import { create, all } from 'mathjs';
+
 import { Calculator } from 'classes/Calculator';
 import type { History } from 'classes/Calculator';
+
+import { UnitConverter } from 'classes/UnitConverter';
 import { CurrencyConverter } from 'classes/CurrencyConverter';
-import { create, all } from 'mathjs';
 
 const MathB = create(all, {
   number: 'BigNumber',
@@ -13,11 +15,17 @@ const MathB = create(all, {
 
 export const useCalcStore = defineStore('calc', {
   state: () => ({
-    darkMode: false,
-    alwaysOnTop: false,
+    // 계산기 클래스
     calc: new Calculator(),
+    // 다크 모드 여부
+    darkMode: false,
+    // 항상 위 여부
+    alwaysOnTop: false,
+    // 숫자 그루핑 여부
     useGrouping: true,
+    // 소수점 자리 (-2: 제한 없음)
     decimalPlaces: -2,
+    // 시스템 로케일 사용 여부
     useSystemLocale: true,
     // 시스템 로케일
     locale: '',
@@ -41,6 +49,8 @@ export const useCalcStore = defineStore('calc', {
     showUnit: true,
     // 통화 변환기에서 통화 기호를 표시할지 여부
     showSymbol: true,
+    // 패널 숫자 위 여백
+    paddingOnResult: 20,
   }),
   getters: {},
   actions: {
@@ -50,20 +60,6 @@ export const useCalcStore = defineStore('calc', {
     },
     toggleDarkMode() {
       this.setDarkMode(!this.darkMode);
-    },
-    getDarkColor(color: string): string | undefined {
-      const darkColors: { [key: string]: string } = {
-        primary: 'brown-4',
-        secondary: 'blue-grey-5',
-        accent: 'purple-5',
-        positive: 'green-5',
-        negative: 'pink-4',
-        info: 'light-blue-3',
-        warning: 'indigo-5',
-      };
-      if (Object.keys(darkColors).includes(color)) {
-        return this.darkMode ? darkColors[color] : color;
-      }
     },
     setAlwaysOnTop(alwaysOnTop: boolean) {
       this.alwaysOnTop = alwaysOnTop;
@@ -99,16 +95,7 @@ export const useCalcStore = defineStore('calc', {
       return integer.replace(regex, separator) + (decimal ? `.${decimal}` : '');
     },
     // 숫자를 표준 로케일 문자열로 변환하는 함수
-    // toLocale(number: number): string {
-    //   return number.toLocaleString(this.locale, {
-    //     style: 'decimal',
-    //     useGrouping: this.useGrouping,
-    //     minimumFractionDigits: this.decimalPlaces == -2 ? 0 : this.decimalPlaces,
-    //     maximumFractionDigits: this.decimalPlaces == -2 ? 20 : this.decimalPlaces,
-    //   });
-    // },
-    // 숫자를 표준 로케일 문자열로 변환하는 함수
-    toLocale(number: string): string {
+    toFormattedNumber(number: string): string {
       const n = MathB.bignumber(number);
       const s = MathB.format(n, {
         precision: this.decimalPlaces === -2 ? 20 : this.decimalPlaces,
@@ -123,30 +110,30 @@ export const useCalcStore = defineStore('calc', {
       const br = lf ? '\n' : '';
       if (['+', '-', '×', '÷'].includes(h.operator)) {
         // 사칙연산
-        return `${this.toLocale(h.previousNumber)}${br} ${h.operator} ${this.toLocale(h.argumentNumber ?? '')}`;
+        return `${this.toFormattedNumber(h.previousNumber)}${br} ${h.operator} ${this.toFormattedNumber(h.argumentNumber ?? '')}`;
       } else if (h.operator == '÷%') {
         // 퍼센트로 나누는 경우
-        return `${this.toLocale(h.previousNumber)}${br} ÷ ${this.toLocale(h.argumentNumber ?? '')}${br} × 100`;
+        return `${this.toFormattedNumber(h.previousNumber)}${br} ÷ ${this.toFormattedNumber(h.argumentNumber ?? '')}${br} × 100`;
       } else if (h.operator == '×%') {
         // 퍼센트로 곱하는 경우
-        return `${this.toLocale(h.previousNumber)}${br} × ${this.toLocale(h.argumentNumber ?? '')}${br} ÷ 100`;
+        return `${this.toFormattedNumber(h.previousNumber)}${br} × ${this.toFormattedNumber(h.argumentNumber ?? '')}${br} ÷ 100`;
       } else if (h.operator == 'rec') {
         // 역수
-        return `1${br} ÷ ${this.toLocale(h.previousNumber)}`;
+        return `1${br} ÷ ${this.toFormattedNumber(h.previousNumber)}`;
       } else if (h.operator == 'pow2') {
         // 제곱
-        return `${this.toLocale(h.previousNumber)} ^ 2`;
+        return `${this.toFormattedNumber(h.previousNumber)} ^ 2`;
       } else if (['sqrt'].includes(h.operator)) {
         // 제곱근
-        return `${h.operator} ( ${this.toLocale(h.previousNumber)} )`;
+        return `${h.operator} ( ${this.toFormattedNumber(h.previousNumber)} )`;
       } else {
         // 그 외
-        return this.toLocale(h.previousNumber);
+        return this.toFormattedNumber(h.previousNumber);
       }
     },
     // 계산 결과 중 우변
     getRightSideInHistory(h: History) {
-      return this.toLocale(h.resultNumber);
+      return this.toFormattedNumber(h.resultNumber);
     },
     // 알림을 띄우는 함수 - 메시지
     notifyMsg(msg: string, timeout = 500) {
@@ -192,6 +179,45 @@ export const useCalcStore = defineStore('calc', {
       const button = document.getElementById(id);
       if (button) {
         button.click();
+      }
+    },
+    // 범주와 단위를 초기화
+    initRecentCategoryAndUnit(): void {
+      // 범주 초기화
+      if (!UnitConverter.categories.includes(this.recentCategory)) {
+        this.recentCategory = UnitConverter.categories[0];
+      }
+    
+      // 단위 초기화
+      if (!UnitConverter.getUnitLists(this.recentCategory).includes(this.recentUnitFrom[this.recentCategory])) {
+        this.recentUnitFrom[this.recentCategory] = UnitConverter.getUnitLists(this.recentCategory)[0];
+      }
+    
+      if (!UnitConverter.getUnitLists(this.recentCategory).includes(this.recentUnitTo[this.recentCategory])) {
+        this.recentUnitTo[this.recentCategory] = UnitConverter.getUnitLists(this.recentCategory)[0];
+        if (this.recentUnitTo[this.recentCategory] == this.recentUnitFrom[this.recentCategory]) {
+          this.recentUnitTo[this.recentCategory] = UnitConverter.getUnitLists(this.recentCategory)[1];
+        }
+      }
+    },
+    // 선택할 통화 초기화
+    initRecentCurrency(): void {
+      const defaultCurrency = ['USD', 'KRW'];
+
+      // 저장된 원본 통화가 잘못됐으면 초기화
+      if (!this.currencyConverter.getCurrencyLists().includes(this.recentCurrencyFrom)) {
+        this.recentCurrencyFrom = defaultCurrency[0];
+        if (this.recentCurrencyFrom === this.recentCurrencyTo) {
+          this.recentCurrencyFrom = defaultCurrency[1];
+        }
+      }
+
+      // 저장된 대상 통화가 잘못됐으면 초기화
+      if (!this.currencyConverter.getCurrencyLists().includes(this.recentCurrencyTo)) {
+        this.recentCurrencyTo = defaultCurrency[1];
+        if (this.recentCurrencyTo === this.recentCurrencyFrom) {
+          this.recentCurrencyTo = defaultCurrency[0];
+        }
       }
     },
   },

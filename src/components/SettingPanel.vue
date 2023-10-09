@@ -115,7 +115,6 @@ onBeforeUnmount(() => {
       <q-space />
       <q-toggle
         v-model="store.alwaysOnTop"
-        :color="store.getDarkColor('primary')"
         @click="store.setAlwaysOnTop(store.alwaysOnTop)"
         keep-color
         dense
@@ -127,7 +126,6 @@ onBeforeUnmount(() => {
       <q-space />
       <q-toggle
         v-model="store.initPanel"
-        :color="store.getDarkColor('primary')"
         @click="store.setInitPanel(store.initPanel)"
         keep-color
         dense
@@ -139,7 +137,6 @@ onBeforeUnmount(() => {
       <q-space />
       <q-toggle
         v-model="store.darkMode"
-        :color="store.getDarkColor('primary')"
         @click="store.setDarkMode(store.darkMode)"
         keep-color
         dense
@@ -155,7 +152,6 @@ onBeforeUnmount(() => {
       <q-space />
       <q-toggle
         v-model="store.useGrouping"
-        :color="store.getDarkColor('primary')"
         keep-color
         dense
       />
@@ -181,7 +177,6 @@ onBeforeUnmount(() => {
         :max="6"
         marker-labels
         class="col-5 q-pr-sm"
-        :color="store.getDarkColor('primary')"
         @change="store.setDecimalPlaces(store.decimalPlaces)"
         dense
       >
@@ -218,7 +213,6 @@ onBeforeUnmount(() => {
         <q-space />
         <q-toggle
           v-model="store.showUnit"
-          :color="store.getDarkColor('primary')"
           keep-color
           dense
         />
@@ -234,7 +228,6 @@ onBeforeUnmount(() => {
         <q-space />
         <q-toggle
           v-model="store.showSymbol"
-          :color="store.getDarkColor('primary')"
           keep-color
           dense
         />
@@ -250,7 +243,6 @@ onBeforeUnmount(() => {
       <q-space />
       <q-toggle
         v-model="store.useSystemLocale"
-        :color="store.getDarkColor('primary')"
         keep-color
         dense
         @click="setLocale()"
@@ -264,7 +256,6 @@ onBeforeUnmount(() => {
         :disable="store.useSystemLocale"
         v-model="store.userLocale"
         :options="localeOptions"
-        :color="store.getDarkColor('primary')"
         dense
         emit-value
         map-options
