@@ -50,7 +50,7 @@ export const useCalcStore = defineStore('calc', {
     // 통화 변환기에서 통화 기호를 표시할지 여부
     showSymbol: true,
     // 패널 숫자 위 여백
-    // paddingOnResult: 20,
+    paddingOnResult: 20,
   }),
   getters: {},
   actions: {

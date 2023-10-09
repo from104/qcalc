@@ -205,6 +205,7 @@ onMounted(() => {
           v-mutation.characterData
           class="self-center no-outline full-width full-height ellipsis text-right text-black q-pt-xs"
           :class="isMainField ? 'text-h5' : ''"
+          :style="`padding-top: ${store.paddingOnResult}px;`"
         >
         <span id="symbol">{{ symbol }}</span>
         <span :id="isMainField ? 'result' : 'subResult'">{{ result }}</span>
