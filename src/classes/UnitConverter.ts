@@ -211,7 +211,9 @@ class UnitConverter {
     return convertedValue.toString();
   }
 }
-export default UnitConverter;
+// export default UnitConverter;
+export { UnitConverter };
+
 // export {};
 
 // console.log(UnitConverter.convert('길이', 1, 'm', 'km'));
