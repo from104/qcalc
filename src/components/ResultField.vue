@@ -21,7 +21,7 @@ const fieldID = computed(() => props.field+'Field');
 const store = useCalcStore();
 
 // 계산기 오브젝트를 스토어에서 가져오기 위한 변수 선언
-const calc = store.calc;
+const { calc } = store;
 
 // 계산 결과 툴팁 표시 상태 변수
 const needFieldTooltip = ref(false);

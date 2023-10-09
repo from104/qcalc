@@ -16,7 +16,7 @@ import { useCalcStore } from 'stores/calc-store';
 const store = useCalcStore();
 
 // 계산기 오브젝트를 스토어에서 가져오기 위한 변수 선언
-const calc = store.calc;
+const { calc } = store;
 
 // 범주와 단위를 초기화
 // const initRecentCategoryAndUnit = () => {
