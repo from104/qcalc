@@ -4,21 +4,14 @@ This is a simple calculator made using the source of the calculator for Android 
 
 ## screenshot
 
-![Screenshot](https://github.com/from104/qcalc/raw/main/assets/screenshot_v0.6.1.png)
+![Screenshot](https://github.com/from104/qcalc/raw/main/assets/screenshot_v0.7.2.png)
 
-## function
+## Features
 
 - Simple arithmetic operations
-- Percent calculation (either as percentage or percentage multiplication)
-- Reciprocal, square, square root calculation
 - Unit conversion function
 - Currency conversion function
-- All functions operated with mouse and keyboard.
 - Copy and paste calculation results, etc.
-- Toggle window always on top
-- Choose whether to initialize the panel at startup
-- Thousand comma display
-- Fixed digits below the decimal point (no limit to 6 digits)
 - Records calculation results (up to 20)
 - Dark mode
 - Supports English and Korean

@@ -1,18 +1,11 @@
 # Functions and usage
 
-## function
+## Features
 
 - Simple arithmetic operations
-- Percent calculation (either as percentage or percentage multiplication)
-- Reciprocal, square, square root calculation
 - Unit conversion function
 - Currency conversion function
-- All functions operated with mouse and keyboard.
 - Copy and paste calculation results, etc.
-- Toggle window always on top
-- Choose whether to initialize the panel at startup
-- Thousand comma display
-- Fixed digits below the decimal point (no limit to 6 digits)
 - Records calculation results (up to 20)
 - Dark mode
 - Supports English and Korean
