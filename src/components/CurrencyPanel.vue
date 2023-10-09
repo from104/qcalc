@@ -7,7 +7,6 @@ import {
   reactive,
   watch,
   Ref,
-  computed,
 } from 'vue';
 import { useI18n } from 'vue-i18n';
 
@@ -19,72 +18,12 @@ const { t } = useI18n();
 
 const store = useCalcStore();
 
-const { calc } = store;
-
-const { currencyConverter } = store;
-
-// 선택할 통화 초기화
-const initRecentCurrency = () => {
-  const defaultCurrency = ['USD', 'KRW'];
-
-
-  // 저장된 원본 통화가 잘못됐으면 초기화
-  if (!currencyConverter.getCurrencyLists().includes(store.recentCurrencyFrom)) {
-    store.recentCurrencyFrom = defaultCurrency[0];
-    if (store.recentCurrencyFrom === store.recentCurrencyTo) {
-      store.recentCurrencyFrom = defaultCurrency[1];
-    }
-  }
-
-  // 저장된 대상 통화가 잘못됐으면 초기화
-  if (!currencyConverter.getCurrencyLists().includes(store.recentCurrencyTo)) {
-    store.recentCurrencyTo = defaultCurrency[1];
-    if (store.recentCurrencyTo === store.recentCurrencyFrom) {
-      store.recentCurrencyTo = defaultCurrency[0];
-    }
-  }
-}
-
-const getCurrencyResult = () => {
-  // 저장된 범주와 단위가 잘못됐으면 초기화
-  initRecentCurrency();
-
-  // 변환 결과를 반환
-  return store.toFormattedNumber(
-    currencyConverter
-      .convert(Number(calc.getCurrentNumber()), store.recentCurrencyFrom, store.recentCurrencyTo)
-      .toString()
-  );
-};
-
-const currencyResult = ref(getCurrencyResult());
-
-// 화폐 기호를 앞에 붙일지 여부
-const symbol = computed(() =>
-  store.showSymbol
-    ? store.currencyConverter?.getSymbol(store.recentCurrencyTo) ?? ''
-    : ''
-);
-
-
-watch(
-  [
-    calc,
-    () => store.useGrouping,
-    () => store.decimalPlaces,
-    () => store.showSymbol,
-    () => store.recentCurrencyFrom,
-    () => store.recentCurrencyTo,
-  ],
-  () => {
-    currencyResult.value = getCurrencyResult();
-  }
-);
+const { calc, currencyConverter } = store;
 
 // 단위 이름과 값을 바꾸기 위한 함수
 const swapCurrencyValue = () => {
   // 변환 결과를 원본 값으로 바꾸기
-  calc.setCurrentNumber(currencyResult.value);
+  calc.setCurrentNumber(document.getElementById('subResult')?.textContent ?? '0');
 
   // 화폐도 바꾸기
   const temp = store.recentCurrencyFrom;
@@ -93,7 +32,7 @@ const swapCurrencyValue = () => {
 }
 
 // 단위 초기화
-initRecentCurrency();
+store.initRecentCurrency();
 
 // 통화 이름을 언어에 맞게 초기화
 interface CurrencyDescription {
@@ -150,7 +89,7 @@ watch(
 let updateRatesTimer: number | undefined;
 
 onMounted(() => {
-  initRecentCurrency();
+  store.initRecentCurrency();
 
   keyBinding.subscribe();
 
@@ -372,34 +311,6 @@ onBeforeMount(() => {
     />
   </q-card-section>
 
-  <q-card-section class="col-12 q-px-sm q-pt-none q-pb-none">
-    <!-- 대상 값 -->
-    <q-field
-      :model-value="currencyResult"
-      class="shadow-2 justify-end self-center q-mt-none q-mb-xs"
-      filled
-      dense
-      readonly
-      :bg-color="!needCurrencyResultTooltip ? 'light-green-3' : 'deep-orange-2'"
-    >
-      <template v-slot:control>
-        <div
-          id="subField"
-          v-mutation="setNeedCurrencyResultTooltip"
-          v-mutation.characterData
-          class="self-center full-width full-height no-outline ellipsis q-pt-xs text-right text-black"
-          :style="`padding-top: ${store.paddingOnResult}px;`"
-        >
-          <span id="symbol">{{ symbol }}</span>
-          <span id="currencyResult">{{ currencyResult }}</span>
-          <span id="unit"> </span>
-          <MyTooltip v-if="needCurrencyResultTooltip">
-            {{ symbol+currencyResult }}
-          </MyTooltip>
-        </div>
-      </template>
-    </q-field>
-  </q-card-section>
 </template>
 
 <i18n lang="yaml5">

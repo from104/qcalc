@@ -1,5 +1,8 @@
 <script setup lang="ts">
-import { ref, onBeforeMount, onMounted, onBeforeUnmount, reactive, watch, computed } from 'vue';
+// import { ref, onBeforeMount, onMounted, onBeforeUnmount, reactive, watch, computed } from 'vue';
+import { onMounted, onBeforeUnmount, reactive, watch,  } from 'vue';
+
+import { UnitConverter } from 'classes/UnitConverter';
 
 import MyTooltip from 'components/MyTooltip.vue';
 
@@ -15,33 +18,31 @@ const store = useCalcStore();
 // 계산기 오브젝트를 스토어에서 가져오기 위한 변수 선언
 const calc = store.calc;
 
-import UnitConverter from 'classes/UnitConverter';
-
 // 범주와 단위를 초기화
-const initRecentCategoryAndUnit = () => {
-  // 범주 초기화
-  if (!UnitConverter.categories.includes(store.recentCategory)) {
-    store.recentCategory = UnitConverter.categories[0];
-  }
+// const initRecentCategoryAndUnit = () => {
+//   // 범주 초기화
+//   if (!UnitConverter.categories.includes(store.recentCategory)) {
+//     store.recentCategory = UnitConverter.categories[0];
+//   }
 
-  // 단위 초기화
-  if (!UnitConverter.getUnitLists(store.recentCategory).includes(store.recentUnitFrom[store.recentCategory])) {
-    store.recentUnitFrom[store.recentCategory] = UnitConverter.getUnitLists(store.recentCategory)[0];
-  }
+//   // 단위 초기화
+//   if (!UnitConverter.getUnitLists(store.recentCategory).includes(store.recentUnitFrom[store.recentCategory])) {
+//     store.recentUnitFrom[store.recentCategory] = UnitConverter.getUnitLists(store.recentCategory)[0];
+//   }
 
-  if (!UnitConverter.getUnitLists(store.recentCategory).includes(store.recentUnitTo[store.recentCategory])) {
-    store.recentUnitTo[store.recentCategory] = UnitConverter.getUnitLists(store.recentCategory)[0];
-    if (store.recentUnitTo[store.recentCategory] == store.recentUnitFrom[store.recentCategory]) {
-      store.recentUnitTo[store.recentCategory] = UnitConverter.getUnitLists(store.recentCategory)[1];
-    }
-  }
-};
+//   if (!UnitConverter.getUnitLists(store.recentCategory).includes(store.recentUnitTo[store.recentCategory])) {
+//     store.recentUnitTo[store.recentCategory] = UnitConverter.getUnitLists(store.recentCategory)[0];
+//     if (store.recentUnitTo[store.recentCategory] == store.recentUnitFrom[store.recentCategory]) {
+//       store.recentUnitTo[store.recentCategory] = UnitConverter.getUnitLists(store.recentCategory)[1];
+//     }
+//   }
+// };
 
 // 단위 이름과 값을 바꾸기 위한 함수
 const swapUnitValue = () => {
   // 변환 결과를 원본 값으로 바꾸기
   // (computed로 선언된 unitResult로 인해 값이 바뀌면 자동으로 변환 결과가 바뀜)
-  calc.setCurrentNumber(unitResult.value);
+  calc.setCurrentNumber(document.getElementById('subResult')?.textContent ?? '0');
 
   // 단위도 바꾸기
   const temp = store.recentUnitFrom[store.recentCategory];
@@ -50,7 +51,7 @@ const swapUnitValue = () => {
 };
 
 // 단위 초기화
-initRecentCategoryAndUnit();
+store.initRecentCategoryAndUnit();
 
 // 범주 이름을 언어에 맞게 초기화
 const categories = reactive(
@@ -67,55 +68,55 @@ watch([() => store.useSystemLocale, () => store.userLocale], () => {
   });
 });
 
-// 변환 결과 툴팁 표시 상태 변수
-const needUnitResultTooltip = ref(false);
+// // 변환 결과 툴팁 표시 상태 변수
+// const needUnitResultTooltip = ref(false);
 
-// 변환 결과가 길 경우 툴팁 표시 상태 셋팅
-const setNeedUnitResultTooltip = () => {
-  const subField = document.getElementById('subField');
-  if (!subField) return false;
+// // 변환 결과가 길 경우 툴팁 표시 상태 셋팅
+// const setNeedUnitResultTooltip = () => {
+//   const subField = document.getElementById('subField');
+//   if (!subField) return false;
 
-  needUnitResultTooltip.value = subField.offsetWidth < subField.scrollWidth;
-  return true;
-}
+//   needUnitResultTooltip.value = subField.offsetWidth < subField.scrollWidth;
+//   return true;
+// }
 
-const getUnitResult = () => {
-  // 저장된 범주와 단위가 잘못됐으면 초기화
-  initRecentCategoryAndUnit();
+// const getUnitResult = () => {
+//   // 저장된 범주와 단위가 잘못됐으면 초기화
+//   initRecentCategoryAndUnit();
 
-  // 변환 결과를 반환
-  return store.toFormattedNumber(
-    UnitConverter.convert(
-      store.recentCategory,
-      calc.getCurrentNumber(),
-      store.recentUnitFrom[store.recentCategory],
-      store.recentUnitTo[store.recentCategory]
-    )
-  );
-};
+//   // 변환 결과를 반환
+//   return store.toFormattedNumber(
+//     UnitConverter.convert(
+//       store.recentCategory,
+//       calc.getCurrentNumber(),
+//       store.recentUnitFrom[store.recentCategory],
+//       store.recentUnitTo[store.recentCategory]
+//     )
+//   );
+// };
 
-const unitResult = ref(getUnitResult());
+// const unitResult = ref(getUnitResult());
 
-// 단위를 뒤에 붙일지 여부
-const unit = computed(() =>
-  store.showUnit ? ' '+store.recentUnitTo[store.recentCategory] ?? '' : ''
-);
+// // 단위를 뒤에 붙일지 여부
+// const unit = computed(() =>
+//   store.showUnit ? ' '+store.recentUnitTo[store.recentCategory] ?? '' : ''
+// );
 
 // 계산 결과가 바뀌면 변환 결과도 바뀌도록 감시
-watch(
-  [
-    calc,
-    () => store.recentCategory,
-    () => store.recentUnitFrom[store.recentCategory],
-    () => store.recentUnitTo[store.recentCategory],
-    () => store.useGrouping,
-    () => store.decimalPlaces,
-    () => store.showUnit
-  ],
-  () => {
-    unitResult.value = getUnitResult();
-  }
-);
+// watch(
+//   [
+//     calc,
+//     () => store.recentCategory,
+//     () => store.recentUnitFrom[store.recentCategory],
+//     () => store.recentUnitTo[store.recentCategory],
+//     () => store.useGrouping,
+//     () => store.decimalPlaces,
+//     () => store.showUnit
+//   ],
+//   () => {
+//     unitResult.value = getUnitResult();
+//   }
+// );
 
 import { KeyBinding } from 'classes/KeyBinding';
 
@@ -125,12 +126,12 @@ const keyBinding = new KeyBinding([
 ]);
 
 onMounted(() => {
-  initRecentCategoryAndUnit();
+  store.initRecentCategoryAndUnit();
 
   // 키바인딩 추가
   keyBinding.subscribe();
   // 변환 결과 툴팁 표시 상태 셋팅
-  setNeedUnitResultTooltip();
+  // setNeedUnitResultTooltip();
 });
 
 onBeforeUnmount(() => {
@@ -174,9 +175,9 @@ watch(
   { immediate: true }
 );
 
-onBeforeMount(() => {
-  window.addEventListener('resize', setNeedUnitResultTooltip);
-});
+// onBeforeMount(() => {
+//   window.addEventListener('resize', setNeedUnitResultTooltip);
+// });
 
 </script>
 
@@ -284,31 +285,6 @@ onBeforeMount(() => {
       size="xs"
       class="col-1 q-px-none"
     />
-  </q-card-section>
-
-  <q-card-section class="col-12 q-px-sm q-pt-none q-pb-none">
-    <!-- 대상 값 -->
-    <q-field
-      class="shadow-2 justify-end self-center q-mt-none q-mb-xs"
-      filled
-      dense
-      readonly
-      :bg-color="!needUnitResultTooltip ? 'light-green-3' : 'deep-orange-2'"
-    >
-      <template v-slot:control>
-        <div
-          id="subField"
-          v-mutation=" setNeedUnitResultTooltip "
-          v-mutation.characterData
-          class="self-center full-width full-height no-outline ellipsis q-pt-xs text-right text-black"
-          :style="`padding-top: ${store.paddingOnResult}px;`"
-        >
-          <span id="unitResult">{{ unitResult }}</span>
-          <span id="unit">{{ unit }}</span>
-          <MyTooltip v-if=" needUnitResultTooltip ">{{ unitResult+unit }}</MyTooltip>
-        </div>
-      </template>
-    </q-field>
   </q-card-section>
 </template>
 
