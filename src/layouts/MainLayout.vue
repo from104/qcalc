@@ -106,7 +106,7 @@ onMounted(() => {
     >
       <SettingPanel />
     </q-drawer>
-    <q-page-container style="padding-bottom: 0px; background: #e0dfdf;">
+    <q-page-container style="padding-bottom: 0px;">
       <router-view v-slot="{ Component }">
         <transition name="slide-fade" mode="out-in" appear>
           <div :key="$route.path">
