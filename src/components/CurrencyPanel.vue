@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import {
   ref,
-  onBeforeMount,
   onMounted,
   onBeforeUnmount,
   reactive,
@@ -56,18 +55,6 @@ watch([() => store.useSystemLocale, () => store.userLocale], () => {
   });
 });
 
-// 변환 결과 툴팁 표시 상태 변수
-const needCurrencyResultTooltip = ref(false);
-
-// 변환 결과가 길 경우 툴팁 표시 상태 셋팅
-const setNeedCurrencyResultTooltip = () => {
-  const subField = document.getElementById('subField');
-  if (!subField) return false;
-
-  needCurrencyResultTooltip.value = subField.offsetWidth < subField.scrollWidth;
-  return true;
-}
-
 // 키바인딩 생성
 const keyBinding = new KeyBinding([
   [['v'], () => store.clickButtonById('btn-swap-currency')],
@@ -92,9 +79,6 @@ onMounted(() => {
   store.initRecentCurrency();
 
   keyBinding.subscribe();
-
-  // 변환 결과 툴팁 표시 상태 셋팅
-  setNeedCurrencyResultTooltip();
 
   // 환율 정보 업데이트
   (async () => {
@@ -196,10 +180,6 @@ const filterFnFrom = createFilterFn(fromFilteredCurrencyOptions, fromCurrencyOpt
 const toFilteredCurrencyOptions = ref<CurrencyOptions[]>(toCurrencyOptions.values);
 // createFilterFn 함수를 사용하여 filterFnTo 함수를 생성합니다.
 const filterFnTo = createFilterFn(toFilteredCurrencyOptions, toCurrencyOptions);
-
-onBeforeMount(() => {
-  window.addEventListener('resize', setNeedCurrencyResultTooltip);
-});
 </script>
 
 <template>

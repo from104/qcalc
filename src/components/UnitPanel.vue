@@ -18,26 +18,6 @@ const store = useCalcStore();
 // 계산기 오브젝트를 스토어에서 가져오기 위한 변수 선언
 const { calc } = store;
 
-// 범주와 단위를 초기화
-// const initRecentCategoryAndUnit = () => {
-//   // 범주 초기화
-//   if (!UnitConverter.categories.includes(store.recentCategory)) {
-//     store.recentCategory = UnitConverter.categories[0];
-//   }
-
-//   // 단위 초기화
-//   if (!UnitConverter.getUnitLists(store.recentCategory).includes(store.recentUnitFrom[store.recentCategory])) {
-//     store.recentUnitFrom[store.recentCategory] = UnitConverter.getUnitLists(store.recentCategory)[0];
-//   }
-
-//   if (!UnitConverter.getUnitLists(store.recentCategory).includes(store.recentUnitTo[store.recentCategory])) {
-//     store.recentUnitTo[store.recentCategory] = UnitConverter.getUnitLists(store.recentCategory)[0];
-//     if (store.recentUnitTo[store.recentCategory] == store.recentUnitFrom[store.recentCategory]) {
-//       store.recentUnitTo[store.recentCategory] = UnitConverter.getUnitLists(store.recentCategory)[1];
-//     }
-//   }
-// };
-
 // 단위 이름과 값을 바꾸기 위한 함수
 const swapUnitValue = () => {
   // 변환 결과를 원본 값으로 바꾸기
@@ -68,56 +48,6 @@ watch([() => store.useSystemLocale, () => store.userLocale], () => {
   });
 });
 
-// // 변환 결과 툴팁 표시 상태 변수
-// const needUnitResultTooltip = ref(false);
-
-// // 변환 결과가 길 경우 툴팁 표시 상태 셋팅
-// const setNeedUnitResultTooltip = () => {
-//   const subField = document.getElementById('subField');
-//   if (!subField) return false;
-
-//   needUnitResultTooltip.value = subField.offsetWidth < subField.scrollWidth;
-//   return true;
-// }
-
-// const getUnitResult = () => {
-//   // 저장된 범주와 단위가 잘못됐으면 초기화
-//   initRecentCategoryAndUnit();
-
-//   // 변환 결과를 반환
-//   return store.toFormattedNumber(
-//     UnitConverter.convert(
-//       store.recentCategory,
-//       calc.getCurrentNumber(),
-//       store.recentUnitFrom[store.recentCategory],
-//       store.recentUnitTo[store.recentCategory]
-//     )
-//   );
-// };
-
-// const unitResult = ref(getUnitResult());
-
-// // 단위를 뒤에 붙일지 여부
-// const unit = computed(() =>
-//   store.showUnit ? ' '+store.recentUnitTo[store.recentCategory] ?? '' : ''
-// );
-
-// 계산 결과가 바뀌면 변환 결과도 바뀌도록 감시
-// watch(
-//   [
-//     calc,
-//     () => store.recentCategory,
-//     () => store.recentUnitFrom[store.recentCategory],
-//     () => store.recentUnitTo[store.recentCategory],
-//     () => store.useGrouping,
-//     () => store.decimalPlaces,
-//     () => store.showUnit
-//   ],
-//   () => {
-//     unitResult.value = getUnitResult();
-//   }
-// );
-
 import { KeyBinding } from 'classes/KeyBinding';
 
 const keyBinding = new KeyBinding([
@@ -130,8 +60,6 @@ onMounted(() => {
 
   // 키바인딩 추가
   keyBinding.subscribe();
-  // 변환 결과 툴팁 표시 상태 셋팅
-  // setNeedUnitResultTooltip();
 });
 
 onBeforeUnmount(() => {
@@ -174,11 +102,6 @@ watch(
   },
   { immediate: true }
 );
-
-// onBeforeMount(() => {
-//   window.addEventListener('resize', setNeedUnitResultTooltip);
-// });
-
 </script>
 
 <template>
