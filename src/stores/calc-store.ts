@@ -1,10 +1,12 @@
 import { defineStore } from 'pinia';
-import { Dark } from 'quasar';
-import { Notify } from 'quasar';
+import { Dark, Notify } from 'quasar';
+import { create, all } from 'mathjs';
+
 import { Calculator } from 'classes/Calculator';
 import type { History } from 'classes/Calculator';
+
+import { UnitConverter } from 'classes/UnitConverter';
 import { CurrencyConverter } from 'classes/CurrencyConverter';
-import { create, all } from 'mathjs';
 
 const MathB = create(all, {
   number: 'BigNumber',
@@ -48,7 +50,7 @@ export const useCalcStore = defineStore('calc', {
     // 통화 변환기에서 통화 기호를 표시할지 여부
     showSymbol: true,
     // 패널 숫자 위 여백
-    paddingOnResult: 20,
+    // paddingOnResult: 20,
   }),
   getters: {},
   actions: {
@@ -177,6 +179,45 @@ export const useCalcStore = defineStore('calc', {
       const button = document.getElementById(id);
       if (button) {
         button.click();
+      }
+    },
+    // 범주와 단위를 초기화
+    initRecentCategoryAndUnit(): void {
+      // 범주 초기화
+      if (!UnitConverter.categories.includes(this.recentCategory)) {
+        this.recentCategory = UnitConverter.categories[0];
+      }
+    
+      // 단위 초기화
+      if (!UnitConverter.getUnitLists(this.recentCategory).includes(this.recentUnitFrom[this.recentCategory])) {
+        this.recentUnitFrom[this.recentCategory] = UnitConverter.getUnitLists(this.recentCategory)[0];
+      }
+    
+      if (!UnitConverter.getUnitLists(this.recentCategory).includes(this.recentUnitTo[this.recentCategory])) {
+        this.recentUnitTo[this.recentCategory] = UnitConverter.getUnitLists(this.recentCategory)[0];
+        if (this.recentUnitTo[this.recentCategory] == this.recentUnitFrom[this.recentCategory]) {
+          this.recentUnitTo[this.recentCategory] = UnitConverter.getUnitLists(this.recentCategory)[1];
+        }
+      }
+    },
+    // 선택할 통화 초기화
+    initRecentCurrency(): void {
+      const defaultCurrency = ['USD', 'KRW'];
+
+      // 저장된 원본 통화가 잘못됐으면 초기화
+      if (!this.currencyConverter.getCurrencyLists().includes(this.recentCurrencyFrom)) {
+        this.recentCurrencyFrom = defaultCurrency[0];
+        if (this.recentCurrencyFrom === this.recentCurrencyTo) {
+          this.recentCurrencyFrom = defaultCurrency[1];
+        }
+      }
+
+      // 저장된 대상 통화가 잘못됐으면 초기화
+      if (!this.currencyConverter.getCurrencyLists().includes(this.recentCurrencyTo)) {
+        this.recentCurrencyTo = defaultCurrency[1];
+        if (this.recentCurrencyTo === this.recentCurrencyFrom) {
+          this.recentCurrencyTo = defaultCurrency[0];
+        }
       }
     },
   },
