@@ -13,7 +13,7 @@ const props = withDefaults(defineProps<{ field?:string, addon?: string }>(), {
   field: 'main', addon: 'none',
 });
 
-const isMainField = props.field == 'main';
+const isMainField = computed(() => props.field == 'main');
 
 const fieldID = computed(() => props.field+'Field');
 
@@ -36,7 +36,7 @@ const setNeedFieldTooltip = () => {
 }
 
 const getResult = () => {
-  if (isMainField) {
+  if (isMainField.value) {
     const currentNumber = calc.getCurrentNumber();
     const toFormattedNumber = store.toFormattedNumber(currentNumber);
     return store.decimalPlaces === -2 && currentNumber.includes('.')
@@ -77,7 +77,7 @@ const result = ref(getResult());
 // 화폐 기호를 앞에 붙일지 여부
 const symbol = computed(() => {
   if (store.showSymbol && props.addon == 'currency') {
-    if (isMainField) {
+    if (isMainField.value) {
       return store.currencyConverter?.getSymbol(store.recentCurrencyFrom) ?? '';
     } else {
       return store.currencyConverter?.getSymbol(store.recentCurrencyTo) ?? '';
@@ -90,7 +90,7 @@ const symbol = computed(() => {
 // 단위를 뒤에 붙일지 여부
 const unit = computed(() => {
   if (store.showUnit && props.addon == 'unit') {
-    if (isMainField) {
+    if (isMainField.value) {
       return ' '+store.recentUnitFrom[store.recentCategory] ?? '';
     } else {
       return ' '+store.recentUnitTo[store.recentCategory] ?? '';
@@ -222,7 +222,7 @@ onMounted(() => {
 <style scoped lang="scss">
 @font-face {
   font-family: 'digital-7-mono-italic';
-    src: url('/digital-7.monoitalic.ttf') format('truetype');
+    src: url('/public/digital-7.monoitalic.ttf') format('truetype');
 }
 
 #symbol {
