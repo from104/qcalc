@@ -43,7 +43,7 @@
     "quasar": "^2.7.7",
     "tinykeys": "^1.4.0",
     "vue": "^3.0.0",
-    "vue-i18n": "9.2.2",
+    "vue-i18n": "9.5.0",
     "vue-router": "^4.0.0"
   },
   "devDependencies": {
