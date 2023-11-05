@@ -4,6 +4,7 @@
 node_modules
 package
 .envrc
+.env
 
 # Quasar core related directories
 .quasar

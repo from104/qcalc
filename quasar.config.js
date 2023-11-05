@@ -11,6 +11,7 @@
 const { configure } = require('quasar/wrappers');
 
 const path = require('path');
+const dotenv = require('dotenv')
 
 module.exports = configure(function (/* ctx */) {
   return {
@@ -53,6 +54,8 @@ module.exports = configure(function (/* ctx */) {
 
     // Full list of options: https://v2.quasar.dev/quasar-cli-vite/quasar-config-js#build
     build: {
+      // .env 파일 사용
+      env: dotenv.config().parsed,
       // import folder alias
       alias: {
         classes: [__dirname, 'src/classes'].join('/'),

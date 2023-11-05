@@ -193,7 +193,7 @@ const currencyBaseData: CurrencyData = {
 // 환율 정보를 사용하는 클래스
 class CurrencyConverter {
   // https://app.freecurrencyapi.com/dashboard
-  private accessKey = 'fca_live_8Oa4U4LV01lAXhfi2lyhatGvOQnp0MYCZheLXxof'; // API 접근 키
+  private accessKey = process.env.FREECURRENCY_API_KEY; // API 접근 키
 
   private intervalToUpdate = 1000 * 60 * 60 * 12; // 환율 정보를 업데이트하는 주기
   private updatedTimeOfRates = 0; // 환율 정보를 업데이트한 시간
