@@ -33,6 +33,7 @@
     "build:win32": "quasar build -m electron -T win32"
   },
   "dependencies": {
+    "@capacitor/clipboard": "^5.0.6",
     "@everapi/freecurrencyapi-js": "^1.0.1",
     "@quasar/extras": "^1.15.1",
     "axios": "^1.6.4",
