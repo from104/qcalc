@@ -34,6 +34,7 @@
   },
   "dependencies": {
     "@capacitor/clipboard": "^5.0.6",
+    "@capacitor/core": "^5.5.1",
     "@everapi/freecurrencyapi-js": "^1.0.1",
     "@quasar/extras": "^1.15.1",
     "axios": "^1.6.4",
