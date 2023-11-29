@@ -4,6 +4,6 @@
   "webDir": "www",
   "server": {
     "androidScheme": "https",
-    "url": "http://192.168.219.117:9500"
+    "url": "http://192.168.219.103:9500"
   }
 }
