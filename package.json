@@ -34,7 +34,7 @@
   },
   "dependencies": {
     "@everapi/freecurrencyapi-js": "^1.0.1",
-    "@quasar/extras": "^1.15.1",
+    "@quasar/extras": "^1.16.8",
     "axios": "^1.4.0",
     "electron-window-state": "^5.0.3",
     "mathjs": "^11.11.0",
