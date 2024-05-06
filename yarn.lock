@@ -17,7 +17,7 @@
   resolved "https://registry.yarnpkg.com/@babel/parser/-/parser-7.23.3.tgz#0ce0be31a4ca4f1884b5786057cadcb6c3be58f9"
   integrity sha512-uVsWNvlVsIninV2prNz/3lHCb+5CJ+e+IUBfbjToAHODtfGYLfCFuY4AU7TskI+dAKk+njsPiBjq1gKTvZOBaw==
 
-"@babel/runtime@^7.20.7", "@babel/runtime@^7.23.1", "@babel/runtime@^7.23.2":
+"@babel/runtime@^7.23.1", "@babel/runtime@^7.23.2":
   version "7.23.2"
   resolved "https://registry.yarnpkg.com/@babel/runtime/-/runtime-7.23.2.tgz#062b0ac103261d68a966c4c7baf2ae3e62ec3885"
   integrity sha512-mM8eg4yl5D6i3lu2QKPuPH4FArvJ8KhTofbE7jwMUv9KX5mBvwPAqnV3MlyBNqdp9RyRKP6Yck8TrfYrPvX3bg==
@@ -367,10 +367,10 @@
     vite "^2.9.13"
     webpack-merge "^5.8.0"
 
-"@quasar/extras@^1.16.8":
-  version "1.16.9"
-  resolved "https://registry.yarnpkg.com/@quasar/extras/-/extras-1.16.9.tgz#6cdf9d34862e6f58009443a2d1e34b84a5e73ad0"
-  integrity sha512-SlOhwzXyPQHWgQIS2ncyDdYdksCJvUYNtgsDQqzAKEG3r3d/ejOxvThle79HTK3Q6HB+gQWFG21Ux00Osr5XSw==
+"@quasar/extras@^1.15.1":
+  version "1.16.11"
+  resolved "https://registry.yarnpkg.com/@quasar/extras/-/extras-1.16.11.tgz#84b1efb9097a6e58c3ebfdd5da83ac658056a35c"
+  integrity sha512-sbTBHOA+Hi7ah0P6qSm+xfRXqwJ94ct3NKA3Lkq3iNPYuHD7VXbSWtP2eA7Cu9Fd0WjVoPbngf6yFGg46U3IfQ==
 
 "@quasar/quasar-app-extension-qmarkdown@^2.0.0-beta.7":
   version "2.0.0-beta.10"
@@ -2058,11 +2058,6 @@ dotenv-expand@^5.1.0:
   version "5.1.0"
   resolved "https://registry.yarnpkg.com/dotenv-expand/-/dotenv-expand-5.1.0.tgz#3fbaf020bfd794884072ea26b1e9791d45a629f0"
   integrity sha512-YXQl1DSa4/PQyRfgrv6aoNjhasp/p4qs9FjJ4q4cQk+8m4r6k4ZSiEyytKG8f8W9gi8WsQtIObNmKd+tMzNTmA==
-
-dotenv@^16.3.1:
-  version "16.3.1"
-  resolved "https://registry.yarnpkg.com/dotenv/-/dotenv-16.3.1.tgz#369034de7d7e5b120972693352a3bf112172cc3e"
-  integrity sha512-IPzF4w4/Rd94bA9imS68tZBaYyBWSCE47V1RGuMrB94iyTOIEwRmVL2x/4An+6mETpLrKJ5hQkB8W4kFAadeIQ==
 
 dotenv@^9.0.2:
   version "9.0.2"
