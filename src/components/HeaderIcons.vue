@@ -42,15 +42,27 @@ const doCopy = (): void => {
     });
 }
 
-import { Clipboard } from '@capacitor/clipboard';
+// import { Clipboard } from '@capacitor/clipboard';
 
-// 클립보드에 있는 숫자를 계산 결과에 추가하는 함수
+// // 클립보드에 있는 숫자를 계산 결과에 추가하는 함수
+// const doPaste = (): void => {
+//   Clipboard
+//     .read()
+//     .then((text) => {
+//       console.log(text)
+//       calc.setCurrentNumber(text.value);
+//       store.notifyMsg(t('pastedFromClipboard'));
+//     })
+//     .catch(() => {
+//       store.notifyError(t('failedToPasteFromClipboard'));
+//     });
+// }
+
 const doPaste = (): void => {
-  Clipboard
-    .read()
+  navigator.clipboard
+    .readText()
     .then((text) => {
-      console.log(text)
-      calc.setCurrentNumber(text.value);
+      calc.setCurrentNumber(text);
       store.notifyMsg(t('pastedFromClipboard'));
     })
     .catch(() => {
