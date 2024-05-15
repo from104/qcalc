@@ -1,12 +1,17 @@
 <script setup lang="ts">
 import { onMounted } from 'vue';
-import { copyToClipboard } from 'quasar';
 import { useI18n } from 'vue-i18n';
+import { copyToClipboard } from 'quasar';
+import { useQuasar } from 'quasar';
 
 import { useCalcStore } from 'stores/calc-store';
-
+import { KeyBinding } from 'classes/KeyBinding';
 import MyTooltip from 'components/MyTooltip.vue';
 
+// Quasar의 $q 객체를 사용하기 위한 변수 선언
+const $q = useQuasar();
+
+// i18n을 사용하기 위한 변수 선언
 const { t } = useI18n();
 
 // 스토어 가져오기
@@ -41,35 +46,16 @@ const doCopy = async (): Promise<void> => {
   }
 }
 
-// import { useClipboard } from '@vueuse/core'
-
-// const {text, isSupported}  = useClipboard({ legacy: true, read: true })
-// // 클립보드에서 숫자를 붙여넣는다.
-
-// const doPaste = (): void => {
-//   if (!isSupported.value) {
-//     store.notifyError(t('failedToPasteFromClipboard'));
-//     return;
-//   }
-//   calc.setCurrentNumber(text.value);
-//   store.notifyMsg(t('pastedFromClipboard'));
-// }
-
-// const doPaste = async (): Promise<void> => {
-//   try {
-//     console.log(navigator);
-//     const text = await navigator.clipboard.readText();
-//     calc.setCurrentNumber(text.value);
-//     store.notifyMsg(t('pastedFromClipboard'));
-//   } catch (error) {
-//     console.error(error); // 에러 메시지를 콘솔에 출력
-//     store.notifyError(t('failedToPasteFromClipboard'));
-//   }
-// }
-const doPaste = (): void => {
+const doPaste = async (): Promise<void> => {
+  let text = '';
   try {
-    // WebAppInterface를 통해 클립보드에서 텍스트를 가져옵니다.
-    const text = AndroidInterface.getFromClipboard();
+    if ($q.platform.is.capacitor) { // Capacitor 플랫폼인 경우
+      // WebAppInterface를 통해 클립보드에서 텍스트를 가져옵니다.
+      text = await AndroidInterface.getFromClipboard();
+    } else {
+      // navigator.clipboard를 통해 클립보드에서 텍스트를 가져옵니다.
+      text = await navigator.clipboard.readText();
+    }
 
     // 가져온 텍스트를 calc 객체의 현재 숫자로 설정합니다.
     calc.setCurrentNumber(text);
@@ -84,8 +70,6 @@ const doPaste = (): void => {
     store.notifyError(t('failedToPasteFromClipboard'));
   }
 }
-
-import { KeyBinding } from 'classes/KeyBinding';
 
 const keyBinding = new KeyBinding([
   [['Control+c', 'Control+Insert', 'Copy'], () => store.clickButtonById('btn-copy')],

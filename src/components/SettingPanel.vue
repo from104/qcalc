@@ -34,7 +34,6 @@ watch([() => store.useSystemLocale, () => store.userLocale], () => {
 
 const setLocale = () => {
   if (store.useSystemLocale) {
-    // store.userLocale = locale.value as string;
     locale.value = navigator.language;
   } else {
     locale.value = store.userLocale;
