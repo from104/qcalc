@@ -1,3 +1,9 @@
+// package org.capacitor.quasar.app;
+
+// import com.getcapacitor.BridgeActivity;
+
+// public class MainActivity extends BridgeActivity {}
+
 package org.capacitor.quasar.app;
 
 import android.os.Bundle;
