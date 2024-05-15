@@ -4,6 +4,10 @@
 
 형식은 [Keep a Changelog (korean)]를 기반으로 하며 이 프로젝트는 [Semantic Versioning (korean)]을 따릅니다.
 
+## [0.8.0] 2024-05-16
+
+- capacitor 플랫폼 추가
+
 ## [0.7.2fix1] 2023-10-17
 
 - 첫 화면에서 커스텀 폰트 적용 안 되던 것 수정
