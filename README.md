@@ -15,7 +15,7 @@ This is a simple calculator made using the source of the calculator for Android 
 - Records calculation results (up to 20)
 - Dark mode
 - Supports English and Korean
-- 데스크탑, 모바일 대응 (electron, capacitor, etc...)
+- Desktop, mobile supports (electron, capacitor, etc...)
 
 ## Shortcut Keys
 
