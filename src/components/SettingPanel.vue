@@ -15,7 +15,7 @@ const urlInside = computed(() => route.fullPath.split('/').pop());
 
 const store = useCalcStore();
 
-const q = useQuasar();
+const $q = useQuasar();
 
 const { locale } = useI18n({ useScope: 'global' });
 const { t } = useI18n();
@@ -42,7 +42,7 @@ const setLocale = () => {
 };
 
 const toggleAlwaysOnTopWithNotify = () => {
-  if (q.platform.is.electron) {
+  if ($q.platform.is.electron) {
     // 수동으로 토글
     store.toggleAlwaysOnTop();
 
