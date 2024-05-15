@@ -219,6 +219,7 @@ ko:
     area: '넓이'
     volume: '부피'
     weight: '무게'
+    angle: '각도'
     temp: '온도'
     time: '시간'
     speed: '속도'
@@ -267,6 +268,13 @@ ko:
       oz: '온스'
       lb: '파운드'
       ton: '톤'
+    angle:
+      deg: '도'
+      rad: '라디안'
+      grad: '그라디안'
+      urad: '마이크로라디안'
+      amin: '분'
+      asec: '초'
     temp:
       '°C': '섭씨'
       '°F': '화씨'
@@ -310,6 +318,7 @@ en:
     volume: 'Volume'
     weight: 'Weight'
     temp: 'Temp'
+    angle: 'Angle'
     time: 'Time'
     speed: 'Speed'
     pressure: 'Pressure'
@@ -357,6 +366,13 @@ en:
       oz: 'Ounce'
       lb: 'Pound'
       ton: 'Ton'
+    angle:
+      deg: 'Degree'
+      rad: 'Radian'
+      grad: 'Gradian'
+      urad: 'Microradian'
+      amin: 'Minute'
+      asec: 'Second'
     temp:
       '°C': 'Celsius'
       '°F': 'Fahrenheit'

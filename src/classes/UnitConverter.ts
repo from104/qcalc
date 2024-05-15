@@ -62,6 +62,14 @@ const unitBaseData: UnitBaseData = {
     lb: { value: 453.59237, desc: 'Pound' },
     ton: { value: 1000000, desc: 'Ton' },
   },
+  angle: {
+    deg: { value: 0.017453292519943295, desc: 'Degree' },
+    rad: { value: 1, desc: 'Radian' },
+    grad: { value: 0.015707963267948967, desc: 'Gradian' },
+    urad: { value: 0.000001, desc: 'Microradian' },
+    amin: { value: 0.0002908882086657216, desc: 'Minute of arc' },
+    asec: { value: 0.00000484813681109536, desc: 'Second of arc' },
+  },
   temp: {
     '°C': { value: 1, desc: 'Celsius' },
     '°F': {
@@ -77,17 +85,15 @@ const unitBaseData: UnitBaseData = {
     K: {
       value: (originalValue: number | string, isReverse = false): BigNumber => {
         const value = MathB.bignumber(originalValue);
-
         return isReverse
           ? value.minus(273.15)   // originalValue - 273.15 (From Kelvin to Celsius)
           : value.plus(273.15);   // originalValue + 273.15 (From Celsius to Kelvin)
-    },
+      },
       desc: 'Kelvin',
     },
     '°R': {
       value: (originalValue: number | string, isReverse = false): BigNumber => {
         const value = MathB.bignumber(originalValue);
-
         return isReverse
           ? value.minus(491.67).times(5).dividedBy(9)   // (originalValue - 491.67) * (5 / 9)
           : value.times(9).dividedBy(5).plus(491.67);   // originalValue * (9 / 5) + 491.67
