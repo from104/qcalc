@@ -17,7 +17,7 @@ const { calc } = store;
 
 // 창에서 선택한 내용이 있으면 선택한 내용을 클립보드에 복사하고
 // 아니면 계산 결과를 클립보드에 복사한다.
-const doCopy = (): void => {
+const doCopy = async (): Promise<void> => {
   // 계산 결과에 있는 내용을 가져온다.
   const resultText = document.getElementById('result')?.textContent ?? '';
   // 선택한 내용을 가져온다.
@@ -30,44 +30,59 @@ const doCopy = (): void => {
     selectedText == ''
       ? t('targetToBeCopiedResult')
       : t('targetToBeCopiedSelected');
+
   // 클립보드에 복사한다.
-  copyToClipboard(textToClipboard)
-    .then(() => {
-      store.notifyMsg(t('copiedToClipboard', { target: targetToBeCopied }));
-    })
-    .catch(() => {
-      store.notifyError(
-        t('failedToCopyToClipboard', { target: targetToBeCopied })
-      );
-    });
+  try {
+    await copyToClipboard(textToClipboard);
+    store.notifyMsg(t('copiedToClipboard', { target: targetToBeCopied }));
+  } catch (error) {
+    console.error(error); // 에러 메시지를 콘솔에 출력
+    store.notifyError(t('failedToCopyToClipboard', { target: targetToBeCopied }));
+  }
 }
 
-// import { Clipboard } from '@capacitor/clipboard';
+// import { useClipboard } from '@vueuse/core'
 
-// // 클립보드에 있는 숫자를 계산 결과에 추가하는 함수
+// const {text, isSupported}  = useClipboard({ legacy: true, read: true })
+// // 클립보드에서 숫자를 붙여넣는다.
+
 // const doPaste = (): void => {
-//   Clipboard
-//     .read()
-//     .then((text) => {
-//       console.log(text)
-//       calc.setCurrentNumber(text.value);
-//       store.notifyMsg(t('pastedFromClipboard'));
-//     })
-//     .catch(() => {
-//       store.notifyError(t('failedToPasteFromClipboard'));
-//     });
+//   if (!isSupported.value) {
+//     store.notifyError(t('failedToPasteFromClipboard'));
+//     return;
+//   }
+//   calc.setCurrentNumber(text.value);
+//   store.notifyMsg(t('pastedFromClipboard'));
 // }
 
+// const doPaste = async (): Promise<void> => {
+//   try {
+//     console.log(navigator);
+//     const text = await navigator.clipboard.readText();
+//     calc.setCurrentNumber(text.value);
+//     store.notifyMsg(t('pastedFromClipboard'));
+//   } catch (error) {
+//     console.error(error); // 에러 메시지를 콘솔에 출력
+//     store.notifyError(t('failedToPasteFromClipboard'));
+//   }
+// }
 const doPaste = (): void => {
-  navigator.clipboard
-    .readText()
-    .then((text) => {
-      calc.setCurrentNumber(text);
-      store.notifyMsg(t('pastedFromClipboard'));
-    })
-    .catch(() => {
-      store.notifyError(t('failedToPasteFromClipboard'));
-    });
+  try {
+    // WebAppInterface를 통해 클립보드에서 텍스트를 가져옵니다.
+    const text = AndroidInterface.getFromClipboard();
+
+    // 가져온 텍스트를 calc 객체의 현재 숫자로 설정합니다.
+    calc.setCurrentNumber(text);
+
+    // 알림 스토어를 통해 사용자에게 클립보드에서 성공적으로 붙여넣었다는 메시지를 보냅니다.
+    store.notifyMsg(t('pastedFromClipboard'));
+  } catch (error) {
+    // 에러가 발생한 경우, 콘솔에 에러 메시지를 출력합니다.
+    console.error(error);
+
+    // 사용자에게 클립보드 붙여넣기 실패를 알립니다.
+    store.notifyError(t('failedToPasteFromClipboard'));
+  }
 }
 
 import { KeyBinding } from 'classes/KeyBinding';

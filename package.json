@@ -33,11 +33,13 @@
     "build:win32": "quasar build -m electron -T win32"
   },
   "dependencies": {
-    "@capacitor/clipboard": "^5.0.6",
+    "@capacitor/android": "^6.0.0",
+    "@capacitor/clipboard": "^6.0.0",
     "@capacitor/core": "^5.5.1",
     "@everapi/freecurrencyapi-js": "^1.0.1",
     "@quasar/extras": "^1.15.1",
-    "axios": "^1.6.4",
+    "axios": "^1.6.0",
+    "dotenv": "^16.3.1",
     "electron-window-state": "^5.0.3",
     "mathjs": "^11.12.0",
     "pinia": "^2.0.11",
