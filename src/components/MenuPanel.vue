@@ -73,7 +73,7 @@ watch(()=>route.path, () => {
   updateTitle();
 });
 
-watch([()=>store.useSystemLocale, ()=>store.userLocale], () => {
+watch([()=>store.locale], () => {
   Object.keys(paths).forEach((path) => {
     paths[path].title = t(`path.${path}.title`);
     paths[path].caption = t(`path.${path}.caption`);

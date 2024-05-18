@@ -222,7 +222,7 @@ onMounted(() => {
 <style scoped lang="scss">
 @font-face {
   font-family: 'digital-7-mono-italic';
-    src: url('/public/digital-7.monoitalic.ttf') format('truetype');
+    src: url('/digital-7.monoitalic.ttf') format('truetype');
 }
 
 #symbol {
@@ -241,13 +241,11 @@ onMounted(() => {
 }
 
 .q-field {
-  &:deep {
-    .q-field__label {
-      right: -100%;
-      text-align: right;
-      font-size: 20px;
-      top: 10px;
-    }
+  :deep(.q-field__label) {
+    right: -100%;
+    text-align: right;
+    font-size: 20px;
+    top: 10px;
   }
 }
 </style>

@@ -10,11 +10,11 @@ const store = useCalcStore();
 const { locale } = useI18n({ useScope: 'global' });
 const { t } = useI18n();
 
-const q = useQuasar();
+const $q = useQuasar();
 
 const title = ref(t('appTitle'));
 
-if (q.platform.is.electron) {
+if ($q.platform.is.electron) {
   store.setAlwaysOnTop(store.alwaysOnTop);
 }
 
@@ -27,9 +27,9 @@ watch(locale, () => {
 });
 
 onBeforeMount(() => {
-  if (q.platform.is.win) {
+  if ($q.platform.is.win) {
     store.paddingOnResult = 8
-  } else if (q.platform.is.linux) {
+  } else if ($q.platform.is.linux) {
     store.paddingOnResult = 3
   } else {
     store.paddingOnResult = 0
