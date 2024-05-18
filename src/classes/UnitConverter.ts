@@ -29,7 +29,7 @@ const unitBaseData: UnitBaseData = {
     yd: { value: 0.9144, desc: 'Yard' }, // 야드
     mi: { value: 1609.344, desc: 'Mile' }, // 마일
     chi: { value: 0.0303, desc: 'Ch\'i (Inch)' }, // 치
-    'ch\'k': { value: 0.303, desc: 'Ch\'ŏk (Foot)' }, // 척
+    'chok': { value: 0.303, desc: 'Ch\'ŏk (Foot)' }, // 척
     chg: { value: 3.03, desc: 'Chang (Fathom)' }, // 장
     ri: { value: 393, desc: 'Ri (Village Distance)' }, // 리
     au: { value: 149597870700, desc: 'Astronomical Unit' }, // 천문학적 단위
@@ -65,9 +65,9 @@ const unitBaseData: UnitBaseData = {
     ml: { value: 0.000001, desc: 'Milliliter' }, // 밀리리터
     kl: { value: 1000, desc: 'Kiloliter' }, // 킬로리터
     gal: { value: 0.003785411784, desc: 'Gallon' }, // 갤런
-    t: { value: 0.0018, desc: 'Toe (Liter)' }, // 되
-    m: { value: 0.018, desc: 'Mal (Decaliter)' }, // 말
-    s: { value: 0.18, desc: 'Sŏm (Hectoliter)' }, // 섬
+    to: { value: 0.0018, desc: 'Toe (Liter)' }, // 되
+    mal: { value: 0.018, desc: 'Mal (Decaliter)' }, // 말
+    seom: { value: 0.18, desc: 'Sŏm (Hectoliter)' }, // 섬
   },
   weight: { // 무게
     g: { value: 1, desc: 'Gram' }, // 그램
@@ -87,8 +87,8 @@ const unitBaseData: UnitBaseData = {
     rad: { value: 1, desc: 'Radian' }, // 라디안
     grad: { value: 0.015707963267948967, desc: 'Gradian' }, // 그라디안
     urad: { value: 0.000001, desc: 'Microradian' }, // 마이크로라디안
-    amin: { value: 0.0002908882086657216, desc: 'Minute of arc' }, // 분(각)
-    asec: { value: 0.00000484813681109536, desc: 'Second of arc' }, // 초(각)  
+    amin: { value: 0.0002908882086657216, desc: 'Minute of arc' }, // 분(각도)
+    asec: { value: 0.00000484813681109536, desc: 'Second of arc' }, // 초(각도)  
   },
   temp: { // 온도 
     '°C': { value: 1, desc: 'Celsius' }, // 섭씨
@@ -110,7 +110,7 @@ const unitBaseData: UnitBaseData = {
       },
       desc: 'Kelvin',
     },
-    '°R': { // 란씨
+    '°R': { // 랭킨
       value: (originalValue: number | string, isReverse = false): BigNumber => {
         const value = MathB.bignumber(originalValue);
         return isReverse
@@ -131,6 +131,10 @@ const unitBaseData: UnitBaseData = {
     kWh: { value: 3600000, desc: 'Kilowatt-hour' }, // 킬로와트시
     MWh: { value: 3600000000, desc: 'Megawatt-hour' }, // 메가와트시
     GWh: { value: 3600000000000, desc: 'Gigawatt-hour' }, // 기가와트시
+    eV: { value: 1.602176634e-19, desc: 'Electronvolt' }, // 전자볼트
+    keV: { value: 1.602176634e-16, desc: 'Kiloelectronvolt' }, // 킬로전자볼트
+    MeV: { value: 1.602176634e-13, desc: 'Megaelectronvolt' }, // 메가전자볼트
+    GeV: { value: 1.602176634e-10, desc: 'Gigaelectronvolt' }, // 기가전자볼트
     BTU: { value: 1055.06, desc: 'British Thermal Unit' }, // 영국 열 단위
     erg: { value: 0.0000001, desc: 'Erg' }, // 에르그
   },
@@ -149,6 +153,8 @@ const unitBaseData: UnitBaseData = {
     week: { value: 604800, desc: 'Week' }, // 주
     month: { value: 2628000, desc: 'Month' }, // 월
     year: { value: 31536000, desc: 'Year' }, // 년  
+    decade: { value: 315360000, desc: 'Decade' }, // 십년
+    century: { value: 3153600000, desc: 'Century' }, // 세기
   },
   speed: { // 속도
     'km/h': { value: 1, desc: 'Kilometer per Hour' }, // 킬로미터/시간
@@ -223,7 +229,6 @@ const unitBaseData: UnitBaseData = {
     lx: { value: 1, desc: 'Lux' }, // 럭스
     ph: { value: 10000, desc: 'Phot' }, // 포트
     fc: { value: 10.76391, desc: 'Foot-candle' }, // 푸트캔들
-    nt: { value: 1, desc: 'Nits' }, // 니트
   },
   electricCharge: { // 전하량
     C: { value: 1, desc: 'Coulomb' }, // 쿨롬
@@ -233,32 +238,7 @@ const unitBaseData: UnitBaseData = {
     pC: { value: 0.000000000001, desc: 'Picocoulomb' }, // 피코쿨롬
     Ah: { value: 3600, desc: 'Ampere-hour' }, // 암페어시
     mAh: { value: 3.6, desc: 'Milliampere-hour' }, // 밀리암페어시
-  },
-  electricCurrent: { // 전류
-    A: { value: 1, desc: 'Ampere' }, // 암페어
-    mA: { value: 0.001, desc: 'Milliampere' }, // 밀리암페어
-    μA: { value: 0.000001, desc: 'Microampere' }, // 마이크로암페어
-    kA: { value: 1000, desc: 'Kiloampere' }, // 킬로암페어
-  },
-  electricPotential: { // 전위
-    V: { value: 1, desc: 'Volt' }, // 볼트
-    mV: { value: 0.001, desc: 'Millivolt' }, // 밀리볼트
-    μV: { value: 0.000001, desc: 'Microvolt' }, // 마이크로볼트
-    kV: { value: 1000, desc: 'Kilovolt' }, // 킬로볼트
-  },
-  capacitance: { // 전기 용량
-    F: { value: 1, desc: 'Farad' }, // 패럿
-    mF: { value: 0.001, desc: 'Millifarad' }, // 밀리패럿
-    μF: { value: 0.000001, desc: 'Microfarad' }, // 마이크로패럿
-    nF: { value: 0.000000001, desc: 'Nanofarad' }, // 나노패럿
-    pF: { value: 0.000000000001, desc: 'Picofarad' }, // 피코패럿
-  },
-  resistance: { // 저항
-    Ω: { value: 1, desc: 'Ohm' }, // 옴
-    mΩ: { value: 0.001, desc: 'Milliohm' }, // 밀리옴
-    μΩ: { value: 0.000001, desc: 'Microohm' }, // 마이크로옴
-    kΩ: { value: 1000, desc: 'Kiloohm' }, // 킬로옴
-    MΩ: { value: 1000000, desc: 'Megaohm' }, // 메가옴
+    e: { value: 1.602176634e-19, desc: 'Elementary Charge' }, // 원자 전하
   },
 };
 
