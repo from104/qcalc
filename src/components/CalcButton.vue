@@ -131,13 +131,13 @@ if (props.type === 'unit' || props.type === 'currency') {
 </template>
 
 <i18n>
-  ko:
-    cannotDivideByZero: '0으로 나눌 수 없습니다.'
-    squareRootOfANegativeNumberIsNotAllowed: '음수의 제곱근은 허용되지 않습니다.'
-  en:
-    cannotDivideByZero: 'Cannot divide by zero'
-    squareRootOfANegativeNumberIsNotAllowed: 'The square root of a negative number is not allowed.'
-  </i18n>
+ko:
+  cannotDivideByZero: '0으로 나눌 수 없습니다.'
+  squareRootOfANegativeNumberIsNotAllowed: '음수의 제곱근은 허용되지 않습니다.'
+en:
+  cannotDivideByZero: 'Cannot divide by zero'
+  squareRootOfANegativeNumberIsNotAllowed: 'The square root of a negative number is not allowed.'
+</i18n>
 
 <style scoped lang="scss">
 .button {

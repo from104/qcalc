@@ -220,11 +220,6 @@ onMounted(() => {
 </template>
 
 <style scoped lang="scss">
-@font-face {
-  font-family: 'digital-7-mono-italic';
-    src: url('/digital-7.monoitalic.ttf') format('truetype');
-}
-
 #symbol {
   font-size: 36px;
   font-family: 'Courier New', Courier, monospace;
