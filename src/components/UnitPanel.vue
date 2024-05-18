@@ -413,7 +413,7 @@ en:
 <style scoped lang="scss">
 @font-face {
   font-family: 'digital-7-mono-italic';
-    src: url('../../public/digital-7.monoitalic.ttf') format('truetype');
+    src: url('/digital-7.monoitalic.ttf') format('truetype');
 }
 
 #unitResult {
