@@ -29,7 +29,7 @@ const unitBaseData: UnitBaseData = {
     yd: { value: 0.9144, desc: 'Yard' }, // 야드
     mi: { value: 1609.344, desc: 'Mile' }, // 마일
     chi: { value: 0.0303, desc: 'Ch\'i (Inch)' }, // 치
-    'chok': { value: 0.303, desc: 'Ch\'ŏk (Foot)' }, // 척
+    chok: { value: 0.303, desc: 'Ch\'ŏk (Foot)' }, // 척
     chg: { value: 3.03, desc: 'Chang (Fathom)' }, // 장
     ri: { value: 393, desc: 'Ri (Village Distance)' }, // 리
     au: { value: 149597870700, desc: 'Astronomical Unit' }, // 천문학적 단위
