@@ -140,7 +140,7 @@ watch(
 // 통화 선택 필터 함수 생성
 // 검색어를 사용하여 통화 목록을 필터링하는 함수를 생성합니다.
 // options 매개변수는 Ref<CurrencyOptions[]> 타입으로 선언되어 있으며, reactiveOptions 매개변수는 ReactiveCurrencyOptions 타입으로 선언되어 있습니다.
-  const createFilterFn = (
+const createFilterFn = (
   options: Ref<CurrencyOptions[]>,
   reactiveOptions: ReactiveCurrencyOptions,
 ) => {
@@ -290,7 +290,6 @@ const filterFnTo = createFilterFn(toFilteredCurrencyOptions, toCurrencyOptions);
       class="col-1 q-px-none"
     />
   </q-card-section>
-
 </template>
 
 <i18n lang="yaml5" src="../i18n/components/CurrencyPanel.yml" />

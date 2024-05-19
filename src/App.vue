@@ -8,32 +8,40 @@ import { useCalcStore } from 'stores/calc-store';
 const store = useCalcStore();
 
 const { locale } = useI18n({ useScope: 'global' });
+
 const { t } = useI18n();
 
 const $q = useQuasar();
 
-const title = ref(t('appTitle'));
+const title = ref( t( 'appTitle' ) );
 
-if ($q.platform.is.electron) {
-  store.setAlwaysOnTop(store.alwaysOnTop);
+const updateTitle = () => {
+  title.value = t( 'appTitle' );
+};
+
+if ( $q.platform.is.electron ) {
+  store.setAlwaysOnTop( store.alwaysOnTop );
 }
 
 useMeta(() => ({
   title: title.value,
 }));
 
-watch(locale, () => {
-  title.value = t('appTitle');
+watch(() => store.locale, () => {
+  updateTitle();
 });
 
-onBeforeMount(() => {
-  if ($q.platform.is.win) {
-    store.paddingOnResult = 8
-  } else if ($q.platform.is.linux) {
-    store.paddingOnResult = 3
+onBeforeMount( () => {
+  locale.value = store.locale;
+
+  if ( $q.platform.is.win ) {
+    store.paddingOnResult = 8;
+  } else if ( $q.platform.is.linux ) {
+    store.paddingOnResult = 3;
   } else {
-    store.paddingOnResult = 0
+    store.paddingOnResult = 0;
   }
+  updateTitle();
 });
 </script>
 
