@@ -211,16 +211,4 @@ watch(
   </q-card-section>
 </template>
 
-<i18n lang="yaml5" src="../i18n/UnitPanel.yml" />
-
-<style scoped lang="scss">
-#unitResult {
-  font-family: 'digital-7-mono-italic';
-  font-size: 40px;
-  min-height: 36px;
-}
-
-#unit {
-  font-size: 22px;
-}
-</style>
+<i18n lang="yaml5" src="../i18n/components/UnitPanel.yml" />

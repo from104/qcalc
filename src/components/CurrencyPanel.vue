@@ -293,25 +293,4 @@ const filterFnTo = createFilterFn(toFilteredCurrencyOptions, toCurrencyOptions);
 
 </template>
 
-<i18n lang="yaml5" src="../i18n/CurrencyPanel.yml" />
-
-<style scoped lang="scss">
-@font-face {
-  font-family: 'digital-7-mono-italic';
-    src: url('/digital-7.monoitalic.ttf') format('truetype');
-}
-
-#symbol {
-  font-size: 35px;
-}
-
-#currencyResult {
-  font-family: 'digital-7-mono-italic';
-  font-size: 40px;
-  min-height: 36px;
-}
-
-#unit {
-  font-size: 22px;
-}
-</style>
+<i18n lang="yaml5" src="../i18n/components/CurrencyPanel.yml" />

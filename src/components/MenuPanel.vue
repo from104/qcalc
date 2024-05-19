@@ -73,12 +73,16 @@ watch(()=>route.path, () => {
   updateTitle();
 });
 
-watch([()=>store.locale], () => {
+const updateLocale = () => {
   Object.keys(paths).forEach((path) => {
     paths[path].title = t(`path.${path}.title`);
     paths[path].caption = t(`path.${path}.caption`);
   });
   updateTitle();
+};
+
+watch([()=>store.locale], () => {
+  updateLocale();
 });
 
 import { KeyBinding } from 'classes/KeyBinding';
@@ -93,9 +97,8 @@ const keyBinding = new KeyBinding([
 
 onMounted(() => {
   keyBinding.subscribe();
-  updateTitle();
+  updateLocale();
 });
-
 </script>
 
 <template>
