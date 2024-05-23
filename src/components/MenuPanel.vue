@@ -1,20 +1,18 @@
 <script setup lang="ts">
-import { useRouter,useRoute } from 'vue-router';
-
-import { useI18n } from 'vue-i18n';
+import { onMounted, reactive, watch } from 'vue';
 
 import { version } from '../../package.json';
 
-import { useCalcStore } from 'src/stores/calc-store';
-import { onMounted, reactive, watch } from 'vue';
-
 import PathRoute from 'components/PathRoute.vue';
 
+import { useRouter,useRoute } from 'vue-router';
 const router = useRouter();
 const route = useRoute();
 
+import { useCalcStore } from 'src/stores/calc-store';
 const store = useCalcStore();
 
+import { useI18n } from 'vue-i18n';
 const { t } = useI18n();
 
 interface Path {
@@ -63,16 +61,22 @@ const paths: {[key: string]: Path} = reactive({
   },
 });
 
+// updateTitle() 함수를 사용하기 위해 emits() 함수를 정의
 const emits = defineEmits(['updateTitle']);
 
+// updateTitle() 함수는 updateTitle 이벤트를 발생시키는 역할
+// paths 객체에서 현재 경로에 해당하는 객체를 찾아 title 속성을 업데이트
+// route.path.slice(1)은 경로에서 첫 번째 문자를 제외한 나머지 문자열을 반환
 const updateTitle = () => {
   emits('updateTitle', paths[route.path.slice(1)].title);
 };
 
+// route.path가 변경될 때마다 updateTitle() 함수를 실행
 watch(()=>route.path, () => {
   updateTitle();
 });
 
+// updateLocale() 함수는 paths 객체의 title과 caption 속성을 각 언어에 맞게 업데이트
 const updateLocale = () => {
   Object.keys(paths).forEach((path) => {
     paths[path].title = t(`path.${path}.title`);
@@ -81,18 +85,25 @@ const updateLocale = () => {
   updateTitle();
 };
 
-watch([()=>store.locale], () => {
+// store.locale이 변경될 때마다 updateLocale() 함수를 실행
+watch(()=>store.locale, () => {
   updateLocale();
 });
+
+// 해당 기능으로 이동
+const toPath = (path: string) => {
+  store.setInitialPath(path);
+  router.push({ path: path });
+};
 
 import { KeyBinding } from 'classes/KeyBinding';
 
 const keyBinding = new KeyBinding([
-  [['F1'], () => router.push({ path: '/help' })],
-  [['F2'], () => router.push({ path: '/calc' })],
-  [['F3'], () => router.push({ path: '/unit' })],
-  [['F4'], () => router.push({ path: '/currency' })],
-  [['F5'], () => router.push({ path: '/about' })],
+  [['F1'], () => toPath('/help')],
+  [['F2'], () => toPath('/calc')],
+  [['F3'], () => toPath('/unit')],
+  [['F4'], () => toPath('/currency')],
+  [['F5'], () => toPath('/about')],
 ]);
 
 onMounted(() => {
@@ -104,7 +115,7 @@ onMounted(() => {
 <template>
   <q-list v-blur>
     <q-item-label class="q-mt-xl text-h5" header>
-      {{ t('menu') }} (M)
+      {{ t('message.menu') }} (M)
     </q-item-label>
     <PathRoute v-for="path in paths" :key="path.title" v-bind="path" />
   </q-list>
@@ -119,7 +130,7 @@ onMounted(() => {
   /> -->
 
   <q-footer class="row items-center q-pa-sm bg-primary" >
-    {{ `${t('version')} : ${version}` }}
+    {{ `${t('message.version')} : ${version}` }}
     <q-space />
   </q-footer>
 </template>

@@ -11,7 +11,7 @@ const { locale } = useI18n({ useScope: 'global' });
   <q-page>
     <q-card flat class="q-pa-lg">
       <q-markdown
-        :src="locale == 'ko' ? HelpPageMD_ko : HelpPageMD_en"
+        :src="locale.substring(0, 2) == 'ko' ? HelpPageMD_ko : HelpPageMD_en"
         no-linkify
         no-heading-anchor-links
       />

@@ -2,8 +2,10 @@
   "extends": "@quasar/app-vite/tsconfig-preset.json",
   "compilerOptions": {
     "module": "ES2020",
+    "resolveJsonModule": true,
     "esModuleInterop": true,
     "moduleResolution": "node",
+    "typeRoots": ["./node_modules/@types", "./types"],
     "baseUrl": ".",
     "paths": {
       "src/*": ["src/*"],
@@ -14,12 +16,9 @@
       "assets/*": ["src/assets/*"],
       "boot/*": ["src/boot/*"],
       "stores/*": ["src/stores/*"],
-      "classes/*": ["src/classes/*"]
+      "classes/*": ["src/classes/*"],
+      "capacitor/*": ["src-capacitor/node_modules/*"]
     },
-    "types": [
-      "@intlify/vite-plugin-vue-i18n/client",
-      "@modyfi/vite-plugin-yaml/modules"
-    ]
   },
   "include": [
     "./**/*.ts",
@@ -28,9 +27,11 @@
     "src/**/*.tsx",
     "src/**/*.vue",
     "src/**/*.ext",
+    "types/**/*.d.ts",
     "src-pwa/*.d.ts",
     "src-bex/*.d.ts",
     "src-ssr/*.d.ts",
+    "src-capacitor/*.d.ts",
     "src-electron/electron-main.js"
   ],
   "exclude": ["node_modules"],

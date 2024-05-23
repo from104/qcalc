@@ -22,6 +22,9 @@ public class WebAppInterface {
 
     /**
      * 클립보드에서 텍스트를 가져오는 메서드입니다.
+     * 
+     * 웹뷰 보안 정책에 따라 해당 기능은 구현되지 않아서 따로 구현했음
+     * 
      * @return 클립보드에서 가져온 텍스트
      */
     @JavascriptInterface

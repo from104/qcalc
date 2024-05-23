@@ -21,13 +21,13 @@ const { locale } = useI18n({ useScope: 'global' });
 const { t } = useI18n();
 
 const localeOptions = reactive([
-  { value: 'ko', label: t('ko') },
-  { value: 'en', label: t('en') },
+  { value: 'ko', label: t('message.ko') },
+  { value: 'en', label: t('message.en') },
 ]);
 
 watch([() => store.useSystemLocale, () => store.userLocale], () => {
   localeOptions.forEach((option) => {
-    option.label = t(option.value);
+    option.label = t('message.'+option.value);
   });
   store.locale = locale.value as string;
 });
@@ -105,7 +105,7 @@ onBeforeUnmount(() => {
 <template>
   <q-list v-blur dense>
     <q-item-label class="q-mt-xl text-h5" header
-      >{{ t('settings') }} (E)</q-item-label
+      >{{ t('message.settings') }} (E)</q-item-label
     >
     <q-item class="q-py-none" v-if="$q.platform.is.electron">
       <q-item-label class="self-center"
@@ -120,7 +120,7 @@ onBeforeUnmount(() => {
       />
     </q-item>
 
-    <q-item class="q-py-none" v-if="$q.platform.is.electron">
+    <q-item class="q-py-none">
       <q-item-label class="self-center">{{ t('initPanel') }} (N)</q-item-label>
       <q-space />
       <q-toggle

@@ -30,10 +30,7 @@ export default configure(function (/* ctx */) {
     // app boot file (/src/boot)
     // --> boot files are part of "main.js"
     // https://v2.quasar.dev/quasar-cli-vite/boot-files
-    boot: [
-      'i18n',
-      'blur',
-    ],
+    boot: ['i18n', 'blur', 'capacitor'],
 
     // https://v2.quasar.dev/quasar-cli-vite/quasar-config-js#css
     css: ['app.scss'],
@@ -59,13 +56,14 @@ export default configure(function (/* ctx */) {
       // import folder alias
       alias: {
         classes: [__dirname, 'src/classes'].join('/'),
+        capacitor: [__dirname, 'src-capacitor/node_modules'].join('/'),
       },
       target: {
         browser: ['es2019', 'edge88', 'firefox78', 'chrome87', 'safari13.1'],
         node: 'node16',
       },
 
-      vueRouterMode: 'hash', // available values: 'hash', 'history'
+      vueRouterMode: 'history', // available values: 'hash', 'history'
       // vueRouterBase,
       // vueDevtools,
       // vueOptionsAPI: false,
@@ -126,10 +124,7 @@ export default configure(function (/* ctx */) {
       // directives: [],
 
       // Quasar plugins
-      plugins: [
-        'Notify',
-        'Meta',
-      ],
+      plugins: ['Notify', 'Meta'],
     },
 
     // animations: 'all', // --- includes all animations
@@ -194,9 +189,9 @@ export default configure(function (/* ctx */) {
 
     sourceFiles: {
       electronMain: 'src-electron/electron-main',
-      electronPreload: 'src-electron/electron-preload'
+      electronPreload: 'src-electron/electron-preload',
     },
-    
+
     // Full list of options: https://v2.quasar.dev/quasar-cli-vite/developing-electron-apps/configuring-electron
     electron: {
       // extendElectronMainConf (esbuildConf)
@@ -227,7 +222,6 @@ export default configure(function (/* ctx */) {
     // Full list of options: https://v2.quasar.dev/quasar-cli-vite/developing-browser-extensions/configuring-bex
     bex: {
       // contentScripts: ['my-content-script'],
-
       // extendBexScriptsConf (esbuildConf) {}
       // extendBexManifestJson (json) {}
     },

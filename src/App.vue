@@ -1,9 +1,14 @@
 <script setup lang="ts">
 import { useI18n } from 'vue-i18n';
+import { useRouter } from 'vue-router';
+
 import { useMeta, useQuasar } from 'quasar';
 import { ref, watch, onBeforeMount } from 'vue';
 
 import { useCalcStore } from 'stores/calc-store';
+import { c, s } from 'vite/dist/node/types.d-aGj9QkWt';
+
+const router = useRouter();
 
 const store = useCalcStore();
 
@@ -13,10 +18,10 @@ const { t } = useI18n();
 
 const $q = useQuasar();
 
-const title = ref( t( 'appTitle' ) );
+const title = ref(t('message.appTitle'));
 
 const updateTitle = () => {
-  title.value = t( 'appTitle' );
+  title.value = t('message.appTitle');
 };
 
 if ( $q.platform.is.electron ) {
@@ -42,6 +47,9 @@ onBeforeMount( () => {
     store.paddingOnResult = 0;
   }
   updateTitle();
+  if (!store.initPanel) {
+    router.push(store.initialPath);
+  }
 });
 </script>
 

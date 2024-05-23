@@ -35,8 +35,6 @@
     "build:android": "quasar build -m capacitor -T android"
   },
   "dependencies": {
-    "@capacitor/android": "^6.0.0",
-    "@capacitor/core": "^6.0.0",
     "@everapi/freecurrencyapi-js": "^1.0.1",
     "@quasar/extras": "^1.15.1",
     "axios": "^1.6.0",
