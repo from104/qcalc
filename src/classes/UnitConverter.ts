@@ -17,13 +17,13 @@ type UnitBaseData = Record<string, Unit>;
 // 단위 범주 목록별 단위 목록
 const unitBaseData: UnitBaseData = {
   length: { // 길이
+    pm: { value: 0.000000000001, desc: 'Picometer' }, // 피코미터
+    nm: { value: 0.000000001, desc: 'Nanometer' }, // 나노미터
+    μm: { value: 0.000001, desc: 'Micrometer' }, // 마이크로미터
+    mm: { value: 0.001, desc: 'Millimeter' }, // 밀리미터
+    cm: { value: 0.01, desc: 'Centimeter' }, // 센티미터
     m: { value: 1, desc: 'Meter' }, // 미터
     km: { value: 1000, desc: 'Kilometer' }, // 킬로미터
-    cm: { value: 0.01, desc: 'Centimeter' }, // 센티미터
-    mm: { value: 0.001, desc: 'Millimeter' }, // 밀리미터
-    μm: { value: 0.000001, desc: 'Micrometer' }, // 마이크로미터
-    nm: { value: 0.000000001, desc: 'Nanometer' }, // 나노미터
-    pm: { value: 0.000000000001, desc: 'Picometer' }, // 피코미터
     in: { value: 0.0254, desc: 'Inch' }, // 인치
     ft: { value: 0.3048, desc: 'Foot' }, // 피트
     yd: { value: 0.9144, desc: 'Yard' }, // 야드
@@ -37,10 +37,10 @@ const unitBaseData: UnitBaseData = {
     pc: { value: 30856775814913672, desc: 'Parsec' }, // 파섹
   },  
   area: { // 넓이
+    'mm²': { value: 0.000001, desc: 'Square Millimeter' }, // 제곱밀리미터
+    'cm²': { value: 0.0001, desc: 'Square Centimeter' }, // 제곱센티미터
     'm²': { value: 1, desc: 'Square Meter' }, // 제곱미터
     'km²': { value: 1000000, desc: 'Square Kilometer' }, // 제곱킬로미터
-    'cm²': { value: 0.0001, desc: 'Square Centimeter' }, // 제곱센티미터
-    'mm²': { value: 0.000001, desc: 'Square Millimeter' }, // 제곱밀리미터
     'in²': { value: 0.00064516, desc: 'Square Inch' }, // 제곱인치
     'ft²': { value: 0.09290304, desc: 'Square Foot' }, // 제곱피트
     'yd²': { value: 0.83612736, desc: 'Square Yard' }, // 제곱야드
@@ -53,16 +53,16 @@ const unitBaseData: UnitBaseData = {
     k: { value: 3305.8, desc: 'Kyŏl (Hectare)' }, // 결  
   },
   volume: { // 부피
+    'mm³': { value: 0.000000001, desc: 'Cubic Millimeter' }, // 입방밀리미터
+    'cm³': { value: 0.000001, desc: 'Cubic Centimeter' }, // 입방센티미터
     'm³': { value: 1, desc: 'Cubic Meter' }, // 입방미터
     'km³': { value: 1000000000, desc: 'Cubic Kilometer' }, // 입방킬로미터
-    'cm³': { value: 0.000001, desc: 'Cubic Centimeter' }, // 입방센티미터
-    'mm³': { value: 0.000000001, desc: 'Cubic Millimeter' }, // 입방밀리미터
     'in³': { value: 0.000016387064, desc: 'Cubic Inch' }, // 입방인치
     'ft³': { value: 0.028316846592, desc: 'Cubic Foot' }, // 입방피트
     'yd³': { value: 0.764554857984, desc: 'Cubic Yard' }, // 입방야드
     'mi³': { value: 4168181825.44058, desc: 'Cubic Mile' }, // 입방마일
-    l: { value: 0.001, desc: 'Liter' }, // 리터
     ml: { value: 0.000001, desc: 'Milliliter' }, // 밀리리터
+    l: { value: 0.001, desc: 'Liter' }, // 리터
     kl: { value: 1000, desc: 'Kiloliter' }, // 킬로리터
     gal: { value: 0.003785411784, desc: 'Gallon' }, // 갤런
     to: { value: 0.0018, desc: 'Toe (Liter)' }, // 되
@@ -84,11 +84,11 @@ const unitBaseData: UnitBaseData = {
   },
   angle: { // 각도 
     deg: { value: 0.017453292519943295, desc: 'Degree' }, // 도
-    rad: { value: 1, desc: 'Radian' }, // 라디안
-    grad: { value: 0.015707963267948967, desc: 'Gradian' }, // 그라디안
     urad: { value: 0.000001, desc: 'Microradian' }, // 마이크로라디안
-    amin: { value: 0.0002908882086657216, desc: 'Minute of arc' }, // 분(각도)
-    asec: { value: 0.00000484813681109536, desc: 'Second of arc' }, // 초(각도)  
+    grad: { value: 0.015707963267948967, desc: 'Gradian' }, // 그라디안
+    rad: { value: 1, desc: 'Radian' }, // 라디안
+    arcm: { value: 0.0002908882086657216, desc: 'Minute of arc' }, // 분(각도)
+    arcs: { value: 0.00000484813681109536, desc: 'Second of arc' }, // 초(각도)  
   },
   temp: { // 온도 
     '°C': { value: 1, desc: 'Celsius' }, // 섭씨
@@ -146,12 +146,16 @@ const unitBaseData: UnitBaseData = {
     kgf: { value: 9.80665, desc: 'Kilogram-force' }, // 킬로그램힘
   },
   time: { // 시간
-    sec: { value: 1, desc: 'Second' }, // 초
-    min: { value: 60, desc: 'Minute' }, // 분
-    hour: { value: 3600, desc: 'Hour' }, // 시간
-    day: { value: 86400, desc: 'Day' }, // 일
-    week: { value: 604800, desc: 'Week' }, // 주
-    month: { value: 2628000, desc: 'Month' }, // 월
+    ps: { value: 0.000000000001, desc: 'Picosecond' }, // 피코초
+    ns: { value: 0.000000001, desc: 'Nanosecond' }, // 나노초
+    'μs': { value: 0.000001, desc: 'Microsecond' }, // 마이크로초 
+    ms: { value: 0.001, desc: 'Millisecond' }, // 밀리초
+    s: { value: 1, desc: 'Second' }, // 초
+    m: { value: 60, desc: 'Minute' }, // 분
+    h: { value: 3600, desc: 'Hour' }, // 시간
+    d: { value: 86400, desc: 'Day' }, // 일
+    w: { value: 604800, desc: 'Week' }, // 주
+    mon: { value: 2628000, desc: 'Month' }, // 월
     year: { value: 31536000, desc: 'Year' }, // 년  
     decade: { value: 315360000, desc: 'Decade' }, // 십년
     century: { value: 3153600000, desc: 'Century' }, // 세기
@@ -165,14 +169,14 @@ const unitBaseData: UnitBaseData = {
   },
   pressure: { // 압력
     Pa: { value: 1, desc: 'Pascal' }, // 파스칼
+    hPa: { value: 100, desc: 'Hectopascal' }, // 헥토파스칼
     kPa: { value: 1000, desc: 'Kilopascal' }, // 킬로파스칼
     MPa: { value: 1000000, desc: 'Megapascal' }, // 메가파스칼
-    hPa: { value: 100, desc: 'Hectopascal' }, // 헥토파스칼
     bar: { value: 100000, desc: 'Bar' }, // 바
     psi: { value: 6894.75729316836, desc: 'Pound per Square Inch' }, // 파운드/제곱인치
     ksi: { value: 6894757.29316836, desc: 'Kilopound per Square Inch' }, // 킬로파운드/제곱인치
   },
-  storage: { // 저장 용량
+  data: { // 데이터
     B: { value: 1, desc: 'Byte' }, // 바이트
     kiB: { value: 1024, desc: 'Kibibyte (1024 Bytes)' }, // 키비바이트 (1024 바이트)
     kB: { value: 1000, desc: 'Kilobyte (1000 Bytes)' }, // 킬로바이트 (1000 바이트)
@@ -231,13 +235,13 @@ const unitBaseData: UnitBaseData = {
     fc: { value: 10.76391, desc: 'Foot-candle' }, // 푸트캔들
   },
   electricCharge: { // 전하량
-    C: { value: 1, desc: 'Coulomb' }, // 쿨롬
-    mC: { value: 0.001, desc: 'Millicoulomb' }, // 밀리쿨롬
-    μC: { value: 0.000001, desc: 'Microcoulomb' }, // 마이크로쿨롬
-    nC: { value: 0.000000001, desc: 'Nanocoulomb' }, // 나노쿨롬
     pC: { value: 0.000000000001, desc: 'Picocoulomb' }, // 피코쿨롬
-    Ah: { value: 3600, desc: 'Ampere-hour' }, // 암페어시
+    nC: { value: 0.000000001, desc: 'Nanocoulomb' }, // 나노쿨롬
+    μC: { value: 0.000001, desc: 'Microcoulomb' }, // 마이크로쿨롬
+    mC: { value: 0.001, desc: 'Millicoulomb' }, // 밀리쿨롬
+    C: { value: 1, desc: 'Coulomb' }, // 쿨롬
     mAh: { value: 3.6, desc: 'Milliampere-hour' }, // 밀리암페어시
+    Ah: { value: 3600, desc: 'Ampere-hour' }, // 암페어시
     e: { value: 1.602176634e-19, desc: 'Elementary Charge' }, // 원자 전하
   },
 };
