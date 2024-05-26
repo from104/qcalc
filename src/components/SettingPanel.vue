@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { onMounted, onBeforeMount, reactive, watch,  onBeforeUnmount, computed } from 'vue';
+import { onMounted, onBeforeMount, reactive, watch,  onBeforeUnmount, computed, ref } from 'vue';
 import { useQuasar } from 'quasar';
 import { useI18n } from 'vue-i18n';
 
@@ -20,6 +20,8 @@ const $q = useQuasar();
 const { locale } = useI18n({ useScope: 'global' });
 const { t } = useI18n();
 
+const systemLocale = ref(navigator.language.substring(0, 2));
+
 const localeOptions = reactive([
   { value: 'ko', label: t('message.ko') },
   { value: 'en', label: t('message.en') },
@@ -34,7 +36,7 @@ watch([() => store.useSystemLocale, () => store.userLocale], () => {
 
 const setLocale = () => {
   if (store.useSystemLocale) {
-    locale.value = navigator.language;
+    locale.value = systemLocale.value;
   } else {
     locale.value = store.userLocale;
   }
@@ -84,11 +86,11 @@ onBeforeMount(() => {
 
   if (store.locale == '') {
     // 처음 실행시
-    store.locale = navigator.language;
+    store.locale = systemLocale.value;
   }
   if (store.userLocale == '') {
     // 처음 실행시
-    store.userLocale = navigator.language;
+    store.userLocale = systemLocale.value;
   }
 });
 
