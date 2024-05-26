@@ -163,12 +163,12 @@ en:
   );
 }
 .bg-btn-important {
-  background: #D35400 !important;
+  background: #cb9247 !important; // 아이콘의 밝은 녹색
 }
 .bg-btn-function {
-  background: #29709f !important;
+  background: #1d8fb6 !important; // 아이콘의 밝은 파란색과 어울리게 조정
 }
 .bg-btn-normal {
-  background: #5f5f5f !important;
+  background: #5e9e7d !important; // 어두운 색
 }
 </style>
