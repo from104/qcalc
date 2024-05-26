@@ -271,14 +271,14 @@ const filterFnTo = createFilterFn(toFilteredCurrencyOptions, toCurrencyOptions);
           <q-item-section>
             <q-item-label caption>{{ descOfCurrency[scope.opt.label] }}</q-item-label>
             <q-item-label>
-              {{ `${scope.opt.label}, ${currencyConverter.getRate(scope.opt.label)}` }}
+              {{ `${scope.opt.label}, ${currencyConverter.getRate(scope.opt.label).toFixed(4)}` }}
             </q-item-label>
           </q-item-section>
         </q-item>
       </template>
       <MyTooltip>
         <div class="text-left" style="white-space: pre-wrap;">
-          {{ `${descOfCurrency[store.recentCurrencyTo]}\n${store.recentCurrencyTo}, ${currencyConverter.getRate(store.recentCurrencyTo)}` }}
+          {{ `${descOfCurrency[store.recentCurrencyTo]}\n${store.recentCurrencyTo}, ${currencyConverter.getRate(store.recentCurrencyTo).toFixed(4)}` }}
         </div>
       </MyTooltip>
     </q-select>
