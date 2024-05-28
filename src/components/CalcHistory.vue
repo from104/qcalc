@@ -209,10 +209,10 @@ onBeforeUnmount(() => {
         align="center"
         class="text-negative bg-white"
       >
-        <q-btn flat :label="t('no')" v-close-popup />
+        <q-btn flat :label="t('message.no')" v-close-popup />
         <q-btn
           flat
-          :label="t('yes')"
+          :label="t('message.yes')"
           @click="calc.clearHistory()"
           autofocus
           v-close-popup

@@ -4,10 +4,15 @@
 node_modules
 package
 .envrc
+.env
 
 # Quasar core related directories
 .quasar
 /dist
+/quasar.config.*.temporary.compiled*
+
+# local .env files
+.env.local*
 
 # Cordova related directories and files
 /src-cordova/node_modules
@@ -18,6 +23,8 @@ package
 # Capacitor related directories and files
 /src-capacitor/www
 /src-capacitor/node_modules
+/src-capacitor/android/app/release
+/src-capacitor/android/app/build
 
 # BEX related directories and files
 /src-bex/www

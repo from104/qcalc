@@ -15,7 +15,8 @@
  *     doAThing: () => {}
  *   })
  */
-import { contextBridge, ipcRenderer } from 'electron';
+import { contextBridge } from 'electron';
+import { ipcRenderer } from 'electron/renderer';
 
 contextBridge.exposeInMainWorld('myAPI', {
   setAlwaysOnTop: (alwaysOnTop: boolean) => {

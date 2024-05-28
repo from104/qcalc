@@ -8,11 +8,12 @@
 // Configuration for your app
 // https://v2.quasar.dev/quasar-cli-vite/quasar-config-js
 
-const { configure } = require('quasar/wrappers');
+import { configure } from 'quasar/wrappers';
 
-const path = require('path');
+import path from 'path';
+import dotenv from 'dotenv';
 
-module.exports = configure(function (/* ctx */) {
+export default configure(function (/* ctx */) {
   return {
     eslint: {
       // fix: true,s
@@ -29,10 +30,7 @@ module.exports = configure(function (/* ctx */) {
     // app boot file (/src/boot)
     // --> boot files are part of "main.js"
     // https://v2.quasar.dev/quasar-cli-vite/boot-files
-    boot: [
-      'i18n',
-      'blur',
-    ],
+    boot: ['i18n', 'blur', 'backButton'],
 
     // https://v2.quasar.dev/quasar-cli-vite/quasar-config-js#css
     css: ['app.scss'],
@@ -53,16 +51,19 @@ module.exports = configure(function (/* ctx */) {
 
     // Full list of options: https://v2.quasar.dev/quasar-cli-vite/quasar-config-js#build
     build: {
+      // .env 파일 사용
+      env: dotenv.config().parsed,
       // import folder alias
       alias: {
         classes: [__dirname, 'src/classes'].join('/'),
+        capacitor: [__dirname, 'src-capacitor/node_modules'].join('/'),
       },
       target: {
         browser: ['es2019', 'edge88', 'firefox78', 'chrome87', 'safari13.1'],
         node: 'node16',
       },
 
-      vueRouterMode: 'hash', // available values: 'hash', 'history'
+      vueRouterMode: 'history', // available values: 'hash', 'history'
       // vueRouterBase,
       // vueDevtools,
       // vueOptionsAPI: false,
@@ -95,6 +96,17 @@ module.exports = configure(function (/* ctx */) {
             defaultSFCLang: 'yml',
           },
         ],
+        [
+          'vite-plugin-checker', 
+          {
+            vueTsc: {
+              tsconfigPath: 'tsconfig.vue-tsc.json'
+            },
+            eslint: {
+              lintCommand: 'eslint "./**/*.{js,ts,mjs,cjs,vue}"'
+            }
+          }, { server: false }
+        ],
       ],
     },
 
@@ -123,10 +135,7 @@ module.exports = configure(function (/* ctx */) {
       // directives: [],
 
       // Quasar plugins
-      plugins: [
-        'Notify',
-        'Meta',
-      ],
+      plugins: ['Notify', 'Meta'],
     },
 
     // animations: 'all', // --- includes all animations
@@ -189,6 +198,11 @@ module.exports = configure(function (/* ctx */) {
       hideSplashscreen: true,
     },
 
+    sourceFiles: {
+      electronMain: 'src-electron/electron-main',
+      electronPreload: 'src-electron/electron-preload',
+    },
+
     // Full list of options: https://v2.quasar.dev/quasar-cli-vite/developing-electron-apps/configuring-electron
     electron: {
       // extendElectronMainConf (esbuildConf)
@@ -218,8 +232,7 @@ module.exports = configure(function (/* ctx */) {
 
     // Full list of options: https://v2.quasar.dev/quasar-cli-vite/developing-browser-extensions/configuring-bex
     bex: {
-      contentScripts: ['my-content-script'],
-
+      // contentScripts: ['my-content-script'],
       // extendBexScriptsConf (esbuildConf) {}
       // extendBexManifestJson (json) {}
     },

@@ -51,6 +51,8 @@ export const useCalcStore = defineStore('calc', {
     showSymbol: true,
     // 패널 숫자 위 여백
     paddingOnResult: 20,
+    // 초기 화면 경로
+    initialPath: '/calc',
   }),
   getters: {},
   actions: {
@@ -136,19 +138,47 @@ export const useCalcStore = defineStore('calc', {
       return this.toFormattedNumber(h.resultNumber);
     },
     // 알림을 띄우는 함수 - 메시지
-    notifyMsg(msg: string, timeout = 500) {
+    notifyMsg(
+      msg: string,
+      timeout = 500,
+      position:
+        | 'top'
+        | 'top-left'
+        | 'top-right'
+        | 'bottom-left'
+        | 'bottom-right'
+        | 'bottom'
+        | 'left'
+        | 'right'
+        | 'center'
+        | undefined = 'top',
+    ): void {
       Notify.create({
         message: msg,
-        position: 'top',
+        position: position,
         timeout: timeout,
         color: 'positive',
       });
     },
     // 알림을 띄우는 함수 - 에러
-    notifyError(msg: string, timeout = 500): void {
+    notifyError(
+      msg: string,
+      timeout = 500,
+      position:
+        | 'top'
+        | 'top-left'
+        | 'top-right'
+        | 'bottom-left'
+        | 'bottom-right'
+        | 'bottom'
+        | 'left'
+        | 'right'
+        | 'center'
+        | undefined = 'top',
+    ): void {
       Notify.create({
         message: msg,
-        position: 'top',
+        position: position,
         timeout: timeout,
         color: 'negative',
       });
@@ -187,12 +217,12 @@ export const useCalcStore = defineStore('calc', {
       if (!UnitConverter.categories.includes(this.recentCategory)) {
         this.recentCategory = UnitConverter.categories[0];
       }
-    
+
       // 단위 초기화
       if (!UnitConverter.getUnitLists(this.recentCategory).includes(this.recentUnitFrom[this.recentCategory])) {
         this.recentUnitFrom[this.recentCategory] = UnitConverter.getUnitLists(this.recentCategory)[0];
       }
-    
+
       if (!UnitConverter.getUnitLists(this.recentCategory).includes(this.recentUnitTo[this.recentCategory])) {
         this.recentUnitTo[this.recentCategory] = UnitConverter.getUnitLists(this.recentCategory)[0];
         if (this.recentUnitTo[this.recentCategory] == this.recentUnitFrom[this.recentCategory]) {
@@ -218,6 +248,15 @@ export const useCalcStore = defineStore('calc', {
         if (this.recentCurrencyTo === this.recentCurrencyFrom) {
           this.recentCurrencyTo = defaultCurrency[0];
         }
+      }
+    },
+    // 시작 경로 설정
+    setInitialPath(path: string): void {
+      // 계산기, 단위 변환기, 통화 변환기 중 하나인 경우에만 설정
+      if (['/calc', '/unit', '/currency'].includes(path)) {
+        this.initialPath = path;
+      } else if (path === '' || this.initialPath === '') {
+        this.initialPath = '/calc';
       }
     },
   },

@@ -4,7 +4,7 @@
 
 ## 스크린샷
 
-![Screenshot](https://github.com/from104/qcalc/raw/main/assets/screenshot_v0.7.2.png)
+![Screenshot](https://github.com/from104/qcalc/raw/main/assets/screenshot_v0.8.0-ko.png)
 
 ## 특징
 
@@ -15,6 +15,7 @@
 - 계산 결과 기록 (최대 20개)
 - 다크 모드
 - 영어, 한국어 지원
+- 데스크탑, 모바일 대응 (electron, capacitor, etc...)
 
 ## 바로가기 키
 
@@ -92,10 +93,14 @@ yarn install
 
 ```bash
 quasar dev -m electron
+또는
+quasar dev -m capacitor -T {android|ios}
 ```
 
 ### 설치 패키지 빌드 [윈도우]
 
 ```bash
 quasar build -m electron [-T win32]
+또는
+quasar build -m capacitor -T {android|ios}
 ```

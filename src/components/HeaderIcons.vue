@@ -1,12 +1,17 @@
 <script setup lang="ts">
 import { onMounted } from 'vue';
-import { copyToClipboard } from 'quasar';
 import { useI18n } from 'vue-i18n';
+import { copyToClipboard } from 'quasar';
+import { useQuasar } from 'quasar';
 
 import { useCalcStore } from 'stores/calc-store';
-
+import { KeyBinding } from 'classes/KeyBinding';
 import MyTooltip from 'components/MyTooltip.vue';
 
+// Quasar의 $q 객체를 사용하기 위한 변수 선언
+const $q = useQuasar();
+
+// i18n을 사용하기 위한 변수 선언
 const { t } = useI18n();
 
 // 스토어 가져오기
@@ -17,7 +22,7 @@ const { calc } = store;
 
 // 창에서 선택한 내용이 있으면 선택한 내용을 클립보드에 복사하고
 // 아니면 계산 결과를 클립보드에 복사한다.
-const doCopy = (): void => {
+const doCopy = async (): Promise<void> => {
   // 계산 결과에 있는 내용을 가져온다.
   const resultText = document.getElementById('result')?.textContent ?? '';
   // 선택한 내용을 가져온다.
@@ -30,32 +35,41 @@ const doCopy = (): void => {
     selectedText == ''
       ? t('targetToBeCopiedResult')
       : t('targetToBeCopiedSelected');
+
   // 클립보드에 복사한다.
-  copyToClipboard(textToClipboard)
-    .then(() => {
-      store.notifyMsg(t('copiedToClipboard', { target: targetToBeCopied }));
-    })
-    .catch(() => {
-      store.notifyError(
-        t('failedToCopyToClipboard', { target: targetToBeCopied })
-      );
-    });
+  try {
+    await copyToClipboard(textToClipboard);
+    store.notifyMsg(t('copiedToClipboard', { target: targetToBeCopied }));
+  } catch (error) {
+    console.error(error); // 에러 메시지를 콘솔에 출력
+    store.notifyError(t('failedToCopyToClipboard', { target: targetToBeCopied }));
+  }
 }
 
-// 클립보드에 있는 숫자를 계산 결과에 추가하는 함수
-const doPaste = (): void => {
-  navigator.clipboard
-    .readText()
-    .then((text) => {
-      calc.setCurrentNumber(text);
-      store.notifyMsg(t('pastedFromClipboard'));
-    })
-    .catch(() => {
-      store.notifyError(t('failedToPasteFromClipboard'));
-    });
-}
+const doPaste = async (): Promise<void> => {
+  let text = '';
+  try {
+    if ($q.platform.is.capacitor) { // Capacitor 플랫폼인 경우
+      // WebAppInterface를 통해 클립보드에서 텍스트를 가져옵니다.
+      text = await AndroidInterface.getFromClipboard();
+    } else {
+      // navigator.clipboard를 통해 클립보드에서 텍스트를 가져옵니다.
+      text = await navigator.clipboard.readText();
+    }
 
-import { KeyBinding } from 'classes/KeyBinding';
+    // 가져온 텍스트를 calc 객체의 현재 숫자로 설정합니다.
+    calc.setCurrentNumber(text);
+
+    // 알림 스토어를 통해 사용자에게 클립보드에서 성공적으로 붙여넣었다는 메시지를 보냅니다.
+    store.notifyMsg(t('pastedFromClipboard'));
+  } catch (error) {
+    // 에러가 발생한 경우, 콘솔에 에러 메시지를 출력합니다.
+    console.error(error);
+
+    // 사용자에게 클립보드 붙여넣기 실패를 알립니다.
+    store.notifyError(t('failedToPasteFromClipboard'));
+  }
+}
 
 const keyBinding = new KeyBinding([
   [['Control+c', 'Control+Insert', 'Copy'], () => store.clickButtonById('btn-copy')],

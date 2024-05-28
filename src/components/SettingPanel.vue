@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { onMounted, onBeforeMount, reactive, watch,  onBeforeUnmount, computed } from 'vue';
+import { onMounted, onBeforeMount, reactive, watch,  onBeforeUnmount, computed, ref } from 'vue';
 import { useQuasar } from 'quasar';
 import { useI18n } from 'vue-i18n';
 
@@ -15,34 +15,35 @@ const urlInside = computed(() => route.fullPath.split('/').pop());
 
 const store = useCalcStore();
 
-const q = useQuasar();
+const $q = useQuasar();
 
 const { locale } = useI18n({ useScope: 'global' });
 const { t } = useI18n();
 
+const systemLocale = ref(navigator.language.substring(0, 2));
+
 const localeOptions = reactive([
-  { value: 'ko', label: t('ko') },
-  { value: 'en', label: t('en') },
+  { value: 'ko', label: t('message.ko') },
+  { value: 'en', label: t('message.en') },
 ]);
 
 watch([() => store.useSystemLocale, () => store.userLocale], () => {
   localeOptions.forEach((option) => {
-    option.label = t(option.value);
+    option.label = t('message.'+option.value);
   });
   store.locale = locale.value as string;
 });
 
 const setLocale = () => {
   if (store.useSystemLocale) {
-    // store.userLocale = locale.value as string;
-    locale.value = navigator.language;
+    locale.value = systemLocale.value;
   } else {
     locale.value = store.userLocale;
   }
 };
 
 const toggleAlwaysOnTopWithNotify = () => {
-  if (q.platform.is.electron) {
+  if ($q.platform.is.electron) {
     // 수동으로 토글
     store.toggleAlwaysOnTop();
 
@@ -85,11 +86,11 @@ onBeforeMount(() => {
 
   if (store.locale == '') {
     // 처음 실행시
-    store.locale = navigator.language;
+    store.locale = systemLocale.value;
   }
   if (store.userLocale == '') {
     // 처음 실행시
-    store.userLocale = navigator.language;
+    store.userLocale = systemLocale.value;
   }
 });
 
@@ -106,7 +107,7 @@ onBeforeUnmount(() => {
 <template>
   <q-list v-blur dense>
     <q-item-label class="q-mt-xl text-h5" header
-      >{{ t('settings') }} (E)</q-item-label
+      >{{ t('message.settings') }} (E)</q-item-label
     >
     <q-item class="q-py-none" v-if="$q.platform.is.electron">
       <q-item-label class="self-center"
@@ -121,7 +122,7 @@ onBeforeUnmount(() => {
       />
     </q-item>
 
-    <q-item class="q-py-none" v-if="$q.platform.is.electron">
+    <q-item class="q-py-none">
       <q-item-label class="self-center">{{ t('initPanel') }} (N)</q-item-label>
       <q-space />
       <q-toggle

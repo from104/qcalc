@@ -131,13 +131,13 @@ if (props.type === 'unit' || props.type === 'currency') {
 </template>
 
 <i18n>
-  ko:
-    cannotDivideByZero: '0으로 나눌 수 없습니다.'
-    squareRootOfANegativeNumberIsNotAllowed: '음수의 제곱근은 허용되지 않습니다.'
-  en:
-    cannotDivideByZero: 'Cannot divide by zero'
-    squareRootOfANegativeNumberIsNotAllowed: 'The square root of a negative number is not allowed.'
-  </i18n>
+ko:
+  cannotDivideByZero: '0으로 나눌 수 없습니다.'
+  squareRootOfANegativeNumberIsNotAllowed: '음수의 제곱근은 허용되지 않습니다.'
+en:
+  cannotDivideByZero: 'Cannot divide by zero'
+  squareRootOfANegativeNumberIsNotAllowed: 'The square root of a negative number is not allowed.'
+</i18n>
 
 <style scoped lang="scss">
 .button {
@@ -163,12 +163,12 @@ if (props.type === 'unit' || props.type === 'currency') {
   );
 }
 .bg-btn-important {
-  background: #D35400 !important;
+  background: #cb9247 !important; // 아이콘의 밝은 녹색
 }
 .bg-btn-function {
-  background: #29709f !important;
+  background: #1d8fb6 !important; // 아이콘의 밝은 파란색과 어울리게 조정
 }
 .bg-btn-normal {
-  background: #5f5f5f !important;
+  background: #5e9e7d !important; // 어두운 색
 }
 </style>

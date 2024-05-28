@@ -1,4 +1,4 @@
-require("@rushstack/eslint-patch/modern-module-resolution")
+require('@rushstack/eslint-patch/modern-module-resolution')
 
 module.exports = {
   // https://eslint.org/docs/user-guide/configuring#configuration-cascading-and-hierarchy
@@ -6,7 +6,7 @@ module.exports = {
   // Remove this if you have an higher level ESLint config file (it usually happens into a monorepos)
   root: true,
 
-  "parser": "vue-eslint-parser",
+  'parser': 'vue-eslint-parser',
   // https://eslint.vuejs.org/user-guide/#how-to-use-a-custom-parser
   // Must use parserOptions instead of "parser" to allow vue-eslint-parser to keep working
   // `parser: 'vue-eslint-parser'` is already included with any 'plugin:vue/**' config and should be omitted
@@ -30,13 +30,14 @@ module.exports = {
     // https://github.com/typescript-eslint/typescript-eslint/tree/master/packages/eslint-plugin#usage
     // ESLint typescript rules
     'plugin:@typescript-eslint/recommended',
+    // "@vue/typescript/recommended",
 
     // Uncomment any of the lines below to choose desired strictness,
     // but leave only one uncommented!
     // See https://eslint.vuejs.org/rules/#available-rules
-    'plugin:vue/vue3-essential', // Priority A: Essential (Error Prevention)
+    // 'plugin:vue/vue3-essential', // Priority A: Essential (Error Prevention)
     // 'plugin:vue/vue3-strongly-recommended', // Priority B: Strongly Recommended (Improving Readability)
-    // 'plugin:vue/vue3-recommended', // Priority C: Recommended (Minimizing Arbitrary Choices and Cognitive Overhead)
+    'plugin:vue/vue3-recommended', // Priority C: Recommended (Minimizing Arbitrary Choices and Cognitive Overhead)
 
     // https://github.com/prettier/eslint-config-prettier#installation
     // usage with Prettier, provided by 'eslint-config-prettier'.
@@ -84,6 +85,8 @@ module.exports = {
     // in plain CommonJS modules, you can't use `import foo = require('foo')` to pass this rule, so it has to be disabled
     '@typescript-eslint/no-var-requires': 'off',
 
+    '@typescript-eslint/no-unused-vars': 'warn',
+
     // The core 'no-unused-vars' rules (in the eslint:recommended ruleset)
     // does not work with type definitions
     'no-unused-vars': 'off',
@@ -91,10 +94,10 @@ module.exports = {
     // allow debugger during development only
     'no-debugger': process.env.NODE_ENV === 'production' ? 'error' : 'off'
   },
-  "settings": {
-    "import/resolver": {
-      "node": {
-        "extensions": [".js", ".jsx", ".ts", ".tsx"],
+  'settings': {
+    'import/resolver': {
+      'node': {
+        'extensions': ['.js', '.jsx', 'e.ts', '.tsx'],
       }
     }
   }
