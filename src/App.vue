@@ -6,7 +6,6 @@ import { useMeta, useQuasar } from 'quasar';
 import { ref, watch, onBeforeMount } from 'vue';
 
 import { useCalcStore } from 'stores/calc-store';
-import { c, s } from 'vite/dist/node/types.d-aGj9QkWt';
 
 const router = useRouter();
 
