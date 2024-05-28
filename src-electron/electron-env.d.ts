@@ -1,6 +1,6 @@
 /* eslint-disable */
 
-declare module NodeJS {
+declare namespace NodeJS {
   interface ProcessEnv {
       QUASAR_PUBLIC_FOLDER: string;
       QUASAR_ELECTRON_PRELOAD_FOLDER: string;

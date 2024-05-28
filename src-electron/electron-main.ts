@@ -54,8 +54,13 @@ async function createWindow() {
     mainWindowState.manage(mainWindow);
 
     mainWindow.removeMenu();
-    mainWindow.loadURL(process.env.APP_URL);
-
+    
+    if (process.env.DEV) {
+      mainWindow.loadURL(process.env.APP_URL)
+    } else {
+      mainWindow.loadFile('index.html')
+    }
+  
     if (process.env.DEBUGGING) {
       // if on DEV or Production with debug enabled
       mainWindow.webContents.openDevTools();
