@@ -1,4 +1,4 @@
-require("@rushstack/eslint-patch/modern-module-resolution")
+require('@rushstack/eslint-patch/modern-module-resolution')
 
 module.exports = {
   // https://eslint.org/docs/user-guide/configuring#configuration-cascading-and-hierarchy
@@ -6,7 +6,7 @@ module.exports = {
   // Remove this if you have an higher level ESLint config file (it usually happens into a monorepos)
   root: true,
 
-  "parser": "vue-eslint-parser",
+  'parser': 'vue-eslint-parser',
   // https://eslint.vuejs.org/user-guide/#how-to-use-a-custom-parser
   // Must use parserOptions instead of "parser" to allow vue-eslint-parser to keep working
   // `parser: 'vue-eslint-parser'` is already included with any 'plugin:vue/**' config and should be omitted
@@ -30,7 +30,7 @@ module.exports = {
     // https://github.com/typescript-eslint/typescript-eslint/tree/master/packages/eslint-plugin#usage
     // ESLint typescript rules
     'plugin:@typescript-eslint/recommended',
-    "@vue/typescript/recommended",
+    // "@vue/typescript/recommended",
 
     // Uncomment any of the lines below to choose desired strictness,
     // but leave only one uncommented!
@@ -94,10 +94,10 @@ module.exports = {
     // allow debugger during development only
     'no-debugger': process.env.NODE_ENV === 'production' ? 'error' : 'off'
   },
-  "settings": {
-    "import/resolver": {
-      "node": {
-        "extensions": [".js", ".jsx", ".ts", ".tsx"],
+  'settings': {
+    'import/resolver': {
+      'node': {
+        'extensions': ['.js', '.jsx', 'e.ts', '.tsx'],
       }
     }
   }
