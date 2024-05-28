@@ -4,7 +4,7 @@
 
 ## 스크린샷
 
-![Screenshot](https://github.com/from104/qcalc/raw/main/assets/screenshot_v0.7.2.png)
+![Screenshot](https://github.com/from104/qcalc/raw/main/assets/screenshot_v0.8.0-ko.png)
 
 ## 특징
 
