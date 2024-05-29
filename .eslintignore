@@ -1,4 +1,5 @@
 /dist
 /.quasar
 /node_modules
+/src-capacitor
 /quasar.config.*.temporary.compiled*
