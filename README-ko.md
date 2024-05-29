@@ -73,7 +73,8 @@
 
 - 릴리즈 페이지에서 해당 플랫폼에 맞는 파일을 받아서 설치하면 됩니다.
 - 리눅스는 appimage파일을 단독으로 쓰거나 snap파일을 --dangerous 옵션을 사용하여 설치하세요.
-- 맥OS는 사용하지 않고 테스트할 방법이 없어서 패키지가 없습니다.
+- 안드로이드는 해당 apk를 받아 설치하세요. 곧 플레이스토어에 올라갑니다.
+- 맥OS, IOS는 사용하지 않고 테스트할 방법이 없어서 패키지가 없습니다.
 
 ## 앱 테스트 및 빌드 방법
 
@@ -94,13 +95,13 @@ yarn install
 ```bash
 quasar dev -m electron
 또는
-quasar dev -m capacitor -T {android|ios}
+quasar dev -m capacitor -T android
 ```
 
 ### 설치 패키지 빌드 [윈도우]
 
 ```bash
-quasar build -m electron [-T win32]
-또는
-quasar build -m capacitor -T {android|ios}
+quasar build -m electron -T {linux|win32}
+or
+quasar build -m capacitor -T android
 ```

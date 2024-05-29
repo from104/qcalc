@@ -73,7 +73,8 @@ This is a simple calculator made using the source of the calculator for Android 
 
 - Just download the appropriate file for the platform from the release page and install it.
 - For Linux, use the appimage file alone or install the snap file using the --dangerous option.
-- MacOS does not have a package because there is no way to test it without using it.
+- For Android, get the APK and install it, it should be on the Play Store soon.
+- MacOS, IOS don't have a package because I don't use it and have no way to test it.
 
 ## How to test and build your app
 
@@ -94,13 +95,13 @@ yarn install
 ```bash
 quasar dev -m electron
 or
-quasar dev -m capacitor -T {android|ios}
+quasar dev -m capacitor -T android
 ```
 
 ### Build the installation package [Windows]
 
 ```bash
-quasar build -m electron [-T win32]
+quasar build -m electron -T {linux|win32}
 or
-quasar build -m capacitor -T {android|ios}
+quasar build -m capacitor -T android
 ```
