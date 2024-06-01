@@ -91,7 +91,7 @@ onMounted(() => {
       overlay
       show-if-above
     >
-      <MenuPanel @updateTitle="updateTitle"/>
+      <MenuPanel @update-title="updateTitle"/>
     </q-drawer>
 
     <q-drawer
