@@ -13,13 +13,12 @@ const store = useCalcStore();
 const { t } = useI18n();
 
 const leftDrawerOpen = ref(false);
+const rightDrawerOpen = ref(false);
 
 const toggleLeftDrawer = () => {
   leftDrawerOpen.value = !leftDrawerOpen.value;
   rightDrawerOpen.value = false;
 };
-
-const rightDrawerOpen = ref(false);
 
 const toggleRightDrawer = () => {
   rightDrawerOpen.value = !rightDrawerOpen.value;
@@ -28,8 +27,8 @@ const toggleRightDrawer = () => {
 
 const title = ref('');
 
-const updateTitle = (t: string) => {
-  title.value = t;
+const updateTitle = (newTitle: string) => {
+  title.value = newTitle;
 };
 
 import { KeyBinding } from 'classes/KeyBinding';
