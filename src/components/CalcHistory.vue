@@ -124,9 +124,9 @@ onBeforeUnmount(() => {
     transition-duration="300"
   >
     <q-bar
+      v-blur
       dark
       class="full-width noselect text-white bg-primary"
-      v-blur
     >
       <q-icon name="history" size="sm" />
       <div>{{ t('history') }}</div>
@@ -144,19 +144,19 @@ onBeforeUnmount(() => {
     </q-bar>
 
     <q-card
-      @scroll="onScroll"
+      id="history"
       square
       class="full-width row justify-center items-start relative-position scrollbar-custom"
-      id="history"
+      @scroll="onScroll"
     >
       <transition name="slide-fade">
         <q-btn
+          v-if="isGoToTopInHistory"
           round
           glossy
           color="secondary"
           icon="publish"
           class="fixed q-ma-md"
-          v-if="isGoToTopInHistory"
           style="z-index: 12"
           @click="goToTopInHistory"
         />
@@ -209,13 +209,13 @@ onBeforeUnmount(() => {
         align="center"
         class="text-negative bg-white"
       >
-        <q-btn flat :label="t('message.no')" v-close-popup />
+        <q-btn v-close-popup flat :label="t('message.no')" />
         <q-btn
+          v-close-popup
           flat
           :label="t('message.yes')"
-          @click="calc.clearHistory()"
           autofocus
-          v-close-popup
+          @click="calc.clearHistory()"
         />
       </q-card-actions>
     </q-card>
