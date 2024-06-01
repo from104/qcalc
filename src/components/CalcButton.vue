@@ -107,13 +107,13 @@ if (props.type === 'unit' || props.type === 'currency') {
 
 <template>
   <q-card-section
-    class="row wrap justify-center q-pt-xs q-pb-none q-px-none"
     v-blur
+    class="row wrap justify-center q-pt-xs q-pb-none q-px-none"
   >
     <div
-      class="col-3 row wrap justify-center q-pa-sm"
       v-for="(button, index) in buttons"
       :key="index"
+      class="col-3 row wrap justify-center q-pa-sm"
     >
       <q-btn
         :id="'btn-'+button[0]"
