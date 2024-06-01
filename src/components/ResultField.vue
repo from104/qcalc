@@ -188,17 +188,17 @@ onMounted(() => {
       :label-slot="isMainField"
       :stack-label="isMainField"
     >
-      <template v-if="isMainField" v-slot:label>
-        <div id="preResult" class="text-black noselect" v-blur>
+      <template v-if="isMainField" #label>
+        <div id="preResult" v-blur class="text-black noselect">
           {{ preResult }}
         </div>
       </template>
-      <template v-slot:prepend v-if="isMainField && operator != ''">
-        <div class="text-black noselect full-height q-mt-xs q-pt-sm" v-blur>
+      <template v-if="isMainField && operator != ''" #prepend>
+        <div v-blur class="text-black noselect full-height q-mt-xs q-pt-sm">
           <q-icon :name="operatorIcons[operator]" />
         </div>
       </template>
-      <template v-slot:control>
+      <template #control>
         <div
           :id="fieldID"
           v-mutation="setNeedFieldTooltip"
