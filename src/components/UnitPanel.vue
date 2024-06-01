@@ -105,7 +105,7 @@ watch(
 </script>
 
 <template>
-  <q-card-section class="row q-px-sm q-pt-none q-pb-sm" v-blur>
+  <q-card-section v-blur class="row q-px-sm q-pt-none q-pb-sm">
     <!-- 카테고리 -->
     <q-select
       v-model=" store.recentCategory "
@@ -142,8 +142,8 @@ watch(
       :options-selected-class="!store.darkMode ? 'text-primary' : 'text-grey-1'"
       :label-color="!store.darkMode ? 'primary' : 'grey-1'"
     >
-      <template v-slot:option=" scope ">
-        <q-item v-bind=" scope.itemProps ">
+      <template #option="scope">
+        <q-item v-bind="scope.itemProps">
           <q-item-section>
             <q-item-label caption>
               {{ t( `unitDesc.${ store.recentCategory }.${ scope.opt.label }` ) }}
@@ -187,7 +187,7 @@ watch(
       :options-selected-class="!store.darkMode ? 'text-primary' : 'text-grey-1'"
       :label-color="!store.darkMode ? 'primary' : 'grey-1'"
     >
-      <template v-slot:option=" scope ">
+      <template #option=" scope ">
         <q-item v-bind=" scope.itemProps ">
           <q-item-section>
             <q-item-label caption>
