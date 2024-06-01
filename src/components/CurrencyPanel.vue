@@ -201,18 +201,18 @@ const filterFnTo = createFilterFn(toFilteredCurrencyOptions, toCurrencyOptions);
       use-input
       fill-input
       hide-selected
+      :label-color="!store.darkMode ? 'primary' : 'grey-1'"
+      :options-selected-class="!store.darkMode ? 'text-primary' : 'text-grey-1'"
+      class="col-4 q-pl-sm shadow-2"
+      :popup-content-class="!store.darkMode ? 'bg-blue-grey-2' : 'bg-blue-grey-6'"
+      :class="!store.darkMode ? 'bg-blue-grey-2' : 'bg-blue-grey-6' "
       @filter="filterFnFrom"
-      @keyup.enter="store.blurElement"
-      @update:model-value="store.blurElement"
       @focus="store.setInputFocused"
       @blur="store.setInputBlurred"
-      class="col-4 q-pl-sm shadow-2"
-      :class="!store.darkMode ? 'bg-blue-grey-2' : 'bg-blue-grey-6' "
-      :popup-content-class="!store.darkMode ? 'bg-blue-grey-2' : 'bg-blue-grey-6'"
-      :options-selected-class="!store.darkMode ? 'text-primary' : 'text-grey-1'"
-      :label-color="!store.darkMode ? 'primary' : 'grey-1'"
+      @keyup.enter="store.blurElement"
+      @update:model-value="store.blurElement"
     >
-      <template v-slot:option="scope">
+      <template #option="scope">
         <q-item v-bind="scope.itemProps">
           <q-item-section>
             <q-item-label caption>{{ descOfCurrency[scope.opt.label] }}</q-item-label>
@@ -255,18 +255,18 @@ const filterFnTo = createFilterFn(toFilteredCurrencyOptions, toCurrencyOptions);
       use-input
       fill-input
       hide-selected
+      :label-color="!store.darkMode ? 'primary' : 'grey-1'"
+      :class="!store.darkMode ? 'bg-blue-grey-2' : 'bg-blue-grey-6'"
+      :popup-content-class="!store.darkMode ? 'bg-blue-grey-2' : 'bg-blue-grey-6'"
+      class="col-4 q-pl-sm shadow-2"
+      :options-selected-class="!store.darkMode ? 'text-primary' : 'text-grey-1'"
       @filter="filterFnTo"
       @keyup.enter="store.blurElement"
       @update:model-value="store.blurElement"
       @focus="store.setInputFocused"
       @blur="store.setInputBlurred"
-      class="col-4 q-pl-sm shadow-2"
-      :class="!store.darkMode ? 'bg-blue-grey-2' : 'bg-blue-grey-6'"
-      :popup-content-class="!store.darkMode ? 'bg-blue-grey-2' : 'bg-blue-grey-6'"
-      :options-selected-class="!store.darkMode ? 'text-primary' : 'text-grey-1'"
-      :label-color="!store.darkMode ? 'primary' : 'grey-1'"
     >
-      <template v-slot:option="scope">
+      <template #option="scope">
         <q-item v-bind="scope.itemProps">
           <q-item-section>
             <q-item-label caption>{{ descOfCurrency[scope.opt.label] }}</q-item-label>
