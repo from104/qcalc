@@ -109,16 +109,16 @@ onBeforeUnmount(() => {
     <q-item-label class="q-mt-xl text-h5" header
       >{{ t('message.settings') }} (E)</q-item-label
     >
-    <q-item class="q-py-none" v-if="$q.platform.is.electron">
+    <q-item v-if="$q.platform.is.electron" class="q-py-none">
       <q-item-label class="self-center"
         >{{ t('alwaysOnTop') }} (T)</q-item-label
       >
       <q-space />
       <q-toggle
         v-model="store.alwaysOnTop"
-        @click="store.setAlwaysOnTop(store.alwaysOnTop)"
         keep-color
         dense
+        @click="store.setAlwaysOnTop(store.alwaysOnTop)"
       />
     </q-item>
 
@@ -127,9 +127,9 @@ onBeforeUnmount(() => {
       <q-space />
       <q-toggle
         v-model="store.initPanel"
-        @click="store.setInitPanel(store.initPanel)"
         keep-color
         dense
+        @click="store.setInitPanel(store.initPanel)"
       />
     </q-item>
 
@@ -138,9 +138,9 @@ onBeforeUnmount(() => {
       <q-space />
       <q-toggle
         v-model="store.darkMode"
-        @click="store.setDarkMode(store.darkMode)"
         keep-color
         dense
+        @click="store.setDarkMode(store.darkMode)"
       />
     </q-item>
 
@@ -178,10 +178,10 @@ onBeforeUnmount(() => {
         :max="6"
         marker-labels
         class="col-5 q-pr-sm"
-        @change="store.setDecimalPlaces(store.decimalPlaces)"
         dense
+        @change="store.setDecimalPlaces(store.decimalPlaces)"
       >
-        <template v-slot:marker-label-group="{ markerList }">
+        <template #marker-label-group="{ markerList }">
           <div
             class="cursor-pointer"
             :class=" ( markerList[ 0 ] as any ).classes "
@@ -254,8 +254,8 @@ onBeforeUnmount(() => {
       <q-item-label class="self-center"> {{ t('language') }} </q-item-label>
       <q-space />
       <q-select
-        :disable="store.useSystemLocale"
         v-model="store.userLocale"
+        :disable="store.useSystemLocale"
         :options="localeOptions"
         dense
         emit-value
