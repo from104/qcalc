@@ -54,21 +54,34 @@ watch(
 onMounted(() => {
   keyBinding.subscribe();
 });
+
+const cTab = ref(store.initialPath.slice(1));
+const tabs = [
+  { name: 'calc', title: t('calc'), to: '/calc' },
+  { name: 'unit', title: t('unit'), to: '/unit' },
+  { name: 'currency', title: t('currency'), to: '/currency' },
+];
 </script>
 
 <template>
-  <q-layout view="hHh lpr fff">
+  <q-layout view="hHh lpR fFf">
     <q-header class="z-top noselect" elevated>
       <q-toolbar v-blur>
-        <q-btn
-          flat
+        <q-tabs
+          v-model="cTab"
+          align="left"
+          class="q-px-xs"
+          active-color="secondary"
+          indicator-color="info"
           dense
-          round
-          icon="menu"
-          :aria-label="t('menu')"
-          @click="toggleLeftDrawer"
-        />
-        <q-toolbar-title> {{ title }} </q-toolbar-title>
+        >
+          <q-route-tab
+            v-for="tab in tabs"
+            :key="tab.name"
+            :label="tab.title"
+            :to="tab.to"
+          />
+        </q-tabs>
         <HeaderIcons />
         <q-btn
           class="q-ml-sm"
@@ -81,18 +94,6 @@ onMounted(() => {
         />
       </q-toolbar>
     </q-header>
-
-    <q-drawer
-      v-model="leftDrawerOpen"
-      :width="200"
-      class="noselect"
-      side="left"
-      elevated
-      overlay
-      show-if-above
-    >
-      <MenuPanel @update-title="updateTitle"/>
-    </q-drawer>
 
     <q-drawer
       v-model="rightDrawerOpen"
