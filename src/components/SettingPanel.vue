@@ -13,7 +13,6 @@ import MyTooltip from 'components/MyTooltip.vue';
 import { useRoute } from 'vue-router';
 
 const route = useRoute();
-const urlInside = computed(() => route.fullPath.split('/').pop());
 
 const store = useCalcStore();
 
@@ -225,7 +224,7 @@ onBeforeUnmount(() => {
             </q-slider>
           </q-item>
 
-          <template v-if="urlInside == 'unit'">
+          <template v-if="store.cTab == 'unit'">
             <q-separator spaced="md" />
 
             <q-item class="q-py-none">
@@ -240,7 +239,7 @@ onBeforeUnmount(() => {
               />
             </q-item>
           </template>
-          <template v-else-if="urlInside == 'currency'">
+          <template v-else-if="store.cTab == 'currency'">
             <q-separator spaced="md" />
 
             <q-item class="q-py-none">
