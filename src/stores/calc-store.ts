@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia';
-import { Dark, Notify } from 'quasar';
+import { Dark, Notify, is } from 'quasar';
 import { create, all } from 'mathjs';
 
 import { Calculator } from 'classes/Calculator';
@@ -53,6 +53,10 @@ export const useCalcStore = defineStore('calc', {
     paddingOnResult: 20,
     // 현재 계산기 탭
     cTab: 'calc',
+    // history dialog가 열렸는지 여부
+    isHistoryDialogOpen: false,
+    // setting dialog가 열렸는지 여부
+    isSettingDialogOpen: false,
   }),
   getters: {},
   actions: {
