@@ -12,12 +12,7 @@ const store = useCalcStore();
 
 let willExitApp: boolean = false;
 
-export default boot(({ app }) => {
-  // 뒤로 가면 store의 initialPath를 마지막 계산기 위치로 변경
-  window.onpopstate = () => {
-    store.setInitialPath(window.location.hash.slice(1));
-  }
-
+export default boot(() => {
   if (Platform.is.capacitor) {
     CapacitorApp.addListener('backButton', async ({canGoBack}) => {
       if (canGoBack) {
