@@ -1,6 +1,8 @@
 <script setup lang="ts">
-import HelpPage from 'src/pages/HelpPage.vue';
+import { useI18n } from 'vue-i18n';
+const { t } = useI18n();
 
+import HelpPage from 'src/pages/HelpPage.vue';
 </script>
 
 <template>
@@ -11,8 +13,9 @@ import HelpPage from 'src/pages/HelpPage.vue';
           flat
           dense
           round
-          icon="back"
+          icon="arrow_back"
           :aria-label="t('message.help')"
+          @click="$router.back()"
         />
         <q-toolbar-title>{{ t('message.help') }}</q-toolbar-title>
       </q-toolbar>
