@@ -3,6 +3,8 @@ import { onMounted, onBeforeMount, reactive, watch,  onBeforeUnmount, computed, 
 import { useQuasar } from 'quasar';
 import { useI18n } from 'vue-i18n';
 
+import { version } from '../../package.json';
+
 import { KeyBinding } from 'classes/KeyBinding';
 import { useCalcStore } from 'src/stores/calc-store';
 
@@ -61,7 +63,8 @@ const keyBinding = new KeyBinding([
   [['k'], store.toggleDarkMode],
   [[','], store.toggleUseGrouping],
   [['['], store.decDecimalPlaces],
-  [[']'], store.incDecimalPlaces]
+  [[']'], store.incDecimalPlaces],
+  [['e'], () => { store.isSettingDialogOpen = true; }],
 ]);
 
 
@@ -105,167 +108,201 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-  <q-list v-blur dense>
-    <q-item-label class="q-mt-xl text-h5" header
-      >{{ t('message.settings') }} (E)</q-item-label
+  <q-dialog
+    v-model="store.isSettingDialogOpen"
+    style="z-index: 15"
+    persistent
+  >
+    <q-card
+      id="setting"
+      class="full-width"
     >
-    <q-item v-if="$q.platform.is.electron" class="q-py-none">
-      <q-item-label class="self-center"
-        >{{ t('alwaysOnTop') }} (T)</q-item-label
-      >
+    <q-bar
+      v-blur
+      dark
+      class="full-width noselect text-white bg-primary"
+    >
+      <q-icon name="settings" size="sm" />
+      <div>{{ t('message.settings') }}</div>
       <q-space />
-      <q-toggle
-        v-model="store.alwaysOnTop"
-        keep-color
-        dense
-        @click="store.setAlwaysOnTop(store.alwaysOnTop)"
-      />
-    </q-item>
+      <q-btn dense flat icon="close" size="md" @click="store.isSettingDialogOpen = false" />
+    </q-bar>
 
-    <q-item class="q-py-none">
-      <q-item-label class="self-center">{{ t('initPanel') }} (N)</q-item-label>
-      <q-space />
-      <q-toggle
-        v-model="store.initPanel"
-        keep-color
-        dense
-        @click="store.setInitPanel(store.initPanel)"
-      />
-    </q-item>
+      <q-card-section class="full-width">
+        <q-list v-blur dense>
+          <q-item v-if="$q.platform.is.electron" class="q-py-none">
+            <q-item-label class="self-center"
+              >{{ t('alwaysOnTop') }} (T)</q-item-label
+            >
+            <q-space />
+            <q-toggle
+              v-model="store.alwaysOnTop"
+              keep-color
+              dense
+              @click="store.setAlwaysOnTop(store.alwaysOnTop)"
+            />
+          </q-item>
 
-    <q-item class="q-py-none">
-      <q-item-label class="self-center">{{ t('darkMode') }} (K)</q-item-label>
-      <q-space />
-      <q-toggle
-        v-model="store.darkMode"
-        keep-color
-        dense
-        @click="store.setDarkMode(store.darkMode)"
-      />
-    </q-item>
+          <q-item class="q-py-none">
+            <q-item-label class="self-center">{{ t('initPanel') }} (N)</q-item-label>
+            <q-space />
+            <q-toggle
+              v-model="store.initPanel"
+              keep-color
+              dense
+              @click="store.setInitPanel(store.initPanel)"
+            />
+          </q-item>
 
-    <q-separator spaced="md" />
+          <q-item class="q-py-none">
+            <q-item-label class="self-center">{{ t('darkMode') }} (K)</q-item-label>
+            <q-space />
+            <q-toggle
+              v-model="store.darkMode"
+              keep-color
+              dense
+              @click="store.setDarkMode(store.darkMode)"
+            />
+          </q-item>
 
-    <q-item class="q-py-none">
-      <q-item-label class="self-center"
-        >{{ t('useGrouping') }} (,)</q-item-label
-      >
-      <q-space />
-      <q-toggle
-        v-model="store.useGrouping"
-        keep-color
-        dense
-      />
-    </q-item>
+          <q-separator spaced="md" />
 
-    <q-item class="q-py-none">
-      <MyTooltip>
-        {{ t('decimalPlacesStat') }}:
-        {{
-          store.decimalPlaces == -2
-            ? t('noLimit')
-            : `${store.decimalPlaces} ${t('toNDecimalPlaces')}`
-        }}
-      </MyTooltip>
-      <q-item-label class="q-pt-xs self-start"
-        >{{ t('decimalPlaces') }} ([,])</q-item-label
-      >
-      <q-space />
-      <q-slider
-        v-model="store.decimalPlaces"
-        :min="-2"
-        :step="2"
-        :max="6"
-        marker-labels
-        class="col-5 q-pr-sm"
-        dense
-        @change="store.setDecimalPlaces(store.decimalPlaces)"
-      >
-        <template #marker-label-group="{ markerList }">
-          <div
-            class="cursor-pointer"
-            :class=" ( markerList[ 0 ] as any ).classes "
-            :style=" ( markerList[ 0 ] as any ).style "
-            @click="store.setDecimalPlaces((markerList[0] as any).value)"
-          >
-            x
-          </div>
-          <div
-            v-for="val in [1, 2, 3, 4]"
-            :key="val"
-            class="cursor-pointer"
-            :class=" ( markerList[ val ] as any ).classes "
-            :style=" ( markerList[ val ] as any ).style "
-            @click="store.setDecimalPlaces((markerList[val] as any).value)"
-          >
-            {{ (markerList[val] as any).value }}
-          </div>
-        </template>
-      </q-slider>
-    </q-item>
+          <q-item class="q-py-none">
+            <q-item-label class="self-center"
+              >{{ t('useGrouping') }} (,)</q-item-label
+            >
+            <q-space />
+            <q-toggle
+              v-model="store.useGrouping"
+              keep-color
+              dense
+            />
+          </q-item>
 
-    <template v-if="urlInside == 'unit'">
-      <q-separator spaced="md" />
+          <q-item class="q-py-none">
+            <MyTooltip>
+              {{ t('decimalPlacesStat') }}:
+              {{
+                store.decimalPlaces == -2
+                  ? t('noLimit')
+                  : `${store.decimalPlaces} ${t('toNDecimalPlaces')}`
+              }}
+            </MyTooltip>
+            <q-item-label class="q-pt-xs self-start"
+              >{{ t('decimalPlaces') }} ([,])</q-item-label
+            >
+            <q-space />
+            <q-slider
+              v-model="store.decimalPlaces"
+              :min="-2"
+              :step="2"
+              :max="6"
+              marker-labels
+              class="col-5 q-pr-sm"
+              dense
+              @change="store.setDecimalPlaces(store.decimalPlaces)"
+            >
+              <template #marker-label-group="{ markerList }">
+                <div
+                  class="cursor-pointer"
+                  :class=" ( markerList[ 0 ] as any ).classes "
+                  :style=" ( markerList[ 0 ] as any ).style "
+                  @click="store.setDecimalPlaces((markerList[0] as any).value)"
+                >
+                  x
+                </div>
+                <div
+                  v-for="val in [1, 2, 3, 4]"
+                  :key="val"
+                  class="cursor-pointer"
+                  :class=" ( markerList[ val ] as any ).classes "
+                  :style=" ( markerList[ val ] as any ).style "
+                  @click="store.setDecimalPlaces((markerList[val] as any).value)"
+                >
+                  {{ (markerList[val] as any).value }}
+                </div>
+              </template>
+            </q-slider>
+          </q-item>
 
-      <q-item class="q-py-none">
-        <q-item-label class="self-center" >
-          {{ t('showUnit') }} (b)
-        </q-item-label>
+          <template v-if="urlInside == 'unit'">
+            <q-separator spaced="md" />
+
+            <q-item class="q-py-none">
+              <q-item-label class="self-center" >
+                {{ t('showUnit') }} (b)
+              </q-item-label>
+              <q-space />
+              <q-toggle
+                v-model="store.showUnit"
+                keep-color
+                dense
+              />
+            </q-item>
+          </template>
+          <template v-else-if="urlInside == 'currency'">
+            <q-separator spaced="md" />
+
+            <q-item class="q-py-none">
+              <q-item-label class="self-center">
+                {{ t('showSymbol') }} (b)
+              </q-item-label>
+              <q-space />
+              <q-toggle
+                v-model="store.showSymbol"
+                keep-color
+                dense
+              />
+            </q-item>
+          </template>
+
+          <q-separator spaced="md" />
+
+          <q-item class="q-py-none">
+            <q-item-label class="self-center">{{
+              t('useSystemLocale')
+            }}</q-item-label>
+            <q-space />
+            <q-toggle
+              v-model="store.useSystemLocale"
+              keep-color
+              dense
+              @click="setLocale()"
+            />
+          </q-item>
+
+          <q-item>
+            <q-item-label class="self-center"> {{ t('language') }} </q-item-label>
+            <q-space />
+            <q-select
+              v-model="store.userLocale"
+              :disable="store.useSystemLocale"
+              :options="localeOptions"
+              dense
+              emit-value
+              map-options
+              options-dense
+              @update:model-value="setLocale()"
+            />
+          </q-item>
+        </q-list>
+      </q-card-section>
+      <q-bar class="full-width noselect text-white bg-primary" >
+        {{ `${t('message.version')} : ${version}` }}
         <q-space />
-        <q-toggle
-          v-model="store.showUnit"
-          keep-color
-          dense
-        />
-      </q-item>
-    </template>
-    <template v-else-if="urlInside == 'currency'">
-      <q-separator spaced="md" />
-
-      <q-item class="q-py-none">
-        <q-item-label class="self-center">
-          {{ t('showSymbol') }} (b)
-        </q-item-label>
-        <q-space />
-        <q-toggle
-          v-model="store.showSymbol"
-          keep-color
-          dense
-        />
-      </q-item>
-    </template>
-
-    <q-separator spaced="md" />
-
-    <q-item class="q-py-none">
-      <q-item-label class="self-center">{{
-        t('useSystemLocale')
-      }}</q-item-label>
-      <q-space />
-      <q-toggle
-        v-model="store.useSystemLocale"
-        keep-color
-        dense
-        @click="setLocale()"
-      />
-    </q-item>
-
-    <q-item>
-      <q-item-label class="self-center"> {{ t('language') }} </q-item-label>
-      <q-space />
-      <q-select
-        v-model="store.userLocale"
-        :disable="store.useSystemLocale"
-        :options="localeOptions"
-        dense
-        emit-value
-        map-options
-        options-dense
-        @update:model-value="setLocale()"
-      />
-    </q-item>
-  </q-list>
+      </q-bar>
+    </q-card>
+  </q-dialog>
 </template>
+<style scoped lang="scss">
+.q-bar {
+  max-width: calc(100vw - 100px);
+}
+
+#setting {
+  max-width: calc(100vw - 100px);
+}
+</style>
 
 <i18n>
 ko:
