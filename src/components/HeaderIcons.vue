@@ -8,6 +8,8 @@ import { useCalcStore } from 'stores/calc-store';
 import { KeyBinding } from 'classes/KeyBinding';
 import MyTooltip from 'components/MyTooltip.vue';
 
+import MenuPanel from './MenuPanel.vue';
+
 // Quasar의 $q 객체를 사용하기 위한 변수 선언
 const $q = useQuasar();
 
@@ -98,10 +100,33 @@ const pasteDisabledPath = ['/', '/help', '/about'];
     flat
     icon="content_paste"
     class="q-ma-none q-pa-none q-pl-xs"
-    :disable="pasteDisabledPath.includes($route.path)"
     @click="doPaste"
   >
     <MyTooltip>{{ t('tooltipPaste') }}</MyTooltip>
+  </q-btn>
+  <q-btn
+    id="btn-history"
+    flat
+    icon="history"
+    class="q-ma-none q-pa-none q-pl-xs"
+    @click="store.isHistoryDialogOpen = !store.isHistoryDialogOpen"
+  >
+    <MyTooltip>{{ t('tooltipPaste') }}</MyTooltip>
+  </q-btn>
+  <q-btn
+    id="btn-menu"
+    flat
+    icon="more_vert"
+    class="q-ma-none q-pa-none q-pl-xs"
+  >
+    <q-menu 
+      auto-close
+      transition-show="slide-down"
+      transition-hide="slide-up"
+      :offset="[0, 20]"
+    >
+      <MenuPanel />
+    </q-menu>
   </q-btn>
 </template>
 
