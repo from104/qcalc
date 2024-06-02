@@ -2,7 +2,6 @@
 import UnitPanel from 'components/UnitPanel.vue';
 import ResultField from 'components/ResultField.vue';
 import CalcButton from 'components/CalcButton.vue';
-import CalcHistory from 'components/CalcHistory.vue';
 </script>
 
 <template>
