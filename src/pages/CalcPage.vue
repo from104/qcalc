@@ -13,5 +13,4 @@ import CalcHistory from 'components/CalcHistory.vue';
       <CalcButton type="normal"/>
     </q-card>
   </q-page>
-  <CalcHistory />
 </template>
