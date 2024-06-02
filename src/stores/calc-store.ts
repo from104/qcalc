@@ -51,8 +51,8 @@ export const useCalcStore = defineStore('calc', {
     showSymbol: true,
     // 패널 숫자 위 여백
     paddingOnResult: 20,
-    // 초기 화면 경로
-    initialPath: '/calc',
+    // 현재 계산기 탭
+    cTab: 'calc',
   }),
   getters: {},
   actions: {
@@ -250,13 +250,13 @@ export const useCalcStore = defineStore('calc', {
         }
       }
     },
-    // 시작 경로 설정
-    setInitialPath(path: string): void {
+    // 시작 탭 설정
+    setCTab(tab: string): void {
       // 계산기, 단위 변환기, 통화 변환기 중 하나인 경우에만 설정
-      if (['/calc', '/unit', '/currency'].includes(path)) {
-        this.initialPath = path;
-      } else if (path === '' || this.initialPath === '') {
-        this.initialPath = '/calc';
+      if (['calc', 'unit', 'currency'].includes(tab)) {
+        this.cTab = tab;
+      } else if (tab === '' || this.cTab === '') {
+        this.cTab = 'calc';
       }
     },
   },
