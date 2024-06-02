@@ -83,40 +83,6 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-  <div class="absolute-bottom justify-center row">
-    <transition name="fade">
-      <q-btn
-        v-if="!store.isHistoryDialogOpen"
-        id="btn-history"
-        class="self-center shadow-4 q-ma-sm show-history-icon"
-        padding="sm"
-        round
-        color="info"
-        size="md"
-        icon="mdi-arrow-up-bold"
-        @click="store.isHistoryDialogOpen = true"
-      >
-        <my-tooltip>
-          {{ t('onClickMsg', { act: t('actShow') }) }}
-        </my-tooltip>
-      </q-btn>
-      <q-btn
-        v-else
-        id="btn-history"
-        class="self-center shadow-4 q-ma-sm hide-history-icon"
-        padding="sm"
-        round
-        color="info"
-        size="md"
-        icon="mdi-arrow-down-bold"
-        @click="store.isHistoryDialogOpen = false"
-      >
-        <my-tooltip>
-          {{ t('onClickMsg', { act: t('actHide') }) }}
-        </my-tooltip>
-      </q-btn>
-    </transition>
-  </div>
   <q-dialog
     v-model="store.isHistoryDialogOpen"
     style="z-index: 10"
