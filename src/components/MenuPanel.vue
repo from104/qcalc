@@ -1,9 +1,7 @@
 <script setup lang="ts">
 import { onMounted, reactive, watch } from 'vue';
 
-import { version } from '../../package.json';
-
-import PathRoute from 'components/PathRoute.vue';
+import MenuItem from 'components/MenuItem.vue';
 
 import { useRouter,useRoute } from 'vue-router';
 const router = useRouter();
@@ -15,74 +13,76 @@ const store = useCalcStore();
 import { useI18n } from 'vue-i18n';
 const { t } = useI18n();
 
-interface Path {
+interface Item {
   title: string;
-  caption: string;
-  shortcut: string;
-  path: string;
-  icon: string;
+  caption?: string;
+  shortcut?: string;
+  icon?: string;
+  action?: ()=>void;
+  isSeparator?: boolean;
 };
 
-const paths: {[key: string]: Path} = reactive({
-  help: {
-    title: t('path.help.title'),
-    caption: t('path.help.caption'),
-    shortcut: 'F1',
-    icon: 'help',
-    path: '/help',
-  },
+const items: {[key: string]: Item} = reactive({
   calc: {
-    title: t('path.calc.title'),
-    caption: t('path.calc.caption'),
-    shortcut: 'F2',
+    title: t('item.calc.title'),
+    caption: t('item.calc.caption'),
+    shortcut: 'Ctrl-1',
     icon: 'calculate',
-    path: '/calc',
+    action: () => {store.cTab = 'calc'},
   },
   unit: {
-    title: t('path.unit.title'),
-    caption: t('path.unit.caption'),
-    shortcut: 'F3',
+    title: t('item.unit.title'),
+    caption: t('item.unit.caption'),
+    shortcut: 'Ctrl-2',
     icon: 'swap_vert',
-    path: '/unit',
+    action: () => {store.cTab = 'unit'},
   },
   currency: {
-    title: t('path.currency.title'),
-    caption: t('path.currency.caption'),
-    shortcut: 'F4',
+    title: t('item.currency.title'),
+    caption: t('item.currency.caption'),
+    shortcut: 'Ctrl-3',
     icon: 'currency_exchange',
-    path: '/currency',
+    action: () => {store.cTab = 'currency'},
+  },
+  separator1: {
+    title: 'separator',
+    isSeparator: true,
+  },
+  settings: {
+    title: t('item.settings.title'),
+    caption: t('item.settings.caption'),
+    shortcut: 'Ctrl-e',
+    icon: 'settings',
+    action: ()=>{store.isSettingDialogOpen = true},
+  },
+  separator2: {
+    title: 'separator',
+    isSeparator: true,
+  },
+  help: {
+    title: t('item.help.title'),
+    caption: t('item.help.caption'),
+    shortcut: 'F1',
+    icon: 'help',
+    action: () => router.push('/help'),
   },
   about: {
-    title: t('path.about.title'),
-    caption: t('path.about.caption'),
-    shortcut: 'F5',
+    title: t('item.about.title'),
+    caption: t('item.about.caption'),
+    shortcut: 'F2',
     icon: 'info',
-    path: '/about',
+    action: () => router.push('/about'),
   },
 });
 
-// updateTitle() 함수를 사용하기 위해 emits() 함수를 정의
-const emits = defineEmits(['updateTitle']);
 
-// updateTitle() 함수는 updateTitle 이벤트를 발생시키는 역할
-// paths 객체에서 현재 경로에 해당하는 객체를 찾아 title 속성을 업데이트
-// route.path.slice(1)은 경로에서 첫 번째 문자를 제외한 나머지 문자열을 반환
-const updateTitle = () => {
-  emits('updateTitle', paths[route.path.slice(1)].title);
-};
 
-// route.path가 변경될 때마다 updateTitle() 함수를 실행
-watch(()=>route.path, () => {
-  updateTitle();
-});
-
-// updateLocale() 함수는 paths 객체의 title과 caption 속성을 각 언어에 맞게 업데이트
+// updateLocale() 함수는 items 객체의 title과 caption 속성을 각 언어에 맞게 업데이트
 const updateLocale = () => {
-  Object.keys(paths).forEach((path) => {
-    paths[path].title = t(`path.${path}.title`);
-    paths[path].caption = t(`path.${path}.caption`);
+  Object.keys(items).forEach((item) => {
+    items[item].title = t(`item.${item}.title`);
+    items[item].caption = t(`item.${item}.caption`);
   });
-  updateTitle();
 };
 
 // store.locale이 변경될 때마다 updateLocale() 함수를 실행
@@ -91,18 +91,16 @@ watch(()=>store.locale, () => {
 });
 
 // 해당 기능으로 이동
-const toPath = (path: string) => {
-  router.push({ path: path });
-};
 
 import { KeyBinding } from 'classes/KeyBinding';
 
 const keyBinding = new KeyBinding([
-  [['F1'], () => toPath('/help')],
-  [['F2'], () => toPath('/calc')],
-  [['F3'], () => toPath('/unit')],
-  [['F4'], () => toPath('/currency')],
-  [['F5'], () => toPath('/about')],
+  [['Control-1'], () => (store.cTab = 'calc')],
+  [['Control-2'], () => (store.cTab = 'unit')],
+  [['Control-3'], () => (store.cTab = 'currency')],
+  [['Control-e'], () => {}],
+  [['F1'], () => router.push('/help')],
+  [['F2'], () => router.push('/about')],
 ]);
 
 onMounted(() => {
@@ -113,33 +111,13 @@ onMounted(() => {
 
 <template>
   <q-list v-blur>
-    <q-item-label class="q-mt-xl text-h5" header>
-      {{ t('message.menu') }} (M)
-    </q-item-label>
-    <PathRoute v-for="path in paths" :key="path.title" v-bind="path" />
+    <MenuItem v-for="item in items" :key="item.title" v-bind="item"/>
   </q-list>
-  <!-- 패널 높이 조절 -->
-  <!-- <q-input 
-    v-model.number="store.paddingOnResult"
-    type="number"
-    filled
-    dense
-    class="text-white"
-    style="max-width: 80px"
-  /> -->
-
-  <q-footer class="row items-center q-pa-sm bg-primary" >
-    {{ `${t('message.version')} : ${version}` }}
-    <q-space />
-  </q-footer>
 </template>
 
 <i18n>
 ko:
-  path:
-    help:
-      title: '도움말'
-      caption: '기능과 사용법'
+  item:
     calc:
       title: '계산기'
       caption: '계산기'
@@ -149,14 +127,17 @@ ko:
     currency:
       title: '통화 환전'
       caption: '통화 환전기'
+    settings:
+      title: '설정'
+      caption: '설정'
+    help:
+      title: '도움말'
+      caption: '기능과 사용법'
     about:
       title: '소개'
       caption: '앱에 대한 소개'
 en:
-  path:
-    help:
-      title: 'Help'
-      caption: 'Features and Usage'
+  item:
     calc:
       title: 'Calculator'
       caption: 'Calculator'
@@ -166,6 +147,12 @@ en:
     currency:
       title: 'Currency Converter'
       caption: 'Currency Converter'
+    settings:
+      title: 'Settings'
+      caption: 'Settings'
+    help:
+      title: 'Help'
+      caption: 'Features and Usage'
     about:
       title: 'About'
       caption: 'About the app'
