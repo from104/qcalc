@@ -92,7 +92,6 @@ watch(()=>store.locale, () => {
 
 // 해당 기능으로 이동
 const toPath = (path: string) => {
-  store.setInitialPath(path);
   router.push({ path: path });
 };
 

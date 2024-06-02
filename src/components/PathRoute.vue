@@ -13,7 +13,7 @@ defineProps({
 </script>
 
 <template>
-  <q-item active-class="text-primary" clickable :to="path" @click="store.setInitialPath(path)" >
+  <q-item active-class="text-primary" clickable :to="path">
     <q-item-section v-if="icon" class="col-3" avatar>
       <q-icon :name="icon" />
     </q-item-section>
