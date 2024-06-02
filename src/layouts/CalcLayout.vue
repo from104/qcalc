@@ -84,14 +84,6 @@ onMounted(() => {
         </q-tabs>
         <q-space />
         <HeaderIcons />
-        <q-btn
-          class="q-ml-sm"
-          flat
-          dense
-          round
-          icon="settings"
-          :aria-label="t('settings')"
-        />
       </q-toolbar>
     </q-header>
 
@@ -101,6 +93,7 @@ onMounted(() => {
           <component :is="tab.component" />
         </q-tab-panel>
       </q-tab-panels>
+      <SettingPanel />
       <CalcHistory />
     </q-page-container>
   </q-layout>
