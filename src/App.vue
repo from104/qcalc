@@ -46,6 +46,8 @@ onBeforeMount( () => {
     store.paddingOnResult = 0;
   }
   updateTitle();
+  store.isHistoryDialogOpen = false;
+  store.isSettingDialogOpen = false;
 });
 </script>
 
