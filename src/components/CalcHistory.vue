@@ -86,7 +86,7 @@ onBeforeUnmount(() => {
   <div class="absolute-bottom justify-center row">
     <transition name="fade">
       <q-btn
-        v-if="!isHistoryOpen"
+        v-if="!store.isHistoryDialogOpen"
         id="btn-history"
         class="self-center shadow-4 q-ma-sm show-history-icon"
         padding="sm"
@@ -94,7 +94,7 @@ onBeforeUnmount(() => {
         color="info"
         size="md"
         icon="mdi-arrow-up-bold"
-        @click="isHistoryOpen = true"
+        @click="store.isHistoryDialogOpen = true"
       >
         <my-tooltip>
           {{ t('onClickMsg', { act: t('actShow') }) }}
@@ -109,7 +109,7 @@ onBeforeUnmount(() => {
         color="info"
         size="md"
         icon="mdi-arrow-down-bold"
-        @click="isHistoryOpen = false"
+        @click="store.isHistoryDialogOpen = false"
       >
         <my-tooltip>
           {{ t('onClickMsg', { act: t('actHide') }) }}
@@ -118,7 +118,7 @@ onBeforeUnmount(() => {
     </transition>
   </div>
   <q-dialog
-    v-model="isHistoryOpen"
+    v-model="store.isHistoryDialogOpen"
     style="z-index: 10"
     position="bottom"
     transition-duration="300"
@@ -140,7 +140,7 @@ onBeforeUnmount(() => {
         :disable="doDeleteHistory || resultHistory.length == 0"
         @click="doDeleteHistory = true"
       />
-      <q-btn dense flat icon="close" size="md" @click="isHistoryOpen = false" />
+      <q-btn dense flat icon="close" size="md" @click="store.isHistoryDialogOpen = false" />
     </q-bar>
 
     <q-card
