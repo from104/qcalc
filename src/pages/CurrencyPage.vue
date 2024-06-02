@@ -2,7 +2,6 @@
 import CurrencyPanel from 'components/CurrencyPanel.vue';
 import ResultField from 'components/ResultField.vue';
 import CalcButton from 'components/CalcButton.vue';
-import CalcHistory from 'components/CalcHistory.vue';
 </script>
 
 <template>
