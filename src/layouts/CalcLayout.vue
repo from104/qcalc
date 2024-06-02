@@ -23,24 +23,13 @@ const tabs = reactive([
   { name: 'currency', title: t('currency'), component: CurrencyPage },
 ]);
 
-const leftDrawerOpen = ref(false);
-const rightDrawerOpen = ref(false);
-
-const toggleLeftDrawer = () => {
-  leftDrawerOpen.value = !leftDrawerOpen.value;
-  rightDrawerOpen.value = false;
-};
-
-const toggleRightDrawer = () => {
-  rightDrawerOpen.value = !rightDrawerOpen.value;
-  leftDrawerOpen.value = false;
-};
 
 import { KeyBinding } from 'classes/KeyBinding';
 
 const keyBinding = new KeyBinding([
-  [['m'], toggleLeftDrawer],
-  [['e'], toggleRightDrawer],
+  [['Control-1'], () => (store.cTab = 'calc')],
+  [['Control-2'], () => (store.cTab = 'unit')],
+  [['Control-3'], () => (store.cTab = 'currency')],
 ]);
 
 // inputFocused 값이 바뀌면 키바인딩을 추가하거나 제거합니다.
@@ -102,25 +91,13 @@ onMounted(() => {
           round
           icon="settings"
           :aria-label="t('settings')"
-          @click="toggleRightDrawer"
         />
       </q-toolbar>
     </q-header>
 
-    <q-drawer
-      v-model="rightDrawerOpen"
-      :width="200"
-      class="noselect"
-      side="right"
-      elevated
-      overlay
-      show-if-above
-    >
-      <SettingPanel />
-    </q-drawer>
-    <q-page-container class="overflow-hidden" style="padding-bottom: 0px;">
+    <q-page-container style="padding-bottom: 0px;">
       <q-tab-panels v-model="store.cTab" animated>
-        <q-tab-panel v-for="tab in tabs" :key="tab.name" :name="tab.name">
+        <q-tab-panel v-for="(tab,index) in tabs" :key="index" :name="tab.name">
           <component :is="tab.component" />
         </q-tab-panel>
       </q-tab-panels>
