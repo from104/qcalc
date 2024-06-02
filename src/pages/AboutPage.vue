@@ -1,10 +1,9 @@
 <script setup lang="ts">
 import { useI18n } from 'vue-i18n';
+const { locale } = useI18n({ useScope: 'global' });
 
 import AboutPageMD_en from './AboutPage-en.md';
 import AboutPageMD_ko from './AboutPage-ko.md';
-
-const { locale } = useI18n({ useScope: 'global' });
 </script>
 
 <template>
