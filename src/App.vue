@@ -46,9 +46,6 @@ onBeforeMount( () => {
     store.paddingOnResult = 0;
   }
   updateTitle();
-  if (!store.initPanel) {
-    router.push(store.initialPath);
-  }
 });
 </script>
 
