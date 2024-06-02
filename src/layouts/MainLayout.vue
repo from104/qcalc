@@ -1,16 +1,27 @@
 <script setup lang="ts">
-import { onMounted, ref, watch } from 'vue';
-import { useI18n } from 'vue-i18n';
+import { onMounted, reactive, ref, watch } from 'vue';
 
-import { useCalcStore } from 'src/stores/calc-store';
 
-import MenuPanel from 'components/MenuPanel.vue';
 import SettingPanel from 'components/SettingPanel.vue';
 import HeaderIcons from 'components/HeaderIcons.vue';
 
+import CalcPage from 'src/pages/CalcPage.vue';
+import UnitPage from 'src/pages/UnitPage.vue';
+import CurrencyPage from 'src/pages/CurrencyPage.vue';
+
+import CalcHistory from 'components/CalcHistory.vue';
+
+import { useCalcStore } from 'src/stores/calc-store';
 const store = useCalcStore();
 
+import { useI18n } from 'vue-i18n';
 const { t } = useI18n();
+
+const tabs = reactive([
+  { name: 'calc', title: t('calc'), component: CalcPage },
+  { name: 'unit', title: t('unit'), component: UnitPage },
+  { name: 'currency', title: t('currency'), component: CurrencyPage },
+]);
 
 const leftDrawerOpen = ref(false);
 const rightDrawerOpen = ref(false);
@@ -23,12 +34,6 @@ const toggleLeftDrawer = () => {
 const toggleRightDrawer = () => {
   rightDrawerOpen.value = !rightDrawerOpen.value;
   leftDrawerOpen.value = false;
-};
-
-const title = ref('');
-
-const updateTitle = (newTitle: string) => {
-  title.value = newTitle;
 };
 
 import { KeyBinding } from 'classes/KeyBinding';
@@ -51,16 +56,16 @@ watch(
   { immediate: true }
 );
 
+watch(() => store.locale, () => {
+  // 언어가 바뀌면 탭 이름도 바꿔줍니다.
+  for (const tab of tabs) {
+    tab.title = t(tab.name);
+  }
+});
+
 onMounted(() => {
   keyBinding.subscribe();
 });
-
-const cTab = ref(store.initialPath.slice(1));
-const tabs = [
-  { name: 'calc', title: t('calc'), to: '/calc' },
-  { name: 'unit', title: t('unit'), to: '/unit' },
-  { name: 'currency', title: t('currency'), to: '/currency' },
-];
 </script>
 
 <template>
@@ -68,20 +73,27 @@ const tabs = [
     <q-header class="z-top noselect" elevated>
       <q-toolbar v-blur>
         <q-tabs
-          v-model="cTab"
+          v-model="store.cTab"
           align="left"
-          class="q-px-xs"
-          active-color="secondary"
-          indicator-color="info"
+          class="col-8 q-px-none"
+          active-color="text-primary"
+          indicator-color="secondary"
           dense
-        >
-          <q-route-tab
+          shrink
+          inline-label
+          outside-arrows
+          mobile-arrows
+         >
+          <q-tab
             v-for="tab in tabs"
             :key="tab.name"
             :label="tab.title"
-            :to="tab.to"
+            :name="tab.name"
+            class="q-px-xs"
+            dense
           />
         </q-tabs>
+        <q-space />
         <HeaderIcons />
         <q-btn
           class="q-ml-sm"
@@ -106,26 +118,35 @@ const tabs = [
     >
       <SettingPanel />
     </q-drawer>
-    <q-page-container style="padding-bottom: 0px;">
-      <router-view v-slot="{ Component }">
-        <transition name="slide-fade" mode="out-in" appear>
-          <div :key="$route.path">
-            <component :is="Component" />
-          </div>
-        </transition>
-      </router-view>
+    <q-page-container class="overflow-hidden" style="padding-bottom: 0px;">
+      <q-tab-panels v-model="store.cTab" animated>
+        <q-tab-panel v-for="tab in tabs" :key="tab.name" :name="tab.name">
+          <component :is="tab.component" />
+        </q-tab-panel>
+      </q-tab-panels>
+      <CalcHistory />
     </q-page-container>
   </q-layout>
 </template>
 
 <style lang="scss" scoped>
-.slide-fade-enter-active,
-.slide-fade-leave-active {
-  transition: all 0.2s ease;
+.q-tab {
+  :deep(.q-tab__label) {
+    font-size: 16px;
+  }
 }
-
-.slide-fade-enter-from,
-.slide-fade-leave-to {
-  opacity: 0;
+.q-tab-panel {
+  padding: 0px;
 }
 </style>
+
+<i18n lang="yaml5">
+ko:
+  calc: 계산기
+  unit: 단위변환
+  currency: 환율
+en: 
+  calc: Calculator
+  unit: Unit Conversion
+  currency: Currency Exchange
+</i18n>
