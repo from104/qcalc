@@ -1,15 +1,13 @@
 <script setup lang="ts">
 import { onMounted, reactive, ref, watch } from 'vue';
 
-
-import SettingPanel from 'components/SettingPanel.vue';
+import HistoryDialog from 'components/HistoryDialog.vue';
+import SettingDialog from 'components/SettingDialog.vue';
 import HeaderIcons from 'components/HeaderIcons.vue';
 
-import CalcPage from 'src/pages/CalcPage.vue';
-import UnitPage from 'src/pages/UnitPage.vue';
-import CurrencyPage from 'src/pages/CurrencyPage.vue';
-
-import CalcHistory from 'components/CalcHistory.vue';
+import CalcPage from 'pages/CalcPage.vue';
+import UnitPage from 'pages/UnitPage.vue';
+import CurrencyPage from 'pages/CurrencyPage.vue';
 
 import { useCalcStore } from 'src/stores/calc-store';
 const store = useCalcStore();
@@ -22,7 +20,6 @@ const tabs = reactive([
   { name: 'unit', title: t('unit'), component: UnitPage },
   { name: 'currency', title: t('currency'), component: CurrencyPage },
 ]);
-
 
 import { KeyBinding } from 'classes/KeyBinding';
 
@@ -78,6 +75,7 @@ onMounted(() => {
             :key="tab.name"
             :label="tab.title"
             :name="tab.name"
+            :disable="store.isSettingDialogOpen"
             class="q-px-xs"
             dense
           />
@@ -93,8 +91,8 @@ onMounted(() => {
           <component :is="tab.component" />
         </q-tab-panel>
       </q-tab-panels>
-      <SettingPanel />
-      <CalcHistory />
+      <SettingDialog />
+      <HistoryDialog />
     </q-page-container>
   </q-layout>
 </template>
