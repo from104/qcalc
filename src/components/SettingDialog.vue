@@ -110,6 +110,8 @@ onBeforeUnmount(() => {
   <q-dialog
     v-model="store.isSettingDialogOpen"
     style="z-index: 15"
+    transition-show="slide-left"
+    transition-hide="slide-right"
     persistent
   >
     <q-card
@@ -293,13 +295,11 @@ onBeforeUnmount(() => {
     </q-card>
   </q-dialog>
 </template>
-<style scoped lang="scss">
-.q-bar {
-  max-width: calc(100vw - 100px);
-}
 
+<style scoped lang="scss">
 #setting {
-  max-width: calc(100vw - 100px);
+  min-width: 250px;
+  max-width: 250px;
 }
 </style>
 
