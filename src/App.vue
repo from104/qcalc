@@ -52,5 +52,31 @@ onBeforeMount( () => {
 </script>
 
 <template>
-  <router-view />
-</template>;
+  <router-view v-slot="{ Component, route }">
+    <transition :name="route.meta?.transition as string || ''" mode="default">
+      <component :is="Component" :key="route.path"/>
+    </transition>
+  </router-view>
+</template>
+
+<style>
+.slide-right-enter-active, .slide-right-leave-active {
+  transition: transform 0.3s ease
+}
+.slide-right-enter, .slide-right-leave-to {
+  transform: translateX(100%);
+}
+.slide-right-enter-to, .slide-right-leave {
+  transform: translateX(0);
+}
+
+.slide-left-enter-active , .slide-left-leave-active {
+  transition: transform 0.3s ease
+}
+.slide-left-enter, .slide-left-leave-to {
+  transform: translateX(-100%);
+}
+.slide-left-enter-to, .slide-left-leave {
+  transform: translateX(0);
+}
+</style>
