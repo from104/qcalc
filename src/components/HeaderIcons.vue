@@ -91,6 +91,7 @@ const pasteDisabledPath = ['/', '/help', '/about'];
     flat
     icon="content_copy"
     class="q-ma-none q-pa-none q-pl-xs"
+    :disable="store.isSettingDialogOpen"
     @click="doCopy"
   >
     <MyTooltip>{{ t('tooltipCopy') }}</MyTooltip>
@@ -100,6 +101,7 @@ const pasteDisabledPath = ['/', '/help', '/about'];
     flat
     icon="content_paste"
     class="q-ma-none q-pa-none q-pl-xs"
+    :disable="store.isSettingDialogOpen"
     @click="doPaste"
   >
     <MyTooltip>{{ t('tooltipPaste') }}</MyTooltip>
@@ -109,6 +111,7 @@ const pasteDisabledPath = ['/', '/help', '/about'];
     flat
     icon="history"
     class="q-ma-none q-pa-none q-pl-xs"
+    :disable="store.isSettingDialogOpen"
     @click="store.isHistoryDialogOpen = !store.isHistoryDialogOpen"
   >
     <MyTooltip>{{ t('tooltipPaste') }}</MyTooltip>
@@ -118,6 +121,7 @@ const pasteDisabledPath = ['/', '/help', '/about'];
     flat
     icon="more_vert"
     class="q-ma-none q-pa-none q-pl-xs"
+    :disable="store.isSettingDialogOpen"
   >
     <q-menu 
       auto-close
