@@ -24,9 +24,9 @@ const tabs = reactive([
 import { KeyBinding } from 'classes/KeyBinding';
 
 const keyBinding = new KeyBinding([
-  [['Control-1'], () => (store.cTab = 'calc')],
-  [['Control-2'], () => (store.cTab = 'unit')],
-  [['Control-3'], () => (store.cTab = 'currency')],
+  [['Control+1'], () => (store.cTab = 'calc')],
+  [['Control+2'], () => (store.cTab = 'unit')],
+  [['Control+3'], () => (store.cTab = 'currency')],
 ]);
 
 // inputFocused 값이 바뀌면 키바인딩을 추가하거나 제거합니다.
