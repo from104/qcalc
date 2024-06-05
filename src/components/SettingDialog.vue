@@ -1,23 +1,17 @@
 <script lang="ts" setup>
-import { onMounted, onBeforeMount, reactive, watch,  onBeforeUnmount, computed, ref } from 'vue';
-import { useQuasar } from 'quasar';
-import { useI18n } from 'vue-i18n';
+import { onMounted, onBeforeMount, reactive, watch,  onBeforeUnmount, ref } from 'vue';
 
 import { version } from '../../package.json';
 
-import { KeyBinding } from 'classes/KeyBinding';
-import { useCalcStore } from 'src/stores/calc-store';
-
 import MyTooltip from 'components/MyTooltip.vue';
 
-import { useRoute } from 'vue-router';
-
-const route = useRoute();
-
-const store = useCalcStore();
-
+import { useQuasar } from 'quasar';
 const $q = useQuasar();
 
+import { useCalcStore } from 'src/stores/calc-store';
+const store = useCalcStore();
+
+import { useI18n } from 'vue-i18n';
 const { locale } = useI18n({ useScope: 'global' });
 const { t } = useI18n();
 
@@ -56,6 +50,7 @@ const toggleAlwaysOnTopWithNotify = () => {
   }
 };
 
+import { KeyBinding } from 'classes/KeyBinding';
 const keyBinding = new KeyBinding([
   [['t'], toggleAlwaysOnTopWithNotify],
   [['n'], store.toggleInitPanel],
