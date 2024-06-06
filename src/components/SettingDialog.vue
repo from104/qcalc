@@ -1,5 +1,12 @@
 <script lang="ts" setup>
-import { onMounted, onBeforeMount, reactive, watch,  onBeforeUnmount, ref } from 'vue';
+import { 
+  onMounted, 
+  onBeforeMount, 
+  reactive, 
+  watch,  
+  onBeforeUnmount, 
+  ref 
+} from 'vue';
 
 import { version } from '../../package.json';
 
