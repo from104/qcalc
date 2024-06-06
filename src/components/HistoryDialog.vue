@@ -1,22 +1,25 @@
 <script setup lang="ts">
-import { onMounted, onBeforeUnmount, ref, computed, watch } from 'vue';
+import { 
+  onMounted, 
+  onBeforeUnmount, 
+  ref, 
+  computed, 
+  watch 
+} from 'vue';
+
+// import MyTooltip from 'components/MyTooltip.vue';
 
 import { useI18n } from 'vue-i18n';
-
-import type { History } from 'classes/Calculator';
-
-import { KeyBinding } from 'classes/KeyBinding';
-import { useCalcStore } from 'stores/calc-store';
-
-import MyTooltip from 'components/MyTooltip.vue';
-
 const { t } = useI18n();
 
 // 스토어 가져오기
+import { useCalcStore } from 'stores/calc-store';
 const store = useCalcStore();
 
 // 계산기 오브젝트를 스토어에서 가져오기 위한 변수 선언
 const { calc } = store;
+
+import type { History } from 'classes/Calculator';
 
 // 계산 결과 배열
 const resultHistory = computed(() => calc.getHistory() as unknown as History[]);
@@ -53,6 +56,7 @@ watch(
   }
 );
 
+import { KeyBinding } from 'classes/KeyBinding';
 const keyBinding = new KeyBinding([
   [['h'], () => { !doDeleteHistory.value && store.clickButtonById('btn-history'); }],
   [['d'], () => { isHistoryOpen.value && store.clickButtonById('btn-delete-history'); }]
@@ -188,23 +192,6 @@ onBeforeUnmount(() => {
   </q-dialog>
 </template>
 
-<i18n>
-ko:
-  onClickMsg: '클릭하면 계산 결과 기록을 {act}.'
-  actShow: '보여줍니다'
-  actHide: '숨깁니다'
-  history: '계산 결과'
-  noHistory: '계산 결과가 없습니다.'
-  doYouDeleteHistory: '계산 기록을 지우겠어요?'
-en:
-  onClickMsg: 'Click to {act} calculation history.'
-  actShow: 'show'
-  actHide: 'hide'
-  history: 'History'
-  noHistory: 'No history.'
-  doYouDeleteHistory: 'Do you want to delete the history?'
-</i18n>
-
 <style scoped lang="scss">
 .q-bar {
   max-width: calc(100vw - 45px);
@@ -269,3 +256,15 @@ en:
   }
 }
 </style>
+
+<i18n>
+  ko:
+    history: '계산 결과'
+    noHistory: '계산 결과가 없습니다.'
+    doYouDeleteHistory: '모든 계산 기록을 지우겠어요?'
+  en:
+    history: 'History'
+    noHistory: 'No history.'
+    doYouDeleteHistory: 'Do you want to delete all history?'
+  </i18n>
+    
