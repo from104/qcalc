@@ -1,11 +1,14 @@
 <script setup lang="ts">
-import { onMounted, reactive, watch } from 'vue';
+import { 
+  onMounted, 
+  reactive, 
+  watch 
+} from 'vue';
 
 import MenuItem from 'components/MenuItem.vue';
 
-import { useRouter,useRoute } from 'vue-router';
+import { useRouter } from 'vue-router';
 const router = useRouter();
-const route = useRoute();
 
 import { useCalcStore } from 'src/stores/calc-store';
 const store = useCalcStore();
@@ -75,8 +78,6 @@ const items: {[key: string]: Item} = reactive({
   },
 });
 
-
-
 // updateLocale() 함수는 items 객체의 title과 caption 속성을 각 언어에 맞게 업데이트
 const updateLocale = () => {
   Object.keys(items).forEach((item) => {
@@ -90,21 +91,8 @@ watch(()=>store.locale, () => {
   updateLocale();
 });
 
-// 해당 기능으로 이동
-
-import { KeyBinding } from 'classes/KeyBinding';
-
-const keyBinding = new KeyBinding([
-  [['Control-1'], () => (store.cTab = 'calc')],
-  [['Control-2'], () => (store.cTab = 'unit')],
-  [['Control-3'], () => (store.cTab = 'currency')],
-  [['Control-e'], () => {}],
-  [['F1'], () => router.push('/help')],
-  [['F2'], () => router.push('/about')],
-]);
 
 onMounted(() => {
-  keyBinding.subscribe();
   updateLocale();
 });
 </script>
