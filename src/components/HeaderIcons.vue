@@ -1,22 +1,21 @@
 <script setup lang="ts">
 import { onMounted } from 'vue';
-import { useI18n } from 'vue-i18n';
 import { copyToClipboard } from 'quasar';
-import { useQuasar } from 'quasar';
 
-import { useCalcStore } from 'stores/calc-store';
-import { KeyBinding } from 'classes/KeyBinding';
 import MyTooltip from 'components/MyTooltip.vue';
 
 import MenuPanel from './MenuPanel.vue';
 
 // Quasar의 $q 객체를 사용하기 위한 변수 선언
+import { useQuasar } from 'quasar';
 const $q = useQuasar();
 
 // i18n을 사용하기 위한 변수 선언
+import { useI18n } from 'vue-i18n';
 const { t } = useI18n();
 
 // 스토어 가져오기
+import { useCalcStore } from 'stores/calc-store';
 const store = useCalcStore();
 
 // 계산기 오브젝트를 스토어에서 가져오기 위한 변수 선언
@@ -73,6 +72,7 @@ const doPaste = async (): Promise<void> => {
   }
 }
 
+import { KeyBinding } from 'classes/KeyBinding';
 const keyBinding = new KeyBinding([
   [['Control+c', 'Control+Insert', 'Copy'], () => store.clickButtonById('btn-copy')],
   [['Control+v', 'Shift+Insert', 'Paste'], () => store.clickButtonById('btn-paste')],
@@ -81,8 +81,6 @@ const keyBinding = new KeyBinding([
 onMounted(() => {
   keyBinding.subscribe();
 });
-
-const pasteDisabledPath = ['/', '/help', '/about'];
 </script>
 
 <template>
@@ -114,7 +112,7 @@ const pasteDisabledPath = ['/', '/help', '/about'];
     :disable="store.isSettingDialogOpen"
     @click="store.isHistoryDialogOpen = !store.isHistoryDialogOpen"
   >
-    <MyTooltip>{{ t('tooltipPaste') }}</MyTooltip>
+    <MyTooltip>{{ t('openHistoryDialog') }}</MyTooltip>
   </q-btn>
   <q-btn
     id="btn-menu"
@@ -144,6 +142,7 @@ ko:
   failedToPasteFromClipboard: '클립보드로부터 숫자를 붙여넣지 못했습니다.'
   tooltipCopy: '내용을 복사합니다.'
   tooltipPaste: '숫자를 붙혀넣습니다.'
+  openHistoryDialog: '클릭하면 기록을 열거나 닫습니다.'
 en:
   targetToBeCopiedResult: 'the calculation result'
   targetToBeCopiedSelected: 'the selected content'
@@ -153,4 +152,5 @@ en:
   failedToPasteFromClipboard: 'Failed to paste the number from the clipboard.'
   tooltipCopy: 'Copy the content.'
   tooltipPaste: 'Paste the number.'
+  openHistoryDialog: 'Click to open or close the history.'
 </i18n>
