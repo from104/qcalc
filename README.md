@@ -38,13 +38,11 @@ This is a simple calculator made using the source of the calculator for Android 
 
 ### Other features
 
-- m: open and close the left menu
-- e: open and close right settings
-- F1: open help
-- F2: open calculator
-- F3: open unit converter
-- F4: open currency converter
-- F5: open app info
+- Control-1: Go to calculator
+- Control-2: Go to unit converter
+- Control-3: Go to currency converter
+- Control-Tab, ->: Go to the right calculator tab.
+- Control-Shift-Tab, <-: Go to the left calculator tab.
 - t: toggle always on top function
 - n: toggle panel initialization on startup
 - k: dark mode toggle
@@ -56,9 +54,9 @@ This is a simple calculator made using the source of the calculator for Android 
 - Control-c, Control-Insert: Copy calculation result or selection to clipboard
 - Control-v, Shift-Insert: Paste from clipboard into app
 
-# Skills and information
+## Skills and information
 
-## Technologies, frameworks, programs used
+### Technologies, frameworks, programs used
 
 - typescript
 - nodeJS
@@ -69,14 +67,14 @@ This is a simple calculator made using the source of the calculator for Android 
 - tinykeys
 - MathJS
 
-## How to install packages
+### How to install packages
 
 - Just download the appropriate file for the platform from the release page and install it.
 - For Linux, use the appimage file alone or install the snap file using the --dangerous option.
 - For Android, get the APK and install it, it should be on the Play Store soon.
 - MacOS, IOS don't have a package because I don't use it and have no way to test it.
 
-## How to test and build your app
+### How to test and build your app
 
 Basically, in nodeJS and vscode environment, install yarn as follows.
 
@@ -84,13 +82,13 @@ Basically, in nodeJS and vscode environment, install yarn as follows.
 npm install -g yarn
 ```
 
-### Install required modules
+#### Install required modules
 
 ```bash
 yarn install
 ```
 
-### Running in development mode (real-time reloading, error checking, etc.)
+#### Running in development mode (real-time reloading, error checking, etc.)
 
 ```bash
 quasar dev -m electron
@@ -98,7 +96,7 @@ or
 quasar dev -m capacitor -T android
 ```
 
-### Build the installation package [Windows]
+#### Build the installation package [Windows]
 
 ```bash
 quasar build -m electron -T {linux|win32}
