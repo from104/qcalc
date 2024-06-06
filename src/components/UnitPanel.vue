@@ -1,18 +1,21 @@
 <script setup lang="ts">
 // import { ref, onBeforeMount, onMounted, onBeforeUnmount, reactive, watch, computed } from 'vue';
-import { onMounted, onBeforeUnmount, reactive, watch,  } from 'vue';
+import { 
+  onMounted, 
+  onBeforeUnmount, 
+  reactive, 
+  watch
+} from 'vue';
 
 import { UnitConverter } from 'classes/UnitConverter';
 
 import MyTooltip from 'components/MyTooltip.vue';
 
 import { useI18n } from 'vue-i18n';
-
 const { t } = useI18n();
 
 // 스토어 가져오기
 import { useCalcStore } from 'stores/calc-store';
-
 const store = useCalcStore();
 
 // 계산기 오브젝트를 스토어에서 가져오기 위한 변수 선언
@@ -51,8 +54,8 @@ watch([()=>store.locale], () => {
 import { KeyBinding } from 'classes/KeyBinding';
 
 const keyBinding = new KeyBinding([
-  [['v'], () => store.clickButtonById('btn-swap-unit')],
-  [['b'], () => store.showUnitToggle()]
+  [['w'], () => store.clickButtonById('btn-swap-unit')],
+  [['o'], () => store.showUnitToggle()]
 ]);
 
 onMounted(() => {
