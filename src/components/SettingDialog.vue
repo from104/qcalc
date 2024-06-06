@@ -114,7 +114,6 @@ onBeforeUnmount(() => {
     style="z-index: 15"
     transition-show="slide-left"
     transition-hide="slide-right"
-    persistent
   >
     <q-card
       id="setting"
