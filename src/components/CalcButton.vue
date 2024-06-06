@@ -1,15 +1,17 @@
 <script setup lang="ts">
-import { onMounted, onBeforeUnmount, ref, watch } from 'vue';
+import { 
+  onMounted, 
+  onBeforeUnmount, 
+  ref, 
+  watch
+} from 'vue';
 
-import { KeyBinding, KeyBindings } from 'classes/KeyBinding';
-import { useCalcStore } from 'stores/calc-store';
 import { useI18n } from 'vue-i18n';
-
-const store = useCalcStore();
-
 const { t } = useI18n();
 
 // 계산기 오브젝트를 스토어에서 가져오기 위한 변수 선언
+import { useCalcStore } from 'stores/calc-store';
+const store = useCalcStore();
 const { calc } = store;
 
 // 에러처리를 위한 함수
@@ -63,8 +65,8 @@ const buttons: Button = [
   ['equals', '@mdi-equal', 'function', ['=', 'Enter'], ()=>calc.equal()],
 ];
 
+import { KeyBinding, KeyBindings } from 'classes/KeyBinding';
 const keyBindings: KeyBindings = buttons.map(([id, , , keys, ]) => [keys, () => store.clickButtonById('btn-'+id)]);
-
 const keyBinding = new KeyBinding(keyBindings);
 
 // dom 요소가 마운트 되었을 때 계산기 키바인딩 설정하기
