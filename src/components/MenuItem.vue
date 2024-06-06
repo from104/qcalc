@@ -1,9 +1,4 @@
 <script setup lang="ts">
-import { is } from 'quasar';
-import { useCalcStore } from 'src/stores/calc-store';
-
-const store = useCalcStore();
-
 defineProps({
   title: { type: String, required: true },
   caption: { type: String, default: '' },
