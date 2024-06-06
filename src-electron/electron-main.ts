@@ -2,7 +2,10 @@ import { fileURLToPath } from 'url';
 import path from 'path';
 import os from 'os';
 import {
-  app, BrowserWindow, nativeTheme, ipcMain,
+  app, 
+  BrowserWindow, 
+  nativeTheme, 
+  ipcMain,
 } from 'electron';
 
 const currentDir = fileURLToPath(new URL('.', import.meta.url))
@@ -23,22 +26,27 @@ import windowState from 'electron-window-state';
 let mainWindow: BrowserWindow | undefined;
 
 async function createWindow() {
+  const iconPath = path.resolve(currentDir, 'icons/icon.png');
+
+  const mainWindowWidth = 352;
+  const mainWindowHeight = 604;
+
   try {
     const mainWindowState = windowState({
-      defaultWidth: 352,
-      defaultHeight: 505,
+      defaultWidth: mainWindowWidth,
+      defaultHeight: mainWindowHeight,
     });
     /**
      * Initial window options
      */
     mainWindow = new BrowserWindow({
-      icon: path.resolve(currentDir, 'icons/icon.png'), // tray icon
+      icon: path.resolve(iconPath), // tray icon
       x: mainWindowState.x,
       y: mainWindowState.y,
       width: mainWindowState.width,
       height: mainWindowState.height,
-      minWidth: 352,
-      minHeight: 505,
+      minWidth: mainWindowWidth,
+      minHeight: mainWindowHeight,
       useContentSize: true,
       resizable: true,
       webPreferences: {
