@@ -7,14 +7,13 @@ import {
   watch,
   Ref,
 } from 'vue';
-import { useI18n } from 'vue-i18n';
 
-import { KeyBinding } from 'classes/KeyBinding';
-import { useCalcStore } from 'stores/calc-store';
 import MyTooltip from 'components/MyTooltip.vue';
 
+import { useI18n } from 'vue-i18n';
 const { t } = useI18n();
 
+import { useCalcStore } from 'stores/calc-store';
 const store = useCalcStore();
 
 const { calc, currencyConverter } = store;
@@ -56,9 +55,10 @@ watch([()=>store.locale], () => {
 });
 
 // 키바인딩 생성
+import { KeyBinding } from 'classes/KeyBinding';
 const keyBinding = new KeyBinding([
-  [['v'], () => store.clickButtonById('btn-swap-currency')],
-  [['b'], () => store.showSymbolToggle()],
+  [['w'], () => store.clickButtonById('btn-swap-currency')],
+  [['o'], () => store.showSymbolToggle()],
 ]);
 
 // inputFocused 값이 바뀌면 키바인딩을 추가하거나 제거합니다.
