@@ -7,7 +7,6 @@ export default boot(() => {
   if (Platform.is.android) {
     CapacitorApp.addListener('backButton', async ({canGoBack}) => {
       if (canGoBack) {
-        console.log('canGoBack');
         return;
       } 
     });
