@@ -1,11 +1,15 @@
 <script setup lang="ts">
-import { ref, computed, onBeforeMount, onMounted, watch } from 'vue';
+import { 
+  ref, 
+  computed, 
+  onBeforeMount, 
+  onMounted, 
+  watch 
+} from 'vue';
 
 import type { History } from 'classes/Calculator';
 
 import { UnitConverter } from 'classes/UnitConverter';
-
-import { useCalcStore } from 'stores/calc-store';
 
 import MyTooltip from 'components/MyTooltip.vue';
 
@@ -18,6 +22,7 @@ const isMainField = computed(() => props.field == 'main');
 const fieldID = computed(() => props.field+'Field');
 
 // 스토어 가져오기
+import { useCalcStore } from 'stores/calc-store';
 const store = useCalcStore();
 
 // 계산기 오브젝트를 스토어에서 가져오기 위한 변수 선언
