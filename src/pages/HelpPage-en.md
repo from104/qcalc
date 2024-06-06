@@ -31,13 +31,11 @@
 
 ### Other features
 
-- m: open and close the left menu
-- e: open and close right settings
-- F1: open help
-- F2: open calculator
-- F3: open unit converter
-- F4: open currency converter
-- F5: open app info
+- Control-1: Go to calculator
+- Control-2: Go to unit converter
+- Control-3: Go to currency converter
+- Control-Tab, ->: Go to the right calculator tab.
+- Control-Shift-Tab, <-: Go to the left calculator tab.
 - t: toggle always on top function
 - n: toggle panel initialization on startup
 - k: dark mode toggle
