@@ -1,8 +1,26 @@
 <script setup lang="ts">
+import { onMounted, onUnmounted } from 'vue';
+import AboutPage from 'src/pages/AboutPage.vue';
+
 import { useI18n } from 'vue-i18n';
 const { t } = useI18n();
 
-import AboutPage from 'src/pages/AboutPage.vue';
+import { useRouter } from 'vue-router';
+const router = useRouter();
+
+const goBackOnEsc = (event: KeyboardEvent) => {
+  if (event.key === 'Escape') {
+    router.back();
+  }
+};
+
+onMounted(() => {
+  window.addEventListener('keydown', goBackOnEsc);
+});
+
+onUnmounted(() => {
+  window.removeEventListener('keydown', goBackOnEsc);
+});
 </script>
 
 <template>
