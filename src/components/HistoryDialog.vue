@@ -47,25 +47,35 @@ const goToTopInHistory = () => {
 let touchStartY = 0;
 
 // 이벤트 처리 함수의 타입을 명시적으로 선언
-const handleTouch = (event: TouchEvent, eventType: 'start' | 'end') => {
-  if (eventType === 'start') {
-    touchStartY = event.touches[0].clientY;
-  } else if (eventType === 'end') {
-    const touchEndY = event.changedTouches[0].clientY;
-    // 아래로 100px 이상 끌어내렸을 경우 다이얼로그 닫기
-    if (touchEndY - touchStartY > 30) {
-      // store의 타입이 명시적으로 선언되어 있지 않으므로, 이 부분은 가정에 따라 달라질 수 있습니다.
-      // 여기서는 store가 이미 적절한 타입으로 선언되어 있고, isHistoryDialogOpen이 boolean 타입의 속성이라고 가정합니다.
-      store.isHistoryDialogOpen = false;
-    }
-  }
-}
+const handleTouchStart = (event: TouchEvent) => {
+  touchStartY = event.touches[0].clientY;
+};
 
-// 최상단으로 가는 아이콘을 히스토리 숨길 때 함께 숨김
+const handleTouchEnd = (event: TouchEvent) => {
+  const touchEndY = event.changedTouches[0].clientY;
+  // 아래로 100px 이상 끌어내렸을 경우 다이얼로그 닫기
+  if (touchEndY - touchStartY > 30) {
+    // store의 타입이 명시적으로 선언되어 있지 않으므로, 이 부분은 가정에 따라 달라질 수 있습니다.
+    // 여기서는 store가 이미 적절한 타입으로 선언되어 있고, isHistoryDialogOpen이 boolean 타입의 속성이라고 가정합니다.
+    store.isHistoryDialogOpen = false;
+  }
+};
+
+// 스크롤 위치를 저장할 변수
+let lastScrollPosition = 0;
+
 watch(
   () => store.isHistoryDialogOpen,
-  (arg) => {
-    if (!arg) {
+  (isOpen) => {
+    if (isOpen) {
+      // 다이얼로그가 열릴 때 시간을 약간 지연하여 저장된 스크롤 위치로 이동
+      setTimeout(() => {
+        document.getElementById('history')?.scrollTo({ top: lastScrollPosition });
+      }, 50);
+    } else {
+      // 다이얼로그가 닫힐 때 현재 스크롤 위치를 저장
+      lastScrollPosition = document.getElementById('history')?.scrollTop ?? 0;
+      // 최상단으로 가는 아이콘을 히스토리 숨길 때 함께 숨김
       isGoToTopInHistory.value = false;
     }
   }
@@ -112,8 +122,8 @@ onBeforeUnmount(() => {
       v-blur
       dark
       class="full-width noselect text-white bg-primary"
-      @touchstart="(event: TouchEvent) => handleTouch(event, 'start')"
-      @touchend="(event: TouchEvent) => handleTouch(event, 'end')"
+      @touchstart.passive="handleTouchStart"
+      @touchend.passive="handleTouchEnd"
     >
       <q-icon name="history" size="sm" />
       <div>{{ t('history') }}</div>
