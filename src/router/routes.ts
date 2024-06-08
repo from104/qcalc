@@ -2,18 +2,21 @@ import { RouteRecordRaw } from 'vue-router';
 
 const routes: RouteRecordRaw[] = [
   {
+    name: 'calc',
     path: '/',
     component: () => import('layouts/CalcLayout.vue'),
     meta: { transition: 'slide-right' }
   },
   {
+    name: 'help',
     path: '/help',
-    component: () => import('layouts/HelpLayout.vue'),
+    component: () => import('layouts/InfoLayout.vue'),
     meta: { transition: 'slide-left' }
   },
   {
+    name: 'about',
     path: '/about',
-    component: () => import('layouts/AboutLayout.vue'),
+    component: () => import('layouts/InfoLayout.vue'),
     meta: { transition: 'slide-left' }
   },
 
