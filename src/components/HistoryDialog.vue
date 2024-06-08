@@ -22,10 +22,7 @@ const { calc } = store;
 import type { History } from 'classes/Calculator';
 
 // 계산 결과 배열
-const resultHistory = computed(() => calc.getHistory() as unknown as History[]);
-
-// 계산 결과 기록 열기 여부
-const isHistoryOpen = ref(false);
+const resultHistory = computed(() => calc.getHistory() as History[]);
 
 // 계산 결과를 지울지 묻는 다이얼로그 표시 여부
 const doDeleteHistory = ref(false);
@@ -46,11 +43,29 @@ const goToTopInHistory = () => {
   });
 };
 
+// 상태를 저장할 변수를 함수 외부에 선언
+let touchStartY = 0;
+
+// 이벤트 처리 함수의 타입을 명시적으로 선언
+const handleTouch = (event: TouchEvent, eventType: 'start' | 'end') => {
+  if (eventType === 'start') {
+    touchStartY = event.touches[0].clientY;
+  } else if (eventType === 'end') {
+    const touchEndY = event.changedTouches[0].clientY;
+    // 아래로 100px 이상 끌어내렸을 경우 다이얼로그 닫기
+    if (touchEndY - touchStartY > 30) {
+      // store의 타입이 명시적으로 선언되어 있지 않으므로, 이 부분은 가정에 따라 달라질 수 있습니다.
+      // 여기서는 store가 이미 적절한 타입으로 선언되어 있고, isHistoryDialogOpen이 boolean 타입의 속성이라고 가정합니다.
+      store.isHistoryDialogOpen = false;
+    }
+  }
+}
+
 // 최상단으로 가는 아이콘을 히스토리 숨길 때 함께 숨김
 watch(
-  () => isHistoryOpen,
-  (isHistoryOpen) => {
-    if (!isHistoryOpen.value) {
+  () => store.isHistoryDialogOpen,
+  (arg) => {
+    if (!arg) {
       isGoToTopInHistory.value = false;
     }
   }
@@ -59,7 +74,7 @@ watch(
 import { KeyBinding } from 'classes/KeyBinding';
 const keyBinding = new KeyBinding([
   [['h'], () => { !doDeleteHistory.value && store.clickButtonById('btn-history'); }],
-  [['d'], () => { isHistoryOpen.value && store.clickButtonById('btn-delete-history'); }]
+  [['d'], () => { store.isHistoryDialogOpen && store.clickButtonById('btn-delete-history'); }]
 ]);
 
 // inputFocused 값이 바뀌면 키바인딩을 추가하거나 제거합니다.
@@ -97,6 +112,8 @@ onBeforeUnmount(() => {
       v-blur
       dark
       class="full-width noselect text-white bg-primary"
+      @touchstart="(event: TouchEvent) => handleTouch(event, 'start')"
+      @touchend="(event: TouchEvent) => handleTouch(event, 'end')"
     >
       <q-icon name="history" size="sm" />
       <div>{{ t('history') }}</div>
@@ -236,24 +253,6 @@ onBeforeUnmount(() => {
 
 .history-list-leave-active {
   position: absolute;
-}
-
-@mixin history-icon {
-  z-index: 14;
-  position: fixed;
-}
-
-.show-history-icon {
-  @include history-icon;
-  bottom: -28px;
-}
-
-.hide-history-icon {
-  @include history-icon;
-  bottom: -14px;
-  &:hover {
-    opacity: 50%;
-  }
 }
 </style>
 
