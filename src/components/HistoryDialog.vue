@@ -265,5 +265,5 @@ onBeforeUnmount(() => {
     history: 'History'
     noHistory: 'No history.'
     doYouDeleteHistory: 'Do you want to delete all history?'
-  </i18n>
+</i18n>
     
