@@ -7,8 +7,6 @@ import {
   watch 
 } from 'vue';
 
-import type { History } from 'classes/Calculator';
-
 import { UnitConverter } from 'classes/UnitConverter';
 
 import MyTooltip from 'components/MyTooltip.vue';
@@ -106,7 +104,7 @@ const unit = computed(() => {
 });
 
 // 계산 결과 배열
-const resultHistory = computed(() => calc.getHistory() as History[]);
+const histories = computed(() => calc.getHistories());
 
 const operator = computed(() => calc.getOperatorString() as string);
 
@@ -120,7 +118,7 @@ const operatorIcons: { [key: string]: string } = {
 
 const getPreResult = () => {
   // 'history'는 계산의 직전 결과 기록을 가져옵니다.
-  const history = resultHistory.value;
+  const lastHistory = calc.getHistorySize() > 0 ? calc.getHistoryByIndex(0) : null;
   // 'shouldReset'은 다음 입력시 계산기가 초기화 될지 판단합니다.
   const shouldReset = calc.getShouldReset();
 
@@ -129,13 +127,13 @@ const getPreResult = () => {
 
   // 계산 기록이 있고, 초기화 될 예정이며, 직전의 history의 결과와 현재의 결과와 같다면
   if (
-    history.length > 0
+    lastHistory !== null
     && shouldReset
-    && calc.getCurrentNumber() == history[0].resultNumber
+    && calc.getCurrentNumber() == lastHistory.resultNumber
     //  && prevHistoryId != (history[0].id as number)
   ) {
     // 이전 이력의 ID를 현재 이력의 ID로 설정하고 계산 이력의 왼쪽 값을 가져온 후 '='으로 결합해서 출력합니다.
-    return [store.getLeftSideInHistory(history[0]), '='].join(' ');
+    return [store.getLeftSideInHistory(lastHistory), '='].join(' ');
   }
   // 입력된 연산자가 있고 초기화 예정이 아니라면
   else if (operatorExists && !shouldReset) {
