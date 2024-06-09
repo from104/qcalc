@@ -19,10 +19,8 @@ const store = useCalcStore();
 // 계산기 오브젝트를 스토어에서 가져오기 위한 변수 선언
 const { calc } = store;
 
-import type { History } from 'classes/Calculator';
-
 // 계산 결과 배열
-const resultHistory = computed(() => calc.getHistory() as History[]);
+const histories = calc.getHistories()
 
 // 계산 결과를 지울지 묻는 다이얼로그 표시 여부
 const doDeleteHistory = ref(false);
@@ -109,6 +107,69 @@ onMounted(() => {
 onBeforeUnmount(() => {
   keyBinding.unsubscribe();
 });
+
+const editDialog = ref(false);
+const memo = ref('');
+
+let slidedID = 0;
+const onLeft = ({reset}: {reset: () => void}, id: number) => {
+  console.log('onLeft', id);
+  slidedID = id;
+
+  if (calc.getMemo(id)) {
+    memo.value = calc.getMemo(id) as string;
+  } else {
+    memo.value = '';
+  }
+  editDialog.value = true;
+
+  setTimeout(() => {
+    reset();
+  }, 500);
+}
+
+const editConfirm = () => {
+  console.log('editConfirm', slidedID, memo.value);
+  calc.setMemo(slidedID, memo.value);
+  editDialog.value = false;
+  memo.value = '';
+  slidedID = 0;
+}
+
+const editCancel = () => {
+  console.log('editCancel', slidedID);
+  editDialog.value = false;
+  memo.value = '';
+  slidedID = 0;
+}
+
+import { copyToClipboard } from 'quasar';
+import { e } from 'mathjs';
+
+const historyCopy = async (): Promise<void> => {
+  if (slidedID) {
+    console.log('historyCopy', slidedID)
+    const history = calc.getHistoryByID(slidedID);
+    const copyText = store.getRightSideInHistory(history);
+    try {
+      await copyToClipboard(copyText);
+      store.notifyMsg('복사 성공');
+    } catch (error) {
+      console.error(error);
+      store.notifyError('복사 실패');
+    }
+    slidedID = 0;
+  }
+}
+
+const toResult = () => {
+  console.log('toResult')
+  if (slidedID) {
+    console.log('toResult', slidedID)
+    calc.setCurrentNumber(calc.getHistoryByID(slidedID).resultNumber);
+    slidedID = 0;
+  }
+}
 </script>
 
 <template>
@@ -134,7 +195,7 @@ onBeforeUnmount(() => {
         flat
         icon="delete_outline"
         size="md"
-        :disable="doDeleteHistory || resultHistory.length == 0"
+        :disable="doDeleteHistory || histories.length == 0"
         @click="doDeleteHistory = true"
       />
       <q-btn dense flat icon="close" size="md" @click="store.isHistoryDialogOpen = false" />
@@ -160,7 +221,7 @@ onBeforeUnmount(() => {
       </transition>
       <q-card-section class="full-width">
         <transition name="slide-fade" mode="out-in">
-          <q-item v-if="resultHistory.length == 0" class="text-center">
+          <q-item v-if="histories.length == 0" class="text-center">
             <q-item-section>
               <q-item-label>
                 <span>{{ t('noHistory') }}</span>
@@ -168,21 +229,35 @@ onBeforeUnmount(() => {
             </q-item-section>
           </q-item>
           <q-list v-else separator>
-            <transition-group name="history-list">
-              <q-item
-                v-for="history in resultHistory"
+            <transition-group name="history-list" appear>
+              <q-slide-item
+                v-for="history in histories"
                 :key="history.id"
-                class="history-list-item text-right q-pa-sm"
+                left-color="positive"
+                right-color="negative"
+                @left="({reset}) => onLeft({ reset }, history.id as number)"
+                @right="calc.deleteHistory(history.id as number)"
               >
-                <q-item-section>
-                  <q-item-label style="white-space: pre-wrap;">
-                    {{ store.getLeftSideInHistory(history, true) }}
-                  </q-item-label>
-                  <q-item-label>
-                    {{ ['=', store.getRightSideInHistory(history)].join(' ') }}
-                  </q-item-label>
-                </q-item-section>
-              </q-item>
+                <template #left>
+                    <q-btn flat dense icon="edit_note" />
+                </template>                  
+                <template #right>
+                  <q-icon name="delete_outline" />
+                </template>
+                <q-item class="text-right q-pa-sm">
+                  <q-item-section class="q-mr-none q-px-none">
+                    <q-item-label v-if="history.memo">
+                      <u>{{ history.memo }}</u>
+                    </q-item-label>
+                    <q-item-label style="white-space: pre-wrap;">
+                      {{ store.getLeftSideInHistory(history, true) }}
+                    </q-item-label>
+                    <q-item-label>
+                      {{ ['=', store.getRightSideInHistory(history)].join(' ') }}
+                    </q-item-label>
+                  </q-item-section>
+                </q-item>
+              </q-slide-item>
             </transition-group>
           </q-list>
         </transition>
@@ -206,13 +281,61 @@ onBeforeUnmount(() => {
         align="center"
         class="text-negative bg-white"
       >
-        <q-btn v-close-popup flat :label="t('message.no')" />
+        <q-btn 
+          v-close-popup 
+          flat 
+          :label="t('message.no')" 
+        />
         <q-btn
           v-close-popup
           flat
           :label="t('message.yes')"
           autofocus
           @click="calc.clearHistory()"
+        />
+      </q-card-actions>
+    </q-card>
+  </q-dialog>
+
+  <q-dialog
+    v-model="editDialog"
+    persistent
+    transition-show="scale"
+    transition-hide="scale"
+    style="z-index: 15"
+  >
+    <q-card
+      class="noselect text-center"
+      style="width: 250px"
+    >
+      <q-card-section class="q-pb-none">      
+        <q-input
+          v-model="memo"
+          clearable
+          filled
+          dense
+          autofocus
+          clear-icon="close"
+          color="primary"
+          label="메모"
+          @focus="store.setInputFocused"
+          @blur="store.setInputBlurred"
+          @keyup.enter="{store.blurElement(); editConfirm();}"
+        />
+      </q-card-section>
+      <q-card-actions
+        align="center"
+        class="text-negative bg-white"
+      >
+        <q-btn 
+          flat 
+          icon="replay"
+          @click="editCancel"
+        />
+        <q-btn
+          flat
+          icon="check"
+          @click="editConfirm"
         />
       </q-card-actions>
     </q-card>
@@ -242,27 +365,23 @@ onBeforeUnmount(() => {
   transform: translateY(-20px);
 }
 
-.fade-enter-active,
-.fade-leave-active {
-  transition: all 0.2s ease-out;
-}
-
-.fade-enter-from,
-.fade-leave-to {
-  transform: translateY(22px);
-}
-
-.history-list-item {
+.history-list-move,
+.history-list-enter-active, 
+.history-list-leave-active {
   transition: all 0.3s ease;
 }
 
-.history-list-enter-from {
+.history-list-enter-from,
+.history-list-leave-to {
   opacity: 0;
-  transform: translateY(-55px);
 }
 
-.history-list-leave-active {
-  position: absolute;
+.history-list-enter-from {
+  transform: translateY(-20px);
+}
+
+.history-list-leave-to {
+  transform: translateX(-20px);
 }
 </style>
 
