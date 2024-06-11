@@ -79,10 +79,33 @@ watch(
   }
 );
 
+const scrollHistory = (offset: number | 'top' | 'bottom') => {
+  if (store.isHistoryDialogOpen) {
+    const historyElement = document.getElementById('history');
+    if (historyElement) {
+      if (offset === 'top') {
+        offset = -historyElement.scrollTop;
+      } else if (offset === 'bottom') {
+        offset = historyElement.scrollHeight - historyElement.scrollTop;
+      }
+      historyElement.scrollTo({
+        top: historyElement.scrollTop + offset,
+        behavior: 'smooth',
+      });
+    }
+  }
+};
+
 import { KeyBinding } from 'classes/KeyBinding';
 const keyBinding = new KeyBinding([
   [['h'], () => { !doDeleteHistory.value && store.clickButtonById('btn-history'); }],
-  [['d'], () => { store.isHistoryDialogOpen && store.clickButtonById('btn-delete-history'); }]
+  [['d'], () => { store.isHistoryDialogOpen && store.clickButtonById('btn-delete-history'); }],
+  [['ArrowUp'], () => scrollHistory(-50)],
+  [['ArrowDown'], () => scrollHistory(50)],
+  [['PageUp'], () => scrollHistory(-400)],
+  [['PageDown'], () => scrollHistory(400)],
+  [['Home'], () => scrollHistory('top')],
+  [['End'], () => scrollHistory('bottom')],
 ]);
 
 // inputFocused 값이 바뀌면 키바인딩을 추가하거나 제거합니다.
@@ -110,10 +133,12 @@ onBeforeUnmount(() => {
 
 const editDialog = ref(false);
 const memo = ref('');
+const editSlide = ref('');
 
 let slidedID = 0;
-const onLeft = ({reset}: {reset: () => void}, id: number) => {
-  console.log('onLeft', id);
+
+const memoDialog = (id: number) => {
+  // console.log('memoDialog', id);
   slidedID = id;
 
   if (calc.getMemo(id)) {
@@ -122,6 +147,11 @@ const onLeft = ({reset}: {reset: () => void}, id: number) => {
     memo.value = '';
   }
   editDialog.value = true;
+}
+
+const onLeft = ({reset}: {reset: () => void}, id: number) => {
+  console.log('onLeft', id);
+  memoDialog(id);
 
   setTimeout(() => {
     reset();
@@ -129,46 +159,47 @@ const onLeft = ({reset}: {reset: () => void}, id: number) => {
 }
 
 const editConfirm = () => {
-  console.log('editConfirm', slidedID, memo.value);
   calc.setMemo(slidedID, memo.value);
+  editSlide.value = 'slide-right';
   editDialog.value = false;
   memo.value = '';
   slidedID = 0;
 }
 
 const editCancel = () => {
-  console.log('editCancel', slidedID);
+  editSlide.value = 'slide-left';
   editDialog.value = false;
   memo.value = '';
   slidedID = 0;
 }
 
-import { copyToClipboard } from 'quasar';
-import { e } from 'mathjs';
+const memoDelete = (id: number) => {
+  calc.deleteMemo(id);
+  memo.value = '';
+}
 
-const historyCopy = async (): Promise<void> => {
-  if (slidedID) {
-    console.log('historyCopy', slidedID)
-    const history = calc.getHistoryByID(slidedID);
-    const copyText = store.getRightSideInHistory(history);
-    try {
-      await copyToClipboard(copyText);
-      store.notifyMsg('복사 성공');
-    } catch (error) {
-      console.error(error);
-      store.notifyError('복사 실패');
-    }
-    slidedID = 0;
+import { copyToClipboard } from 'quasar';
+const historyCopy = async (id: number, copyType: 'formattedNumber' | 'onlyNumber' | 'memo'): Promise<void> => {
+  const history = calc.getHistoryByID(id);
+  const copyText = copyType === 'formattedNumber' ? store.getRightSideInHistory(history) : 
+                   copyType === 'onlyNumber' ? history.resultNumber : 
+                   copyType === 'memo' ? calc.getMemo(id) as string : '';
+  try {
+    await copyToClipboard(copyText);
+    store.notifyMsg('복사 성공');
+  } catch (error) {
+    console.error(error);
+    store.notifyError('복사 실패');
   }
 }
 
-const toResult = () => {
-  console.log('toResult')
-  if (slidedID) {
-    console.log('toResult', slidedID)
-    calc.setCurrentNumber(calc.getHistoryByID(slidedID).resultNumber);
-    slidedID = 0;
-  }
+const toResult = (id: number) => {
+  const history = calc.getHistoryByID(id);
+  calc.setCurrentNumber(history.resultNumber);
+}
+
+const deleteHistory = (id: number) => {
+  calc.deleteHistory(id);
 }
 </script>
 
@@ -186,7 +217,10 @@ const toResult = () => {
       @touchstart.passive="handleTouchStart"
       @touchend.passive="handleTouchEnd"
     >
-      <q-icon name="history" size="sm" />
+      <q-icon
+        name="history"
+        size="sm"
+      />
       <div>{{ t('history') }}</div>
       <q-space />
       <q-btn
@@ -198,9 +232,14 @@ const toResult = () => {
         :disable="doDeleteHistory || histories.length == 0"
         @click="doDeleteHistory = true"
       />
-      <q-btn dense flat icon="close" size="md" @click="store.isHistoryDialogOpen = false" />
+      <q-btn
+        icon="close"
+        size="md"
+        dense
+        flat
+        @click="store.isHistoryDialogOpen = false"
+      />      
     </q-bar>
-
     <q-card
       id="history"
       square
@@ -219,7 +258,7 @@ const toResult = () => {
           @click="goToTopInHistory"
         />
       </transition>
-      <q-card-section class="full-width">
+      <q-card-section class="full-width q-pt-xs">
         <transition name="slide-fade" mode="out-in">
           <q-item v-if="histories.length == 0" class="text-center">
             <q-item-section>
@@ -229,7 +268,7 @@ const toResult = () => {
             </q-item-section>
           </q-item>
           <q-list v-else separator>
-            <transition-group name="history-list" appear>
+            <transition-group name="history-list">
               <q-slide-item
                 v-for="history in histories"
                 :key="history.id"
@@ -239,7 +278,7 @@ const toResult = () => {
                 @right="calc.deleteHistory(history.id as number)"
               >
                 <template #left>
-                    <q-btn flat dense icon="edit_note" />
+                  <q-icon name="edit_note" />
                 </template>                  
                 <template #right>
                   <q-icon name="delete_outline" />
@@ -256,6 +295,95 @@ const toResult = () => {
                       {{ ['=', store.getRightSideInHistory(history)].join(' ') }}
                     </q-item-label>
                   </q-item-section>
+                  <q-menu
+                    context-menu
+                    auto-close
+                    touch-position
+                  >
+                    <q-list dense style="max-width: 200px;">
+                      <q-item
+                        v-if="!history.memo"
+                        v-ripple
+                        clickable
+                        @click="memoDialog(history.id as number)"
+                      >
+                        <q-item-section>
+                          <q-item-label>메모 추가</q-item-label>
+                        </q-item-section>
+                      </q-item>
+                      <q-item
+                        v-if="history.memo"
+                        v-ripple
+                        clickable
+                        @click="memoDialog(history.id as number)"
+                      >
+                        <q-item-section>
+                          <q-item-label>메모 수정</q-item-label>
+                        </q-item-section>
+                      </q-item>
+                      <q-item
+                        v-if="history.memo"
+                        v-ripple
+                        clickable
+                        @click="historyCopy(history.id as number, 'memo')"
+                      >
+                        <q-item-section>
+                          <q-item-label>메모 복사</q-item-label>
+                        </q-item-section>
+                      </q-item>
+                      <q-item
+                        v-if="history.memo"
+                        v-ripple
+                        clickable
+                        @click="memoDelete(history.id as number)"
+                      >
+                        <q-item-section>
+                          <q-item-label>메모 삭제</q-item-label>
+                        </q-item-section>
+                      </q-item>
+                      <q-separator />
+                      <q-item
+                        v-ripple
+                        clickable
+                        @click="historyCopy(history.id as number, 'formattedNumber')"
+                      >
+                        <q-item-section>
+                          <q-item-label>결과 복사 (표시된)</q-item-label>
+                          <q-item-section class="ellipsis">[ {{ store.getRightSideInHistory(history) }} ]</q-item-section>
+                        </q-item-section>
+                      </q-item>
+                      <q-item
+                        v-ripple
+                        clickable
+                        @click="historyCopy(history.id as number, 'onlyNumber')"
+                      >
+                        <q-item-section>
+                          <q-item-label>결과 복사 (숫자만)</q-item-label>
+                          <q-item-section class="ellipsis">[ {{ history.resultNumber }} ]</q-item-section>
+                        </q-item-section>
+                      </q-item>
+                      <q-separator />
+                      <q-item
+                        v-ripple
+                        clickable
+                        @click="toResult(history.id as number)"
+                      >
+                        <q-item-section>
+                          <q-item-label>메인 패널에 불러오기</q-item-label>
+                        </q-item-section>
+                      </q-item>
+                      <q-separator />
+                      <q-item
+                        v-ripple
+                        clickable
+                        @click="deleteHistory(history.id as number)"
+                      >
+                        <q-item-section>
+                          <q-item-label>결과 지우기</q-item-label>
+                        </q-item-section>
+                      </q-item>
+                    </q-list>
+                  </q-menu>
                 </q-item>
               </q-slide-item>
             </transition-group>
@@ -265,6 +393,7 @@ const toResult = () => {
     </q-card>
   </q-dialog>
 
+  <!-- 기록 전체 삭제 다이얼로그 -->
   <q-dialog
     v-model="doDeleteHistory"
     persistent
@@ -297,18 +426,40 @@ const toResult = () => {
     </q-card>
   </q-dialog>
 
+  <!-- 기록의 메모 수정 다이얼로그 -->
   <q-dialog
     v-model="editDialog"
     persistent
-    transition-show="scale"
-    transition-hide="scale"
+    transition-show="slide-right"
+    :transition-hide="editSlide"
     style="z-index: 15"
   >
     <q-card
       class="noselect text-center"
       style="width: 250px"
     >
-      <q-card-section class="q-pb-none">      
+      <q-bar
+        v-blur
+        dark
+        class="full-width justify-between nnoselect text-body1 text-white bg-primary"
+      >
+        <q-btn 
+          dense
+          flat 
+          icon="replay"
+          size="sm"
+          @click="editCancel"
+        />
+        <div>{{ t('memo') }}</div>
+        <q-btn
+          dense
+          flat
+          icon="check"
+          size="sm"
+          @click="editConfirm"
+        />
+      </q-bar>
+      <q-card-section>      
         <q-input
           v-model="memo"
           clearable
@@ -317,27 +468,11 @@ const toResult = () => {
           autofocus
           clear-icon="close"
           color="primary"
-          label="메모"
           @focus="store.setInputFocused"
           @blur="store.setInputBlurred"
-          @keyup.enter="{store.blurElement(); editConfirm();}"
+          @keyup.enter="{store.setInputBlurred; editConfirm();}"
         />
       </q-card-section>
-      <q-card-actions
-        align="center"
-        class="text-negative bg-white"
-      >
-        <q-btn 
-          flat 
-          icon="replay"
-          @click="editCancel"
-        />
-        <q-btn
-          flat
-          icon="check"
-          @click="editConfirm"
-        />
-      </q-card-actions>
     </q-card>
   </q-dialog>
 </template>
@@ -390,9 +525,10 @@ const toResult = () => {
     history: '계산 결과'
     noHistory: '계산 결과가 없습니다.'
     doYouDeleteHistory: '모든 계산 기록을 지우겠어요?'
+    memo: '메모'
   en:
     history: 'History'
     noHistory: 'No history.'
     doYouDeleteHistory: 'Do you want to delete all history?'
-</i18n>
-    
+    memo: 'Memo'
+</i18n>    
