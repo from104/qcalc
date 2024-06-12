@@ -103,9 +103,6 @@ const unit = computed(() => {
   }
 });
 
-// 계산 결과 배열
-const histories = computed(() => calc.getHistories());
-
 const operator = computed(() => calc.getOperatorString() as string);
 
 // 사칙연산 표시 아이콘 배열
