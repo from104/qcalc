@@ -236,7 +236,7 @@ const filterFnTo = createFilterFn(toFilteredCurrencyOptions, toCurrencyOptions);
       icon="swap_horiz"
       size="md"
       class="col-2 q-mx-none q-px-sm"
-      @click="swapCurrencyValue"
+      @click="store.swapCurrencyValue"
     >
       <MyTooltip>{{ t('tooltipSwap') }}</MyTooltip>
     </q-btn>
