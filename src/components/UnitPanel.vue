@@ -169,7 +169,7 @@ watch(
       icon="swap_horiz"
       size="md"
       class="col-1 q-mx-none q-px-sm"
-      @click="swapUnitValue()"
+      @click="store.swapUnitValue()"
     >
       <MyTooltip>{{ t( 'tooltipSwap' ) }}</MyTooltip>
     </q-btn>
