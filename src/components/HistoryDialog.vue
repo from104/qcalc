@@ -186,16 +186,30 @@ const historyCopy = async (id: number, copyType: 'formattedNumber' | 'onlyNumber
                    copyType === 'memo' ? calc.getMemo(id) as string : '';
   try {
     await copyToClipboard(copyText);
-    store.notifyMsg('복사 성공');
+    store.notifyMsg(t('copySuccess'));
   } catch (error) {
     console.error(error);
-    store.notifyError('복사 실패');
+    store.notifyError(t('copyFailure'));
   }
 }
 
-const toResult = (id: number) => {
+const toMainResult = (id: number) => {
   const history = calc.getHistoryByID(id);
   calc.setCurrentNumber(history.resultNumber);
+}
+
+const toSubResult = (id: number) => {
+  const history = calc.getHistoryByID(id);
+  console.log('toSubResult', history, store.cTab);
+  if (store.cTab === 'unit') {
+    store.swapUnitValue();
+    setTimeout( () => { calc.setCurrentNumber(history.resultNumber); }, 5 );
+    setTimeout( () => { store.swapUnitValue(); }, 10 );
+  } else if (store.cTab === 'currency') {
+    store.swapCurrencyValue();
+    setTimeout( () => { calc.setCurrentNumber(history.resultNumber); }, 5 );
+    setTimeout( () => { store.swapCurrencyValue(); }, 10 );
+  }
 }
 
 const deleteHistory = (id: number) => {
@@ -308,7 +322,7 @@ const deleteHistory = (id: number) => {
                         @click="memoDialog(history.id as number)"
                       >
                         <q-item-section>
-                          <q-item-label>메모 추가</q-item-label>
+                          <q-item-label>{{ t('addMemo') }}</q-item-label>
                         </q-item-section>
                       </q-item>
                       <q-item
@@ -318,7 +332,7 @@ const deleteHistory = (id: number) => {
                         @click="memoDialog(history.id as number)"
                       >
                         <q-item-section>
-                          <q-item-label>메모 수정</q-item-label>
+                          <q-item-label>{{ t('editMemo') }}</q-item-label>
                         </q-item-section>
                       </q-item>
                       <q-item
@@ -328,7 +342,7 @@ const deleteHistory = (id: number) => {
                         @click="historyCopy(history.id as number, 'memo')"
                       >
                         <q-item-section>
-                          <q-item-label>메모 복사</q-item-label>
+                          <q-item-label>{{ t('copyMemo') }}</q-item-label>
                         </q-item-section>
                       </q-item>
                       <q-item
@@ -338,7 +352,7 @@ const deleteHistory = (id: number) => {
                         @click="memoDelete(history.id as number)"
                       >
                         <q-item-section>
-                          <q-item-label>메모 삭제</q-item-label>
+                          <q-item-label>{{ t('deleteMemo') }}</q-item-label>
                         </q-item-section>
                       </q-item>
                       <q-separator />
@@ -348,7 +362,7 @@ const deleteHistory = (id: number) => {
                         @click="historyCopy(history.id as number, 'formattedNumber')"
                       >
                         <q-item-section>
-                          <q-item-label>결과 복사 (표시된)</q-item-label>
+                            <q-item-label>{{ t('copyDisplayedResult') }}</q-item-label>
                           <q-item-section class="ellipsis">[ {{ store.getRightSideInHistory(history) }} ]</q-item-section>
                         </q-item-section>
                       </q-item>
@@ -358,7 +372,7 @@ const deleteHistory = (id: number) => {
                         @click="historyCopy(history.id as number, 'onlyNumber')"
                       >
                         <q-item-section>
-                          <q-item-label>결과 복사 (숫자만)</q-item-label>
+                            <q-item-label>{{ t('copyResultNumber') }}</q-item-label>
                           <q-item-section class="ellipsis">[ {{ history.resultNumber }} ]</q-item-section>
                         </q-item-section>
                       </q-item>
@@ -366,10 +380,20 @@ const deleteHistory = (id: number) => {
                       <q-item
                         v-ripple
                         clickable
-                        @click="toResult(history.id as number)"
+                        @click="toMainResult(history.id as number)"
                       >
                         <q-item-section>
-                          <q-item-label>메인 패널에 불러오기</q-item-label>
+                          <q-item-label>{{ t('loadToMainPanel') }}</q-item-label>
+                        </q-item-section>
+                      </q-item>
+                      <q-item
+                        v-if="store.cTab === 'unit' || store.cTab === 'currency'"
+                        v-ripple
+                        clickable
+                        @click="toSubResult(history.id as number)"
+                      >
+                        <q-item-section>
+                          <q-item-label>{{ t('loadToSubPanel') }}</q-item-label>
                         </q-item-section>
                       </q-item>
                       <q-separator />
@@ -379,7 +403,7 @@ const deleteHistory = (id: number) => {
                         @click="deleteHistory(history.id as number)"
                       >
                         <q-item-section>
-                          <q-item-label>결과 지우기</q-item-label>
+                          <q-item-label>{{ t('deleteResult') }}</q-item-label>
                         </q-item-section>
                       </q-item>
                     </q-list>
@@ -526,9 +550,31 @@ const deleteHistory = (id: number) => {
     noHistory: '계산 결과가 없습니다.'
     doYouDeleteHistory: '모든 계산 기록을 지우겠어요?'
     memo: '메모'
+    copySuccess: '클립보드에 복사되었습니다.'
+    copyFailure: '클립보드 복사에 실패했습니다.'
+    addMemo: '메모 추가'
+    editMemo: '메모 수정'
+    copyMemo: '메모 복사'
+    deleteMemo: '메모 삭제'
+    copyDisplayedResult: '표시된 결과 복사'
+    copyResultNumber: '결과 숫자 복사'
+    loadToMainPanel: '메인 패널에 불러오기'
+    loadToSubPanel: '서브 패널에 불러오기'
+    deleteResult: '결과 삭제'
   en:
     history: 'History'
     noHistory: 'No history.'
     doYouDeleteHistory: 'Do you want to delete all history?'
     memo: 'Memo'
+    copySuccess: 'Copied to clipboard.'
+    copyFailure: 'Failed to copy to clipboard.'
+    addMemo: 'Add memo'
+    editMemo: 'Edit memo'
+    copyMemo: 'Copy memo'
+    deleteMemo: 'Delete memo'    
+    copyDisplayedResult: 'Copy displayed result'
+    copyResultNumber: 'Copy result number'
+    loadToMainPanel: 'Load to main panel'
+    loadToSubPanel: 'Load to sub panel'
+    deleteResult: 'Delete result'
 </i18n>    
