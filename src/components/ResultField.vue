@@ -166,9 +166,6 @@ watch(
 
 onBeforeMount(() => {
   window.addEventListener('resize', setNeedFieldTooltip);
-  if (store.initPanel) {
-    calc.clear();
-  }
 });
 
 onMounted(() => {
