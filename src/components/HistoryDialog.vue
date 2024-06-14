@@ -362,8 +362,8 @@ const deleteHistory = (id: number) => {
                         @click="historyCopy(history.id as number, 'formattedNumber')"
                       >
                         <q-item-section>
-                            <q-item-label>{{ t('copyDisplayedResult') }}</q-item-label>
-                          <q-item-section class="ellipsis">[ {{ store.getRightSideInHistory(history) }} ]</q-item-section>
+                          <q-item-label>{{ t('copyDisplayedResult') }}</q-item-label>
+                          <q-item-label class="ellipsis">[ {{ store.getRightSideInHistory(history) }} ]</q-item-label>
                         </q-item-section>
                       </q-item>
                       <q-item
@@ -372,8 +372,8 @@ const deleteHistory = (id: number) => {
                         @click="historyCopy(history.id as number, 'onlyNumber')"
                       >
                         <q-item-section>
-                            <q-item-label>{{ t('copyResultNumber') }}</q-item-label>
-                          <q-item-section class="ellipsis">[ {{ history.resultNumber }} ]</q-item-section>
+                          <q-item-label>{{ t('copyResultNumber') }}</q-item-label>
+                          <q-item-label class="ellipsis">[ {{ history.resultNumber }} ]</q-item-label>
                         </q-item-section>
                       </q-item>
                       <q-separator />
