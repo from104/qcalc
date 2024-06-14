@@ -11,6 +11,9 @@ import { UnitConverter } from 'classes/UnitConverter';
 
 import MyTooltip from 'components/MyTooltip.vue';
 
+import { useI18n } from 'vue-i18n';
+const { t } = useI18n();
+
 const props = withDefaults(defineProps<{ field?:string, addon?: string }>(), {
   field: 'main', addon: 'none',
 });
@@ -38,6 +41,29 @@ const setNeedFieldTooltip = () => {
   return true;
 }
 
+const convertedUnitNumber = () => {
+  if (props.addon == 'unit') {
+    return UnitConverter.convert(
+      store.recentCategory,
+      calc.getCurrentNumber(),
+      store.recentUnitFrom[store.recentCategory],
+      store.recentUnitTo[store.recentCategory]
+    );
+  } else {
+    return '';
+  }
+}
+
+const convertedCurrencyNumber = () => {
+  if (props.addon == 'currency') {
+    return store.currencyConverter
+      .convert(Number(calc.getCurrentNumber()), store.recentCurrencyFrom, store.recentCurrencyTo)
+      .toString();
+  } else {
+    return '';
+  }
+}
+
 const getResult = () => {
   if (isMainField.value) {
     const currentNumber = calc.getCurrentNumber();
@@ -52,12 +78,7 @@ const getResult = () => {
 
       // 변환 결과를 반환
       return store.toFormattedNumber(
-        UnitConverter.convert(
-          store.recentCategory,
-          calc.getCurrentNumber(),
-          store.recentUnitFrom[store.recentCategory],
-          store.recentUnitTo[store.recentCategory]
-        )
+        convertedUnitNumber()
       );
     } else if (props.addon == 'currency') {
       // 저장된 환율이 잘못됐으면 초기화
@@ -65,9 +86,7 @@ const getResult = () => {
 
       // 변환 결과를 반환
       return store.toFormattedNumber(
-        store.currencyConverter
-          .convert(Number(calc.getCurrentNumber()), store.recentCurrencyFrom, store.recentCurrencyTo)
-          .toString()
+        convertedCurrencyNumber()
       );
     } else {
       return '';
@@ -101,6 +120,12 @@ const unit = computed(() => {
   } else {
     return '';
   }
+});
+
+const onlyNumber = computed(() => {
+  return props.field == 'main' ? calc.getCurrentNumber() :
+         props.addon == 'unit' ? convertedUnitNumber() :
+         props.addon == 'currency' ? convertedCurrencyNumber() : '';
 });
 
 const operator = computed(() => calc.getOperatorString() as string);
@@ -204,9 +229,37 @@ onMounted(() => {
           :class="isMainField ? 'text-h5' : ''"
           :style="`padding-top: ${store.paddingOnResult}px;`"
         >
-        <span id="symbol">{{ symbol }}</span>
-        <span :id="isMainField ? 'result' : 'subResult'">{{ result }}</span>
-        <span id="unit">{{ unit }}</span>
+          <span id="symbol">{{ symbol }}</span>
+          <span :id="isMainField ? 'result' : 'subResult'">{{ result }}</span>
+          <span id="unit">{{ unit }}</span>
+          <q-menu
+            context-menu
+            auto-close
+            touch-position
+          >
+            <q-list dense style="max-width: 200px;">
+              <q-item
+                v-ripple
+                clickable
+                @click="store.copyToClipboard(symbol+result+unit, t('copiedDisplayedResult'))"
+              >
+                <q-item-section>
+                  <q-item-label>{{ t('copyDisplayedResult') }}</q-item-label>
+                  <q-item-label class="ellipsis">[ {{ symbol+result+unit  }} ]</q-item-label>
+                </q-item-section>
+              </q-item>
+              <q-item
+                v-ripple
+                clickable
+                @click="store.copyToClipboard(onlyNumber, t('copiedOnlyNumber'))"
+              >
+                <q-item-section>
+                  <q-item-label>{{ t('copyOnlyNumber') }}</q-item-label>
+                  <q-item-label class="ellipsis">[ {{ onlyNumber }} ]</q-item-label>
+                </q-item-section>
+              </q-item>
+            </q-list>
+          </q-menu>
           <MyTooltip v-if="needFieldTooltip">
             {{ symbol+result+unit }}
           </MyTooltip>
@@ -246,3 +299,16 @@ onMounted(() => {
   }
 }
 </style>
+
+<i18n>
+  ko:
+    copiedDisplayedResult: '표시된 결과가 복사되었습니다.'
+    copyDisplayedResult: '표시된 결과 복사'
+    copiedOnlyNumber: '결과 숫자가 복사되었습니다.'
+    copyOnlyNumber: '결과 숫자 복사'    
+  en:
+    copiedDisplayedResult: 'The displayed result has been copied.'
+    copyDisplayedResult: 'Copy displayed result'
+    copiedOnlyNumber: 'The result number has been copied.'
+    copyOnlyNumber: 'Copy result number'
+</i18n>    
