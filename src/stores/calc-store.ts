@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia';
-import { Dark, Notify, is } from 'quasar';
+import { Dark, Notify, copyToClipboard } from 'quasar';
 import { create, all } from 'mathjs';
 
 import { Calculator } from 'classes/Calculator';
@@ -102,14 +102,14 @@ export const useCalcStore = defineStore('calc', {
     },
     // 숫자를 표준 로케일 문자열로 변환하는 함수
     toFormattedNumber(number: string): string {
-      const n = MathB.bignumber(number);
-      const s = MathB.format(n, {
+      const bignumber = MathB.bignumber(number);
+      const formattedNumber = MathB.format(bignumber, {
         precision: this.decimalPlaces === -2 ? 20 : this.decimalPlaces,
         notation: this.decimalPlaces === -2 ? 'auto' : 'fixed',
         lowerExp: -20,
         upperExp: 20,
       });
-      return this.useGrouping ? this.numberGrouping(s) : s;
+      return this.useGrouping ? this.numberGrouping(formattedNumber) : formattedNumber;
     },
     // 계산 결과 중 좌변
     getLeftSideInHistory(h: History, lf = false) {
@@ -186,6 +186,11 @@ export const useCalcStore = defineStore('calc', {
         timeout: timeout,
         color: 'negative',
       });
+    },
+    // 클립보드에 복사하는 함수
+    copyToClipboard(text: string, message: string): void {
+      copyToClipboard(text);
+      this.notifyMsg(message);
     },
     // 요소의 포커스를 해제하는 함수
     blurElement(): void {
