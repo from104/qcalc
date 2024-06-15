@@ -32,7 +32,7 @@ onUnmounted(() => {
 <template>
   <q-layout view="hHh lpR fFf">
     <q-header class="z-top noselect" elevated>
-      <q-toolbar v-blur>
+      <q-toolbar id="header" v-blur>
         <q-btn
           flat
           dense
@@ -44,7 +44,9 @@ onUnmounted(() => {
       </q-toolbar>
     </q-header>
     <q-page-container style="padding-bottom: 0px;">
-      <component :is="Component" />
+      <q-scroll-area style="height: calc(100vh - 50px)">
+        <component :is="Component" />
+      </q-scroll-area>
     </q-page-container>
   </q-layout>
 </template>
