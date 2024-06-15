@@ -49,6 +49,9 @@ export class Calculator {
   // 계산기에서 실제로 보여지는 숫자
   private currentNumber!: string;
 
+  // 메모리 숫자
+  private memoryNumber!: string;
+
   // 연산자 코드 저장
   private currentOperator!: Operator;
 
@@ -71,6 +74,7 @@ export class Calculator {
     this.previousNumber = '0';
     this.repeatedNumber = '0';
     this.currentNumber = '0';
+    this.memoryNumber = '0';
     this.currentOperator = Operator.None;
     this.shouldReset = false;
   }
@@ -402,6 +406,37 @@ export class Calculator {
     this.shouldReset = true;
   }
 
+  // 메모리 저장
+  public memorySave() {
+    this.memoryNumber = this.currentNumber;
+  }
+
+  // 메모리 불러오기
+  public memoryRecall() {
+    this.clear();
+    this.currentNumber = this.memoryNumber;
+  }
+
+  // 메모리 클리어
+  public memoryClear() {
+    this.memoryNumber = '0';
+  }
+
+  // 메모리 더하기
+  public memoryPlus() {
+    this.memoryNumber = MathB.bignumber(this.memoryNumber).add(this.currentNumber).toString();
+  }
+
+  // 메모리 마이너스
+  public memoryMinus() {
+    this.memoryNumber = MathB.bignumber(this.memoryNumber).sub(this.currentNumber).toString();
+  }
+
+  // 메모리 숫자 얻기
+  public getMemoryNumber(): string {
+    return this.memoryNumber;
+  }
+  
   // 히스토리 추가
   private addHistory(history: History): string {
     // console.log(history);
