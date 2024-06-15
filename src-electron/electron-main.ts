@@ -6,6 +6,7 @@ import {
   BrowserWindow, 
   nativeTheme, 
   ipcMain,
+  screen,
 } from 'electron';
 
 const currentDir = fileURLToPath(new URL('.', import.meta.url))
@@ -28,13 +29,19 @@ let mainWindow: BrowserWindow | undefined;
 async function createWindow() {
   const iconPath = path.resolve(currentDir, 'icons/icon.png');
 
-  const mainWindowWidth = 352;
-  const mainWindowHeight = 604;
+  const defaultWindowWidth = 352;
+  const defaultWindowHeight = 604;
 
   try {
+    const { width, height } = screen.getPrimaryDisplay().workAreaSize;
+    const isLandscape = width > height;
+
+    const maxWindowHeight = isLandscape ? height : Math.floor(height / 2);
+    const maxWindowWidth = isLandscape ? Math.floor(width / 4) : Math.floor(width / 3);
+
     const mainWindowState = windowState({
-      defaultWidth: mainWindowWidth,
-      defaultHeight: mainWindowHeight,
+      defaultWidth: defaultWindowWidth,
+      defaultHeight: defaultWindowHeight,
     });
     /**
      * Initial window options
@@ -45,10 +52,14 @@ async function createWindow() {
       y: mainWindowState.y,
       width: mainWindowState.width,
       height: mainWindowState.height,
-      minWidth: mainWindowWidth,
-      minHeight: mainWindowHeight,
+      minWidth: defaultWindowWidth,
+      minHeight: defaultWindowHeight,
+      maxWidth: maxWindowWidth,
+      maxHeight: maxWindowHeight,
       useContentSize: true,
       resizable: true,
+      maximizable: false,
+      show: false,
       webPreferences: {
         contextIsolation: true,
         // More info: https://v2.quasar.dev/quasar-cli-vite/developing-electron-apps/electron-preload-script
@@ -81,6 +92,10 @@ async function createWindow() {
 
     mainWindow.on('closed', () => {
       mainWindow = undefined;
+    });
+
+    mainWindow.once('ready-to-show', () => {
+      mainWindow?.show();
     });
   } catch (error) {
     console.error('Failed to create window:', error);
