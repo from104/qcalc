@@ -269,12 +269,10 @@ export const useCalcStore = defineStore('calc', {
       }
     },
     swapUnitValue(): void {
-      console.log('swapUnitValue'+this.cTab);
       if (this.cTab === 'unit') {
         // 변환 결과를 원본 값으로 바꾸기
         // (computed로 선언된 unitResult로 인해 값이 바뀌면 자동으로 변환 결과가 바뀜)
         this.calc.setCurrentNumber(document.getElementById('subResult')?.textContent ?? '0');
-        console.log('swapUnitValue'+document.getElementById('subResult')?.textContent ?? '0');
         // 단위도 바꾸기
         const temp = this.recentUnitFrom[this.recentCategory];
         this.recentUnitFrom[this.recentCategory] = this.recentUnitTo[this.recentCategory];
@@ -285,7 +283,6 @@ export const useCalcStore = defineStore('calc', {
       if (this.cTab === 'currency') {
         // 변환 결과를 원본 값으로 바꾸기
         this.calc.setCurrentNumber(document.getElementById('subResult')?.textContent ?? '0');
-      
         // 화폐도 바꾸기
         const temp = this.recentCurrencyFrom;
         this.recentCurrencyFrom = this.recentCurrencyTo;
