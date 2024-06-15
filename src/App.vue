@@ -13,13 +13,13 @@ import { useI18n } from 'vue-i18n';
 const { locale } = useI18n({ useScope: 'global' });
 const { t } = useI18n();
 
+const title = ref(t('message.appTitle'));
+
 import { useMeta, useQuasar } from 'quasar';
 useMeta(() => ({
   title: title.value,
-}));
+}));  
 const $q = useQuasar();
-
-const title = ref(t('message.appTitle'));
 
 const updateTitle = () => {
   title.value = t('message.appTitle');
