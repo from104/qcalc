@@ -119,7 +119,7 @@ onMounted(() => {
       v-if="store.cTab !== 'calc'"
       context-menu
       auto-close
-      touch-position
+      class="z-max"
     >
       <q-list dense style="max-width: 200px;">
         <q-item
