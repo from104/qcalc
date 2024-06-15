@@ -200,7 +200,6 @@ const toMainResult = (id: number) => {
 
 const toSubResult = (id: number) => {
   const history = calc.getHistoryByID(id);
-  console.log('toSubResult', history, store.cTab);
   if (store.cTab === 'unit') {
     store.swapUnitValue();
     setTimeout( () => { calc.setCurrentNumber(history.resultNumber); }, 5 );
