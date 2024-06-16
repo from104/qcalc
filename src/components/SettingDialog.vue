@@ -119,17 +119,16 @@ onBeforeUnmount(() => {
       id="setting"
       class="full-width"
     >
-    <q-bar
-      v-blur
-      dark
-      class="full-width noselect text-white bg-primary"
-    >
-      <q-icon name="settings" size="sm" />
-      <div>{{ t('message.settings') }}</div>
-      <q-space />
-      <q-btn dense flat icon="close" size="md" @click="store.isSettingDialogOpen = false" />
-    </q-bar>
-
+      <q-bar
+        v-blur
+        dark
+        class="full-width noselect text-white bg-primary"
+      >
+        <q-icon name="settings" size="sm" />
+        <div>{{ t('message.settings') }}</div>
+        <q-space />
+        <q-btn dense flat icon="close" size="md" @click="store.isSettingDialogOpen = false" />
+      </q-bar>
       <q-card-section class="full-width">
         <q-list v-blur dense>
           <q-item v-if="$q.platform.is.electron" class="q-py-none">
@@ -225,6 +224,18 @@ onBeforeUnmount(() => {
                 </div>
               </template>
             </q-slider>
+          </q-item>
+          
+          <q-item class="q-py-none">
+            <q-item-label class="self-center"
+              >{{ '버튼 추가 라벨 표시' }} (;)</q-item-label
+            >
+            <q-space />
+            <q-toggle
+              v-model="store.showButtonAddedLabel"
+              keep-color
+              dense
+            />
           </q-item>
 
           <template v-if="store.cTab == 'unit'">
