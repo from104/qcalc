@@ -57,6 +57,8 @@ export const useCalcStore = defineStore('calc', {
     isHistoryDialogOpen: false,
     // setting dialog가 열렸는지 여부
     isSettingDialogOpen: false,
+    // 버튼의 추가 라벨 표시 여부
+    showButtonAddedLabel: true,
   }),
   getters: {},
   actions: {
