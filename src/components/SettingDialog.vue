@@ -62,10 +62,11 @@ const keyBinding = new KeyBinding([
   [['t'], toggleAlwaysOnTopWithNotify],
   [['n'], store.toggleInitPanel],
   [['k'], store.toggleDarkMode],
+  [[';'], store.toggleButtonAddedLabel],
   [[','], store.toggleUseGrouping],
   [['['], store.decDecimalPlaces],
   [[']'], store.incDecimalPlaces],
-  [['e'], () => { store.isSettingDialogOpen = true; }],
+  [['Alt+s'], () => { store.isSettingDialogOpen = true; }],
 ]);
 
 
@@ -170,6 +171,18 @@ onBeforeUnmount(() => {
 
           <q-item class="q-py-none">
             <q-item-label class="self-center"
+              >{{ t('showButtonAddedLabel') }} (;)</q-item-label>
+            >
+            <q-space />
+            <q-toggle
+              v-model="store.showButtonAddedLabel"
+              keep-color
+              dense
+            />
+          </q-item>
+
+          <q-item class="q-py-none">
+            <q-item-label class="self-center"
               >{{ t('useGrouping') }} (,)</q-item-label
             >
             <q-space />
@@ -225,18 +238,6 @@ onBeforeUnmount(() => {
               </template>
             </q-slider>
           </q-item>
-          
-          <q-item class="q-py-none">
-            <q-item-label class="self-center"
-              >{{ '버튼 추가 라벨 표시' }} (;)</q-item-label
-            >
-            <q-space />
-            <q-toggle
-              v-model="store.showButtonAddedLabel"
-              keep-color
-              dense
-            />
-          </q-item>
 
           <template v-if="store.cTab == 'unit'">
             <q-separator spaced="md" />
@@ -258,7 +259,7 @@ onBeforeUnmount(() => {
 
             <q-item class="q-py-none">
               <q-item-label class="self-center">
-                {{ t('showSymbol') }} (b)
+                {{ t('showSymbol') }} (o)
               </q-item-label>
               <q-space />
               <q-toggle
@@ -322,6 +323,7 @@ ko:
   alwaysOnTopOff: '항상 위 꺼짐'
   initPanel: '시작 시 패널 초기화'
   darkMode: '다크 모드'
+  showButtonAddedLabel:; '버튼 추가 라벨 표시'
   useGrouping: '천단위 표시'
   decimalPlaces: '소수점'
   decimalPlacesStat: '소수점 자리수'
@@ -337,6 +339,7 @@ en:
   alwaysOnTopOff: 'Always on top OFF'
   initPanel: 'Init panel at startup'
   darkMode: 'Dark mode'
+  showButtonAddedLabel: 'Show button added label'
   useGrouping: 'Use grouping'
   decimalPlaces: 'Decimal'
   decimalPlacesStat: 'Decimal places (stat)'

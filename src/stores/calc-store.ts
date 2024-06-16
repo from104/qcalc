@@ -85,6 +85,9 @@ export const useCalcStore = defineStore('calc', {
     toggleUseGrouping() {
       this.useGrouping = !this.useGrouping;
     },
+    toggleButtonAddedLabel() {
+      this.showButtonAddedLabel = !this.showButtonAddedLabel;
+    },
     setDecimalPlaces(decimalPlaces: number) {
       if ([-2, 0, 2, 4, 6].includes(decimalPlaces)) {
         this.decimalPlaces = decimalPlaces;
