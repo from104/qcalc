@@ -34,39 +34,80 @@ const funcWithError = (func: ()=>void) => {
     }
   }
 };
+
 // 버튼 레이블, 버튼 컬러, 버튼에 해당하는 키, 버튼 클릭 이벤트 핸들러
-type Button = [id: string, label: string, color: string, keys: string[], handler: () => void][];
+type Button = {[id: string]: [isIcon: boolean, label: string, color: string, keys: string[], handler: () => void]};
 
 // prettier-ignore
-const buttons: Button = [
-  ['power', 'x²', 'function', ['u'], () => calc.pow2()],
-  ['root', '√x', 'function', ['r'], () => calc.sqrt()],
-  ['clear', 'C', 'important', ['Delete', 'Escape', 'c'], () => calc.clear()],
-  ['backspace', '@mdi-backspace', 'important', ['Backspace'], () => calc.deleteDigitOrDot()],
-  ['plusMinus', '@mdi-plus-minus-variant', 'function', ['Shift+Minus', 's'], () => calc.changeSign()],
-  ['percent', '%', 'function', ['%', 'p'], () => calc.percent()],
-  ['reciprocal', '1/x', 'function', ['i'], () => calc.rec()],
-  ['divide', '@mdi-division', 'function', ['/'], () => calc.div()],
-  ['seven', '7', 'normal', ['7'], () => calc.addDigit(7)],
-  ['eight', '8', 'normal', ['8'], () => calc.addDigit(8)],
-  ['nine', '9', 'normal', ['9'], () => calc.addDigit(9)],
-  ['multiply', '@mdi-close', 'function', ['*'], () => calc.mul()],
-  ['four', '4', 'normal', ['4'], () => calc.addDigit(4)],
-  ['five', '5', 'normal', ['5'], () => calc.addDigit(5)],
-  ['six', '6', 'normal', ['6'], () => calc.addDigit(6)],
-  ['minus', '@mdi-minus', 'function', ['-'], () => calc.minus()],
-  ['one', '1', 'normal', ['1'], () => calc.addDigit(1)],
-  ['two', '2', 'normal', ['2'], () => calc.addDigit(2)],
-  ['three', '3', 'normal', ['3'], () => calc.addDigit(3)],
-  ['plus', '@mdi-plus', 'function', ['+'], () => calc.plus()],
-  ['doubleZero', '00', 'normal', [], () => { calc.addDigit(0); calc.addDigit(0); }],
-  ['zero', '0', 'normal', ['0'], () => calc.addDigit(0)],
-  ['dot', '@mdi-circle-small', 'normal', ['.'], () => calc.addDot()],
-  ['equals', '@mdi-equal', 'function', ['=', 'Enter'], ()=>calc.equal()],
-];
+const buttons: Button = {
+  a1: [false, 'x²', 'function', ['u'], () => calc.pow2()],
+  b1: [false, '√x', 'function', ['r'], () => calc.sqrt()],
+  c1: [false, 'C', 'important', ['Delete', 'Escape', 'c'], () => calc.clear()],
+  d1: [true,  'mdi-backspace', 'important', ['Backspace'], () => calc.deleteDigitOrDot()],
+  a2: [true,  'mdi-plus-minus-variant', 'function', ['Shift+Minus', 's'], () => calc.changeSign()],
+  b2: [false, '%', 'function', ['%', 'p'], () => calc.percent()],
+  c2: [false, '1/x', 'function', ['i'], () => calc.rec()],
+  d2: [true,  'mdi-division', 'function', ['/'], () => calc.div()],
+  a3: [false, '7', 'normal', ['7'], () => calc.addDigit(7)],
+  b3: [false, '8', 'normal', ['8'], () => calc.addDigit(8)],
+  c3: [false, '9', 'normal', ['9'], () => calc.addDigit(9)],
+  d3: [true,  'mdi-close', 'function', ['*'], () => calc.mul()],
+  a4: [false, '4', 'normal', ['4'], () => calc.addDigit(4)],
+  b4: [false, '5', 'normal', ['5'], () => calc.addDigit(5)],
+  c4: [false, '6', 'normal', ['6'], () => calc.addDigit(6)],
+  d4: [true,  'mdi-minus', 'function', ['-'], () => calc.minus()],
+  a5: [false, '1', 'normal', ['1'], () => calc.addDigit(1)],
+  b5: [false, '2', 'normal', ['2'], () => calc.addDigit(2)],
+  c5: [false, '3', 'normal', ['3'], () => calc.addDigit(3)],
+  d5: [true,  'mdi-plus', 'function', ['+'], () => calc.plus()],
+  a6: [true,  'keyboard_capslock', 'important', [], () => { calc.addDigit(0); calc.addDigit(0); }],
+  b6: [false, '0', 'normal', ['0'], () => calc.addDigit(0)],
+  c6: [true,  'mdi-circle-small', 'normal', ['.'], () => calc.addDot()],
+  d6: [true,  'mdi-equal', 'important', ['=', 'Enter'], () => calc.equal()],
+};
+
+/*
+x^y, x의 y제곱근, MC, MR
+10^x, x mod y, x!, M/
+sin, cos, tan, M*
+Pi/2, ln(10), ln(2) M-
+Pi, 황금비(φ),log e,  M+
+shift, int, frac, MS
+*/
+
+type ButtonAddedFunc = {[id: string]: string};
+
+// 계산기 버튼에 2번째 기능에 대한 레이블 정의
+// prettier-ignore
+const buttonsAddedFunc: ButtonAddedFunc = {
+  a1: 'xⁿ',
+  b1: 'ⁿ√x',
+  c1: 'MC',
+  d1: 'MR',
+  a2: '10ⁿ',
+  b2: 'x % y',
+  c2: 'x!',
+  d2: 'M÷',
+  a3: 'sin',
+  b3: 'cos',
+  c3: 'tan',
+  d3: 'M×',
+  a4: 'Pi/2',
+  b4: 'ln 10',
+  c4: 'ln 2',
+  d4: 'M-',
+  a5: 'Pi',
+  b5: 'phi',
+  c5: 'e',
+  d5: 'M+',
+  a6: '',
+  b6: 'int',
+  c6: 'frac',
+  d6: 'MS',
+};
 
 import { KeyBinding, KeyBindings } from 'classes/KeyBinding';
-const keyBindings: KeyBindings = buttons.map(([id, , , keys, ]) => [keys, () => store.clickButtonById('btn-'+id)]);
+const keyBindings: KeyBindings = Object.entries(buttons).map(([id, [, , , keys, ]]) => [keys, () => store.clickButtonById('btn-'+id)]);
 const keyBinding = new KeyBinding(keyBindings);
 
 // dom 요소가 마운트 되었을 때 계산기 키바인딩 설정하기
@@ -113,21 +154,31 @@ if (props.type === 'unit' || props.type === 'currency') {
     class="row wrap justify-center q-pt-xs q-pb-none q-px-none"
   >
     <div
-      v-for="(button, index) in buttons"
-      :key="index"
+      v-for="(button, id) in buttons"
+      :key="id"
       class="col-3 row wrap justify-center q-pa-sm"
     >
       <q-btn
-        :id="'btn-'+button[0]"
+        :id="'btn-'+id"
         class="shadow-2 noselect col-12 button"
         no-caps
         push
-        :label="button[1].charAt(0) != '@' ? button[1] : undefined"
-        :icon="button[1].charAt(0) == '@' ? button[1].slice(1) : undefined"
-        :class="button[1].charAt(0) == '@' ? 'icon' : 'char'"
+        :label="button[0] ? undefined : button[1]"
+        :icon=" button[0] ? button[1] : undefined"
+        :class="button[0] ? 'icon' : 'char'"
+        :style="!store.showButtonAddedLabel || !buttonsAddedFunc[id] ? {paddingTop: '4px'} : {}"
         :color="`btn-${button[2]}`"
         @click="() => funcWithError(button[4])"
-      />
+      >
+        <span 
+          v-if="store.showButtonAddedLabel && buttonsAddedFunc[id]"
+          class="top-label"
+          :class="[`top-label-${button[0] ? 'icon' : 'char'}`, `top-label-${button[2]}`]"
+        >
+          {{ buttonsAddedFunc[id] }}
+          
+        </span>
+      </q-btn>
     </div>
   </q-card-section>
 </template>
@@ -146,6 +197,7 @@ en:
   min-height: calc((100vh - v-bind('baseHeight')) / 6 - 20px);
   max-height: calc((100vh - v-bind('baseHeight')) / 6 - 20px);
   font-weight: 700;
+  position: relative;
 }
 
 .icon {
@@ -153,9 +205,11 @@ en:
     min(
         calc((100vh - v-bind('baseHeight')) / 6 * 0.25),
         calc((100vw - 40px) / 4 * 0.3)
-      ) * 0.9
+      ) * 0.8
   );
+  padding-top: calc(((100vh - v-bind('baseHeight')) / 6 - 15px) * 0.3); /* Lower the content by 4px */
 }
+
 .char {
   font-size: calc(
     min(
@@ -163,14 +217,49 @@ en:
         calc((100vw - 40px) / 4 * 0.3)
       ) * 1.2
   );
+  padding-top: calc(((100vh - v-bind('baseHeight')) / 6 - 25px) * 0.3); /* Lower the content by 4px */
 }
+
+.top-label {
+  text-align: center;
+  position: absolute;
+  font-size: calc(
+    min(
+        calc((100vh - v-bind('baseHeight')) / 6 * 0.26),
+        calc((100vw - 40px) / 4 * 0.3)
+      ) * 1.2 * 0.7
+  );
+}
+
+.top-label-icon {
+  top: calc(((100vh - v-bind('baseHeight')) / 6) * 0.15 - 9px);
+}
+
+.top-label-char {
+  top: calc(((100vh - v-bind('baseHeight')) / 6) * 0.15 - 17px);
+}
+
 .bg-btn-important {
   background: #cb9247 !important; // 아이콘의 밝은 녹색
-}
+};
+
 .bg-btn-function {
   background: #1d8fb6 !important; // 아이콘의 밝은 파란색과 어울리게 조정
-}
+};
+
 .bg-btn-normal {
   background: #5e9e7d !important; // 어두운 색
-}
+};
+
+.top-label-important {
+  color: #e6d8c6 !important; // 아이콘의 밝은 녹색
+};
+
+.top-label-function {
+  color: #b8dfed !important; // 아이콘의 밝은 파란색과 어울리게 조정
+};
+
+.top-label-normal {
+  color: #bcddcc !important; // 어두운 색
+};
 </style>
