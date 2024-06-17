@@ -323,7 +323,7 @@ ko:
   alwaysOnTopOff: '항상 위 꺼짐'
   initPanel: '시작 시 패널 초기화'
   darkMode: '다크 모드'
-  showButtonAddedLabel:; '버튼 추가 라벨 표시'
+  showButtonAddedLabel: '버튼 추가 라벨 표시'
   useGrouping: '천단위 표시'
   decimalPlaces: '소수점'
   decimalPlacesStat: '소수점 자리수'
