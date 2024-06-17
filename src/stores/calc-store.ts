@@ -59,6 +59,10 @@ export const useCalcStore = defineStore('calc', {
     isSettingDialogOpen: false,
     // 버튼의 추가 라벨 표시 여부
     showButtonAddedLabel: true,
+    // 계산기 버튼의 추가 기능 여부
+    buttonShift: false,
+    // 계산기 버튼의 추가 기능 잠금
+    buttonShiftLock: false,
   }),
   getters: {},
   actions: {
@@ -303,6 +307,24 @@ export const useCalcStore = defineStore('calc', {
         this.recentCurrencyTo = temp;
       }
     },    
+    toggleButtonShift(): void {
+      this.buttonShift = !this.buttonShift;
+    },
+    onButtonShift(): void {
+      this.buttonShift = true;
+    },
+    offButtonShift(): void {
+      this.buttonShift = false;
+    },
+    toggleButtonShiftLock(): void {
+      this.buttonShiftLock = !this.buttonShiftLock;
+    },
+    onButtonShiftLock(): void {
+      this.buttonShiftLock = true;
+    },
+    offButtonShiftLock(): void {
+      this.buttonShiftLock = false;
+    },
   },
   persist: true,
 });
