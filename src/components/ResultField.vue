@@ -136,7 +136,12 @@ const operatorIcons: { [key: string]: string } = {
   '-': 'mdi-minus-box',
   '×': 'mdi-close-box',
   '÷': 'mdi-division-box',
+  'mod': 'mdi-alpha-m-box',
+  'pow': 'mdi-chevron-up-box',
+  'root': 'mdi-square-root-box',
 };
+
+const isMemoryReset = computed(() => calc.getIsMemoryReset());
 
 const getPreResult = () => {
   // 'history'는 계산의 직전 결과 기록을 가져옵니다.
@@ -202,7 +207,7 @@ onMounted(() => {
   <q-card-section class="col-12 q-px-sm" :class="field == 'main' ? 'q-pt-md q-pb-sm' : 'q-py-none'">
     <q-field
       class="shadow-2 justify-end self-center"
-      :class="isMainField ? '' : 'q-mt-none q-mb-xs'"
+      :class="[isMainField ? '' : 'q-mt-none q-mb-xs']"
       filled
       dense
       readonly
@@ -211,12 +216,19 @@ onMounted(() => {
       :stack-label="isMainField"
     >
       <template v-if="isMainField" #label>
-        <div id="preResult" v-blur class="text-black noselect">
+        <div id="preResult" v-blur class="noselect">
           {{ preResult }}
         </div>
       </template>
-      <template v-if="isMainField && operator != ''" #prepend>
-        <div v-blur class="text-black noselect full-height q-mt-xs q-pt-sm">
+      <template v-if="isMainField" #prepend>
+        <div v-if="!isMemoryReset" v-blur class="noselect full-height q-mt-xs q-pt-sm">
+          <q-icon name="mdi-alpha-m-circle" >
+            <q-tooltip>
+              {{ calc.getMemoryNumber() }}
+            </q-tooltip>
+          </q-icon>
+        </div>
+        <div v-if="operator != ''" v-blur class="noselect full-height q-mt-xs q-pt-sm">
           <q-icon :name="operatorIcons[operator]" />
         </div>
       </template>
@@ -225,7 +237,7 @@ onMounted(() => {
           :id="fieldID"
           v-mutation="setNeedFieldTooltip"
           v-mutation.characterData
-          class="self-center no-outline full-width full-height ellipsis text-right text-black q-pt-xs"
+          class="self-center no-outline full-width full-height ellipsis text-right q-pt-xs"
           :class="isMainField ? 'text-h5' : ''"
           :style="`padding-top: ${store.paddingOnResult}px;`"
         >
