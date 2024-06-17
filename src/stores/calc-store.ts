@@ -119,9 +119,15 @@ export const useCalcStore = defineStore('calc', {
     // 계산 결과 중 좌변
     getLeftSideInHistory(h: History, lf = false) {
       const br = lf ? '\n' : '';
-      if (['+', '-', '×', '÷'].includes(h.operator)) {
+      if (['+', '-', '×', '÷', 'mod'].includes(h.operator)) {
         // 사칙연산
         return `${this.toFormattedNumber(h.previousNumber)}${br} ${h.operator} ${this.toFormattedNumber(h.argumentNumber ?? '')}`;
+      } else if (h.operator == 'pow') {
+        // N제곱
+        return `${this.toFormattedNumber(h.previousNumber)}${br} ^ ${this.toFormattedNumber(h.argumentNumber ?? '')}`;
+      } else if (h.operator == 'root') {
+        // N제곱근
+        return `${this.toFormattedNumber(h.previousNumber)}${br} ^ (1/${this.toFormattedNumber(h.argumentNumber ?? '')})`;
       } else if (h.operator == '÷%') {
         // 퍼센트로 나누는 경우
         return `${this.toFormattedNumber(h.previousNumber)}${br} ÷ ${this.toFormattedNumber(h.argumentNumber ?? '')}${br} × 100`;
@@ -134,8 +140,11 @@ export const useCalcStore = defineStore('calc', {
       } else if (h.operator == 'pow2') {
         // 제곱
         return `${this.toFormattedNumber(h.previousNumber)} ^ 2`;
-      } else if (['sqrt'].includes(h.operator)) {
-        // 제곱근
+      } else if (h.operator == 'exp10') {
+        // 10의 N제곱
+        return `10 ^ ${this.toFormattedNumber(h.previousNumber)}`;
+      } else if (['sqrt', 'sin', 'cos', 'tan', 'fct', 'int', 'frac'].includes(h.operator)) {
+        // 제곱근 및 삼각함수 등
         return `${h.operator} ( ${this.toFormattedNumber(h.previousNumber)} )`;
       } else {
         // 그 외
