@@ -3,7 +3,8 @@ import {
   onMounted, 
   onBeforeUnmount, 
   ref, 
-  watch
+  watch,
+  reactive
 } from 'vue';
 
 import { useI18n } from 'vue-i18n';
@@ -60,7 +61,7 @@ const buttons: Button = {
   b5: [false, '2', 'normal', ['2'], () => calc.addDigit(2)],
   c5: [false, '3', 'normal', ['3'], () => calc.addDigit(3)],
   d5: [true,  'mdi-plus', 'function', ['+'], () => calc.plus()],
-  a6: [true,  'keyboard_capslock', 'important', [], () => { calc.addDigit(0); calc.addDigit(0); }],
+  a6: [true,  'keyboard_capslock', 'important', ['\\'], () => store.toggleButtonShift()],
   b6: [false, '0', 'normal', ['0'], () => calc.addDigit(0)],
   c6: [true,  'mdi-circle-small', 'normal', ['.'], () => calc.addDot()],
   d6: [true,  'mdi-equal', 'important', ['=', 'Enter'], () => calc.equal()],
@@ -75,35 +76,82 @@ Pi, 황금비(φ),log e,  M+
 shift, int, frac, MS
 */
 
-type ButtonAddedFunc = {[id: string]: string};
+type ButtonAddedFunc = {[id: string]: [label: string, keys: string[], handler: () => void]};
 
 // 계산기 버튼에 2번째 기능에 대한 레이블 정의
 // prettier-ignore
 const buttonsAddedFunc: ButtonAddedFunc = {
-  a1: 'xⁿ',
-  b1: 'ⁿ√x',
-  c1: 'MC',
-  d1: 'MR',
-  a2: '10ⁿ',
-  b2: 'x % y',
-  c2: 'x!',
-  d2: 'M÷',
-  a3: 'sin',
-  b3: 'cos',
-  c3: 'tan',
-  d3: 'M×',
-  a4: 'Pi/2',
-  b4: 'ln 10',
-  c4: 'ln 2',
-  d4: 'M-',
-  a5: 'Pi',
-  b5: 'phi',
-  c5: 'e',
-  d5: 'M+',
-  a6: '',
-  b6: 'int',
-  c6: 'frac',
-  d6: 'MS',
+  a1: ['xⁿ', [], () => calc.pow()],
+  b1: ['ⁿ√x', [], () => calc.root()],
+  c1: ['MC', [], () => calc.memoryClear()],
+  d1: ['MR', [], () => calc.memoryRecall()],
+  a2: ['10ⁿ', [], () => calc.exp10()],
+  b2: ['x%y', [], () => calc.mod()],
+  c2: ['x!', [], () => calc.fct()],
+  d2: ['M÷', [], () => calc.memoryDiv()],
+  a3: ['sin', [], () => calc.sin()],
+  b3: ['cos', [], () => calc.cos()],
+  c3: ['tan', [], () => calc.tan()],
+  d3: ['M×', [], () => calc.memoryMul()],
+  a4: ['Pi/2', [], () => calc.setConstant('pi2')],
+  b4: ['ln10', [], () => calc.setConstant('ln10')],
+  c4: ['ln2', [], () => calc.setConstant('ln2')],
+  d4: ['M-', [], () => calc.memoryMinus()],
+  a5: ['Pi', [], () => calc.setConstant('pi')],
+  b5: ['phi', [], () => calc.setConstant('phi')],
+  c5: ['e', [], () => calc.setConstant('e')],
+  d5: ['M+', [], () => calc.memoryPlus()],
+  a6: ['', [], () => null],
+  b6: ['int', [], () => calc.int()],
+  c6: ['frac', [], () => calc.frac()],
+  d6: ['MS', [], () => calc.memorySave()],
+};
+
+const showTooltips: { [id: string]: boolean } = reactive(
+  Object.fromEntries(Object.keys(buttons).map((id) => [id, false]))
+);
+
+// 버튼 시프트 상태에 따라 기능 실행
+const shiftFunc = (id: string | number) => {
+  if (store.buttonShift) {
+    funcWithError(buttonsAddedFunc[id][2]);
+    if (id === 'a6') {
+      store.offButtonShift();
+      store.offButtonShiftLock();
+      return;
+    }
+    if (store.buttonShiftLock)
+      return;
+    store.offButtonShift();
+  } else {
+    funcWithError(buttons[id][4]);
+  }
+};
+
+const holdFunc = (id: string | number) => {
+  if (id === 'a6') {
+    if (store.buttonShiftLock) {
+      store.offButtonShiftLock();
+      store.offButtonShift();
+    } else {
+      store.onButtonShiftLock();
+      store.onButtonShift();
+    }
+    return;
+  }
+  if (store.buttonShift) {
+    funcWithError(buttons[id][4]);
+    if (store.buttonShiftLock)
+      return;
+    store.offButtonShift();
+    return;
+  } else {
+    funcWithError(buttonsAddedFunc[id][2]);
+    showTooltips[id] = true;
+    setTimeout(() => {
+      showTooltips[id] = false;
+    }, 1000);
+  }
 };
 
 import { KeyBinding, KeyBindings } from 'classes/KeyBinding';
@@ -157,27 +205,38 @@ if (props.type === 'unit' || props.type === 'currency') {
       v-for="(button, id) in buttons"
       :key="id"
       class="col-3 row wrap justify-center q-pa-sm"
-    >
+      >
       <q-btn
         :id="'btn-'+id"
+        v-touch-hold.mouse="() => holdFunc(id)"
         class="shadow-2 noselect col-12 button"
         no-caps
         push
-        :label="button[0] ? undefined : button[1]"
-        :icon=" button[0] ? button[1] : undefined"
-        :class="button[0] ? 'icon' : 'char'"
-        :style="!store.showButtonAddedLabel || !buttonsAddedFunc[id] ? {paddingTop: '4px'} : {}"
+        :label="store.buttonShift && !store.showButtonAddedLabel && id !== 'a6' ? buttonsAddedFunc[id][0]: (button[0] ? undefined : button[1])"
+        :icon=" store.buttonShift && !store.showButtonAddedLabel && id !== 'a6' ? undefined : (button[0] ? button[1] : undefined)"
+        :class="[store.buttonShift && !store.showButtonAddedLabel && id !== 'a6' ? 'char' : (button[0] ? 'icon' : 'char'), id === 'a6' && store.buttonShift ? 'button-shift' : '']"
+        :style="!store.showButtonAddedLabel || !buttonsAddedFunc[id][0] ? {paddingTop: '4px'} : {}"
         :color="`btn-${button[2]}`"
-        @click="() => funcWithError(button[4])"
+        @click="() => shiftFunc(id)"
       >
         <span 
           v-if="store.showButtonAddedLabel && buttonsAddedFunc[id]"
           class="top-label"
           :class="[`top-label-${button[0] ? 'icon' : 'char'}`, `top-label-${button[2]}`]"
         >
-          {{ buttonsAddedFunc[id] }}
-          
+          {{ buttonsAddedFunc[id][0] }}          
         </span>
+        <q-tooltip 
+          :model-value="showTooltips[id]" 
+          no-parent-event 
+          anchor="top middle" 
+          self="center middle"
+          transition-show="jump-up"
+          transition-hide="jump-down"
+          transition-duration="50"
+        >
+          {{ buttonsAddedFunc[id][0] }}
+        </q-tooltip>
       </q-btn>
     </div>
   </q-card-section>
@@ -261,5 +320,9 @@ en:
 
 .top-label-normal {
   color: #bcddcc !important; // 어두운 색
+};
+
+.button-shift {
+  background: #cb4747 !important; 
 };
 </style>
