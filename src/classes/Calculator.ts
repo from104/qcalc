@@ -1,13 +1,10 @@
-import { create, all, pi, BigNumber, phi } from 'mathjs';
+import { create, all } from 'mathjs';
 
 const MathB = create(all, {
   number: 'BigNumber',
   precision: 64,
 }) as math.MathJsStatic;
 
-/**
- * Enum representing different operators.
- */
 /**
  * 다양한 연산자를 나타내는 열거형입니다.
  */
@@ -114,8 +111,6 @@ export class Calculator {
     this.previousNumber = '0';
     this.repeatedNumber = '0';
     this.currentNumber = '0';
-    this.memoryNumber = '0';
-    this.isMemoryReset = true;
     this.currentOperator = Operator.None;
     this.shouldReset = false;
   }
@@ -603,8 +598,11 @@ export class Calculator {
 
   // 메모리 불러오기
   public memoryRecall() {
-    this.clear();
-    this.currentNumber = this.memoryNumber;
+    if (this.isMemoryReset) {
+      throw new Error('No memory to recall.'); 
+    } else {
+      this.currentNumber = this.memoryNumber;
+    }
   }
 
   // 메모리 클리어
@@ -662,7 +660,7 @@ export class Calculator {
     } else {
       history.id = Math.max(...(this.histories.map((h) => h.id) as number[])) + 1;
     }
-    // 배열 앞에 히스토리 추가ㄴ
+    // 배열 앞에 히스토리 추가
     this.histories.unshift(history);
     
     // 히스토리 크기가 최대 크기를 넘어서면 제일 뒤의 것을 제거
