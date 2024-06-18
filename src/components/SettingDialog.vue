@@ -1,112 +1,116 @@
 <script lang="ts" setup>
-import { 
-  onMounted, 
-  onBeforeMount, 
-  reactive, 
-  watch,  
-  onBeforeUnmount, 
-  ref 
-} from 'vue';
+  import {
+    onMounted,
+    onBeforeMount,
+    reactive,
+    watch,
+    onBeforeUnmount,
+    ref,
+  } from 'vue';
 
-import { version } from '../../package.json';
+  import {version} from '../../package.json';
 
-import MyTooltip from 'components/MyTooltip.vue';
+  import MyTooltip from 'components/MyTooltip.vue';
 
-import { useQuasar } from 'quasar';
-const $q = useQuasar();
+  import {useQuasar} from 'quasar';
+  const $q = useQuasar();
 
-import { useCalcStore } from 'src/stores/calc-store';
-const store = useCalcStore();
+  import {useCalcStore} from 'src/stores/calc-store';
+  const store = useCalcStore();
 
-import { useI18n } from 'vue-i18n';
-const { locale } = useI18n({ useScope: 'global' });
-const { t } = useI18n();
+  import {useI18n} from 'vue-i18n';
+  const {locale} = useI18n({useScope: 'global'});
+  const {t} = useI18n();
 
-const systemLocale = ref(navigator.language.substring(0, 2));
+  const systemLocale = ref(navigator.language.substring(0, 2));
 
-const localeOptions = reactive([
-  { value: 'ko', label: t('message.ko') },
-  { value: 'en', label: t('message.en') },
-]);
+  const localeOptions = reactive([
+    {value: 'ko', label: t('message.ko')},
+    {value: 'en', label: t('message.en')},
+  ]);
 
-watch([() => store.useSystemLocale, () => store.userLocale], () => {
-  localeOptions.forEach((option) => {
-    option.label = t('message.'+option.value);
+  watch([() => store.useSystemLocale, () => store.userLocale], () => {
+    localeOptions.forEach((option) => {
+      option.label = t('message.' + option.value);
+    });
+    store.locale = locale.value as string;
   });
-  store.locale = locale.value as string;
-});
 
-const setLocale = () => {
-  if (store.useSystemLocale) {
-    locale.value = systemLocale.value;
-  } else {
-    locale.value = store.userLocale;
-  }
-};
-
-const toggleAlwaysOnTopWithNotify = () => {
-  if ($q.platform.is.electron) {
-    // 수동으로 토글
-    store.toggleAlwaysOnTop();
-
-    if (store.alwaysOnTop) {
-      store.notifyMsg(t('alwaysOnTopOn'));
+  const setLocale = () => {
+    if (store.useSystemLocale) {
+      locale.value = systemLocale.value;
     } else {
-      store.notifyMsg(t('alwaysOnTopOff'));
+      locale.value = store.userLocale;
     }
-  }
-};
+  };
 
-import { KeyBinding } from 'classes/KeyBinding';
-const keyBinding = new KeyBinding([
-  [['t'], toggleAlwaysOnTopWithNotify],
-  [['n'], store.toggleInitPanel],
-  [['k'], store.toggleDarkMode],
-  [[';'], store.toggleButtonAddedLabel],
-  [[','], store.toggleUseGrouping],
-  [['['], store.decDecimalPlaces],
-  [[']'], store.incDecimalPlaces],
-  [['Alt+s'], () => { store.isSettingDialogOpen = true; }],
-]);
+  const toggleAlwaysOnTopWithNotify = () => {
+    if ($q.platform.is.electron) {
+      // 수동으로 토글
+      store.toggleAlwaysOnTop();
 
-
-// inputFocused 값이 바뀌면 키바인딩을 추가하거나 제거합니다.
-watch(
-  () => store.inputFocused,
-  () => {
-    // console.log('setting inputFocused', store.inputFocused);
-    if (store.inputFocused) {
-      keyBinding.unsubscribe();
-    } else {
-      keyBinding.subscribe();
+      if (store.alwaysOnTop) {
+        store.notifyMsg(t('alwaysOnTopOn'));
+      } else {
+        store.notifyMsg(t('alwaysOnTopOff'));
+      }
     }
-  },
-  { immediate: true }
-);
+  };
 
-onBeforeMount(() => {
-  store.setDarkMode(store.darkMode);
+  import {KeyBinding} from 'classes/KeyBinding';
+  const keyBinding = new KeyBinding([
+    [['t'], toggleAlwaysOnTopWithNotify],
+    [['n'], store.toggleInitPanel],
+    [['k'], store.toggleDarkMode],
+    [[';'], store.toggleButtonAddedLabel],
+    [[','], store.toggleUseGrouping],
+    [['['], store.decDecimalPlaces],
+    [[']'], store.incDecimalPlaces],
+    [
+      ['Alt+s'],
+      () => {
+        store.isSettingDialogOpen = true;
+      },
+    ],
+  ]);
 
-  setLocale();
+  // inputFocused 값이 바뀌면 키바인딩을 추가하거나 제거합니다.
+  watch(
+    () => store.inputFocused,
+    () => {
+      // console.log('setting inputFocused', store.inputFocused);
+      if (store.inputFocused) {
+        keyBinding.unsubscribe();
+      } else {
+        keyBinding.subscribe();
+      }
+    },
+    {immediate: true},
+  );
 
-  if (store.locale == '') {
-    // 처음 실행시
-    store.locale = systemLocale.value;
-  }
-  if (store.userLocale == '') {
-    // 처음 실행시
-    store.userLocale = systemLocale.value;
-  }
-});
+  onBeforeMount(() => {
+    store.setDarkMode(store.darkMode);
 
-onMounted(() => {
-  keyBinding.subscribe();
-});
+    setLocale();
 
-// dom 요소가 언마운트되기 전에 키바인딩 제거
-onBeforeUnmount(() => {
-  keyBinding.unsubscribe();
-});
+    if (store.locale == '') {
+      // 처음 실행시
+      store.locale = systemLocale.value;
+    }
+    if (store.userLocale == '') {
+      // 처음 실행시
+      store.userLocale = systemLocale.value;
+    }
+  });
+
+  onMounted(() => {
+    keyBinding.subscribe();
+  });
+
+  // dom 요소가 언마운트되기 전에 키바인딩 제거
+  onBeforeUnmount(() => {
+    keyBinding.unsubscribe();
+  });
 </script>
 
 <template>
@@ -116,19 +120,18 @@ onBeforeUnmount(() => {
     transition-show="slide-left"
     transition-hide="slide-right"
   >
-    <q-card
-      id="setting"
-      class="full-width"
-    >
-      <q-bar
-        v-blur
-        dark
-        class="full-width noselect text-white bg-primary"
-      >
+    <q-card id="setting" class="full-width">
+      <q-bar v-blur dark class="full-width noselect text-white bg-primary">
         <q-icon name="settings" size="sm" />
         <div>{{ t('message.settings') }}</div>
         <q-space />
-        <q-btn dense flat icon="close" size="md" @click="store.isSettingDialogOpen = false" />
+        <q-btn
+          dense
+          flat
+          icon="close"
+          size="md"
+          @click="store.isSettingDialogOpen = false"
+        />
       </q-bar>
       <q-card-section class="full-width">
         <q-list v-blur dense>
@@ -146,7 +149,9 @@ onBeforeUnmount(() => {
           </q-item>
 
           <q-item class="q-py-none">
-            <q-item-label class="self-center">{{ t('initPanel') }} (N)</q-item-label>
+            <q-item-label class="self-center"
+              >{{ t('initPanel') }} (N)</q-item-label
+            >
             <q-space />
             <q-toggle
               v-model="store.initPanel"
@@ -157,7 +162,9 @@ onBeforeUnmount(() => {
           </q-item>
 
           <q-item class="q-py-none">
-            <q-item-label class="self-center">{{ t('darkMode') }} (K)</q-item-label>
+            <q-item-label class="self-center"
+              >{{ t('darkMode') }} (K)</q-item-label
+            >
             <q-space />
             <q-toggle
               v-model="store.darkMode"
@@ -171,14 +178,11 @@ onBeforeUnmount(() => {
 
           <q-item class="q-py-none">
             <q-item-label class="self-center"
-              >{{ t('showButtonAddedLabel') }} (;)</q-item-label>
+              >{{ t('showButtonAddedLabel') }} (;)</q-item-label
+            >
             >
             <q-space />
-            <q-toggle
-              v-model="store.showButtonAddedLabel"
-              keep-color
-              dense
-            />
+            <q-toggle v-model="store.showButtonAddedLabel" keep-color dense />
           </q-item>
 
           <q-item class="q-py-none">
@@ -186,11 +190,7 @@ onBeforeUnmount(() => {
               >{{ t('useGrouping') }} (,)</q-item-label
             >
             <q-space />
-            <q-toggle
-              v-model="store.useGrouping"
-              keep-color
-              dense
-            />
+            <q-toggle v-model="store.useGrouping" keep-color dense />
           </q-item>
 
           <q-item class="q-py-none">
@@ -216,11 +216,11 @@ onBeforeUnmount(() => {
               dense
               @change="store.setDecimalPlaces(store.decimalPlaces)"
             >
-              <template #marker-label-group="{ markerList }">
+              <template #marker-label-group="{markerList}">
                 <div
                   class="cursor-pointer"
-                  :class=" ( markerList[ 0 ] as any ).classes "
-                  :style=" ( markerList[ 0 ] as any ).style "
+                  :class="(markerList[0] as any).classes"
+                  :style="(markerList[0] as any).style"
                   @click="store.setDecimalPlaces((markerList[0] as any).value)"
                 >
                   x
@@ -229,9 +229,11 @@ onBeforeUnmount(() => {
                   v-for="val in [1, 2, 3, 4]"
                   :key="val"
                   class="cursor-pointer"
-                  :class=" ( markerList[ val ] as any ).classes "
-                  :style=" ( markerList[ val ] as any ).style "
-                  @click="store.setDecimalPlaces((markerList[val] as any).value)"
+                  :class="(markerList[val] as any).classes"
+                  :style="(markerList[val] as any).style"
+                  @click="
+                    store.setDecimalPlaces((markerList[val] as any).value)
+                  "
                 >
                   {{ (markerList[val] as any).value }}
                 </div>
@@ -243,15 +245,11 @@ onBeforeUnmount(() => {
             <q-separator spaced="md" />
 
             <q-item class="q-py-none">
-              <q-item-label class="self-center" >
+              <q-item-label class="self-center">
                 {{ t('showUnit') }} (b)
               </q-item-label>
               <q-space />
-              <q-toggle
-                v-model="store.showUnit"
-                keep-color
-                dense
-              />
+              <q-toggle v-model="store.showUnit" keep-color dense />
             </q-item>
           </template>
           <template v-else-if="store.cTab == 'currency'">
@@ -262,11 +260,7 @@ onBeforeUnmount(() => {
                 {{ t('showSymbol') }} (o)
               </q-item-label>
               <q-space />
-              <q-toggle
-                v-model="store.showSymbol"
-                keep-color
-                dense
-              />
+              <q-toggle v-model="store.showSymbol" keep-color dense />
             </q-item>
           </template>
 
@@ -286,7 +280,9 @@ onBeforeUnmount(() => {
           </q-item>
 
           <q-item>
-            <q-item-label class="self-center"> {{ t('language') }} </q-item-label>
+            <q-item-label class="self-center">
+              {{ t('language') }}
+            </q-item-label>
             <q-space />
             <q-select
               v-model="store.userLocale"
@@ -301,7 +297,7 @@ onBeforeUnmount(() => {
           </q-item>
         </q-list>
       </q-card-section>
-      <q-bar class="full-width noselect text-white bg-primary" >
+      <q-bar class="full-width noselect text-white bg-primary">
         {{ `${t('message.version')} : ${version}` }}
         <q-space />
       </q-bar>
@@ -310,10 +306,10 @@ onBeforeUnmount(() => {
 </template>
 
 <style scoped lang="scss">
-#setting {
-  min-width: 250px;
-  max-width: 250px;
-}
+  #setting {
+    min-width: 250px;
+    max-width: 250px;
+  }
 </style>
 
 <i18n>

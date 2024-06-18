@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import CurrencyPanel from 'components/CurrencyPanel.vue';
-import ResultField from 'components/ResultField.vue';
-import CalcButton from 'components/CalcButton.vue';
+  import CurrencyPanel from 'components/CurrencyPanel.vue';
+  import ResultField from 'components/ResultField.vue';
+  import CalcButton from 'components/CalcButton.vue';
 </script>
 
 <template>
@@ -10,7 +10,7 @@ import CalcButton from 'components/CalcButton.vue';
       <ResultField field="main" addon="currency" />
       <CurrencyPanel />
       <ResultField field="sub" addon="currency" />
-      <CalcButton type="currency"/>
+      <CalcButton type="currency" />
     </q-card>
   </q-page>
 </template>

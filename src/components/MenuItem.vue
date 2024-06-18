@@ -1,12 +1,12 @@
 <script setup lang="ts">
-defineProps({
-  title: { type: String, required: true },
-  caption: { type: String, default: '' },
-  shortcut: { type: String, default: '' },
-  icon: { type: String, default: '' },
-  action: { type: Function, default: () => {} },
-  isSeparator: { type: Boolean, default: false },
-});
+  defineProps({
+    title: {type: String, required: true},
+    caption: {type: String, default: ''},
+    shortcut: {type: String, default: ''},
+    icon: {type: String, default: ''},
+    action: {type: Function, default: () => {}},
+    isSeparator: {type: Boolean, default: false},
+  });
 </script>
 
 <template>

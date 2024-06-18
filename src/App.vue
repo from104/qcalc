@@ -1,86 +1,91 @@
 <script setup lang="ts">
-import { 
-  ref, 
-  watch, 
-  onBeforeMount 
-} from 'vue';
+  import {ref, watch, onBeforeMount} from 'vue';
 
-import { useCalcStore } from 'stores/calc-store';
+  import {useCalcStore} from 'stores/calc-store';
 
-const store = useCalcStore();
+  const store = useCalcStore();
 
-import { useI18n } from 'vue-i18n';
-const { locale } = useI18n({ useScope: 'global' });
-const { t } = useI18n();
+  import {useI18n} from 'vue-i18n';
+  const {locale} = useI18n({useScope: 'global'});
+  const {t} = useI18n();
 
-const title = ref(t('message.appTitle'));
+  const title = ref(t('message.appTitle'));
 
-import { useMeta, useQuasar } from 'quasar';
-useMeta(() => ({
-  title: title.value,
-}));  
-const $q = useQuasar();
+  import {useMeta, useQuasar} from 'quasar';
+  useMeta(() => ({
+    title: title.value,
+  }));
+  const $q = useQuasar();
 
-const updateTitle = () => {
-  title.value = t('message.appTitle');
-};
+  const updateTitle = () => {
+    title.value = t('message.appTitle');
+  };
 
-watch(() => store.locale, () => {
-  updateTitle();
-});
+  watch(
+    () => store.locale,
+    () => {
+      updateTitle();
+    },
+  );
 
-onBeforeMount(() => {
-  locale.value = store.locale;
+  onBeforeMount(() => {
+    locale.value = store.locale;
 
-  if ($q.platform.is.win) {
-    store.paddingOnResult = 8;
-  } else if ($q.platform.is.linux) {
-    store.paddingOnResult = 3;
-  } else {
-    store.paddingOnResult = 0;
-  }
+    if ($q.platform.is.win) {
+      store.paddingOnResult = 8;
+    } else if ($q.platform.is.linux) {
+      store.paddingOnResult = 3;
+    } else {
+      store.paddingOnResult = 0;
+    }
 
-  updateTitle();
+    updateTitle();
 
-  store.isHistoryDialogOpen = false;
-  store.isSettingDialogOpen = false;
+    store.isHistoryDialogOpen = false;
+    store.isSettingDialogOpen = false;
 
-  if (store.initPanel) {
-    store.calc.clear();
-  }
+    if (store.initPanel) {
+      store.calc.clear();
+    }
 
-  if ( $q.platform.is.electron ) {
-    store.setAlwaysOnTop( store.alwaysOnTop );
-  }
-});
+    if ($q.platform.is.electron) {
+      store.setAlwaysOnTop(store.alwaysOnTop);
+    }
+  });
 </script>
 
 <template>
-  <router-view v-slot="{ Component, route }">
-    <transition :name="route.meta?.transition as string || ''" mode="default">
-      <component :is="Component" :key="route.path"/>
+  <router-view v-slot="{Component, route}">
+    <transition :name="(route.meta?.transition as string) || ''" mode="default">
+      <component :is="Component" :key="route.path" />
     </transition>
   </router-view>
 </template>
 
 <style>
-.slide-right-enter-active, .slide-right-leave-active {
-  transition: transform 0.3s ease
-}
-.slide-right-enter, .slide-right-leave-to {
-  transform: translateX(100%);
-}
-.slide-right-enter-to, .slide-right-leave {
-  transform: translateX(0);
-}
+  .slide-right-enter-active,
+  .slide-right-leave-active {
+    transition: transform 0.3s ease;
+  }
+  .slide-right-enter,
+  .slide-right-leave-to {
+    transform: translateX(100%);
+  }
+  .slide-right-enter-to,
+  .slide-right-leave {
+    transform: translateX(0);
+  }
 
-.slide-left-enter-active , .slide-left-leave-active {
-  transition: transform 0.3s ease
-}
-.slide-left-enter, .slide-left-leave-to {
-  transform: translateX(-100%);
-}
-.slide-left-enter-to, .slide-left-leave {
-  transform: translateX(0);
-}
+  .slide-left-enter-active,
+  .slide-left-leave-active {
+    transition: transform 0.3s ease;
+  }
+  .slide-left-enter,
+  .slide-left-leave-to {
+    transform: translateX(-100%);
+  }
+  .slide-left-enter-to,
+  .slide-left-leave {
+    transform: translateX(0);
+  }
 </style>

@@ -1,219 +1,242 @@
 <script setup lang="ts">
-import { 
-  onMounted, 
-  onBeforeUnmount, 
-  ref, 
-  computed, 
-  watch 
-} from 'vue';
+  import {onMounted, onBeforeUnmount, ref, computed, watch} from 'vue';
 
-// import MyTooltip from 'components/MyTooltip.vue';
+  // import MyTooltip from 'components/MyTooltip.vue';
 
-import { useI18n } from 'vue-i18n';
-const { t } = useI18n();
+  import {useI18n} from 'vue-i18n';
+  const {t} = useI18n();
 
-// 스토어 가져오기
-import { useCalcStore } from 'stores/calc-store';
-const store = useCalcStore();
+  // 스토어 가져오기
+  import {useCalcStore} from 'stores/calc-store';
+  const store = useCalcStore();
 
-// 계산기 오브젝트를 스토어에서 가져오기 위한 변수 선언
-const { calc } = store;
+  // 계산기 오브젝트를 스토어에서 가져오기 위한 변수 선언
+  const {calc} = store;
 
-// 계산 결과 배열
-const histories = calc.getHistories()
+  // 계산 결과 배열
+  const histories = calc.getHistories();
 
-// 계산 결과를 지울지 묻는 다이얼로그 표시 여부
-const doDeleteHistory = ref(false);
+  // 계산 결과를 지울지 묻는 다이얼로그 표시 여부
+  const doDeleteHistory = ref(false);
 
-// 계산 결과 맨 위로 가는 아이콘 표시 여부
-const isGoToTopInHistory = ref(false);
+  // 계산 결과 맨 위로 가는 아이콘 표시 여부
+  const isGoToTopInHistory = ref(false);
 
-// 계산 결과 창 스크롤 위치에 따라 아이콘 표시 설정
-const onScroll = (evt: Event) => {
-  isGoToTopInHistory.value = (evt.target as HTMLDivElement).scrollTop > 50;
-};
+  // 계산 결과 창 스크롤 위치에 따라 아이콘 표시 설정
+  const onScroll = (evt: Event) => {
+    isGoToTopInHistory.value = (evt.target as HTMLDivElement).scrollTop > 50;
+  };
 
-// 계산 결과 창 스크롤 위치를 최상단으로 이동
-const goToTopInHistory = () => {
-  document.getElementById('history')?.scrollTo({
-    top: 0,
-    behavior: 'smooth',
-  });
-};
+  // 계산 결과 창 스크롤 위치를 최상단으로 이동
+  const goToTopInHistory = () => {
+    document.getElementById('history')?.scrollTo({
+      top: 0,
+      behavior: 'smooth',
+    });
+  };
 
-// 상태를 저장할 변수를 함수 외부에 선언
-let touchStartY = 0;
+  // 상태를 저장할 변수를 함수 외부에 선언
+  let touchStartY = 0;
 
-// 이벤트 처리 함수의 타입을 명시적으로 선언
-const handleTouchStart = (event: TouchEvent) => {
-  touchStartY = event.touches[0].clientY;
-};
+  // 이벤트 처리 함수의 타입을 명시적으로 선언
+  const handleTouchStart = (event: TouchEvent) => {
+    touchStartY = event.touches[0].clientY;
+  };
 
-const handleTouchEnd = (event: TouchEvent) => {
-  const touchEndY = event.changedTouches[0].clientY;
-  // 아래로 100px 이상 끌어내렸을 경우 다이얼로그 닫기
-  if (touchEndY - touchStartY > 30) {
-    // store의 타입이 명시적으로 선언되어 있지 않으므로, 이 부분은 가정에 따라 달라질 수 있습니다.
-    // 여기서는 store가 이미 적절한 타입으로 선언되어 있고, isHistoryDialogOpen이 boolean 타입의 속성이라고 가정합니다.
-    store.isHistoryDialogOpen = false;
-  }
-};
-
-// 스크롤 위치를 저장할 변수
-let lastScrollPosition = 0;
-
-watch(
-  () => store.isHistoryDialogOpen,
-  (isOpen) => {
-    if (isOpen) {
-      // 다이얼로그가 열릴 때 시간을 약간 지연하여 저장된 스크롤 위치로 이동
-      setTimeout(() => {
-        document.getElementById('history')?.scrollTo({ top: lastScrollPosition });
-      }, 50);
-    } else {
-      // 다이얼로그가 닫힐 때 현재 스크롤 위치를 저장
-      lastScrollPosition = document.getElementById('history')?.scrollTop ?? 0;
-      // 최상단으로 가는 아이콘을 히스토리 숨길 때 함께 숨김
-      isGoToTopInHistory.value = false;
+  const handleTouchEnd = (event: TouchEvent) => {
+    const touchEndY = event.changedTouches[0].clientY;
+    // 아래로 100px 이상 끌어내렸을 경우 다이얼로그 닫기
+    if (touchEndY - touchStartY > 30) {
+      // store의 타입이 명시적으로 선언되어 있지 않으므로, 이 부분은 가정에 따라 달라질 수 있습니다.
+      // 여기서는 store가 이미 적절한 타입으로 선언되어 있고, isHistoryDialogOpen이 boolean 타입의 속성이라고 가정합니다.
+      store.isHistoryDialogOpen = false;
     }
-  }
-);
+  };
 
-const scrollHistory = (offset: number | 'top' | 'bottom') => {
-  if (store.isHistoryDialogOpen) {
-    const historyElement = document.getElementById('history');
-    if (historyElement) {
-      if (offset === 'top') {
-        offset = -historyElement.scrollTop;
-      } else if (offset === 'bottom') {
-        offset = historyElement.scrollHeight - historyElement.scrollTop;
+  // 스크롤 위치를 저장할 변수
+  let lastScrollPosition = 0;
+
+  watch(
+    () => store.isHistoryDialogOpen,
+    (isOpen) => {
+      if (isOpen) {
+        // 다이얼로그가 열릴 때 시간을 약간 지연하여 저장된 스크롤 위치로 이동
+        setTimeout(() => {
+          document
+            .getElementById('history')
+            ?.scrollTo({top: lastScrollPosition});
+        }, 50);
+      } else {
+        // 다이얼로그가 닫힐 때 현재 스크롤 위치를 저장
+        lastScrollPosition = document.getElementById('history')?.scrollTop ?? 0;
+        // 최상단으로 가는 아이콘을 히스토리 숨길 때 함께 숨김
+        isGoToTopInHistory.value = false;
       }
-      historyElement.scrollTo({
-        top: historyElement.scrollTop + offset,
-        behavior: 'smooth',
-      });
+    },
+  );
+
+  const scrollHistory = (offset: number | 'top' | 'bottom') => {
+    if (store.isHistoryDialogOpen) {
+      const historyElement = document.getElementById('history');
+      if (historyElement) {
+        if (offset === 'top') {
+          offset = -historyElement.scrollTop;
+        } else if (offset === 'bottom') {
+          offset = historyElement.scrollHeight - historyElement.scrollTop;
+        }
+        historyElement.scrollTo({
+          top: historyElement.scrollTop + offset,
+          behavior: 'smooth',
+        });
+      }
     }
-  }
-};
+  };
 
-import { KeyBinding } from 'classes/KeyBinding';
-const keyBinding = new KeyBinding([
-  [['h'], () => { !doDeleteHistory.value && store.clickButtonById('btn-history'); }],
-  [['d'], () => { store.isHistoryDialogOpen && store.clickButtonById('btn-delete-history'); }],
-  [['ArrowUp'], () => scrollHistory(-50)],
-  [['ArrowDown'], () => scrollHistory(50)],
-  [['PageUp'], () => scrollHistory(-400)],
-  [['PageDown'], () => scrollHistory(400)],
-  [['Home'], () => scrollHistory('top')],
-  [['End'], () => scrollHistory('bottom')],
-]);
+  import {KeyBinding} from 'classes/KeyBinding';
+  const keyBinding = new KeyBinding([
+    [
+      ['h'],
+      () => {
+        !doDeleteHistory.value && store.clickButtonById('btn-history');
+      },
+    ],
+    [
+      ['d'],
+      () => {
+        store.isHistoryDialogOpen &&
+          store.clickButtonById('btn-delete-history');
+      },
+    ],
+    [['ArrowUp'], () => scrollHistory(-50)],
+    [['ArrowDown'], () => scrollHistory(50)],
+    [['PageUp'], () => scrollHistory(-400)],
+    [['PageDown'], () => scrollHistory(400)],
+    [['Home'], () => scrollHistory('top')],
+    [['End'], () => scrollHistory('bottom')],
+  ]);
 
-// inputFocused 값이 바뀌면 키바인딩을 추가하거나 제거합니다.
-watch(
-  () => store.inputFocused,
-  () => {
-    if (store.inputFocused) {
-      keyBinding.unsubscribe();
+  // inputFocused 값이 바뀌면 키바인딩을 추가하거나 제거합니다.
+  watch(
+    () => store.inputFocused,
+    () => {
+      if (store.inputFocused) {
+        keyBinding.unsubscribe();
+      } else {
+        keyBinding.subscribe();
+      }
+    },
+    {immediate: true},
+  );
+
+  // dom 요소가 마운트 되었을 때
+  onMounted(() => {
+    keyBinding.subscribe();
+  });
+
+  // dom 요소가 언마운트되기 전에 키바인딩 제거
+  onBeforeUnmount(() => {
+    keyBinding.unsubscribe();
+  });
+
+  const editDialog = ref(false);
+  const memo = ref('');
+  const editSlide = ref('');
+
+  let slidedID = 0;
+
+  const memoDialog = (id: number) => {
+    // console.log('memoDialog', id);
+    slidedID = id;
+
+    if (calc.getMemo(id)) {
+      memo.value = calc.getMemo(id) as string;
     } else {
-      keyBinding.subscribe();
+      memo.value = '';
     }
-  },
-  { immediate: true }
-);
+    editDialog.value = true;
+  };
 
-// dom 요소가 마운트 되었을 때
-onMounted(() => {
-  keyBinding.subscribe();
-});
+  const onLeft = ({reset}: {reset: () => void}, id: number) => {
+    console.log('onLeft', id);
+    memoDialog(id);
 
-// dom 요소가 언마운트되기 전에 키바인딩 제거
-onBeforeUnmount(() => {
-  keyBinding.unsubscribe();
-});
+    setTimeout(() => {
+      reset();
+    }, 500);
+  };
 
-const editDialog = ref(false);
-const memo = ref('');
-const editSlide = ref('');
-
-let slidedID = 0;
-
-const memoDialog = (id: number) => {
-  // console.log('memoDialog', id);
-  slidedID = id;
-
-  if (calc.getMemo(id)) {
-    memo.value = calc.getMemo(id) as string;
-  } else {
+  const editConfirm = () => {
+    calc.setMemo(slidedID, memo.value);
+    editSlide.value = 'slide-right';
+    editDialog.value = false;
     memo.value = '';
-  }
-  editDialog.value = true;
-}
+    slidedID = 0;
+  };
 
-const onLeft = ({reset}: {reset: () => void}, id: number) => {
-  console.log('onLeft', id);
-  memoDialog(id);
+  const editCancel = () => {
+    editSlide.value = 'slide-left';
+    editDialog.value = false;
+    memo.value = '';
+    slidedID = 0;
+  };
 
-  setTimeout(() => {
-    reset();
-  }, 500);
-}
+  const memoDelete = (id: number) => {
+    calc.deleteMemo(id);
+    memo.value = '';
+  };
 
-const editConfirm = () => {
-  calc.setMemo(slidedID, memo.value);
-  editSlide.value = 'slide-right';
-  editDialog.value = false;
-  memo.value = '';
-  slidedID = 0;
-}
+  import {copyToClipboard} from 'quasar';
+  const historyCopy = async (
+    id: number,
+    copyType: 'formattedNumber' | 'onlyNumber' | 'memo',
+  ): Promise<void> => {
+    const history = calc.getHistoryByID(id);
+    const copyText =
+      copyType === 'formattedNumber'
+        ? store.getRightSideInHistory(history)
+        : copyType === 'onlyNumber'
+          ? history.resultNumber
+          : copyType === 'memo'
+            ? (calc.getMemo(id) as string)
+            : '';
+    try {
+      await copyToClipboard(copyText);
+      store.notifyMsg(t('copySuccess'));
+    } catch (error) {
+      console.error(error);
+      store.notifyError(t('copyFailure'));
+    }
+  };
 
-const editCancel = () => {
-  editSlide.value = 'slide-left';
-  editDialog.value = false;
-  memo.value = '';
-  slidedID = 0;
-}
+  const toMainResult = (id: number) => {
+    const history = calc.getHistoryByID(id);
+    calc.setCurrentNumber(history.resultNumber);
+  };
 
-const memoDelete = (id: number) => {
-  calc.deleteMemo(id);
-  memo.value = '';
-}
+  const toSubResult = (id: number) => {
+    const history = calc.getHistoryByID(id);
+    if (store.cTab === 'unit') {
+      store.swapUnitValue();
+      setTimeout(() => {
+        calc.setCurrentNumber(history.resultNumber);
+      }, 5);
+      setTimeout(() => {
+        store.swapUnitValue();
+      }, 10);
+    } else if (store.cTab === 'currency') {
+      store.swapCurrencyValue();
+      setTimeout(() => {
+        calc.setCurrentNumber(history.resultNumber);
+      }, 5);
+      setTimeout(() => {
+        store.swapCurrencyValue();
+      }, 10);
+    }
+  };
 
-import { copyToClipboard } from 'quasar';
-const historyCopy = async (id: number, copyType: 'formattedNumber' | 'onlyNumber' | 'memo'): Promise<void> => {
-  const history = calc.getHistoryByID(id);
-  const copyText = copyType === 'formattedNumber' ? store.getRightSideInHistory(history) : 
-                   copyType === 'onlyNumber' ? history.resultNumber : 
-                   copyType === 'memo' ? calc.getMemo(id) as string : '';
-  try {
-    await copyToClipboard(copyText);
-    store.notifyMsg(t('copySuccess'));
-  } catch (error) {
-    console.error(error);
-    store.notifyError(t('copyFailure'));
-  }
-}
-
-const toMainResult = (id: number) => {
-  const history = calc.getHistoryByID(id);
-  calc.setCurrentNumber(history.resultNumber);
-}
-
-const toSubResult = (id: number) => {
-  const history = calc.getHistoryByID(id);
-  if (store.cTab === 'unit') {
-    store.swapUnitValue();
-    setTimeout( () => { calc.setCurrentNumber(history.resultNumber); }, 5 );
-    setTimeout( () => { store.swapUnitValue(); }, 10 );
-  } else if (store.cTab === 'currency') {
-    store.swapCurrencyValue();
-    setTimeout( () => { calc.setCurrentNumber(history.resultNumber); }, 5 );
-    setTimeout( () => { store.swapCurrencyValue(); }, 10 );
-  }
-}
-
-const deleteHistory = (id: number) => {
-  calc.deleteHistory(id);
-}
+  const deleteHistory = (id: number) => {
+    calc.deleteHistory(id);
+  };
 </script>
 
 <template>
@@ -230,10 +253,7 @@ const deleteHistory = (id: number) => {
       @touchstart.passive="handleTouchStart"
       @touchend.passive="handleTouchEnd"
     >
-      <q-icon
-        name="history"
-        size="sm"
-      />
+      <q-icon name="history" size="sm" />
       <div>{{ t('history') }}</div>
       <q-space />
       <q-btn
@@ -251,7 +271,7 @@ const deleteHistory = (id: number) => {
         dense
         flat
         @click="store.isHistoryDialogOpen = false"
-      />      
+      />
     </q-bar>
     <q-card
       id="history"
@@ -287,12 +307,12 @@ const deleteHistory = (id: number) => {
                 :key="history.id"
                 left-color="positive"
                 right-color="negative"
-                @left="({reset}) => onLeft({ reset }, history.id as number)"
+                @left="({reset}) => onLeft({reset}, history.id as number)"
                 @right="calc.deleteHistory(history.id as number)"
               >
                 <template #left>
                   <q-icon name="edit_note" />
-                </template>                  
+                </template>
                 <template #right>
                   <q-icon name="delete_outline" />
                 </template>
@@ -301,19 +321,17 @@ const deleteHistory = (id: number) => {
                     <q-item-label v-if="history.memo">
                       <u>{{ history.memo }}</u>
                     </q-item-label>
-                    <q-item-label style="white-space: pre-wrap;">
+                    <q-item-label style="white-space: pre-wrap">
                       {{ store.getLeftSideInHistory(history, true) }}
                     </q-item-label>
                     <q-item-label>
-                      {{ ['=', store.getRightSideInHistory(history)].join(' ') }}
+                      {{
+                        ['=', store.getRightSideInHistory(history)].join(' ')
+                      }}
                     </q-item-label>
                   </q-item-section>
-                  <q-menu
-                    context-menu
-                    auto-close
-                    touch-position
-                  >
-                    <q-list dense style="max-width: 200px;">
+                  <q-menu context-menu auto-close touch-position>
+                    <q-list dense style="max-width: 200px">
                       <q-item
                         v-if="!history.memo"
                         v-ripple
@@ -358,11 +376,21 @@ const deleteHistory = (id: number) => {
                       <q-item
                         v-ripple
                         clickable
-                        @click="historyCopy(history.id as number, 'formattedNumber')"
+                        @click="
+                          historyCopy(history.id as number, 'formattedNumber')
+                        "
                       >
                         <q-item-section>
-                          <q-item-label>{{ t('copyDisplayedResult') }}</q-item-label>
-                          <q-item-label class="ellipsis">[ {{ store.getRightSideInHistory(history) }} ]</q-item-label>
+                          <q-item-label>{{
+                            t('copyDisplayedResult')
+                          }}</q-item-label>
+                          <q-item-label class="ellipsis"
+                            >[
+                            {{
+                              store.getRightSideInHistory(history)
+                            }}
+                            ]</q-item-label
+                          >
                         </q-item-section>
                       </q-item>
                       <q-item
@@ -371,8 +399,12 @@ const deleteHistory = (id: number) => {
                         @click="historyCopy(history.id as number, 'onlyNumber')"
                       >
                         <q-item-section>
-                          <q-item-label>{{ t('copyResultNumber') }}</q-item-label>
-                          <q-item-label class="ellipsis">[ {{ history.resultNumber }} ]</q-item-label>
+                          <q-item-label>{{
+                            t('copyResultNumber')
+                          }}</q-item-label>
+                          <q-item-label class="ellipsis"
+                            >[ {{ history.resultNumber }} ]</q-item-label
+                          >
                         </q-item-section>
                       </q-item>
                       <q-separator />
@@ -382,11 +414,15 @@ const deleteHistory = (id: number) => {
                         @click="toMainResult(history.id as number)"
                       >
                         <q-item-section>
-                          <q-item-label>{{ t('loadToMainPanel') }}</q-item-label>
+                          <q-item-label>{{
+                            t('loadToMainPanel')
+                          }}</q-item-label>
                         </q-item-section>
                       </q-item>
                       <q-item
-                        v-if="store.cTab === 'unit' || store.cTab === 'currency'"
+                        v-if="
+                          store.cTab === 'unit' || store.cTab === 'currency'
+                        "
                         v-ripple
                         clickable
                         @click="toSubResult(history.id as number)"
@@ -429,15 +465,8 @@ const deleteHistory = (id: number) => {
       style="width: 200px"
     >
       <q-card-section>{{ t('doYouDeleteHistory') }} </q-card-section>
-      <q-card-actions
-        align="center"
-        class="text-negative bg-white"
-      >
-        <q-btn 
-          v-close-popup 
-          flat 
-          :label="t('message.no')" 
-        />
+      <q-card-actions align="center" class="text-negative bg-white">
+        <q-btn v-close-popup flat :label="t('message.no')" />
         <q-btn
           v-close-popup
           flat
@@ -457,32 +486,17 @@ const deleteHistory = (id: number) => {
     :transition-hide="editSlide"
     style="z-index: 15"
   >
-    <q-card
-      class="noselect text-center"
-      style="width: 250px"
-    >
+    <q-card class="noselect text-center" style="width: 250px">
       <q-bar
         v-blur
         dark
         class="full-width justify-between nnoselect text-body1 text-white bg-primary"
       >
-        <q-btn 
-          dense
-          flat 
-          icon="replay"
-          size="sm"
-          @click="editCancel"
-        />
+        <q-btn dense flat icon="replay" size="sm" @click="editCancel" />
         <div>{{ t('memo') }}</div>
-        <q-btn
-          dense
-          flat
-          icon="check"
-          size="sm"
-          @click="editConfirm"
-        />
+        <q-btn dense flat icon="check" size="sm" @click="editConfirm" />
       </q-bar>
-      <q-card-section>      
+      <q-card-section>
         <q-input
           v-model="memo"
           clearable
@@ -493,7 +507,12 @@ const deleteHistory = (id: number) => {
           color="primary"
           @focus="store.setInputFocused"
           @blur="store.setInputBlurred"
-          @keyup.enter="{store.setInputBlurred; editConfirm();}"
+          @keyup.enter="
+            {
+              store.setInputBlurred;
+              editConfirm();
+            }
+          "
         />
       </q-card-section>
     </q-card>
@@ -501,46 +520,46 @@ const deleteHistory = (id: number) => {
 </template>
 
 <style scoped lang="scss">
-.q-bar {
-  max-width: calc(100vw - 45px);
-}
+  .q-bar {
+    max-width: calc(100vw - 45px);
+  }
 
-#history {
-  max-height: calc(100vh - 170px);
-  min-height: calc(100vh - 170px);
-  max-width: calc(100vw - 45px);
-  overflow: overlay;
-}
+  #history {
+    max-height: calc(100vh - 170px);
+    min-height: calc(100vh - 170px);
+    max-width: calc(100vw - 45px);
+    overflow: overlay;
+  }
 
-.slide-fade-enter-active,
-.slide-fade-leave-active {
-  transition: all 0.2s ease-out;
-}
+  .slide-fade-enter-active,
+  .slide-fade-leave-active {
+    transition: all 0.2s ease-out;
+  }
 
-.slide-fade-enter-from,
-.slide-fade-leave-to {
-  opacity: 0;
-  transform: translateY(-20px);
-}
+  .slide-fade-enter-from,
+  .slide-fade-leave-to {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
 
-.history-list-move,
-.history-list-enter-active, 
-.history-list-leave-active {
-  transition: all 0.3s ease;
-}
+  .history-list-move,
+  .history-list-enter-active,
+  .history-list-leave-active {
+    transition: all 0.3s ease;
+  }
 
-.history-list-enter-from,
-.history-list-leave-to {
-  opacity: 0;
-}
+  .history-list-enter-from,
+  .history-list-leave-to {
+    opacity: 0;
+  }
 
-.history-list-enter-from {
-  transform: translateY(-20px);
-}
+  .history-list-enter-from {
+    transform: translateY(-20px);
+  }
 
-.history-list-leave-to {
-  transform: translateX(-20px);
-}
+  .history-list-leave-to {
+    transform: translateX(-20px);
+  }
 </style>
 
 <i18n>
@@ -576,4 +595,4 @@ const deleteHistory = (id: number) => {
     loadToMainPanel: 'Load to main panel'
     loadToSubPanel: 'Load to sub panel'
     deleteResult: 'Delete result'
-</i18n>    
+</i18n>

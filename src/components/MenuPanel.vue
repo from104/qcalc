@@ -1,105 +1,111 @@
 <script setup lang="ts">
-import { 
-  onMounted, 
-  reactive, 
-  watch 
-} from 'vue';
+  import {onMounted, reactive, watch} from 'vue';
 
-import MenuItem from 'components/MenuItem.vue';
+  import MenuItem from 'components/MenuItem.vue';
 
-import { useRouter } from 'vue-router';
-const router = useRouter();
+  import {useRouter} from 'vue-router';
+  const router = useRouter();
 
-import { useCalcStore } from 'src/stores/calc-store';
-const store = useCalcStore();
+  import {useCalcStore} from 'src/stores/calc-store';
+  const store = useCalcStore();
 
-import { useI18n } from 'vue-i18n';
-const { t } = useI18n();
+  import {useI18n} from 'vue-i18n';
+  const {t} = useI18n();
 
-interface Item {
-  title: string;
-  caption?: string;
-  shortcut?: string;
-  icon?: string;
-  action?: ()=>void;
-  isSeparator?: boolean;
-};
+  interface Item {
+    title: string;
+    caption?: string;
+    shortcut?: string;
+    icon?: string;
+    action?: () => void;
+    isSeparator?: boolean;
+  }
 
-const items: {[key: string]: Item} = reactive({
-  calc: {
-    title: t('item.calc.title'),
-    caption: t('item.calc.caption'),
-    shortcut: 'Ctrl-1',
-    icon: 'calculate',
-    action: () => {store.cTab = 'calc'},
-  },
-  unit: {
-    title: t('item.unit.title'),
-    caption: t('item.unit.caption'),
-    shortcut: 'Ctrl-2',
-    icon: 'swap_vert',
-    action: () => {store.cTab = 'unit'},
-  },
-  currency: {
-    title: t('item.currency.title'),
-    caption: t('item.currency.caption'),
-    shortcut: 'Ctrl-3',
-    icon: 'currency_exchange',
-    action: () => {store.cTab = 'currency'},
-  },
-  separator1: {
-    title: 'separator',
-    isSeparator: true,
-  },
-  settings: {
-    title: t('item.settings.title'),
-    caption: t('item.settings.caption'),
-    shortcut: 'Ctrl-e',
-    icon: 'settings',
-    action: ()=>{store.isSettingDialogOpen = true},
-  },
-  separator2: {
-    title: 'separator',
-    isSeparator: true,
-  },
-  help: {
-    title: t('item.help.title'),
-    caption: t('item.help.caption'),
-    shortcut: 'F1',
-    icon: 'help',
-    action: () => router.push('/help'),
-  },
-  about: {
-    title: t('item.about.title'),
-    caption: t('item.about.caption'),
-    shortcut: 'F2',
-    icon: 'info',
-    action: () => router.push('/about'),
-  },
-});
-
-// updateLocale() 함수는 items 객체의 title과 caption 속성을 각 언어에 맞게 업데이트
-const updateLocale = () => {
-  Object.keys(items).forEach((item) => {
-    items[item].title = t(`item.${item}.title`);
-    items[item].caption = t(`item.${item}.caption`);
+  const items: {[key: string]: Item} = reactive({
+    calc: {
+      title: t('item.calc.title'),
+      caption: t('item.calc.caption'),
+      shortcut: 'Ctrl-1',
+      icon: 'calculate',
+      action: () => {
+        store.cTab = 'calc';
+      },
+    },
+    unit: {
+      title: t('item.unit.title'),
+      caption: t('item.unit.caption'),
+      shortcut: 'Ctrl-2',
+      icon: 'swap_vert',
+      action: () => {
+        store.cTab = 'unit';
+      },
+    },
+    currency: {
+      title: t('item.currency.title'),
+      caption: t('item.currency.caption'),
+      shortcut: 'Ctrl-3',
+      icon: 'currency_exchange',
+      action: () => {
+        store.cTab = 'currency';
+      },
+    },
+    separator1: {
+      title: 'separator',
+      isSeparator: true,
+    },
+    settings: {
+      title: t('item.settings.title'),
+      caption: t('item.settings.caption'),
+      shortcut: 'Ctrl-e',
+      icon: 'settings',
+      action: () => {
+        store.isSettingDialogOpen = true;
+      },
+    },
+    separator2: {
+      title: 'separator',
+      isSeparator: true,
+    },
+    help: {
+      title: t('item.help.title'),
+      caption: t('item.help.caption'),
+      shortcut: 'F1',
+      icon: 'help',
+      action: () => router.push('/help'),
+    },
+    about: {
+      title: t('item.about.title'),
+      caption: t('item.about.caption'),
+      shortcut: 'F2',
+      icon: 'info',
+      action: () => router.push('/about'),
+    },
   });
-};
 
-// store.locale이 변경될 때마다 updateLocale() 함수를 실행
-watch(()=>store.locale, () => {
-  updateLocale();
-});
+  // updateLocale() 함수는 items 객체의 title과 caption 속성을 각 언어에 맞게 업데이트
+  const updateLocale = () => {
+    Object.keys(items).forEach((item) => {
+      items[item].title = t(`item.${item}.title`);
+      items[item].caption = t(`item.${item}.caption`);
+    });
+  };
 
+  // store.locale이 변경될 때마다 updateLocale() 함수를 실행
+  watch(
+    () => store.locale,
+    () => {
+      updateLocale();
+    },
+  );
 
-onMounted(() => {
-  updateLocale();
-});
+  onMounted(() => {
+    updateLocale();
+  });
 </script>
 
 <template>
   <q-list v-blur>
-    <MenuItem v-for="item in items" :key="item.title" v-bind="item"/>
+    <MenuItem v-for="item in items" :key="item.title" v-bind="item" />
   </q-list>
 </template>
 

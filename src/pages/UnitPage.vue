@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import UnitPanel from 'components/UnitPanel.vue';
-import ResultField from 'components/ResultField.vue';
-import CalcButton from 'components/CalcButton.vue';
+  import UnitPanel from 'components/UnitPanel.vue';
+  import ResultField from 'components/ResultField.vue';
+  import CalcButton from 'components/CalcButton.vue';
 </script>
 
 <template>
@@ -10,7 +10,7 @@ import CalcButton from 'components/CalcButton.vue';
       <ResultField field="main" addon="unit" />
       <UnitPanel />
       <ResultField field="sub" addon="unit" />
-      <CalcButton type="unit"/>
+      <CalcButton type="unit" />
     </q-card>
   </q-page>
 </template>

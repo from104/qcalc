@@ -1,46 +1,51 @@
 <script setup lang="ts">
-import { 
-  onMounted, 
-  onBeforeUnmount, 
-  ref, 
-  watch,
-  reactive
-} from 'vue';
+  import {onMounted, onBeforeUnmount, ref, watch, reactive} from 'vue';
 
-import { useI18n } from 'vue-i18n';
-const { t } = useI18n();
+  import {useI18n} from 'vue-i18n';
+  const {t} = useI18n();
 
-// 계산기 오브젝트를 스토어에서 가져오기 위한 변수 선언
-import { useCalcStore } from 'stores/calc-store';
-const store = useCalcStore();
-const { calc } = store;
+  // 계산기 오브젝트를 스토어에서 가져오기 위한 변수 선언
+  import {useCalcStore} from 'stores/calc-store';
+  const store = useCalcStore();
+  const {calc} = store;
 
-// 에러처리를 위한 함수
-const funcWithError = (func: ()=>void) => {
-  try {
-    func();
-  } catch (e: unknown) {
-    if (e instanceof Error) {
-      // console.error(e.message);
-      switch (e.message) {
-        case 'Cannot divide by zero':
-          store.notifyError(t('cannotDivideByZero'), 1000);
-          break;
-        case 'The square root of a negative number is not allowed.':
-          store.notifyError(t('squareRootOfANegativeNumberIsNotAllowed'), 1000);
-          break;
-        default:
-          store.notifyError(e.message);
+  // 에러처리를 위한 함수
+  const funcWithError = (func: () => void) => {
+    try {
+      func();
+    } catch (e: unknown) {
+      if (e instanceof Error) {
+        // console.error(e.message);
+        switch (e.message) {
+          case 'Cannot divide by zero':
+            store.notifyError(t('cannotDivideByZero'), 1000);
+            break;
+          case 'The square root of a negative number is not allowed.':
+            store.notifyError(
+              t('squareRootOfANegativeNumberIsNotAllowed'),
+              1000,
+            );
+            break;
+          default:
+            store.notifyError(e.message);
+        }
       }
     }
-  }
-};
+  };
 
-// 버튼 레이블, 버튼 컬러, 버튼에 해당하는 키, 버튼 클릭 이벤트 핸들러
-type Button = {[id: string]: [isIcon: boolean, label: string, color: string, keys: string[], handler: () => void]};
+  // 버튼 레이블, 버튼 컬러, 버튼에 해당하는 키, 버튼 클릭 이벤트 핸들러
+  type Button = {
+    [id: string]: [
+      isIcon: boolean,
+      label: string,
+      color: string,
+      keys: string[],
+      handler: () => void,
+    ];
+  };
 
-// prettier-ignore
-const buttons: Button = {
+  // prettier-ignore
+  const buttons: Button = {
   a1: [false, 'x²', 'function', ['u'], () => calc.pow2()],
   b1: [false, '√x', 'function', ['r'], () => calc.sqrt()],
   c1: [false, 'C', 'important', ['Delete', 'Escape', 'c'], () => calc.clear()],
@@ -67,7 +72,7 @@ const buttons: Button = {
   d6: [true,  'mdi-equal', 'important', ['=', 'Enter'], () => calc.equal()],
 };
 
-/*
+  /*
 x^y, x의 y제곱근, MC, MR
 10^x, x mod y, x!, M/
 sin, cos, tan, M*
@@ -76,11 +81,13 @@ Pi, 황금비(φ),log e,  M+
 shift, int, frac, MS
 */
 
-type ButtonAddedFunc = {[id: string]: [label: string, keys: string[], handler: () => void]};
+  type ButtonAddedFunc = {
+    [id: string]: [label: string, keys: string[], handler: () => void];
+  };
 
-// 계산기 버튼에 2번째 기능에 대한 레이블 정의
-// prettier-ignore
-const buttonsAddedFunc: ButtonAddedFunc = {
+  // 계산기 버튼에 2번째 기능에 대한 레이블 정의
+  // prettier-ignore
+  const buttonsAddedFunc: ButtonAddedFunc = {
   a1: ['xⁿ', [], () => calc.pow()],
   b1: ['ⁿ√x', [], () => calc.root()],
   c1: ['MC', [], () => calc.memoryClear()],
@@ -107,93 +114,93 @@ const buttonsAddedFunc: ButtonAddedFunc = {
   d6: ['MS', [], () => calc.memorySave()],
 };
 
-const showTooltips: { [id: string]: boolean } = reactive(
-  Object.fromEntries(Object.keys(buttons).map((id) => [id, false]))
-);
+  const showTooltips: {[id: string]: boolean} = reactive(
+    Object.fromEntries(Object.keys(buttons).map((id) => [id, false])),
+  );
 
-// 버튼 시프트 상태에 따라 기능 실행
-const shiftFunc = (id: string | number) => {
-  if (store.buttonShift) {
-    funcWithError(buttonsAddedFunc[id][2]);
+  // 버튼 시프트 상태에 따라 기능 실행
+  const shiftFunc = (id: string | number) => {
+    if (store.buttonShift) {
+      funcWithError(buttonsAddedFunc[id][2]);
+      if (id === 'a6') {
+        store.offButtonShift();
+        store.offButtonShiftLock();
+        return;
+      }
+      if (store.buttonShiftLock) return;
+      store.offButtonShift();
+    } else {
+      funcWithError(buttons[id][4]);
+    }
+  };
+
+  const holdFunc = (id: string | number) => {
     if (id === 'a6') {
+      if (store.buttonShiftLock) {
+        store.offButtonShiftLock();
+        store.offButtonShift();
+      } else {
+        store.onButtonShiftLock();
+        store.onButtonShift();
+      }
+      return;
+    }
+    if (store.buttonShift) {
+      funcWithError(buttons[id][4]);
+      if (store.buttonShiftLock) return;
       store.offButtonShift();
-      store.offButtonShiftLock();
       return;
-    }
-    if (store.buttonShiftLock)
-      return;
-    store.offButtonShift();
-  } else {
-    funcWithError(buttons[id][4]);
-  }
-};
-
-const holdFunc = (id: string | number) => {
-  if (id === 'a6') {
-    if (store.buttonShiftLock) {
-      store.offButtonShiftLock();
-      store.offButtonShift();
     } else {
-      store.onButtonShiftLock();
-      store.onButtonShift();
+      funcWithError(buttonsAddedFunc[id][2]);
+      showTooltips[id] = true;
+      setTimeout(() => {
+        showTooltips[id] = false;
+      }, 1000);
     }
-    return;
+  };
+
+  import {KeyBinding, KeyBindings} from 'classes/KeyBinding';
+  const keyBindings: KeyBindings = Object.entries(buttons).map(
+    ([id, [, , , keys]]) => [keys, () => store.clickButtonById('btn-' + id)],
+  );
+  const keyBinding = new KeyBinding(keyBindings);
+
+  // dom 요소가 마운트 되었을 때 계산기 키바인딩 설정하기
+  onMounted(() => {
+    keyBinding.subscribe();
+  });
+
+  // dom 요소가 언마운트되기 전에 키바인딩 제거
+  onBeforeUnmount(() => {
+    keyBinding.unsubscribe();
+  });
+
+  // inputFocused 값이 바뀌면 키바인딩을 추가하거나 제거합니다.
+  watch(
+    () => store.inputFocused,
+    () => {
+      // console.log('buttons inputFocused', store.inputFocused);
+      if (store.inputFocused) {
+        keyBinding.unsubscribe();
+      } else {
+        keyBinding.subscribe();
+      }
+    },
+    {immediate: true},
+  );
+
+  // props의 기본값 설정
+  const props = withDefaults(defineProps<{type?: string}>(), {
+    type: 'normal',
+  });
+
+  // 계산기 버튼의 높이를 계산하기 위한 변수 선언
+  const baseHeight = ref('136px');
+
+  // 계산기 타입에 따라 버튼 높이를 다르게 설정
+  if (props.type === 'unit' || props.type === 'currency') {
+    baseHeight.value = '234px';
   }
-  if (store.buttonShift) {
-    funcWithError(buttons[id][4]);
-    if (store.buttonShiftLock)
-      return;
-    store.offButtonShift();
-    return;
-  } else {
-    funcWithError(buttonsAddedFunc[id][2]);
-    showTooltips[id] = true;
-    setTimeout(() => {
-      showTooltips[id] = false;
-    }, 1000);
-  }
-};
-
-import { KeyBinding, KeyBindings } from 'classes/KeyBinding';
-const keyBindings: KeyBindings = Object.entries(buttons).map(([id, [, , , keys, ]]) => [keys, () => store.clickButtonById('btn-'+id)]);
-const keyBinding = new KeyBinding(keyBindings);
-
-// dom 요소가 마운트 되었을 때 계산기 키바인딩 설정하기
-onMounted(() => {
-  keyBinding.subscribe();
-});
-
-// dom 요소가 언마운트되기 전에 키바인딩 제거
-onBeforeUnmount(() => {
-  keyBinding.unsubscribe();
-});
-
-// inputFocused 값이 바뀌면 키바인딩을 추가하거나 제거합니다.
-watch(
-  () => store.inputFocused,
-  () => {
-    // console.log('buttons inputFocused', store.inputFocused);
-    if (store.inputFocused) {
-      keyBinding.unsubscribe();
-    } else {
-      keyBinding.subscribe();
-    }
-  },
-  { immediate: true }
-);
-
-// props의 기본값 설정
-const props = withDefaults(defineProps<{ type?: string }>(), {
-  type: 'normal',
-});
-
-// 계산기 버튼의 높이를 계산하기 위한 변수 선언
-const baseHeight = ref('136px');
-
-// 계산기 타입에 따라 버튼 높이를 다르게 설정
-if (props.type === 'unit' || props.type === 'currency') {
-  baseHeight.value = '234px';
-}
 </script>
 
 <template>
@@ -205,31 +212,57 @@ if (props.type === 'unit' || props.type === 'currency') {
       v-for="(button, id) in buttons"
       :key="id"
       class="col-3 row wrap justify-center q-pa-sm"
-      >
+    >
       <q-btn
-        :id="'btn-'+id"
+        :id="'btn-' + id"
         v-touch-hold.mouse="() => holdFunc(id)"
         class="shadow-2 noselect col-12 button"
         no-caps
         push
-        :label="store.buttonShift && !store.showButtonAddedLabel && id !== 'a6' ? buttonsAddedFunc[id][0]: (button[0] ? undefined : button[1])"
-        :icon=" store.buttonShift && !store.showButtonAddedLabel && id !== 'a6' ? undefined : (button[0] ? button[1] : undefined)"
-        :class="[store.buttonShift && !store.showButtonAddedLabel && id !== 'a6' ? 'char' : (button[0] ? 'icon' : 'char'), id === 'a6' && store.buttonShift ? 'button-shift' : '']"
-        :style="!store.showButtonAddedLabel || !buttonsAddedFunc[id][0] ? {paddingTop: '4px'} : {}"
+        :label="
+          store.buttonShift && !store.showButtonAddedLabel && id !== 'a6'
+            ? buttonsAddedFunc[id][0]
+            : button[0]
+              ? undefined
+              : button[1]
+        "
+        :icon="
+          store.buttonShift && !store.showButtonAddedLabel && id !== 'a6'
+            ? undefined
+            : button[0]
+              ? button[1]
+              : undefined
+        "
+        :class="[
+          store.buttonShift && !store.showButtonAddedLabel && id !== 'a6'
+            ? 'char'
+            : button[0]
+              ? 'icon'
+              : 'char',
+          id === 'a6' && store.buttonShift ? 'button-shift' : '',
+        ]"
+        :style="
+          !store.showButtonAddedLabel || !buttonsAddedFunc[id][0]
+            ? {paddingTop: '4px'}
+            : {}
+        "
         :color="`btn-${button[2]}`"
         @click="() => shiftFunc(id)"
       >
-        <span 
+        <span
           v-if="store.showButtonAddedLabel && buttonsAddedFunc[id]"
           class="top-label"
-          :class="[`top-label-${button[0] ? 'icon' : 'char'}`, `top-label-${button[2]}`]"
+          :class="[
+            `top-label-${button[0] ? 'icon' : 'char'}`,
+            `top-label-${button[2]}`,
+          ]"
         >
-          {{ buttonsAddedFunc[id][0] }}          
+          {{ buttonsAddedFunc[id][0] }}
         </span>
-        <q-tooltip 
-          :model-value="showTooltips[id]" 
-          no-parent-event 
-          anchor="top middle" 
+        <q-tooltip
+          :model-value="showTooltips[id]"
+          no-parent-event
+          anchor="top middle"
           self="center middle"
           transition-show="jump-up"
           transition-hide="jump-down"
@@ -252,77 +285,81 @@ en:
 </i18n>
 
 <style scoped lang="scss">
-.button {
-  min-height: calc((100vh - v-bind('baseHeight')) / 6 - 20px);
-  max-height: calc((100vh - v-bind('baseHeight')) / 6 - 20px);
-  font-weight: 700;
-  position: relative;
-}
+  .button {
+    min-height: calc((100vh - v-bind('baseHeight')) / 6 - 20px);
+    max-height: calc((100vh - v-bind('baseHeight')) / 6 - 20px);
+    font-weight: 700;
+    position: relative;
+  }
 
-.icon {
-  font-size: calc(
-    min(
-        calc((100vh - v-bind('baseHeight')) / 6 * 0.25),
-        calc((100vw - 40px) / 4 * 0.3)
-      ) * 0.8
-  );
-  padding-top: calc(((100vh - v-bind('baseHeight')) / 6 - 15px) * 0.3); /* Lower the content by 4px */
-}
+  .icon {
+    font-size: calc(
+      min(
+          calc((100vh - v-bind('baseHeight')) / 6 * 0.25),
+          calc((100vw - 40px) / 4 * 0.3)
+        ) * 0.8
+    );
+    padding-top: calc(
+      ((100vh - v-bind('baseHeight')) / 6 - 15px) * 0.3
+    ); /* Lower the content by 4px */
+  }
 
-.char {
-  font-size: calc(
-    min(
-        calc((100vh - v-bind('baseHeight')) / 6 * 0.26),
-        calc((100vw - 40px) / 4 * 0.3)
-      ) * 1.2
-  );
-  padding-top: calc(((100vh - v-bind('baseHeight')) / 6 - 25px) * 0.3); /* Lower the content by 4px */
-}
+  .char {
+    font-size: calc(
+      min(
+          calc((100vh - v-bind('baseHeight')) / 6 * 0.26),
+          calc((100vw - 40px) / 4 * 0.3)
+        ) * 1.2
+    );
+    padding-top: calc(
+      ((100vh - v-bind('baseHeight')) / 6 - 25px) * 0.3
+    ); /* Lower the content by 4px */
+  }
 
-.top-label {
-  text-align: center;
-  position: absolute;
-  font-size: calc(
-    min(
-        calc((100vh - v-bind('baseHeight')) / 6 * 0.26),
-        calc((100vw - 40px) / 4 * 0.3)
-      ) * 1.2 * 0.7
-  );
-}
+  .top-label {
+    text-align: center;
+    position: absolute;
+    font-size: calc(
+      min(
+          calc((100vh - v-bind('baseHeight')) / 6 * 0.26),
+          calc((100vw - 40px) / 4 * 0.3)
+        ) * 1.2 * 0.7
+    );
+  }
 
-.top-label-icon {
-  top: calc(((100vh - v-bind('baseHeight')) / 6) * 0.15 - 9px);
-}
+  .top-label-icon {
+    top: calc(((100vh - v-bind('baseHeight')) / 6) * 0.15 - 9px);
+  }
 
-.top-label-char {
-  top: calc(((100vh - v-bind('baseHeight')) / 6) * 0.15 - 17px);
-}
+  .top-label-char {
+    top: calc(((100vh - v-bind('baseHeight')) / 6) * 0.15 - 17px);
+  }
 
-.bg-btn-important {
-  background: #cb9247 !important; // 아이콘의 밝은 녹색
-};
+  .bg-btn-important {
+    background: #cb9247 !important; // 아이콘의 밝은 녹색
+  }
 
-.bg-btn-function {
-  background: #1d8fb6 !important; // 아이콘의 밝은 파란색과 어울리게 조정
-};
+  .bg-btn-function {
+    background: #1d8fb6 !important; // 아이콘의 밝은 파란색과 어울리게 조정
+  }
 
-.bg-btn-normal {
-  background: #5e9e7d !important; // 어두운 색
-};
+  .bg-btn-normal {
+    background: #5e9e7d !important; // 어두운 색
+  }
 
-.top-label-important {
-  color: #e6d8c6 !important; // 아이콘의 밝은 녹색
-};
+  .top-label-important {
+    color: #e6d8c6 !important; // 아이콘의 밝은 녹색
+  }
 
-.top-label-function {
-  color: #b8dfed !important; // 아이콘의 밝은 파란색과 어울리게 조정
-};
+  .top-label-function {
+    color: #b8dfed !important; // 아이콘의 밝은 파란색과 어울리게 조정
+  }
 
-.top-label-normal {
-  color: #bcddcc !important; // 어두운 색
-};
+  .top-label-normal {
+    color: #bcddcc !important; // 어두운 색
+  }
 
-.button-shift {
-  background: #cb4747 !important; 
-};
+  .button-shift {
+    background: #cb4747 !important;
+  }
 </style>
