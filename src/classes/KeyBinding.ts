@@ -1,4 +1,4 @@
-import tinykeys, { KeyBindingMap } from 'tinykeys';
+import {tinykeys, KeyBindingMap} from 'tinykeys';
 
 export type KeyBindings = [string[], () => void][]; // [keybinding, callback][]
 
