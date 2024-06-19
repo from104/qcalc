@@ -47,7 +47,7 @@
     "pinia-plugin-persistedstate": "^1.6.1",
     "postcss": "^8.1.0",
     "quasar": "^2.7.7",
-    "tinykeys": "^1.4.0",
+    "tinykeys": "^2.1.0",
     "vue": "3",
     "vue-i18n": "9.13.1",
     "vue-router": "4",
@@ -82,7 +82,7 @@
     "vue-tsc": "^1.8.22"
   },
   "engines": {
-    "node": "^18 || ^16 || ^14.19",
+    "node": "^20 || ^18 || ^16 || ^14.19",
     "npm": ">= 6.13.4",
     "yarn": ">= 1.21.1"
   },
