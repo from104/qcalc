@@ -59,7 +59,7 @@ export default configure(function (/* ctx */) {
         capacitor: [__dirname, 'src-capacitor/node_modules'].join('/'),
       },
       target: {
-        browser: ['es2019', 'edge88', 'firefox78', 'chrome87', 'safari13.1'],
+        browser: ['es2020', 'edge79', 'firefox68', 'chrome67', 'safari14'],
         node: 'node16',
       },
 
