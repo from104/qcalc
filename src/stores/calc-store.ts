@@ -146,7 +146,7 @@ export const useCalcStore = defineStore('calc', {
         return `${this.toFormattedNumber(h.previousNumber)} ^ 2`;
       } else if (h.operator == 'exp10') {
         // 10의 N제곱
-        return `10 ^ ${this.toFormattedNumber(h.previousNumber)}`;
+        return `${this.toFormattedNumber('10')} ^ ${this.toFormattedNumber(h.previousNumber)}`;
       } else if (['sqrt', 'sin', 'cos', 'tan', 'fct', 'int', 'frac'].includes(h.operator)) {
         // 제곱근 및 삼각함수 등
         return `${h.operator} ( ${this.toFormattedNumber(h.previousNumber)} )`;

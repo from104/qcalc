@@ -233,7 +233,7 @@
         >
           <q-icon name="mdi-alpha-m-circle">
             <q-tooltip>
-              {{ calc.getMemoryNumber() }}
+              {{ store.toFormattedNumber(calc.getMemoryNumber()) }}
             </q-tooltip>
           </q-icon>
         </div>
@@ -250,7 +250,7 @@
           :id="fieldID"
           v-mutation="setNeedFieldTooltip"
           v-mutation.characterData
-          class="self-center no-outline full-width full-height ellipsis text-right q-pt-xs"
+          class="self-center no-outline full-width full-height ellipsis text-right q-pt-xs noselect"
           :class="isMainField ? 'text-h5' : ''"
           :style="`padding-top: ${store.paddingOnResult}px;`"
         >
@@ -258,7 +258,7 @@
           <span :id="isMainField ? 'result' : 'subResult'">{{ result }}</span>
           <span id="unit">{{ unit }}</span>
           <q-menu context-menu auto-close touch-position>
-            <q-list dense style="max-width: 200px">
+            <q-list class="noselect" dense style="max-width: 200px">
               <q-item
                 v-ripple
                 clickable

@@ -331,7 +331,7 @@
                     </q-item-label>
                   </q-item-section>
                   <q-menu context-menu auto-close touch-position>
-                    <q-list dense style="max-width: 200px">
+                    <q-list dense class="noselect" style="max-width: 200px">
                       <q-item
                         v-if="!history.memo"
                         v-ripple
