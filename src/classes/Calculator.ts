@@ -1,4 +1,4 @@
-import { create, all } from 'mathjs';
+import {create, all} from 'mathjs';
 
 const MathB = create(all, {
   number: 'BigNumber',
@@ -31,7 +31,7 @@ enum Operator {
 }
 
 // 연산자와 문자열을 매핑하는 객체
-const operatorMap: { [key: string]: Operator } = {
+const operatorMap: {[key: string]: Operator} = {
   '': Operator.None,
   '+': Operator.Plus,
   '-': Operator.Minus,
@@ -54,7 +54,7 @@ const operatorMap: { [key: string]: Operator } = {
 };
 
 // 상수
-const constants: { [key: string]: string } = {
+const constants: {[key: string]: string} = {
   pi: MathB.pi.toString(),
   pi2: MathB.bignumber(MathB.pi).div(2).toString(),
   e: MathB.e.toString(),
@@ -136,15 +136,13 @@ export class Calculator {
     }
 
     // 부호와 숫자만 리턴
-    return MathB.bignumber(
-      (isMinus ? '-' : '') + (result == '' ? '0' : result)
-    ).toString();
+    return MathB.bignumber((isMinus ? '-' : '') + (result == '' ? '0' : result)).toString();
   }
 
   // shownNumber를 문자열로 셋팅
   public setCurrentNumber(s: string): void {
     this.currentNumber = this.extractNumberString(
-      s.substring(0, s.length < 64 ? s.length : 64) // 최대 표시 숫자 갯수는 64
+      s.substring(0, s.length < 64 ? s.length : 64), // 최대 표시 숫자 갯수는 64
     );
     this.shouldReset = false; // 초기화 예정 끄기
   }
@@ -224,7 +222,7 @@ export class Calculator {
 
   // 부동소수점 숫자를 문자열로
   private numberToString(numberForCalc: string): string {
-    const [integer, decimal] = numberForCalc.toString().split('.') // 정수와 소수점으로 나눔
+    const [integer, decimal] = numberForCalc.toString().split('.'); // 정수와 소수점으로 나눔
     if (decimal) {
       // 소수점이 있으면
       return integer + '.' + decimal;
@@ -260,7 +258,7 @@ export class Calculator {
       numberForCalc = this.repeatedNumber;
     } else {
       // 아니면 표시 숫자를 계산에 사용
-      numberForCalc = this.currentNumber
+      numberForCalc = this.currentNumber;
       this.repeatedNumber = numberForCalc;
     }
 
@@ -402,9 +400,7 @@ export class Calculator {
 
   // 연산자 문자열로 얻기
   public getOperatorString(operator: Operator = this.currentOperator): string {
-    return (
-      Object.keys(operatorMap).find((key) => operatorMap[key] === operator) || ''
-    );
+    return Object.keys(operatorMap).find((key) => operatorMap[key] === operator) || '';
   }
 
   // % 처리
@@ -415,9 +411,8 @@ export class Calculator {
     if (this.currentOperator == Operator.Div || this.currentOperator == Operator.Mul) {
       this.performPreCalculation(); // 사전 계산
 
-      const { previousNumber, argumentNumber } = this.histories.shift() as History; // 계산 결과를 빼냄
-      const operator =
-        this.getOperatorString() + this.getOperatorString(Operator.Pct); // 연산자를 %로
+      const {previousNumber, argumentNumber} = this.histories.shift() as History; // 계산 결과를 빼냄
+      const operator = this.getOperatorString() + this.getOperatorString(Operator.Pct); // 연산자를 %로
       const resultNumber =
         this.currentOperator == Operator.Div
           ? MathB.bignumber(this.previousNumber).mul(100).toString()
@@ -433,7 +428,7 @@ export class Calculator {
       this.setCurrentNumberFromPrevious();
     }
 
-    this.currentOperator = Operator.None // 연산자 리셋
+    this.currentOperator = Operator.None; // 연산자 리셋
     this.repeatedNumber = '0'; // 반복 숫자 초기화
     this.shouldReset = true; // 숫자 입력 초기화 예정
   }
@@ -446,7 +441,7 @@ export class Calculator {
           previousNumber: this.currentNumber,
           operator: this.getOperatorString(Operator.Rec) as string,
           resultNumber: MathB.bignumber(1).div(this.currentNumber).toString(),
-        })
+        }),
       );
       this.repeatedNumber = '0';
       this.shouldReset = true;
@@ -460,7 +455,7 @@ export class Calculator {
         previousNumber: this.currentNumber,
         operator: this.getOperatorString(Operator.Pow2) as string,
         resultNumber: MathB.bignumber(this.currentNumber).pow(2).toString(),
-      })
+      }),
     );
     this.repeatedNumber = '0';
     this.shouldReset = true;
@@ -476,7 +471,7 @@ export class Calculator {
         previousNumber: this.currentNumber,
         operator: this.getOperatorString(Operator.Sqrt) as string,
         resultNumber: MathB.bignumber(this.currentNumber).sqrt().toString(),
-      })
+      }),
     );
     this.repeatedNumber = '0';
     this.shouldReset = true;
@@ -489,7 +484,7 @@ export class Calculator {
         previousNumber: this.currentNumber,
         operator: this.getOperatorString(Operator.Sin) as string,
         resultNumber: MathB.sin(MathB.bignumber(this.currentNumber)).toString(),
-      })
+      }),
     );
     this.repeatedNumber = '0';
     this.shouldReset = true;
@@ -502,7 +497,7 @@ export class Calculator {
         previousNumber: this.currentNumber,
         operator: this.getOperatorString(Operator.Cos) as string,
         resultNumber: MathB.cos(MathB.bignumber(this.currentNumber)).toString(),
-      })
+      }),
     );
     this.repeatedNumber = '0';
     this.shouldReset = true;
@@ -515,7 +510,7 @@ export class Calculator {
         previousNumber: this.currentNumber,
         operator: this.getOperatorString(Operator.Tan) as string,
         resultNumber: MathB.tan(MathB.bignumber(this.currentNumber)).toString(),
-      })
+      }),
     );
     this.repeatedNumber = '0';
     this.shouldReset = true;
@@ -531,7 +526,7 @@ export class Calculator {
         previousNumber: this.currentNumber,
         operator: this.getOperatorString(Operator.Fct) as string,
         resultNumber: MathB.factorial(MathB.bignumber(this.currentNumber)).toString(),
-      })
+      }),
     );
     this.repeatedNumber = '0';
     this.shouldReset = true;
@@ -544,12 +539,12 @@ export class Calculator {
         previousNumber: this.currentNumber,
         operator: this.getOperatorString(Operator.Exp10) as string,
         resultNumber: MathB.pow(10, MathB.bignumber(this.currentNumber)).toString(),
-      })
+      }),
     );
     this.repeatedNumber = '0';
     this.shouldReset = true;
   }
-  
+
   // 정수부 계산
   public int() {
     this.currentNumber = this.numberToString(
@@ -557,7 +552,7 @@ export class Calculator {
         previousNumber: this.currentNumber,
         operator: this.getOperatorString(Operator.Int) as string,
         resultNumber: MathB.bignumber(this.currentNumber).floor().toString(),
-      })
+      }),
     );
     this.repeatedNumber = '0';
     this.shouldReset = true;
@@ -570,7 +565,7 @@ export class Calculator {
         previousNumber: this.currentNumber,
         operator: this.getOperatorString(Operator.Frac) as string,
         resultNumber: MathB.bignumber(this.currentNumber).mod(1).toString(),
-      })
+      }),
     );
     this.repeatedNumber = '0';
     this.shouldReset = true;
@@ -599,7 +594,7 @@ export class Calculator {
   // 메모리 불러오기
   public memoryRecall() {
     if (this.isMemoryReset) {
-      throw new Error('No memory to recall.'); 
+      throw new Error('No memory to recall.');
     } else {
       this.currentNumber = this.memoryNumber;
     }
@@ -646,7 +641,7 @@ export class Calculator {
   public getMemoryNumber(): string {
     return this.memoryNumber;
   }
-  
+
   // 메모리가 리셋되었는지 여부
   public getIsMemoryReset(): boolean {
     return this.isMemoryReset;
@@ -662,7 +657,7 @@ export class Calculator {
     }
     // 배열 앞에 히스토리 추가
     this.histories.unshift(history);
-    
+
     // 히스토리 크기가 최대 크기를 넘어서면 제일 뒤의 것을 제거
     if (this.histories.length > this.HISTORY_MAX_SIZE) this.histories.pop();
 
@@ -734,8 +729,8 @@ export class Calculator {
 }
 
 export default Calculator;
-export { Operator };
-export type { History };
+export {Operator};
+export type {History};
 
 // const bigmath = create(all, {
 //   number: 'BigNumber',
