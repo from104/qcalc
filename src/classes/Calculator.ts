@@ -3,7 +3,7 @@ import {create, all} from 'mathjs';
 const MathB = create(all, {
   number: 'BigNumber',
   precision: 64,
-}) as math.MathJsStatic;
+});
 
 /**
  * 다양한 연산자를 나타내는 열거형입니다.
