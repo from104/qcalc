@@ -62,9 +62,7 @@
       if (isOpen) {
         // 다이얼로그가 열릴 때 시간을 약간 지연하여 저장된 스크롤 위치로 이동
         setTimeout(() => {
-          document
-            .getElementById('history')
-            ?.scrollTo({top: lastScrollPosition});
+          document.getElementById('history')?.scrollTo({top: lastScrollPosition});
         }, 50);
       } else {
         // 다이얼로그가 닫힐 때 현재 스크롤 위치를 저장
@@ -103,8 +101,7 @@
     [
       ['d'],
       () => {
-        store.isHistoryDialogOpen &&
-          store.clickButtonById('btn-delete-history');
+        store.isHistoryDialogOpen && store.clickButtonById('btn-delete-history');
       },
     ],
     [['ArrowUp'], () => scrollHistory(-50)],
@@ -186,10 +183,7 @@
   };
 
   import {copyToClipboard} from 'quasar';
-  const historyCopy = async (
-    id: number,
-    copyType: 'formattedNumber' | 'onlyNumber' | 'memo',
-  ): Promise<void> => {
+  const historyCopy = async (id: number, copyType: 'formattedNumber' | 'onlyNumber' | 'memo'): Promise<void> => {
     const history = calc.getHistoryByID(id);
     const copyText =
       copyType === 'formattedNumber'
@@ -240,12 +234,7 @@
 </script>
 
 <template>
-  <q-dialog
-    v-model="store.isHistoryDialogOpen"
-    style="z-index: 10"
-    position="bottom"
-    transition-duration="300"
-  >
+  <q-dialog v-model="store.isHistoryDialogOpen" style="z-index: 10" position="bottom" transition-duration="300">
     <q-bar
       v-blur
       dark
@@ -265,13 +254,7 @@
         :disable="doDeleteHistory || histories.length == 0"
         @click="doDeleteHistory = true"
       />
-      <q-btn
-        icon="close"
-        size="md"
-        dense
-        flat
-        @click="store.isHistoryDialogOpen = false"
-      />
+      <q-btn icon="close" size="md" dense flat @click="store.isHistoryDialogOpen = false" />
     </q-bar>
     <q-card
       id="history"
@@ -325,104 +308,52 @@
                       {{ store.getLeftSideInHistory(history, true) }}
                     </q-item-label>
                     <q-item-label>
-                      {{
-                        ['=', store.getRightSideInHistory(history)].join(' ')
-                      }}
+                      {{ ['=', store.getRightSideInHistory(history)].join(' ') }}
                     </q-item-label>
                   </q-item-section>
                   <q-menu context-menu auto-close touch-position>
                     <q-list dense class="noselect" style="max-width: 200px">
-                      <q-item
-                        v-if="!history.memo"
-                        v-ripple
-                        clickable
-                        @click="memoDialog(history.id as number)"
-                      >
+                      <q-item v-if="!history.memo" v-ripple clickable @click="memoDialog(history.id as number)">
                         <q-item-section>
                           <q-item-label>{{ t('addMemo') }}</q-item-label>
                         </q-item-section>
                       </q-item>
-                      <q-item
-                        v-if="history.memo"
-                        v-ripple
-                        clickable
-                        @click="memoDialog(history.id as number)"
-                      >
+                      <q-item v-if="history.memo" v-ripple clickable @click="memoDialog(history.id as number)">
                         <q-item-section>
                           <q-item-label>{{ t('editMemo') }}</q-item-label>
                         </q-item-section>
                       </q-item>
-                      <q-item
-                        v-if="history.memo"
-                        v-ripple
-                        clickable
-                        @click="historyCopy(history.id as number, 'memo')"
-                      >
+                      <q-item v-if="history.memo" v-ripple clickable @click="historyCopy(history.id as number, 'memo')">
                         <q-item-section>
                           <q-item-label>{{ t('copyMemo') }}</q-item-label>
                         </q-item-section>
                       </q-item>
-                      <q-item
-                        v-if="history.memo"
-                        v-ripple
-                        clickable
-                        @click="memoDelete(history.id as number)"
-                      >
+                      <q-item v-if="history.memo" v-ripple clickable @click="memoDelete(history.id as number)">
                         <q-item-section>
                           <q-item-label>{{ t('deleteMemo') }}</q-item-label>
                         </q-item-section>
                       </q-item>
                       <q-separator />
-                      <q-item
-                        v-ripple
-                        clickable
-                        @click="
-                          historyCopy(history.id as number, 'formattedNumber')
-                        "
-                      >
+                      <q-item v-ripple clickable @click="historyCopy(history.id as number, 'formattedNumber')">
                         <q-item-section>
-                          <q-item-label>{{
-                            t('copyDisplayedResult')
-                          }}</q-item-label>
-                          <q-item-label class="ellipsis"
-                            >[
-                            {{
-                              store.getRightSideInHistory(history)
-                            }}
-                            ]</q-item-label
-                          >
+                          <q-item-label>{{ t('copyDisplayedResult') }}</q-item-label>
+                          <q-item-label class="ellipsis"> [ {{ store.getRightSideInHistory(history) }} ] </q-item-label>
                         </q-item-section>
                       </q-item>
-                      <q-item
-                        v-ripple
-                        clickable
-                        @click="historyCopy(history.id as number, 'onlyNumber')"
-                      >
+                      <q-item v-ripple clickable @click="historyCopy(history.id as number, 'onlyNumber')">
                         <q-item-section>
-                          <q-item-label>{{
-                            t('copyResultNumber')
-                          }}</q-item-label>
-                          <q-item-label class="ellipsis"
-                            >[ {{ history.resultNumber }} ]</q-item-label
-                          >
+                          <q-item-label>{{ t('copyResultNumber') }}</q-item-label>
+                          <q-item-label class="ellipsis">[ {{ history.resultNumber }} ]</q-item-label>
                         </q-item-section>
                       </q-item>
                       <q-separator />
-                      <q-item
-                        v-ripple
-                        clickable
-                        @click="toMainResult(history.id as number)"
-                      >
+                      <q-item v-ripple clickable @click="toMainResult(history.id as number)">
                         <q-item-section>
-                          <q-item-label>{{
-                            t('loadToMainPanel')
-                          }}</q-item-label>
+                          <q-item-label>{{ t('loadToMainPanel') }}</q-item-label>
                         </q-item-section>
                       </q-item>
                       <q-item
-                        v-if="
-                          store.cTab === 'unit' || store.cTab === 'currency'
-                        "
+                        v-if="store.cTab === 'unit' || store.cTab === 'currency'"
                         v-ripple
                         clickable
                         @click="toSubResult(history.id as number)"
@@ -432,11 +363,7 @@
                         </q-item-section>
                       </q-item>
                       <q-separator />
-                      <q-item
-                        v-ripple
-                        clickable
-                        @click="deleteHistory(history.id as number)"
-                      >
+                      <q-item v-ripple clickable @click="deleteHistory(history.id as number)">
                         <q-item-section>
                           <q-item-label>{{ t('deleteResult') }}</q-item-label>
                         </q-item-section>
@@ -453,27 +380,12 @@
   </q-dialog>
 
   <!-- 기록 전체 삭제 다이얼로그 -->
-  <q-dialog
-    v-model="doDeleteHistory"
-    persistent
-    transition-show="scale"
-    transition-hide="scale"
-    style="z-index: 15"
-  >
-    <q-card
-      class="noselect text-center text-white bg-negative"
-      style="width: 200px"
-    >
+  <q-dialog v-model="doDeleteHistory" persistent transition-show="scale" transition-hide="scale" style="z-index: 15">
+    <q-card class="noselect text-center text-white bg-negative" style="width: 200px">
       <q-card-section>{{ t('doYouDeleteHistory') }} </q-card-section>
       <q-card-actions align="center" class="text-negative bg-white">
         <q-btn v-close-popup flat :label="t('message.no')" />
-        <q-btn
-          v-close-popup
-          flat
-          :label="t('message.yes')"
-          autofocus
-          @click="calc.clearHistory()"
-        />
+        <q-btn v-close-popup flat :label="t('message.yes')" autofocus @click="calc.clearHistory()" />
       </q-card-actions>
     </q-card>
   </q-dialog>
@@ -487,11 +399,7 @@
     style="z-index: 15"
   >
     <q-card class="noselect text-center" style="width: 250px">
-      <q-bar
-        v-blur
-        dark
-        class="full-width justify-between nnoselect text-body1 text-white bg-primary"
-      >
+      <q-bar v-blur dark class="full-width justify-between nnoselect text-body1 text-white bg-primary">
         <q-btn dense flat icon="replay" size="sm" @click="editCancel" />
         <div>{{ t('memo') }}</div>
         <q-btn dense flat icon="check" size="sm" @click="editConfirm" />
@@ -563,36 +471,36 @@
 </style>
 
 <i18n>
-  ko:
-    history: '계산 결과'
-    noHistory: '계산 결과가 없습니다.'
-    doYouDeleteHistory: '모든 계산 기록을 지우겠어요?'
-    memo: '메모'
-    copySuccess: '클립보드에 복사되었습니다.'
-    copyFailure: '클립보드 복사에 실패했습니다.'
-    addMemo: '메모 추가'
-    editMemo: '메모 수정'
-    copyMemo: '메모 복사'
-    deleteMemo: '메모 삭제'
-    copyDisplayedResult: '표시된 결과 복사'
-    copyResultNumber: '결과 숫자 복사'
-    loadToMainPanel: '메인 패널에 불러오기'
-    loadToSubPanel: '서브 패널에 불러오기'
-    deleteResult: '결과 삭제'
-  en:
-    history: 'History'
-    noHistory: 'No history.'
-    doYouDeleteHistory: 'Do you want to delete all history?'
-    memo: 'Memo'
-    copySuccess: 'Copied to clipboard.'
-    copyFailure: 'Failed to copy to clipboard.'
-    addMemo: 'Add memo'
-    editMemo: 'Edit memo'
-    copyMemo: 'Copy memo'
-    deleteMemo: 'Delete memo'    
-    copyDisplayedResult: 'Copy displayed result'
-    copyResultNumber: 'Copy result number'
-    loadToMainPanel: 'Load to main panel'
-    loadToSubPanel: 'Load to sub panel'
-    deleteResult: 'Delete result'
+ko:
+  history: '계산 결과'
+  noHistory: '계산 결과가 없습니다.'
+  doYouDeleteHistory: '모든 계산 기록을 지우겠어요?'
+  memo: '메모'
+  copySuccess: '클립보드에 복사되었습니다.'
+  copyFailure: '클립보드 복사에 실패했습니다.'
+  addMemo: '메모 추가'
+  editMemo: '메모 수정'
+  copyMemo: '메모 복사'
+  deleteMemo: '메모 삭제'
+  copyDisplayedResult: '표시된 결과 복사'
+  copyResultNumber: '결과 숫자 복사'
+  loadToMainPanel: '메인 패널에 불러오기'
+  loadToSubPanel: '서브 패널에 불러오기'
+  deleteResult: '결과 삭제'
+en:
+  history: 'History'
+  noHistory: 'No history.'
+  doYouDeleteHistory: 'Do you want to delete all history?'
+  memo: 'Memo'
+  copySuccess: 'Copied to clipboard.'
+  copyFailure: 'Failed to copy to clipboard.'
+  addMemo: 'Add memo'
+  editMemo: 'Edit memo'
+  copyMemo: 'Copy memo'
+  deleteMemo: 'Delete memo'    
+  copyDisplayedResult: 'Copy displayed result'
+  copyResultNumber: 'Copy result number'
+  loadToMainPanel: 'Load to main panel'
+  loadToSubPanel: 'Load to sub panel'
+  deleteResult: 'Delete result'
 </i18n>

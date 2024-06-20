@@ -1,12 +1,5 @@
 <script lang="ts" setup>
-  import {
-    onMounted,
-    onBeforeMount,
-    reactive,
-    watch,
-    onBeforeUnmount,
-    ref,
-  } from 'vue';
+  import {onMounted, onBeforeMount, reactive, watch, onBeforeUnmount, ref} from 'vue';
 
   import {version} from '../../package.json';
 
@@ -125,70 +118,39 @@
         <q-icon name="settings" size="sm" />
         <div>{{ t('message.settings') }}</div>
         <q-space />
-        <q-btn
-          dense
-          flat
-          icon="close"
-          size="md"
-          @click="store.isSettingDialogOpen = false"
-        />
+        <q-btn dense flat icon="close" size="md" @click="store.isSettingDialogOpen = false" />
       </q-bar>
       <q-card-section class="full-width">
         <q-list v-blur dense>
           <q-item v-if="$q.platform.is.electron" class="q-py-none">
-            <q-item-label class="self-center"
-              >{{ t('alwaysOnTop') }} (T)</q-item-label
-            >
+            <q-item-label class="self-center">{{ t('alwaysOnTop') }} (T)</q-item-label>
             <q-space />
-            <q-toggle
-              v-model="store.alwaysOnTop"
-              keep-color
-              dense
-              @click="store.setAlwaysOnTop(store.alwaysOnTop)"
-            />
+            <q-toggle v-model="store.alwaysOnTop" keep-color dense @click="store.setAlwaysOnTop(store.alwaysOnTop)" />
           </q-item>
 
           <q-item class="q-py-none">
-            <q-item-label class="self-center"
-              >{{ t('initPanel') }} (N)</q-item-label
-            >
+            <q-item-label class="self-center">{{ t('initPanel') }} (N)</q-item-label>
             <q-space />
-            <q-toggle
-              v-model="store.initPanel"
-              keep-color
-              dense
-              @click="store.setInitPanel(store.initPanel)"
-            />
+            <q-toggle v-model="store.initPanel" keep-color dense @click="store.setInitPanel(store.initPanel)" />
           </q-item>
 
           <q-item class="q-py-none">
-            <q-item-label class="self-center"
-              >{{ t('darkMode') }} (K)</q-item-label
-            >
+            <q-item-label class="self-center">{{ t('darkMode') }} (K)</q-item-label>
             <q-space />
-            <q-toggle
-              v-model="store.darkMode"
-              keep-color
-              dense
-              @click="store.setDarkMode(store.darkMode)"
-            />
+            <q-toggle v-model="store.darkMode" keep-color dense @click="store.setDarkMode(store.darkMode)" />
           </q-item>
 
           <q-separator spaced="md" />
 
           <q-item class="q-py-none">
-            <q-item-label class="self-center"
-              >{{ t('showButtonAddedLabel') }} (;)</q-item-label
-            >
+            <q-item-label class="self-center">{{ t('showButtonAddedLabel') }} (;)</q-item-label>
             >
             <q-space />
             <q-toggle v-model="store.showButtonAddedLabel" keep-color dense />
           </q-item>
 
           <q-item class="q-py-none">
-            <q-item-label class="self-center"
-              >{{ t('useGrouping') }} (,)</q-item-label
-            >
+            <q-item-label class="self-center">{{ t('useGrouping') }} (,)</q-item-label>
             <q-space />
             <q-toggle v-model="store.useGrouping" keep-color dense />
           </q-item>
@@ -196,15 +158,9 @@
           <q-item class="q-py-none">
             <MyTooltip>
               {{ t('decimalPlacesStat') }}:
-              {{
-                store.decimalPlaces == -2
-                  ? t('noLimit')
-                  : `${store.decimalPlaces} ${t('toNDecimalPlaces')}`
-              }}
+              {{ store.decimalPlaces == -2 ? t('noLimit') : `${store.decimalPlaces} ${t('toNDecimalPlaces')}` }}
             </MyTooltip>
-            <q-item-label class="q-pt-xs self-start"
-              >{{ t('decimalPlaces') }} ([,])</q-item-label
-            >
+            <q-item-label class="q-pt-xs self-start">{{ t('decimalPlaces') }} ([,])</q-item-label>
             <q-space />
             <q-slider
               v-model="store.decimalPlaces"
@@ -231,9 +187,7 @@
                   class="cursor-pointer"
                   :class="(markerList[val] as any).classes"
                   :style="(markerList[val] as any).style"
-                  @click="
-                    store.setDecimalPlaces((markerList[val] as any).value)
-                  "
+                  @click="store.setDecimalPlaces((markerList[val] as any).value)"
                 >
                   {{ (markerList[val] as any).value }}
                 </div>
@@ -245,9 +199,7 @@
             <q-separator spaced="md" />
 
             <q-item class="q-py-none">
-              <q-item-label class="self-center">
-                {{ t('showUnit') }} (b)
-              </q-item-label>
+              <q-item-label class="self-center"> {{ t('showUnit') }} (b) </q-item-label>
               <q-space />
               <q-toggle v-model="store.showUnit" keep-color dense />
             </q-item>
@@ -256,9 +208,7 @@
             <q-separator spaced="md" />
 
             <q-item class="q-py-none">
-              <q-item-label class="self-center">
-                {{ t('showSymbol') }} (o)
-              </q-item-label>
+              <q-item-label class="self-center"> {{ t('showSymbol') }} (o) </q-item-label>
               <q-space />
               <q-toggle v-model="store.showSymbol" keep-color dense />
             </q-item>
@@ -267,16 +217,9 @@
           <q-separator spaced="md" />
 
           <q-item class="q-py-none">
-            <q-item-label class="self-center">{{
-              t('useSystemLocale')
-            }}</q-item-label>
+            <q-item-label class="self-center">{{ t('useSystemLocale') }}</q-item-label>
             <q-space />
-            <q-toggle
-              v-model="store.useSystemLocale"
-              keep-color
-              dense
-              @click="setLocale()"
-            />
+            <q-toggle v-model="store.useSystemLocale" keep-color dense @click="setLocale()" />
           </q-item>
 
           <q-item>

@@ -20,14 +20,11 @@
   const swapUnitValue = () => {
     // 변환 결과를 원본 값으로 바꾸기
     // (computed로 선언된 unitResult로 인해 값이 바뀌면 자동으로 변환 결과가 바뀜)
-    calc.setCurrentNumber(
-      document.getElementById('subResult')?.textContent ?? '0',
-    );
+    calc.setCurrentNumber(document.getElementById('subResult')?.textContent ?? '0');
 
     // 단위도 바꾸기
     const temp = store.recentUnitFrom[store.recentCategory];
-    store.recentUnitFrom[store.recentCategory] =
-      store.recentUnitTo[store.recentCategory];
+    store.recentUnitFrom[store.recentCategory] = store.recentUnitTo[store.recentCategory];
     store.recentUnitTo[store.recentCategory] = temp;
   };
 
@@ -82,10 +79,7 @@
   const toUnitOptions = reactive({values: []} as ReactiveUnitOptions);
 
   watch(
-    [
-      () => store.recentUnitFrom[store.recentCategory],
-      () => store.recentUnitTo[store.recentCategory],
-    ],
+    [() => store.recentUnitFrom[store.recentCategory], () => store.recentUnitTo[store.recentCategory]],
     () => {
       const category = store.recentCategory;
       const unitList = UnitConverter.getUnitLists(category);
@@ -122,9 +116,7 @@
       map-options
       class="col-3 q-pl-sm shadow-2 text-black"
       :class="!store.darkMode ? 'bg-blue-grey-2' : 'bg-blue-grey-6'"
-      :popup-content-class="
-        !store.darkMode ? 'bg-blue-grey-2' : 'bg-blue-grey-6'
-      "
+      :popup-content-class="!store.darkMode ? 'bg-blue-grey-2' : 'bg-blue-grey-6'"
       :options-selected-class="!store.darkMode ? 'text-primary' : 'text-grey-1'"
       :label-color="!store.darkMode ? 'primary' : 'grey-1'"
     />
@@ -136,11 +128,7 @@
     <q-select
       v-model="store.recentUnitFrom[store.recentCategory]"
       :options="fromUnitOptions.values"
-      :label="
-        t(
-          `unitDesc.${store.recentCategory}.${store.recentUnitFrom[store.recentCategory]}`,
-        )
-      "
+      :label="t(`unitDesc.${store.recentCategory}.${store.recentUnitFrom[store.recentCategory]}`)"
       stack-label
       dense
       options-dense
@@ -148,9 +136,7 @@
       map-options
       class="col-3 q-pl-sm shadow-2"
       :class="!store.darkMode ? 'bg-blue-grey-2' : 'bg-blue-grey-6'"
-      :popup-content-class="
-        !store.darkMode ? 'bg-blue-grey-2' : 'bg-blue-grey-6'
-      "
+      :popup-content-class="!store.darkMode ? 'bg-blue-grey-2' : 'bg-blue-grey-6'"
       :options-selected-class="!store.darkMode ? 'text-primary' : 'text-grey-1'"
       :label-color="!store.darkMode ? 'primary' : 'grey-1'"
     >
@@ -165,11 +151,7 @@
         </q-item>
       </template>
       <MyTooltip>
-        {{
-          t(
-            `unitDesc.${store.recentCategory}.${store.recentUnitFrom[store.recentCategory]}`,
-          )
-        }}
+        {{ t(`unitDesc.${store.recentCategory}.${store.recentUnitFrom[store.recentCategory]}`) }}
       </MyTooltip>
     </q-select>
 
@@ -191,11 +173,7 @@
     <q-select
       v-model="store.recentUnitTo[store.recentCategory]"
       :options="toUnitOptions.values"
-      :label="
-        t(
-          `unitDesc.${store.recentCategory}.${store.recentUnitTo[store.recentCategory]}`,
-        )
-      "
+      :label="t(`unitDesc.${store.recentCategory}.${store.recentUnitTo[store.recentCategory]}`)"
       stack-label
       dense
       options-dense
@@ -203,9 +181,7 @@
       map-options
       class="col-3 q-pl-sm shadow-2"
       :class="!store.darkMode ? 'bg-blue-grey-2' : 'bg-blue-grey-6'"
-      :popup-content-class="
-        !store.darkMode ? 'bg-blue-grey-2' : 'bg-blue-grey-6'
-      "
+      :popup-content-class="!store.darkMode ? 'bg-blue-grey-2' : 'bg-blue-grey-6'"
       :options-selected-class="!store.darkMode ? 'text-primary' : 'text-grey-1'"
       :label-color="!store.darkMode ? 'primary' : 'grey-1'"
     >
@@ -220,20 +196,12 @@
         </q-item>
       </template>
       <MyTooltip>
-        {{
-          t(
-            `unitDesc.${store.recentCategory}.${store.recentUnitTo[store.recentCategory]}`,
-          )
-        }}
+        {{ t(`unitDesc.${store.recentCategory}.${store.recentUnitTo[store.recentCategory]}`) }}
       </MyTooltip>
     </q-select>
 
     <!-- 대상 방향 -->
-    <q-icon
-      name="keyboard_double_arrow_down"
-      size="xs"
-      class="col-1 q-px-none"
-    />
+    <q-icon name="keyboard_double_arrow_down" size="xs" class="col-1 q-px-none" />
   </q-card-section>
 </template>
 

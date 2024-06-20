@@ -1,12 +1,12 @@
-import { defineStore } from 'pinia';
-import { Dark, Notify, copyToClipboard } from 'quasar';
-import { create, all } from 'mathjs';
+import {defineStore} from 'pinia';
+import {Dark, Notify, copyToClipboard} from 'quasar';
+import {create, all} from 'mathjs';
 
-import { Calculator } from 'classes/Calculator';
-import type { History } from 'classes/Calculator';
+import {Calculator} from 'classes/Calculator';
+import type {History} from 'classes/Calculator';
 
-import { UnitConverter } from 'classes/UnitConverter';
-import { CurrencyConverter } from 'classes/CurrencyConverter';
+import {UnitConverter} from 'classes/UnitConverter';
+import {CurrencyConverter} from 'classes/CurrencyConverter';
 
 const MathB = create(all, {
   number: 'BigNumber',
@@ -34,8 +34,8 @@ export const useCalcStore = defineStore('calc', {
     // 최근 단위 변환 범주
     recentCategory: '',
     // 최근 단위 변환 단위
-    recentUnitFrom: {} as { [key: string]: string },
-    recentUnitTo: {} as { [key: string]: string },
+    recentUnitFrom: {} as {[key: string]: string},
+    recentUnitTo: {} as {[key: string]: string},
     // 시작시 패널 초기화 여부
     initPanel: false,
     // 환율 계산기
@@ -297,7 +297,7 @@ export const useCalcStore = defineStore('calc', {
         this.recentUnitTo[this.recentCategory] = temp;
       }
     },
-    swapCurrencyValue (): void {
+    swapCurrencyValue(): void {
       if (this.cTab === 'currency') {
         // 변환 결과를 원본 값으로 바꾸기
         this.calc.setCurrentNumber(document.getElementById('subResult')?.textContent ?? '0');
@@ -306,7 +306,7 @@ export const useCalcStore = defineStore('calc', {
         this.recentCurrencyFrom = this.recentCurrencyTo;
         this.recentCurrencyTo = temp;
       }
-    },    
+    },
     toggleButtonShift(): void {
       this.buttonShift = !this.buttonShift;
     },

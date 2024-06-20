@@ -9,20 +9,7 @@
   import {useCalcStore} from 'stores/calc-store';
   const store = useCalcStore();
 
-  const {calc, currencyConverter} = store;
-
-  // 단위 이름과 값을 바꾸기 위한 함수
-  const swapCurrencyValue = () => {
-    // 변환 결과를 원본 값으로 바꾸기
-    calc.setCurrentNumber(
-      document.getElementById('subResult')?.textContent ?? '0',
-    );
-
-    // 화폐도 바꾸기
-    const temp = store.recentCurrencyFrom;
-    store.recentCurrencyFrom = store.recentCurrencyTo;
-    store.recentCurrencyTo = temp;
-  };
+  const {currencyConverter} = store;
 
   // 단위 초기화
   store.initRecentCurrency();
@@ -33,12 +20,10 @@
   }
 
   const descOfCurrency = reactive<CurrencyDescription>(
-    currencyConverter
-      .getCurrencyLists()
-      .reduce((acc: CurrencyDescription, currency) => {
-        acc[currency] = t(`currencyDesc.${currency}`);
-        return acc;
-      }, {}),
+    currencyConverter.getCurrencyLists().reduce((acc: CurrencyDescription, currency) => {
+      acc[currency] = t(`currencyDesc.${currency}`);
+      return acc;
+    }, {}),
   );
 
   // 통화 이름을 언어에 맞게 바꾸기 위한 감시
@@ -138,16 +123,9 @@
   // 통화 선택 필터 함수 생성
   // 검색어를 사용하여 통화 목록을 필터링하는 함수를 생성합니다.
   // options 매개변수는 Ref<CurrencyOptions[]> 타입으로 선언되어 있으며, reactiveOptions 매개변수는 ReactiveCurrencyOptions 타입으로 선언되어 있습니다.
-  const createFilterFn = (
-    options: Ref<CurrencyOptions[]>,
-    reactiveOptions: ReactiveCurrencyOptions,
-  ) => {
+  const createFilterFn = (options: Ref<CurrencyOptions[]>, reactiveOptions: ReactiveCurrencyOptions) => {
     // 검색어(val), 업데이트 함수(update), 중단 함수(abort)를 매개변수로 받는 함수를 반환합니다.
-    return (
-      val: string,
-      update: (fn: () => void) => void,
-      abort: () => void,
-    ) => {
+    return (val: string, update: (fn: () => void) => void, abort: () => void) => {
       // 검색어의 길이가 1보다 작으면 검색을 중단하고, 검색어의 길이가 1 이상이면 검색을 시작합니다.
       if (val.length < 1) {
         // 검색어가 없으면 options 배열에 모든 값을 저장합니다.
@@ -173,24 +151,14 @@
   };
 
   // fromCurrencyOptions.values 배열을 사용하여 fromFilteredCurrencyOptions 배열을 생성합니다.
-  const fromFilteredCurrencyOptions = ref<CurrencyOptions[]>(
-    fromCurrencyOptions.values,
-  );
+  const fromFilteredCurrencyOptions = ref<CurrencyOptions[]>(fromCurrencyOptions.values);
   // createFilterFn 함수를 사용하여 filterFnFrom 함수를 생성합니다.
-  const filterFnFrom = createFilterFn(
-    fromFilteredCurrencyOptions,
-    fromCurrencyOptions,
-  );
+  const filterFnFrom = createFilterFn(fromFilteredCurrencyOptions, fromCurrencyOptions);
 
   // toCurrencyOptions.values 배열을 사용하여 toFilteredCurrencyOptions 배열을 생성합니다.
-  const toFilteredCurrencyOptions = ref<CurrencyOptions[]>(
-    toCurrencyOptions.values,
-  );
+  const toFilteredCurrencyOptions = ref<CurrencyOptions[]>(toCurrencyOptions.values);
   // createFilterFn 함수를 사용하여 filterFnTo 함수를 생성합니다.
-  const filterFnTo = createFilterFn(
-    toFilteredCurrencyOptions,
-    toCurrencyOptions,
-  );
+  const filterFnTo = createFilterFn(toFilteredCurrencyOptions, toCurrencyOptions);
 </script>
 
 <template>
@@ -215,9 +183,7 @@
       :label-color="!store.darkMode ? 'primary' : 'grey-1'"
       :options-selected-class="!store.darkMode ? 'text-primary' : 'text-grey-1'"
       class="col-4 q-pl-sm shadow-2"
-      :popup-content-class="
-        !store.darkMode ? 'bg-blue-grey-2' : 'bg-blue-grey-6'
-      "
+      :popup-content-class="!store.darkMode ? 'bg-blue-grey-2' : 'bg-blue-grey-6'"
       :class="!store.darkMode ? 'bg-blue-grey-2' : 'bg-blue-grey-6'"
       @filter="filterFnFrom"
       @focus="store.setInputFocused"
@@ -228,18 +194,14 @@
       <template #option="scope">
         <q-item v-bind="scope.itemProps">
           <q-item-section>
-            <q-item-label caption>{{
-              descOfCurrency[scope.opt.label]
-            }}</q-item-label>
+            <q-item-label caption>{{ descOfCurrency[scope.opt.label] }}</q-item-label>
             <q-item-label>{{ scope.opt.label }}</q-item-label>
           </q-item-section>
         </q-item>
       </template>
       <MyTooltip>
         <div class="text-left" style="white-space: pre-wrap">
-          {{
-            `${descOfCurrency[store.recentCurrencyFrom]}\n${store.recentCurrencyFrom}`
-          }}
+          {{ `${descOfCurrency[store.recentCurrencyFrom]}\n${store.recentCurrencyFrom}` }}
         </div>
       </MyTooltip>
     </q-select>
@@ -274,9 +236,7 @@
       hide-selected
       :label-color="!store.darkMode ? 'primary' : 'grey-1'"
       :class="!store.darkMode ? 'bg-blue-grey-2' : 'bg-blue-grey-6'"
-      :popup-content-class="
-        !store.darkMode ? 'bg-blue-grey-2' : 'bg-blue-grey-6'
-      "
+      :popup-content-class="!store.darkMode ? 'bg-blue-grey-2' : 'bg-blue-grey-6'"
       class="col-4 q-pl-sm shadow-2"
       :options-selected-class="!store.darkMode ? 'text-primary' : 'text-grey-1'"
       @filter="filterFnTo"
@@ -288,13 +248,9 @@
       <template #option="scope">
         <q-item v-bind="scope.itemProps">
           <q-item-section>
-            <q-item-label caption>{{
-              descOfCurrency[scope.opt.label]
-            }}</q-item-label>
+            <q-item-label caption>{{ descOfCurrency[scope.opt.label] }}</q-item-label>
             <q-item-label>
-              {{
-                `${scope.opt.label}, ${currencyConverter.getRate(scope.opt.label).toFixed(4)}`
-              }}
+              {{ `${scope.opt.label}, ${currencyConverter.getRate(scope.opt.label).toFixed(4)}` }}
             </q-item-label>
           </q-item-section>
         </q-item>
@@ -309,11 +265,7 @@
     </q-select>
 
     <!-- 대상 방향 -->
-    <q-icon
-      name="keyboard_double_arrow_down"
-      size="xs"
-      class="col-1 q-px-none"
-    />
+    <q-icon name="keyboard_double_arrow_down" size="xs" class="col-1 q-px-none" />
   </q-card-section>
 </template>
 

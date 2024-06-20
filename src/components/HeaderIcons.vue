@@ -32,16 +32,10 @@
     const textToClipboard = selectedText == '' ? resultText : selectedText;
     // 복사할 대상이 디스플레이에 있는 내용인지 선택한 내용인지에 따라
     // 복사할 대상을 표시한다.
-    const targetToBeCopied =
-      selectedText == ''
-        ? t('targetToBeCopiedResult')
-        : t('targetToBeCopiedSelected');
+    const targetToBeCopied = selectedText == '' ? t('targetToBeCopiedResult') : t('targetToBeCopiedSelected');
 
     // 클립보드에 복사한다.
-    store.copyToClipboard(
-      textToClipboard,
-      t('copiedToClipboard', {target: targetToBeCopied}),
-    );
+    store.copyToClipboard(textToClipboard, t('copiedToClipboard', {target: targetToBeCopied}));
   };
 
   const doPaste = async (target: 'main' | 'sub' = 'main'): Promise<void> => {
@@ -58,9 +52,7 @@
 
       if (text === '') {
         // 클립보드에 텍스트가 없는 경우, 알림 스토어를 통해 사용자에게 클립보드에 텍스트가 없다는 메시지를 보냅니다.
-        store.notifyError(
-          t('clipboardIsEmptyOrContainsDataThatCannotBePasted.'),
-        );
+        store.notifyError(t('clipboardIsEmptyOrContainsDataThatCannotBePasted.'));
         return;
       }
 
@@ -101,14 +93,8 @@
 
   import {KeyBinding} from 'classes/KeyBinding';
   const keyBinding = new KeyBinding([
-    [
-      ['Control+c', 'Control+Insert', 'Copy'],
-      () => store.clickButtonById('btn-copy'),
-    ],
-    [
-      ['Control+v', 'Shift+Insert', 'Paste'],
-      () => store.clickButtonById('btn-paste'),
-    ],
+    [['Control+c', 'Control+Insert', 'Copy'], () => store.clickButtonById('btn-copy')],
+    [['Control+v', 'Shift+Insert', 'Paste'], () => store.clickButtonById('btn-paste')],
   ]);
 
   onMounted(() => {
@@ -161,19 +147,8 @@
   >
     <MyTooltip>{{ t('openHistoryDialog') }}</MyTooltip>
   </q-btn>
-  <q-btn
-    id="btn-menu"
-    flat
-    icon="more_vert"
-    class="q-ma-none q-pa-none q-pl-xs"
-    :disable="store.isSettingDialogOpen"
-  >
-    <q-menu
-      auto-close
-      transition-show="slide-down"
-      transition-hide="slide-up"
-      :offset="[0, 20]"
-    >
+  <q-btn id="btn-menu" flat icon="more_vert" class="q-ma-none q-pa-none q-pl-xs" :disable="store.isSettingDialogOpen">
+    <q-menu auto-close transition-show="slide-down" transition-hide="slide-up" :offset="[0, 20]">
       <MenuPanel />
     </q-menu>
   </q-btn>

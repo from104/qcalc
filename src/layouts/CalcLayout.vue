@@ -110,11 +110,7 @@
     </q-header>
 
     <q-page-container style="padding-bottom: 0px">
-      <q-tab-panels
-        v-model="store.cTab"
-        animated
-        :swipeable="$q.platform.is.mobile"
-      >
+      <q-tab-panels v-model="store.cTab" animated :swipeable="$q.platform.is.mobile">
         <q-tab-panel v-for="(tab, index) in tabs" :key="index" :name="tab.name">
           <component :is="tab.component" />
         </q-tab-panel>

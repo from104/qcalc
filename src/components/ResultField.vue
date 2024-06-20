@@ -52,11 +52,7 @@
   const convertedCurrencyNumber = () => {
     if (props.addon == 'currency') {
       return store.currencyConverter
-        .convert(
-          Number(calc.getCurrentNumber()),
-          store.recentCurrencyFrom,
-          store.recentCurrencyTo,
-        )
+        .convert(Number(calc.getCurrentNumber()), store.recentCurrencyFrom, store.recentCurrencyTo)
         .toString();
     } else {
       return '';
@@ -95,9 +91,7 @@
   const symbol = computed(() => {
     if (store.showSymbol && props.addon == 'currency') {
       if (isMainField.value) {
-        return (
-          store.currencyConverter?.getSymbol(store.recentCurrencyFrom) ?? ''
-        );
+        return store.currencyConverter?.getSymbol(store.recentCurrencyFrom) ?? '';
       } else {
         return store.currencyConverter?.getSymbol(store.recentCurrencyTo) ?? '';
       }
@@ -146,8 +140,7 @@
 
   const getPreResult = () => {
     // 'history'는 계산의 직전 결과 기록을 가져옵니다.
-    const lastHistory =
-      calc.getHistorySize() > 0 ? calc.getHistoryByIndex(0) : null;
+    const lastHistory = calc.getHistorySize() > 0 ? calc.getHistoryByIndex(0) : null;
     // 'shouldReset'은 다음 입력시 계산기가 초기화 될지 판단합니다.
     const shouldReset = calc.getShouldReset();
 
@@ -206,10 +199,7 @@
 </script>
 
 <template>
-  <q-card-section
-    class="col-12 q-px-sm"
-    :class="field == 'main' ? 'q-pt-md q-pb-sm' : 'q-py-none'"
-  >
+  <q-card-section class="col-12 q-px-sm" :class="field == 'main' ? 'q-pt-md q-pb-sm' : 'q-py-none'">
     <q-field
       class="shadow-2 justify-end self-center"
       :class="[isMainField ? '' : 'q-mt-none q-mb-xs']"
@@ -226,22 +216,14 @@
         </div>
       </template>
       <template v-if="isMainField" #prepend>
-        <div
-          v-if="!isMemoryReset"
-          v-blur
-          class="noselect full-height q-mt-xs q-pt-sm"
-        >
+        <div v-if="!isMemoryReset" v-blur class="noselect full-height q-mt-xs q-pt-sm">
           <q-icon name="mdi-alpha-m-circle">
             <q-tooltip>
               {{ store.toFormattedNumber(calc.getMemoryNumber()) }}
             </q-tooltip>
           </q-icon>
         </div>
-        <div
-          v-if="operator != ''"
-          v-blur
-          class="noselect full-height q-mt-xs q-pt-sm"
-        >
+        <div v-if="operator != ''" v-blur class="noselect full-height q-mt-xs q-pt-sm">
           <q-icon :name="operatorIcons[operator]" />
         </div>
       </template>
@@ -262,32 +244,17 @@
               <q-item
                 v-ripple
                 clickable
-                @click="
-                  store.copyToClipboard(
-                    symbol + result + unit,
-                    t('copiedDisplayedResult'),
-                  )
-                "
+                @click="store.copyToClipboard(symbol + result + unit, t('copiedDisplayedResult'))"
               >
                 <q-item-section>
                   <q-item-label>{{ t('copyDisplayedResult') }}</q-item-label>
-                  <q-item-label class="ellipsis"
-                    >[ {{ symbol + result + unit }} ]</q-item-label
-                  >
+                  <q-item-label class="ellipsis">[ {{ symbol + result + unit }} ]</q-item-label>
                 </q-item-section>
               </q-item>
-              <q-item
-                v-ripple
-                clickable
-                @click="
-                  store.copyToClipboard(onlyNumber, t('copiedOnlyNumber'))
-                "
-              >
+              <q-item v-ripple clickable @click="store.copyToClipboard(onlyNumber, t('copiedOnlyNumber'))">
                 <q-item-section>
                   <q-item-label>{{ t('copyOnlyNumber') }}</q-item-label>
-                  <q-item-label class="ellipsis"
-                    >[ {{ onlyNumber }} ]</q-item-label
-                  >
+                  <q-item-label class="ellipsis">[ {{ onlyNumber }} ]</q-item-label>
                 </q-item-section>
               </q-item>
             </q-list>
