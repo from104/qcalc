@@ -1,5 +1,5 @@
 <script setup lang="ts">
-  import {onMounted, onBeforeUnmount, ref, computed, watch} from 'vue';
+  import {onMounted, onBeforeUnmount, ref, computed, watch, reactive, h} from 'vue';
 
   // import MyTooltip from 'components/MyTooltip.vue';
 
@@ -14,9 +14,33 @@
   const {calc} = store;
 
   // 계산 결과 배열
-  const histories = calc.getHistories();
+  const histories = computed(() => calc.getHistories());
 
-  // 계산 결과를 지울지 묻는 다이얼로그 표시 여부
+  // 계산 결과 메뉴가 열려있는지 여부
+  const historyMenu: {[id: number]: boolean} = reactive(Object.fromEntries(histories.value.map((h) => [h.id, false])));
+
+  watch(
+    () => histories,
+    (newHistories) => {
+      newHistories.value.forEach((h) => {
+        if (h.id) {
+          if (historyMenu[h.id] === undefined) {
+            historyMenu[h.id] = false;
+          }
+        } else {
+        }
+      });
+
+      for (const id in historyMenu) {
+        if (!newHistories.value.some((h) => h.id === parseInt(id))) {
+          delete historyMenu[id];
+        }
+      }
+      console.log('historyMenu', historyMenu);
+    },
+    {deep: true}, // 깊은 감시를 위해 deep 옵션을 true로 설정
+  ); // 계산 결과를 지울지 묻는 다이얼로그 표시 여부
+
   const doDeleteHistory = ref(false);
 
   // 계산 결과 맨 위로 가는 아이콘 표시 여부
@@ -183,6 +207,7 @@
   };
 
   import {copyToClipboard} from 'quasar';
+  import {number} from 'mathjs';
   const historyCopy = async (id: number, copyType: 'formattedNumber' | 'onlyNumber' | 'memo'): Promise<void> => {
     const history = calc.getHistoryByID(id);
     const copyText =
@@ -287,7 +312,7 @@
             <transition-group name="history-list">
               <q-slide-item
                 v-for="history in histories"
-                :key="history.id"
+                :key="history.id"                
                 left-color="positive"
                 right-color="negative"
                 @left="({reset}) => onLeft({reset}, history.id as number)"
@@ -299,7 +324,7 @@
                 <template #right>
                   <q-icon name="delete_outline" />
                 </template>
-                <q-item class="text-right q-pa-sm">
+                <q-item v-touch-hold.mouse="() => historyMenu[history.id as number] = true" class="text-right q-pa-sm">
                   <q-item-section class="q-mr-none q-px-none">
                     <q-item-label v-if="history.memo">
                       <u>{{ history.memo }}</u>
@@ -311,66 +336,72 @@
                       {{ ['=', store.getRightSideInHistory(history)].join(' ') }}
                     </q-item-label>
                   </q-item-section>
-                  <q-menu context-menu auto-close touch-position>
-                    <q-list dense class="noselect" style="max-width: 200px">
-                      <q-item v-if="!history.memo" v-ripple clickable @click="memoDialog(history.id as number)">
-                        <q-item-section>
-                          <q-item-label>{{ t('addMemo') }}</q-item-label>
-                        </q-item-section>
-                      </q-item>
-                      <q-item v-if="history.memo" v-ripple clickable @click="memoDialog(history.id as number)">
-                        <q-item-section>
-                          <q-item-label>{{ t('editMemo') }}</q-item-label>
-                        </q-item-section>
-                      </q-item>
-                      <q-item v-if="history.memo" v-ripple clickable @click="historyCopy(history.id as number, 'memo')">
-                        <q-item-section>
-                          <q-item-label>{{ t('copyMemo') }}</q-item-label>
-                        </q-item-section>
-                      </q-item>
-                      <q-item v-if="history.memo" v-ripple clickable @click="memoDelete(history.id as number)">
-                        <q-item-section>
-                          <q-item-label>{{ t('deleteMemo') }}</q-item-label>
-                        </q-item-section>
-                      </q-item>
-                      <q-separator />
-                      <q-item v-ripple clickable @click="historyCopy(history.id as number, 'formattedNumber')">
-                        <q-item-section>
-                          <q-item-label>{{ t('copyDisplayedResult') }}</q-item-label>
-                          <q-item-label class="ellipsis"> [ {{ store.getRightSideInHistory(history) }} ] </q-item-label>
-                        </q-item-section>
-                      </q-item>
-                      <q-item v-ripple clickable @click="historyCopy(history.id as number, 'onlyNumber')">
-                        <q-item-section>
-                          <q-item-label>{{ t('copyResultNumber') }}</q-item-label>
-                          <q-item-label class="ellipsis">[ {{ history.resultNumber }} ]</q-item-label>
-                        </q-item-section>
-                      </q-item>
-                      <q-separator />
-                      <q-item v-ripple clickable @click="toMainResult(history.id as number)">
-                        <q-item-section>
-                          <q-item-label>{{ t('loadToMainPanel') }}</q-item-label>
-                        </q-item-section>
-                      </q-item>
-                      <q-item
-                        v-if="store.cTab === 'unit' || store.cTab === 'currency'"
-                        v-ripple
-                        clickable
-                        @click="toSubResult(history.id as number)"
-                      >
-                        <q-item-section>
-                          <q-item-label>{{ t('loadToSubPanel') }}</q-item-label>
-                        </q-item-section>
-                      </q-item>
-                      <q-separator />
-                      <q-item v-ripple clickable @click="deleteHistory(history.id as number)">
-                        <q-item-section>
-                          <q-item-label>{{ t('deleteResult') }}</q-item-label>
-                        </q-item-section>
-                      </q-item>
-                    </q-list>
-                  </q-menu>
                 </q-item>
+                <q-menu
+                  v-model="historyMenu[history.id as number]"
+                  class="shadow-6"
+                  :context-menu="$q.platform.is.desktop"
+                  auto-close
+                  anchor="center left" self="top left"
+                >
+                  <q-list dense class="noselect" style="max-width: 200px">
+                    <q-item v-if="!history.memo" v-ripple clickable @click="memoDialog(history.id as number)">
+                      <q-item-section>
+                        <q-item-label>{{ t('addMemo') }}</q-item-label>
+                      </q-item-section>
+                    </q-item>
+                    <q-item v-if="history.memo" v-ripple clickable @click="memoDialog(history.id as number)">
+                      <q-item-section>
+                        <q-item-label>{{ t('editMemo') }}</q-item-label>
+                      </q-item-section>
+                    </q-item>
+                    <q-item v-if="history.memo" v-ripple clickable @click="historyCopy(history.id as number, 'memo')">
+                      <q-item-section>
+                        <q-item-label>{{ t('copyMemo') }}</q-item-label>
+                      </q-item-section>
+                    </q-item>
+                    <q-item v-if="history.memo" v-ripple clickable @click="memoDelete(history.id as number)">
+                      <q-item-section>
+                        <q-item-label>{{ t('deleteMemo') }}</q-item-label>
+                      </q-item-section>
+                    </q-item>
+                    <q-separator />
+                    <q-item v-ripple clickable @click="historyCopy(history.id as number, 'formattedNumber')">
+                      <q-item-section>
+                        <q-item-label>{{ t('copyDisplayedResult') }}</q-item-label>
+                        <q-item-label class="ellipsis"> [ {{ store.getRightSideInHistory(history) }} ] </q-item-label>
+                      </q-item-section>
+                    </q-item>
+                    <q-item v-ripple clickable @click="historyCopy(history.id as number, 'onlyNumber')">
+                      <q-item-section>
+                        <q-item-label>{{ t('copyResultNumber') }}</q-item-label>
+                        <q-item-label class="ellipsis">[ {{ history.resultNumber }} ]</q-item-label>
+                      </q-item-section>
+                    </q-item>
+                    <q-separator />
+                    <q-item v-ripple clickable @click="toMainResult(history.id as number)">
+                      <q-item-section>
+                        <q-item-label>{{ t('loadToMainPanel') }}</q-item-label>
+                      </q-item-section>
+                    </q-item>
+                    <q-item
+                      v-if="store.cTab === 'unit' || store.cTab === 'currency'"
+                      v-ripple
+                      clickable
+                      @click="toSubResult(history.id as number)"
+                    >
+                      <q-item-section>
+                        <q-item-label>{{ t('loadToSubPanel') }}</q-item-label>
+                      </q-item-section>
+                    </q-item>
+                    <q-separator />
+                    <q-item v-ripple clickable @click="deleteHistory(history.id as number)">
+                      <q-item-section>
+                        <q-item-label>{{ t('deleteResult') }}</q-item-label>
+                      </q-item-section>
+                    </q-item>
+                  </q-list>
+                </q-menu>
               </q-slide-item>
             </transition-group>
           </q-list>

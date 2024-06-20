@@ -225,7 +225,7 @@
 </script>
 
 <template>
-  <q-card-section v-blur class="row wrap justify-center q-pt-xs q-pb-none q-px-none">
+  <q-card-section v-touch-swipe.up="() => store.isHistoryDialogOpen = true" v-blur class="row wrap justify-center q-pt-xs q-pb-none q-px-none">
     <div v-for="(button, id) in buttons" :key="id" class="col-3 row wrap justify-center q-pa-sm">
       <q-btn
         :id="'btn-' + id"

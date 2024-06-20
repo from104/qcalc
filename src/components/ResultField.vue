@@ -206,24 +206,35 @@
       filled
       dense
       readonly
+      :dark="false"
       :bg-color="!needFieldTooltip ? 'light-green-3' : 'deep-orange-2'"
       :label-slot="isMainField"
       :stack-label="isMainField"
     >
       <template v-if="isMainField" #label>
-        <div id="preResult" v-blur class="noselect">
+        <div id="preResult" v-blur class="noselect" :class="[!needFieldTooltip ? 'text-light-green-10' : 'text-deep-orange-8']">
           {{ preResult }}
         </div>
       </template>
       <template v-if="isMainField" #prepend>
-        <div v-if="!isMemoryReset" v-blur class="noselect full-height q-mt-xs q-pt-sm">
+        <div
+          v-if="!isMemoryReset"
+          v-blur
+          class="noselect full-height q-mt-xs q-pt-sm"
+          :class="[!needFieldTooltip ? 'text-light-green-10' : 'text-deep-orange-8']"
+        >
           <q-icon name="mdi-alpha-m-circle">
             <q-tooltip>
               {{ store.toFormattedNumber(calc.getMemoryNumber()) }}
             </q-tooltip>
           </q-icon>
         </div>
-        <div v-if="operator != ''" v-blur class="noselect full-height q-mt-xs q-pt-sm">
+        <div
+          v-if="operator != ''"
+          v-blur
+          class="noselect full-height q-mt-xs q-pt-sm"
+          :class="[!needFieldTooltip ? 'text-light-green-10' : 'text-deep-orange-8']"
+        >
           <q-icon :name="operatorIcons[operator]" />
         </div>
       </template>
@@ -233,14 +244,14 @@
           v-mutation="setNeedFieldTooltip"
           v-mutation.characterData
           class="self-center no-outline full-width full-height ellipsis text-right q-pt-xs noselect"
-          :class="isMainField ? 'text-h5' : ''"
+          :class="[isMainField ? 'text-h5' : '', !needFieldTooltip ? 'text-light-green-10' : 'text-deep-orange-8']"
           :style="`padding-top: ${store.paddingOnResult}px;`"
         >
           <span id="symbol">{{ symbol }}</span>
           <span :id="isMainField ? 'result' : 'subResult'">{{ result }}</span>
           <span id="unit">{{ unit }}</span>
-          <q-menu context-menu auto-close touch-position>
-            <q-list class="noselect" dense style="max-width: 200px">
+          <q-menu context-menu auto-close touch-position class="shadow-6">
+            <q-list class="noselect" dense style="min-width: 150px">
               <q-item
                 v-ripple
                 clickable

@@ -121,7 +121,7 @@
     :disable="store.isSettingDialogOpen"
     @click="doPaste()"
   >
-    <q-menu v-if="store.cTab !== 'calc'" context-menu auto-close class="z-max">
+    <q-menu v-if="store.cTab !== 'calc'" context-menu auto-close class="z-max shadow-6">
       <q-list dense style="max-width: 200px">
         <q-item v-ripple clickable @click="doPaste('main')">
           <q-item-section>
@@ -148,7 +148,7 @@
     <MyTooltip>{{ t('openHistoryDialog') }}</MyTooltip>
   </q-btn>
   <q-btn id="btn-menu" flat icon="more_vert" class="q-ma-none q-pa-none q-pl-xs" :disable="store.isSettingDialogOpen">
-    <q-menu auto-close transition-show="slide-down" transition-hide="slide-up" :offset="[0, 20]">
+    <q-menu auto-close transition-show="slide-down" transition-hide="slide-up" :offset="[0, 20]"  class="shadow-6">
       <MenuPanel />
     </q-menu>
   </q-btn>
