@@ -144,7 +144,6 @@
 
           <q-item class="q-py-none">
             <q-item-label class="self-center">{{ t('showButtonAddedLabel') }} (;)</q-item-label>
-            >
             <q-space />
             <q-toggle v-model="store.showButtonAddedLabel" keep-color dense />
           </q-item>
