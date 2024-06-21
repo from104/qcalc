@@ -54,4 +54,5 @@ overrides:
       parser: babel
   - files: '*.vue'
     options:
+      printWidth: 120
       parser: vue
