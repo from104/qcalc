@@ -36,7 +36,6 @@
           delete historyMenu[id];
         }
       }
-      console.log('historyMenu', historyMenu);
     },
     {deep: true}, // 깊은 감시를 위해 deep 옵션을 true로 설정
   ); // 계산 결과를 지울지 묻는 다이얼로그 표시 여부
@@ -264,8 +263,6 @@
       v-blur
       dark
       class="full-width noselect text-white bg-primary"
-      @touchstart.passive="handleTouchStart"
-      @touchend.passive="handleTouchEnd"
     >
       <q-icon name="history" size="sm" />
       <div>{{ t('history') }}</div>
@@ -283,6 +280,7 @@
     </q-bar>
     <q-card
       id="history"
+      v-touch-swipe:12e-1:12:50.down="() => (store.isHistoryDialogOpen = false)"
       square
       class="full-width row justify-center items-start relative-position scrollbar-custom"
       @scroll="onScroll"

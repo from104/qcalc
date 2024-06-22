@@ -597,6 +597,7 @@ export class Calculator {
       throw new Error('No memory to recall.');
     } else {
       this.currentNumber = this.memoryNumber;
+      this.shouldReset = false; // 숫자 하나로 셋팅하고 초기화 예정 끄기
     }
   }
 
@@ -617,7 +618,7 @@ export class Calculator {
   public memoryMinus() {
     if (!this.isMemoryReset) {
       this.memoryNumber = MathB.bignumber(this.memoryNumber).sub(this.currentNumber).toString();
-    }
+    };
   }
 
   // 메모리 곱하기

@@ -83,28 +83,77 @@
   const buttonsAddedFunc: ButtonAddedFunc = {
     a1: ['xⁿ', ['Shift+Control+q'], () => calc.pow()],
     b1: ['ⁿ√x', ['Shift+Control+w'], () => calc.root()],
-    c1: ['MC', ['Shift+Control+e', 'Shift+Delete', 'Shift+Escape'], () => calc.memoryClear()],
-    d1: ['MR', ['Shift+Backspace', 'Shift+Control+r'], () => calc.memoryRecall()],
+    c1: [
+      'MC',
+      ['Shift+Control+e', 'Shift+Delete', 'Shift+Escape'],
+      () => {
+        calc.memoryClear();
+        showMemoryTooltip();
+      },
+    ],
+    d1: [
+      'MR',
+      ['Shift+Backspace', 'Shift+Control+r'],
+      () => {
+        calc.memoryRecall();
+        showMemoryTooltip();
+      },
+    ],
     a2: ['10ⁿ', ['Shift+Control+a'], () => calc.exp10()],
     b2: ['x%y', ['Shift+Control+s'], () => calc.mod()],
     c2: ['x!', ['Shift+Control+d'], () => calc.fct()],
-    d2: ['M÷', ['Shift+Slash', 'Shift+NumpadDivide'], () => calc.memoryDiv()],
+    d2: [
+      'M÷',
+      ['Shift+Slash', 'Shift+NumpadDivide'],
+      () => {
+        calc.memoryDiv();
+        showMemoryTooltip();
+      },
+    ],
     a3: ['sin', ['Shift+Digit7', 'Shift+Numpad7'], () => calc.sin()],
     b3: ['cos', ['Shift+Digit8', 'Shift+Numpad8'], () => calc.cos()],
     c3: ['tan', ['Shift+Digit9', 'Shift+Numpad9'], () => calc.tan()],
-    d3: ['M×', ['Shift+NumpadMultiply'], () => calc.memoryMul()],
+    d3: [
+      'M×',
+      ['Shift+NumpadMultiply'],
+      () => {
+        calc.memoryMul();
+        showMemoryTooltip();
+      },
+    ],
     a4: ['Pi/2', ['Shift+Digit4', 'Shift+Numpad4'], () => calc.setConstant('pi2')],
     b4: ['ln10', ['Shift+Digit5', 'Shift+Numpad5'], () => calc.setConstant('ln10')],
     c4: ['ln2', ['Shift+Digit6', 'Shift+Numpad6'], () => calc.setConstant('ln2')],
-    d4: ['M-', ['Shift+Minus', 'Shift+NumpadSubtract'], () => calc.memoryMinus()],
+    d4: [
+      'M-',
+      ['Shift+Minus', 'Shift+NumpadSubtract'],
+      () => {
+        calc.memoryMinus();
+        showMemoryTooltip();
+      },
+    ],
     a5: ['Pi', ['Shift+Digit1', 'Shift+Numpad1'], () => calc.setConstant('pi')],
     b5: ['phi', ['Shift+Digit2', 'Shift+Numpad2'], () => calc.setConstant('phi')],
     c5: ['e', ['Shift+Digit3', 'Shift+Numpad3'], () => calc.setConstant('e')],
-    d5: ['M+', ['Shift+Plus', 'Shift+NumpadAdd'], () => calc.memoryPlus()],
+    d5: [
+      'M+',
+      ['Shift+Plus', 'Shift+NumpadAdd'],
+      () => {
+        calc.memoryPlus();
+        showMemoryTooltip();
+      },
+    ],
     a6: ['', [], () => null],
     b6: ['int', ['Shift+Digit0', 'Shift+Numpad0'], () => calc.int()],
     c6: ['frac', ['Shift+Period', 'Shift+NumpadDecimal'], () => calc.frac()],
-    d6: ['MS', ['Shift+Equal', 'Shift+Enter', 'Shift+NumpadEnter'], () => calc.memorySave()],
+    d6: [
+      'MS',
+      ['Shift+Equal', 'Shift+Enter', 'Shift+NumpadEnter'],
+      () => {
+        calc.memorySave();
+        showMemoryTooltip();
+      },
+    ],
   };
 
   // 버튼 레이블이 비어있는 버튼을 찾아서 shiftID에 저장 - shiftID는 시프트 버튼의 id
@@ -159,6 +208,15 @@
     } else {
       funcWithError(buttonsAddedFunc[id][2]);
       showTooltipOfFunc(id);
+    }
+  };
+
+  const showMemoryTooltip = () => {
+    if (!calc.getIsMemoryReset()) {
+      store.showMemoryTooltip = true;
+      setTimeout(() => {
+        store.showMemoryTooltip = false;
+      }, 2000);
     }
   };
 
@@ -225,7 +283,11 @@
 </script>
 
 <template>
-  <q-card-section v-touch-swipe.up="() => store.isHistoryDialogOpen = true" v-blur class="row wrap justify-center q-pt-xs q-pb-none q-px-none">
+  <q-card-section
+    v-touch-swipe:6e-2:12:50.up="() => (store.isHistoryDialogOpen = true)"
+    v-blur
+    class="row wrap justify-center q-pt-xs q-pb-none q-px-none"
+  >
     <div v-for="(button, id) in buttons" :key="id" class="col-3 row wrap justify-center q-pa-sm">
       <q-btn
         :id="'btn-' + id"

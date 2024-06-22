@@ -80,7 +80,6 @@ export class UnitConverter {
       convertedValue = convertedValue.div(toUnitValue);
     }
 
-    console.log(baseValue.toString(), convertedValue.toString());
     return convertedValue.toString();
   }
 }

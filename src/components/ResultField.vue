@@ -212,7 +212,12 @@
       :stack-label="isMainField"
     >
       <template v-if="isMainField" #label>
-        <div id="preResult" v-blur class="noselect" :class="[!needFieldTooltip ? 'text-light-green-10' : 'text-deep-orange-8']">
+        <div
+          id="preResult"
+          v-blur
+          class="noselect"
+          :class="[!needFieldTooltip ? 'text-light-green-10' : 'text-deep-orange-8']"
+        >
           {{ preResult }}
         </div>
       </template>
@@ -224,7 +229,14 @@
           :class="[!needFieldTooltip ? 'text-light-green-10' : 'text-deep-orange-8']"
         >
           <q-icon name="mdi-alpha-m-circle">
-            <q-tooltip>
+            <q-tooltip
+              v-model="store.showMemoryTooltip"
+              :hide-delay="2000"
+              class="text-green-10 bg-green-2 text-body2 text-center fa-border-all"
+              style="border: 1px solid black; word-break: break-all; word-wrap: break-word"
+              anchor="bottom middle"
+              self="center middle"
+            >
               {{ store.toFormattedNumber(calc.getMemoryNumber()) }}
             </q-tooltip>
           </q-icon>

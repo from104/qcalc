@@ -63,6 +63,8 @@ export const useCalcStore = defineStore('calc', {
     buttonShift: false,
     // 계산기 버튼의 추가 기능 잠금
     buttonShiftLock: false,
+    // 메모리 톨팁 표시 여부
+    showMemoryTooltip: false,
   }),
   getters: {},
   actions: {
