@@ -168,18 +168,18 @@ export class CurrencyConverter {
   }
 }
 
-(async () => {
-  // 지연 전에 실행할 코드
-  const converter =  new CurrencyConverter();
-  await converter.updateRates();
+// (async () => {
+//   // 지연 전에 실행할 코드
+//   const converter =  new CurrencyConverter();
+//   await converter.updateRates();
 
-  // 지연 후에 실행할 코드
-  console.log(converter.convert(100, 'USD', 'KRW'));
-  console.log(converter.format(converter.convert(100, 'USD', 'KRW'), 'KRW'));
-  console.log(converter.convert(100, 'USD', 'EUR'));
-  console.log(converter.format(converter.convert(100, 'USD', 'EUR'), 'EUR'));
-  const ratesEUR = converter.getRates('EUR');
-  const ratesUSD = converter.getRates('USD');
-  console.log(ratesEUR['KRW']);
-  console.log(ratesUSD['KRW']);
-})();
+//   // 지연 후에 실행할 코드
+//   console.log(converter.convert(100, 'USD', 'KRW'));
+//   console.log(converter.format(converter.convert(100, 'USD', 'KRW'), 'KRW'));
+//   console.log(converter.convert(100, 'USD', 'EUR'));
+//   console.log(converter.format(converter.convert(100, 'USD', 'EUR'), 'EUR'));
+//   const ratesEUR = converter.getRates('EUR');
+//   const ratesUSD = converter.getRates('USD');
+//   console.log(ratesEUR['KRW']);
+//   console.log(ratesUSD['KRW']);
+// })();
