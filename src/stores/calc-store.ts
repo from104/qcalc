@@ -113,10 +113,10 @@ export const useCalcStore = defineStore('calc', {
     toFormattedNumber(number: string): string {
       const bignumber = MathB.bignumber(number);
       const formattedNumber = MathB.format(bignumber, {
-        precision: this.decimalPlaces === -2 ? 20 : this.decimalPlaces,
+        precision: this.decimalPlaces === -2 ? 64 : this.decimalPlaces,
         notation: this.decimalPlaces === -2 ? 'auto' : 'fixed',
-        lowerExp: -20,
-        upperExp: 20,
+        lowerExp: -64,
+        upperExp: 64,
       });
       return this.useGrouping ? this.numberGrouping(formattedNumber) : formattedNumber;
     },

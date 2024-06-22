@@ -1,4 +1,5 @@
-import {MathB, unitBaseData, UnitBaseData} from './UnitBaseData';
+import {BigNumber} from 'mathjs';
+import {BigNumberType, MathB, unitBaseData, UnitBaseData} from './UnitBaseData';
 
 // 단위 변환기 클래스
 export class UnitConverter {
@@ -22,7 +23,7 @@ export class UnitConverter {
   }
 
   // 단위 값 반환
-  static getUnitValue(category: string, unit: string) {
+  static getUnitValue(category: string, unit: string): BigNumber | ((value: BigNumberType, toBase?: boolean) => BigNumber){
     // 예외 처리
     if (!this.categories.includes(category)) {
       throw new Error(`Invalid category: ${category}`);
@@ -30,7 +31,8 @@ export class UnitConverter {
     if (!this.getUnitLists(category).includes(unit)) {
       throw new Error(`Invalid unit: ${unit}`);
     }
-    return this.units[category][unit].value;
+    const unitValue = this.units[category][unit].value;
+    return typeof unitValue === 'function' ? unitValue : MathB.bignumber(unitValue);
   }
 
   // 단위 설명 반환
@@ -48,7 +50,7 @@ export class UnitConverter {
   // 단위 변환
   static convert<T extends keyof UnitBaseData>(
     category: T,
-    originalValue: number | string,
+    originalValue: BigNumberType,
     from: string,
     to: string,
   ): string {
@@ -78,11 +80,10 @@ export class UnitConverter {
       convertedValue = convertedValue.div(toUnitValue);
     }
 
+    console.log(baseValue.toString(), convertedValue.toString());
     return convertedValue.toString();
   }
 }
-
-// export {};
 
 // console.log(UnitConverter.convert('길이', 1, 'm', 'km'));
 // console.log(UnitConverter.convert('온도', 100, 'F', 'K'));

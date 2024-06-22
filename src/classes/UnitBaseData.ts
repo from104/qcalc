@@ -5,14 +5,17 @@ export const MathB = create(all, {
   precision: 64,
 });
 
+export type BigNumberType = number | BigNumber | string;
+
 interface Unit {
   [unit: string]: {
-    value: number | ((originalValue: number | string, isReverse?: boolean) => BigNumber);
+    value: number | ((originalValue: BigNumberType, isReverse?: boolean) => BigNumber);
     desc: string;
   };
 }
 
 export type UnitBaseData = Record<string, Unit>;
+
 // 단위 범주 목록별 단위 목록
 export const unitBaseData: UnitBaseData = {
   length: {
@@ -99,7 +102,7 @@ export const unitBaseData: UnitBaseData = {
     '°C': {value: 1, desc: 'Celsius'}, // 섭씨
     '°F': {
       // 화씨
-      value: (originalValue: number | string, isReverse = false): BigNumber => {
+      value: (originalValue: BigNumberType, isReverse = false): BigNumber => {
         const value = MathB.bignumber(originalValue);
         return isReverse
           ? value.minus(32).times(5).dividedBy(9) // (originalValue - 32) * (5 / 9)
@@ -109,7 +112,7 @@ export const unitBaseData: UnitBaseData = {
     },
     K: {
       // 켈빈
-      value: (originalValue: number | string, isReverse = false): BigNumber => {
+      value: (originalValue: BigNumberType, isReverse = false): BigNumber => {
         const value = MathB.bignumber(originalValue);
         return isReverse
           ? value.minus(273.15) // originalValue - 273.15 (From Kelvin to Celsius)
@@ -119,7 +122,7 @@ export const unitBaseData: UnitBaseData = {
     },
     '°R': {
       // 랭킨
-      value: (originalValue: number | string, isReverse = false): BigNumber => {
+      value: (originalValue: BigNumberType, isReverse = false): BigNumber => {
         const value = MathB.bignumber(originalValue);
         return isReverse
           ? value.minus(491.67).times(5).dividedBy(9) // (originalValue - 491.67) * (5 / 9)
