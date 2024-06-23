@@ -1,11 +1,11 @@
-import tinykeys, { KeyBindingMap } from 'tinykeys';
+import {tinykeys, KeyBindingMap} from 'tinykeys';
 
 export type KeyBindings = [string[], () => void][]; // [keybinding, callback][]
 
 export class KeyBinding {
   private isSubscribe = false;
   private keyBindings: KeyBindings = [];
-  private unsubscribeMethod: ()=>void = ()=>{};
+  private unsubscribeMethod: () => void = () => {};
 
   constructor(keybindings: KeyBindings, subscribe = false) {
     this.addKeyBindings(keybindings);
@@ -41,11 +41,10 @@ export class KeyBinding {
 
   unsubscribe() {
     if (this.isSubscribe) {
+      this.unsubscribeMethod();
+      this.unsubscribeMethod = () => {};
 
-    this.unsubscribeMethod();
-    this.unsubscribeMethod = ()=>{};
-
-    this.isSubscribe = false;
+      this.isSubscribe = false;
     }
   }
 

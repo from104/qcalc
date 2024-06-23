@@ -8,7 +8,7 @@
 // Configuration for your app
 // https://v2.quasar.dev/quasar-cli-vite/quasar-config-js
 
-import { configure } from 'quasar/wrappers';
+import {configure} from 'quasar/wrappers';
 
 import path from 'path';
 import dotenv from 'dotenv';
@@ -30,7 +30,7 @@ export default configure(function (/* ctx */) {
     // app boot file (/src/boot)
     // --> boot files are part of "main.js"
     // https://v2.quasar.dev/quasar-cli-vite/boot-files
-    boot: ['i18n', 'blur', 'backButton'],
+    boot: ['i18n', 'blur', 'android'],
 
     // https://v2.quasar.dev/quasar-cli-vite/quasar-config-js#css
     css: ['app.scss'],
@@ -59,11 +59,11 @@ export default configure(function (/* ctx */) {
         capacitor: [__dirname, 'src-capacitor/node_modules'].join('/'),
       },
       target: {
-        browser: ['es2019', 'edge88', 'firefox78', 'chrome87', 'safari13.1'],
-        node: 'node16',
+        browser: ['es2020', 'edge79', 'firefox68', 'chrome67', 'safari14'],
+        node: 'node20',
       },
 
-      vueRouterMode: 'history', // available values: 'hash', 'history'
+      vueRouterMode: 'hash', // available values: 'hash', 'history'
       // vueRouterBase,
       // vueDevtools,
       // vueOptionsAPI: false,
@@ -97,15 +97,16 @@ export default configure(function (/* ctx */) {
           },
         ],
         [
-          'vite-plugin-checker', 
+          'vite-plugin-checker',
           {
             vueTsc: {
-              tsconfigPath: 'tsconfig.vue-tsc.json'
+              tsconfigPath: 'tsconfig.vue-tsc.json',
             },
             eslint: {
-              lintCommand: 'eslint "./**/*.{js,ts,mjs,cjs,vue}"'
-            }
-          }, { server: false }
+              lintCommand: 'eslint "./**/*.{js,ts,mjs,cjs,vue}"',
+            },
+          },
+          {server: false},
         ],
       ],
     },

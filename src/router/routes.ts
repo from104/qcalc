@@ -1,21 +1,23 @@
-import { RouteRecordRaw } from 'vue-router';
-// import { useCalcStore } from 'src/stores/calc-store';
-// const store = useCalcStore();
-// const initialPath = store.initPanel ? '/calc' : store.initialPath;
-const initialPath = '/calc';
+import {RouteRecordRaw} from 'vue-router';
 
 const routes: RouteRecordRaw[] = [
   {
+    name: 'calc',
     path: '/',
-    component: () => import('layouts/MainLayout.vue'),
-    children: [
-      { path: '', redirect: initialPath },
-      { path: '/calc', component: () => import('pages/CalcPage.vue') },
-      { path: '/unit', component: () => import('pages/UnitPage.vue') },
-      { path: '/currency', component: () => import('pages/CurrencyPage.vue') },
-      { path: '/help', component: () => import('pages/HelpPage.vue') },
-      { path: '/about', component: () => import('pages/AboutPage.vue') },
-    ],
+    component: () => import('layouts/CalcLayout.vue'),
+    meta: {transition: 'slide-right'},
+  },
+  {
+    name: 'help',
+    path: '/help',
+    component: () => import('layouts/InfoLayout.vue'),
+    meta: {transition: 'slide-left'},
+  },
+  {
+    name: 'about',
+    path: '/about',
+    component: () => import('layouts/InfoLayout.vue'),
+    meta: {transition: 'slide-left'},
   },
 
   // Always leave this as last one,

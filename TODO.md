@@ -1,25 +1,27 @@
 # qcalc of TODO.md
 
-이 문서는 qcalc (Q Calc)의 TODO.md 입니다.
-
-포맷을 이해하려면 이 파일의 원래 내용을 보세요.
-
 ## Todo
 
-- [ ] 프로그래머 계산기
-- [ ] 광고 기능 (수익화)
-- [ ] 디자인 개편
-- [ ] 테마 기능
-- [ ] tauri 프래임워크로 전환
-- [ ] 자동 업데이트
+- [ ] Programmer's calculator
+- [ ] Ads function (monetization)
+- [ ] Theme function
+- [ ] Automatic updates (electron)
+- [ ] Mobile app implementation (capacitor:ios)
+- [ ] Search calculation result history
 
 ## In Progress
 
-## Done ✓
+## Done
 
-- [ ] 다크모드 추가
-- [ ] 설정 패널 만들기
-- [ ] vue i18n 적용
-- [ ] 창 크기 변경 가능하도록
-- [ ] 단위 변환기
-- [ ] 통화 환전기
+- [x] Add dark mode
+- [x] Create settings panel
+- [x] Apply vue i18n
+- [x] Make window size changeable
+- [x] Unit converter
+- [x] Currency converter
+- [x] Implement mobile app (capacitor:android)
+- [x] Reorganized calculator selection into 'tabs'
+- [x] 3 dot menu
+- [x] Settings dialog
+- [x] Additional functions per button
+- [x] Ability to edit and note calculation history individually

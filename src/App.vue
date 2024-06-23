@@ -1,57 +1,91 @@
 <script setup lang="ts">
-import { useI18n } from 'vue-i18n';
-import { useRouter } from 'vue-router';
+  import {ref, watch, onBeforeMount} from 'vue';
 
-import { useMeta, useQuasar } from 'quasar';
-import { ref, watch, onBeforeMount } from 'vue';
+  import {useCalcStore} from 'stores/calc-store';
 
-import { useCalcStore } from 'stores/calc-store';
+  const store = useCalcStore();
 
-const router = useRouter();
+  import {useI18n} from 'vue-i18n';
+  const {locale} = useI18n({useScope: 'global'});
+  const {t} = useI18n();
 
-const store = useCalcStore();
+  const title = ref(t('message.appTitle'));
 
-const { locale } = useI18n({ useScope: 'global' });
+  import {useMeta, useQuasar} from 'quasar';
+  useMeta(() => ({
+    title: title.value,
+  }));
+  const $q = useQuasar();
 
-const { t } = useI18n();
+  const updateTitle = () => {
+    title.value = t('message.appTitle');
+  };
 
-const $q = useQuasar();
+  watch(
+    () => store.locale,
+    () => {
+      updateTitle();
+    },
+  );
 
-const title = ref(t('message.appTitle'));
+  onBeforeMount(() => {
+    locale.value = store.locale;
 
-const updateTitle = () => {
-  title.value = t('message.appTitle');
-};
+    if ($q.platform.is.win) {
+      store.paddingOnResult = 8;
+    } else if ($q.platform.is.linux) {
+      store.paddingOnResult = 3;
+    } else {
+      store.paddingOnResult = 0;
+    }
 
-if ( $q.platform.is.electron ) {
-  store.setAlwaysOnTop( store.alwaysOnTop );
-}
+    updateTitle();
 
-useMeta(() => ({
-  title: title.value,
-}));
+    store.isHistoryDialogOpen = false;
+    store.isSettingDialogOpen = false;
 
-watch(() => store.locale, () => {
-  updateTitle();
-});
+    if (store.initPanel) {
+      store.calc.clear();
+    }
 
-onBeforeMount( () => {
-  locale.value = store.locale;
-
-  if ( $q.platform.is.win ) {
-    store.paddingOnResult = 8;
-  } else if ( $q.platform.is.linux ) {
-    store.paddingOnResult = 3;
-  } else {
-    store.paddingOnResult = 0;
-  }
-  updateTitle();
-  if (!store.initPanel) {
-    router.push(store.initialPath);
-  }
-});
+    if ($q.platform.is.electron) {
+      store.setAlwaysOnTop(store.alwaysOnTop);
+    }
+  });
 </script>
 
 <template>
-  <router-view />
-</template>;
+  <router-view v-slot="{Component, route}">
+    <transition :name="(route.meta?.transition as string) || ''" mode="default">
+      <component :is="Component" :key="route.path" />
+    </transition>
+  </router-view>
+</template>
+
+<style>
+  .slide-right-enter-active,
+  .slide-right-leave-active {
+    transition: transform 0.3s ease;
+  }
+  .slide-right-enter,
+  .slide-right-leave-to {
+    transform: translateX(100%);
+  }
+  .slide-right-enter-to,
+  .slide-right-leave {
+    transform: translateX(0);
+  }
+
+  .slide-left-enter-active,
+  .slide-left-leave-active {
+    transition: transform 0.3s ease;
+  }
+  .slide-left-enter,
+  .slide-left-leave-to {
+    transform: translateX(-100%);
+  }
+  .slide-left-enter-to,
+  .slide-left-leave {
+    transform: translateX(0);
+  }
+</style>

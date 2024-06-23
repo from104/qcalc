@@ -1,12 +1,12 @@
-import { defineStore } from 'pinia';
-import { Dark, Notify } from 'quasar';
-import { create, all } from 'mathjs';
+import {defineStore} from 'pinia';
+import {Dark, Notify, copyToClipboard} from 'quasar';
+import {create, all} from 'mathjs';
 
-import { Calculator } from 'classes/Calculator';
-import type { History } from 'classes/Calculator';
+import {Calculator} from 'classes/Calculator';
+import type {History} from 'classes/Calculator';
 
-import { UnitConverter } from 'classes/UnitConverter';
-import { CurrencyConverter } from 'classes/CurrencyConverter';
+import {UnitConverter} from 'classes/UnitConverter';
+import {CurrencyConverter} from 'classes/CurrencyConverter';
 
 const MathB = create(all, {
   number: 'BigNumber',
@@ -34,8 +34,8 @@ export const useCalcStore = defineStore('calc', {
     // 최근 단위 변환 범주
     recentCategory: '',
     // 최근 단위 변환 단위
-    recentUnitFrom: {} as { [key: string]: string },
-    recentUnitTo: {} as { [key: string]: string },
+    recentUnitFrom: {} as {[key: string]: string},
+    recentUnitTo: {} as {[key: string]: string},
     // 시작시 패널 초기화 여부
     initPanel: false,
     // 환율 계산기
@@ -51,8 +51,20 @@ export const useCalcStore = defineStore('calc', {
     showSymbol: true,
     // 패널 숫자 위 여백
     paddingOnResult: 20,
-    // 초기 화면 경로
-    initialPath: '/calc',
+    // 현재 계산기 탭
+    cTab: 'calc',
+    // history dialog가 열렸는지 여부
+    isHistoryDialogOpen: false,
+    // setting dialog가 열렸는지 여부
+    isSettingDialogOpen: false,
+    // 버튼의 추가 라벨 표시 여부
+    showButtonAddedLabel: true,
+    // 계산기 버튼의 추가 기능 여부
+    buttonShift: false,
+    // 계산기 버튼의 추가 기능 잠금
+    buttonShiftLock: false,
+    // 메모리 톨팁 표시 여부
+    showMemoryTooltip: false,
   }),
   getters: {},
   actions: {
@@ -79,6 +91,9 @@ export const useCalcStore = defineStore('calc', {
     toggleUseGrouping() {
       this.useGrouping = !this.useGrouping;
     },
+    toggleButtonAddedLabel() {
+      this.showButtonAddedLabel = !this.showButtonAddedLabel;
+    },
     setDecimalPlaces(decimalPlaces: number) {
       if ([-2, 0, 2, 4, 6].includes(decimalPlaces)) {
         this.decimalPlaces = decimalPlaces;
@@ -98,21 +113,27 @@ export const useCalcStore = defineStore('calc', {
     },
     // 숫자를 표준 로케일 문자열로 변환하는 함수
     toFormattedNumber(number: string): string {
-      const n = MathB.bignumber(number);
-      const s = MathB.format(n, {
-        precision: this.decimalPlaces === -2 ? 20 : this.decimalPlaces,
+      const bignumber = MathB.bignumber(number);
+      const formattedNumber = MathB.format(bignumber, {
+        precision: this.decimalPlaces === -2 ? 64 : this.decimalPlaces,
         notation: this.decimalPlaces === -2 ? 'auto' : 'fixed',
-        lowerExp: -20,
-        upperExp: 20,
+        lowerExp: -64,
+        upperExp: 64,
       });
-      return this.useGrouping ? this.numberGrouping(s) : s;
+      return this.useGrouping ? this.numberGrouping(formattedNumber) : formattedNumber;
     },
     // 계산 결과 중 좌변
     getLeftSideInHistory(h: History, lf = false) {
       const br = lf ? '\n' : '';
-      if (['+', '-', '×', '÷'].includes(h.operator)) {
+      if (['+', '-', '×', '÷', 'mod'].includes(h.operator)) {
         // 사칙연산
         return `${this.toFormattedNumber(h.previousNumber)}${br} ${h.operator} ${this.toFormattedNumber(h.argumentNumber ?? '')}`;
+      } else if (h.operator == 'pow') {
+        // N제곱
+        return `${this.toFormattedNumber(h.previousNumber)}${br} ^ ${this.toFormattedNumber(h.argumentNumber ?? '')}`;
+      } else if (h.operator == 'root') {
+        // N제곱근
+        return `${this.toFormattedNumber(h.previousNumber)}${br} ^ (1/${this.toFormattedNumber(h.argumentNumber ?? '')})`;
       } else if (h.operator == '÷%') {
         // 퍼센트로 나누는 경우
         return `${this.toFormattedNumber(h.previousNumber)}${br} ÷ ${this.toFormattedNumber(h.argumentNumber ?? '')}${br} × 100`;
@@ -125,8 +146,11 @@ export const useCalcStore = defineStore('calc', {
       } else if (h.operator == 'pow2') {
         // 제곱
         return `${this.toFormattedNumber(h.previousNumber)} ^ 2`;
-      } else if (['sqrt'].includes(h.operator)) {
-        // 제곱근
+      } else if (h.operator == 'exp10') {
+        // 10의 N제곱
+        return `${this.toFormattedNumber('10')} ^ ${this.toFormattedNumber(h.previousNumber)}`;
+      } else if (['sqrt', 'sin', 'cos', 'tan', 'fct', 'int', 'frac'].includes(h.operator)) {
+        // 제곱근 및 삼각함수 등
         return `${h.operator} ( ${this.toFormattedNumber(h.previousNumber)} )`;
       } else {
         // 그 외
@@ -182,6 +206,11 @@ export const useCalcStore = defineStore('calc', {
         timeout: timeout,
         color: 'negative',
       });
+    },
+    // 클립보드에 복사하는 함수
+    copyToClipboard(text: string, message: string): void {
+      copyToClipboard(text);
+      this.notifyMsg(message);
     },
     // 요소의 포커스를 해제하는 함수
     blurElement(): void {
@@ -250,14 +279,53 @@ export const useCalcStore = defineStore('calc', {
         }
       }
     },
-    // 시작 경로 설정
-    setInitialPath(path: string): void {
+    // 시작 탭 설정
+    setCTab(tab: string): void {
       // 계산기, 단위 변환기, 통화 변환기 중 하나인 경우에만 설정
-      if (['/calc', '/unit', '/currency'].includes(path)) {
-        this.initialPath = path;
-      } else if (path === '' || this.initialPath === '') {
-        this.initialPath = '/calc';
+      if (['calc', 'unit', 'currency'].includes(tab)) {
+        this.cTab = tab;
+      } else if (tab === '' || this.cTab === '') {
+        this.cTab = 'calc';
       }
+    },
+    swapUnitValue(): void {
+      if (this.cTab === 'unit') {
+        // 변환 결과를 원본 값으로 바꾸기
+        // (computed로 선언된 unitResult로 인해 값이 바뀌면 자동으로 변환 결과가 바뀜)
+        this.calc.setCurrentNumber(document.getElementById('subResult')?.textContent ?? '0');
+        // 단위도 바꾸기
+        const temp = this.recentUnitFrom[this.recentCategory];
+        this.recentUnitFrom[this.recentCategory] = this.recentUnitTo[this.recentCategory];
+        this.recentUnitTo[this.recentCategory] = temp;
+      }
+    },
+    swapCurrencyValue(): void {
+      if (this.cTab === 'currency') {
+        // 변환 결과를 원본 값으로 바꾸기
+        this.calc.setCurrentNumber(document.getElementById('subResult')?.textContent ?? '0');
+        // 화폐도 바꾸기
+        const temp = this.recentCurrencyFrom;
+        this.recentCurrencyFrom = this.recentCurrencyTo;
+        this.recentCurrencyTo = temp;
+      }
+    },
+    toggleButtonShift(): void {
+      this.buttonShift = !this.buttonShift;
+    },
+    onButtonShift(): void {
+      this.buttonShift = true;
+    },
+    offButtonShift(): void {
+      this.buttonShift = false;
+    },
+    toggleButtonShiftLock(): void {
+      this.buttonShiftLock = !this.buttonShiftLock;
+    },
+    onButtonShiftLock(): void {
+      this.buttonShiftLock = true;
+    },
+    offButtonShiftLock(): void {
+      this.buttonShiftLock = false;
     },
   },
   persist: true,

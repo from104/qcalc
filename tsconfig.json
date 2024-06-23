@@ -1,7 +1,7 @@
 {
   "extends": "@quasar/app-vite/tsconfig-preset.json",
   "compilerOptions": {
-    "module": "ES2020",
+    "module": "ESNext",
     "resolveJsonModule": true,
     "esModuleInterop": true,
     "moduleResolution": "node",
@@ -19,6 +19,9 @@
       "classes/*": ["src/classes/*"],
       "capacitor/*": ["src-capacitor/node_modules/*"]
     },
+    "preserveValueImports": false,
+    "allowSyntheticDefaultImports": true,
+    "target": "ESNext"
   },
   "include": [
     "./**/*.ts",
@@ -34,14 +37,7 @@
     "src-capacitor/*.d.ts",
     "src-electron/electron-main.js"
   ],
-  "exclude": [
-    "./dist",
-    "./.quasar",
-    "./node_modules",
-    "./src-capacitor",
-    "./src-cordova",
-    "./quasar.config.*.temporary.compiled*"
-  ],
+  "exclude": ["./dist", "./.quasar", "./node_modules", "./src-capacitor", "./src-cordova", "./quasar.config.*.temporary.compiled*"],
   "ts-node": {
     "esm": true
   }
