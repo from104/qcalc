@@ -230,7 +230,7 @@
           class="noselect full-height q-mt-xs q-pt-sm"
           :class="[!needFieldTooltip ? 'text-light-green-10' : 'text-deep-orange-8']"
         >
-          <q-icon name="mdi-alpha-m-circle">
+          <q-icon name="mdi-chip">
             <q-tooltip
               v-model="store.showMemoryTooltip"
               :hide-delay="2000"
