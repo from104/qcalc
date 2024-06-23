@@ -106,10 +106,14 @@
   <q-dialog
     v-model="store.isSettingDialogOpen"
     style="z-index: 15"
-    transition-show="slide-left"
-    transition-hide="slide-right"
+    transition-show="slide-down"
+    transition-hide="slide-up"
   >
-    <q-card id="setting" class="full-width">
+    <q-card 
+      id="setting"
+      v-touch-swipe:9e-2:12:50.up="() => (store.isSettingDialogOpen = false)"
+      class="full-width"
+    >
       <q-bar v-blur dark class="full-width noselect text-white bg-primary">
         <q-icon name="settings" size="sm" />
         <div>{{ t('message.settings') }}</div>

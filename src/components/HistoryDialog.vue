@@ -250,7 +250,12 @@
 </script>
 
 <template>
-  <q-dialog v-model="store.isHistoryDialogOpen" style="z-index: 10" position="bottom" transition-duration="300">
+  <q-dialog
+    v-model="store.isHistoryDialogOpen"
+    style="z-index: 10"
+    position="bottom"
+    transition-duration="300"
+  >
     <q-bar v-blur dark class="full-width noselect text-white bg-primary">
       <q-icon name="history" size="sm" />
       <div>{{ t('history') }}</div>
