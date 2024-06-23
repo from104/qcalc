@@ -89,7 +89,7 @@ Basically, install yarn like below in nodeJS, vscode environment.
 
 ```bash
 npm install -g yarn
-```bash npm install -g yarn
+```
 
 #### Install the required modules
 
