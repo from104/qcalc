@@ -13,12 +13,12 @@
   const {t} = useI18n();
 
   interface Item {
-    title: string;
+    title?: string;
     caption?: string;
     shortcut?: string;
     icon?: string;
     action?: () => void;
-    isSeparator?: boolean;
+    separator?: boolean;
   }
 
   const items: {[key: string]: Item} = reactive({
@@ -50,33 +50,29 @@
       },
     },
     separator1: {
-      title: 'separator',
-      isSeparator: true,
+      separator: true,
     },
     settings: {
       title: t('item.settings.title'),
       caption: t('item.settings.caption'),
-      shortcut: 'Ctrl-e',
+      shortcut: 'Alt-s',
       icon: 'settings',
       action: () => {
         store.isSettingDialogOpen = true;
       },
     },
     separator2: {
-      title: 'separator',
-      isSeparator: true,
+      separator: true,
     },
     help: {
       title: t('item.help.title'),
       caption: t('item.help.caption'),
-      shortcut: 'F1',
       icon: 'help',
       action: () => router.push('/help'),
     },
     about: {
       title: t('item.about.title'),
       caption: t('item.about.caption'),
-      shortcut: 'F2',
       icon: 'info',
       action: () => router.push('/about'),
     },

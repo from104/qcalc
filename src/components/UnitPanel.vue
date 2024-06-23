@@ -1,5 +1,4 @@
 <script setup lang="ts">
-  // import { ref, onBeforeMount, onMounted, onBeforeUnmount, reactive, watch, computed } from 'vue';
   import {onMounted, onBeforeUnmount, reactive, watch} from 'vue';
 
   import {UnitConverter} from 'classes/UnitConverter';
@@ -12,21 +11,6 @@
   // 스토어 가져오기
   import {useCalcStore} from 'stores/calc-store';
   const store = useCalcStore();
-
-  // 계산기 오브젝트를 스토어에서 가져오기 위한 변수 선언
-  const {calc} = store;
-
-  // 단위 이름과 값을 바꾸기 위한 함수
-  const swapUnitValue = () => {
-    // 변환 결과를 원본 값으로 바꾸기
-    // (computed로 선언된 unitResult로 인해 값이 바뀌면 자동으로 변환 결과가 바뀜)
-    calc.setCurrentNumber(document.getElementById('subResult')?.textContent ?? '0');
-
-    // 단위도 바꾸기
-    const temp = store.recentUnitFrom[store.recentCategory];
-    store.recentUnitFrom[store.recentCategory] = store.recentUnitTo[store.recentCategory];
-    store.recentUnitTo[store.recentCategory] = temp;
-  };
 
   // 단위 초기화
   store.initRecentCategoryAndUnit();
@@ -47,10 +31,10 @@
   });
 
   import {KeyBinding} from 'classes/KeyBinding';
-
+  // prettier-ignore
   const keyBinding = new KeyBinding([
-    [['w'], () => store.clickButtonById('btn-swap-unit')],
-    [['o'], () => store.showUnitToggle()],
+    [['Alt+w'], () => store.clickButtonById('btn-swap-unit')],
+    [['Alt+y'], () => store.showUnitToggle()],
   ]);
 
   onMounted(() => {

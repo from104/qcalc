@@ -18,14 +18,11 @@
   import {useI18n} from 'vue-i18n';
   const {t} = useI18n();
 
+  // prettier-ignore
   const tabs = reactive([
     {name: 'calc', title: t('calc'), component: shallowRef(CalcPage)},
     {name: 'unit', title: t('unit'), component: shallowRef(UnitPage)},
-    {
-      name: 'currency',
-      title: t('currency'),
-      component: shallowRef(CurrencyPage),
-    },
+    {name: 'currency', title: t('currency'), component: shallowRef(CurrencyPage)},
   ]);
 
   // 탭 오른쪽으로 이동

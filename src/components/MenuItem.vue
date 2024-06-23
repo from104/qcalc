@@ -1,26 +1,26 @@
 <script setup lang="ts">
   defineProps({
-    title: {type: String, required: true},
+    title: {type: String, default: ''},
     caption: {type: String, default: ''},
     shortcut: {type: String, default: ''},
     icon: {type: String, default: ''},
     action: {type: Function, default: () => {}},
-    isSeparator: {type: Boolean, default: false},
+    separator: {type: Boolean, default: false},
   });
 </script>
 
 <template>
-  <q-item v-if="!isSeparator" clickable @click="action()">
+  <q-item v-if="!separator" clickable @click="action()">
     <q-item-section v-if="icon" class="col-3" avatar>
       <q-icon :name="icon" />
     </q-item-section>
 
     <q-item-section>
-      <q-item-label>
+      <q-item-label v-if="title">
         {{ title }}
       </q-item-label>
-      <q-item-label caption>
-        {{ `${caption} (${shortcut})` }}
+      <q-item-label v-if="caption" caption class="ellipsis">
+        {{ caption }} {{ shortcut ? '('+shortcut+')' : '' }}
       </q-item-label>
     </q-item-section>
   </q-item>

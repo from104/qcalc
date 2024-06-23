@@ -6,6 +6,8 @@
   import {useI18n} from 'vue-i18n';
   const {t} = useI18n();
 
+  import MenuItem from 'components/MenuItem.vue';
+
   // 스토어 가져오기
   import {useCalcStore} from 'stores/calc-store';
   const store = useCalcStore();
@@ -114,19 +116,10 @@
   };
 
   import {KeyBinding} from 'classes/KeyBinding';
+  // prettier-ignore
   const keyBinding = new KeyBinding([
-    [
-      ['h'],
-      () => {
-        !doDeleteHistory.value && store.clickButtonById('btn-history');
-      },
-    ],
-    [
-      ['d'],
-      () => {
-        store.isHistoryDialogOpen && store.clickButtonById('btn-delete-history');
-      },
-    ],
+    [['Alt+h'], () => { !doDeleteHistory.value && store.clickButtonById('btn-history'); }],
+    [['d'], () => { store.isHistoryDialogOpen && store.clickButtonById('btn-delete-history'); }],
     [['ArrowUp'], () => scrollHistory(-50)],
     [['ArrowDown'], () => scrollHistory(50)],
     [['PageUp'], () => scrollHistory(-400)],
@@ -206,7 +199,6 @@
   };
 
   import {copyToClipboard} from 'quasar';
-  import {number} from 'mathjs';
   const historyCopy = async (id: number, copyType: 'formattedNumber' | 'onlyNumber' | 'memo'): Promise<void> => {
     const history = calc.getHistoryByID(id);
     const copyText =
@@ -259,11 +251,7 @@
 
 <template>
   <q-dialog v-model="store.isHistoryDialogOpen" style="z-index: 10" position="bottom" transition-duration="300">
-    <q-bar
-      v-blur
-      dark
-      class="full-width noselect text-white bg-primary"
-    >
+    <q-bar v-blur dark class="full-width noselect text-white bg-primary">
       <q-icon name="history" size="sm" />
       <div>{{ t('history') }}</div>
       <q-space />
@@ -310,7 +298,7 @@
             <transition-group name="history-list">
               <q-slide-item
                 v-for="history in histories"
-                :key="history.id"                
+                :key="history.id"
                 left-color="positive"
                 right-color="negative"
                 @left="({reset}) => onLeft({reset}, history.id as number)"
@@ -322,7 +310,10 @@
                 <template #right>
                   <q-icon name="delete_outline" />
                 </template>
-                <q-item v-touch-hold.mouse="() => historyMenu[history.id as number] = true" class="text-right q-pa-sm">
+                <q-item
+                  v-touch-hold.mouse="() => (historyMenu[history.id as number] = true)"
+                  class="text-right q-pa-sm"
+                >
                   <q-item-section class="q-mr-none q-px-none">
                     <q-item-label v-if="history.memo">
                       <u>{{ history.memo }}</u>
@@ -340,64 +331,50 @@
                   class="shadow-6"
                   :context-menu="$q.platform.is.desktop"
                   auto-close
-                  anchor="center left" self="top left"
+                  anchor="center left"
+                  self="top left"
                 >
                   <q-list dense class="noselect" style="max-width: 200px">
-                    <q-item v-if="!history.memo" v-ripple clickable @click="memoDialog(history.id as number)">
-                      <q-item-section>
-                        <q-item-label>{{ t('addMemo') }}</q-item-label>
-                      </q-item-section>
-                    </q-item>
-                    <q-item v-if="history.memo" v-ripple clickable @click="memoDialog(history.id as number)">
-                      <q-item-section>
-                        <q-item-label>{{ t('editMemo') }}</q-item-label>
-                      </q-item-section>
-                    </q-item>
-                    <q-item v-if="history.memo" v-ripple clickable @click="historyCopy(history.id as number, 'memo')">
-                      <q-item-section>
-                        <q-item-label>{{ t('copyMemo') }}</q-item-label>
-                      </q-item-section>
-                    </q-item>
-                    <q-item v-if="history.memo" v-ripple clickable @click="memoDelete(history.id as number)">
-                      <q-item-section>
-                        <q-item-label>{{ t('deleteMemo') }}</q-item-label>
-                      </q-item-section>
-                    </q-item>
-                    <q-separator />
-                    <q-item v-ripple clickable @click="historyCopy(history.id as number, 'formattedNumber')">
-                      <q-item-section>
-                        <q-item-label>{{ t('copyDisplayedResult') }}</q-item-label>
-                        <q-item-label class="ellipsis"> [ {{ store.getRightSideInHistory(history) }} ] </q-item-label>
-                      </q-item-section>
-                    </q-item>
-                    <q-item v-ripple clickable @click="historyCopy(history.id as number, 'onlyNumber')">
-                      <q-item-section>
-                        <q-item-label>{{ t('copyResultNumber') }}</q-item-label>
-                        <q-item-label class="ellipsis">[ {{ history.resultNumber }} ]</q-item-label>
-                      </q-item-section>
-                    </q-item>
-                    <q-separator />
-                    <q-item v-ripple clickable @click="toMainResult(history.id as number)">
-                      <q-item-section>
-                        <q-item-label>{{ t('loadToMainPanel') }}</q-item-label>
-                      </q-item-section>
-                    </q-item>
-                    <q-item
+                    <MenuItem
+                      v-if="!history.memo"
+                      :title="t('addMemo')"
+                      :action="() => memoDialog(history.id as number)"
+                    />
+                    <MenuItem
+                      v-if="history.memo"
+                      :title="t('editMemo')"
+                      :action="() => memoDialog(history.id as number)"
+                    />
+                    <MenuItem
+                      v-if="history.memo"
+                      :title="t('copyMemo')"
+                      :action="() => historyCopy(history.id as number, 'memo')"
+                    />
+                    <MenuItem
+                      v-if="history.memo"
+                      :title="t('deleteMemo')"
+                      :action="() => memoDelete(history.id as number)"
+                    />
+                    <MenuItem separator />
+                    <MenuItem
+                      :title="t('copyDisplayedResult')"
+                      :action="() => historyCopy(history.id as number, 'formattedNumber')"
+                      :caption="store.getRightSideInHistory(history)"
+                    />
+                    <MenuItem
+                      :title="t('copyResultNumber')"
+                      :action="() => historyCopy(history.id as number, 'onlyNumber')"
+                      :caption="history.resultNumber"
+                    />
+                    <MenuItem separator />
+                    <MenuItem :title="t('loadToMainPanel')" :action="() => toMainResult(history.id as number)" />
+                    <MenuItem
                       v-if="store.cTab === 'unit' || store.cTab === 'currency'"
-                      v-ripple
-                      clickable
-                      @click="toSubResult(history.id as number)"
-                    >
-                      <q-item-section>
-                        <q-item-label>{{ t('loadToSubPanel') }}</q-item-label>
-                      </q-item-section>
-                    </q-item>
-                    <q-separator />
-                    <q-item v-ripple clickable @click="deleteHistory(history.id as number)">
-                      <q-item-section>
-                        <q-item-label>{{ t('deleteResult') }}</q-item-label>
-                      </q-item-section>
-                    </q-item>
+                      :title="t('loadToSubPanel')"
+                      :action="() => toSubResult(history.id as number)"
+                    />
+                    <MenuItem separator />
+                    <MenuItem :title="t('deleteResult')" :action="() => deleteHistory(history.id as number)" />
                   </q-list>
                 </q-menu>
               </q-slide-item>

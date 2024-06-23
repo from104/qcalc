@@ -37,8 +37,8 @@
   // 키바인딩 생성
   import {KeyBinding} from 'classes/KeyBinding';
   const keyBinding = new KeyBinding([
-    [['w'], () => store.clickButtonById('btn-swap-currency')],
-    [['o'], () => store.showSymbolToggle()],
+    [['Alt+w'], () => store.clickButtonById('btn-swap-currency')],
+    [['Alt+y'], () => store.showSymbolToggle()],
   ]);
 
   // inputFocused 값이 바뀌면 키바인딩을 추가하거나 제거합니다.

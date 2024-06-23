@@ -51,20 +51,16 @@
   };
 
   import {KeyBinding} from 'classes/KeyBinding';
+  // prettier-ignore
   const keyBinding = new KeyBinding([
-    [['t'], toggleAlwaysOnTopWithNotify],
-    [['n'], store.toggleInitPanel],
-    [['k'], store.toggleDarkMode],
+    [['Alt+t'], toggleAlwaysOnTopWithNotify],
+    [['Alt+i'], store.toggleInitPanel],
+    [['Alt+d'], store.toggleDarkMode],
+    [['Alt+s'], () => { store.isSettingDialogOpen = true; }],
     [[';'], store.toggleButtonAddedLabel],
     [[','], store.toggleUseGrouping],
     [['['], store.decDecimalPlaces],
     [[']'], store.incDecimalPlaces],
-    [
-      ['Alt+s'],
-      () => {
-        store.isSettingDialogOpen = true;
-      },
-    ],
   ]);
 
   // inputFocused 값이 바뀌면 키바인딩을 추가하거나 제거합니다.

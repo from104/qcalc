@@ -5,6 +5,8 @@
 
   import MyTooltip from 'components/MyTooltip.vue';
 
+  import MenuItem from 'components/MenuItem.vue';
+
   import {useI18n} from 'vue-i18n';
   const {t} = useI18n();
 
@@ -264,22 +266,16 @@
           <span id="unit">{{ unit }}</span>
           <q-menu context-menu auto-close touch-position class="shadow-6">
             <q-list class="noselect" dense style="min-width: 150px">
-              <q-item
-                v-ripple
-                clickable
-                @click="store.copyToClipboard(symbol + result + unit, t('copiedDisplayedResult'))"
-              >
-                <q-item-section>
-                  <q-item-label>{{ t('copyDisplayedResult') }}</q-item-label>
-                  <q-item-label class="ellipsis">[ {{ symbol + result + unit }} ]</q-item-label>
-                </q-item-section>
-              </q-item>
-              <q-item v-ripple clickable @click="store.copyToClipboard(onlyNumber, t('copiedOnlyNumber'))">
-                <q-item-section>
-                  <q-item-label>{{ t('copyOnlyNumber') }}</q-item-label>
-                  <q-item-label class="ellipsis">[ {{ onlyNumber }} ]</q-item-label>
-                </q-item-section>
-              </q-item>
+              <MenuItem
+                :action="() => store.copyToClipboard(symbol + result + unit, t('copiedDisplayedResult'))"
+                :title="t('copyDisplayedResult')"
+                :caption="symbol + result + unit"
+              />
+              <MenuItem
+                :action="() => store.copyToClipboard(onlyNumber, t('copiedOnlyNumber'))"
+                :title="t('copyOnlyNumber')"
+                :caption="onlyNumber"
+              />
             </q-list>
           </q-menu>
           <MyTooltip v-if="needFieldTooltip">

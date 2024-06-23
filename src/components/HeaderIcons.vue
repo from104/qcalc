@@ -1,8 +1,9 @@
 <script setup lang="ts">
   import {onMounted} from 'vue';
-  import {copyToClipboard} from 'quasar';
 
   import MyTooltip from 'components/MyTooltip.vue';
+  
+  import MenuItem from 'components/MenuItem.vue';
 
   import MenuPanel from './MenuPanel.vue';
 
@@ -91,7 +92,8 @@
     }
   };
 
-  import {KeyBinding} from 'classes/KeyBinding';
+  import { KeyBinding } from 'classes/KeyBinding';
+  // prettier-ignore
   const keyBinding = new KeyBinding([
     [['Control+c', 'Control+Insert', 'Copy'], () => store.clickButtonById('btn-copy')],
     [['Control+v', 'Shift+Insert', 'Paste'], () => store.clickButtonById('btn-paste')],
@@ -123,16 +125,8 @@
   >
     <q-menu v-if="store.cTab !== 'calc'" context-menu auto-close class="z-max shadow-6">
       <q-list dense style="max-width: 200px">
-        <q-item v-ripple clickable @click="doPaste('main')">
-          <q-item-section>
-            <q-item-label>{{ t('pasteToMainPanel') }}</q-item-label>
-          </q-item-section>
-        </q-item>
-        <q-item v-ripple clickable @click="doPaste('sub')">
-          <q-item-section>
-            <q-item-label>{{ t('pasteToSubPanel') }}</q-item-label>
-          </q-item-section>
-        </q-item>
+        <MenuItem :action="() => doPaste('main')" :title="t('pasteToMainPanel')"/>
+        <MenuItem :action="() =>  doPaste('sub')" :title="t('pasteToSubPanel')"/>
       </q-list>
     </q-menu>
     <MyTooltip>{{ t('tooltipPaste') }}</MyTooltip>
