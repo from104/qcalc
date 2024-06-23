@@ -11,7 +11,7 @@
 
 ## In Progress
 
-## Done ✓
+## Done
 
 - [x] Add dark mode
 - [x] Create settings panel
