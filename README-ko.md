@@ -72,6 +72,7 @@
 - q-markdown
 - tinykeys
 - MathJS
+- freecurrencyapi-js
 
 ### 패키지 설치 방법
 
@@ -98,22 +99,55 @@ yarn install
 
 ```bash
 quasar dev -m electron
+```
+
 또는
+
+```bash
 quasar dev -m capacitor -T android
 ```
 
-#### 설치 패키지 빌드 [윈도우]
+#### 설치 패키지 빌드 {리눅스,윈도우,안드로이드}
 
 ```bash
 quasar build -m electron -T {linux|win32}
-or
+```
+
+또는
+
+```bash
 quasar build -m capacitor -T android
 ```
 
 #### 빌드 시 유의사항
 
-릴리즈 페이지의 설치파일을 사용할 때 봉화기능을 사용시에 잘 작동할테지만 직접 빌드할 경우에는 그 기능은 아마도 동작하지 않을텐데요. 왜자하면 통화변환 데이터를 [외부 사이트](https://freecurrencyapi.com/)에서 기져오기 때문입니다. 이 사이트에서 무료 API key를 발급받아 .env 파일에 다음과 같이 넣어주세요.
+릴리즈 페이지의 설치파일을 사용할 때 통화환전기능은 잘 작동할 것입니다. 하지만 직접 빌드할 경우에는 그 기능이 동작하지 않을 수 있습니다. 이는 통화환전 데이터를 [외부 사이트(https://freecurrencyapi.com/)](https://freecurrencyapi.com/)에서 가져오기 때문입니다. 이 사이트에서 무료 API key를 발급받아 프로젝트 폴더의 '.env' 파일에 다음과 같이 넣고 빌드하세요. 월 5000회 데이터를 무료로 갱신할 수 있습니다.
 
 ```plaintext
 FREECURRENCY_API_KEY=<당신의_키>
 ```
+
+### Android Studio에서의 추가적인 개발, 빌드 절차
+
+#### Android Studio 설치 및 설정
+
+1. [Android Studio](https://developer.android.com/studio) 최신 버전을 설치합니다.
+2. Android Studio를 열고, 기본적인 설정을 완료합니다 (SDK 설정 등).
+
+#### Quasar 프로젝트 Android Studio로 가져오기
+
+1. Quasar 프로젝트 디렉토리에서 `quasar build -m capacitor -T android` 명령어를 실행하여 안드로이드 빌드를 생성합니다.
+2. `src-capacitor` 디렉토리 안에 `capacitor.config.json` 파일이 생성됩니다.
+3. Android Studio에서 `Open an existing Android Studio project`를 선택하고, `src-capacitor` 디렉토리를 엽니다.
+
+#### Android 프로젝트 설정
+
+1. Android Studio에서 프로젝트가 열리면, `Sync Project with Gradle Files`를 클릭하여 프로젝트를 동기화합니다.
+2. `MainActivity.java` 또는 `MainActivity.kt` 파일을 열고, 필요한 패키지 및 설정을 확인합니다.
+
+#### 빌드 및 실행
+
+1. Android 기기를 USB 디버깅 모드로 연결하거나 Android 에뮬레이터를 실행합니다.
+2. Android Studio에서 `Run` 버튼을 클릭하여 앱을 빌드하고 실행합니다.
+
+이 과정을 통해 Android Studio에서 추가적인 개발 및 빌드를 수행할 수 있습니다.
