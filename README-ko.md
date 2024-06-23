@@ -4,7 +4,7 @@
 
 ## 스크린샷
 
-![Screenshot](https://github.com/from104/qcalc/raw/main/assets/screenshot_v0.8.0-ko.png)
+![Screenshot](https://github.com/from104/qcalc/raw/main/assets/screenshot_v0.9.0-ko.png)
 
 ## 특징
 
@@ -55,6 +55,7 @@
 - ;: 버튼의 추가 기능 표시
 - ,: 천단위 , 표시
 - [, ]: 소수점 고정 조정 (제한없음~6자리)
+- "'": 버튼 추가 기능 활성화
 
 ### 클립보드
 

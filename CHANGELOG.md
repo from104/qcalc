@@ -1,139 +1,154 @@
 # Changelog
 
-이 프로젝트에 대한 모든 주목할만한 변경 사항은 이 파일에 기록됩니다.
+All notable changes to this project are recorded in this file.
 
-형식은 [Keep a Changelog (korean)]를 기반으로 하며 이 프로젝트는 [Semantic Versioning (korean)]을 따릅니다.
+The format is based on [Keep a Changelog] and this project follows [Semantic Versioning].
 
-## [0.9.0] 2024-06-10
+## [0.9.0] 2024-06-24
 
-- 계산기 전환 방식 탭으로 변경
-- 메뉴 방식을 사이드에서 모바일 방식으로 변경
-- 설정을 다이얼로그 방식으로 변경
-- 계산 결과 기록에서 스와이프하여 개별 기록 지우기, 메모 편집 기능 추가
+### Added
+
+- Added the ability to swipe through the calculation result history to clear or edit individual records.
+- Added ability to add and edit notes in the calculation result history
+- Added a variety of new math functions: N-squared, N-square root, remainder, sine, cosine, tangent, factorial, N-squared to the 10th power, integer, and decimal calculations.
+- Added functionality to buttons to enter key constants: Pi, phi (golden mean), e (base of log), Pi/2, log 10, log 2, etc.
+- Expanded memory functionality to add the ability to store, recall, clear, add, subtract, multiply, and divide memory.
+
+### Changed
+
+- Changed calculator switching method to tabs
+- Changed menu method from side (web) to mobile method
+- Changed settings to dialog method
+- Switch calculator, open and close settings and calculation result history with swipe on mobile
 
 ## [0.8.0] 2024-05-26
 
-- capacitor(android) 플랫폼 추가
-- 단위 변환기에 각도 추가
-- 세부 단위 다수 추가
-- 미지막에 썼던 계산기 기억 기능 추가
-- 아이콘 이미지 교체 
+### Added
+
+- Added capacitor (android) platform
+- Added angle to unit converter
+- Added multiple subdivisions
+- Added remember last used calculator function
+
+### Changed
+
+- Replace icon image 
 
 ## [0.7.2fix1] 2023-10-17
 
-- 첫 화면에서 커스텀 폰트 적용 안 되던 것 수정
+- Fixed custom fonts not being applied on the first screen
 
 ## [0.7.2] - 2023-10-10
 
-- 계산 결과 글꼴 교체
-- 버튼 및 테마 색 수정
+- Replace fonts for calculation results
+- Fixed button and theme colors
 
 ## [0.7.1] - 2023-09-23
 
-- 계산기 키 버튼 등 디자인 변경
-- 계산기 키 및 바로가기 키 누를 시 버튼 누름 효과 주기
-- 계산기 정밀도 최대 64자리까지 향상 (MathJS 사용)
-- 0으로 나누기, 음수의 제곱근 계산 에러 처리
-- 자잘한 버그 수정
+- Calculator key buttons and other design changes
+- Cycled button press effect when pressing calculator keys and shortcut keys
+- Improved calculator precision up to 64 digits (using MathJS)
+- Handled division by zero, square root of negative numbers calculation errors
+- Minor bug fixes
 
 ## [0.7.0] - 2023-08-03
 
-- 통화 변환기 추가
-- 단위 및 통화 기호 표시 기능 추가 ('b'키)
+- Added currency converter
+- added ability to display units and currency symbols ('b' key)
 
 ## [0.6.2] - 2023-02-20
 
-- % 버튼 기능 확장 (전 연산자가 나누기면 퍼센트 구하기, 전 연산자가 곱하기면 퍼센트로 곱하기,)
-- 시작 시 패널 초기화 옵션 추가
+- Extend % button functionality (get percent if previous operator is division, multiply by percent if previous operator is multiplication,)
+- Added option to initialize panel on startup
 
 ## [0.6.1] - 2022-12-31
 
-- 단위 변환 패널을 다이얼로그 방식에서 화면 전환 방식으로 변경
-- 단위 변환 패널 디자인 변경
-- 단위 설명 추가
+- Change the unit conversion panel from dialog to screen switching
+- Changed the design of the unit conversion panel
+- Added unit descriptions
 
 ## [0.6.0] - 2022-12-25
 
-- 단위 변환 패널 추가 (바로가기 v키)
-- 계산기 화면이 아니면 붙혀넣기, 단위 변환 패널 아이콘 비 활성화
+- Add unit conversion panel (shortcut v-key)
+- Disable Paste, Unit Conversion panel icon unless on calculator screen
 
 ## [0.5.4fix1] - 2022-10-05
 
-- 윈도우에서 창 크기 및 위치 기억 버그 수정
+- Fixed bug with remembering window size and position in windows
 
 ## [0.5.4] - 2022-10-02
 
-- 창 크기 변경 가능하게 수정
-- 창 크기 및 위치 기억
+- Fix window size changeable
+- Remember window size and position
 
 ## [0.5.3] - 2022-09-22
 
-- 사용 언어를 영어, 한국어로 선택 가능
+- Select language as English, Korean
 
 ## [0.5.2] - 2022-08-20
 
-- 계산 결과 상단 표시 버그 수정 및 기능 보강
-- 앱 정보 페이지에 아이콘 추가
+- Display calculation results at the top Bug fixes and enhancements
+- Added icon to app info page
 
 ## [0.5.1] - 2022-08-16
 
-- 설정 패널 추가
-- MIT 라이선스 추가
+- Added settings panel
+- Added MIT license
 
 ## [0.5.0] - 2022-08-13
 
-- 다크 모드 추가
-- 계산 결과 기록 열기 버튼 하단으로 이동
+- Added dark mode
+- Move Open calculation result history button to bottom
 
 ## [0.4.4] - 2022-08-11
 
-- 특정 상황에서 엔터키 안 먹는 버그 수정
+- Fix enter not working in certain situations
 
 ## [0.4.3] - 2022-08-08
 
-- 마지막 계산 결과를 화면에 표시
-- 주 화면 전환 효과 추가
-- 계산기 페이지를 내부적으로 나눔
+- Show last calculation result on screen
+- Added main screen transition effect
+- Divide calculator page internally
 
 ## [0.4.2] - 2022-07-31
 
-- 계산 결과 기록 화면 효과 추가
-- 계산 결과 기록 복사 가능하도록 수정
+- Added calculation result history screen effect
+- Make calculation result history copyable
 
 ## [0.4.0] - 2022-07-25
 
-- 계산 결과 기록 보기 기능 추가
-- 버튼에 아이콘 사용
-- 사칙연산자 활성화 시 아이콘으로 표시
+- Added ability to view calculation result history
+- Use icons for buttons
+- Display icon when activating arithmetic operators
 
 ## [0.3.1] - 2022-07-19
 
-- 소수점 제한이 아닐 때 소수점 아래에 입력한 그대로 못 나타내는 버그 수정
+- Fix bug with not displaying decimal point exactly as typed when not in decimal limit
 
 ## [0.3.0] - 2022-07-18
 
-- 역수, 제곱, 제곱근 버튼 추가
+- Added inverse, square and square root buttons
 
 ## [0.2.0] - 2022-07-11
 
-- 쉼표 표시, 소수점 표시 제어 요소 한글 표시
-- 일부 화면 요소에 텍스트 선택 불가 적용
+- Display comma and decimal point control elements in Korean
+- Apply text non-selectability to some screen elements
 
 ## [0.1.3] - 2022-07-09
 
-- 왼쪽 메뉴 관련 바로가기 키 추가 (README.md 참조)
+- Added shortcut key for left menu (see README.md)
 
 ## [0.1.2] - 2022-07-07
 
-- 결과 폼을 input->field 변경
-- 소수점 자릿수, 천단위 구분 상태를 창을 닫아도 기억하도록 수정
+- Change result form to input->field
+- Fix to remember decimal places, thousands separation state even when window is closed
 
 ## [0.1.1] - 2022-07-05
 
-- 초기 버전
-- 소수점 고정 기능, 모양 개선
+- Initial version
+- Fixed decimal point, improved appearance
 
 <!-- Links -->
 
-[keep a changelog (korean)]: https://keepachangelog.com/ko/1.0.0/
-[semantic versioning (korean)]: https://semver.org/lang/ko/
+[keep a changelog]: https://keepachangelog.com/en/1.1.0/
+[semantic versioning]: https://semver.org/
