@@ -1,6 +1,9 @@
 <script setup lang="ts">
   import {onMounted, onBeforeUnmount, ref, watch, reactive} from 'vue';
 
+  import {colors} from 'quasar';
+  const {lighten} = colors;
+
   import {useI18n} from 'vue-i18n';
   const {t} = useI18n();
 
@@ -38,11 +41,18 @@
   };
 
   const buttonColorsLight: {[key: string]: string} = {
-    important: '#e6d8c6',
-    function: '#b8dfed',
-    normal: '#bcddcc',
+    important: lighten(buttonColors.important, 70),
+    function: lighten(buttonColors.function, 70),
+    normal: lighten(buttonColors.normal, 70),
   };
 
+  const buttonColorsDark: {[key: string]: string} = {
+    important: lighten(buttonColors.important, 50),
+    function: lighten(buttonColors.function, 50),
+    normal: lighten(buttonColors.normal, 50),
+  };
+
+  const buttonShiftPressedColor = lighten(buttonColors.important, -30);
   // 버튼 레이블, 버튼 컬러, 버튼에 해당하는 키, 버튼 클릭 이벤트 핸들러
   type Button = {
     [id: string]: [isIcon: boolean, label: string, color: string, keys: string[], handler: () => void];
@@ -185,6 +195,7 @@
   };
 
   import {KeyBinding, KeyBindings} from 'classes/KeyBinding';
+  import {im} from 'mathjs';
 
   const keyBindingsPrimary: KeyBindings = Object.entries(buttons).map(([id, [, , , keys]]) => [
     keys,
@@ -274,7 +285,8 @@
         <span
           v-if="store.showButtonAddedLabel && buttonsAddedFunc[id]"
           class="top-label"
-          :class="[`top-label-${button[0] ? 'icon' : 'char'}`, `top-label-${button[2]}`]"
+          :class="[`top-label-${button[0] ? 'icon' : 'char'}`]"
+          :style="`color: ${store.buttonShift ? buttonColorsLight[button[2]] : buttonColorsDark[button[2]]}`"
         >
           {{ buttonsAddedFunc[id][0] }}
         </span>
@@ -366,6 +378,6 @@ en:
   }
 
   .button-shift {
-    background: #cb4747 !important;
+    background: v-bind(buttonShiftPressedColor) !important;
   }
 </style>
