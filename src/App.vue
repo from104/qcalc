@@ -17,6 +17,8 @@
   }));
   const $q = useQuasar();
 
+  store.setDarkMode(store.darkMode);
+
   const updateTitle = () => {
     title.value = t('message.appTitle');
   };
