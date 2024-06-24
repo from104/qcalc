@@ -78,8 +78,6 @@
   );
 
   onBeforeMount(() => {
-    store.setDarkMode(store.darkMode);
-
     setLocale();
 
     if (store.locale == '') {
