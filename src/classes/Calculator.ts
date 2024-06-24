@@ -104,6 +104,7 @@ export class Calculator {
   // 생성자
   constructor() {
     this.clear();
+    this.memoryClear();
   }
 
   // 초기화
