@@ -273,7 +273,7 @@
     </q-bar>
     <q-card
       id="history"
-      v-touch-swipe:12e-1:12:50.down="() => (store.isHistoryDialogOpen = false)"
+      v-touch-swipe:9e-2:12:50.down="() => (store.isHistoryDialogOpen = false)"
       square
       class="full-width row justify-center items-start relative-position scrollbar-custom"
       @scroll="onScroll"
