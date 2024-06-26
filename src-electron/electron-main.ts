@@ -20,19 +20,26 @@ import windowState from 'electron-window-state';
 
 let mainWindow: BrowserWindow | undefined;
 
+const iconPath = path.resolve(currentDir, 'icons/icon.png');
+
+const defaultWindowWidth = 352;
+const defaultWindowHeight = 604;
+
+// 플랫폼에 따라 창 크기 보정
+const adjustedWidth = platform === 'win32' ? -15 : 0;
+const adjustedHeight = platform === 'win32' ? -40 : 0;
+
+// 창 생성
 async function createWindow() {
-  const iconPath = path.resolve(currentDir, 'icons/icon.png');
-
-  const defaultWindowWidth = 352;
-  const defaultWindowHeight = 604;
-
   try {
+    // 화면 크기와 방향 확인
     const {width, height} = screen.getPrimaryDisplay().workAreaSize;
     const isLandscape = width > height;
-
-    const maxWindowHeight = isLandscape ? height : Math.floor(height / 2);
+    
+    // 최대 창 크기 설정
+    const maxWindowHeight = isLandscape ? Math.floor(height / 3 * 2) : Math.floor(height / 3);
     const maxWindowWidth = isLandscape ? Math.floor(width / 4) : Math.floor(width / 3);
-
+    
     const mainWindowState = windowState({
       defaultWidth: defaultWindowWidth,
       defaultHeight: defaultWindowHeight,
@@ -44,12 +51,12 @@ async function createWindow() {
       icon: path.resolve(iconPath), // tray icon
       x: mainWindowState.x,
       y: mainWindowState.y,
-      width: mainWindowState.width,
-      height: mainWindowState.height,
+      width: mainWindowState.width + adjustedWidth,
+      height: mainWindowState.height + adjustedHeight,
       minWidth: defaultWindowWidth,
       minHeight: defaultWindowHeight,
-      maxWidth: maxWindowWidth,
-      maxHeight: maxWindowHeight,
+      maxWidth: Math.max(maxWindowWidth, defaultWindowWidth),
+      maxHeight: Math.max(maxWindowHeight, defaultWindowHeight),
       useContentSize: true,
       resizable: true,
       maximizable: false,
