@@ -4,6 +4,22 @@ All notable changes to this project are recorded in this file.
 
 The format is based on [Keep a Changelog] and this project follows [Semantic Versioning].
 
+## [0.9.1] 2024-06-28
+
+### Added
+
+- Implemented platform-specific window size and positioning adjustments to improve user experience.
+
+### Changed
+
+- Modified maximum window height calculation for a more adaptive layout depending on screen orientation.
+- Adjusted swipe sensitivity of HistoryDialog component for smoother user experience.
+
+### Fixed
+
+- Fixed calculator starting in memory on first launch.
+- Fixed screen flickering when starting in dark mode on mobile.
+
 ## [0.9.0] 2024-06-24
 
 ### Added
