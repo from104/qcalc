@@ -17,6 +17,7 @@ try {
 }
 
 import windowState from 'electron-window-state';
+import { c } from 'vite/dist/node/types.d-aGj9QkWt';
 
 let mainWindow: BrowserWindow | undefined;
 
@@ -29,17 +30,21 @@ const defaultWindowHeight = 604;
 const adjustedWidth = platform === 'win32' ? -15 : 0;
 const adjustedHeight = platform === 'win32' ? -40 : 0;
 
+// 플랫폼에 따라 창 위치 보정
+const adjustedY = platform === 'linux' ? -38 : 0;
+const adjustedX = platform === 'linux' ? 0 : 0;
+
 // 창 생성
 async function createWindow() {
   try {
     // 화면 크기와 방향 확인
     const {width, height} = screen.getPrimaryDisplay().workAreaSize;
     const isLandscape = width > height;
-    
+
     // 최대 창 크기 설정
-    const maxWindowHeight = isLandscape ? Math.floor(height / 3 * 2) : Math.floor(height / 3);
+    const maxWindowHeight = isLandscape ? Math.floor((height / 3) * 2) : Math.floor(height / 3);
     const maxWindowWidth = isLandscape ? Math.floor(width / 4) : Math.floor(width / 3);
-    
+
     const mainWindowState = windowState({
       defaultWidth: defaultWindowWidth,
       defaultHeight: defaultWindowHeight,
@@ -49,8 +54,8 @@ async function createWindow() {
      */
     mainWindow = new BrowserWindow({
       icon: path.resolve(iconPath), // tray icon
-      x: mainWindowState.x,
-      y: mainWindowState.y,
+      x: mainWindowState.x + adjustedX,
+      y: mainWindowState.y + adjustedY,
       width: mainWindowState.width + adjustedWidth,
       height: mainWindowState.height + adjustedHeight,
       minWidth: defaultWindowWidth,

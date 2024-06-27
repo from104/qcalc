@@ -159,30 +159,25 @@ export default configure(function (/* ctx */) {
     ssr: {
       // ssrPwaHtmlFilename: 'offline.html', // do NOT use index.html as name!
       // will mess up SSR
-
       // extendSSRWebserverConf (esbuildConf) {},
       // extendPackageJson (json) {},
-
-      pwa: false,
-
+      // pwa: false,
       // manualStoreHydration: true,
       // manualPostHydrationTrigger: true,
-
-      prodPort: 3000, // The default port that the production server should use
+      // prodPort: 3000, // The default port that the production server should use
       // (gets superseded if process.env.PORT is specified at runtime)
-
-      middlewares: [
-        'render', // keep this as last one
-      ],
+      // middlewares: [
+      //   'render', // keep this as last one
+      // ],
     },
 
     // https://v2.quasar.dev/quasar-cli-vite/developing-pwa/configuring-pwa
     pwa: {
-      workboxMode: 'generateSW', // or 'injectManifest'
-      injectPwaMetaTags: true,
-      swFilename: 'sw.js',
-      manifestFilename: 'manifest.json',
-      useCredentialsForManifestTag: false,
+      // workboxMode: 'generateSW', // or 'injectManifest'
+      // injectPwaMetaTags: true,
+      // swFilename: 'sw.js',
+      // manifestFilename: 'manifest.json',
+      // useCredentialsForManifestTag: false,
       // extendGenerateSWOptions (cfg) {}
       // extendInjectManifestOptions (cfg) {},
       // extendManifestJson (json) {}
@@ -197,11 +192,6 @@ export default configure(function (/* ctx */) {
     // Full list of options: https://v2.quasar.dev/quasar-cli-vite/developing-capacitor-apps/configuring-capacitor
     capacitor: {
       hideSplashscreen: true,
-    },
-
-    sourceFiles: {
-      electronMain: 'src-electron/electron-main',
-      electronPreload: 'src-electron/electron-preload',
     },
 
     // Full list of options: https://v2.quasar.dev/quasar-cli-vite/developing-electron-apps/configuring-electron
@@ -227,7 +217,16 @@ export default configure(function (/* ctx */) {
       builder: {
         // https://www.electron.build/configuration/configuration
 
-        appId: 'qcalc',
+        appId: 'com.atit.qcalc',
+        productName: 'QCalc',
+        artifactName: '${productName}-${version}-${os}.${ext}',
+        linux: {
+          target: ['AppImage', 'snap'],
+          category: 'Utility',
+        },
+        win: {
+          target: ['nsis'],
+        },
       },
     },
 
