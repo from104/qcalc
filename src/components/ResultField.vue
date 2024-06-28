@@ -93,9 +93,9 @@
   const symbol = computed(() => {
     if (store.showSymbol && props.addon == 'currency') {
       if (isMainField.value) {
-        return store.currencyConverter?.getSymbol(store.recentCurrencyFrom) ?? '';
+        return store.currencyConverter?.getSymbol(store.recentCurrencyFrom);
       } else {
-        return store.currencyConverter?.getSymbol(store.recentCurrencyTo) ?? '';
+        return store.currencyConverter?.getSymbol(store.recentCurrencyTo);
       }
     } else {
       return '';
@@ -106,9 +106,9 @@
   const unit = computed(() => {
     if (store.showUnit && props.addon == 'unit') {
       if (isMainField.value) {
-        return ' ' + store.recentUnitFrom[store.recentCategory] ?? '';
+        return ' ' + store.recentUnitFrom[store.recentCategory];
       } else {
-        return ' ' + store.recentUnitTo[store.recentCategory] ?? '';
+        return ' ' + store.recentUnitTo[store.recentCategory];
       }
     } else {
       return '';
