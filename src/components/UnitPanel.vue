@@ -11,9 +11,10 @@
   // 스토어 가져오기
   import {useCalcStore} from 'stores/calc-store';
   const store = useCalcStore();
+  const {swapUnitValue, initRecentCategoryAndUnit,clickButtonById,showUnitToggle} = store;
 
   // 단위 초기화
-  store.initRecentCategoryAndUnit();
+  initRecentCategoryAndUnit();
 
   // 범주 이름을 언어에 맞게 초기화
   const categories = reactive(
@@ -33,12 +34,12 @@
   import {KeyBinding} from 'classes/KeyBinding';
   // prettier-ignore
   const keyBinding = new KeyBinding([
-    [['Alt+w'], () => store.clickButtonById('btn-swap-unit')],
-    [['Alt+y'], () => store.showUnitToggle()],
+    [['Alt+w'], () => clickButtonById('btn-swap-unit')],
+    [['Alt+y'], () => showUnitToggle()],
   ]);
 
   onMounted(() => {
-    store.initRecentCategoryAndUnit();
+    initRecentCategoryAndUnit();
 
     // 키바인딩 추가
     keyBinding.subscribe();
@@ -148,7 +149,7 @@
       icon="swap_horiz"
       size="md"
       class="col-1 q-mx-none q-px-sm"
-      @click="store.swapUnitValue()"
+      @click="swapUnitValue()"
     >
       <MyTooltip>{{ t('tooltipSwap') }}</MyTooltip>
     </q-btn>

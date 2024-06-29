@@ -32,6 +32,7 @@
     getLeftSideInHistory,
     showMemoryOff,
     copyToClipboard,
+    showMemoryOnWithTimer,
   } = store;
 
   // 계산 결과 툴팁 표시 상태 변수
@@ -254,8 +255,8 @@
           v-if="!isMemoryReset"
           v-blur
           class="noselect full-height q-mt-xs q-pt-sm"
-          :class="[selectResultColor()]"
-          @click="store.showMemoryOnWithTimer()"
+          :class="selectResultColor()"
+          @click="showMemoryOnWithTimer()"
         >
           <q-icon name="mdi-chip" />
         </div>
