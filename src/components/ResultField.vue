@@ -24,7 +24,15 @@
   const store = useCalcStore();
 
   // 계산기 오브젝트를 스토어에서 가져오기 위한 변수 선언
-  const {calc} = store;
+  const {
+    calc,
+    toFormattedNumber,
+    initRecentCategoryAndUnit,
+    initRecentCurrency,
+    getLeftSideInHistory,
+    showMemoryOff,
+    copyToClipboard,
+  } = store;
 
   // 계산 결과 툴팁 표시 상태 변수
   const needFieldTooltip = ref(false);
@@ -64,23 +72,23 @@
   const getResult = () => {
     if (isMainField.value) {
       const currentNumber = calc.getCurrentNumber();
-      const toFormattedNumber = store.toFormattedNumber(currentNumber);
+      const formattedNumber = toFormattedNumber(currentNumber);
       return store.decimalPlaces === -2 && currentNumber.includes('.')
-        ? `${toFormattedNumber.split('.')[0]}.${currentNumber.split('.')[1]}`
-        : toFormattedNumber;
+        ? `${formattedNumber.split('.')[0]}.${currentNumber.split('.')[1]}`
+        : formattedNumber;
     } else {
       if (props.addon == 'unit') {
         // 저장된 범주와 단위가 잘못됐으면 초기화
-        store.initRecentCategoryAndUnit();
+        initRecentCategoryAndUnit();
 
         // 변환 결과를 반환
-        return store.toFormattedNumber(convertedUnitNumber());
+        return toFormattedNumber(convertedUnitNumber());
       } else if (props.addon == 'currency') {
         // 저장된 환율이 잘못됐으면 초기화
-        store.initRecentCurrency();
+        initRecentCurrency();
 
         // 변환 결과를 반환
-        return store.toFormattedNumber(convertedCurrencyNumber());
+        return toFormattedNumber(convertedCurrencyNumber());
       } else {
         return '';
       }
@@ -157,12 +165,12 @@
       //  && prevHistoryId != (history[0].id as number)
     ) {
       // 이전 이력의 ID를 현재 이력의 ID로 설정하고 계산 이력의 왼쪽 값을 가져온 후 '='으로 결합해서 출력합니다.
-      return [store.getLeftSideInHistory(lastHistory), '='].join(' ');
+      return [getLeftSideInHistory(lastHistory), '='].join(' ');
     }
     // 입력된 연산자가 있고 초기화 예정이 아니라면
     else if (operatorExists && !shouldReset) {
       // 백업된 숫자를 현재 지역의 표기법으로 변환하여 반환합니다.
-      return store.toFormattedNumber(calc.getPreviousNumber());
+      return toFormattedNumber(calc.getPreviousNumber());
     } else {
       // 위의 조건에 해당하지 않는 경우, 빈 문자열을 반환합니다.
       return '';
@@ -170,6 +178,28 @@
   };
 
   const preResult = ref(getPreResult());
+
+  const resultColor = {
+    normal: 'text-light-green-8',
+    warning: 'text-deep-orange-5',
+    normalDark: 'text-light-green-10',
+    warningDark: 'text-deep-orange-8',
+  };
+
+  const resultBGColor = {
+    normal: 'light-green-3',
+    warning: 'deep-orange-2',
+  };
+
+  const selectResultColor = () => {
+    return store.showMemory
+      ? !needFieldTooltip.value
+        ? resultColor.normalDark
+        : resultColor.warningDark
+      : !needFieldTooltip.value
+        ? resultColor.normal
+        : resultColor.warning;
+  };
 
   watch(
     [
@@ -188,6 +218,7 @@
       result.value = getResult();
       preResult.value = getPreResult();
       setNeedFieldTooltip();
+      showMemoryOff();
     },
   );
 
@@ -209,17 +240,12 @@
       dense
       readonly
       :dark="false"
-      :bg-color="!needFieldTooltip ? 'light-green-3' : 'deep-orange-2'"
+      :bg-color="!needFieldTooltip ? resultBGColor.normal : resultBGColor.warning"
       :label-slot="isMainField"
       :stack-label="isMainField"
     >
       <template v-if="isMainField" #label>
-        <div
-          id="preResult"
-          v-blur
-          class="noselect"
-          :class="[!needFieldTooltip ? 'text-light-green-10' : 'text-deep-orange-8']"
-        >
+        <div id="preResult" v-blur class="noselect" :class="selectResultColor()">
           {{ preResult }}
         </div>
       </template>
@@ -228,27 +254,12 @@
           v-if="!isMemoryReset"
           v-blur
           class="noselect full-height q-mt-xs q-pt-sm"
-          :class="[!needFieldTooltip ? 'text-light-green-10' : 'text-deep-orange-8']"
+          :class="[selectResultColor()]"
+          @click="store.showMemoryOnWithTimer()"
         >
-          <q-icon name="mdi-chip">
-            <q-tooltip
-              v-model="store.showMemoryTooltip"
-              :hide-delay="2000"
-              class="text-green-10 bg-green-2 text-body2 text-center fa-border-all"
-              style="border: 1px solid black; word-break: break-all; word-wrap: break-word"
-              anchor="bottom middle"
-              self="center middle"
-            >
-              {{ store.toFormattedNumber(calc.getMemoryNumber()) }}
-            </q-tooltip>
-          </q-icon>
+          <q-icon name="mdi-chip" />
         </div>
-        <div
-          v-if="operator != ''"
-          v-blur
-          class="noselect full-height q-mt-xs q-pt-sm"
-          :class="[!needFieldTooltip ? 'text-light-green-10' : 'text-deep-orange-8']"
-        >
+        <div v-if="operator != ''" v-blur class="noselect full-height q-mt-xs q-pt-sm" :class="selectResultColor()">
           <q-icon :name="operatorIcons[operator]" />
         </div>
       </template>
@@ -258,21 +269,24 @@
           v-mutation="setNeedFieldTooltip"
           v-mutation.characterData
           class="self-center no-outline full-width full-height ellipsis text-right q-pt-xs noselect"
-          :class="[isMainField ? 'text-h5' : '', !needFieldTooltip ? 'text-light-green-10' : 'text-deep-orange-8']"
+          :class="[isMainField ? 'text-h5' : '', selectResultColor()]"
           :style="`padding-top: ${store.paddingOnResult}px;`"
         >
           <span id="symbol">{{ symbol }}</span>
-          <span :id="isMainField ? 'result' : 'subResult'">{{ result }}</span>
+          <span v-if="isMainField && store.showMemory" id="result" :class="selectResultColor()">
+            {{ toFormattedNumber(calc.getMemoryNumber()) }}
+          </span>
+          <span v-else :id="isMainField ? 'result' : 'subResult'">{{ result }}</span>
           <span id="unit">{{ unit }}</span>
           <q-menu context-menu auto-close touch-position class="shadow-6">
             <q-list class="noselect" dense style="min-width: 150px">
               <MenuItem
-                :action="() => store.copyToClipboard(symbol + result + unit, t('copiedDisplayedResult'))"
+                :action="() => copyToClipboard(symbol + result + unit, t('copiedDisplayedResult'))"
                 :title="t('copyDisplayedResult')"
                 :caption="symbol + result + unit"
               />
               <MenuItem
-                :action="() => store.copyToClipboard(onlyNumber, t('copiedOnlyNumber'))"
+                :action="() => copyToClipboard(onlyNumber, t('copiedOnlyNumber'))"
                 :title="t('copyOnlyNumber')"
                 :caption="onlyNumber"
               />
