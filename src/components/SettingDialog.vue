@@ -10,7 +10,7 @@
 
   import {useCalcStore} from 'src/stores/calc-store';
   const store = useCalcStore();
-  const {toggleAlwaysOnTop, notifyMsg, setInitPanel, setDarkMode, setAlwaysOnTop, setDecimalPlaces} = store;
+  const {toggleAlwaysOnTop, notifyMsg, setInitPanel, setDarkMode, setAlwaysOnTop,setHapticsMode, setDecimalPlaces} = store;
 
   import {useI18n} from 'vue-i18n';
   const {locale} = useI18n({useScope: 'global'});
@@ -135,6 +135,12 @@
             <q-toggle v-model="store.darkMode" keep-color dense @click="setDarkMode(store.darkMode)" />
           </q-item>
 
+          <q-item v-if="$q.platform.is.capacitor" class="q-py-none">
+            <q-item-label class="self-center">{{ t('hapticsMode') }} (K)</q-item-label>
+            <q-space />
+            <q-toggle v-model="store.hapticsMode" keep-color dense @click="setHapticsMode(store.hapticsMode)" />
+          </q-item>
+
           <q-separator spaced="md" />
 
           <q-item class="q-py-none">
@@ -256,6 +262,7 @@ ko:
   alwaysOnTopOff: '항상 위 꺼짐'
   initPanel: '시작 시 패널 초기화'
   darkMode: '다크 모드'
+  hapticsMode: '진동 모드'
   showButtonAddedLabel: '버튼 추가 라벨 표시'
   useGrouping: '천단위 표시'
   decimalPlaces: '소수점'
@@ -272,6 +279,7 @@ en:
   alwaysOnTopOff: 'Always on top OFF'
   initPanel: 'Init panel at startup'
   darkMode: 'Dark mode'
+  hapticsMode: 'Haptics mode'
   showButtonAddedLabel: 'Show button added label'
   useGrouping: 'Use grouping'
   decimalPlaces: 'Decimal'

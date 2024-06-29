@@ -193,7 +193,7 @@
   };
 
   const selectResultColor = () => {
-    return store.showMemory
+    return isMainField.value && store.showMemory
       ? !needFieldTooltip.value
         ? resultColor.normalDark
         : resultColor.warningDark

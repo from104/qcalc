@@ -1,11 +1,27 @@
 <script setup lang="ts">
   import {onMounted, onBeforeUnmount, ref, watch, reactive} from 'vue';
 
-  import {colors} from 'quasar';
+  import {useQuasar, colors} from 'quasar';
   const {lighten} = colors;
 
   import {useI18n} from 'vue-i18n';
   const {t} = useI18n();
+
+  const $q = useQuasar();
+
+  import {Haptics, ImpactStyle} from 'capacitor/@capacitor/haptics';
+
+  const impactLight = async () => {
+    if ($q.platform.is.capacitor && store.hapticsMode) {
+      await Haptics.impact({style: ImpactStyle.Light});
+    }
+  };
+
+  const impactMedium = async () => {
+    if ($q.platform.is.capacitor && store.hapticsMode) {
+      await Haptics.impact({style: ImpactStyle.Medium});
+    }
+  };
 
   // 계산기 오브젝트를 스토어에서 가져오기 위한 변수 선언
   import {useCalcStore} from 'stores/calc-store';
@@ -21,7 +37,7 @@
     onButtonShiftLock,
     showMemoryOnWithTimer,
     toggleButtonShift,
-    } = store;
+  } = store;
 
   // 에러처리를 위한 함수
   const funcWithError = (func: () => void) => {
@@ -64,6 +80,7 @@
   };
 
   const buttonShiftPressedColor = lighten(buttonColors.important, -30);
+
   // 버튼 레이블, 버튼 컬러, 버튼에 해당하는 키, 버튼 클릭 이벤트 핸들러
   type Button = {
     [id: string]: [isIcon: boolean, label: string, color: string, keys: string[], handler: () => void];
@@ -130,16 +147,16 @@
     d6: [ 'MS', ['Shift+Equal', 'Shift+Enter', 'Shift+NumpadEnter'], () => { calc.memorySave(); showMemory(); }],
   };
 
-  const showButtonNotify = (id: string | number) => {
-    if (buttonsAddedFunc[id][0] =='MC') {
+  const showButtonNotify = (id: ButtonID) => {
+    if (buttonsAddedFunc[id][0] == 'MC') {
       notifyMsg(t('memoryCleared'));
-    } else if (buttonsAddedFunc[id][0] =='MR' && !calc.getIsMemoryReset()) {
+    } else if (buttonsAddedFunc[id][0] == 'MR' && !calc.getIsMemoryReset()) {
       notifyMsg(t('memoryRecalled'));
-    } else if (buttonsAddedFunc[id][0] =='MS') {
+    } else if (buttonsAddedFunc[id][0] == 'MS') {
       notifyMsg(t('memorySaved'));
     }
   };
-  
+
   // 버튼 레이블이 비어있는 버튼을 찾아서 shiftID에 저장 - shiftID는 시프트 버튼의 id
   const shiftID = Object.keys(buttonsAddedFunc).find((key) => buttonsAddedFunc[key][0] === '');
 
@@ -148,7 +165,9 @@
     Object.fromEntries(Object.keys(buttons).map((id) => [id, false])),
   );
 
-  const showTooltipOfFunc = (id: string | number) => {
+  type ButtonID = string | number;
+
+  const showTooltipOfFunc = (id: ButtonID) => {
     if (timersOfTooltip[id] || id === shiftID || (!store.showButtonAddedLabel && store.buttonShift)) return;
     timersOfTooltip[id] = true;
     setTimeout(() => {
@@ -157,7 +176,7 @@
   };
 
   // 버튼 시프트 상태에 따라 기능 실행
-  const shiftFunc = (id: string | number) => {
+  const shiftFunc = (id: ButtonID) => {
     if (store.buttonShift) {
       funcWithError(buttonsAddedFunc[id][2]);
       showTooltipOfFunc(id);
@@ -174,7 +193,8 @@
     }
   };
 
-  const holdFunc = (id: string | number) => {
+  const holdFunc = (id: ButtonID) => {
+    impactMedium();
     if (id === shiftID) {
       if (store.buttonShiftLock) {
         offButtonShiftLock();
@@ -201,11 +221,12 @@
     if (!calc.getIsMemoryReset()) {
       setTimeout(() => {
         showMemoryOnWithTimer();
-      }, 10);''
+      }, 10);
+      ('');
     }
   };
 
-  const buttonClickByKey = (id: string, isShift: boolean) => {
+  const buttonClickByKey = (id: ButtonID, isShift: boolean) => {
     if (isShift) {
       toggleButtonShift();
       setTimeout(() => {
@@ -302,6 +323,7 @@
         :style="!store.showButtonAddedLabel || !buttonsAddedFunc[id][0] ? {paddingTop: '4px'} : {}"
         :color="`btn-${button[2]}`"
         @click="() => shiftFunc(id)"
+        @touchstart="() => impactLight()"
       >
         <span
           v-if="store.showButtonAddedLabel && buttonsAddedFunc[id]"
