@@ -4,6 +4,7 @@
   import {useCalcStore} from 'stores/calc-store';
 
   const store = useCalcStore();
+  const {setDarkMode, setAlwaysOnTop} = store;
 
   import {useI18n} from 'vue-i18n';
   const {locale} = useI18n({useScope: 'global'});
@@ -16,6 +17,8 @@
     title: title.value,
   }));
   const $q = useQuasar();
+
+  setDarkMode(store.darkMode);
 
   const updateTitle = () => {
     title.value = t('message.appTitle');
@@ -49,7 +52,7 @@
     }
 
     if ($q.platform.is.electron) {
-      store.setAlwaysOnTop(store.alwaysOnTop);
+      setAlwaysOnTop(store.alwaysOnTop);
     }
   });
 </script>

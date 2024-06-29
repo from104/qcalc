@@ -10,6 +10,7 @@
 
   import {useCalcStore} from 'src/stores/calc-store';
   const store = useCalcStore();
+  const {toggleAlwaysOnTop, notifyMsg, setInitPanel, setDarkMode, setAlwaysOnTop,setHapticsMode, setDecimalPlaces} = store;
 
   import {useI18n} from 'vue-i18n';
   const {locale} = useI18n({useScope: 'global'});
@@ -40,12 +41,12 @@
   const toggleAlwaysOnTopWithNotify = () => {
     if ($q.platform.is.electron) {
       // 수동으로 토글
-      store.toggleAlwaysOnTop();
+      toggleAlwaysOnTop();
 
       if (store.alwaysOnTop) {
-        store.notifyMsg(t('alwaysOnTopOn'));
+        notifyMsg(t('alwaysOnTopOn'));
       } else {
-        store.notifyMsg(t('alwaysOnTopOff'));
+        notifyMsg(t('alwaysOnTopOff'));
       }
     }
   };
@@ -78,8 +79,6 @@
   );
 
   onBeforeMount(() => {
-    store.setDarkMode(store.darkMode);
-
     setLocale();
 
     if (store.locale == '') {
@@ -109,11 +108,7 @@
     transition-show="slide-down"
     transition-hide="slide-up"
   >
-    <q-card 
-      id="setting"
-      v-touch-swipe:9e-2:12:50.up="() => (store.isSettingDialogOpen = false)"
-      class="full-width"
-    >
+    <q-card id="setting" v-touch-swipe:9e-2:12:50.up="() => (store.isSettingDialogOpen = false)" class="full-width">
       <q-bar v-blur dark class="full-width noselect text-white bg-primary">
         <q-icon name="settings" size="sm" />
         <div>{{ t('message.settings') }}</div>
@@ -125,19 +120,25 @@
           <q-item v-if="$q.platform.is.electron" class="q-py-none">
             <q-item-label class="self-center">{{ t('alwaysOnTop') }} (T)</q-item-label>
             <q-space />
-            <q-toggle v-model="store.alwaysOnTop" keep-color dense @click="store.setAlwaysOnTop(store.alwaysOnTop)" />
+            <q-toggle v-model="store.alwaysOnTop" keep-color dense @click="setAlwaysOnTop(store.alwaysOnTop)" />
           </q-item>
 
           <q-item class="q-py-none">
             <q-item-label class="self-center">{{ t('initPanel') }} (N)</q-item-label>
             <q-space />
-            <q-toggle v-model="store.initPanel" keep-color dense @click="store.setInitPanel(store.initPanel)" />
+            <q-toggle v-model="store.initPanel" keep-color dense @click="setInitPanel(store.initPanel)" />
           </q-item>
 
           <q-item class="q-py-none">
             <q-item-label class="self-center">{{ t('darkMode') }} (K)</q-item-label>
             <q-space />
-            <q-toggle v-model="store.darkMode" keep-color dense @click="store.setDarkMode(store.darkMode)" />
+            <q-toggle v-model="store.darkMode" keep-color dense @click="setDarkMode(store.darkMode)" />
+          </q-item>
+
+          <q-item v-if="$q.platform.is.capacitor" class="q-py-none">
+            <q-item-label class="self-center">{{ t('hapticsMode') }} (K)</q-item-label>
+            <q-space />
+            <q-toggle v-model="store.hapticsMode" keep-color dense @click="setHapticsMode(store.hapticsMode)" />
           </q-item>
 
           <q-separator spaced="md" />
@@ -169,14 +170,14 @@
               marker-labels
               class="col-5 q-pr-sm"
               dense
-              @change="store.setDecimalPlaces(store.decimalPlaces)"
+              @change="setDecimalPlaces(store.decimalPlaces)"
             >
               <template #marker-label-group="{markerList}">
                 <div
                   class="cursor-pointer"
                   :class="(markerList[0] as any).classes"
                   :style="(markerList[0] as any).style"
-                  @click="store.setDecimalPlaces((markerList[0] as any).value)"
+                  @click="setDecimalPlaces((markerList[0] as any).value)"
                 >
                   x
                 </div>
@@ -186,7 +187,7 @@
                   class="cursor-pointer"
                   :class="(markerList[val] as any).classes"
                   :style="(markerList[val] as any).style"
-                  @click="store.setDecimalPlaces((markerList[val] as any).value)"
+                  @click="setDecimalPlaces((markerList[val] as any).value)"
                 >
                   {{ (markerList[val] as any).value }}
                 </div>
@@ -261,6 +262,7 @@ ko:
   alwaysOnTopOff: '항상 위 꺼짐'
   initPanel: '시작 시 패널 초기화'
   darkMode: '다크 모드'
+  hapticsMode: '진동 모드'
   showButtonAddedLabel: '버튼 추가 라벨 표시'
   useGrouping: '천단위 표시'
   decimalPlaces: '소수점'
@@ -277,6 +279,7 @@ en:
   alwaysOnTopOff: 'Always on top OFF'
   initPanel: 'Init panel at startup'
   darkMode: 'Dark mode'
+  hapticsMode: 'Haptics mode'
   showButtonAddedLabel: 'Show button added label'
   useGrouping: 'Use grouping'
   decimalPlaces: 'Decimal'

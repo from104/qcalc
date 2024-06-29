@@ -4,6 +4,22 @@ All notable changes to this project are recorded in this file.
 
 The format is based on [Keep a Changelog] and this project follows [Semantic Versioning].
 
+## [0.9.1] 2024-06-29
+
+### Added
+
+- Added notifications for memory actions, such as memory cleared, recalled, and saved.
+- Added haptics feedback when using the app on mobile, can be enabled or disabled in settings.
+
+### Changed
+
+- Changed memory display method from tooltip to panel.
+
+### Fixed
+
+- Fixed calculator starting in memory on first launch.
+- Fixed screen flickering when starting in dark mode on mobile.
+
 ## [0.9.0] 2024-06-24
 
 ### Added

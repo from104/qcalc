@@ -13,7 +13,16 @@
   const store = useCalcStore();
 
   // 계산기 오브젝트를 스토어에서 가져오기 위한 변수 선언
-  const {calc} = store;
+  const {
+    calc,
+    clickButtonById,
+    getRightSideInHistory,
+    getLeftSideInHistory,
+    notifyMsg,
+    notifyError,
+    swapUnitValue,
+    swapCurrencyValue,
+  } = store;
 
   // 계산 결과 배열
   const histories = computed(() => calc.getHistories());
@@ -118,8 +127,8 @@
   import {KeyBinding} from 'classes/KeyBinding';
   // prettier-ignore
   const keyBinding = new KeyBinding([
-    [['Alt+h'], () => { !doDeleteHistory.value && store.clickButtonById('btn-history'); }],
-    [['d'], () => { store.isHistoryDialogOpen && store.clickButtonById('btn-delete-history'); }],
+    [['Alt+h'], () => { !doDeleteHistory.value && clickButtonById('btn-history'); }],
+    [['d'], () => { store.isHistoryDialogOpen && clickButtonById('btn-delete-history'); }],
     [['ArrowUp'], () => scrollHistory(-50)],
     [['ArrowDown'], () => scrollHistory(50)],
     [['PageUp'], () => scrollHistory(-400)],
@@ -203,7 +212,7 @@
     const history = calc.getHistoryByID(id);
     const copyText =
       copyType === 'formattedNumber'
-        ? store.getRightSideInHistory(history)
+        ? getRightSideInHistory(history)
         : copyType === 'onlyNumber'
           ? history.resultNumber
           : copyType === 'memo'
@@ -211,10 +220,10 @@
             : '';
     try {
       await copyToClipboard(copyText);
-      store.notifyMsg(t('copySuccess'));
+      notifyMsg(t('copySuccess'));
     } catch (error) {
       console.error(error);
-      store.notifyError(t('copyFailure'));
+      notifyError(t('copyFailure'));
     }
   };
 
@@ -226,20 +235,20 @@
   const toSubResult = (id: number) => {
     const history = calc.getHistoryByID(id);
     if (store.cTab === 'unit') {
-      store.swapUnitValue();
+      swapUnitValue();
       setTimeout(() => {
         calc.setCurrentNumber(history.resultNumber);
       }, 5);
       setTimeout(() => {
-        store.swapUnitValue();
+        swapUnitValue();
       }, 10);
     } else if (store.cTab === 'currency') {
-      store.swapCurrencyValue();
+      swapCurrencyValue();
       setTimeout(() => {
         calc.setCurrentNumber(history.resultNumber);
       }, 5);
       setTimeout(() => {
-        store.swapCurrencyValue();
+        swapCurrencyValue();
       }, 10);
     }
   };
@@ -250,12 +259,7 @@
 </script>
 
 <template>
-  <q-dialog
-    v-model="store.isHistoryDialogOpen"
-    style="z-index: 10"
-    position="bottom"
-    transition-duration="300"
-  >
+  <q-dialog v-model="store.isHistoryDialogOpen" style="z-index: 10" position="bottom" transition-duration="300">
     <q-bar v-blur dark class="full-width noselect text-white bg-primary">
       <q-icon name="history" size="sm" />
       <div>{{ t('history') }}</div>
@@ -273,7 +277,7 @@
     </q-bar>
     <q-card
       id="history"
-      v-touch-swipe:12e-1:12:50.down="() => (store.isHistoryDialogOpen = false)"
+      v-touch-swipe:9e-2:12:50.down="() => (store.isHistoryDialogOpen = false)"
       square
       class="full-width row justify-center items-start relative-position scrollbar-custom"
       @scroll="onScroll"
@@ -324,10 +328,10 @@
                       <u>{{ history.memo }}</u>
                     </q-item-label>
                     <q-item-label style="white-space: pre-wrap">
-                      {{ store.getLeftSideInHistory(history, true) }}
+                      {{ getLeftSideInHistory(history, true) }}
                     </q-item-label>
                     <q-item-label>
-                      {{ ['=', store.getRightSideInHistory(history)].join(' ') }}
+                      {{ ['=', getRightSideInHistory(history)].join(' ') }}
                     </q-item-label>
                   </q-item-section>
                 </q-item>
@@ -364,7 +368,7 @@
                     <MenuItem
                       :title="t('copyDisplayedResult')"
                       :action="() => historyCopy(history.id as number, 'formattedNumber')"
-                      :caption="store.getRightSideInHistory(history)"
+                      :caption="getRightSideInHistory(history)"
                     />
                     <MenuItem
                       :title="t('copyResultNumber')"

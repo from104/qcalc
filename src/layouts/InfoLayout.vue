@@ -30,9 +30,6 @@
 
   const headerHeight = computed(() => {
     const header = document.getElementById('header');
-    if (header) {
-      console.log(header.clientHeight);
-    }
     return header ? header.clientHeight + 'px' : '0px';
   });
 </script>

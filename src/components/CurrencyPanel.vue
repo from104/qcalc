@@ -9,10 +9,19 @@
   import {useCalcStore} from 'stores/calc-store';
   const store = useCalcStore();
 
-  const {currencyConverter} = store;
+  const {
+    currencyConverter,
+    initRecentCurrency,
+    clickButtonById,
+    showSymbolToggle,
+    setInputBlurred,
+    setInputFocused,
+    blurElement,
+    swapCurrencyValue,
+  } = store;
 
   // 단위 초기화
-  store.initRecentCurrency();
+  initRecentCurrency();
 
   // 통화 이름을 언어에 맞게 초기화
   interface CurrencyDescription {
@@ -37,8 +46,8 @@
   // 키바인딩 생성
   import {KeyBinding} from 'classes/KeyBinding';
   const keyBinding = new KeyBinding([
-    [['Alt+w'], () => store.clickButtonById('btn-swap-currency')],
-    [['Alt+y'], () => store.showSymbolToggle()],
+    [['Alt+w'], () => clickButtonById('btn-swap-currency')],
+    [['Alt+y'], () => showSymbolToggle()],
   ]);
 
   // inputFocused 값이 바뀌면 키바인딩을 추가하거나 제거합니다.
@@ -56,7 +65,7 @@
   let updateRatesTimer: number | undefined;
 
   onMounted(() => {
-    store.initRecentCurrency();
+    initRecentCurrency();
 
     keyBinding.subscribe();
 
@@ -77,7 +86,7 @@
   // dom 요소가 언마운트되기 전에 키바인딩 제거
   onBeforeUnmount(() => {
     keyBinding.unsubscribe();
-    store.setInputBlurred();
+    setInputBlurred();
     clearInterval(updateRatesTimer);
   });
 
@@ -186,10 +195,10 @@
       :popup-content-class="!store.darkMode ? 'bg-blue-grey-2' : 'bg-blue-grey-6'"
       :class="!store.darkMode ? 'bg-blue-grey-2' : 'bg-blue-grey-6'"
       @filter="filterFnFrom"
-      @focus="store.setInputFocused"
-      @blur="store.setInputBlurred"
-      @keyup.enter="store.blurElement"
-      @update:model-value="store.blurElement"
+      @focus="setInputFocused()"
+      @blur="setInputBlurred()"
+      @keyup.enter="blurElement()"
+      @update:model-value="blurElement()"
     >
       <template #option="scope">
         <q-item v-bind="scope.itemProps">
@@ -215,7 +224,7 @@
       icon="swap_horiz"
       size="md"
       class="col-2 q-mx-none q-px-sm"
-      @click="store.swapCurrencyValue"
+      @click="swapCurrencyValue()"
     >
       <MyTooltip>{{ t('tooltipSwap') }}</MyTooltip>
     </q-btn>
@@ -240,10 +249,10 @@
       class="col-4 q-pl-sm shadow-2"
       :options-selected-class="!store.darkMode ? 'text-primary' : 'text-grey-1'"
       @filter="filterFnTo"
-      @keyup.enter="store.blurElement"
-      @update:model-value="store.blurElement"
-      @focus="store.setInputFocused"
-      @blur="store.setInputBlurred"
+      @keyup.enter="blurElement()"
+      @update:model-value="blurElement()"
+      @focus="setInputFocused()"
+      @blur="setInputBlurred()"
     >
       <template #option="scope">
         <q-item v-bind="scope.itemProps">

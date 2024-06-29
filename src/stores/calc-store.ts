@@ -1,17 +1,17 @@
 import {defineStore} from 'pinia';
 import {Dark, Notify, copyToClipboard} from 'quasar';
+
 import {create, all} from 'mathjs';
+const MathB = create(all, {
+  number: 'BigNumber',
+  precision: 64,
+}) as math.MathJsStatic;
 
 import {Calculator} from 'classes/Calculator';
 import type {History} from 'classes/Calculator';
 
 import {UnitConverter} from 'classes/UnitConverter';
 import {CurrencyConverter} from 'classes/CurrencyConverter';
-
-const MathB = create(all, {
-  number: 'BigNumber',
-  precision: 64,
-}) as math.MathJsStatic;
 
 export const useCalcStore = defineStore('calc', {
   state: () => ({
@@ -63,8 +63,10 @@ export const useCalcStore = defineStore('calc', {
     buttonShift: false,
     // 계산기 버튼의 추가 기능 잠금
     buttonShiftLock: false,
-    // 메모리 톨팁 표시 여부
-    showMemoryTooltip: false,
+    // 메모리  표시 여부
+    showMemory: false,
+    // 햅틱 피드백 여부
+    hapticsMode: true,
   }),
   getters: {},
   actions: {
@@ -326,6 +328,18 @@ export const useCalcStore = defineStore('calc', {
     },
     offButtonShiftLock(): void {
       this.buttonShiftLock = false;
+    },
+    showMemoryOff(): void {
+      this.showMemory = false;
+    },
+    showMemoryOnWithTimer(): void {
+      this.showMemory = true;
+      setTimeout(() => {
+        this.showMemory = false;
+      }, 2000);
+    },
+    setHapticsMode(hapticsMode: boolean): void {
+      this.hapticsMode = hapticsMode;
     },
   },
   persist: true,

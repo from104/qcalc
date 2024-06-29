@@ -1,8 +1,0 @@
-{
-  "appId": "org.capacitor.quasar.app",
-  "appName": "Q Calc",
-  "webDir": "www",
-  "server": {
-    "androidScheme": "https"
-  }
-}

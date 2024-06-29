@@ -1,16 +1,43 @@
 <script setup lang="ts">
   import {onMounted, onBeforeUnmount, ref, watch, reactive} from 'vue';
 
-  import {colors} from 'quasar';
+  import {useQuasar, colors} from 'quasar';
   const {lighten} = colors;
 
   import {useI18n} from 'vue-i18n';
   const {t} = useI18n();
 
+  const $q = useQuasar();
+
+  import {Haptics, ImpactStyle} from 'capacitor/@capacitor/haptics';
+
+  const impactLight = async () => {
+    if ($q.platform.is.capacitor && store.hapticsMode) {
+      await Haptics.impact({style: ImpactStyle.Light});
+    }
+  };
+
+  const impactMedium = async () => {
+    if ($q.platform.is.capacitor && store.hapticsMode) {
+      await Haptics.impact({style: ImpactStyle.Medium});
+    }
+  };
+
   // 계산기 오브젝트를 스토어에서 가져오기 위한 변수 선언
   import {useCalcStore} from 'stores/calc-store';
   const store = useCalcStore();
-  const {calc} = store;
+  const {
+    calc,
+    clickButtonById,
+    notifyError,
+    notifyMsg,
+    offButtonShift,
+    offButtonShiftLock,
+    onButtonShift,
+    onButtonShiftLock,
+    showMemoryOnWithTimer,
+    toggleButtonShift,
+  } = store;
 
   // 에러처리를 위한 함수
   const funcWithError = (func: () => void) => {
@@ -26,9 +53,9 @@
       if (e instanceof Error) {
         // console.error(e.message);
         if (errorMessages[e.message]) {
-          store.notifyError(t(errorMessages[e.message]));
+          notifyError(t(errorMessages[e.message]));
         } else {
-          store.notifyError(e.message);
+          notifyError(e.message);
         }
       }
     }
@@ -53,6 +80,7 @@
   };
 
   const buttonShiftPressedColor = lighten(buttonColors.important, -30);
+
   // 버튼 레이블, 버튼 컬러, 버튼에 해당하는 키, 버튼 클릭 이벤트 핸들러
   type Button = {
     [id: string]: [isIcon: boolean, label: string, color: string, keys: string[], handler: () => void];
@@ -80,7 +108,7 @@
     b5: [false, '2', 'normal', ['2'], () => calc.addDigit(2)],
     c5: [false, '3', 'normal', ['3'], () => calc.addDigit(3)],
     d5: [true, 'mdi-plus', 'function', ['+'], () => calc.plus()],
-    a6: [true, 'keyboard_capslock', 'important', ["'"], () => store.toggleButtonShift()],
+    a6: [true, 'keyboard_capslock', 'important', ["'"], () => toggleButtonShift()],
     b6: [false, '0', 'normal', ['0'], () => calc.addDigit(0)],
     c6: [true, 'mdi-circle-small', 'normal', ['.'], () => calc.addDot()],
     d6: [true, 'mdi-equal', 'important', ['=', 'Enter'], () => calc.equal()],
@@ -95,28 +123,38 @@
   const buttonsAddedFunc: ButtonAddedFunc = {
     a1: ['xⁿ', ['Shift+Control+q'], () => calc.pow()],
     b1: ['ⁿ√x', ['Shift+Control+w'], () => calc.root()],
-    c1: ['MC', ['Shift+Control+e', 'Shift+Delete', 'Shift+Escape'], () => { calc.memoryClear(); showMemoryTooltip()}],
-    d1: ['MR', ['Shift+Backspace', 'Shift+Control+r'], () => { calc.memoryRecall(); showMemoryTooltip(); }],
+    c1: ['MC', ['Shift+Control+e', 'Shift+Delete', 'Shift+Escape'], () => calc.memoryClear()],
+    d1: ['MR', ['Shift+Backspace', 'Shift+Control+r'], () => { calc.memoryRecall(); showMemory(); }],
     a2: ['10ⁿ', ['Shift+Control+a'], () => calc.exp10()],
     b2: ['x%y', ['Shift+Control+s'], () => calc.mod()],
     c2: ['x!', ['Shift+Control+d'], () => calc.fct()],
-    d2: ['M÷', ['Shift+Slash', 'Shift+NumpadDivide'], () => { calc.memoryDiv(); showMemoryTooltip(); }],
+    d2: ['M÷', ['Shift+Slash', 'Shift+NumpadDivide'], () => { calc.memoryDiv(); showMemory(); }],
     a3: ['sin', ['Shift+Digit7', 'Shift+Numpad7'], () => calc.sin()],
     b3: ['cos', ['Shift+Digit8', 'Shift+Numpad8'], () => calc.cos()],
     c3: ['tan', ['Shift+Digit9', 'Shift+Numpad9'], () => calc.tan()],
-    d3: ['M×', ['Shift+NumpadMultiply'], () => { calc.memoryMul(); showMemoryTooltip(); }, ],
+    d3: ['M×', ['Shift+NumpadMultiply'], () => { calc.memoryMul(); showMemory(); }, ],
     a4: ['Pi/2', ['Shift+Digit4', 'Shift+Numpad4'], () => calc.setConstant('pi2')],
     b4: ['ln10', ['Shift+Digit5', 'Shift+Numpad5'], () => calc.setConstant('ln10')],
     c4: ['ln2', ['Shift+Digit6', 'Shift+Numpad6'], () => calc.setConstant('ln2')],
-    d4: ['M-', ['Shift+Minus', 'Shift+NumpadSubtract'], () => { calc.memoryMinus(); showMemoryTooltip(); }],
+    d4: ['M-', ['Shift+Minus', 'Shift+NumpadSubtract'], () => { calc.memoryMinus(); showMemory(); }],
     a5: ['Pi', ['Shift+Digit1', 'Shift+Numpad1'], () => calc.setConstant('pi')],
     b5: ['phi', ['Shift+Digit2', 'Shift+Numpad2'], () => calc.setConstant('phi')],
     c5: ['e', ['Shift+Digit3', 'Shift+Numpad3'], () => calc.setConstant('e')],
-    d5: ['M+', ['Shift+Plus', 'Shift+NumpadAdd'], () => { calc.memoryPlus(); showMemoryTooltip(); }],
+    d5: ['M+', ['Shift+Plus', 'Shift+NumpadAdd'], () => { calc.memoryPlus(); showMemory(); }],
     a6: ['', [], () => null],
     b6: ['int', ['Shift+Digit0', 'Shift+Numpad0'], () => calc.int()],
     c6: ['frac', ['Shift+Period', 'Shift+NumpadDecimal'], () => calc.frac()],
-    d6: [ 'MS', ['Shift+Equal', 'Shift+Enter', 'Shift+NumpadEnter'], () => { calc.memorySave(); showMemoryTooltip(); }],
+    d6: [ 'MS', ['Shift+Equal', 'Shift+Enter', 'Shift+NumpadEnter'], () => { calc.memorySave(); showMemory(); }],
+  };
+
+  const showButtonNotify = (id: ButtonID) => {
+    if (buttonsAddedFunc[id][0] == 'MC') {
+      notifyMsg(t('memoryCleared'));
+    } else if (buttonsAddedFunc[id][0] == 'MR' && !calc.getIsMemoryReset()) {
+      notifyMsg(t('memoryRecalled'));
+    } else if (buttonsAddedFunc[id][0] == 'MS') {
+      notifyMsg(t('memorySaved'));
+    }
   };
 
   // 버튼 레이블이 비어있는 버튼을 찾아서 shiftID에 저장 - shiftID는 시프트 버튼의 id
@@ -127,7 +165,9 @@
     Object.fromEntries(Object.keys(buttons).map((id) => [id, false])),
   );
 
-  const showTooltipOfFunc = (id: string | number) => {
+  type ButtonID = string | number;
+
+  const showTooltipOfFunc = (id: ButtonID) => {
     if (timersOfTooltip[id] || id === shiftID || (!store.showButtonAddedLabel && store.buttonShift)) return;
     timersOfTooltip[id] = true;
     setTimeout(() => {
@@ -136,66 +176,68 @@
   };
 
   // 버튼 시프트 상태에 따라 기능 실행
-  const shiftFunc = (id: string | number) => {
+  const shiftFunc = (id: ButtonID) => {
     if (store.buttonShift) {
       funcWithError(buttonsAddedFunc[id][2]);
       showTooltipOfFunc(id);
+      showButtonNotify(id);
       if (id === shiftID) {
-        store.offButtonShift();
-        store.offButtonShiftLock();
+        offButtonShift();
+        offButtonShiftLock();
         return;
       }
       if (store.buttonShiftLock) return;
-      store.offButtonShift();
+      offButtonShift();
     } else {
       funcWithError(buttons[id][4]);
     }
   };
 
-  const holdFunc = (id: string | number) => {
+  const holdFunc = (id: ButtonID) => {
+    impactMedium();
     if (id === shiftID) {
       if (store.buttonShiftLock) {
-        store.offButtonShiftLock();
-        store.offButtonShift();
+        offButtonShiftLock();
+        offButtonShift();
       } else {
-        store.onButtonShiftLock();
-        store.onButtonShift();
+        onButtonShiftLock();
+        onButtonShift();
       }
       return;
     }
     if (store.buttonShift) {
       funcWithError(buttons[id][4]);
       if (store.buttonShiftLock) return;
-      store.offButtonShift();
+      offButtonShift();
       return;
     } else {
       funcWithError(buttonsAddedFunc[id][2]);
       showTooltipOfFunc(id);
+      showButtonNotify(id);
     }
   };
 
-  const showMemoryTooltip = () => {
+  const showMemory = () => {
     if (!calc.getIsMemoryReset()) {
-      store.showMemoryTooltip = true;
       setTimeout(() => {
-        store.showMemoryTooltip = false;
-      }, 2000);
+        showMemoryOnWithTimer();
+      }, 10);
+      ('');
     }
   };
 
-  const buttonClickByKey = (id: string, isShift: boolean) => {
+  const buttonClickByKey = (id: ButtonID, isShift: boolean) => {
     if (isShift) {
-      store.toggleButtonShift();
+      toggleButtonShift();
       setTimeout(() => {
-        store.clickButtonById('btn-' + id);
+        clickButtonById('btn-' + id);
       }, 5);
     } else {
-      store.clickButtonById('btn-' + id);
+      clickButtonById('btn-' + id);
     }
   };
 
   import {KeyBinding, KeyBindings} from 'classes/KeyBinding';
-  import {im} from 'mathjs';
 
   const keyBindingsPrimary: KeyBindings = Object.entries(buttons).map(([id, [, , , keys]]) => [
     keys,
@@ -222,7 +264,7 @@
   watch(
     () => store.inputFocused,
     () => {
-      // console.log('buttons inputFocused', store.inputFocused);
+      // console.log('buttons inputFocused', inputFocused);
       if (store.inputFocused) {
         keyBinding.unsubscribe();
       } else {
@@ -281,6 +323,7 @@
         :style="!store.showButtonAddedLabel || !buttonsAddedFunc[id][0] ? {paddingTop: '4px'} : {}"
         :color="`btn-${button[2]}`"
         @click="() => shiftFunc(id)"
+        @touchstart="() => impactLight()"
       >
         <span
           v-if="store.showButtonAddedLabel && buttonsAddedFunc[id]"
@@ -313,11 +356,17 @@ ko:
   cannotDivideByZero: '0으로 나눌 수 없습니다.'
   squareRootOfANegativeNumberIsNotAllowed: '음수의 제곱근은 허용되지 않습니다.'
   factorialOfANegativeNumberIsNotAllowed: '음수의 팩토리얼은 허용되지 않습니다.'
+  memoryCleared: '메모리를 초기화했습니다.'
+  memoryRecalled: '메모리를 불러왔습니다.'
+  memorySaved: '메모리에 저장되었습니다.'
   noMemoryToRecall: '불러올 메모리가 없습니다.'
 en:
   cannotDivideByZero: 'Cannot divide by zero'
   squareRootOfANegativeNumberIsNotAllowed: 'The square root of a negative number is not allowed.'
   factorialOfANegativeNumberIsNotAllowed: 'The factorial of a negative number is not allowed.'
+  memoryCleared: 'Memory cleared.'
+  memoryRecalled: 'Memory recalled.'
+  memorySaved: 'Memory saved.'
   noMemoryToRecall: 'No memory to recall.'
 </i18n>
 
