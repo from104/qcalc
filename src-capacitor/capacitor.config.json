@@ -1,0 +1,8 @@
+{
+  "appId": "com.atit.qcalc",
+  "appName": "Q Calc",
+  "webDir": "www",
+  "server": {
+    "androidScheme": "https"
+  }
+}
