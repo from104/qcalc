@@ -8,13 +8,11 @@ The format is based on [Keep a Changelog] and this project follows [Semantic Ver
 
 ### Added
 
-- Implemented platform-specific window size and positioning adjustments to improve user experience.
 - Added notifications for memory actions, such as memory cleared, recalled, and saved.
+- Added haptics feedback when using the app on mobile, can be enabled or disabled in settings.
 
 ### Changed
 
-- Modified maximum window height calculation for a more adaptive layout depending on screen orientation.
-- Adjusted swipe sensitivity of HistoryDialog component for smoother user experience.
 - Changed memory display method from tooltip to panel.
 
 ### Fixed
