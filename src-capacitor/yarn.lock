@@ -43,6 +43,11 @@
   dependencies:
     tslib "^2.1.0"
 
+"@capacitor/haptics@^6.0.0":
+  version "6.0.0"
+  resolved "https://registry.yarnpkg.com/@capacitor/haptics/-/haptics-6.0.0.tgz#4ff29ca16173c28d50ab6a227bc4cb8091df6e1d"
+  integrity sha512-z2TmB+pTbd98Il2I1xpZGClCFwORxxP2m9f1a0rh70c2ubj2atVyZctgxrx1fuoExZTNGSxHaylWfrmjmtelVg==
+
 "@capacitor/splash-screen@^6.0.0":
   version "6.0.0"
   resolved "https://registry.yarnpkg.com/@capacitor/splash-screen/-/splash-screen-6.0.0.tgz#15a66cb27f9b99076845113188cead77ad1c0864"
