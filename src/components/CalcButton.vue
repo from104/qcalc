@@ -10,7 +10,18 @@
   // 계산기 오브젝트를 스토어에서 가져오기 위한 변수 선언
   import {useCalcStore} from 'stores/calc-store';
   const store = useCalcStore();
-  const {calc} = store;
+  const {
+    calc,
+    clickButtonById,
+    notifyError,
+    notifyMsg,
+    offButtonShift,
+    offButtonShiftLock,
+    onButtonShift,
+    onButtonShiftLock,
+    showMemoryOnWithTimer,
+    toggleButtonShift,
+    } = store;
 
   // 에러처리를 위한 함수
   const funcWithError = (func: () => void) => {
@@ -26,9 +37,9 @@
       if (e instanceof Error) {
         // console.error(e.message);
         if (errorMessages[e.message]) {
-          store.notifyError(t(errorMessages[e.message]));
+          notifyError(t(errorMessages[e.message]));
         } else {
-          store.notifyError(e.message);
+          notifyError(e.message);
         }
       }
     }
@@ -80,7 +91,7 @@
     b5: [false, '2', 'normal', ['2'], () => calc.addDigit(2)],
     c5: [false, '3', 'normal', ['3'], () => calc.addDigit(3)],
     d5: [true, 'mdi-plus', 'function', ['+'], () => calc.plus()],
-    a6: [true, 'keyboard_capslock', 'important', ["'"], () => store.toggleButtonShift()],
+    a6: [true, 'keyboard_capslock', 'important', ["'"], () => toggleButtonShift()],
     b6: [false, '0', 'normal', ['0'], () => calc.addDigit(0)],
     c6: [true, 'mdi-circle-small', 'normal', ['.'], () => calc.addDot()],
     d6: [true, 'mdi-equal', 'important', ['=', 'Enter'], () => calc.equal()],
@@ -121,11 +132,11 @@
 
   const showButtonNotify = (id: string | number) => {
     if (buttonsAddedFunc[id][0] =='MC') {
-      store.notifyMsg(t('memoryCleared'));
+      notifyMsg(t('memoryCleared'));
     } else if (buttonsAddedFunc[id][0] =='MR' && !calc.getIsMemoryReset()) {
-      store.notifyMsg(t('memoryRecalled'));
+      notifyMsg(t('memoryRecalled'));
     } else if (buttonsAddedFunc[id][0] =='MS') {
-      store.notifyMsg(t('memorySaved'));
+      notifyMsg(t('memorySaved'));
     }
   };
   
@@ -152,12 +163,12 @@
       showTooltipOfFunc(id);
       showButtonNotify(id);
       if (id === shiftID) {
-        store.offButtonShift();
-        store.offButtonShiftLock();
+        offButtonShift();
+        offButtonShiftLock();
         return;
       }
       if (store.buttonShiftLock) return;
-      store.offButtonShift();
+      offButtonShift();
     } else {
       funcWithError(buttons[id][4]);
     }
@@ -166,18 +177,18 @@
   const holdFunc = (id: string | number) => {
     if (id === shiftID) {
       if (store.buttonShiftLock) {
-        store.offButtonShiftLock();
-        store.offButtonShift();
+        offButtonShiftLock();
+        offButtonShift();
       } else {
-        store.onButtonShiftLock();
-        store.onButtonShift();
+        onButtonShiftLock();
+        onButtonShift();
       }
       return;
     }
     if (store.buttonShift) {
       funcWithError(buttons[id][4]);
       if (store.buttonShiftLock) return;
-      store.offButtonShift();
+      offButtonShift();
       return;
     } else {
       funcWithError(buttonsAddedFunc[id][2]);
@@ -189,19 +200,19 @@
   const showMemory = () => {
     if (!calc.getIsMemoryReset()) {
       setTimeout(() => {
-        store.showMemoryOnWithTimer();
+        showMemoryOnWithTimer();
       }, 10);''
     }
   };
 
   const buttonClickByKey = (id: string, isShift: boolean) => {
     if (isShift) {
-      store.toggleButtonShift();
+      toggleButtonShift();
       setTimeout(() => {
-        store.clickButtonById('btn-' + id);
+        clickButtonById('btn-' + id);
       }, 5);
     } else {
-      store.clickButtonById('btn-' + id);
+      clickButtonById('btn-' + id);
     }
   };
 
@@ -232,7 +243,7 @@
   watch(
     () => store.inputFocused,
     () => {
-      // console.log('buttons inputFocused', store.inputFocused);
+      // console.log('buttons inputFocused', inputFocused);
       if (store.inputFocused) {
         keyBinding.unsubscribe();
       } else {
