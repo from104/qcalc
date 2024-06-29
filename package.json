@@ -17,13 +17,7 @@
     "url": "https://github.com/from104/qcalc/issues"
   },
   "homepage": "https://github.com/from104/qcalc#readme",
-  "keywords": [
-    "calculator",
-    "quasar",
-    "vue",
-    "electron",
-    "typescript"
-  ],
+  "keywords": ["calculator", "quasar", "vue", "electron", "typescript"],
   "type": "module",
   "scripts": {
     "lint": "eslint --ext .js,.ts,.vue ./",
@@ -32,7 +26,8 @@
     "dev:android": "quasar dev -m capacitor -T android",
     "build": "quasar build -m electron",
     "build:win32": "quasar build -m electron -T win32",
-    "build:android": "quasar build -m capacitor -T android"
+    "build:android": "quasar build -m capacitor -T android",
+    "icons": "icongenie g -m spa,electron -i ./assets/qcalc_icon_v2.png; icongenie g -m capacitor -i ./assets/qcalc_icon_v2.png --skip-trim; rm -r src-capacitor/ios"
   },
   "dependencies": {
     "@everapi/freecurrencyapi-js": "^1.0.1",
