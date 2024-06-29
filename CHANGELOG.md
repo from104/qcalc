@@ -4,16 +4,18 @@ All notable changes to this project are recorded in this file.
 
 The format is based on [Keep a Changelog] and this project follows [Semantic Versioning].
 
-## [0.9.1] 2024-06-28
+## [0.9.1] 2024-06-29
 
 ### Added
 
 - Implemented platform-specific window size and positioning adjustments to improve user experience.
+- Added notifications for memory actions, such as memory cleared, recalled, and saved.
 
 ### Changed
 
 - Modified maximum window height calculation for a more adaptive layout depending on screen orientation.
 - Adjusted swipe sensitivity of HistoryDialog component for smoother user experience.
+- Changed memory display method from tooltip to panel.
 
 ### Fixed
 
