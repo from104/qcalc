@@ -65,6 +65,8 @@ export const useCalcStore = defineStore('calc', {
     buttonShiftLock: false,
     // 메모리 톨팁 표시 여부
     showMemoryTooltip: false,
+    // 메모리  표시 여부
+    showMemory: false,
   }),
   getters: {},
   actions: {
@@ -326,6 +328,15 @@ export const useCalcStore = defineStore('calc', {
     },
     offButtonShiftLock(): void {
       this.buttonShiftLock = false;
+    },
+    showMemoryOff(): void {
+      this.showMemory = false;
+    },
+    showMemoryOnWithTimer(): void {
+      this.showMemory = true;
+      setTimeout(() => {
+        this.showMemory = false;
+      }, 2000);
     },
   },
   persist: true,
