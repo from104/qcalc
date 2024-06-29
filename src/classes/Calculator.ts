@@ -612,6 +612,7 @@ export class Calculator {
   public memoryPlus() {
     if (!this.isMemoryReset) {
       this.memoryNumber = MathB.bignumber(this.memoryNumber).add(this.currentNumber).toString();
+      this.shouldReset = true;
     }
   }
 
@@ -619,13 +620,15 @@ export class Calculator {
   public memoryMinus() {
     if (!this.isMemoryReset) {
       this.memoryNumber = MathB.bignumber(this.memoryNumber).sub(this.currentNumber).toString();
-    };
+      this.shouldReset = true;
+    }
   }
 
   // 메모리 곱하기
   public memoryMul() {
     if (!this.isMemoryReset) {
       this.memoryNumber = MathB.bignumber(this.memoryNumber).mul(this.currentNumber).toString();
+      this.shouldReset = true;
     }
   }
 
@@ -636,6 +639,7 @@ export class Calculator {
         throw new Error('Cannot divide by zero');
       }
       this.memoryNumber = MathB.bignumber(this.memoryNumber).div(this.currentNumber).toString();
+      this.shouldReset = true;
     }
   }
 
