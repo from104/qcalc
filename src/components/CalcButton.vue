@@ -95,30 +95,40 @@
   const buttonsAddedFunc: ButtonAddedFunc = {
     a1: ['xⁿ', ['Shift+Control+q'], () => calc.pow()],
     b1: ['ⁿ√x', ['Shift+Control+w'], () => calc.root()],
-    c1: ['MC', ['Shift+Control+e', 'Shift+Delete', 'Shift+Escape'], () => { calc.memoryClear(); showMemoryTooltip()}],
-    d1: ['MR', ['Shift+Backspace', 'Shift+Control+r'], () => { calc.memoryRecall(); showMemoryTooltip(); }],
+    c1: ['MC', ['Shift+Control+e', 'Shift+Delete', 'Shift+Escape'], () => calc.memoryClear()],
+    d1: ['MR', ['Shift+Backspace', 'Shift+Control+r'], () => { calc.memoryRecall(); showMemory(); }],
     a2: ['10ⁿ', ['Shift+Control+a'], () => calc.exp10()],
     b2: ['x%y', ['Shift+Control+s'], () => calc.mod()],
     c2: ['x!', ['Shift+Control+d'], () => calc.fct()],
-    d2: ['M÷', ['Shift+Slash', 'Shift+NumpadDivide'], () => { calc.memoryDiv(); showMemoryTooltip(); }],
+    d2: ['M÷', ['Shift+Slash', 'Shift+NumpadDivide'], () => { calc.memoryDiv(); showMemory(); }],
     a3: ['sin', ['Shift+Digit7', 'Shift+Numpad7'], () => calc.sin()],
     b3: ['cos', ['Shift+Digit8', 'Shift+Numpad8'], () => calc.cos()],
     c3: ['tan', ['Shift+Digit9', 'Shift+Numpad9'], () => calc.tan()],
-    d3: ['M×', ['Shift+NumpadMultiply'], () => { calc.memoryMul(); showMemoryTooltip(); }, ],
+    d3: ['M×', ['Shift+NumpadMultiply'], () => { calc.memoryMul(); showMemory(); }, ],
     a4: ['Pi/2', ['Shift+Digit4', 'Shift+Numpad4'], () => calc.setConstant('pi2')],
     b4: ['ln10', ['Shift+Digit5', 'Shift+Numpad5'], () => calc.setConstant('ln10')],
     c4: ['ln2', ['Shift+Digit6', 'Shift+Numpad6'], () => calc.setConstant('ln2')],
-    d4: ['M-', ['Shift+Minus', 'Shift+NumpadSubtract'], () => { calc.memoryMinus(); showMemoryTooltip(); }],
+    d4: ['M-', ['Shift+Minus', 'Shift+NumpadSubtract'], () => { calc.memoryMinus(); showMemory(); }],
     a5: ['Pi', ['Shift+Digit1', 'Shift+Numpad1'], () => calc.setConstant('pi')],
     b5: ['phi', ['Shift+Digit2', 'Shift+Numpad2'], () => calc.setConstant('phi')],
     c5: ['e', ['Shift+Digit3', 'Shift+Numpad3'], () => calc.setConstant('e')],
-    d5: ['M+', ['Shift+Plus', 'Shift+NumpadAdd'], () => { calc.memoryPlus(); showMemoryTooltip(); }],
+    d5: ['M+', ['Shift+Plus', 'Shift+NumpadAdd'], () => { calc.memoryPlus(); showMemory(); }],
     a6: ['', [], () => null],
     b6: ['int', ['Shift+Digit0', 'Shift+Numpad0'], () => calc.int()],
     c6: ['frac', ['Shift+Period', 'Shift+NumpadDecimal'], () => calc.frac()],
-    d6: [ 'MS', ['Shift+Equal', 'Shift+Enter', 'Shift+NumpadEnter'], () => { calc.memorySave(); showMemoryTooltip(); }],
+    d6: [ 'MS', ['Shift+Equal', 'Shift+Enter', 'Shift+NumpadEnter'], () => { calc.memorySave(); showMemory(); }],
   };
 
+  const showButtonNotify = (id: string | number) => {
+    if (buttonsAddedFunc[id][0] =='MC') {
+      store.notifyMsg(t('memoryCleared'));
+    } else if (buttonsAddedFunc[id][0] =='MR' && !calc.getIsMemoryReset()) {
+      store.notifyMsg(t('memoryRecalled'));
+    } else if (buttonsAddedFunc[id][0] =='MS') {
+      store.notifyMsg(t('memorySaved'));
+    }
+  };
+  
   // 버튼 레이블이 비어있는 버튼을 찾아서 shiftID에 저장 - shiftID는 시프트 버튼의 id
   const shiftID = Object.keys(buttonsAddedFunc).find((key) => buttonsAddedFunc[key][0] === '');
 
@@ -140,6 +150,7 @@
     if (store.buttonShift) {
       funcWithError(buttonsAddedFunc[id][2]);
       showTooltipOfFunc(id);
+      showButtonNotify(id);
       if (id === shiftID) {
         store.offButtonShift();
         store.offButtonShiftLock();
@@ -171,15 +182,15 @@
     } else {
       funcWithError(buttonsAddedFunc[id][2]);
       showTooltipOfFunc(id);
+      showButtonNotify(id);
     }
   };
 
-  const showMemoryTooltip = () => {
+  const showMemory = () => {
     if (!calc.getIsMemoryReset()) {
-      store.showMemoryTooltip = true;
       setTimeout(() => {
-        store.showMemoryTooltip = false;
-      }, 2000);
+        store.showMemoryOnWithTimer();
+      }, 10);''
     }
   };
 
@@ -195,7 +206,6 @@
   };
 
   import {KeyBinding, KeyBindings} from 'classes/KeyBinding';
-  import {im} from 'mathjs';
 
   const keyBindingsPrimary: KeyBindings = Object.entries(buttons).map(([id, [, , , keys]]) => [
     keys,
@@ -313,11 +323,17 @@ ko:
   cannotDivideByZero: '0으로 나눌 수 없습니다.'
   squareRootOfANegativeNumberIsNotAllowed: '음수의 제곱근은 허용되지 않습니다.'
   factorialOfANegativeNumberIsNotAllowed: '음수의 팩토리얼은 허용되지 않습니다.'
+  memoryCleared: '메모리를 초기화했습니다.'
+  memoryRecalled: '메모리를 불러왔습니다.'
+  memorySaved: '메모리에 저장되었습니다.'
   noMemoryToRecall: '불러올 메모리가 없습니다.'
 en:
   cannotDivideByZero: 'Cannot divide by zero'
   squareRootOfANegativeNumberIsNotAllowed: 'The square root of a negative number is not allowed.'
   factorialOfANegativeNumberIsNotAllowed: 'The factorial of a negative number is not allowed.'
+  memoryCleared: 'Memory cleared.'
+  memoryRecalled: 'Memory recalled.'
+  memorySaved: 'Memory saved.'
   noMemoryToRecall: 'No memory to recall.'
 </i18n>
 
