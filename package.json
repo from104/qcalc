@@ -48,7 +48,7 @@
     "postcss": "^8.1.0",
     "quasar": "^2.7.7",
     "tinykeys": "^2.1.0",
-    "vue": "3",
+    "vue": "3.4.30",
     "vue-i18n": "9.13.1",
     "vue-router": "4",
     "webpack": "^5.0.0"
