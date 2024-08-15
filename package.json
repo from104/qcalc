@@ -37,7 +37,7 @@
   "dependencies": {
     "@everapi/freecurrencyapi-js": "^1.0.1",
     "@quasar/extras": "^1.16.11",
-    "axios": "^1.7.2",
+    "axios": "^1.7.4",
     "dmg-builder": "24.13.3",
     "dotenv": "^16.3.1",
     "electron-builder-squirrel-windows": "24.13.3",
