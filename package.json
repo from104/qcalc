@@ -51,7 +51,7 @@
     "vue": "3",
     "vue-i18n": "9.13.1",
     "vue-router": "4",
-    "webpack": "^5.0.0"
+    "webpack": "^5.94.0"
   },
   "devDependencies": {
     "@intlify/vite-plugin-vue-i18n": "6.0.1",
