@@ -1,4 +1,4 @@
-import {create, all} from 'mathjs';
+import {create, all, BigNumber} from 'mathjs';
 
 const MathB = create(all, {
   number: 'BigNumber',
@@ -118,26 +118,26 @@ export class Calculator {
 
   // 문자열에서 숫자 문자열만 추출
   private extractNumberString(originalString: string): string {
-    // 숫자, 부호, 소수점만 남김
+    // 숫자, 부호, 소수점만 남기고 제거
     let onlyNumber = originalString.replace(/[^0-9.\-]/gm, '');
 
-    // 부호 체크
-    const isMinus = onlyNumber.match(/^-/);
+    // 음수 여부 확인
+    const isNegative = onlyNumber.startsWith('-');
 
     // 부호 제거
     onlyNumber = onlyNumber.replace(/-/g, '');
 
-    // 소수점으로 나누기
-    const splitedNumberByDot = onlyNumber.split('.');
-    let result = splitedNumberByDot.shift();
+    // 소수점을 기준으로 문자열 분리
+    const [integerPart, ...decimalParts] = onlyNumber.split('.');
 
-    // 소수점이 있으면 추가
-    if (splitedNumberByDot.length > 0) {
-      result += '.' + splitedNumberByDot.join('');
+    // 정수 부분과 소수 부분 결합
+    let result = integerPart || '0';
+    if (decimalParts.length > 0) {
+      result += '.' + decimalParts.join('');
     }
 
-    // 부호와 숫자만 리턴
-    return MathB.bignumber((isMinus ? '-' : '') + (result == '' ? '0' : result)).toString();
+    // 음수 부호 추가 및 BigNumber로 변환하여 반환
+    return MathB.bignumber((isNegative ? '-' : '') + result).toString();
   }
 
   // shownNumber를 문자열로 셋팅
@@ -170,26 +170,39 @@ export class Calculator {
 
   // 숫자 1개씩 추가
   public addDigit(digit: number | string): void {
-    if (typeof digit === 'string') {
-      try {
-        digit = Number.parseInt(digit.charAt(0)); // 첫번째 숫자만 정수로 변환후 추가
-      } catch (e: unknown) {
-        digit = 0; //변환 실패 시 0으로 추가
-      }
-    }
+    // 입력된 digit을 숫자로 변환
+    const parsedDigit = this.parseDigit(digit);
 
-    digit |= 0; // 정수 부분만 추출
-    if (digit >= 0 && digit <= 9) {
-      // 0~9 숫자만
-      const d = digit.toString();
-      if (this.currentNumber === '0' || this.shouldReset) {
-        // 초기 숫자이거나 표시 숫자 초기화 예정이면
-        this.currentNumber = d;
-        this.shouldReset = false; // 숫자 하나로 셋팅하고 초기화 예정 끄기
-      } else {
-        // 아니면
-        this.currentNumber += d; // 기존 표시숫자에 추가
-      }
+    // 유효한 숫자인 경우에만 처리
+    if (this.isValidDigit(parsedDigit)) {
+      this.updateCurrentNumber(parsedDigit.toString());
+    }
+  }
+
+  // 입력된 digit을 숫자로 변환하는 private 메서드
+  private parseDigit(digit: number | string): number {
+    if (typeof digit === 'string') {
+      // 문자열인 경우 첫 번째 문자만 정수로 변환
+      return parseInt(digit.charAt(0)) || 0;
+    }
+    // 이미 숫자인 경우 정수 부분만 반환
+    return Math.floor(digit);
+  }
+
+  // 유효한 숫자인지 확인하는 private 메서드
+  private isValidDigit(digit: number): boolean {
+    return digit >= 0 && digit <= 9;
+  }
+
+  // 현재 숫자를 업데이트하는 private 메서드
+  private updateCurrentNumber(digitString: string): void {
+    if (this.currentNumber === '0' || this.shouldReset) {
+      // 현재 숫자가 0이거나 초기화 예정인 경우
+      this.currentNumber = digitString;
+      this.shouldReset = false;
+    } else {
+      // 기존 숫자에 새로운 숫자 추가
+      this.currentNumber += digitString;
     }
   }
 
@@ -216,21 +229,17 @@ export class Calculator {
     }
   }
 
-  // // 표시 숫자를 bignumber로 얻기
-  // public getShownBigNumber(): string {
-  //   return MathB.bignumber(this.currentNumber);
-  // }
-
-  // 부동소수점 숫자를 문자열로
+  /**
+   * 부동소수점 숫자를 문자열로 변환
+   * @param numberForCalc 변환할 숫자 (문자열 형태)
+   * @returns 정수 부분과 소수 부분이 포함된 문자열
+   */
   private numberToString(numberForCalc: string): string {
-    const [integer, decimal] = numberForCalc.toString().split('.'); // 정수와 소수점으로 나눔
-    if (decimal) {
-      // 소수점이 있으면
-      return integer + '.' + decimal;
-    } else {
-      // 없으면
-      return integer;
-    }
+    const [integer, decimal] = numberForCalc.split('.');
+
+    // 소수점이 있는 경우 정수 부분과 소수 부분을 결합하여 반환
+    // 소수점이 없는 경우 정수 부분만 반환
+    return decimal ? `${integer}.${decimal}` : integer;
   }
 
   // 부호 변환
@@ -243,159 +252,116 @@ export class Calculator {
     this.currentNumber = this.previousNumber;
   }
 
-  // 표시 숫자를 임시 숫자로
+  // 표시 숫자를 임��� 숫자로
   private setPreviousNumberFromCurrent() {
     this.previousNumber = this.currentNumber;
   }
 
   // 사전 계산 함수
   private performPreCalculation() {
-    let numberForCalc: string; // 계산에 쓰일 숫자
+    // 계산에 사용할 숫자 결정
+    const numberForCalc = this.shouldReset ? this.repeatedNumber : this.currentNumber;
 
-    if (this.shouldReset) {
-      // 반복 계산 숫자가 0이면 아무것도 안함
-      if (this.repeatedNumber == '0') return;
-      // 초기화 예정이면 반복 계산될 숫자를
-      numberForCalc = this.repeatedNumber;
-    } else {
-      // 아니면 표시 숫자를 계산에 사용
-      numberForCalc = this.currentNumber;
+    // 초기화 예정이고 반복 계산 숫자가 0이면 계산 중단
+    if (this.shouldReset && numberForCalc === '0') return;
+
+    // 반복 계산을 위해 현재 숫자 저장
+    if (!this.shouldReset) {
       this.repeatedNumber = numberForCalc;
     }
 
-    // 사전에 정해진 연산자에 따라 실제 계산
+    // 연산 수행 및 결과 저장
+    const result = this.calculateResult(numberForCalc);
+    this.previousNumber = this.addHistory({
+      previousNumber: this.previousNumber,
+      operator: this.getOperatorString() as string,
+      argumentNumber: numberForCalc,
+      resultNumber: result,
+    });
+  }
+
+  // 실제 계산 수행 함수
+  private calculateResult(numberForCalc: string): string {
+    const prev = MathB.bignumber(this.previousNumber);
+    const curr = MathB.bignumber(numberForCalc);
+
     switch (this.currentOperator) {
       case Operator.Plus:
-        this.previousNumber = this.addHistory({
-          previousNumber: this.previousNumber,
-          operator: this.getOperatorString() as string,
-          argumentNumber: numberForCalc,
-          resultNumber: MathB.bignumber(this.previousNumber).add(numberForCalc).toString(),
-        });
-        break;
+        return prev.add(curr).toString();
       case Operator.Minus:
-        this.previousNumber = this.addHistory({
-          previousNumber: this.previousNumber,
-          operator: this.getOperatorString() as string,
-          argumentNumber: numberForCalc,
-          resultNumber: MathB.bignumber(this.previousNumber).sub(numberForCalc).toString(),
-        });
-        break;
+        return prev.sub(curr).toString();
       case Operator.Mul:
-        this.previousNumber = this.addHistory({
-          previousNumber: this.previousNumber,
-          operator: this.getOperatorString() as string,
-          argumentNumber: numberForCalc,
-          resultNumber: MathB.bignumber(this.previousNumber).mul(numberForCalc).toString(),
-        });
-        break;
+        return prev.mul(curr).toString();
       case Operator.Div:
-        if (numberForCalc === '0') {
-          throw new Error('Cannot divide by zero');
+        if (curr.isZero()) {
+          throw new Error('Cannot divide by zero.');
         }
-        this.previousNumber = this.addHistory({
-          previousNumber: this.previousNumber,
-          operator: this.getOperatorString() as string,
-          argumentNumber: numberForCalc,
-          resultNumber: MathB.bignumber(this.previousNumber).div(numberForCalc).toString(),
-        });
-        break;
+        return prev.div(curr).toString();
       case Operator.Pow:
-        this.previousNumber = this.addHistory({
-          previousNumber: this.previousNumber,
-          operator: this.getOperatorString() as string,
-          argumentNumber: numberForCalc,
-          resultNumber: MathB.bignumber(this.previousNumber).pow(numberForCalc).toString(),
-        });
-        break;
+        return prev.pow(curr).toString();
       case Operator.Root:
-        this.previousNumber = this.addHistory({
-          previousNumber: this.previousNumber,
-          operator: this.getOperatorString() as string,
-          argumentNumber: numberForCalc,
-          // Math.pow(x, 1 / n); // x의 n제곱근
-          resultNumber: MathB.bignumber(this.previousNumber).pow(MathB.bignumber(1).div(numberForCalc)).toString(),
-        });
-        break;
+        return prev.pow(MathB.bignumber(1).div(curr)).toString();
       case Operator.Mod:
-        this.previousNumber = this.addHistory({
-          previousNumber: this.previousNumber,
-          operator: this.getOperatorString() as string,
-          argumentNumber: numberForCalc,
-          resultNumber: MathB.bignumber(this.previousNumber).mod(numberForCalc).toString(),
-        });
-        break;
+        return prev.mod(curr).toString();
       default:
-        break;
+        return this.previousNumber;
     }
   }
 
-  // 연산자 공동 함수
+  // 연산자 공통 처리 함수
   private performOperation(operator: Operator) {
-    if (this.currentOperator == Operator.None) {
-      // 전 연산자가 없을 경우 표시 숫자를 백업
+    if (this.currentOperator === Operator.None) {
+      // 이전 연산자가 없는 경우, 현재 숫자를 이전 숫자로 설정
       this.setPreviousNumberFromCurrent();
     } else {
-      this.performPreCalculation(); // 계산
-
-      this.setCurrentNumberFromPrevious(); // 저장 숫자를 표시 숫자로
+      // 이전 연산자가 있는 경우, 계산 수행
+      this.performPreCalculation();
+      // 계산 결과를 현재 숫자로 설정
+      this.setCurrentNumberFromPrevious();
     }
 
-    this.currentOperator = operator; // 다음 연산자 셋팅
-    this.shouldReset = true; // 다음 숫자 입력 시 1번째 자리부터
+    // 새로운 연산자 설정 및 초기화 플래그 설정
+    this.currentOperator = operator;
+    this.shouldReset = true;
   }
 
-  // 더하기
+  // 기본 산술 연산 메서드들
   public plus() {
     this.performOperation(Operator.Plus);
   }
-
-  // 빼기
   public minus() {
     this.performOperation(Operator.Minus);
   }
-
-  // 곱하기
   public mul() {
     this.performOperation(Operator.Mul);
   }
-
-  // 나누기
   public div() {
     this.performOperation(Operator.Div);
   }
-
-  // N제곱
   public pow() {
     this.performOperation(Operator.Pow);
   }
-
-  // N제곱근
   public root() {
     this.performOperation(Operator.Root);
   }
-
-  // 나머지
   public mod() {
     this.performOperation(Operator.Mod);
   }
 
-  // = 버튼 처리
+  // 등호(=) 버튼 처리
   public equal() {
-    if (this.currentOperator == Operator.None) {
-      // 전 연산자가 없었다면
-      this.setPreviousNumberFromCurrent(); // 표시 숫자를 백업
+    if (this.currentOperator === Operator.None) {
+      // 이전 연산자가 없는 경우, 현재 숫자를 이전 숫자로 설정
+      this.setPreviousNumberFromCurrent();
     } else {
-      // 전 연산자가 있었다면
-      this.performPreCalculation(); // 계산
+      // 이전 연산자가 있는 경우, 계산 수행 및 결과 처리
+      this.performPreCalculation();
+      this.setCurrentNumberFromPrevious();
 
-      this.setCurrentNumberFromPrevious(); // 저장 숫자를 표시 숫자로
-
-      this.currentOperator = Operator.None; // 연산자 리셋
-
-      this.shouldReset = true; // 숫자 입력 초기화 예정
-
-      this.repeatedNumber = '0'; // 반복 숫자 초기화
+      // 상태 초기화
+      this.currentOperator = Operator.None;
+      this.shouldReset = true;
+      this.repeatedNumber = '0';
     }
   }
 
@@ -404,172 +370,146 @@ export class Calculator {
     return Object.keys(operatorMap).find((key) => operatorMap[key] === operator) || '';
   }
 
-  // % 처리
-  // 나누기와 곱하기만 처리
-  // 나누기면 퍼센트를 구하기
-  // 곱하기면 퍼센트로 곱하기
+  // % 연산 처리
   public percent(): void {
-    if (this.currentOperator == Operator.Div || this.currentOperator == Operator.Mul) {
-      this.performPreCalculation(); // 사전 계산
+    if (this.currentOperator === Operator.Div || this.currentOperator === Operator.Mul) {
+      this.performPreCalculation(); // 사전 계산 수행
 
-      const {previousNumber, argumentNumber} = this.histories.shift() as History; // 계산 결과를 빼냄
-      const operator = this.getOperatorString() + this.getOperatorString(Operator.Pct); // 연산자를 %로
+      const {previousNumber, argumentNumber} = this.histories.shift() as History;
+      const operator = this.getOperatorString() + this.getOperatorString(Operator.Pct);
+
+      // 나��기면 퍼센트를 구하고, 곱하기면 퍼센트로 곱함
       const resultNumber =
-        this.currentOperator == Operator.Div
+        this.currentOperator === Operator.Div
           ? MathB.bignumber(this.previousNumber).mul(100).toString()
-          : MathB.bignumber(this.previousNumber).div(100).toString(); // 나누기면 곱하기 100, 곱하기면 나누기 100
+          : MathB.bignumber(this.previousNumber).div(100).toString();
 
       this.previousNumber = this.addHistory({
-        previousNumber: previousNumber,
-        operator: operator,
-        argumentNumber: argumentNumber,
-        resultNumber: resultNumber,
+        previousNumber,
+        operator,
+        argumentNumber,
+        resultNumber,
       });
 
       this.setCurrentNumberFromPrevious();
     }
 
-    this.currentOperator = Operator.None; // 연산자 리셋
-    this.repeatedNumber = '0'; // 반복 숫자 초기화
-    this.shouldReset = true; // 숫자 입력 초기화 예정
+    this.resetOperatorState();
   }
 
   // 역수 계산
-  public rec() {
-    if (Number(this.currentNumber) != 0) {
-      this.currentNumber = this.numberToString(
-        this.addHistory({
-          previousNumber: this.currentNumber,
-          operator: this.getOperatorString(Operator.Rec) as string,
-          resultNumber: MathB.bignumber(1).div(this.currentNumber).toString(),
-        }),
+  public rec(): void {
+    if (Number(this.currentNumber) !== 0) {
+      this.currentNumber = this.calculateAndAddHistory(this.currentNumber, Operator.Rec, () =>
+        MathB.bignumber(1).div(this.currentNumber).toString(),
       );
-      this.repeatedNumber = '0';
-      this.shouldReset = true;
+      this.resetInputState();
     }
   }
 
   // 제곱 계산
-  public pow2() {
-    this.currentNumber = this.numberToString(
-      this.addHistory({
-        previousNumber: this.currentNumber,
-        operator: this.getOperatorString(Operator.Pow2) as string,
-        resultNumber: MathB.bignumber(this.currentNumber).pow(2).toString(),
-      }),
+  public pow2(): void {
+    this.currentNumber = this.calculateAndAddHistory(this.currentNumber, Operator.Pow2, () =>
+      MathB.bignumber(this.currentNumber).pow(2).toString(),
     );
-    this.repeatedNumber = '0';
-    this.shouldReset = true;
+    this.resetInputState();
   }
 
   // 제곱근 계산
-  public sqrt() {
+  public sqrt(): void {
     if (this.currentNumber.charAt(0) === '-') {
       throw new Error('The square root of a negative number is not allowed.');
     }
-    this.currentNumber = this.numberToString(
-      this.addHistory({
-        previousNumber: this.currentNumber,
-        operator: this.getOperatorString(Operator.Sqrt) as string,
-        resultNumber: MathB.bignumber(this.currentNumber).sqrt().toString(),
-      }),
+    this.currentNumber = this.calculateAndAddHistory(this.currentNumber, Operator.Sqrt, () =>
+      MathB.bignumber(this.currentNumber).sqrt().toString(),
     );
-    this.repeatedNumber = '0';
-    this.shouldReset = true;
+    this.resetInputState();
   }
 
-  // sin 계산
-  public sin() {
-    this.currentNumber = this.numberToString(
-      this.addHistory({
-        previousNumber: this.currentNumber,
-        operator: this.getOperatorString(Operator.Sin) as string,
-        resultNumber: MathB.sin(MathB.bignumber(this.currentNumber)).toString(),
-      }),
-    );
-    this.repeatedNumber = '0';
-    this.shouldReset = true;
+  private degreesToRadians(degrees: BigNumber): BigNumber {
+    return degrees.times(MathB.pi).div(180);
   }
 
-  // cos 계산
-  public cos() {
-    this.currentNumber = this.numberToString(
-      this.addHistory({
-        previousNumber: this.currentNumber,
-        operator: this.getOperatorString(Operator.Cos) as string,
-        resultNumber: MathB.cos(MathB.bignumber(this.currentNumber)).toString(),
-      }),
-    );
-    this.repeatedNumber = '0';
-    this.shouldReset = true;
+  private calculateTrigonometricFunction(operator: Operator, mathFunction: (x: BigNumber) => BigNumber): void {
+    this.currentNumber = this.calculateAndAddHistory(this.currentNumber, operator, () => {
+      const radians = this.degreesToRadians(MathB.bignumber(this.currentNumber));
+      return mathFunction(radians).toString();
+    });
+    this.resetInputState();
   }
 
-  // tan 계산
-  public tan() {
-    this.currentNumber = this.numberToString(
-      this.addHistory({
-        previousNumber: this.currentNumber,
-        operator: this.getOperatorString(Operator.Tan) as string,
-        resultNumber: MathB.tan(MathB.bignumber(this.currentNumber)).toString(),
-      }),
-    );
-    this.repeatedNumber = '0';
-    this.shouldReset = true;
+  // 삼각함수 계산 (sin, cos, tan)
+  public sin(): void {
+    this.calculateTrigonometricFunction(Operator.Sin, MathB.sin);
+  }
+
+  public cos(): void {
+    this.calculateTrigonometricFunction(Operator.Cos, MathB.cos);
+  }
+
+  public tan(): void {
+    this.calculateTrigonometricFunction(Operator.Tan, MathB.tan);
+  }
+
+  // 공통 계산 함수
+  private commonCalculation(operator: Operator, calculation: () => string): void {
+    this.currentNumber = this.calculateAndAddHistory(this.currentNumber, operator, calculation);
+    this.resetInputState();
   }
 
   // 팩토리얼 계산
-  public fct() {
+  public fct(): void {
     if (Number(this.currentNumber) < 0) {
       throw new Error('The factorial of a negative number is not allowed.');
     }
-    this.currentNumber = this.numberToString(
-      this.addHistory({
-        previousNumber: this.currentNumber,
-        operator: this.getOperatorString(Operator.Fct) as string,
-        resultNumber: MathB.factorial(MathB.bignumber(this.currentNumber)).toString(),
-      }),
+    this.commonCalculation(Operator.Fct, () =>
+      MathB.factorial(MathB.bignumber(this.currentNumber)).toString()
     );
-    this.repeatedNumber = '0';
-    this.shouldReset = true;
   }
 
-  // 지수 계산
-  public exp10() {
-    this.currentNumber = this.numberToString(
-      this.addHistory({
-        previousNumber: this.currentNumber,
-        operator: this.getOperatorString(Operator.Exp10) as string,
-        resultNumber: MathB.pow(10, MathB.bignumber(this.currentNumber)).toString(),
-      }),
+  // 10의 거듭제곱 계산
+  public exp10(): void {
+    this.commonCalculation(Operator.Exp10, () =>
+      MathB.pow(10, MathB.bignumber(this.currentNumber)).toString()
     );
-    this.repeatedNumber = '0';
-    this.shouldReset = true;
   }
 
   // 정수부 계산
-  public int() {
-    this.currentNumber = this.numberToString(
-      this.addHistory({
-        previousNumber: this.currentNumber,
-        operator: this.getOperatorString(Operator.Int) as string,
-        resultNumber: MathB.bignumber(this.currentNumber).floor().toString(),
-      }),
+  public int(): void {
+    this.commonCalculation(Operator.Int, () =>
+      MathB.bignumber(this.currentNumber).floor().toString()
     );
+  }
+
+  // 소수부 계산
+  public frac(): void {
+    this.commonCalculation(Operator.Frac, () =>
+      MathB.bignumber(this.currentNumber).mod(1).toString()
+    );
+  }
+  
+  // 연산자 상태 초기화
+  private resetOperatorState(): void {
+    this.currentOperator = Operator.None;
     this.repeatedNumber = '0';
     this.shouldReset = true;
   }
 
-  // 소수부 계산
-  public frac() {
-    this.currentNumber = this.numberToString(
-      this.addHistory({
-        previousNumber: this.currentNumber,
-        operator: this.getOperatorString(Operator.Frac) as string,
-        resultNumber: MathB.bignumber(this.currentNumber).mod(1).toString(),
-      }),
-    );
+  // 입력 상태 초기화
+  private resetInputState(): void {
     this.repeatedNumber = '0';
     this.shouldReset = true;
+  }
+
+  // 계산 및 히스토리 추가 헬퍼 함수
+  private calculateAndAddHistory(number: string, operator: Operator, calculation: () => string): string {
+    return this.numberToString(
+      this.addHistory({
+        previousNumber: number,
+        operator: this.getOperatorString(operator) as string,
+        resultNumber: calculation(),
+      }),
+    );
   }
 
   // 상수 얻기 (pi, e, phi)

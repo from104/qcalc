@@ -42,7 +42,7 @@
   // 에러처리를 위한 함수
   const funcWithError = (func: () => void) => {
     const errorMessages: {[key: string]: string} = {
-      'Cannot divide by zero': 'cannotDivideByZero',
+      'Cannot divide by zero.': 'cannotDivideByZero',
       'The square root of a negative number is not allowed.': 'squareRootOfANegativeNumberIsNotAllowed',
       'The factorial of a negative number is not allowed.': 'factorialOfANegativeNumberIsNotAllowed',
       'No memory to recall.': 'noMemoryToRecall',
