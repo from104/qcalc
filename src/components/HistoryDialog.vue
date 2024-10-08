@@ -9,8 +9,8 @@
   import MenuItem from 'components/MenuItem.vue';
 
   // 스토어 가져오기
-  import {useCalcStore} from 'stores/calc-store';
-  const store = useCalcStore();
+  import {useStoreCalc} from 'src/stores/store-calc';
+  const store = useStoreCalc();
 
   // 계산기 오브젝트를 스토어에서 가져오기 위한 변수 선언
   const {

@@ -8,9 +8,10 @@
   import {useQuasar} from 'quasar';
   const $q = useQuasar();
 
-  import {useCalcStore} from 'src/stores/calc-store';
-  const store = useCalcStore();
-  const {toggleAlwaysOnTop, notifyMsg, setInitPanel, setDarkMode, setAlwaysOnTop,setHapticsMode, setDecimalPlaces} = store;
+  import {useStoreCalc} from 'src/stores/store-calc';
+  const store = useStoreCalc();
+  const {toggleAlwaysOnTop, notifyMsg, setInitPanel, setDarkMode, setAlwaysOnTop, setHapticsMode, setDecimalPlaces} =
+    store;
 
   import {useI18n} from 'vue-i18n';
   const {locale} = useI18n({useScope: 'global'});

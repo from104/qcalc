@@ -13,7 +13,7 @@ import type {History} from 'classes/Calculator';
 import {UnitConverter} from 'classes/UnitConverter';
 import {CurrencyConverter} from 'classes/CurrencyConverter';
 
-export const useCalcStore = defineStore('calc', {
+export const useStoreCalc = defineStore('calc', {
   state: () => ({
     // 계산기 클래스
     calc: new Calculator(),

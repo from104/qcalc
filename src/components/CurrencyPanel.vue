@@ -6,8 +6,8 @@
   import {useI18n} from 'vue-i18n';
   const {t} = useI18n();
 
-  import {useCalcStore} from 'stores/calc-store';
-  const store = useCalcStore();
+  import {useStoreCalc} from 'src/stores/store-calc';
+  const store = useStoreCalc();
 
   const {
     currencyConverter,

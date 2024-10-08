@@ -1,9 +1,9 @@
 <script setup lang="ts">
   import {ref, watch, onBeforeMount} from 'vue';
 
-  import {useCalcStore} from 'stores/calc-store';
+  import {useStoreCalc} from 'src/stores/store-calc';
 
-  const store = useCalcStore();
+  const store = useStoreCalc();
   const {setDarkMode, setAlwaysOnTop} = store;
 
   import {useI18n} from 'vue-i18n';

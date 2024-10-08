@@ -9,9 +9,9 @@
   const {t} = useI18n();
 
   // 스토어 가져오기
-  import {useCalcStore} from 'stores/calc-store';
-  const store = useCalcStore();
-  const {swapUnitValue, initRecentCategoryAndUnit,clickButtonById,showUnitToggle} = store;
+  import {useStoreCalc} from 'src/stores/store-calc';
+  const store = useStoreCalc();
+  const {swapUnitValue, initRecentCategoryAndUnit, clickButtonById, showUnitToggle} = store;
 
   // 단위 초기화
   initRecentCategoryAndUnit();

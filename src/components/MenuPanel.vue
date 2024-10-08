@@ -6,8 +6,8 @@
   import {useRouter} from 'vue-router';
   const router = useRouter();
 
-  import {useCalcStore} from 'src/stores/calc-store';
-  const store = useCalcStore();
+  import {useStoreCalc} from 'src/stores/store-calc';
+  const store = useStoreCalc();
 
   import {useI18n} from 'vue-i18n';
   const {t} = useI18n();
