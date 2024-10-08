@@ -3,8 +3,8 @@
 
   import {useStoreCalc} from 'src/stores/store-calc';
 
-  const store = useStoreCalc();
-  const {setDarkMode, setAlwaysOnTop} = store;
+  const storeCalc = useStoreCalc();
+  const {setDarkMode, setAlwaysOnTop} = storeCalc;
 
   import {useI18n} from 'vue-i18n';
   const {locale} = useI18n({useScope: 'global'});
@@ -18,41 +18,41 @@
   }));
   const $q = useQuasar();
 
-  setDarkMode(store.darkMode);
+  setDarkMode(storeCalc.darkMode);
 
   const updateTitle = () => {
     title.value = t('message.appTitle');
   };
 
   watch(
-    () => store.locale,
+    () => storeCalc.locale,
     () => {
       updateTitle();
     },
   );
 
   onBeforeMount(() => {
-    locale.value = store.locale;
+    locale.value = storeCalc.locale;
 
     if ($q.platform.is.win) {
-      store.paddingOnResult = 8;
+      storeCalc.paddingOnResult = 8;
     } else if ($q.platform.is.linux) {
-      store.paddingOnResult = 3;
+      storeCalc.paddingOnResult = 3;
     } else {
-      store.paddingOnResult = 0;
+      storeCalc.paddingOnResult = 0;
     }
 
     updateTitle();
 
-    store.isHistoryDialogOpen = false;
-    store.isSettingDialogOpen = false;
+    storeCalc.isHistoryDialogOpen = false;
+    storeCalc.isSettingDialogOpen = false;
 
-    if (store.initPanel) {
-      store.calc.clear();
+    if (storeCalc.initPanel) {
+      storeCalc.calc.clear();
     }
 
     if ($q.platform.is.electron) {
-      setAlwaysOnTop(store.alwaysOnTop);
+      setAlwaysOnTop(storeCalc.alwaysOnTop);
     }
   });
 </script>

@@ -12,20 +12,20 @@
   import {Haptics, ImpactStyle} from 'capacitor/@capacitor/haptics';
 
   const impactLight = async () => {
-    if ($q.platform.is.capacitor && store.hapticsMode) {
+    if ($q.platform.is.capacitor && storeCalc.hapticsMode) {
       await Haptics.impact({style: ImpactStyle.Light});
     }
   };
 
   const impactMedium = async () => {
-    if ($q.platform.is.capacitor && store.hapticsMode) {
+    if ($q.platform.is.capacitor && storeCalc.hapticsMode) {
       await Haptics.impact({style: ImpactStyle.Medium});
     }
   };
 
   // 계산기 오브젝트를 스토어에서 가져오기 위한 변수 선언
   import {useStoreCalc} from 'src/stores/store-calc';
-  const store = useStoreCalc();
+  const storeCalc = useStoreCalc();
   const {
     calc,
     clickButtonById,
@@ -37,7 +37,7 @@
     onButtonShiftLock,
     showMemoryOnWithTimer,
     toggleButtonShift,
-  } = store;
+  } = storeCalc;
 
   // 에러처리를 위한 함수
   const funcWithError = (func: () => void) => {
@@ -168,7 +168,7 @@
   type ButtonID = string | number;
 
   const showTooltipOfFunc = (id: ButtonID) => {
-    if (timersOfTooltip[id] || id === shiftID || (!store.showButtonAddedLabel && store.buttonShift)) return;
+    if (timersOfTooltip[id] || id === shiftID || (!storeCalc.showButtonAddedLabel && storeCalc.buttonShift)) return;
     timersOfTooltip[id] = true;
     setTimeout(() => {
       timersOfTooltip[id] = false;
@@ -177,7 +177,7 @@
 
   // 버튼 시프트 상태에 따라 기능 실행
   const shiftFunc = (id: ButtonID) => {
-    if (store.buttonShift) {
+    if (storeCalc.buttonShift) {
       funcWithError(buttonsAddedFunc[id][2]);
       showTooltipOfFunc(id);
       showButtonNotify(id);
@@ -186,7 +186,7 @@
         offButtonShiftLock();
         return;
       }
-      if (store.buttonShiftLock) return;
+      if (storeCalc.buttonShiftLock) return;
       offButtonShift();
     } else {
       funcWithError(buttons[id][4]);
@@ -196,7 +196,7 @@
   const holdFunc = (id: ButtonID) => {
     impactMedium();
     if (id === shiftID) {
-      if (store.buttonShiftLock) {
+      if (storeCalc.buttonShiftLock) {
         offButtonShiftLock();
         offButtonShift();
       } else {
@@ -205,9 +205,9 @@
       }
       return;
     }
-    if (store.buttonShift) {
+    if (storeCalc.buttonShift) {
       funcWithError(buttons[id][4]);
-      if (store.buttonShiftLock) return;
+      if (storeCalc.buttonShiftLock) return;
       offButtonShift();
       return;
     } else {
@@ -262,10 +262,10 @@
 
   // inputFocused 값이 바뀌면 키바인딩을 추가하거나 제거합니다.
   watch(
-    () => store.inputFocused,
+    () => storeCalc.inputFocused,
     () => {
       // console.log('buttons inputFocused', inputFocused);
-      if (store.inputFocused) {
+      if (storeCalc.inputFocused) {
         keyBinding.unsubscribe();
       } else {
         keyBinding.subscribe();
@@ -290,8 +290,8 @@
 
 <template>
   <q-card-section
-    v-touch-swipe:9e-2:12:50.up="() => (store.isHistoryDialogOpen = true)"
-    v-touch-swipe:9e-2:12:50.down="() => (store.isSettingDialogOpen = true)"
+    v-touch-swipe:9e-2:12:50.up="() => (storeCalc.isHistoryDialogOpen = true)"
+    v-touch-swipe:9e-2:12:50.down="() => (storeCalc.isSettingDialogOpen = true)"
     v-blur
     class="row wrap justify-center q-pt-xs q-pb-none q-px-none"
   >
@@ -303,33 +303,33 @@
         no-caps
         push
         :label="
-          store.buttonShift && !store.showButtonAddedLabel && id !== shiftID
+          storeCalc.buttonShift && !storeCalc.showButtonAddedLabel && id !== shiftID
             ? buttonsAddedFunc[id][0]
             : button[0]
               ? undefined
               : button[1]
         "
         :icon="
-          store.buttonShift && !store.showButtonAddedLabel && id !== shiftID
+          storeCalc.buttonShift && !storeCalc.showButtonAddedLabel && id !== shiftID
             ? undefined
             : button[0]
               ? button[1]
               : undefined
         "
         :class="[
-          store.buttonShift && !store.showButtonAddedLabel && id !== shiftID ? 'char' : button[0] ? 'icon' : 'char',
-          id === shiftID && store.buttonShift ? 'button-shift' : '',
+          storeCalc.buttonShift && !storeCalc.showButtonAddedLabel && id !== shiftID ? 'char' : button[0] ? 'icon' : 'char',
+          id === shiftID && storeCalc.buttonShift ? 'button-shift' : '',
         ]"
-        :style="!store.showButtonAddedLabel || !buttonsAddedFunc[id][0] ? {paddingTop: '4px'} : {}"
+        :style="!storeCalc.showButtonAddedLabel || !buttonsAddedFunc[id][0] ? {paddingTop: '4px'} : {}"
         :color="`btn-${button[2]}`"
         @click="() => shiftFunc(id)"
         @touchstart="() => impactLight()"
       >
         <span
-          v-if="store.showButtonAddedLabel && buttonsAddedFunc[id]"
+          v-if="storeCalc.showButtonAddedLabel && buttonsAddedFunc[id]"
           class="top-label"
           :class="[`top-label-${button[0] ? 'icon' : 'char'}`]"
-          :style="`color: ${store.buttonShift ? buttonColorsLight[button[2]] : buttonColorsDark[button[2]]}`"
+          :style="`color: ${storeCalc.buttonShift ? buttonColorsLight[button[2]] : buttonColorsDark[button[2]]}`"
         >
           {{ buttonsAddedFunc[id][0] }}
         </span>

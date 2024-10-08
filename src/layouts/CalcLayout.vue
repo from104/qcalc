@@ -13,7 +13,7 @@
   const $q = useQuasar();
 
   import {useStoreCalc} from 'src/stores/store-calc';
-  const store = useStoreCalc();
+  const storeCalc = useStoreCalc();
 
   import {useI18n} from 'vue-i18n';
   const {t} = useI18n();
@@ -27,31 +27,31 @@
 
   // 탭 오른쪽으로 이동
   const moveTabRight = () => {
-    const index = tabs.findIndex((tab) => tab.name === store.cTab);
-    store.cTab = tabs[(index + 1) % tabs.length].name;
+    const index = tabs.findIndex((tab) => tab.name === storeCalc.cTab);
+    storeCalc.cTab = tabs[(index + 1) % tabs.length].name;
   };
 
   // 탭 왼쪽으로 이동
   const moveTabLeft = () => {
-    const index = tabs.findIndex((tab) => tab.name === store.cTab);
-    store.cTab = tabs[(index + tabs.length - 1) % tabs.length].name;
+    const index = tabs.findIndex((tab) => tab.name === storeCalc.cTab);
+    storeCalc.cTab = tabs[(index + tabs.length - 1) % tabs.length].name;
   };
 
   import {KeyBinding} from 'classes/KeyBinding';
 
   const keyBinding = new KeyBinding([
-    [['Control+1'], () => (store.cTab = 'calc')],
-    [['Control+2'], () => (store.cTab = 'unit')],
-    [['Control+3'], () => (store.cTab = 'currency')],
+    [['Control+1'], () => (storeCalc.cTab = 'calc')],
+    [['Control+2'], () => (storeCalc.cTab = 'unit')],
+    [['Control+3'], () => (storeCalc.cTab = 'currency')],
     [['Control+Tab', 'ArrowRight'], moveTabRight],
     [['Control+Shift+Tab', 'ArrowLeft'], moveTabLeft],
   ]);
 
   // inputFocused 값이 바뀌면 키바인딩을 추가하거나 제거합니다.
   watch(
-    () => store.inputFocused,
+    () => storeCalc.inputFocused,
     () => {
-      if (store.inputFocused) {
+      if (storeCalc.inputFocused) {
         keyBinding.unsubscribe();
       } else {
         keyBinding.subscribe();
@@ -61,7 +61,7 @@
   );
 
   watch(
-    () => store.locale,
+    () => storeCalc.locale,
     () => {
       // 언어가 바뀌면 탭 이름도 바꿔줍니다.
       for (const tab of tabs) {
@@ -80,7 +80,7 @@
     <q-header class="z-top noselect" elevated>
       <q-toolbar v-blur>
         <q-tabs
-          v-model="store.cTab"
+          v-model="storeCalc.cTab"
           align="left"
           class="col-8 q-px-none"
           active-color="text-primary"
@@ -96,7 +96,7 @@
             :key="tab.name"
             :label="tab.title"
             :name="tab.name"
-            :disable="store.isSettingDialogOpen"
+            :disable="storeCalc.isSettingDialogOpen"
             class="q-px-xs"
             dense
           />
@@ -107,7 +107,7 @@
     </q-header>
 
     <q-page-container style="padding-bottom: 0px">
-      <q-tab-panels v-model="store.cTab" animated :swipeable="$q.platform.is.mobile">
+      <q-tab-panels v-model="storeCalc.cTab" animated :swipeable="$q.platform.is.mobile">
         <q-tab-panel v-for="(tab, index) in tabs" :key="index" :name="tab.name">
           <component :is="tab.component" />
         </q-tab-panel>

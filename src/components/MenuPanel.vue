@@ -7,7 +7,7 @@
   const router = useRouter();
 
   import {useStoreCalc} from 'src/stores/store-calc';
-  const store = useStoreCalc();
+  const storeCalc = useStoreCalc();
 
   import {useI18n} from 'vue-i18n';
   const {t} = useI18n();
@@ -28,7 +28,7 @@
       shortcut: 'Ctrl-1',
       icon: 'calculate',
       action: () => {
-        store.cTab = 'calc';
+        storeCalc.cTab = 'calc';
       },
     },
     unit: {
@@ -37,7 +37,7 @@
       shortcut: 'Ctrl-2',
       icon: 'swap_vert',
       action: () => {
-        store.cTab = 'unit';
+        storeCalc.cTab = 'unit';
       },
     },
     currency: {
@@ -46,7 +46,7 @@
       shortcut: 'Ctrl-3',
       icon: 'currency_exchange',
       action: () => {
-        store.cTab = 'currency';
+        storeCalc.cTab = 'currency';
       },
     },
     separator1: {
@@ -58,7 +58,7 @@
       shortcut: 'Alt-s',
       icon: 'settings',
       action: () => {
-        store.isSettingDialogOpen = true;
+        storeCalc.isSettingDialogOpen = true;
       },
     },
     separator2: {
@@ -78,7 +78,6 @@
     },
   });
 
-  // updateLocale() 함수는 items 객체의 title과 caption 속성을 각 언어에 맞게 업데이트
   const updateLocale = () => {
     Object.keys(items).forEach((item) => {
       items[item].title = t(`item.${item}.title`);
@@ -86,9 +85,8 @@
     });
   };
 
-  // store.locale이 변경될 때마다 updateLocale() 함수를 실행
   watch(
-    () => store.locale,
+    () => storeCalc.locale,
     () => {
       updateLocale();
     },

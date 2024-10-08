@@ -9,9 +9,9 @@
   const $q = useQuasar();
 
   import {useStoreCalc} from 'src/stores/store-calc';
-  const store = useStoreCalc();
+  const storeCalc = useStoreCalc();
   const {toggleAlwaysOnTop, notifyMsg, setInitPanel, setDarkMode, setAlwaysOnTop, setHapticsMode, setDecimalPlaces} =
-    store;
+    storeCalc;
 
   import {useI18n} from 'vue-i18n';
   const {locale} = useI18n({useScope: 'global'});
@@ -24,18 +24,18 @@
     {value: 'en', label: t('message.en')},
   ]);
 
-  watch([() => store.useSystemLocale, () => store.userLocale], () => {
+  watch([() => storeCalc.useSystemLocale, () => storeCalc.userLocale], () => {
     localeOptions.forEach((option) => {
       option.label = t('message.' + option.value);
     });
-    store.locale = locale.value as string;
+    storeCalc.locale = locale.value as string;
   });
 
   const setLocale = () => {
-    if (store.useSystemLocale) {
+    if (storeCalc.useSystemLocale) {
       locale.value = systemLocale.value;
     } else {
-      locale.value = store.userLocale;
+      locale.value = storeCalc.userLocale;
     }
   };
 
@@ -44,7 +44,7 @@
       // 수동으로 토글
       toggleAlwaysOnTop();
 
-      if (store.alwaysOnTop) {
+      if (storeCalc.alwaysOnTop) {
         notifyMsg(t('alwaysOnTopOn'));
       } else {
         notifyMsg(t('alwaysOnTopOff'));
@@ -56,21 +56,21 @@
   // prettier-ignore
   const keyBinding = new KeyBinding([
     [['Alt+t'], toggleAlwaysOnTopWithNotify],
-    [['Alt+i'], store.toggleInitPanel],
-    [['Alt+d'], store.toggleDarkMode],
-    [['Alt+s'], () => { store.isSettingDialogOpen = true; }],
-    [[';'], store.toggleButtonAddedLabel],
-    [[','], store.toggleUseGrouping],
-    [['['], store.decDecimalPlaces],
-    [[']'], store.incDecimalPlaces],
+    [['Alt+i'], storeCalc.toggleInitPanel],
+    [['Alt+d'], storeCalc.toggleDarkMode],
+    [['Alt+s'], () => { storeCalc.isSettingDialogOpen = true; }],
+    [[';'], storeCalc.toggleButtonAddedLabel],
+    [[','], storeCalc.toggleUseGrouping],
+    [['['], storeCalc.decDecimalPlaces],
+    [[']'], storeCalc.incDecimalPlaces],
   ]);
 
   // inputFocused 값이 바뀌면 키바인딩을 추가하거나 제거합니다.
   watch(
-    () => store.inputFocused,
+    () => storeCalc.inputFocused,
     () => {
-      // console.log('setting inputFocused', store.inputFocused);
-      if (store.inputFocused) {
+      // console.log('setting inputFocused', storeCalc.inputFocused);
+      if (storeCalc.inputFocused) {
         keyBinding.unsubscribe();
       } else {
         keyBinding.subscribe();
@@ -82,13 +82,13 @@
   onBeforeMount(() => {
     setLocale();
 
-    if (store.locale == '') {
+    if (storeCalc.locale == '') {
       // 처음 실행시
-      store.locale = systemLocale.value;
+      storeCalc.locale = systemLocale.value;
     }
-    if (store.userLocale == '') {
+    if (storeCalc.userLocale == '') {
       // 처음 실행시
-      store.userLocale = systemLocale.value;
+      storeCalc.userLocale = systemLocale.value;
     }
   });
 
@@ -104,42 +104,42 @@
 
 <template>
   <q-dialog
-    v-model="store.isSettingDialogOpen"
+    v-model="storeCalc.isSettingDialogOpen"
     style="z-index: 15"
     transition-show="slide-down"
     transition-hide="slide-up"
   >
-    <q-card id="setting" v-touch-swipe:9e-2:12:50.up="() => (store.isSettingDialogOpen = false)" class="full-width">
+    <q-card id="setting" v-touch-swipe:9e-2:12:50.up="() => (storeCalc.isSettingDialogOpen = false)" class="full-width">
       <q-bar v-blur dark class="full-width noselect text-white bg-primary">
         <q-icon name="settings" size="sm" />
         <div>{{ t('message.settings') }}</div>
         <q-space />
-        <q-btn dense flat icon="close" size="md" @click="store.isSettingDialogOpen = false" />
+        <q-btn dense flat icon="close" size="md" @click="storeCalc.isSettingDialogOpen = false" />
       </q-bar>
       <q-card-section class="full-width">
         <q-list v-blur dense>
           <q-item v-if="$q.platform.is.electron" class="q-py-none">
             <q-item-label class="self-center">{{ t('alwaysOnTop') }} (T)</q-item-label>
             <q-space />
-            <q-toggle v-model="store.alwaysOnTop" keep-color dense @click="setAlwaysOnTop(store.alwaysOnTop)" />
+            <q-toggle v-model="storeCalc.alwaysOnTop" keep-color dense @click="setAlwaysOnTop(storeCalc.alwaysOnTop)" />
           </q-item>
 
           <q-item class="q-py-none">
             <q-item-label class="self-center">{{ t('initPanel') }} (N)</q-item-label>
             <q-space />
-            <q-toggle v-model="store.initPanel" keep-color dense @click="setInitPanel(store.initPanel)" />
+            <q-toggle v-model="storeCalc.initPanel" keep-color dense @click="setInitPanel(storeCalc.initPanel)" />
           </q-item>
 
           <q-item class="q-py-none">
             <q-item-label class="self-center">{{ t('darkMode') }} (K)</q-item-label>
             <q-space />
-            <q-toggle v-model="store.darkMode" keep-color dense @click="setDarkMode(store.darkMode)" />
+            <q-toggle v-model="storeCalc.darkMode" keep-color dense @click="setDarkMode(storeCalc.darkMode)" />
           </q-item>
 
           <q-item v-if="$q.platform.is.capacitor" class="q-py-none">
             <q-item-label class="self-center">{{ t('hapticsMode') }} (K)</q-item-label>
             <q-space />
-            <q-toggle v-model="store.hapticsMode" keep-color dense @click="setHapticsMode(store.hapticsMode)" />
+            <q-toggle v-model="storeCalc.hapticsMode" keep-color dense @click="setHapticsMode(storeCalc.hapticsMode)" />
           </q-item>
 
           <q-separator spaced="md" />
@@ -147,31 +147,31 @@
           <q-item class="q-py-none">
             <q-item-label class="self-center">{{ t('showButtonAddedLabel') }} (;)</q-item-label>
             <q-space />
-            <q-toggle v-model="store.showButtonAddedLabel" keep-color dense />
+            <q-toggle v-model="storeCalc.showButtonAddedLabel" keep-color dense />
           </q-item>
 
           <q-item class="q-py-none">
             <q-item-label class="self-center">{{ t('useGrouping') }} (,)</q-item-label>
             <q-space />
-            <q-toggle v-model="store.useGrouping" keep-color dense />
+            <q-toggle v-model="storeCalc.useGrouping" keep-color dense />
           </q-item>
 
           <q-item class="q-py-none">
             <MyTooltip>
               {{ t('decimalPlacesStat') }}:
-              {{ store.decimalPlaces == -2 ? t('noLimit') : `${store.decimalPlaces} ${t('toNDecimalPlaces')}` }}
+              {{ storeCalc.decimalPlaces == -2 ? t('noLimit') : `${storeCalc.decimalPlaces} ${t('toNDecimalPlaces')}` }}
             </MyTooltip>
             <q-item-label class="q-pt-xs self-start">{{ t('decimalPlaces') }} ([,])</q-item-label>
             <q-space />
             <q-slider
-              v-model="store.decimalPlaces"
+              v-model="storeCalc.decimalPlaces"
               :min="-2"
               :step="2"
               :max="6"
               marker-labels
               class="col-5 q-pr-sm"
               dense
-              @change="setDecimalPlaces(store.decimalPlaces)"
+              @change="setDecimalPlaces(storeCalc.decimalPlaces)"
             >
               <template #marker-label-group="{markerList}">
                 <div
@@ -196,22 +196,22 @@
             </q-slider>
           </q-item>
 
-          <template v-if="store.cTab == 'unit'">
+          <template v-if="storeCalc.cTab == 'unit'">
             <q-separator spaced="md" />
 
             <q-item class="q-py-none">
               <q-item-label class="self-center"> {{ t('showUnit') }} (b) </q-item-label>
               <q-space />
-              <q-toggle v-model="store.showUnit" keep-color dense />
+              <q-toggle v-model="storeCalc.showUnit" keep-color dense />
             </q-item>
           </template>
-          <template v-else-if="store.cTab == 'currency'">
+          <template v-else-if="storeCalc.cTab == 'currency'">
             <q-separator spaced="md" />
 
             <q-item class="q-py-none">
               <q-item-label class="self-center"> {{ t('showSymbol') }} (o) </q-item-label>
               <q-space />
-              <q-toggle v-model="store.showSymbol" keep-color dense />
+              <q-toggle v-model="storeCalc.showSymbol" keep-color dense />
             </q-item>
           </template>
 
@@ -220,7 +220,7 @@
           <q-item class="q-py-none">
             <q-item-label class="self-center">{{ t('useSystemLocale') }}</q-item-label>
             <q-space />
-            <q-toggle v-model="store.useSystemLocale" keep-color dense @click="setLocale()" />
+            <q-toggle v-model="storeCalc.useSystemLocale" keep-color dense @click="setLocale()" />
           </q-item>
 
           <q-item>
@@ -229,8 +229,8 @@
             </q-item-label>
             <q-space />
             <q-select
-              v-model="store.userLocale"
-              :disable="store.useSystemLocale"
+              v-model="storeCalc.userLocale"
+              :disable="storeCalc.useSystemLocale"
               :options="localeOptions"
               dense
               emit-value

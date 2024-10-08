@@ -17,10 +17,10 @@
 
   // 스토어 가져오기
   import {useStoreCalc} from 'src/stores/store-calc';
-  const store = useStoreCalc();
+  const storeCalc = useStoreCalc();
 
   // 계산기 오브젝트를 스토어에서 가져오기 위한 변수 선언
-  const {calc, copyToClipboard, notifyError, swapUnitValue, swapCurrencyValue, notifyMsg, clickButtonById} = store;
+  const {calc, copyToClipboard, notifyError, swapUnitValue, swapCurrencyValue, notifyMsg, clickButtonById} = storeCalc;
 
   // 창에서 선택한 내용이 있으면 선택한 내용을 클립보드에 복사하고
   // 아니면 계산 결과를 클립보드에 복사한다.
@@ -59,7 +59,7 @@
 
       if (target === 'sub') {
         // 보조 디스플레이에 붙여넣기를 한 경우, calc 객체의 보조 숫자로 설정합니다.
-        if (store.cTab === 'unit') {
+        if (storeCalc.cTab === 'unit') {
           swapUnitValue();
           setTimeout(() => {
             calc.setCurrentNumber(text);
@@ -67,7 +67,7 @@
           setTimeout(() => {
             swapUnitValue();
           }, 10);
-        } else if (store.cTab === 'currency') {
+        } else if (storeCalc.cTab === 'currency') {
           swapCurrencyValue();
           setTimeout(() => {
             calc.setCurrentNumber(text);
@@ -93,7 +93,6 @@
   };
 
   import {KeyBinding} from 'classes/KeyBinding';
-  // prettier-ignore
   const keyBinding = new KeyBinding([
     [['Control+c', 'Control+Insert', 'Copy'], () => clickButtonById('btn-copy')],
     [['Control+v', 'Shift+Insert', 'Paste'], () => clickButtonById('btn-paste')],
@@ -110,7 +109,7 @@
     flat
     icon="content_copy"
     class="q-ma-none q-pa-none q-pl-xs"
-    :disable="store.isSettingDialogOpen"
+    :disable="storeCalc.isSettingDialogOpen"
     @click="doCopy"
   >
     <MyTooltip>{{ t('tooltipCopy') }}</MyTooltip>
@@ -120,10 +119,10 @@
     flat
     icon="content_paste"
     class="q-ma-none q-pa-none q-pl-xs"
-    :disable="store.isSettingDialogOpen"
+    :disable="storeCalc.isSettingDialogOpen"
     @click="doPaste()"
   >
-    <q-menu v-if="store.cTab !== 'calc'" context-menu auto-close class="z-max shadow-6">
+    <q-menu v-if="storeCalc.cTab !== 'calc'" context-menu auto-close class="z-max shadow-6">
       <q-list dense style="max-width: 200px">
         <MenuItem :action="() => doPaste('main')" :title="t('pasteToMainPanel')" />
         <MenuItem :action="() => doPaste('sub')" :title="t('pasteToSubPanel')" />
@@ -136,12 +135,12 @@
     flat
     icon="history"
     class="q-ma-none q-pa-none q-pl-xs"
-    :disable="store.isSettingDialogOpen"
-    @click="store.isHistoryDialogOpen = !store.isHistoryDialogOpen"
+    :disable="storeCalc.isSettingDialogOpen"
+    @click="storeCalc.isHistoryDialogOpen = !storeCalc.isHistoryDialogOpen"
   >
     <MyTooltip>{{ t('openHistoryDialog') }}</MyTooltip>
   </q-btn>
-  <q-btn id="btn-menu" flat icon="more_vert" class="q-ma-none q-pa-none q-pl-xs" :disable="store.isSettingDialogOpen">
+  <q-btn id="btn-menu" flat icon="more_vert" class="q-ma-none q-pa-none q-pl-xs" :disable="storeCalc.isSettingDialogOpen">
     <q-menu auto-close transition-show="slide-left" transition-hide="slide-right" :offset="[0, 10]" class="shadow-6">
       <MenuPanel />
     </q-menu>

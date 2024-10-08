@@ -10,7 +10,7 @@
 
   // 스토어 가져오기
   import {useStoreCalc} from 'src/stores/store-calc';
-  const store = useStoreCalc();
+  const storeCalc = useStoreCalc();
 
   // 계산기 오브젝트를 스토어에서 가져오기 위한 변수 선언
   const {
@@ -22,7 +22,7 @@
     notifyError,
     swapUnitValue,
     swapCurrencyValue,
-  } = store;
+  } = storeCalc;
 
   // 계산 결과 배열
   const histories = computed(() => calc.getHistories());
@@ -83,7 +83,7 @@
     if (touchEndY - touchStartY > 30) {
       // store의 타입이 명시적으로 선언되어 있지 않으므로, 이 부분은 가정에 따라 달라질 수 있습니다.
       // 여기서는 store가 이미 적절한 타입으로 선언되어 있고, isHistoryDialogOpen이 boolean 타입의 속성이라고 가정합니다.
-      store.isHistoryDialogOpen = false;
+      storeCalc.isHistoryDialogOpen = false;
     }
   };
 
@@ -91,7 +91,7 @@
   let lastScrollPosition = 0;
 
   watch(
-    () => store.isHistoryDialogOpen,
+    () => storeCalc.isHistoryDialogOpen,
     (isOpen) => {
       if (isOpen) {
         // 다이얼로그가 열릴 때 시간을 약간 지연하여 저장된 스크롤 위치로 이동
@@ -108,7 +108,7 @@
   );
 
   const scrollHistory = (offset: number | 'top' | 'bottom') => {
-    if (store.isHistoryDialogOpen) {
+    if (storeCalc.isHistoryDialogOpen) {
       const historyElement = document.getElementById('history');
       if (historyElement) {
         if (offset === 'top') {
@@ -128,7 +128,7 @@
   // prettier-ignore
   const keyBinding = new KeyBinding([
     [['Alt+h'], () => { !doDeleteHistory.value && clickButtonById('btn-history'); }],
-    [['d'], () => { store.isHistoryDialogOpen && clickButtonById('btn-delete-history'); }],
+    [['d'], () => { storeCalc.isHistoryDialogOpen && clickButtonById('btn-delete-history'); }],
     [['ArrowUp'], () => scrollHistory(-50)],
     [['ArrowDown'], () => scrollHistory(50)],
     [['PageUp'], () => scrollHistory(-400)],
@@ -139,9 +139,9 @@
 
   // inputFocused 값이 바뀌면 키바인딩을 추가하거나 제거합니다.
   watch(
-    () => store.inputFocused,
+    () => storeCalc.inputFocused,
     () => {
-      if (store.inputFocused) {
+      if (storeCalc.inputFocused) {
         keyBinding.unsubscribe();
       } else {
         keyBinding.subscribe();
@@ -234,7 +234,7 @@
 
   const toSubResult = (id: number) => {
     const history = calc.getHistoryByID(id);
-    if (store.cTab === 'unit') {
+    if (storeCalc.cTab === 'unit') {
       swapUnitValue();
       setTimeout(() => {
         calc.setCurrentNumber(history.resultNumber);
@@ -242,7 +242,7 @@
       setTimeout(() => {
         swapUnitValue();
       }, 10);
-    } else if (store.cTab === 'currency') {
+    } else if (storeCalc.cTab === 'currency') {
       swapCurrencyValue();
       setTimeout(() => {
         calc.setCurrentNumber(history.resultNumber);
@@ -259,7 +259,7 @@
 </script>
 
 <template>
-  <q-dialog v-model="store.isHistoryDialogOpen" style="z-index: 10" position="bottom" transition-duration="300">
+  <q-dialog v-model="storeCalc.isHistoryDialogOpen" style="z-index: 10" position="bottom" transition-duration="300">
     <q-bar v-blur dark class="full-width noselect text-white bg-primary">
       <q-icon name="history" size="sm" />
       <div>{{ t('history') }}</div>
@@ -273,11 +273,11 @@
         :disable="doDeleteHistory || histories.length == 0"
         @click="doDeleteHistory = true"
       />
-      <q-btn icon="close" size="md" dense flat @click="store.isHistoryDialogOpen = false" />
+      <q-btn icon="close" size="md" dense flat @click="storeCalc.isHistoryDialogOpen = false" />
     </q-bar>
     <q-card
       id="history"
-      v-touch-swipe:9e-2:12:50.down="() => (store.isHistoryDialogOpen = false)"
+      v-touch-swipe:9e-2:12:50.down="() => (storeCalc.isHistoryDialogOpen = false)"
       square
       class="full-width row justify-center items-start relative-position scrollbar-custom"
       @scroll="onScroll"
@@ -378,7 +378,7 @@
                     <MenuItem separator />
                     <MenuItem :title="t('loadToMainPanel')" :action="() => toMainResult(history.id as number)" />
                     <MenuItem
-                      v-if="store.cTab === 'unit' || store.cTab === 'currency'"
+                      v-if="storeCalc.cTab === 'unit' || storeCalc.cTab === 'currency'"
                       :title="t('loadToSubPanel')"
                       :action="() => toSubResult(history.id as number)"
                     />
@@ -428,11 +428,11 @@
           autofocus
           clear-icon="close"
           color="primary"
-          @focus="store.setInputFocused"
-          @blur="store.setInputBlurred"
+          @focus="storeCalc.setInputFocused"
+          @blur="storeCalc.setInputBlurred"
           @keyup.enter="
             {
-              store.setInputBlurred;
+              storeCalc.setInputBlurred;
               editConfirm();
             }
           "
