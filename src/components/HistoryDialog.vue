@@ -28,7 +28,7 @@
   const storeCurrency = useStoreCurrency();
 
   // 계산기 오브젝트를 스토어에서 가져오기 위한 변수 선언
-  const { calc } = storeBase;
+  const { calc, calcHistory } = storeBase;
   const { clickButtonById } = storeUtils;
   const { notifyMsg, notifyError } = storeNotifications;
   const { swapUnitValue } = storeUnit;
@@ -36,7 +36,7 @@
   const { getRightSideInHistory, getLeftSideInHistory} = storeUtils;
 
   // 계산 결과 배열
-  const histories = computed(() => calc.getHistories());
+  const histories = computed(() => calcHistory.getHistories());
 
   // 계산 결과 메뉴가 열려있는지 여부
   const historyMenu: {[id: number]: boolean} = reactive(Object.fromEntries(histories.value.map((h) => [h.id, false])));
@@ -181,8 +181,8 @@
     // console.log('memoDialog', id);
     slidedID = id;
 
-    if (calc.getMemo(id)) {
-      memo.value = calc.getMemo(id) as string;
+    if (calcHistory.getMemo(id)) {
+      memo.value = calcHistory.getMemo(id) as string;
     } else {
       memo.value = '';
     }
@@ -199,7 +199,7 @@
   };
 
   const editConfirm = () => {
-    calc.setMemo(slidedID, memo.value);
+    calcHistory.setMemo(slidedID, memo.value);
     editSlide.value = 'slide-right';
     editDialog.value = false;
     memo.value = '';
@@ -214,20 +214,20 @@
   };
 
   const memoDelete = (id: number) => {
-    calc.deleteMemo(id);
+    calcHistory.deleteMemo(id);
     memo.value = '';
   };
 
   import {copyToClipboard} from 'quasar';
   const historyCopy = async (id: number, copyType: 'formattedNumber' | 'onlyNumber' | 'memo'): Promise<void> => {
-    const history = calc.getHistoryByID(id);
+    const history = calcHistory.getHistoryByID(id);
     const copyText =
       copyType === 'formattedNumber'
-        ? getRightSideInHistory(history)
+        ? getRightSideInHistory(history.resultSnapshot)
         : copyType === 'onlyNumber'
-          ? history.resultNumber
+          ? history.resultSnapshot.resultNumber
           : copyType === 'memo'
-            ? (calc.getMemo(id) as string)
+            ? (calcHistory.getMemo(id) as string)
             : '';
     try {
       await copyToClipboard(copyText);
@@ -239,16 +239,16 @@
   };
 
   const toMainResult = (id: number) => {
-    const history = calc.getHistoryByID(id);
-    calc.setCurrentNumber(history.resultNumber);
+    const history = calcHistory.getHistoryByID(id);
+    calc.setCurrentNumber(history.resultSnapshot.resultNumber);
   };
 
   const toSubResult = (id: number) => {
-    const history = calc.getHistoryByID(id);
+    const history = calcHistory.getHistoryByID(id);
     if (storeBase.cTab === 'unit') {
       swapUnitValue();
       setTimeout(() => {
-        calc.setCurrentNumber(history.resultNumber);
+        calc.setCurrentNumber(history.resultSnapshot.resultNumber);
       }, 5);
       setTimeout(() => {
         swapUnitValue();
@@ -256,7 +256,7 @@
     } else if (storeBase.cTab === 'currency') {
       swapCurrencyValue();
       setTimeout(() => {
-        calc.setCurrentNumber(history.resultNumber);
+        calc.setCurrentNumber(history.resultSnapshot.resultNumber);
       }, 5);
       setTimeout(() => {
         swapCurrencyValue();
@@ -265,7 +265,7 @@
   };
 
   const deleteHistory = (id: number) => {
-    calc.deleteHistory(id);
+    calcHistory.deleteHistory(id);
   };
 </script>
 
@@ -322,7 +322,7 @@
                 left-color="positive"
                 right-color="negative"
                 @left="({reset}) => onLeft({reset}, history.id as number)"
-                @right="calc.deleteHistory(history.id as number)"
+                @right="calcHistory.deleteHistory(history.id as number)"
               >
                 <template #left>
                   <q-icon name="edit_note" />
@@ -339,10 +339,10 @@
                       <u>{{ history.memo }}</u>
                     </q-item-label>
                     <q-item-label style="white-space: pre-wrap">
-                      {{ getLeftSideInHistory(history, true) }}
+                      {{ getLeftSideInHistory(history.resultSnapshot, true) }}
                     </q-item-label>
                     <q-item-label>
-                      {{ ['=', getRightSideInHistory(history)].join(' ') }}
+                      {{ ['=', getRightSideInHistory(history.resultSnapshot)].join(' ') }}
                     </q-item-label>
                   </q-item-section>
                 </q-item>
@@ -379,12 +379,12 @@
                     <MenuItem
                       :title="t('copyDisplayedResult')"
                       :action="() => historyCopy(history.id as number, 'formattedNumber')"
-                      :caption="getRightSideInHistory(history)"
+                      :caption="['=', getRightSideInHistory(history.resultSnapshot)].join(' ')"
                     />
                     <MenuItem
                       :title="t('copyResultNumber')"
                       :action="() => historyCopy(history.id as number, 'onlyNumber')"
-                      :caption="history.resultNumber"
+                      :caption="history.resultSnapshot.resultNumber"
                     />
                     <MenuItem separator />
                     <MenuItem :title="t('loadToMainPanel')" :action="() => toMainResult(history.id as number)" />
@@ -411,7 +411,7 @@
       <q-card-section>{{ t('doYouDeleteHistory') }} </q-card-section>
       <q-card-actions align="center" class="text-negative bg-white">
         <q-btn v-close-popup flat :label="t('message.no')" />
-        <q-btn v-close-popup flat :label="t('message.yes')" autofocus @click="calc.clearHistory()" />
+        <q-btn v-close-popup flat :label="t('message.yes')" autofocus @click="calcHistory.clearHistory()" />
       </q-card-actions>
     </q-card>
   </q-dialog>

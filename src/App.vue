@@ -15,6 +15,8 @@
   const title = ref(t('message.appTitle'));
 
   import {useMeta, useQuasar} from 'quasar';
+import { Calculator } from './classes/Calculator';
+import { CalculatorHistory } from './classes/CalculatorHistory';
   useMeta(() => ({
     title: title.value,
   }));
@@ -49,7 +51,15 @@
     storeBase.isHistoryDialogOpen = false;
     storeBase.isSettingDialogOpen = false;
 
-    if (storeSettings.initPanel) {
+    if (storeBase.calc === null) {
+      storeBase.calc = new Calculator();
+    }
+
+    if (storeBase.calc && storeBase.calcHistory === null) {
+      storeBase.calcHistory = new CalculatorHistory(storeBase.calc as unknown as Calculator);
+    }
+
+    if (storeSettings.initPanel && storeBase.calc) {
       storeBase.calc.clear();
     }
 

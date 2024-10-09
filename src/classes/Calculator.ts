@@ -1,3 +1,5 @@
+import {EventEmitter} from 'events';
+
 import {create, all, BigNumber} from 'mathjs';
 
 const MathB = create(all, {
@@ -8,7 +10,7 @@ const MathB = create(all, {
 /**
  * 다양한 연산자를 나타내는 열거형입니다.
  */
-enum Operator {
+export enum Operator {
   None, // 연산자 없음
   Plus, // 덧셈
   Minus, // 뺄셈
@@ -63,17 +65,14 @@ const constants: {[key: string]: string} = {
   phi: MathB.phi.toString(),
 };
 
-// 히스토리 객체
-interface History {
-  id?: number;
+export interface ResultSnapshot {
   previousNumber: string;
   operator: string;
   argumentNumber?: string;
   resultNumber: string;
-  memo?: string;
 }
 
-export class Calculator {
+export class Calculator extends EventEmitter {
   // 연산자가 눌렸을 때 임시로 숫자를 저장
   private previousNumber!: string;
 
@@ -95,14 +94,14 @@ export class Calculator {
   // 표시 숫자가 앞으로 리셋 될지 여부
   private shouldReset!: boolean;
 
+  private resultSnapshot!: ResultSnapshot;
+
   // 계산 히스토리 저장 배열
   private histories: History[] = [];
 
-  // 히스토리 최대 크기
-  private readonly HISTORY_MAX_SIZE = 100;
-
   // 생성자
   constructor() {
+    super();
     this.clear();
     this.memoryClear();
   }
@@ -114,6 +113,26 @@ export class Calculator {
     this.currentNumber = '0';
     this.currentOperator = Operator.None;
     this.shouldReset = false;
+  }
+
+  private saveResultSnapshot(history: ResultSnapshot) {
+    this.resultSnapshot = history;
+  }
+
+  private addHistory(history: ResultSnapshot): string {
+    this.saveResultSnapshot(history);
+    this.emit('addHistory', this.resultSnapshot);
+    return this.resultSnapshot.resultNumber;
+  }
+
+  private unshiftHistory() {
+    this.resultSnapshot = {
+      previousNumber: '0',
+      operator: '', // null을 빈 문자열로 변경
+      argumentNumber: '0',
+      resultNumber: '0',
+    };
+    this.emit('unshiftHistory');
   }
 
   // 문자열에서 숫자 문자열만 추출
@@ -197,7 +216,7 @@ export class Calculator {
   // 현재 숫자를 업데이트하는 private 메서드
   private updateCurrentNumber(digitString: string): void {
     if (this.currentNumber === '0' || this.shouldReset) {
-      // 현재 숫자가 0이거나 초기화 예정인 경우
+      // 현재 숫자가 0��거나 초기화 예정인 경우
       this.currentNumber = digitString;
       this.shouldReset = false;
     } else {
@@ -237,7 +256,7 @@ export class Calculator {
   private numberToString(numberForCalc: string): string {
     const [integer, decimal] = numberForCalc.split('.');
 
-    // 소수점이 있는 경우 정수 부분과 소수 부분을 결합하여 반환
+    // 소수��이 있는 경우 정수 부분과 소수 부분을 결합하여 반환
     // 소수점이 없는 경우 정수 부분만 반환
     return decimal ? `${integer}.${decimal}` : integer;
   }
@@ -252,7 +271,7 @@ export class Calculator {
     this.currentNumber = this.previousNumber;
   }
 
-  // 표시 숫자를 임��� 숫자로
+  // 표시 숫자를 임 숫자로
   private setPreviousNumberFromCurrent() {
     this.previousNumber = this.currentNumber;
   }
@@ -375,10 +394,11 @@ export class Calculator {
     if (this.currentOperator === Operator.Div || this.currentOperator === Operator.Mul) {
       this.performPreCalculation(); // 사전 계산 수행
 
-      const {previousNumber, argumentNumber} = this.histories.shift() as History;
+      const {previousNumber, argumentNumber} = this.resultSnapshot;
+      this.unshiftHistory();
       const operator = this.getOperatorString() + this.getOperatorString(Operator.Pct);
 
-      // 나��기면 퍼센트를 구하고, 곱하기면 퍼센트로 곱함
+      // 나기면 퍼센트를 구하고, 곱하기면 퍼센트로 곱함
       const resultNumber =
         this.currentOperator === Operator.Div
           ? MathB.bignumber(this.previousNumber).mul(100).toString()
@@ -462,32 +482,24 @@ export class Calculator {
     if (Number(this.currentNumber) < 0) {
       throw new Error('The factorial of a negative number is not allowed.');
     }
-    this.commonCalculation(Operator.Fct, () =>
-      MathB.factorial(MathB.bignumber(this.currentNumber)).toString()
-    );
+    this.commonCalculation(Operator.Fct, () => MathB.factorial(MathB.bignumber(this.currentNumber)).toString());
   }
 
   // 10의 거듭제곱 계산
   public exp10(): void {
-    this.commonCalculation(Operator.Exp10, () =>
-      MathB.pow(10, MathB.bignumber(this.currentNumber)).toString()
-    );
+    this.commonCalculation(Operator.Exp10, () => MathB.pow(10, MathB.bignumber(this.currentNumber)).toString());
   }
 
   // 정수부 계산
   public int(): void {
-    this.commonCalculation(Operator.Int, () =>
-      MathB.bignumber(this.currentNumber).floor().toString()
-    );
+    this.commonCalculation(Operator.Int, () => MathB.bignumber(this.currentNumber).floor().toString());
   }
 
   // 소수부 계산
   public frac(): void {
-    this.commonCalculation(Operator.Frac, () =>
-      MathB.bignumber(this.currentNumber).mod(1).toString()
-    );
+    this.commonCalculation(Operator.Frac, () => MathB.bignumber(this.currentNumber).mod(1).toString());
   }
-  
+
   // 연산자 상태 초기화
   private resetOperatorState(): void {
     this.currentOperator = Operator.None;
@@ -592,107 +604,4 @@ export class Calculator {
   public getIsMemoryReset(): boolean {
     return this.isMemoryReset;
   }
-
-  // 히스토리 추가
-  private addHistory(history: History): string {
-    // console.log(history);
-    if (this.histories.length == 0) {
-      history.id = 1;
-    } else {
-      history.id = Math.max(...(this.histories.map((h) => h.id) as number[])) + 1;
-    }
-    // 배열 앞에 히스토리 추가
-    this.histories.unshift(history);
-
-    // 히스토리 크기가 최대 크기를 넘어서면 제일 뒤의 것을 제거
-    if (this.histories.length > this.HISTORY_MAX_SIZE) this.histories.pop();
-
-    // 최종적으로 계산 결과를 반환
-    return history.resultNumber;
-  }
-
-  // 히스토리 크기 얻기
-  public getHistorySize(): number {
-    return this.histories.length;
-  }
-
-  // 히스토리 전체 얻기
-  public getHistories(): History[] {
-    return this.histories;
-  }
-
-  // 히스토리의 id로 인덱스 찾기
-  public getHistoryIndexByID(id: number): number {
-    const index = this.histories.findIndex((h) => h.id === id);
-    if (index !== -1) {
-      return index;
-    } else {
-      throw new Error('History not found');
-    }
-  }
-
-  // 히스토리에서 배열 인덱스로 찾기
-  public getHistoryByIndex(index: number): History {
-    if (index >= 0 && index < this.histories.length) {
-      return this.histories[index];
-    } else {
-      throw new Error('History not found');
-    }
-  }
-
-  // 히스토리에서 id로 찾기
-  public getHistoryByID(id: number): History {
-    return this.getHistoryByIndex(this.getHistoryIndexByID(id));
-  }
-
-  // id를 사용하여 히스토리 배열에서 해당 항목을 찾아서 삭제
-  public deleteHistory(id: number): void {
-    this.histories.splice(this.getHistoryIndexByID(id), 1);
-  }
-
-  // 히스토리 초기화
-  public clearHistory(): void {
-    this.histories = [];
-  }
-
-  // 히스토리에 메모 셋팅
-  public setMemo(id: number, memo: string): void {
-    const index = this.getHistoryIndexByID(id);
-    this.histories[index].memo = memo;
-  }
-
-  // 히스토리에서 메모 얻기
-  public getMemo(id: number): string | null {
-    const index = this.getHistoryIndexByID(id);
-    return this.histories[index].memo || null;
-  }
-
-  // 히스토리에서 메모 삭제
-  public deleteMemo(id: number): void {
-    const index = this.getHistoryIndexByID(id);
-    delete this.histories[index].memo;
-  }
 }
-
-export default Calculator;
-export {Operator};
-export type {History};
-
-// const bigmath = create(all, {
-//   number: 'BigNumber',
-//   precision: 64,
-// }) as math.MathJsStatic;
-
-// const a = bigmath.bignumber(0.1);
-// // const b = bigmath.bignumber(0.2);
-// console.log(a.div(3).mul(3).toDecimalPlaces(20).toString());
-// console.log(bigmath.format(a.div(3).mul(3), {  precision: 20 }));
-
-// const numberGrouping = (number: number | string | BigNumber, grouping: number = 3, separator: string = ',') => {
-//   const
-//   [integer, decimal] = number.toString().split('.'),
-//   regex = new RegExp(`\\B(?=(\\d{${grouping}})+(?!\\d))`, 'g');
-//   return integer.replace(regex, separator) + (decimal ? `.${decimal}` : '');
-// }
-
-// console.log(numberGrouping(bigmath.bignumber('123456789.123456789'), 4, '_'));

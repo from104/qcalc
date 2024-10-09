@@ -3,7 +3,8 @@ import {defineStore} from 'pinia';
 import {create, all} from 'mathjs';
 import {useStoreSettings} from './store-settings';
 import {useStoreNotifications} from './store-notifications';
-import type {History} from 'classes/Calculator';
+import {ResultSnapshot} from 'src/classes/Calculator';
+
 const MathB = create(all, {
   number: 'BigNumber',
   precision: 64,
@@ -30,7 +31,7 @@ export const useStoreUtils = defineStore('utils', {
       });
       return storeSettings.useGrouping ? this.numberGrouping(formattedNumber) : formattedNumber;
     },
-    getLeftSideInHistory(history: History, useLineBreak = false) {
+    getLeftSideInHistory(history: ResultSnapshot, useLineBreak = false) {
       const lineBreak = useLineBreak ? '\n' : '';
       const formattedPrev = this.toFormattedNumber(history.previousNumber);
       const formattedArg = this.toFormattedNumber(history.argumentNumber ?? '');
@@ -68,8 +69,8 @@ export const useStoreUtils = defineStore('utils', {
           return formattedPrev;
       }
     },
-    getRightSideInHistory(h: History) {
-      return this.toFormattedNumber(h.resultNumber);
+    getRightSideInHistory(history: ResultSnapshot) {
+      return this.toFormattedNumber(history.resultNumber);
     },
     blurElement(): void {
       const el = document.activeElement as HTMLElement;

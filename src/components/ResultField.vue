@@ -26,7 +26,7 @@
   import { useStoreCurrency } from 'src/stores/store-currency';
   const storeCurrency = useStoreCurrency();
 
-  const { calc, showMemoryOff, showMemoryOnWithTimer } = storeBase;
+  const { calc, calcHistory, showMemoryOff, showMemoryOnWithTimer } = storeBase;
   const { toFormattedNumber, getLeftSideInHistory, copyToClipboard } = storeUtils;
   const { initRecentCategoryAndUnit } = storeUnit;
   const { initRecentCurrency, currencyConverter } = storeCurrency;
@@ -135,16 +135,16 @@
   const isMemoryReset = computed(() => calc.getIsMemoryReset());
 
   const getPreResult = () => {
-    const lastHistory = calc.getHistorySize() > 0 ? calc.getHistoryByIndex(0) : null;
+    const lastHistory = calcHistory.getHistorySize() > 0 ? calcHistory.getHistoryByIndex(0) : null;
     const shouldReset = calc.getShouldReset();
     const operatorExists = operator.value != '';
 
     if (
       lastHistory !== null &&
       shouldReset &&
-      calc.getCurrentNumber() == lastHistory.resultNumber
+      calc.getCurrentNumber() == lastHistory.resultSnapshot.resultNumber
     ) {
-      return [getLeftSideInHistory(lastHistory), '='].join(' ');
+      return [getLeftSideInHistory(lastHistory.resultSnapshot), '='].join(' ');
     } else if (operatorExists && !shouldReset) {
       return toFormattedNumber(calc.getPreviousNumber());
     } else {

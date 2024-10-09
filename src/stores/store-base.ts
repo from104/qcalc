@@ -1,10 +1,12 @@
 import {defineStore} from 'pinia';
 import {Calculator} from 'classes/Calculator';
+import {CalculatorHistory} from 'classes/CalculatorHistory';
 import {CurrencyConverter} from 'classes/CurrencyConverter';
 
 export const useStoreBase = defineStore('base', {
   state: () => ({
-    calc: new Calculator(),
+    calc: null as unknown as Calculator,
+    calcHistory: null as unknown as CalculatorHistory,
     cTab: 'calc',
     isHistoryDialogOpen: false,
     isSettingDialogOpen: false,
