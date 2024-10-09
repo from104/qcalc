@@ -1,5 +1,13 @@
 <script setup lang="ts">
-  import {onMounted} from 'vue';
+  import { onMounted } from 'vue';
+
+  // Quasar의 $q 객체를 사용하기 위한 변수 선언
+  import { useQuasar } from 'quasar';
+  const $q = useQuasar();
+
+  // i18n을 사용하기 위한 변수 선언
+  import { useI18n } from 'vue-i18n';
+  const { t } = useI18n();
 
   import MyTooltip from 'components/MyTooltip.vue';
 
@@ -7,20 +15,24 @@
 
   import MenuPanel from './MenuPanel.vue';
 
-  // Quasar의 $q 객체를 사용하기 위한 변수 선언
-  import {useQuasar} from 'quasar';
-  const $q = useQuasar();
-
-  // i18n을 사용하기 위한 변수 선언
-  import {useI18n} from 'vue-i18n';
-  const {t} = useI18n();
-
   // 스토어 가져오기
-  import {useStoreCalc} from 'src/stores/store-calc';
-  const storeCalc = useStoreCalc();
+  import { useStoreBase } from 'src/stores/store-base';
+  const storeBase = useStoreBase();
+  import { useStoreUtils } from 'src/stores/store-utils';
+  const storeUtils = useStoreUtils();
+  import { useStoreNotifications } from 'src/stores/store-notifications';
+  const storeNotifications = useStoreNotifications();
+  import { useStoreUnit } from 'src/stores/store-unit';
+  const storeUnit = useStoreUnit();
+  import { useStoreCurrency } from 'src/stores/store-currency';
+  const storeCurrency = useStoreCurrency();
 
-  // 계산기 오브젝트를 스토어에서 가져오기 위한 변수 선언
-  const {calc, copyToClipboard, notifyError, swapUnitValue, swapCurrencyValue, notifyMsg, clickButtonById} = storeCalc;
+  // 스토어 변수 선언
+  const { calc } = storeBase;
+  const { copyToClipboard, clickButtonById } = storeUtils;
+  const { notifyError, notifyMsg } = storeNotifications;
+  const { swapUnitValue } = storeUnit;
+  const { swapCurrencyValue } = storeCurrency;
 
   // 창에서 선택한 내용이 있으면 선택한 내용을 클립보드에 복사하고
   // 아니면 계산 결과를 클립보드에 복사한다.
@@ -59,7 +71,7 @@
 
       if (target === 'sub') {
         // 보조 디스플레이에 붙여넣기를 한 경우, calc 객체의 보조 숫자로 설정합니다.
-        if (storeCalc.cTab === 'unit') {
+        if (storeBase.cTab === 'unit') {
           swapUnitValue();
           setTimeout(() => {
             calc.setCurrentNumber(text);
@@ -67,7 +79,7 @@
           setTimeout(() => {
             swapUnitValue();
           }, 10);
-        } else if (storeCalc.cTab === 'currency') {
+        } else if (storeBase.cTab === 'currency') {
           swapCurrencyValue();
           setTimeout(() => {
             calc.setCurrentNumber(text);
@@ -109,7 +121,7 @@
     flat
     icon="content_copy"
     class="q-ma-none q-pa-none q-pl-xs"
-    :disable="storeCalc.isSettingDialogOpen"
+    :disable="storeBase.isSettingDialogOpen"
     @click="doCopy"
   >
     <MyTooltip>{{ t('tooltipCopy') }}</MyTooltip>
@@ -119,10 +131,10 @@
     flat
     icon="content_paste"
     class="q-ma-none q-pa-none q-pl-xs"
-    :disable="storeCalc.isSettingDialogOpen"
+    :disable="storeBase.isSettingDialogOpen"
     @click="doPaste()"
   >
-    <q-menu v-if="storeCalc.cTab !== 'calc'" context-menu auto-close class="z-max shadow-6">
+    <q-menu v-if="storeBase.cTab !== 'calc'" context-menu auto-close class="z-max shadow-6">
       <q-list dense style="max-width: 200px">
         <MenuItem :action="() => doPaste('main')" :title="t('pasteToMainPanel')" />
         <MenuItem :action="() => doPaste('sub')" :title="t('pasteToSubPanel')" />
@@ -135,12 +147,12 @@
     flat
     icon="history"
     class="q-ma-none q-pa-none q-pl-xs"
-    :disable="storeCalc.isSettingDialogOpen"
-    @click="storeCalc.isHistoryDialogOpen = !storeCalc.isHistoryDialogOpen"
+    :disable="storeBase.isSettingDialogOpen"
+    @click="storeBase.isHistoryDialogOpen = !storeBase.isHistoryDialogOpen"
   >
     <MyTooltip>{{ t('openHistoryDialog') }}</MyTooltip>
   </q-btn>
-  <q-btn id="btn-menu" flat icon="more_vert" class="q-ma-none q-pa-none q-pl-xs" :disable="storeCalc.isSettingDialogOpen">
+  <q-btn id="btn-menu" flat icon="more_vert" class="q-ma-none q-pa-none q-pl-xs" :disable="storeBase.isSettingDialogOpen">
     <q-menu auto-close transition-show="slide-left" transition-hide="slide-right" :offset="[0, 10]" class="shadow-6">
       <MenuPanel />
     </q-menu>

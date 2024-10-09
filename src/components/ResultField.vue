@@ -15,18 +15,21 @@
   const fieldID = computed(() => props.field + 'Field');
 
   // 스토어 가져오기
-  import { useStoreCalc } from 'src/stores/store-calc';
-  const storeCalc = useStoreCalc();
-  const {
-    calc,
-    toFormattedNumber,
-    initRecentCategoryAndUnit,
-    initRecentCurrency,
-    getLeftSideInHistory,
-    showMemoryOff,
-    copyToClipboard,
-    showMemoryOnWithTimer,
-  } = storeCalc;
+  import { useStoreBase } from 'src/stores/store-base';
+  const storeBase = useStoreBase();
+  import { useStoreSettings } from 'src/stores/store-settings';
+  const storeSettings = useStoreSettings();
+  import { useStoreUtils } from 'src/stores/store-utils';
+  const storeUtils = useStoreUtils();
+  import { useStoreUnit } from 'src/stores/store-unit';
+  const storeUnit = useStoreUnit();
+  import { useStoreCurrency } from 'src/stores/store-currency';
+  const storeCurrency = useStoreCurrency();
+
+  const { calc, showMemoryOff, showMemoryOnWithTimer } = storeBase;
+  const { toFormattedNumber, getLeftSideInHistory, copyToClipboard } = storeUtils;
+  const { initRecentCategoryAndUnit } = storeUnit;
+  const { initRecentCurrency, currencyConverter } = storeCurrency;
 
   const needFieldTooltip = ref(false);
 
@@ -41,10 +44,10 @@
   const convertedUnitNumber = () => {
     if (props.addon == 'unit') {
       return UnitConverter.convert(
-        storeCalc.recentCategory,
+        storeUnit.recentCategory,
         calc.getCurrentNumber(),
-        storeCalc.recentUnitFrom[storeCalc.recentCategory],
-        storeCalc.recentUnitTo[storeCalc.recentCategory],
+        storeUnit.recentUnitFrom[storeUnit.recentCategory],
+        storeUnit.recentUnitTo[storeUnit.recentCategory],
       );
     } else {
       return '';
@@ -53,8 +56,8 @@
 
   const convertedCurrencyNumber = () => {
     if (props.addon == 'currency') {
-      return storeCalc.currencyConverter
-        .convert(Number(calc.getCurrentNumber()), storeCalc.recentCurrencyFrom, storeCalc.recentCurrencyTo)
+      return currencyConverter
+        .convert(Number(calc.getCurrentNumber()), storeCurrency.recentCurrencyFrom, storeCurrency.recentCurrencyTo)
         .toString();
     } else {
       return '';
@@ -65,7 +68,7 @@
     if (isMainField.value) {
       const currentNumber = calc.getCurrentNumber();
       const formattedNumber = toFormattedNumber(currentNumber);
-      return storeCalc.decimalPlaces === -2 && currentNumber.includes('.')
+      return storeSettings.decimalPlaces === -2 && currentNumber.includes('.')
         ? `${formattedNumber.split('.')[0]}.${currentNumber.split('.')[1]}`
         : formattedNumber;
     } else {
@@ -84,11 +87,11 @@
   const result = ref(getResult());
 
   const symbol = computed(() => {
-    if (storeCalc.showSymbol && props.addon == 'currency') {
+    if (storeSettings.showSymbol && props.addon == 'currency') {
       if (isMainField.value) {
-        return storeCalc.currencyConverter?.getSymbol(storeCalc.recentCurrencyFrom);
+        return currencyConverter.getSymbol(storeCurrency.recentCurrencyFrom);
       } else {
-        return storeCalc.currencyConverter?.getSymbol(storeCalc.recentCurrencyTo);
+        return currencyConverter.getSymbol(storeCurrency.recentCurrencyTo);
       }
     } else {
       return '';
@@ -96,11 +99,11 @@
   });
 
   const unit = computed(() => {
-    if (storeCalc.showUnit && props.addon == 'unit') {
+    if (storeSettings.showUnit && props.addon == 'unit') {
       if (isMainField.value) {
-        return ' ' + storeCalc.recentUnitFrom[storeCalc.recentCategory];
+        return ' ' + storeUnit.recentUnitFrom[storeUnit.recentCategory];
       } else {
-        return ' ' + storeCalc.recentUnitTo[storeCalc.recentCategory];
+        return ' ' + storeUnit.recentUnitTo[storeUnit.recentCategory];
       }
     } else {
       return '';
@@ -164,7 +167,7 @@
   };
 
   const selectResultColor = () => {
-    return isMainField.value && storeCalc.showMemory
+    return isMainField.value && storeBase.showMemory
       ? !needFieldTooltip.value
         ? resultColor.normalDark
         : resultColor.warningDark
@@ -176,15 +179,15 @@
   watch(
     [
       calc,
-      () => storeCalc.useGrouping,
-      () => storeCalc.decimalPlaces,
-      () => storeCalc.showUnit,
-      () => storeCalc.recentCategory,
-      () => storeCalc.recentUnitFrom[storeCalc.recentCategory],
-      () => storeCalc.recentUnitTo[storeCalc.recentCategory],
-      () => storeCalc.showSymbol,
-      () => storeCalc.recentCurrencyFrom,
-      () => storeCalc.recentCurrencyTo,
+      () => storeSettings.useGrouping,
+      () => storeSettings.decimalPlaces,
+      () => storeSettings.showUnit,
+      () => storeUnit.recentCategory,
+      () => storeUnit.recentUnitFrom[storeUnit.recentCategory],
+      () => storeUnit.recentUnitTo[storeUnit.recentCategory],
+      () => storeSettings.showSymbol,
+      () => storeCurrency.recentCurrencyFrom,
+      () => storeCurrency.recentCurrencyTo,
     ],
     () => {
       result.value = getResult();
@@ -242,10 +245,10 @@
           v-mutation.characterData
           class="self-center no-outline full-width full-height ellipsis text-right q-pt-xs noselect"
           :class="[isMainField ? 'text-h5' : '', selectResultColor()]"
-          :style="`padding-top: ${storeCalc.paddingOnResult}px;`"
+          :style="`padding-top: ${storeBase.paddingOnResult}px;`"
         >
           <span id="symbol">{{ symbol }}</span>
-          <span v-if="isMainField && storeCalc.showMemory" id="result" :class="selectResultColor()">
+          <span v-if="isMainField && storeBase.showMemory" id="result" :class="selectResultColor()">
             {{ toFormattedNumber(calc.getMemoryNumber()) }}
           </span>
           <span v-else :id="isMainField ? 'result' : 'subResult'">{{ result }}</span>

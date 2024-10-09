@@ -1,15 +1,17 @@
 <script setup lang="ts">
-  import {onMounted, reactive, watch} from 'vue';
+  import { onMounted, reactive, watch} from 'vue';
 
   import MenuItem from 'components/MenuItem.vue';
 
-  import {useRouter} from 'vue-router';
+  import { useRouter} from 'vue-router';
   const router = useRouter();
 
-  import {useStoreCalc} from 'src/stores/store-calc';
-  const storeCalc = useStoreCalc();
+  import { useStoreBase } from 'src/stores/store-base';
+  const storeBase = useStoreBase();
+  import { useStoreSettings } from 'src/stores/store-settings';
+  const storeSettings = useStoreSettings();
 
-  import {useI18n} from 'vue-i18n';
+  import { useI18n} from 'vue-i18n';
   const {t} = useI18n();
 
   interface Item {
@@ -28,7 +30,7 @@
       shortcut: 'Ctrl-1',
       icon: 'calculate',
       action: () => {
-        storeCalc.cTab = 'calc';
+        storeBase.cTab = 'calc';
       },
     },
     unit: {
@@ -37,7 +39,7 @@
       shortcut: 'Ctrl-2',
       icon: 'swap_vert',
       action: () => {
-        storeCalc.cTab = 'unit';
+        storeBase.cTab = 'unit';
       },
     },
     currency: {
@@ -46,7 +48,7 @@
       shortcut: 'Ctrl-3',
       icon: 'currency_exchange',
       action: () => {
-        storeCalc.cTab = 'currency';
+        storeBase.cTab = 'currency';
       },
     },
     separator1: {
@@ -58,7 +60,7 @@
       shortcut: 'Alt-s',
       icon: 'settings',
       action: () => {
-        storeCalc.isSettingDialogOpen = true;
+        storeBase.isSettingDialogOpen = true;
       },
     },
     separator2: {
@@ -86,7 +88,7 @@
   };
 
   watch(
-    () => storeCalc.locale,
+    () => storeSettings.locale,
     () => {
       updateLocale();
     },

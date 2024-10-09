@@ -1,43 +1,50 @@
 <script setup lang="ts">
-  import {onMounted, onBeforeUnmount, ref, watch, reactive} from 'vue';
+  import { onMounted, onBeforeUnmount, ref, watch, reactive } from 'vue';
 
-  import {useQuasar, colors} from 'quasar';
-  const {lighten} = colors;
-
-  import {useI18n} from 'vue-i18n';
-  const {t} = useI18n();
-
+  import { useQuasar, colors } from 'quasar';
   const $q = useQuasar();
+  const { lighten } = colors;
 
-  import {Haptics, ImpactStyle} from 'capacitor/@capacitor/haptics';
+  import { useI18n } from 'vue-i18n';
+  const { t } = useI18n();
+
+  import { Haptics, ImpactStyle } from 'capacitor/@capacitor/haptics';
+
+  import { useStoreSettings } from 'src/stores/store-settings';
+  const storeSettings = useStoreSettings();
 
   const impactLight = async () => {
-    if ($q.platform.is.capacitor && storeCalc.hapticsMode) {
+    if ($q.platform.is.capacitor && storeSettings.hapticsMode) {
       await Haptics.impact({style: ImpactStyle.Light});
     }
   };
 
   const impactMedium = async () => {
-    if ($q.platform.is.capacitor && storeCalc.hapticsMode) {
+    if ($q.platform.is.capacitor && storeSettings.hapticsMode) {
       await Haptics.impact({style: ImpactStyle.Medium});
     }
   };
 
-  // 계산기 오브젝트를 스토어에서 가져오기 위한 변수 선언
-  import {useStoreCalc} from 'src/stores/store-calc';
-  const storeCalc = useStoreCalc();
+  // 스토어 가져오기
+  import {useStoreBase} from 'src/stores/store-base';
+  const storeBase = useStoreBase();
   const {
     calc,
-    clickButtonById,
-    notifyError,
-    notifyMsg,
     offButtonShift,
     offButtonShiftLock,
     onButtonShift,
     onButtonShiftLock,
     showMemoryOnWithTimer,
     toggleButtonShift,
-  } = storeCalc;
+  } = storeBase;
+
+  import {useStoreNotifications} from 'src/stores/store-notifications';
+  const storeNotifications = useStoreNotifications();
+  const {notifyError, notifyMsg} = storeNotifications;
+
+  import {useStoreUtils} from 'src/stores/store-utils';
+  const storeUtils = useStoreUtils();
+  const {clickButtonById} = storeUtils;
 
   // 에러처리를 위한 함수
   const funcWithError = (func: () => void) => {
@@ -168,7 +175,7 @@
   type ButtonID = string | number;
 
   const showTooltipOfFunc = (id: ButtonID) => {
-    if (timersOfTooltip[id] || id === shiftID || (!storeCalc.showButtonAddedLabel && storeCalc.buttonShift)) return;
+    if (timersOfTooltip[id] || id === shiftID || (!storeSettings.showButtonAddedLabel && storeBase.buttonShift)) return;
     timersOfTooltip[id] = true;
     setTimeout(() => {
       timersOfTooltip[id] = false;
@@ -177,7 +184,7 @@
 
   // 버튼 시프트 상태에 따라 기능 실행
   const shiftFunc = (id: ButtonID) => {
-    if (storeCalc.buttonShift) {
+    if (storeBase.buttonShift) {
       funcWithError(buttonsAddedFunc[id][2]);
       showTooltipOfFunc(id);
       showButtonNotify(id);
@@ -186,7 +193,7 @@
         offButtonShiftLock();
         return;
       }
-      if (storeCalc.buttonShiftLock) return;
+      if (storeBase.buttonShiftLock) return;
       offButtonShift();
     } else {
       funcWithError(buttons[id][4]);
@@ -196,7 +203,7 @@
   const holdFunc = (id: ButtonID) => {
     impactMedium();
     if (id === shiftID) {
-      if (storeCalc.buttonShiftLock) {
+      if (storeBase.buttonShiftLock) {
         offButtonShiftLock();
         offButtonShift();
       } else {
@@ -205,9 +212,9 @@
       }
       return;
     }
-    if (storeCalc.buttonShift) {
+    if (storeBase.buttonShift) {
       funcWithError(buttons[id][4]);
-      if (storeCalc.buttonShiftLock) return;
+      if (storeBase.buttonShiftLock) return;
       offButtonShift();
       return;
     } else {
@@ -262,10 +269,10 @@
 
   // inputFocused 값이 바뀌면 키바인딩을 추가하거나 제거합니다.
   watch(
-    () => storeCalc.inputFocused,
+    () => storeUtils.inputFocused,
     () => {
       // console.log('buttons inputFocused', inputFocused);
-      if (storeCalc.inputFocused) {
+      if (storeUtils.inputFocused) {
         keyBinding.unsubscribe();
       } else {
         keyBinding.subscribe();
@@ -290,8 +297,8 @@
 
 <template>
   <q-card-section
-    v-touch-swipe:9e-2:12:50.up="() => (storeCalc.isHistoryDialogOpen = true)"
-    v-touch-swipe:9e-2:12:50.down="() => (storeCalc.isSettingDialogOpen = true)"
+    v-touch-swipe:9e-2:12:50.up="() => (storeBase.isHistoryDialogOpen = true)"
+    v-touch-swipe:9e-2:12:50.down="() => (storeBase.isSettingDialogOpen = true)"
     v-blur
     class="row wrap justify-center q-pt-xs q-pb-none q-px-none"
   >
@@ -303,33 +310,33 @@
         no-caps
         push
         :label="
-          storeCalc.buttonShift && !storeCalc.showButtonAddedLabel && id !== shiftID
+          storeBase.buttonShift && !storeSettings.showButtonAddedLabel && id !== shiftID
             ? buttonsAddedFunc[id][0]
             : button[0]
               ? undefined
               : button[1]
         "
         :icon="
-          storeCalc.buttonShift && !storeCalc.showButtonAddedLabel && id !== shiftID
+          storeBase.buttonShift && !storeSettings.showButtonAddedLabel && id !== shiftID
             ? undefined
             : button[0]
               ? button[1]
               : undefined
         "
         :class="[
-          storeCalc.buttonShift && !storeCalc.showButtonAddedLabel && id !== shiftID ? 'char' : button[0] ? 'icon' : 'char',
-          id === shiftID && storeCalc.buttonShift ? 'button-shift' : '',
+          storeBase.buttonShift && !storeSettings.showButtonAddedLabel && id !== shiftID ? 'char' : button[0] ? 'icon' : 'char',
+          id === shiftID && storeBase.buttonShift ? 'button-shift' : '',
         ]"
-        :style="!storeCalc.showButtonAddedLabel || !buttonsAddedFunc[id][0] ? {paddingTop: '4px'} : {}"
+        :style="!storeSettings.showButtonAddedLabel || !buttonsAddedFunc[id][0] ? {paddingTop: '4px'} : {}"
         :color="`btn-${button[2]}`"
         @click="() => shiftFunc(id)"
         @touchstart="() => impactLight()"
       >
         <span
-          v-if="storeCalc.showButtonAddedLabel && buttonsAddedFunc[id]"
+          v-if="storeSettings.showButtonAddedLabel && buttonsAddedFunc[id]"
           class="top-label"
           :class="[`top-label-${button[0] ? 'icon' : 'char'}`]"
-          :style="`color: ${storeCalc.buttonShift ? buttonColorsLight[button[2]] : buttonColorsDark[button[2]]}`"
+          :style="`color: ${storeBase.buttonShift ? buttonColorsLight[button[2]] : buttonColorsDark[button[2]]}`"
         >
           {{ buttonsAddedFunc[id][0] }}
         </span>

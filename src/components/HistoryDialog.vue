@@ -1,28 +1,39 @@
 <script setup lang="ts">
-  import {onMounted, onBeforeUnmount, ref, computed, watch, reactive, h} from 'vue';
+  import {
+    onMounted,
+    onBeforeUnmount,
+    ref,
+    computed,
+    watch,
+    reactive,
+  } from 'vue';
 
   // import MyTooltip from 'components/MyTooltip.vue';
 
-  import {useI18n} from 'vue-i18n';
-  const {t} = useI18n();
+  import { useI18n } from 'vue-i18n';
+  const { t} = useI18n();
 
   import MenuItem from 'components/MenuItem.vue';
 
   // 스토어 가져오기
-  import {useStoreCalc} from 'src/stores/store-calc';
-  const storeCalc = useStoreCalc();
+  import { useStoreBase } from 'src/stores/store-base';
+  const storeBase = useStoreBase();
+  import { useStoreUtils } from 'src/stores/store-utils';
+  const storeUtils = useStoreUtils();
+  import { useStoreNotifications } from 'src/stores/store-notifications';
+  const storeNotifications = useStoreNotifications();
+  import { useStoreUnit } from 'src/stores/store-unit';
+  const storeUnit = useStoreUnit();
+  import { useStoreCurrency } from 'src/stores/store-currency';
+  const storeCurrency = useStoreCurrency();
 
   // 계산기 오브젝트를 스토어에서 가져오기 위한 변수 선언
-  const {
-    calc,
-    clickButtonById,
-    getRightSideInHistory,
-    getLeftSideInHistory,
-    notifyMsg,
-    notifyError,
-    swapUnitValue,
-    swapCurrencyValue,
-  } = storeCalc;
+  const { calc } = storeBase;
+  const { clickButtonById } = storeUtils;
+  const { notifyMsg, notifyError } = storeNotifications;
+  const { swapUnitValue } = storeUnit;
+  const { swapCurrencyValue } = storeCurrency;
+  const { getRightSideInHistory, getLeftSideInHistory} = storeUtils;
 
   // 계산 결과 배열
   const histories = computed(() => calc.getHistories());
@@ -83,7 +94,7 @@
     if (touchEndY - touchStartY > 30) {
       // store의 타입이 명시적으로 선언되어 있지 않으므로, 이 부분은 가정에 따라 달라질 수 있습니다.
       // 여기서는 store가 이미 적절한 타입으로 선언되어 있고, isHistoryDialogOpen이 boolean 타입의 속성이라고 가정합니다.
-      storeCalc.isHistoryDialogOpen = false;
+      storeBase.isHistoryDialogOpen = false;
     }
   };
 
@@ -91,7 +102,7 @@
   let lastScrollPosition = 0;
 
   watch(
-    () => storeCalc.isHistoryDialogOpen,
+    () => storeBase.isHistoryDialogOpen,
     (isOpen) => {
       if (isOpen) {
         // 다이얼로그가 열릴 때 시간을 약간 지연하여 저장된 스크롤 위치로 이동
@@ -108,7 +119,7 @@
   );
 
   const scrollHistory = (offset: number | 'top' | 'bottom') => {
-    if (storeCalc.isHistoryDialogOpen) {
+    if (storeBase.isHistoryDialogOpen) {
       const historyElement = document.getElementById('history');
       if (historyElement) {
         if (offset === 'top') {
@@ -128,7 +139,7 @@
   // prettier-ignore
   const keyBinding = new KeyBinding([
     [['Alt+h'], () => { !doDeleteHistory.value && clickButtonById('btn-history'); }],
-    [['d'], () => { storeCalc.isHistoryDialogOpen && clickButtonById('btn-delete-history'); }],
+    [['d'], () => { storeBase.isHistoryDialogOpen && clickButtonById('btn-delete-history'); }],
     [['ArrowUp'], () => scrollHistory(-50)],
     [['ArrowDown'], () => scrollHistory(50)],
     [['PageUp'], () => scrollHistory(-400)],
@@ -139,9 +150,9 @@
 
   // inputFocused 값이 바뀌면 키바인딩을 추가하거나 제거합니다.
   watch(
-    () => storeCalc.inputFocused,
+    () => storeUtils.inputFocused,
     () => {
-      if (storeCalc.inputFocused) {
+      if (storeUtils.inputFocused) {
         keyBinding.unsubscribe();
       } else {
         keyBinding.subscribe();
@@ -234,7 +245,7 @@
 
   const toSubResult = (id: number) => {
     const history = calc.getHistoryByID(id);
-    if (storeCalc.cTab === 'unit') {
+    if (storeBase.cTab === 'unit') {
       swapUnitValue();
       setTimeout(() => {
         calc.setCurrentNumber(history.resultNumber);
@@ -242,7 +253,7 @@
       setTimeout(() => {
         swapUnitValue();
       }, 10);
-    } else if (storeCalc.cTab === 'currency') {
+    } else if (storeBase.cTab === 'currency') {
       swapCurrencyValue();
       setTimeout(() => {
         calc.setCurrentNumber(history.resultNumber);
@@ -259,7 +270,7 @@
 </script>
 
 <template>
-  <q-dialog v-model="storeCalc.isHistoryDialogOpen" style="z-index: 10" position="bottom" transition-duration="300">
+  <q-dialog v-model="storeBase.isHistoryDialogOpen" style="z-index: 10" position="bottom" transition-duration="300">
     <q-bar v-blur dark class="full-width noselect text-white bg-primary">
       <q-icon name="history" size="sm" />
       <div>{{ t('history') }}</div>
@@ -273,11 +284,11 @@
         :disable="doDeleteHistory || histories.length == 0"
         @click="doDeleteHistory = true"
       />
-      <q-btn icon="close" size="md" dense flat @click="storeCalc.isHistoryDialogOpen = false" />
+      <q-btn icon="close" size="md" dense flat @click="storeBase.isHistoryDialogOpen = false" />
     </q-bar>
     <q-card
       id="history"
-      v-touch-swipe:9e-2:12:50.down="() => (storeCalc.isHistoryDialogOpen = false)"
+      v-touch-swipe:9e-2:12:50.down="() => (storeBase.isHistoryDialogOpen = false)"
       square
       class="full-width row justify-center items-start relative-position scrollbar-custom"
       @scroll="onScroll"
@@ -378,7 +389,7 @@
                     <MenuItem separator />
                     <MenuItem :title="t('loadToMainPanel')" :action="() => toMainResult(history.id as number)" />
                     <MenuItem
-                      v-if="storeCalc.cTab === 'unit' || storeCalc.cTab === 'currency'"
+                      v-if="storeBase.cTab === 'unit' || storeBase.cTab === 'currency'"
                       :title="t('loadToSubPanel')"
                       :action="() => toSubResult(history.id as number)"
                     />
@@ -428,11 +439,11 @@
           autofocus
           clear-icon="close"
           color="primary"
-          @focus="storeCalc.setInputFocused"
-          @blur="storeCalc.setInputBlurred"
+          @focus="storeUtils.setInputFocused"
+          @blur="storeUtils.setInputBlurred"
           @keyup.enter="
             {
-              storeCalc.setInputBlurred;
+              storeUtils.setInputBlurred;
               editConfirm();
             }
           "

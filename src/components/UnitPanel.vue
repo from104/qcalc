@@ -1,17 +1,27 @@
 <script setup lang="ts">
-  import {onMounted, onBeforeUnmount, reactive, watch} from 'vue';
+  import {
+    onMounted,
+    onBeforeUnmount,
+    reactive,
+    watch,
+  } from 'vue';
 
-  import {UnitConverter} from 'classes/UnitConverter';
+  import { useI18n } from 'vue-i18n';
+  const { t } = useI18n();
+
+  import { UnitConverter} from 'classes/UnitConverter';
 
   import MyTooltip from 'components/MyTooltip.vue';
 
-  import {useI18n} from 'vue-i18n';
-  const {t} = useI18n();
-
   // 스토어 가져오기
-  import {useStoreCalc} from 'src/stores/store-calc';
-  const storeCalc = useStoreCalc();
-  const {swapUnitValue, initRecentCategoryAndUnit, clickButtonById, showUnitToggle} = storeCalc;
+  import { useStoreUnit } from 'src/stores/store-unit';
+  import { useStoreSettings } from 'src/stores/store-settings';
+  import { useStoreUtils } from 'src/stores/store-utils';
+  const storeUnit = useStoreUnit();
+  const storeSettings = useStoreSettings();
+  const storeUtils = useStoreUtils();
+  const { clickButtonById } = storeUtils;
+  const { swapUnitValue, initRecentCategoryAndUnit } = storeUnit;
 
   // 단위 초기화
   initRecentCategoryAndUnit();
@@ -25,7 +35,7 @@
   );
 
   // 범주 이름을 언어에 맞게 바꾸기 위한 감시
-  watch([() => storeCalc.locale], () => {
+  watch([() => storeSettings.locale], () => {
     categories.forEach((category) => {
       category.label = t(`categories.${category.value}`);
     });
@@ -35,7 +45,7 @@
   // prettier-ignore
   const keyBinding = new KeyBinding([
     [['Alt+w'], () => clickButtonById('btn-swap-unit')],
-    [['Alt+y'], () => showUnitToggle()],
+    [['Alt+y'], () => storeSettings.toggleShowUnit()],
   ]);
 
   onMounted(() => {
@@ -64,23 +74,23 @@
   const toUnitOptions = reactive({values: []} as ReactiveUnitOptions);
 
   watch(
-    [() => storeCalc.recentUnitFrom[storeCalc.recentCategory], () => storeCalc.recentUnitTo[storeCalc.recentCategory]],
+    [() => storeUnit.recentUnitFrom[storeUnit.recentCategory], () => storeUnit.recentUnitTo[storeUnit.recentCategory]],
     () => {
-      const category = storeCalc.recentCategory;
+      const category = storeUnit.recentCategory;
       const unitList = UnitConverter.getUnitLists(category);
 
       fromUnitOptions.values = unitList.map((unit) => ({
         value: unit,
         label: unit,
         desc: UnitConverter.getUnitDesc(category, unit),
-        disable: storeCalc.recentUnitTo[category] === unit,
+        disable: storeUnit.recentUnitTo[category] === unit,
       }));
 
       toUnitOptions.values = unitList.map((unit) => ({
         value: unit,
         label: unit,
         desc: UnitConverter.getUnitDesc(category, unit),
-        disable: storeCalc.recentUnitFrom[category] === unit,
+        disable: storeUnit.recentUnitFrom[category] === unit,
       }));
     },
     {immediate: true},
@@ -91,7 +101,7 @@
   <q-card-section v-blur class="row q-px-sm q-pt-none q-pb-sm">
     <!-- 카테고리 -->
     <q-select
-      v-model="storeCalc.recentCategory"
+      v-model="storeUnit.recentCategory"
       :options="categories"
       :label="t('category')"
       stack-label
@@ -100,10 +110,10 @@
       emit-value
       map-options
       class="col-3 q-pl-sm shadow-2 text-black"
-      :class="!storeCalc.darkMode ? 'bg-blue-grey-2' : 'bg-blue-grey-6'"
-      :popup-content-class="!storeCalc.darkMode ? 'bg-blue-grey-2' : 'bg-blue-grey-6'"
-      :options-selected-class="!storeCalc.darkMode ? 'text-primary' : 'text-grey-1'"
-      :label-color="!storeCalc.darkMode ? 'primary' : 'grey-1'"
+      :class="!storeSettings.darkMode ? 'bg-blue-grey-2' : 'bg-blue-grey-6'"
+      :popup-content-class="!storeSettings.darkMode ? 'bg-blue-grey-2' : 'bg-blue-grey-6'"
+      :options-selected-class="!storeSettings.darkMode ? 'text-primary' : 'text-grey-1'"
+      :label-color="!storeSettings.darkMode ? 'primary' : 'grey-1'"
     />
 
     <!-- 원본 방향 -->
@@ -111,32 +121,32 @@
 
     <!-- 원본 단위 -->
     <q-select
-      v-model="storeCalc.recentUnitFrom[storeCalc.recentCategory]"
+      v-model="storeUnit.recentUnitFrom[storeUnit.recentCategory]"
       :options="fromUnitOptions.values"
-      :label="t(`unitDesc.${storeCalc.recentCategory}.${storeCalc.recentUnitFrom[storeCalc.recentCategory]}`)"
+      :label="t(`unitDesc.${storeUnit.recentCategory}.${storeUnit.recentUnitFrom[storeUnit.recentCategory]}`)"
       stack-label
       dense
       options-dense
       emit-value
       map-options
       class="col-3 q-pl-sm shadow-2"
-      :class="!storeCalc.darkMode ? 'bg-blue-grey-2' : 'bg-blue-grey-6'"
-      :popup-content-class="!storeCalc.darkMode ? 'bg-blue-grey-2' : 'bg-blue-grey-6'"
-      :options-selected-class="!storeCalc.darkMode ? 'text-primary' : 'text-grey-1'"
-      :label-color="!storeCalc.darkMode ? 'primary' : 'grey-1'"
+      :class="!storeSettings.darkMode ? 'bg-blue-grey-2' : 'bg-blue-grey-6'"
+      :popup-content-class="!storeSettings.darkMode ? 'bg-blue-grey-2' : 'bg-blue-grey-6'"
+      :options-selected-class="!storeSettings.darkMode ? 'text-primary' : 'text-grey-1'"
+      :label-color="!storeSettings.darkMode ? 'primary' : 'grey-1'"
     >
       <template #option="scope">
         <q-item v-bind="scope.itemProps">
           <q-item-section>
             <q-item-label caption>
-              {{ t(`unitDesc.${storeCalc.recentCategory}.${scope.opt.label}`) }}
+              {{ t(`unitDesc.${storeUnit.recentCategory}.${scope.opt.label}`) }}
             </q-item-label>
             <q-item-label>{{ scope.opt.label }}</q-item-label>
           </q-item-section>
         </q-item>
       </template>
       <MyTooltip>
-        {{ t(`unitDesc.${storeCalc.recentCategory}.${storeCalc.recentUnitFrom[storeCalc.recentCategory]}`) }}
+        {{ t(`unitDesc.${storeUnit.recentCategory}.${storeUnit.recentUnitFrom[storeUnit.recentCategory]}`) }}
       </MyTooltip>
     </q-select>
 
@@ -156,32 +166,32 @@
 
     <!-- 대상 단위 -->
     <q-select
-      v-model="storeCalc.recentUnitTo[storeCalc.recentCategory]"
+      v-model="storeUnit.recentUnitTo[storeUnit.recentCategory]"
       :options="toUnitOptions.values"
-      :label="t(`unitDesc.${storeCalc.recentCategory}.${storeCalc.recentUnitTo[storeCalc.recentCategory]}`)"
+      :label="t(`unitDesc.${storeUnit.recentCategory}.${storeUnit.recentUnitTo[storeUnit.recentCategory]}`)"
       stack-label
       dense
       options-dense
       emit-value
       map-options
       class="col-3 q-pl-sm shadow-2"
-      :class="!storeCalc.darkMode ? 'bg-blue-grey-2' : 'bg-blue-grey-6'"
-      :popup-content-class="!storeCalc.darkMode ? 'bg-blue-grey-2' : 'bg-blue-grey-6'"
-      :options-selected-class="!storeCalc.darkMode ? 'text-primary' : 'text-grey-1'"
-      :label-color="!storeCalc.darkMode ? 'primary' : 'grey-1'"
+      :class="!storeSettings.darkMode ? 'bg-blue-grey-2' : 'bg-blue-grey-6'"
+      :popup-content-class="!storeSettings.darkMode ? 'bg-blue-grey-2' : 'bg-blue-grey-6'"
+      :options-selected-class="!storeSettings.darkMode ? 'text-primary' : 'text-grey-1'"
+      :label-color="!storeSettings.darkMode ? 'primary' : 'grey-1'"
     >
       <template #option="scope">
         <q-item v-bind="scope.itemProps">
           <q-item-section>
             <q-item-label caption>
-              {{ t(`unitDesc.${storeCalc.recentCategory}.${scope.opt.label}`) }}
+              {{ t(`unitDesc.${storeUnit.recentCategory}.${scope.opt.label}`) }}
             </q-item-label>
             <q-item-label>{{ scope.opt.label }}</q-item-label>
           </q-item-section>
         </q-item>
       </template>
       <MyTooltip>
-        {{ t(`unitDesc.${storeCalc.recentCategory}.${storeCalc.recentUnitTo[storeCalc.recentCategory]}`) }}
+        {{ t(`unitDesc.${storeUnit.recentCategory}.${storeUnit.recentUnitTo[storeUnit.recentCategory]}`) }}
       </MyTooltip>
     </q-select>
 
