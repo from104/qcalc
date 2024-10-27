@@ -4,6 +4,20 @@ All notable changes to this project are recorded in this file.
 
 The format is based on [Keep a Changelog] and this project follows [Semantic Versioning].
 
+## [0.9.2] 2024-10-27
+
+### Added
+
+- 
+
+### Changed
+
+- 
+
+### Fixed
+
+- Fixed trigonometric function calculation error
+
 ## [0.9.1] 2024-06-29
 
 ### Added
