@@ -4,35 +4,42 @@
   import MyTooltip from 'components/MyTooltip.vue';
   import MenuItem from 'components/MenuItem.vue';
   import { useI18n } from 'vue-i18n';
+  import { useStoreBase } from 'src/stores/store-base';
+  import { useStoreSettings } from 'src/stores/store-settings';
+  import { useStoreUtils } from 'src/stores/store-utils';
+  import { useStoreUnit } from 'src/stores/store-unit';
+  import { useStoreCurrency } from 'src/stores/store-currency';
+
+  // i18n 설정
   const { t } = useI18n();
 
+  // props 정의
   const props = withDefaults(defineProps<{ field?: string; addon?: string }>(), {
     field: 'main',
     addon: 'none',
   });
 
-  const isMainField = computed(() => props.field == 'main');
-  const fieldID = computed(() => props.field + 'Field');
+  // 계산된 속성 정의
+  const isMainField = computed(() => props.field === 'main');
+  const fieldID = computed(() => `${props.field}Field`);
 
-  // 스토어 가져오기
-  import { useStoreBase } from 'src/stores/store-base';
+  // 스토어 인스턴스 생성
   const storeBase = useStoreBase();
-  import { useStoreSettings } from 'src/stores/store-settings';
   const storeSettings = useStoreSettings();
-  import { useStoreUtils } from 'src/stores/store-utils';
   const storeUtils = useStoreUtils();
-  import { useStoreUnit } from 'src/stores/store-unit';
   const storeUnit = useStoreUnit();
-  import { useStoreCurrency } from 'src/stores/store-currency';
   const storeCurrency = useStoreCurrency();
 
-  const { calc, calcHistory, showMemoryOff, showMemoryOnWithTimer } = storeBase;
+  // 스토어에서 필요한 메서드와 속성 추출
+  const { calc, showMemoryOff, showMemoryOnWithTimer } = storeBase;
   const { toFormattedNumber, getLeftSideInHistory, copyToClipboard } = storeUtils;
   const { initRecentCategoryAndUnit } = storeUnit;
   const { initRecentCurrency, currencyConverter } = storeCurrency;
 
+  const calcHistory = calc.history;
   const needFieldTooltip = ref(false);
 
+  // 필드 툴팁 필요 여부 설정 함수
   const setNeedFieldTooltip = () => {
     const field = document.getElementById(fieldID.value);
     if (!field) return false;
@@ -41,29 +48,30 @@
     return true;
   };
 
+  // 단위 변환 결과 계산 함수
   const convertedUnitNumber = () => {
-    if (props.addon == 'unit') {
+    if (props.addon === 'unit') {
       return UnitConverter.convert(
         storeUnit.recentCategory,
         calc.getCurrentNumber(),
         storeUnit.recentUnitFrom[storeUnit.recentCategory],
         storeUnit.recentUnitTo[storeUnit.recentCategory],
       );
-    } else {
-      return '';
     }
+    return '';
   };
 
+  // 통화 변환 결과 계산 함수
   const convertedCurrencyNumber = () => {
-    if (props.addon == 'currency') {
+    if (props.addon === 'currency') {
       return currencyConverter
         .convert(Number(calc.getCurrentNumber()), storeCurrency.recentCurrencyFrom, storeCurrency.recentCurrencyTo)
         .toString();
-    } else {
-      return '';
     }
+    return '';
   };
 
+  // 결과 문자열 생성 함수
   const getResult = () => {
     if (isMainField.value) {
       const currentNumber = calc.getCurrentNumber();
@@ -72,56 +80,55 @@
         ? `${formattedNumber.split('.')[0]}.${currentNumber.split('.')[1]}`
         : formattedNumber;
     } else {
-      if (props.addon == 'unit') {
+      if (props.addon === 'unit') {
         initRecentCategoryAndUnit();
         return toFormattedNumber(convertedUnitNumber());
-      } else if (props.addon == 'currency') {
+      } else if (props.addon === 'currency') {
         initRecentCurrency();
         return toFormattedNumber(convertedCurrencyNumber());
-      } else {
-        return '';
       }
+      return '';
     }
   };
 
   const result = ref(getResult());
 
+  // 통화 기호 계산된 속성
   const symbol = computed(() => {
-    if (storeSettings.showSymbol && props.addon == 'currency') {
-      if (isMainField.value) {
-        return currencyConverter.getSymbol(storeCurrency.recentCurrencyFrom);
-      } else {
-        return currencyConverter.getSymbol(storeCurrency.recentCurrencyTo);
-      }
-    } else {
-      return '';
+    if (storeSettings.showSymbol && props.addon === 'currency') {
+      return isMainField.value
+        ? currencyConverter.getSymbol(storeCurrency.recentCurrencyFrom)
+        : currencyConverter.getSymbol(storeCurrency.recentCurrencyTo);
     }
+    return '';
   });
 
+  // 단위 표시 계산된 속성
   const unit = computed(() => {
-    if (storeSettings.showUnit && props.addon == 'unit') {
-      if (isMainField.value) {
-        return ' ' + storeUnit.recentUnitFrom[storeUnit.recentCategory];
-      } else {
-        return ' ' + storeUnit.recentUnitTo[storeUnit.recentCategory];
-      }
-    } else {
-      return '';
+    if (storeSettings.showUnit && props.addon === 'unit') {
+      return isMainField.value
+        ? ` ${storeUnit.recentUnitFrom[storeUnit.recentCategory]}`
+        : ` ${storeUnit.recentUnitTo[storeUnit.recentCategory]}`;
     }
+    return '';
   });
 
+  // 숫자만 표시하는 계산된 속성
   const onlyNumber = computed(() => {
-    return props.field == 'main'
-      ? calc.getCurrentNumber()
-      : props.addon == 'unit'
-        ? convertedUnitNumber()
-        : props.addon == 'currency'
-          ? convertedCurrencyNumber()
-          : '';
+    if (props.field === 'main') {
+      return calc.getCurrentNumber();
+    } else if (props.addon === 'unit') {
+      return convertedUnitNumber();
+    } else if (props.addon === 'currency') {
+      return convertedCurrencyNumber();
+    }
+    return '';
   });
 
+  // 연산자 문자열 계산된 속성
   const operator = computed(() => calc.getOperatorString() as string);
 
+  // 연산자 아이콘 매핑
   const operatorIcons: { [key: string]: string } = {
     '+': 'mdi-plus-box',
     '-': 'mdi-minus-box',
@@ -132,28 +139,30 @@
     root: 'mdi-square-root-box',
   };
 
+  // 메모리 초기화 여부 계산된 속성
   const isMemoryReset = computed(() => calc.getIsMemoryReset());
 
+  // 이전 결과 문자열 생성 함수
   const getPreResult = () => {
     const lastHistory = calcHistory.getHistorySize() > 0 ? calcHistory.getHistoryByIndex(0) : null;
     const shouldReset = calc.getShouldReset();
-    const operatorExists = operator.value != '';
+    const operatorExists = operator.value !== '';
 
     if (
       lastHistory !== null &&
       shouldReset &&
-      calc.getCurrentNumber() == lastHistory.resultSnapshot.resultNumber
+      calc.getCurrentNumber() === lastHistory.resultSnapshot.resultNumber
     ) {
-      return [getLeftSideInHistory(lastHistory.resultSnapshot), '='].join(' ');
+      return `${getLeftSideInHistory(lastHistory.resultSnapshot)} =`;
     } else if (operatorExists && !shouldReset) {
       return toFormattedNumber(calc.getPreviousNumber());
-    } else {
-      return '';
     }
+    return '';
   };
 
   const preResult = ref(getPreResult());
 
+  // 결과 색상 정의
   const resultColor = {
     normal: 'text-light-green-8',
     warning: 'text-deep-orange-5',
@@ -161,21 +170,21 @@
     warningDark: 'text-deep-orange-8',
   };
 
+  // 결과 배경색 정의
   const resultBGColor = {
     normal: 'light-green-3',
     warning: 'deep-orange-2',
   };
 
+  // 결과 색상 선택 함수
   const selectResultColor = () => {
-    return isMainField.value && storeBase.showMemory
-      ? !needFieldTooltip.value
-        ? resultColor.normalDark
-        : resultColor.warningDark
-      : !needFieldTooltip.value
-        ? resultColor.normal
-        : resultColor.warning;
+    if (isMainField.value && storeBase.showMemory) {
+      return !needFieldTooltip.value ? resultColor.normalDark : resultColor.warningDark;
+    }
+    return !needFieldTooltip.value ? resultColor.normal : resultColor.warning;
   };
 
+  // 감시자 설정
   watch(
     [
       calc,
@@ -197,10 +206,12 @@
     },
   );
 
+  // 컴포넌트 마운트 전 이벤트 리스너 등록
   onBeforeMount(() => {
     window.addEventListener('resize', setNeedFieldTooltip);
   });
 
+  // 컴포넌트 마운트 후 초기 설정
   onMounted(() => {
     setNeedFieldTooltip();
   });

@@ -1,4 +1,5 @@
 <script lang="ts" setup>
+  // Vue 3의 Composition API에서 필요한 함수들을 가져옵니다.
   import {
     onMounted,
     onBeforeMount,
@@ -8,25 +9,30 @@
     ref,
   } from 'vue';
 
+  // 패키지 버전 정보를 가져옵니다.
   import { version } from '../../package.json';
 
+  // 사용자 정의 툴팁 컴포넌트를 가져옵니다.
   import MyTooltip from 'components/MyTooltip.vue';
 
+  // Quasar 프레임워크의 useQuasar 훅을 가져옵니다.
   import { useQuasar } from 'quasar';
   const $q = useQuasar();
 
-  import {useStoreBase} from 'src/stores/store-base';
+  // 애플리케이션의 여러 스토어들을 가져옵니다.
+  import { useStoreBase } from 'src/stores/store-base';
   import { useStoreSettings } from 'src/stores/store-settings';
   import { useStoreNotifications } from 'src/stores/store-notifications';
   import { useStoreUtils } from 'src/stores/store-utils';
 
+  // 스토어 인스턴스들을 생성합니다.
   const storeBase = useStoreBase();
   const storeSettings = useStoreSettings();
   const storeNotifications = useStoreNotifications();
   const storeUtils = useStoreUtils();
 
-  // 
-  const { notifyMsg} = storeNotifications;
+  // 스토어에서 필요한 함수들을 구조 분해 할당으로 가져옵니다.
+  const { notifyMsg } = storeNotifications;
   const {
     toggleAlwaysOnTop,
     setInitPanel,
@@ -36,17 +42,21 @@
     setDecimalPlaces
   } = storeSettings;
 
+  // i18n 설정을 위한 훅을 가져옵니다.
   import { useI18n } from 'vue-i18n';
   const { locale } = useI18n({useScope: 'global'});
   const { t } = useI18n();
 
+  // 시스템 로케일을 참조로 저장합니다.
   const systemLocale = ref(navigator.language.substring(0, 2));
 
+  // 언어 옵션을 반응형 배열로 정의합니다.
   const localeOptions = reactive([
     {value: 'ko', label: t('message.ko')},
     {value: 'en', label: t('message.en')},
   ]);
 
+  // 시스템 로케일 사용 여부와 사용자 로케일이 변경될 때마다 언어 옵션 라벨을 업데이트합니다.
   watch([() => storeSettings.useSystemLocale, () => storeSettings.userLocale], () => {
     localeOptions.forEach((option) => {
       option.label = t('message.' + option.value);
@@ -54,6 +64,7 @@
     storeSettings.locale = locale.value as string;
   });
 
+  // 로케일을 설정하는 함수입니다.
   const setLocale = () => {
     if (storeSettings.useSystemLocale) {
       locale.value = systemLocale.value;
@@ -62,9 +73,9 @@
     }
   };
 
+  // '항상 위에' 설정을 토글하고 알림을 표시하는 함수입니다.
   const toggleAlwaysOnTopWithNotify = () => {
     if ($q.platform.is.electron) {
-      // 수동으로 토글
       toggleAlwaysOnTop();
 
       if (storeSettings.alwaysOnTop) {
@@ -75,8 +86,10 @@
     }
   };
 
-  import {KeyBinding} from 'classes/KeyBinding';
-  // prettier-ignore
+  // 키 바인딩 클래스를 가져옵니다.
+  import { KeyBinding } from 'classes/KeyBinding';
+  
+  // 키 바인딩을 설정합니다.
   const keyBinding = new KeyBinding([
     [['Alt+t'], toggleAlwaysOnTopWithNotify],
     [['Alt+i'], storeSettings.toggleInitPanel],
@@ -88,11 +101,10 @@
     [[']'], storeSettings.incDecimalPlaces],
   ]);
 
-  // inputFocused 값이 바뀌면 키바인딩을 추가하거나 제거합니다.
+  // 입력 포커스 상태에 따라 키 바인딩을 활성화/비활성화합니다.
   watch(
     () => storeUtils.inputFocused,
     () => {
-      // console.log('setting inputFocused', storeCalc.inputFocused);
       if (storeUtils.inputFocused) {
         keyBinding.unsubscribe();
       } else {
@@ -102,24 +114,25 @@
     {immediate: true},
   );
 
+  // 컴포넌트가 마운트되기 전에 실행되는 훅입니다.
   onBeforeMount(() => {
     setLocale();
 
-    if (storeSettings.locale == '') {
-      // 처음 실행시
+    // 초기 실행 시 로케일 설정
+    if (storeSettings.locale === '') {
       storeSettings.locale = systemLocale.value;
     }
-    if (storeSettings.userLocale == '') {
-      // 처음 실행시
+    if (storeSettings.userLocale === '') {
       storeSettings.userLocale = systemLocale.value;
     }
   });
 
+  // 컴포넌트가 마운트된 후 실행되는 훅입니다.
   onMounted(() => {
     keyBinding.subscribe();
   });
 
-  // dom 요소가 언마운트되기 전에 키바인딩 제거
+  // 컴포넌트가 언마운트되기 전에 실행되는 훅입니다.
   onBeforeUnmount(() => {
     keyBinding.unsubscribe();
   });

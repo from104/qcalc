@@ -1,20 +1,23 @@
 <script setup lang="ts">
-  import { onMounted, reactive, watch} from 'vue';
-
+  import { onMounted, reactive, watch } from 'vue';
   import MenuItem from 'components/MenuItem.vue';
+  import { useRouter } from 'vue-router';
+  import { useStoreBase } from 'src/stores/store-base';
+  import { useStoreSettings } from 'src/stores/store-settings';
+  import { useI18n } from 'vue-i18n';
 
-  import { useRouter} from 'vue-router';
+  // 라우터 인스턴스 초기화
   const router = useRouter();
 
-  import { useStoreBase } from 'src/stores/store-base';
+  // 스토어 인스턴스 초기화
   const storeBase = useStoreBase();
-  import { useStoreSettings } from 'src/stores/store-settings';
   const storeSettings = useStoreSettings();
 
-  import { useI18n} from 'vue-i18n';
-  const {t} = useI18n();
+  // i18n 설정
+  const { t } = useI18n();
 
-  interface Item {
+  // 메뉴 아이템 인터페이스 정의
+  interface MenuItem {
     title?: string;
     caption?: string;
     shortcut?: string;
@@ -23,49 +26,38 @@
     separator?: boolean;
   }
 
-  const items: {[key: string]: Item} = reactive({
+  // 메뉴 아이템 정의
+  const items: { [key: string]: MenuItem } = reactive({
     calc: {
       title: t('item.calc.title'),
       caption: t('item.calc.caption'),
       shortcut: 'Ctrl-1',
       icon: 'calculate',
-      action: () => {
-        storeBase.cTab = 'calc';
-      },
+      action: () => { storeBase.cTab = 'calc'; },
     },
     unit: {
       title: t('item.unit.title'),
       caption: t('item.unit.caption'),
       shortcut: 'Ctrl-2',
       icon: 'swap_vert',
-      action: () => {
-        storeBase.cTab = 'unit';
-      },
+      action: () => { storeBase.cTab = 'unit'; },
     },
     currency: {
       title: t('item.currency.title'),
       caption: t('item.currency.caption'),
       shortcut: 'Ctrl-3',
       icon: 'currency_exchange',
-      action: () => {
-        storeBase.cTab = 'currency';
-      },
+      action: () => { storeBase.cTab = 'currency'; },
     },
-    separator1: {
-      separator: true,
-    },
+    separator1: { separator: true },
     settings: {
       title: t('item.settings.title'),
       caption: t('item.settings.caption'),
       shortcut: 'Alt-s',
       icon: 'settings',
-      action: () => {
-        storeBase.isSettingDialogOpen = true;
-      },
+      action: () => { storeBase.isSettingDialogOpen = true; },
     },
-    separator2: {
-      separator: true,
-    },
+    separator2: { separator: true },
     help: {
       title: t('item.help.title'),
       caption: t('item.help.caption'),
@@ -80,13 +72,17 @@
     },
   });
 
+  // 언어 변경 시 메뉴 아이템 텍스트 업데이트 함수
   const updateLocale = () => {
     Object.keys(items).forEach((item) => {
-      items[item].title = t(`item.${item}.title`);
-      items[item].caption = t(`item.${item}.caption`);
+      if (!items[item].separator) {
+        items[item].title = t(`item.${item}.title`);
+        items[item].caption = t(`item.${item}.caption`);
+      }
     });
   };
 
+  // 언어 변경 감지 및 메뉴 아이템 텍스트 업데이트
   watch(
     () => storeSettings.locale,
     () => {
@@ -94,6 +90,7 @@
     },
   );
 
+  // 컴포넌트 마운트 시 초기 언어 설정
   onMounted(() => {
     updateLocale();
   });

@@ -8,66 +8,69 @@
     reactive,
   } from 'vue';
 
-  // import MyTooltip from 'components/MyTooltip.vue';
-
   import { useI18n } from 'vue-i18n';
-  const { t} = useI18n();
-
   import MenuItem from 'components/MenuItem.vue';
-
-  // 스토어 가져오기
   import { useStoreBase } from 'src/stores/store-base';
-  const storeBase = useStoreBase();
   import { useStoreUtils } from 'src/stores/store-utils';
-  const storeUtils = useStoreUtils();
   import { useStoreNotifications } from 'src/stores/store-notifications';
-  const storeNotifications = useStoreNotifications();
   import { useStoreUnit } from 'src/stores/store-unit';
-  const storeUnit = useStoreUnit();
   import { useStoreCurrency } from 'src/stores/store-currency';
+  import { KeyBinding } from 'classes/KeyBinding';
+  import { copyToClipboard } from 'quasar';
+
+  // i18n 설정
+  const { t } = useI18n();
+
+  // 스토어 인스턴스 초기화
+  const storeBase = useStoreBase();
+  const storeUtils = useStoreUtils();
+  const storeNotifications = useStoreNotifications();
+  const storeUnit = useStoreUnit();
   const storeCurrency = useStoreCurrency();
 
-  // 계산기 오브젝트를 스토어에서 가져오기 위한 변수 선언
-  const { calc, calcHistory } = storeBase;
-  const { clickButtonById } = storeUtils;
+  // 스토어에서 필요한 메서드와 속성 추출
+  const { calc } = storeBase;
+  const { clickButtonById, getRightSideInHistory, getLeftSideInHistory } = storeUtils;
   const { notifyMsg, notifyError } = storeNotifications;
   const { swapUnitValue } = storeUnit;
   const { swapCurrencyValue } = storeCurrency;
-  const { getRightSideInHistory, getLeftSideInHistory} = storeUtils;
 
-  // 계산 결과 배열
+  const calcHistory = calc.history;
+  
+  // 계산 결과 배열 (반응형)
   const histories = computed(() => calcHistory.getHistories());
 
-  // 계산 결과 메뉴가 열려있는지 여부
-  const historyMenu: {[id: number]: boolean} = reactive(Object.fromEntries(histories.value.map((h) => [h.id, false])));
+  // 계산 결과 메뉴의 열림 상태를 관리하는 반응형 객체
+  const historyMenu = reactive(Object.fromEntries(histories.value.map((h) => [h.id, false])));
 
+  // histories 변경 감시
   watch(
     () => histories,
     (newHistories) => {
+      // 새로운 히스토리 항목에 대한 메뉴 상태 초기화
       newHistories.value.forEach((h) => {
-        if (h.id) {
-          if (historyMenu[h.id] === undefined) {
-            historyMenu[h.id] = false;
-          }
-        } else {
+        if (h.id && historyMenu[h.id] === undefined) {
+          historyMenu[h.id] = false;
         }
       });
 
+      // 삭제된 히스토리 항목의 메뉴 상태 제거
       for (const id in historyMenu) {
         if (!newHistories.value.some((h) => h.id === parseInt(id))) {
           delete historyMenu[id];
         }
       }
     },
-    {deep: true}, // 깊은 감시를 위해 deep 옵션을 true로 설정
-  ); // 계산 결과를 지울지 묻는 다이얼로그 표시 여부
+    { deep: true } // 깊은 감시 설정
+  );
 
+  // 계산 결과 삭제 확인 다이얼로그 표시 여부
   const doDeleteHistory = ref(false);
 
   // 계산 결과 맨 위로 가는 아이콘 표시 여부
   const isGoToTopInHistory = ref(false);
 
-  // 계산 결과 창 스크롤 위치에 따라 아이콘 표시 설정
+  // 계산 결과 창 스크롤 이벤트 핸들러
   const onScroll = (evt: Event) => {
     isGoToTopInHistory.value = (evt.target as HTMLDivElement).scrollTop > 50;
   };
@@ -80,44 +83,45 @@
     });
   };
 
-  // 상태를 저장할 변수를 함수 외부에 선언
+  // 터치 시작 위치 저장 변수
   let touchStartY = 0;
 
-  // 이벤트 처리 함수의 타입을 명시적으로 선언
+  // 터치 시작 이벤트 핸들러
   const handleTouchStart = (event: TouchEvent) => {
     touchStartY = event.touches[0].clientY;
   };
 
+  // 터치 종료 이벤트 핸들러
   const handleTouchEnd = (event: TouchEvent) => {
     const touchEndY = event.changedTouches[0].clientY;
-    // 아래로 100px 이상 끌어내렸을 경우 다이얼로그 닫기
+    // 아래로 30px 이상 끌어내렸을 경우 다이얼로그 닫기
     if (touchEndY - touchStartY > 30) {
-      // store의 타입이 명시적으로 선언되어 있지 않으므로, 이 부분은 가정에 따라 달라질 수 있습니다.
-      // 여기서는 store가 이미 적절한 타입으로 선언되어 있고, isHistoryDialogOpen이 boolean 타입의 속성이라고 가정합니다.
       storeBase.isHistoryDialogOpen = false;
     }
   };
 
-  // 스크롤 위치를 저장할 변수
+  // 스크롤 위치 저장 변수
   let lastScrollPosition = 0;
 
+  // 히스토리 다이얼로그 열림/닫힘 상태 감시
   watch(
     () => storeBase.isHistoryDialogOpen,
     (isOpen) => {
       if (isOpen) {
-        // 다이얼로그가 열릴 때 시간을 약간 지연하여 저장된 스크롤 위치로 이동
+        // 다이얼로그가 열릴 때 저장된 스크롤 위치로 이동 (약간의 지연 적용)
         setTimeout(() => {
           document.getElementById('history')?.scrollTo({top: lastScrollPosition});
         }, 50);
       } else {
-        // 다이얼로그가 닫힐 때 현재 스크롤 위치를 저장
+        // 다이얼로그가 닫힐 때 현재 스크롤 위치 저장
         lastScrollPosition = document.getElementById('history')?.scrollTop ?? 0;
-        // 최상단으로 가는 아이콘을 히스토리 숨길 때 함께 숨김
+        // 최상단으로 가는 아이콘 숨김
         isGoToTopInHistory.value = false;
       }
     },
   );
 
+  // 히스토리 스크롤 함수
   const scrollHistory = (offset: number | 'top' | 'bottom') => {
     if (storeBase.isHistoryDialogOpen) {
       const historyElement = document.getElementById('history');
@@ -135,8 +139,7 @@
     }
   };
 
-  import {KeyBinding} from 'classes/KeyBinding';
-  // prettier-ignore
+  // 키 바인딩 설정
   const keyBinding = new KeyBinding([
     [['Alt+h'], () => { !doDeleteHistory.value && clickButtonById('btn-history'); }],
     [['d'], () => { storeBase.isHistoryDialogOpen && clickButtonById('btn-delete-history'); }],
@@ -148,7 +151,7 @@
     [['End'], () => scrollHistory('bottom')],
   ]);
 
-  // inputFocused 값이 바뀌면 키바인딩을 추가하거나 제거합니다.
+  // 입력 포커스 상태에 따른 키 바인딩 활성화/비활성화
   watch(
     () => storeUtils.inputFocused,
     () => {
@@ -158,46 +161,39 @@
         keyBinding.subscribe();
       }
     },
-    {immediate: true},
+    { immediate: true },
   );
 
-  // dom 요소가 마운트 되었을 때
+  // 컴포넌트 마운트 시 키 바인딩 활성화
   onMounted(() => {
     keyBinding.subscribe();
   });
 
-  // dom 요소가 언마운트되기 전에 키바인딩 제거
+  // 컴포넌트 언마운트 시 키 바인딩 비활성화
   onBeforeUnmount(() => {
     keyBinding.unsubscribe();
   });
 
+  // 메모 편집 관련 상태 변수
   const editDialog = ref(false);
   const memo = ref('');
   const editSlide = ref('');
-
   let slidedID = 0;
 
+  // 메모 다이얼로그 열기 함수
   const memoDialog = (id: number) => {
-    // console.log('memoDialog', id);
     slidedID = id;
-
-    if (calcHistory.getMemo(id)) {
-      memo.value = calcHistory.getMemo(id) as string;
-    } else {
-      memo.value = '';
-    }
+    memo.value = calcHistory.getMemo(id) as string || '';
     editDialog.value = true;
   };
 
-  const onLeft = ({reset}: {reset: () => void}, id: number) => {
-    console.log('onLeft', id);
+  // 슬라이드 왼쪽 동작 핸들러
+  const onLeft = ({ reset }: { reset: () => void }, id: number) => {
     memoDialog(id);
-
-    setTimeout(() => {
-      reset();
-    }, 500);
+    setTimeout(reset, 500);
   };
 
+  // 메모 편집 확인 함수
   const editConfirm = () => {
     calcHistory.setMemo(slidedID, memo.value);
     editSlide.value = 'slide-right';
@@ -206,6 +202,7 @@
     slidedID = 0;
   };
 
+  // 메모 편집 취소 함수
   const editCancel = () => {
     editSlide.value = 'slide-left';
     editDialog.value = false;
@@ -213,12 +210,13 @@
     slidedID = 0;
   };
 
+  // 메모 삭제 함수
   const memoDelete = (id: number) => {
     calcHistory.deleteMemo(id);
     memo.value = '';
   };
 
-  import {copyToClipboard} from 'quasar';
+  // 히스토리 항목 복사 함수
   const historyCopy = async (id: number, copyType: 'formattedNumber' | 'onlyNumber' | 'memo'): Promise<void> => {
     const history = calcHistory.getHistoryByID(id);
     const copyText =
@@ -238,11 +236,13 @@
     }
   };
 
+  // 메인 결과로 이동 함수
   const toMainResult = (id: number) => {
     const history = calcHistory.getHistoryByID(id);
     calc.setCurrentNumber(history.resultSnapshot.resultNumber);
   };
 
+  // 서브 결과로 이동 함수
   const toSubResult = (id: number) => {
     const history = calcHistory.getHistoryByID(id);
     if (storeBase.cTab === 'unit') {
@@ -250,20 +250,17 @@
       setTimeout(() => {
         calc.setCurrentNumber(history.resultSnapshot.resultNumber);
       }, 5);
-      setTimeout(() => {
-        swapUnitValue();
-      }, 10);
+      setTimeout(swapUnitValue, 10);
     } else if (storeBase.cTab === 'currency') {
       swapCurrencyValue();
       setTimeout(() => {
         calc.setCurrentNumber(history.resultSnapshot.resultNumber);
       }, 5);
-      setTimeout(() => {
-        swapCurrencyValue();
-      }, 10);
+      setTimeout(swapCurrencyValue, 10);
     }
   };
 
+  // 히스토리 항목 삭제 함수
   const deleteHistory = (id: number) => {
     calcHistory.deleteHistory(id);
   };

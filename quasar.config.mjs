@@ -1,222 +1,126 @@
 /* eslint-env node */
 
 /*
- * This file runs in a Node context (it's NOT transpiled by Babel), so use only
- * the ES6 features that are supported by your Node version. https://node.green/
+ * 이 파일은 Node 환경에서 실행됩니다 (Babel로 트랜스파일되지 않음).
+ * 따라서 현재 Node 버전에서 지원하는 ES6 기능만 사용하세요.
+ * 지원되는 기능 확인: https://node.green/
  */
 
-// Configuration for your app
-// https://v2.quasar.dev/quasar-cli-vite/quasar-config-js
+// Quasar 앱 구성
+// 자세한 내용: https://v2.quasar.dev/quasar-cli-vite/quasar-config-js
 
-import {configure} from 'quasar/wrappers';
-
+import { configure } from 'quasar/wrappers';
 import path from 'path';
 import dotenv from 'dotenv';
 
 export default configure(function (/* ctx */) {
   return {
+    // ESLint 설정
     eslint: {
-      // fix: true,s
-      // include = [],
-      // exclude = [],
-      // rawOptions = {},
-      warnings: true,
-      errors: true,
+      // fix: true, // 자동 수정 활성화 (주석 처리됨)
+      // include: [], // 포함할 파일
+      // exclude: [], // 제외할 파일
+      // rawOptions: {}, // 추가 ESLint 옵션
+      warnings: true, // 경고 표시
+      errors: true, // 오류 표시
     },
 
-    // https://v2.quasar.dev/quasar-cli-vite/prefetch-feature
+    // 프리페치 기능 (주석 처리됨)
     // preFetch: true,
 
-    // app boot file (/src/boot)
-    // --> boot files are part of "main.js"
-    // https://v2.quasar.dev/quasar-cli-vite/boot-files
+    // 앱 부트 파일 (/src/boot)
+    // 부트 파일은 "main.js"의 일부입니다
     boot: ['i18n', 'blur', 'android'],
 
-    // https://v2.quasar.dev/quasar-cli-vite/quasar-config-js#css
+    // CSS 파일
     css: ['app.scss'],
 
-    // https://github.com/quasarframework/quasar/tree/dev/extras
+    // Quasar 추가 기능
     extras: [
-      // 'ionicons-v4',
       'mdi-v5',
-      // 'fontawesome-v6',
-      // 'eva-icons',
-      // 'themify',
-      // 'line-awesome',
-      // 'roboto-font-latin-ext', // this or either 'roboto-font', NEVER both!
-
-      'roboto-font', // optional, you are not bound to it
-      'material-icons', // optional, you are not bound to it
+      'roboto-font',
+      'material-icons',
     ],
 
-    // Full list of options: https://v2.quasar.dev/quasar-cli-vite/quasar-config-js#build
+    // 빌드 설정
     build: {
       // .env 파일 사용
       env: dotenv.config().parsed,
-      // import folder alias
+      
+      // 폴더 별칭 설정
       alias: {
-        classes: [__dirname, 'src/classes'].join('/'),
-        capacitor: [__dirname, 'src-capacitor/node_modules'].join('/'),
+        classes: path.join(__dirname, 'src/classes'),
+        capacitor: path.join(__dirname, 'src-capacitor/node_modules'),
       },
+      
+      // 대상 브라우저 및 Node 버전
       target: {
         browser: ['es2020', 'edge79', 'firefox68', 'chrome67', 'safari14'],
         node: 'node20',
       },
 
-      vueRouterMode: 'hash', // available values: 'hash', 'history'
-      // vueRouterBase,
-      // vueDevtools,
-      // vueOptionsAPI: false,
+      vueRouterMode: 'hash', // 라우터 모드: 'hash' 또는 'history'
 
-      // rebuildCache: true, // rebuilds Vite/linter/etc cache on startup
-
-      // publicPath: '/',
-      // analyze: true,
-      // env: {},
-      // rawDefine: {}
-      // ignorePublicFolder: true,
-      // minify: false,
-      // polyfillModulePreload: true,
-      // distDir
-
-      // extendViteConf (viteConf) {},
-      // viteVuePluginOptions: {},
-
+      // Vite 플러그인 설정
       vitePlugins: [
-        [
-          '@intlify/vite-plugin-vue-i18n',
-          {
-            // if you want to use Vue I18n Legacy API, you need to set `compositionOnly: false`
-            compositionOnly: true,
-
-            // you need to set i18n resource including paths !
-            include: path.resolve(__dirname, './src/i18n/**'),
-
-            // default i18n block format
-            defaultSFCLang: 'yml',
+        // Vue I18n 플러그인
+        ['@intlify/vite-plugin-vue-i18n', {
+          compositionOnly: true,
+          include: path.resolve(__dirname, './src/i18n/**'),
+          defaultSFCLang: 'yml',
+        }],
+        // 타입스크립트 및 ESLint 검사 플러그인
+        ['vite-plugin-checker', {
+          vueTsc: {
+            tsconfigPath: 'tsconfig.vue-tsc.json',
           },
-        ],
-        [
-          'vite-plugin-checker',
-          {
-            vueTsc: {
-              tsconfigPath: 'tsconfig.vue-tsc.json',
-            },
-            eslint: {
-              lintCommand: 'eslint "./**/*.{js,ts,mjs,cjs,vue}"',
-            },
+          eslint: {
+            lintCommand: 'eslint "./**/*.{js,ts,mjs,cjs,vue}"',
           },
-          {server: false},
-        ],
+        }, { server: false }],
       ],
     },
 
-    devtools: {
-      // https://v2.quasar.dev/quasar-cli-vite/quasar-config-js#devtools
-      // devtools: true,
-    },
-    // Full list of options: https://v2.quasar.dev/quasar-cli-vite/quasar-config-js#devServer
+    // 개발 서버 설정
     devServer: {
-      // https: true
-      open: true, // opens browser window automatically
+      open: true, // 브라우저 자동 실행
     },
 
-    // https://v2.quasar.dev/quasar-cli-vite/quasar-config-js#framework
+    // Quasar 프레임워크 설정
     framework: {
       config: {},
-
-      // iconSet: 'material-icons', // Quasar icon set
-      // lang: 'en-US', // Quasar language pack
-
-      // For special cases outside of where the auto-import strategy can have an impact
-      // (like functional components as one of the examples),
-      // you can manually specify Quasar components/directives to be available everywhere:
-      //
-      // components: [],
-      // directives: [],
-
-      // Quasar plugins
       plugins: ['Notify', 'Meta'],
     },
 
-    // animations: 'all', // --- includes all animations
-    // https://v2.quasar.dev/options/animations
+    // 애니메이션 설정
     animations: [],
 
-    // https://v2.quasar.dev/quasar-cli-vite/quasar-config-js#sourcefiles
-    // sourceFiles: {
-    //   rootComponent: 'src/App.vue',
-    //   router: 'src/router/index',
-    //   store: 'src/store/index',
-    //   registerServiceWorker: 'src-pwa/register-service-worker',
-    //   serviceWorker: 'src-pwa/custom-service-worker',
-    //   pwaManifestFile: 'src-pwa/manifest.json',
-    //   electronMain: 'src-electron/electron-main',
-    //   electronPreload: 'src-electron/electron-preload'
-    // },
-
-    // https://v2.quasar.dev/quasar-cli-vite/developing-ssr/configuring-ssr
+    // SSR(서버 사이드 렌더링) 설정
     ssr: {
-      // ssrPwaHtmlFilename: 'offline.html', // do NOT use index.html as name!
-      // will mess up SSR
-      // extendSSRWebserverConf (esbuildConf) {},
-      // extendPackageJson (json) {},
-      // pwa: false,
-      // manualStoreHydration: true,
-      // manualPostHydrationTrigger: true,
-      // prodPort: 3000, // The default port that the production server should use
-      // (gets superseded if process.env.PORT is specified at runtime)
-      // middlewares: [
-      //   'render', // keep this as last one
-      // ],
+      // SSR 관련 설정 (주석 처리됨)
     },
 
-    // https://v2.quasar.dev/quasar-cli-vite/developing-pwa/configuring-pwa
+    // PWA(프로그레시브 웹 앱) 설정
     pwa: {
-      // workboxMode: 'generateSW', // or 'injectManifest'
-      // injectPwaMetaTags: true,
-      // swFilename: 'sw.js',
-      // manifestFilename: 'manifest.json',
-      // useCredentialsForManifestTag: false,
-      // extendGenerateSWOptions (cfg) {}
-      // extendInjectManifestOptions (cfg) {},
-      // extendManifestJson (json) {}
-      // extendPWACustomSWConf (esbuildConf) {}
+      // PWA 관련 설정 (주석 처리됨)
     },
 
-    // Full list of options: https://v2.quasar.dev/quasar-cli-vite/developing-cordova-apps/configuring-cordova
+    // Cordova 설정
     cordova: {
-      // noIosLegacyBuildFlag: true, // uncomment only if you know what you are doing
+      // Cordova 관련 설정 (주석 처리됨)
     },
 
-    // Full list of options: https://v2.quasar.dev/quasar-cli-vite/developing-capacitor-apps/configuring-capacitor
+    // Capacitor 설정
     capacitor: {
       hideSplashscreen: true,
     },
 
-    // Full list of options: https://v2.quasar.dev/quasar-cli-vite/developing-electron-apps/configuring-electron
+    // Electron 설정
     electron: {
-      // extendElectronMainConf (esbuildConf)
-      // extendElectronPreloadConf (esbuildConf)
-
       inspectPort: 5858,
-
-      bundler: 'builder', // 'packager' or 'builder'
-
-      packager: {
-        // https://github.com/electron-userland/electron-packager/blob/master/docs/api.md#options
-        // OS X / Mac App Store
-        // appBundleId: '',
-        // appCategoryType: '',
-        // osxSign: '',
-        // protocol: 'myapp://path',
-        // Windows only
-        // win32metadata: { ... }
-      },
+      bundler: 'builder', // 'packager' 또는 'builder'
 
       builder: {
-        // https://www.electron.build/configuration/configuration
-
         appId: 'com.atit.qcalc',
         productName: 'QCalc',
         artifactName: '${productName}-${version}-${os}.${ext}',
@@ -230,11 +134,9 @@ export default configure(function (/* ctx */) {
       },
     },
 
-    // Full list of options: https://v2.quasar.dev/quasar-cli-vite/developing-browser-extensions/configuring-bex
+    // 브라우저 확장 프로그램(BEX) 설정
     bex: {
-      // contentScripts: ['my-content-script'],
-      // extendBexScriptsConf (esbuildConf) {}
-      // extendBexManifestJson (json) {}
+      // BEX 관련 설정 (주석 처리됨)
     },
   };
 });

@@ -1,48 +1,65 @@
 import Freecurrencyapi from '@everapi/freecurrencyapi-js';
 import {CurrencyExchangeRates, CurrencyData, currencyBaseData} from './CurrencyBaseData';
 
-// 환율 정보를 사용하는 클래스
+/**
+ * CurrencyConverter 클래스
+ * 
+ * 이 클래스는 환율 정보를 관리하고 통화 변환 기능을 제공합니다.
+ */
 export class CurrencyConverter {
-  // https://app.freecurrencyapi.com/dashboard
-  private accessKey = process.env.FREECURRENCY_API_KEY; // API 접근 키
+  // FreeCurrency API 접근 키
+  private accessKey = process.env.FREECURRENCY_API_KEY;
 
-  private intervalToUpdate = 1000 * 60 * 60 * 12; // 환율 정보를 업데이트하는 주기
-  private updatedTimeOfCurrencyExchangeRates = 0; // 환율 정보를 업데이트한 시간
-  private baseCurrencyExchangeRates: CurrencyExchangeRates = {}; // 기본 환율 정보 (EUR)
-  private baseCurrency = 'EUR'; // 환율 정보의 기준 통화
-  private rates: CurrencyExchangeRates = {}; // 환율 정보
-  private currencies: CurrencyData = currencyBaseData; // 환율 정보를 사용하는 통화 데이터
+  // 환율 정보 업데이트 주기 (12시간)
+  private intervalToUpdate = 1000 * 60 * 60 * 12;
+  
+  // 마지막 환율 정보 업데이트 시간
+  private updatedTimeOfCurrencyExchangeRates = 0;
+  
+  // 기본 환율 정보 (EUR 기준)
+  private baseCurrencyExchangeRates: CurrencyExchangeRates = {};
+  
+  // 기준 통화 (기본값: EUR)
+  private baseCurrency = 'EUR';
+  
+  // 현재 사용 중인 환율 정보
+  private rates: CurrencyExchangeRates = {};
+  
+  // 통화 데이터 (심볼, 설명 등)
+  private currencies: CurrencyData = currencyBaseData;
 
-  // 생성자
+  /**
+   * 생성자
+   * 인스턴스 생성 시 환율 정보를 업데이트합니다.
+   */
   constructor() {
-    // 환율 정보를 업데이트합니다.
     this.updateRates();
   }
 
-  // baseRates가 비어있는지 확인하는 메소드
+  /**
+   * 환율 정보가 비어있는지 확인하는 메소드
+   * @returns {boolean} 환율 정보가 비어있으면 true, 그렇지 않으면 false
+   */
   isRatesEmpty() {
-    // baseRates가 비어있다면 true를 반환합니다.
     return Object.keys(this.baseCurrencyExchangeRates).length === 0;
   }
 
-  // 환율 정보를 업데이트하는 메소드
+  /**
+   * 환율 정보를 업데이트하는 메소드
+   * @param {boolean} force - 강제 업데이트 여부
+   */
   async updateRates(force = false) {
-    // 환율 정보가 없거나, 업데이트 주기가 지났거나, 경과 시간과 무관하게 업데이트를 강제하려는 경우
     try {
       if (
         this.isRatesEmpty() ||
         Date.now() - this.updatedTimeOfCurrencyExchangeRates > this.intervalToUpdate ||
         force
       ) {
-        // API로 부터 환율 정보를 가져옵니다.
         const api = new Freecurrencyapi(this.accessKey);
         const data = await api.latest({base_currency: 'EUR'});
         this.baseCurrencyExchangeRates = data.data;
-        // 기준 통화에 대한 환율 정보를 설정합니다.
         this.rates = this.getRates(this.baseCurrency);
-        // 마지막 업데이트 시간을 현재 시간으로 갱신합니다.
         this.updatedTimeOfCurrencyExchangeRates = Date.now();
-        // console.log('환율 정보를 업데이트 했습니다.');
       }
     } catch (error) {
       this.rates = {};
@@ -50,136 +67,149 @@ export class CurrencyConverter {
     }
   }
 
-  // 통화 목록을 가져오는 메소드
+  /**
+   * 사용 가능한 통화 목록을 반환하는 메소드
+   * @returns {string[]} 통화 코드 배열
+   */
   getCurrencyLists(): string[] {
-    if (this.isRatesEmpty()) {
-      return [];
-    } else {
-      return Object.keys(this.baseCurrencyExchangeRates);
-    }
-  }
-  // 기준 통화를 설정하는 메소드
-  setBase(baseCurrency: string) {
-    // baseRates가 비어있지 않고, baseRates에 baseCurrency 통화가 있는 경우
-    if (!this.isRatesEmpty() && this.baseCurrencyExchangeRates.hasOwnProperty(baseCurrency)) {
-      this.baseCurrency = baseCurrency; // base를 기준 통화로 설정
-      this.rates = this.getRates(baseCurrency); // base에 대한 환율 정보를 가져옵니다.
-    }
+    return this.isRatesEmpty() ? [] : Object.keys(this.baseCurrencyExchangeRates);
   }
 
-  // 기준 통화를 반환하는 메소드
+  /**
+   * 기준 통화를 설정하는 메소드
+   * @param {string} baseCurrency - 새로운 기준 통화
+   */
+  setBase(baseCurrency: string) {
+    if (this.isRatesEmpty()) {
+      throw new Error('Exchange rates are not available');
+    }
+    if (!this.baseCurrencyExchangeRates[baseCurrency]) {
+      throw new Error('Invalid base currency');
+    }
+    this.baseCurrency = baseCurrency;
+    this.rates = this.getRates(baseCurrency);
+  }
+
+  /**
+   * 현재 기준 통화를 반환하는 메소드
+   * @returns {string} 현재 기준 통화
+   */
   getBase() {
     return this.baseCurrency;
   }
 
-  // 기준 통화에 대한 환율 정보를 가져오는 메소드
+  /**
+   * 특정 기준 통화에 대한 환율 정보를 계산하는 메소드
+   * @param {string} baseCurrency - 기준 통화 (기본값: 'EUR')
+   * @returns {CurrencyExchangeRates} 계산된 환율 정보
+   */
   getRates(baseCurrency = 'EUR'): CurrencyExchangeRates {
-    // baseRates가 비어있지 않는 경우
-    if (!this.isRatesEmpty()) {
-      // base가 'EUR'인 경우
-      if (baseCurrency === 'EUR') {
-        return this.baseCurrencyExchangeRates;
-      } else if (this.baseCurrencyExchangeRates.hasOwnProperty(baseCurrency)) {
-        const rates: CurrencyExchangeRates = {};
-        // baseCurrency 통화에 대한 다른 통화의 환율 정보를 계산합니다.
-        for (const currency in this.baseCurrencyExchangeRates) {
-          rates[currency] = this.baseCurrencyExchangeRates[currency] / this.baseCurrencyExchangeRates[baseCurrency];
-        }
-        return rates;
-      }
+    if (this.isRatesEmpty()) {
+      return {};
     }
-    return {}; // baseRates가 비어있는 경우 빈 객체를 반환
+
+    if (baseCurrency === 'EUR') {
+      return this.baseCurrencyExchangeRates;
+    }
+
+    if (!this.baseCurrencyExchangeRates.hasOwnProperty(baseCurrency)) {
+      throw new Error('Invalid base currency');
+    }
+
+    const baseRate = this.baseCurrencyExchangeRates[baseCurrency];
+    return Object.fromEntries(
+      Object.entries(this.baseCurrencyExchangeRates).map(
+        ([currency, rate]) => [currency, rate / baseRate]
+      )
+    );
   }
 
-  // 두 통화 간의 환율을 가져오는 메소드 오버로딩
-  getRate(from: string, to: string): number; // 두 통화 간의 환율을 가져오는 메소드
-  getRate(to: string): number; // 통화의 환율을 가져오는 메소드
-
-  // 두 통화 간의 환율을 가져오는 메소드
+  /**
+   * 두 통화 간의 환율을 가져오는 메소드
+   * @param {string} from - 출발 통화
+   * @param {string} to - 도착 통화 (선택적)
+   * @returns {number} 계산된 환율
+   */
   getRate(from: string, to?: string): number {
-    // 먼저 환율 정보가 있는지 확인합니다. 정보가 없다면 0 반환
-    if (!this.isRatesEmpty()) {
-      // 'to'가 없는 경우, 'from'을 기준 통화로 설정하고, 'to'를 'from'으로 설정합니다.
-      if (to === undefined) {
-        to = from;
-        from = this.baseCurrency;
-      }
-      // 'to'와 'from'이 rates 오브젝트에 있는지 확인
-      // 둘 다 있다면 'to'를 'from'으로 나눈 값을 반환
-      if (this.rates.hasOwnProperty(to) && this.rates.hasOwnProperty(from)) {
-        return this.rates[to] / this.rates[from];
-      }
+    if (this.isRatesEmpty()) {
+      throw new Error('Exchange rates are not available');
     }
-    // 환율 정보가 없거나, 'to'와 'from'이 rates 오브젝트에 없는 경우 0 반환
-    return 0;
+
+    const actualTo = to ?? from;
+    const actualFrom = to ? from : this.baseCurrency;
+
+    if (!this.rates[actualTo] || !this.rates[actualFrom]) {
+      throw new Error('Invalid currency');
+    }
+
+    return this.rates[actualTo] / this.rates[actualFrom];
   }
 
-  // 주어진 두 통화에 대한 환율을 사용해서 금액을 변환하는 메소드
+  /**
+   * 주어진 금액을 한 통화에서 다른 통화로 변환하는 메소드
+   * @param {number} amount - 변환할 금액
+   * @param {string} from - 출발 통화
+   * @param {string} to - 도착 통화
+   * @returns {number} 변환된 금액
+   */
   convert(amount: number, from: string, to: string): number {
     return amount * this.getRate(from, to);
   }
 
-  // 통화의 종류에 따라서 금액을 표시하는 방법이 각기 다르므로, 이에 맞게 금액을 서식화하는 메소드
+  /**
+   * 금액을 특정 통화 형식으로 포맷팅하는 메소드
+   * @param {number} amount - 포맷팅할 금액
+   * @param {string} currency - 통화 코드
+   * @returns {string} 포맷팅된 금액 문자열
+   */
   format(amount: number, currency: string): string {
     return `${this.currencies[currency].symbol}${amount.toFixed(2)}`;
   }
 
-  // 환율 정보가 있는 통화 데이터를 가져오는 메소드
+  /**
+   * 현재 사용 가능한 통화 정보를 반환하는 메소드
+   * @returns {CurrencyData} 통화 정보 객체
+   */
   getCurrenciesInfo(): CurrencyData {
-    // 먼저 환율 정보가 비어있는지 검사합니다.
-    // 비어있지 않다면 환율 정보를 사용해 통화 데이터를 가져옵니다.
-    if (!this.isRatesEmpty()) {
-      // 가져올 통화 데이터를 저장할 빈 객체를 생성합니다.
-      const currencies: CurrencyData = {};
-      // 환율 정보의 각 통화에 대해 반복문을 실행합니다.
-      for (const currency in this.rates) {
-        // 통화가 현재 통화 목록에 있는지 확인합니다.
-        if (this.currencies.hasOwnProperty(currency)) {
-          // 해당 통화가 존재한다면 통화 데이터에 추가합니다.
-          currencies[currency] = this.currencies[currency];
-        }
-      }
-      // 완성된 통화 데이터를 반환합니다.
-      return currencies;
-    } else {
-      // 환율 정보가 비어있다면 비어있는 객체를 반환합니다.
+    if (this.isRatesEmpty()) {
       return {};
     }
+    
+    return Object.keys(this.rates).reduce((currencies, currency) => {
+      if (this.currencies.hasOwnProperty(currency)) {
+        currencies[currency] = this.currencies[currency];
+      }
+      return currencies;
+    }, {} as CurrencyData);
   }
 
+  /**
+   * 특정 통화의 심볼을 반환하는 메소드
+   * @param {string} currency - 통화 코드
+   * @returns {string} 통화 심볼
+   */
   getSymbol(currency: string): string {
-    // 통화 정보가 비어있지 않다면, 통화 기호를 반환합니다.
-    if (!this.isRatesEmpty() && this.currencies.hasOwnProperty(currency) && this.rates.hasOwnProperty(currency)) {
-      return this.currencies[currency].symbol;
-    } else {
-      // 통화 정보가 비어있다면, 빈 문자열을 반환합니다.
-      return '';
+    if (this.isRatesEmpty()) {
+      throw new Error('Exchange rates are not available');
     }
+    if (!this.currencies[currency] || !this.rates[currency]) {
+      throw new Error(`Invalid currency: ${currency}`);
+    }
+    return this.currencies[currency].symbol;
   }
 
+  /**
+   * 특정 통화의 설명을 반환하는 메소드
+   * @param {string} currency - 통화 코드
+   * @returns {string} 통화 설명
+   */
   getDesc(currency: string): string {
-    // 통화 정보가 비어있지 않다면, 통화 설명을 반환합니다.
-    if (!this.isRatesEmpty() && this.currencies.hasOwnProperty(currency) && this.rates.hasOwnProperty(currency)) {
-      return this.currencies[currency].desc;
-    } else {
-      // 통화 정보가 비어있다면, 빈 문자열을 반환합니다.
-      return '';
+    if (this.isRatesEmpty()) {
+      throw new Error('Exchange rates are not available');
     }
+    if (!this.currencies[currency] || !this.rates[currency]) {
+      throw new Error(`Invalid currency: ${currency}`);
+    }
+    return this.currencies[currency].desc;
   }
 }
-
-// (async () => {
-//   // 지연 전에 실행할 코드
-//   const converter =  new CurrencyConverter();
-//   await converter.updateRates();
-
-//   // 지연 후에 실행할 코드
-//   console.log(converter.convert(100, 'USD', 'KRW'));
-//   console.log(converter.format(converter.convert(100, 'USD', 'KRW'), 'KRW'));
-//   console.log(converter.convert(100, 'USD', 'EUR'));
-//   console.log(converter.format(converter.convert(100, 'USD', 'EUR'), 'EUR'));
-//   const ratesEUR = converter.getRates('EUR');
-//   const ratesUSD = converter.getRates('USD');
-//   console.log(ratesEUR['KRW']);
-//   console.log(ratesUSD['KRW']);
-// })();

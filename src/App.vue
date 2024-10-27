@@ -1,33 +1,41 @@
 <script setup lang="ts">
-  import {ref, watch, onBeforeMount} from 'vue';
+  // Vue 및 관련 기능 가져오기
+  import { ref, watch, onBeforeMount } from 'vue';
+  import { useI18n } from 'vue-i18n';
+  import { useMeta, useQuasar } from 'quasar';
 
-  import {useStoreBase} from 'src/stores/store-base';
-  import {useStoreSettings} from 'src/stores/store-settings';
+  // 스토어 가져오기
+  import { useStoreBase } from 'src/stores/store-base';
+  import { useStoreSettings } from 'src/stores/store-settings';
 
+  // 스토어 초기화
   const storeBase = useStoreBase();
   const storeSettings = useStoreSettings();
-  const {setDarkMode, setAlwaysOnTop} = storeSettings;
+  const { setDarkMode, setAlwaysOnTop } = storeSettings;
 
-  import {useI18n} from 'vue-i18n';
-  const {locale} = useI18n({useScope: 'global'});
-  const {t} = useI18n();
+  // i18n 설정
+  const { locale, t } = useI18n({ useScope: 'global' });
 
+  // 앱 제목 설정
   const title = ref(t('message.appTitle'));
 
-  import {useMeta, useQuasar} from 'quasar';
-import { Calculator } from './classes/Calculator';
-import { CalculatorHistory } from './classes/CalculatorHistory';
+  // 메타 데이터 설정
   useMeta(() => ({
     title: title.value,
   }));
+
+  // Quasar 인스턴스 가져오기
   const $q = useQuasar();
 
+  // 다크 모드 설정
   setDarkMode(storeSettings.darkMode);
 
+  // 제목 업데이트 함수
   const updateTitle = () => {
     title.value = t('message.appTitle');
   };
 
+  // 로케일 변경 감지 및 제목 업데이트
   watch(
     () => storeSettings.locale,
     () => {
@@ -35,9 +43,12 @@ import { CalculatorHistory } from './classes/CalculatorHistory';
     },
   );
 
+  // 컴포넌트 마운트 전 실행되는 훅
   onBeforeMount(() => {
+    // 로케일 설정
     locale.value = storeSettings.locale;
 
+    // 플랫폼별 결과 패딩 설정
     if ($q.platform.is.win) {
       storeBase.paddingOnResult = 8;
     } else if ($q.platform.is.linux) {
@@ -46,23 +57,19 @@ import { CalculatorHistory } from './classes/CalculatorHistory';
       storeBase.paddingOnResult = 0;
     }
 
+    // 제목 업데이트
     updateTitle();
 
+    // 다이얼로그 상태 초기화
     storeBase.isHistoryDialogOpen = false;
     storeBase.isSettingDialogOpen = false;
 
-    if (storeBase.calc === null) {
-      storeBase.calc = new Calculator();
-    }
-
-    if (storeBase.calc && storeBase.calcHistory === null) {
-      storeBase.calcHistory = new CalculatorHistory(storeBase.calc as unknown as Calculator);
-    }
-
+    // 초기 패널 설정
     if (storeSettings.initPanel && storeBase.calc) {
       storeBase.calc.clear();
     }
 
+    // 일렉트론 환경에서 항상 위에 표시 설정
     if ($q.platform.is.electron) {
       setAlwaysOnTop(storeSettings.alwaysOnTop);
     }

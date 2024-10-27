@@ -1,65 +1,61 @@
 <script setup lang="ts">
-  import {
-    onMounted,
-    onBeforeUnmount,
-    reactive,
-    watch,
-  } from 'vue';
-
+  import { onMounted, onBeforeUnmount, reactive, watch } from 'vue';
   import { useI18n } from 'vue-i18n';
-  const { t } = useI18n();
-
-  import { UnitConverter} from 'classes/UnitConverter';
-
+  import { UnitConverter } from 'classes/UnitConverter';
   import MyTooltip from 'components/MyTooltip.vue';
-
-  // 스토어 가져오기
   import { useStoreUnit } from 'src/stores/store-unit';
   import { useStoreSettings } from 'src/stores/store-settings';
   import { useStoreUtils } from 'src/stores/store-utils';
+  import { KeyBinding } from 'classes/KeyBinding';
+
+  // i18n 설정
+  const { t } = useI18n();
+
+  // 스토어 인스턴스 생성
   const storeUnit = useStoreUnit();
   const storeSettings = useStoreSettings();
   const storeUtils = useStoreUtils();
+
+  // 스토어에서 필요한 메서드 추출
   const { clickButtonById } = storeUtils;
   const { swapUnitValue, initRecentCategoryAndUnit } = storeUnit;
 
   // 단위 초기화
   initRecentCategoryAndUnit();
 
-  // 범주 이름을 언어에 맞게 초기화
+  // 범주 이름을 현재 언어에 맞게 초기화
   const categories = reactive(
     UnitConverter.categories.map((category) => ({
       value: category,
       label: t(`categories.${category}`),
-    })),
+    }))
   );
 
-  // 범주 이름을 언어에 맞게 바꾸기 위한 감시
-  watch([() => storeSettings.locale], () => {
+  // 언어 변경 시 범주 이름 업데이트
+  watch(() => storeSettings.locale, () => {
     categories.forEach((category) => {
       category.label = t(`categories.${category.value}`);
     });
   });
 
-  import {KeyBinding} from 'classes/KeyBinding';
-  // prettier-ignore
+  // 키 바인딩 설정
   const keyBinding = new KeyBinding([
     [['Alt+w'], () => clickButtonById('btn-swap-unit')],
     [['Alt+y'], () => storeSettings.toggleShowUnit()],
   ]);
 
+  // 컴포넌트 마운트 시 실행
   onMounted(() => {
     initRecentCategoryAndUnit();
-
-    // 키바인딩 추가
     keyBinding.subscribe();
   });
 
+  // 컴포넌트 언마운트 전 실행
   onBeforeUnmount(() => {
-    // 키바인딩 제거
     keyBinding.unsubscribe();
   });
 
+  // 단위 옵션 타입 정의
   type UnitOptions = {
     value: string;
     label: string;
@@ -70,15 +66,21 @@
     values: UnitOptions[];
   };
 
-  const fromUnitOptions = reactive({values: []} as ReactiveUnitOptions);
-  const toUnitOptions = reactive({values: []} as ReactiveUnitOptions);
+  // 단위 옵션 초기화
+  const fromUnitOptions = reactive({ values: [] } as ReactiveUnitOptions);
+  const toUnitOptions = reactive({ values: [] } as ReactiveUnitOptions);
 
+  // 단위 변경 시 옵션 업데이트
   watch(
-    [() => storeUnit.recentUnitFrom[storeUnit.recentCategory], () => storeUnit.recentUnitTo[storeUnit.recentCategory]],
+    [
+      () => storeUnit.recentUnitFrom[storeUnit.recentCategory],
+      () => storeUnit.recentUnitTo[storeUnit.recentCategory],
+    ],
     () => {
       const category = storeUnit.recentCategory;
       const unitList = UnitConverter.getUnitLists(category);
 
+      // 'From' 단위 옵션 설정
       fromUnitOptions.values = unitList.map((unit) => ({
         value: unit,
         label: unit,
@@ -86,6 +88,7 @@
         disable: storeUnit.recentUnitTo[category] === unit,
       }));
 
+      // 'To' 단위 옵션 설정
       toUnitOptions.values = unitList.map((unit) => ({
         value: unit,
         label: unit,
@@ -93,7 +96,7 @@
         disable: storeUnit.recentUnitFrom[category] === unit,
       }));
     },
-    {immediate: true},
+    { immediate: true }
   );
 </script>
 

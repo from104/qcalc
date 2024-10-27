@@ -1,49 +1,56 @@
 <script setup lang="ts">
-  import {onMounted, reactive, shallowRef, watch} from 'vue';
+  import { onMounted, reactive, shallowRef, watch } from 'vue';
 
+  // 컴포넌트 가져오기
   import HistoryDialog from 'components/HistoryDialog.vue';
   import SettingDialog from 'components/SettingDialog.vue';
   import HeaderIcons from 'components/HeaderIcons.vue';
 
+  // 페이지 컴포넌트 가져오기
   import CalcPage from 'pages/CalcPage.vue';
   import UnitPage from 'pages/UnitPage.vue';
   import CurrencyPage from 'pages/CurrencyPage.vue';
 
-  import {useQuasar} from 'quasar';
+  // Quasar 프레임워크 사용을 위한 설정
+  import { useQuasar } from 'quasar';
   const $q = useQuasar();
 
-  import {useStoreBase} from 'src/stores/store-base';
+  // 스토어 가져오기
+  import { useStoreBase } from 'src/stores/store-base';
+  import { useStoreSettings } from 'src/stores/store-settings';
+  import { useStoreUtils } from 'src/stores/store-utils';
+
   const storeBase = useStoreBase();
-
-  import {useStoreSettings} from 'src/stores/store-settings';
   const storeSettings = useStoreSettings();
-
-  import {useStoreUtils} from 'src/stores/store-utils';
   const storeUtils = useStoreUtils();
 
-  import {useI18n} from 'vue-i18n';
-  const {t} = useI18n();
+  // 다국어 지원을 위한 i18n 설정
+  import { useI18n } from 'vue-i18n';
+  const { t } = useI18n();
 
-  // prettier-ignore
+  // 탭 정보 설정
   const tabs = reactive([
-    {name: 'calc', title: t('calc'), component: shallowRef(CalcPage)},
-    {name: 'unit', title: t('unit'), component: shallowRef(UnitPage)},
-    {name: 'currency', title: t('currency'), component: shallowRef(CurrencyPage)},
+    { name: 'calc', title: t('calc'), component: shallowRef(CalcPage) },
+    { name: 'unit', title: t('unit'), component: shallowRef(UnitPage) },
+    { name: 'currency', title: t('currency'), component: shallowRef(CurrencyPage) },
   ]);
 
-  // 탭 오른쪽으로 이동
+  // 탭 오른쪽으로 이동하는 함수
   const moveTabRight = () => {
     const index = tabs.findIndex((tab) => tab.name === storeBase.cTab);
-    storeBase.setCTab(tabs[(index + 1) % tabs.length].name);
+    const newTab = tabs[(index + 1) % tabs.length].name;
+    storeBase.setCTab(newTab);
   };
 
-  // 탭 왼쪽으로 이동
+  // 탭 왼쪽으로 이동하는 함수
   const moveTabLeft = () => {
     const index = tabs.findIndex((tab) => tab.name === storeBase.cTab);
-    storeBase.setCTab(tabs[(index + tabs.length - 1) % tabs.length].name);
+    const newTab = tabs[(index + tabs.length - 1) % tabs.length].name;
+    storeBase.setCTab(newTab);
   };
 
-  import {KeyBinding} from 'classes/KeyBinding';
+  // 키 바인딩 설정
+  import { KeyBinding } from 'classes/KeyBinding';
 
   const keyBinding = new KeyBinding([
     [['Control+1'], () => storeBase.setCTab('calc')],
@@ -53,7 +60,7 @@
     [['Control+Shift+Tab', 'ArrowLeft'], moveTabLeft],
   ]);
 
-  // inputFocused 값이 바뀌면 키바인딩을 추가하거나 제거합니다.
+  // 입력 포커스 상태에 따라 키 바인딩 활성화/비활성화
   watch(
     () => storeUtils.inputFocused,
     () => {
@@ -63,19 +70,20 @@
         keyBinding.subscribe();
       }
     },
-    {immediate: true},
+    { immediate: true },
   );
 
+  // 언어 변경 시 탭 이름 업데이트
   watch(
     () => storeSettings.locale,
     () => {
-      // 언어가 바뀌면 탭 이름도 바꿔줍니다.
-      for (const tab of tabs) {
+      tabs.forEach((tab) => {
         tab.title = t(tab.name);
-      }
+      });
     },
   );
 
+  // 컴포넌트 마운트 시 키 바인딩 활성화
   onMounted(() => {
     keyBinding.subscribe();
   });

@@ -1,33 +1,27 @@
 <script setup lang="ts">
   import { onMounted, onBeforeUnmount, ref, watch, reactive } from 'vue';
-
   import { useQuasar, colors } from 'quasar';
+  import { useI18n } from 'vue-i18n';
+  import { Haptics, ImpactStyle } from 'capacitor/@capacitor/haptics';
+  import { useStoreSettings } from 'src/stores/store-settings';
+  import { useStoreBase } from 'src/stores/store-base';
+  import { useStoreNotifications } from 'src/stores/store-notifications';
+  import { useStoreUtils } from 'src/stores/store-utils';
+
+  // Quasar 인스턴스 및 색상 유틸리티 초기화
   const $q = useQuasar();
   const { lighten } = colors;
 
-  import { useI18n } from 'vue-i18n';
+  // i18n 설정
   const { t } = useI18n();
 
-  import { Haptics, ImpactStyle } from 'capacitor/@capacitor/haptics';
-
-  import { useStoreSettings } from 'src/stores/store-settings';
+  // 스토어 인스턴스 초기화
   const storeSettings = useStoreSettings();
-
-  const impactLight = async () => {
-    if ($q.platform.is.capacitor && storeSettings.hapticsMode) {
-      await Haptics.impact({style: ImpactStyle.Light});
-    }
-  };
-
-  const impactMedium = async () => {
-    if ($q.platform.is.capacitor && storeSettings.hapticsMode) {
-      await Haptics.impact({style: ImpactStyle.Medium});
-    }
-  };
-
-  // 스토어 가져오기
-  import {useStoreBase} from 'src/stores/store-base';
   const storeBase = useStoreBase();
+  const storeNotifications = useStoreNotifications();
+  const storeUtils = useStoreUtils();
+
+  // 스토어에서 필요한 메서드 추출
   const {
     calc,
     offButtonShift,
@@ -37,18 +31,25 @@
     showMemoryOnWithTimer,
     toggleButtonShift,
   } = storeBase;
+  const { notifyError, notifyMsg } = storeNotifications;
+  const { clickButtonById } = storeUtils;
 
-  import {useStoreNotifications} from 'src/stores/store-notifications';
-  const storeNotifications = useStoreNotifications();
-  const {notifyError, notifyMsg} = storeNotifications;
+  // 햅틱 피드백 함수
+  const impactLight = async () => {
+    if ($q.platform.is.capacitor && storeSettings.hapticsMode) {
+      await Haptics.impact({ style: ImpactStyle.Light });
+    }
+  };
 
-  import {useStoreUtils} from 'src/stores/store-utils';
-  const storeUtils = useStoreUtils();
-  const {clickButtonById} = storeUtils;
+  const impactMedium = async () => {
+    if ($q.platform.is.capacitor && storeSettings.hapticsMode) {
+      await Haptics.impact({ style: ImpactStyle.Medium });
+    }
+  };
 
-  // 에러처리를 위한 함수
+  // 에러 처리 함수
   const funcWithError = (func: () => void) => {
-    const errorMessages: {[key: string]: string} = {
+    const errorMessages: { [key: string]: string } = {
       'Cannot divide by zero.': 'cannotDivideByZero',
       'The square root of a negative number is not allowed.': 'squareRootOfANegativeNumberIsNotAllowed',
       'The factorial of a negative number is not allowed.': 'factorialOfANegativeNumberIsNotAllowed',
@@ -58,7 +59,6 @@
       func();
     } catch (e: unknown) {
       if (e instanceof Error) {
-        // console.error(e.message);
         if (errorMessages[e.message]) {
           notifyError(t(errorMessages[e.message]));
         } else {
@@ -68,19 +68,20 @@
     }
   };
 
-  const buttonColors: {[key: string]: string} = {
+  // 버튼 색상 정의
+  const buttonColors: { [key: string]: string } = {
     important: '#cb9247',
     function: '#1d8fb6',
     normal: '#5e9e7d',
   };
 
-  const buttonColorsLight: {[key: string]: string} = {
+  const buttonColorsLight: { [key: string]: string } = {
     important: lighten(buttonColors.important, 70),
     function: lighten(buttonColors.function, 70),
     normal: lighten(buttonColors.normal, 70),
   };
 
-  const buttonColorsDark: {[key: string]: string} = {
+  const buttonColorsDark: { [key: string]: string } = {
     important: lighten(buttonColors.important, 50),
     function: lighten(buttonColors.function, 50),
     normal: lighten(buttonColors.normal, 50),
@@ -88,7 +89,7 @@
 
   const buttonShiftPressedColor = lighten(buttonColors.important, -30);
 
-  // 버튼 레이블, 버튼 컬러, 버튼에 해당하는 키, 버튼 클릭 이벤트 핸들러
+  // 버튼 타입 정의
   type Button = {
     [id: string]: [isIcon: boolean, label: string, color: string, keys: string[], handler: () => void];
   };
@@ -154,26 +155,28 @@
     d6: [ 'MS', ['Shift+Equal', 'Shift+Enter', 'Shift+NumpadEnter'], () => { calc.memorySave(); showMemory(); }],
   };
 
+  // 버튼 클릭 시 알림 표시 함수
   const showButtonNotify = (id: ButtonID) => {
-    if (buttonsAddedFunc[id][0] == 'MC') {
+    if (buttonsAddedFunc[id][0] === 'MC') {
       notifyMsg(t('memoryCleared'));
-    } else if (buttonsAddedFunc[id][0] == 'MR' && !calc.getIsMemoryReset()) {
+    } else if (buttonsAddedFunc[id][0] === 'MR' && !calc.getIsMemoryReset()) {
       notifyMsg(t('memoryRecalled'));
-    } else if (buttonsAddedFunc[id][0] == 'MS') {
+    } else if (buttonsAddedFunc[id][0] === 'MS') {
       notifyMsg(t('memorySaved'));
     }
   };
 
-  // 버튼 레이블이 비어있는 버튼을 찾아서 shiftID에 저장 - shiftID는 시프트 버튼의 id
+  // 시프트 버튼의 ID 찾기
   const shiftID = Object.keys(buttonsAddedFunc).find((key) => buttonsAddedFunc[key][0] === '');
 
-  // 추가 기능이 활성화되어있으면 추가 기능 레이블을 툴팁으로 보여줄때 쓰는 타이머 변수들.
+  // 추가 기능 툴팁 표시를 위한 타이머 상태 객체
   const timersOfTooltip: {[id: string]: boolean} = reactive(
-    Object.fromEntries(Object.keys(buttons).map((id) => [id, false])),
+    Object.fromEntries(Object.keys(buttons).map((id) => [id, false]))
   );
 
   type ButtonID = string | number;
 
+  // 추가 기능 툴팁 표시 함수
   const showTooltipOfFunc = (id: ButtonID) => {
     if (timersOfTooltip[id] || id === shiftID || (!storeSettings.showButtonAddedLabel && storeBase.buttonShift)) return;
     timersOfTooltip[id] = true;
@@ -182,7 +185,7 @@
     }, 1000);
   };
 
-  // 버튼 시프트 상태에 따라 기능 실행
+  // 버튼 시프트 상태에 따른 기능 실행
   const shiftFunc = (id: ButtonID) => {
     if (storeBase.buttonShift) {
       funcWithError(buttonsAddedFunc[id][2]);
@@ -193,13 +196,13 @@
         offButtonShiftLock();
         return;
       }
-      if (storeBase.buttonShiftLock) return;
-      offButtonShift();
+      if (!storeBase.buttonShiftLock) offButtonShift();
     } else {
       funcWithError(buttons[id][4]);
     }
   };
 
+  // 버튼 길게 누르기 기능
   const holdFunc = (id: ButtonID) => {
     impactMedium();
     if (id === shiftID) {
@@ -214,9 +217,7 @@
     }
     if (storeBase.buttonShift) {
       funcWithError(buttons[id][4]);
-      if (storeBase.buttonShiftLock) return;
-      offButtonShift();
-      return;
+      if (!storeBase.buttonShiftLock) offButtonShift();
     } else {
       funcWithError(buttonsAddedFunc[id][2]);
       showTooltipOfFunc(id);
@@ -224,15 +225,16 @@
     }
   };
 
+  // 메모리 표시 함수
   const showMemory = () => {
     if (!calc.getIsMemoryReset()) {
       setTimeout(() => {
         showMemoryOnWithTimer();
       }, 10);
-      ('');
     }
   };
 
+  // 키 입력에 따른 버튼 클릭 함수
   const buttonClickByKey = (id: ButtonID, isShift: boolean) => {
     if (isShift) {
       toggleButtonShift();
@@ -246,50 +248,48 @@
 
   import {KeyBinding, KeyBindings} from 'classes/KeyBinding';
 
+  // 주요 키 바인딩 설정
   const keyBindingsPrimary: KeyBindings = Object.entries(buttons).map(([id, [, , , keys]]) => [
     keys,
     () => buttonClickByKey(id, false),
   ]);
-  const keyBindingsSecandary: KeyBindings = Object.entries(buttonsAddedFunc).map(([id, [, keys]]) => [
+
+  // 보조 키 바인딩 설정
+  const keyBindingsSecondary: KeyBindings = Object.entries(buttonsAddedFunc).map(([id, [, keys]]) => [
     keys,
     () => buttonClickByKey(id, true),
   ]);
-  const keyBindings = [keyBindingsPrimary, keyBindingsSecandary].flat();
+
+  // 모든 키 바인딩 통합
+  const keyBindings = [...keyBindingsPrimary, ...keyBindingsSecondary];
   const keyBinding = new KeyBinding(keyBindings);
 
-  // dom 요소가 마운트 되었을 때 계산기 키바인딩 설정하기
+  // 컴포넌트 마운트 시 키 바인딩 활성화
   onMounted(() => {
     keyBinding.subscribe();
   });
 
-  // dom 요소가 언마운트되기 전에 키바인딩 제거
+  // 컴포넌트 언마운트 전 키 바인딩 비활성화
   onBeforeUnmount(() => {
     keyBinding.unsubscribe();
   });
 
-  // inputFocused 값이 바뀌면 키바인딩을 추가하거나 제거합니다.
+  // 입력 포커스 상태에 따른 키 바인딩 관리
   watch(
     () => storeUtils.inputFocused,
-    () => {
-      // console.log('buttons inputFocused', inputFocused);
-      if (storeUtils.inputFocused) {
-        keyBinding.unsubscribe();
-      } else {
-        keyBinding.subscribe();
-      }
+    (focused) => {
+      focused ? keyBinding.unsubscribe() : keyBinding.subscribe();
     },
-    {immediate: true},
+    {immediate: true}
   );
 
-  // props의 기본값 설정
+  // props 기본값 설정
   const props = withDefaults(defineProps<{type?: string}>(), {
     type: 'normal',
   });
 
-  // 계산기 버튼의 높이를 계산하기 위한 변수 선언
+  // 계산기 버튼 높이 설정
   const baseHeight = ref('136px');
-
-  // 계산기 타입에 따라 버튼 높이를 다르게 설정
   if (props.type === 'unit' || props.type === 'currency') {
     baseHeight.value = '234px';
   }

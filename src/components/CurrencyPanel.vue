@@ -2,33 +2,32 @@
   import { ref, onMounted, onBeforeUnmount, reactive, watch, Ref } from 'vue';
   import MyTooltip from 'components/MyTooltip.vue';
   import { useI18n } from 'vue-i18n';
+  import { useStoreSettings } from 'src/stores/store-settings';
+  import { useStoreCurrency } from 'src/stores/store-currency';
+  import { useStoreUtils } from 'src/stores/store-utils';
+  import { KeyBinding } from 'classes/KeyBinding';
+
+  // i18n 설정
   const { t } = useI18n();
 
-  import { useStoreSettings } from 'src/stores/store-settings';
+  // 스토어 인스턴스 초기화
   const storeSettings = useStoreSettings();
-  
-
-  import { useStoreCurrency } from 'src/stores/store-currency';
   const storeCurrency = useStoreCurrency();
-  const { currencyConverter, swapCurrencyValue, initRecentCurrency } = storeCurrency;
-
-  import { useStoreUtils } from 'src/stores/store-utils';
   const storeUtils = useStoreUtils();
-  const {
-    clickButtonById,
-    setInputBlurred,
-    setInputFocused,
-    blurElement,
-  } = storeUtils;
+
+  // 스토어에서 필요한 메서드 추출
+  const { currencyConverter, swapCurrencyValue, initRecentCurrency } = storeCurrency;
+  const { clickButtonById, setInputBlurred, setInputFocused, blurElement } = storeUtils;
 
   // 단위 초기화
   initRecentCurrency();
 
-  // 통화 이름을 언어에 맞게 초기화
+  // 통화 설명을 위한 인터페이스 정의
   interface CurrencyDescription {
     [key: string]: string;
   }
 
+  // 통화 이름을 현재 언어에 맞게 초기화
   const descOfCurrency = reactive<CurrencyDescription>(
     currencyConverter.getCurrencyLists().reduce((acc: CurrencyDescription, currency) => {
       acc[currency] = t(`currencyDesc.${currency}`);
@@ -36,20 +35,20 @@
     }, {}),
   );
 
-  // 통화 이름을 언어에 맞게 바꾸기 위한 감시
+  // 언어 변경 시 통화 이름 업데이트
   watch([() => storeSettings.locale], () => {
     currencyConverter.getCurrencyLists().forEach((currency) => {
       descOfCurrency[currency] = t(`currencyDesc.${currency}`);
     });
   });
 
-  // 키바인딩 생성
-  import { KeyBinding } from 'classes/KeyBinding';
+  // 키 바인딩 설정
   const keyBinding = new KeyBinding([
     [['Alt+w'], () => clickButtonById('btn-swap-currency')],
     [['Alt+y'], () => storeSettings.toggleShowSymbol()],
   ]);
 
+  // 입력 포커스에 따른 키 바인딩 활성화/비활성화
   watch(
     () => storeUtils.inputFocused,
     () => {
@@ -67,12 +66,12 @@
     initRecentCurrency();
     keyBinding.subscribe();
 
-    // 환율 정보 업데이트
+    // 초기 환율 정보 업데이트
     (async () => {
       await currencyConverter.updateRates();
     })();
 
-    // 환율 정보 업데이트 주기마다 환율 정보 업데이트
+    // 주기적으로 환율 정보 업데이트 (1시간마다)
     updateRatesTimer = window.setInterval(
       async () => {
         await currencyConverter.updateRates();
@@ -87,6 +86,7 @@
     clearInterval(updateRatesTimer);
   });
 
+  // 통화 옵션 타입 정의
   type CurrencyOptions = {
     value: string;
     label: string;
@@ -98,14 +98,17 @@
     values: CurrencyOptions[];
   };
 
+  // 통화 옵션 초기화
   const fromCurrencyOptions = reactive({ values: [] } as ReactiveCurrencyOptions);
   const toCurrencyOptions = reactive({ values: [] } as ReactiveCurrencyOptions);
 
+  // 통화 옵션 업데이트
   watch(
     [() => storeCurrency.recentCurrencyFrom, () => storeCurrency.recentCurrencyTo],
     () => {
       const currencyList = currencyConverter.getCurrencyLists();
 
+      // 'From' 통화 옵션 설정
       fromCurrencyOptions.values = currencyList.map((currency) => ({
         value: currency,
         label: currency,
@@ -113,6 +116,7 @@
         disable: storeCurrency.recentCurrencyTo === currency,
       }));
 
+      // 'To' 통화 옵션 설정
       toCurrencyOptions.values = currencyList.map((currency) => ({
         value: currency,
         label: currency,
@@ -148,9 +152,11 @@
     };
   };
 
+  // 'From' 통화 필터 설정
   const fromFilteredCurrencyOptions = ref<CurrencyOptions[]>(fromCurrencyOptions.values);
   const filterFnFrom = createFilterFn(fromFilteredCurrencyOptions, fromCurrencyOptions);
 
+  // 'To' 통화 필터 설정
   const toFilteredCurrencyOptions = ref<CurrencyOptions[]>(toCurrencyOptions.values);
   const filterFnTo = createFilterFn(toFilteredCurrencyOptions, toCurrencyOptions);
 </script>

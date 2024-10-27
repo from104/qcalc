@@ -1,103 +1,114 @@
-import {Calculator, ResultSnapshot} from './Calculator';
+import { Calculator, ResultSnapshot } from './Calculator';
 
-// 히스토리 객체
+// 계산기 히스토리를 위한 인터페이스
 export interface History {
-  id?: number;
-  resultSnapshot: ResultSnapshot;
-  memo?: string;
+  id?: number;           // 히스토리 항목의 고유 식별자
+  resultSnapshot: ResultSnapshot;  // 계산 결과의 스냅샷
+  memo?: string;         // 선택적인 메모 필드
 }
 
 export class CalculatorHistory {
-  private histories: History[] = [];
-  // 히스토리 최대 크기
-  private readonly HISTORY_MAX_SIZE = 100;
+  private histories: History[] = [];  // 히스토리 항목들을 저장하는 배열
+  private readonly HISTORY_MAX_SIZE = 100; // 히스토리의 최대 크기
 
-  constructor(calculator: Calculator) {
-    calculator.on('addHistory', this.addHistory.bind(this));
-    calculator.on('unshiftHistory', this.unshiftHistory.bind(this));
+  // 새로운 히스토리 항목 추가
+  public addHistory(history: ResultSnapshot): void {
+    // 새로운 히스토리 ID 생성
+    const historyId = this.generateNewId();
+    
+    // 새로운 히스토리 객체 생성
+    const newHistory: History = {
+      id: historyId,
+      resultSnapshot: history,
+      memo: '',
+    };
+
+    // 새 히스토리를 배열의 앞쪽에 추가
+    this.histories.unshift(newHistory);
+    
+    // 히스토리 크기가 최대치를 넘지 않도록 조정
+    this.trimHistoryIfNeeded();
   }
 
-  // 히스토리 추가
-  private addHistory(history: History): string {
-    // console.log(history);
-    if (this.histories.length == 0) {
-      history.id = 1;
-    } else {
-      history.id = Math.max(...(this.histories.map((h) => h.id) as number[])) + 1;
-    }
-    // 배열 앞에 히스토리 추가
-    this.histories.unshift(history);
-
-    // 히스토리 크기가 최대 크기를 넘어서면 제일 뒤의 것을 제거
-    if (this.histories.length > this.HISTORY_MAX_SIZE) this.histories.pop();
-
-    // 최종적으로 계산 결과를 반환
-    return history.resultSnapshot.resultNumber;
+  // 가장 오래된 히스토리 항목 제거
+  public shiftHistory(): void {
+    this.histories.shift();
   }
 
-  private unshiftHistory() {
-    this.histories.unshift();
-  }
-
-  // 히스토리 크기 얻기
+  // 현재 히스토리 크기 반환
   public getHistorySize(): number {
     return this.histories.length;
   }
 
-  // 히스토리 전체 얻기
+  // 전체 히스토리 배열 반환
   public getHistories(): History[] {
     return this.histories;
   }
 
-  // 히스토리의 id로 인덱스 찾기
+  // ID로 히스토리 인덱스 찾기
   public getHistoryIndexByID(id: number): number {
     const index = this.histories.findIndex((h) => h.id === id);
-    if (index !== -1) {
-      return index;
-    } else {
-      throw new Error('History not found');
-    }
+    if (index === -1) throw new Error('히스토리를 찾을 수 없습니다.');
+    return index;
   }
 
-  // 히스토리에서 배열 인덱스로 찾기
+  // 인덱스로 히스토리 항목 찾기
   public getHistoryByIndex(index: number): History {
-    if (index >= 0 && index < this.histories.length) {
-      return this.histories[index];
-    } else {
-      throw new Error('History not found');
+    if (index < 0 || index >= this.histories.length) {
+      throw new Error('유효하지 않은 인덱스입니다.');
     }
+    return this.histories[index];
   }
 
-  // 히스토리에서 id로 찾기
+  // ID로 히스토리 항목 찾기
   public getHistoryByID(id: number): History {
     return this.getHistoryByIndex(this.getHistoryIndexByID(id));
   }
 
-  // id를 사용하여 히스토리 배열에서 해당 항목을 찾아서 삭제
+  // ID로 히스토리 항목 삭제
   public deleteHistory(id: number): void {
-    this.histories.splice(this.getHistoryIndexByID(id), 1);
+    const index = this.getHistoryIndexByID(id);
+    this.histories.splice(index, 1);
   }
 
-  // 히스토리 초기화
+  // 모든 히스토리 삭제
   public clearHistory(): void {
     this.histories = [];
   }
 
-  // 히스토리에 메모 셋팅
+  // 히스토리 항목에 메모 추가
   public setMemo(id: number, memo: string): void {
     const index = this.getHistoryIndexByID(id);
     this.histories[index].memo = memo;
   }
 
-  // 히스토리에서 메모 얻기
+  // 히스토리 항목의 메모 가져오기
   public getMemo(id: number): string | null {
     const index = this.getHistoryIndexByID(id);
     return this.histories[index].memo || null;
   }
 
-  // 히스토리에서 메모 삭제
+  // 히스토리 항목의 메모 삭제
   public deleteMemo(id: number): void {
     const index = this.getHistoryIndexByID(id);
     delete this.histories[index].memo;
+  }
+
+  // 새로운 히스토리 ID 생성
+  private generateNewId(): number {
+    // 히스토리가 비어있으면 1을 반환
+    if (this.histories.length === 0) return 1;
+    
+    // 현재 존재하는 ID 중 가장 큰 값을 찾아 1을 더함
+    const maxId = Math.max(...(this.histories.map((h) => h.id) as number[]));
+    return maxId + 1;
+  }
+
+  // 히스토리 크기 제한
+  private trimHistoryIfNeeded(): void {
+    // 히스토리 크기가 최대치를 초과하면 가장 오래된 항목 제거
+    if (this.histories.length > this.HISTORY_MAX_SIZE) {
+      this.histories.pop();
+    }
   }
 }
