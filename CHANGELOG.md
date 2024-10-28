@@ -12,11 +12,11 @@ The format is based on [Keep a Changelog] and this project follows [Semantic Ver
 
 ### Changed
 
-- 
+- Modified button addition functionality based on calculator type to provide users with clearer and more intuitive button layouts and features
 
 ### Fixed
 
-- Fixed trigonometric function calculation error
+- Corrected a bug in trigonometric function calculations, ensuring accurate results and reliability in advanced math operations.
 
 ## [0.9.1] 2024-06-29
 
