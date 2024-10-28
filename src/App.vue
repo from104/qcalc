@@ -1,41 +1,43 @@
 <script setup lang="ts">
-  // Vue 및 관련 기능 가져오기
+  // Vue 핵심 기능 및 컴포지션 API 가져오기
   import { ref, watch, onBeforeMount } from 'vue';
   import { useI18n } from 'vue-i18n';
   import { useMeta, useQuasar } from 'quasar';
 
-  // 스토어 가져오기
+  // 상태 관리를 위한 스토어 가져오기
   import { useStoreBase } from 'src/stores/store-base';
   import { useStoreSettings } from 'src/stores/store-settings';
 
-  // 스토어 초기화
+  // 스토어 인스턴스 생성 및 필요한 메서드 추출
   const storeBase = useStoreBase();
   const storeSettings = useStoreSettings();
   const { setDarkMode, setAlwaysOnTop } = storeSettings;
 
-  // i18n 설정
+  // 다국어 지원을 위한 i18n 설정
+  // useScope: 'global'로 설정하여 전역 범위에서 사용
   const { locale, t } = useI18n({ useScope: 'global' });
 
-  // 앱 제목 설정
+  // 앱 제목을 반응형 변수로 선언
   const title = ref(t('message.appTitle'));
 
-  // 메타 데이터 설정
+  // HTML 메타 데이터 설정 (페이지 제목)
   useMeta(() => ({
     title: title.value,
   }));
 
-  // Quasar 인스턴스 가져오기
+  // Quasar 프레임워크 인스턴스 초기화
   const $q = useQuasar();
 
-  // 다크 모드 설정
+  // 사용자 설정에 따른 다크 모드 적용
   setDarkMode(storeSettings.darkMode);
 
-  // 제목 업데이트 함수
+  // 앱 제목 업데이트 함수
+  // 현재 설정된 언어로 제목을 변경
   const updateTitle = () => {
     title.value = t('message.appTitle');
   };
 
-  // 로케일 변경 감지 및 제목 업데이트
+  // 언어 설정 변경 감지 및 제목 자동 업데이트
   watch(
     () => storeSettings.locale,
     () => {
@@ -43,12 +45,12 @@
     },
   );
 
-  // 컴포넌트 마운트 전 실행되는 훅
+  // 컴포넌트 마운트 직전 초기화 작업 수행
   onBeforeMount(() => {
-    // 로케일 설정
+    // 저장된 언어 설정 적용
     locale.value = storeSettings.locale;
 
-    // 플랫폼별 결과 패딩 설정
+    // 운영체제별 결과창 패딩 최적화
     if ($q.platform.is.win) {
       storeBase.paddingOnResult = 8;
     } else if ($q.platform.is.linux) {
@@ -57,19 +59,19 @@
       storeBase.paddingOnResult = 0;
     }
 
-    // 제목 업데이트
+    // 현재 언어로 앱 제목 설정
     updateTitle();
 
-    // 다이얼로그 상태 초기화
+    // 모든 다이얼로그 초기 상태를 닫힘으로 설정
     storeBase.isHistoryDialogOpen = false;
     storeBase.isSettingDialogOpen = false;
 
-    // 초기 패널 설정
+    // 설정에 따라 계산기 패널 초기화
     if (storeSettings.initPanel && storeBase.calc) {
       storeBase.calc.clear();
     }
 
-    // 일렉트론 환경에서 항상 위에 표시 설정
+    // 일렉트론 환경에서만 '항상 위에 표시' 설정 적용
     if ($q.platform.is.electron) {
       setAlwaysOnTop(storeSettings.alwaysOnTop);
     }
