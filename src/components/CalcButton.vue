@@ -1,5 +1,5 @@
 <script setup lang="ts">
-  import { onMounted, onBeforeUnmount, ref, watch, reactive } from 'vue';
+  import { onMounted, onBeforeUnmount, ref, watch, reactive, computed } from 'vue';
   import { useQuasar, colors } from 'quasar';
   import { useI18n } from 'vue-i18n';
   import { Haptics, ImpactStyle } from 'capacitor/@capacitor/haptics';
@@ -14,6 +14,11 @@
 
   // i18n 설정
   const { t } = useI18n();
+
+  // props 기본값 설정
+  const props = withDefaults(defineProps<{type?: string}>(), {
+    type: 'calc',
+  });
 
   // 스토어 인스턴스 초기화
   const storeSettings = useStoreSettings();
@@ -126,59 +131,105 @@
     [id: string]: [label: string, keys: string[], handler: () => void];
   };
 
-  // 계산기 버튼에 2번째 기능에 대한 레이블 정의
-  // prettier-ignore
-  const buttonsAddedFunc: ButtonAddedFunc = {
+  // 공통으로 사용할 기본 버튼 기능
+  const commonButtonsAddedFunc: ButtonAddedFunc = {
     a1: ['xⁿ', ['Shift+Control+q'], () => calc.pow()],
     b1: ['ⁿ√x', ['Shift+Control+w'], () => calc.root()],
     c1: ['MC', ['Shift+Control+e', 'Shift+Delete', 'Shift+Escape'], () => calc.memoryClear()],
     d1: ['MR', ['Shift+Backspace', 'Shift+Control+r'], () => { calc.memoryRecall(); showMemory(); }],
-    a2: ['10ⁿ', ['Shift+Control+a'], () => calc.exp10()],
-    b2: ['x%y', ['Shift+Control+s'], () => calc.mod()],
-    c2: ['x!', ['Shift+Control+d'], () => calc.fct()],
     d2: ['M÷', ['Shift+Slash', 'Shift+NumpadDivide'], () => { calc.memoryDiv(); showMemory(); }],
-    a3: ['sin', ['Shift+Digit7', 'Shift+Numpad7'], () => calc.sin()],
-    b3: ['cos', ['Shift+Digit8', 'Shift+Numpad8'], () => calc.cos()],
-    c3: ['tan', ['Shift+Digit9', 'Shift+Numpad9'], () => calc.tan()],
-    d3: ['M×', ['Shift+NumpadMultiply'], () => { calc.memoryMul(); showMemory(); }, ],
-    a4: ['Pi/2', ['Shift+Digit4', 'Shift+Numpad4'], () => calc.setConstant('pi2')],
-    b4: ['ln10', ['Shift+Digit5', 'Shift+Numpad5'], () => calc.setConstant('ln10')],
-    c4: ['ln2', ['Shift+Digit6', 'Shift+Numpad6'], () => calc.setConstant('ln2')],
+    d3: ['M×', ['Shift+NumpadMultiply'], () => { calc.memoryMul(); showMemory(); }],
     d4: ['M-', ['Shift+Minus', 'Shift+NumpadSubtract'], () => { calc.memoryMinus(); showMemory(); }],
-    a5: ['Pi', ['Shift+Digit1', 'Shift+Numpad1'], () => calc.setConstant('pi')],
-    b5: ['phi', ['Shift+Digit2', 'Shift+Numpad2'], () => calc.setConstant('phi')],
-    c5: ['e', ['Shift+Digit3', 'Shift+Numpad3'], () => calc.setConstant('e')],
     d5: ['M+', ['Shift+Plus', 'Shift+NumpadAdd'], () => { calc.memoryPlus(); showMemory(); }],
     a6: ['', [], () => null],
     b6: ['int', ['Shift+Digit0', 'Shift+Numpad0'], () => calc.int()],
     c6: ['frac', ['Shift+Period', 'Shift+NumpadDecimal'], () => calc.frac()],
-    d6: [ 'MS', ['Shift+Equal', 'Shift+Enter', 'Shift+NumpadEnter'], () => { calc.memorySave(); showMemory(); }],
+    d6: ['MS', ['Shift+Equal', 'Shift+Enter', 'Shift+NumpadEnter'], () => { calc.memorySave(); showMemory(); }],
   };
+
+  type NumberButtonFunc = {
+    [key: string]: [string, string[], () => void];
+  };
+
+  type CalcTypes = {
+    [key in 'calc' | 'unit' | 'currency']: NumberButtonFunc;
+  };
+
+  const numberButtonsAddedFunc: CalcTypes = {
+    calc: {
+      a2: ['10ⁿ', ['Shift+Control+a'], () => calc.exp10()],
+      b2: ['x%y', ['Shift+Control+s'], () => calc.mod()],
+      c2: ['x!', ['Shift+Control+d'], () => calc.fct()],
+      a3: ['sin', ['Shift+Digit7', 'Shift+Numpad7'], () => calc.sin()],
+      b3: ['cos', ['Shift+Digit8', 'Shift+Numpad8'], () => calc.cos()],
+      c3: ['tan', ['Shift+Digit9', 'Shift+Numpad9'], () => calc.tan()],
+      a4: ['Pi/2', ['Shift+Digit4', 'Shift+Numpad4'], () => calc.setConstant('pi2')],
+      b4: ['ln10', ['Shift+Digit5', 'Shift+Numpad5'], () => calc.setConstant('ln10')],
+      c4: ['ln2', ['Shift+Digit6', 'Shift+Numpad6'], () => calc.setConstant('ln2')],
+      a5: ['Pi', ['Shift+Digit1', 'Shift+Numpad1'], () => calc.setConstant('pi')],
+      b5: ['phi', ['Shift+Digit2', 'Shift+Numpad2'], () => calc.setConstant('phi')],
+      c5: ['e', ['Shift+Digit3', 'Shift+Numpad3'], () => calc.setConstant('e')],
+    },
+    unit: {
+      a2: ['×2', ['Shift+Control+a'], () => calc.mulN(2)],
+      b2: ['×3', ['Shift+Control+s'], () => calc.mulN(3)],
+      c2: ['×5', ['Shift+Control+d'], () => calc.mulN(5)],
+      a3: ['÷2', ['Shift+Digit7', 'Shift+Numpad7'], () => calc.divN(2)],
+      b3: ['÷3', ['Shift+Digit8', 'Shift+Numpad8'], () => calc.divN(3)],
+      c3: ['÷5', ['Shift+Digit9', 'Shift+Numpad9'], () => calc.divN(5)],
+      a4: ['×10', ['Shift+Digit4', 'Shift+Numpad4'], () => calc.mulN(10)],
+      b4: ['×100', ['Shift+Digit5', 'Shift+Numpad5'], () => calc.mulN(100)],
+      c4: ['×1000', ['Shift+Digit6', 'Shift+Numpad6'], () => calc.mulN(1000)],
+      a5: ['÷10', ['Shift+Digit1', 'Shift+Numpad1'], () => calc.divN(10)],
+      b5: ['÷100', ['Shift+Digit2', 'Shift+Numpad2'], () => calc.divN(100)],
+      c5: ['÷1000', ['Shift+Digit3', 'Shift+Numpad3'], () => calc.divN(1000)],
+    },
+    currency: {
+      a2: ['+5', ['Shift+Control+a'], () => calc.plusN(5)],
+      b2: ['+10', ['Shift+Control+s'], () => calc.plusN(10)],
+      c2: ['+100', ['Shift+Control+d'], () => calc.plusN(100)],
+      a3: ['-5', ['Shift+Digit7', 'Shift+Numpad7'], () => calc.minusN(5)],
+      b3: ['-10', ['Shift+Digit8', 'Shift+Numpad8'], () => calc.minusN(10)],
+      c3: ['-100', ['Shift+Digit9', 'Shift+Numpad9'], () => calc.minusN(100)],
+      a4: ['×10', ['Shift+Digit4', 'Shift+Numpad4'], () => calc.mulN(10)],
+      b4: ['×100', ['Shift+Digit5', 'Shift+Numpad5'], () => calc.mulN(100)],
+      c4: ['×1000', ['Shift+Digit6', 'Shift+Numpad6'], () => calc.mulN(1000)],
+      a5: ['÷10', ['Shift+Digit1', 'Shift+Numpad1'], () => calc.divN(10)],
+      b5: ['÷100', ['Shift+Digit2', 'Shift+Numpad2'], () => calc.divN(100)],
+      c5: ['÷1000', ['Shift+Digit3', 'Shift+Numpad3'], () => calc.divN(1000)],
+    },
+  };
+
+  // prop type에 따라 적절한 버튼 기능 선택
+  const buttonsAddedFunc = computed(() => ({
+    ...commonButtonsAddedFunc,
+    ...numberButtonsAddedFunc[props.type as keyof typeof numberButtonsAddedFunc],
+  }));
+
+  type ButtonID = keyof typeof commonButtonsAddedFunc;
 
   // 버튼 클릭 시 알림 표시 함수
   const showButtonNotify = (id: ButtonID) => {
-    if (buttonsAddedFunc[id][0] === 'MC') {
+    const buttonFunc = buttonsAddedFunc.value[id];
+    if (buttonFunc[0] === 'MC') {
       notifyMsg(t('memoryCleared'));
-    } else if (buttonsAddedFunc[id][0] === 'MR' && !calc.getIsMemoryReset()) {
+    } else if (buttonFunc[0] === 'MR' && !calc.getIsMemoryReset()) {
       notifyMsg(t('memoryRecalled'));
-    } else if (buttonsAddedFunc[id][0] === 'MS') {
-      notifyMsg(t('memorySaved'));
     }
   };
 
   // 시프트 버튼의 ID 찾기
-  const shiftID = Object.keys(buttonsAddedFunc).find((key) => buttonsAddedFunc[key][0] === '');
+  const shiftID = computed(() => Object.keys(buttonsAddedFunc.value).find((key) => buttonsAddedFunc.value[key][0] === ''));
 
   // 추가 기능 툴팁 표시를 위한 타이머 상태 객체
   const timersOfTooltip: {[id: string]: boolean} = reactive(
     Object.fromEntries(Object.keys(buttons).map((id) => [id, false]))
   );
 
-  type ButtonID = string | number;
 
   // 추가 기능 툴팁 표시 함수
   const showTooltipOfFunc = (id: ButtonID) => {
-    if (timersOfTooltip[id] || id === shiftID || (!storeSettings.showButtonAddedLabel && storeBase.buttonShift)) return;
+    if (timersOfTooltip[id] || id === shiftID.value || (!storeSettings.showButtonAddedLabel && storeBase.buttonShift)) return;
     timersOfTooltip[id] = true;
     setTimeout(() => {
       timersOfTooltip[id] = false;
@@ -188,10 +239,10 @@
   // 버튼 시프트 상태에 따른 기능 실행
   const shiftFunc = (id: ButtonID) => {
     if (storeBase.buttonShift) {
-      funcWithError(buttonsAddedFunc[id][2]);
+      funcWithError(buttonsAddedFunc.value[id][2]);
       showTooltipOfFunc(id);
       showButtonNotify(id);
-      if (id === shiftID) {
+      if (id === shiftID.value) {
         offButtonShift();
         offButtonShiftLock();
         return;
@@ -205,7 +256,7 @@
   // 버튼 길게 누르기 기능
   const holdFunc = (id: ButtonID) => {
     impactMedium();
-    if (id === shiftID) {
+    if (id === shiftID.value) {
       if (storeBase.buttonShiftLock) {
         offButtonShiftLock();
         offButtonShift();
@@ -219,7 +270,7 @@
       funcWithError(buttons[id][4]);
       if (!storeBase.buttonShiftLock) offButtonShift();
     } else {
-      funcWithError(buttonsAddedFunc[id][2]);
+      funcWithError(buttonsAddedFunc.value[id][2]);
       showTooltipOfFunc(id);
       showButtonNotify(id);
     }
@@ -255,7 +306,7 @@
   ]);
 
   // 보조 키 바인딩 설정
-  const keyBindingsSecondary: KeyBindings = Object.entries(buttonsAddedFunc).map(([id, [, keys]]) => [
+  const keyBindingsSecondary: KeyBindings = Object.entries(buttonsAddedFunc.value).map(([id, [, keys]]) => [
     keys,
     () => buttonClickByKey(id, true),
   ]);
@@ -286,11 +337,6 @@
     },
     {immediate: true}
   );
-
-  // props 기본값 설정
-  const props = withDefaults(defineProps<{type?: string}>(), {
-    type: 'normal',
-  });
 
   // 계산기 버튼 높이 설정
   const baseHeight = ref('136px');
@@ -441,3 +487,6 @@ en:
     background: v-bind(buttonShiftPressedColor) !important;
   }
 </style>
+
+
+

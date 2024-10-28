@@ -1,9 +1,9 @@
-import { copyToClipboard } from 'quasar';
-import { defineStore } from 'pinia';
-import { create, all } from 'mathjs';
-import { useStoreSettings } from './store-settings';
-import { useStoreNotifications } from './store-notifications';
-import { ResultSnapshot } from 'src/classes/Calculator';
+import {copyToClipboard} from 'quasar';
+import {defineStore} from 'pinia';
+import {create, all} from 'mathjs';
+import {useStoreSettings} from './store-settings';
+import {useStoreNotifications} from './store-notifications';
+import {ResultSnapshot} from 'src/classes/Calculator';
 
 // BigNumber 정밀도를 64로 설정한 MathJS 인스턴스 생성
 const MathB = create(all, {
@@ -30,6 +30,10 @@ export const useStoreUtils = defineStore('utils', {
     // 숫자를 포맷팅된 문자열로 변환
     toFormattedNumber(number: string): string {
       const storeSettings = useStoreSettings();
+      console.log('toFormattedNumber', number);
+      if (number === '') {
+        return '';
+      }
       const bignumber = MathB.bignumber(number);
       const formattedNumber = MathB.format(bignumber, {
         precision: storeSettings.decimalPlaces === -2 ? 64 : storeSettings.decimalPlaces,
@@ -44,7 +48,7 @@ export const useStoreUtils = defineStore('utils', {
     getLeftSideInHistory(history: ResultSnapshot, useLineBreak = false): string {
       const lineBreak = useLineBreak ? '\n' : '';
       const formattedPrev = this.toFormattedNumber(history.previousNumber);
-      const formattedArg = this.toFormattedNumber(history.argumentNumber ?? '');
+      const formattedArg = history.argumentNumber ? this.toFormattedNumber(history.argumentNumber) : '';
 
       let result = '';
       switch (history.operator) {

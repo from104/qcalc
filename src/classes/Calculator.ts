@@ -938,6 +938,82 @@ export class Calculator {
   }
 
   /**
+   * 이항 연산을 간단하게 수행하는 공통 메서드
+   * @param operator 수행할 연산자
+   * @param n 연산에 사용할 숫자
+   */
+  private performBinaryOperation(operator: Operator, n: number): void {
+    switch (operator) {
+      case Operator.Plus: this.plus(); break;
+      case Operator.Minus: this.minus(); break;
+      case Operator.Mul: this.mul(); break;
+      case Operator.Div: this.div(); break;
+      case Operator.Pow: this.pow(); break;
+      case Operator.Root: this.root(); break;
+      case Operator.Mod: this.mod(); break;
+      default: throw new Error('Invalid operator');
+    }
+    this.setCurrentNumber(n.toString()); // 숫자를 현재 숫자로 설정
+    this.equal(); // 계산 수행 및 결과 설정
+  }
+
+  /**
+   * 숫자를 더하는 메서드
+   * @param n 더할 숫자
+   */
+  public plusN(n: number): void {
+    this.performBinaryOperation(Operator.Plus, n);
+  }
+
+  /**
+   * 숫자를 뺄하는 메서드
+   * @param n 뺄 숫자
+   */
+  public minusN(n: number): void {
+    this.performBinaryOperation(Operator.Minus, n);
+  }
+
+  /**
+   * 숫자를 곱하는 메서드
+   * @param n 곱할 숫자
+   */
+  public mulN(n: number): void {
+    this.performBinaryOperation(Operator.Mul, n);
+  } 
+
+  /**
+   * 숫자를 나누는 메서드
+   * @param n 나눌 숫자
+   */
+  public divN(n: number): void {
+    this.performBinaryOperation(Operator.Div, n);
+  }   
+
+  /**
+   * 숫자를 거듭제곱하는 메서드
+   * @param n 거듭제곱할 숫자
+   */
+  public powN(n: number): void {
+    this.performBinaryOperation(Operator.Pow, n);
+  }
+
+  /**
+   * 숫자의 제곱근을 계산하는 메서드
+   * @param n 제곱근을 계산할 숫자
+   */
+  public rootN(n: number): void {
+    this.performBinaryOperation(Operator.Root, n);
+  } 
+
+  /**
+   * 숫자의 나머지를 계산하는 메서드
+   * @param n 나머지를 계산할 숫자
+   */
+  public modN(n: number): void {
+    this.performBinaryOperation(Operator.Mod, n);
+  }
+
+  /**
    * 수학 상수 값을 조회하는 메서드
    * 
    * @param constant - 조회할 상수의 이름 (예: 'PI', 'E' 등)
