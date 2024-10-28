@@ -30,7 +30,6 @@ export const useStoreUtils = defineStore('utils', {
     // 숫자를 포맷팅된 문자열로 변환
     toFormattedNumber(number: string): string {
       const storeSettings = useStoreSettings();
-      console.log('toFormattedNumber', number);
       if (number === '') {
         return '';
       }
