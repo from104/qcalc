@@ -278,7 +278,11 @@
   watch(
     () => storeUtils.inputFocused,
     (focused) => {
-      focused ? keyBinding.unsubscribe() : keyBinding.subscribe();
+      if (focused) {
+        keyBinding.unsubscribe();
+      } else {
+        keyBinding.subscribe();
+      }
     },
     {immediate: true}
   );

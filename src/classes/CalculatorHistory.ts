@@ -1,4 +1,4 @@
-import { Calculator, ResultSnapshot } from './Calculator';
+import { ResultSnapshot } from './Calculator';
 
 // 계산기 히스토리를 위한 인터페이스
 export interface History {

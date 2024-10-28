@@ -58,7 +58,7 @@
   "devDependencies": {
     "@intlify/vite-plugin-vue-i18n": "7.0.0",
     "@modyfi/vite-plugin-yaml": "^1.1.0",
-    "@quasar/app-vite": "1.10.2",
+    "@quasar/app-vite": "2.0.0-beta.24",
     "@quasar/quasar-app-extension-qmarkdown": "^2.0.0-beta.10",
     "@rushstack/eslint-patch": "^1.10.4",
     "@types/node": "22.8.1",
@@ -69,7 +69,7 @@
     "autoprefixer": "^10.4.20",
     "electron": "33.0.2",
     "electron-builder": "25.1.8",
-    "eslint": "9.13.0",
+    "eslint": "^8.56.0",
     "eslint-config-airbnb-base": "^15.0.0",
     "eslint-config-prettier": "^9.1.0",
     "eslint-plugin-import": "^2.31.0",

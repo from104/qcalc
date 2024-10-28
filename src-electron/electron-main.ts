@@ -1,8 +1,8 @@
 // 필요한 모듈 가져오기
-import { fileURLToPath } from 'url';
+import {fileURLToPath} from 'url';
 import path from 'path';
 import os from 'os';
-import { app, BrowserWindow, nativeTheme, ipcMain, screen } from 'electron';
+import {app, BrowserWindow, nativeTheme, ipcMain, screen} from 'electron';
 import windowState from 'electron-window-state';
 
 // 현재 디렉토리 경로 설정
@@ -14,7 +14,9 @@ const platform = process.platform || os.platform();
 // Windows에서 다크 모드일 때 DevTools Extensions 제거 시도
 try {
   if (platform === 'win32' && nativeTheme.shouldUseDarkColors === true) {
-    require('fs').unlinkSync(path.join(app.getPath('userData'), 'DevTools Extensions'));
+    const fs = await import('fs');
+    const path = await import('path');
+    fs.unlinkSync(path.join(app.getPath('userData'), 'DevTools Extensions'));
   }
 } catch (_) {
   // 오류 발생 시 무시
@@ -42,7 +44,7 @@ const adjustedX = platform === 'linux' ? 0 : 0;
 async function createWindow() {
   try {
     // 화면 크기와 방향 확인
-    const { width, height } = screen.getPrimaryDisplay().workAreaSize;
+    const {width, height} = screen.getPrimaryDisplay().workAreaSize;
     const isLandscape = width > height;
 
     // 최대 윈도우 크기 설정
@@ -122,12 +124,13 @@ async function createWindow() {
 }
 
 // 앱 준비 완료 시 실행
-app.whenReady()
+app
+  .whenReady()
   .then(() => {
     createWindow().catch((err) => {
       console.error('Failed to create window during app preparation:', err);
     });
-    
+
     // 항상 위에 표시 토글 이벤트 처리
     ipcMain.on('toggle-always-on-top', (_event, res) => {
       mainWindow?.setAlwaysOnTop(res);

@@ -84,23 +84,6 @@
   };
 
   // 터치 시작 위치 저장 변수
-  let touchStartY = 0;
-
-  // 터치 시작 이벤트 핸들러
-  const handleTouchStart = (event: TouchEvent) => {
-    touchStartY = event.touches[0].clientY;
-  };
-
-  // 터치 종료 이벤트 핸들러
-  const handleTouchEnd = (event: TouchEvent) => {
-    const touchEndY = event.changedTouches[0].clientY;
-    // 아래로 30px 이상 끌어내렸을 경우 다이얼로그 닫기
-    if (touchEndY - touchStartY > 30) {
-      storeBase.isHistoryDialogOpen = false;
-    }
-  };
-
-  // 스크롤 위치 저장 변수
   let lastScrollPosition = 0;
 
   // 히스토리 다이얼로그 열림/닫힘 상태 감시
@@ -141,8 +124,8 @@
 
   // 키 바인딩 설정
   const keyBinding = new KeyBinding([
-    [['Alt+h'], () => { !doDeleteHistory.value && clickButtonById('btn-history'); }],
-    [['d'], () => { storeBase.isHistoryDialogOpen && clickButtonById('btn-delete-history'); }],
+    [['Alt+h'], () => { if (!doDeleteHistory.value) clickButtonById('btn-history'); }],
+    [['d'], () => { if (storeBase.isHistoryDialogOpen) clickButtonById('btn-delete-history'); }],
     [['ArrowUp'], () => scrollHistory(-50)],
     [['ArrowDown'], () => scrollHistory(50)],
     [['PageUp'], () => scrollHistory(-400)],
