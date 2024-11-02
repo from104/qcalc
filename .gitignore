@@ -5,6 +5,8 @@ node_modules
 package
 .envrc
 .env
+__test__
+.yarn
 
 # Quasar core related directories
 .quasar
