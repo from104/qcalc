@@ -1,15 +1,15 @@
-import {copyToClipboard} from 'quasar';
+import { copyToClipboard } from 'quasar';
 import {defineStore} from 'pinia';
 import {create, all} from 'mathjs';
 import {useStoreSettings} from './store-settings';
 import {useStoreNotifications} from './store-notifications';
-import {ResultSnapshot} from 'src/classes/Calculator';
+import {Operator, operatorMap, ResultSnapshot} from 'src/classes/Calculator';
 
 // BigNumber 정밀도를 64로 설정한 MathJS 인스턴스 생성
 const MathB = create(all, {
   number: 'BigNumber',
   precision: 64,
-}) as math.MathJsStatic;
+})
 
 // 유틸리티 관련 상태 및 동작을 관리하는 스토어 정의
 export const useStoreUtils = defineStore('utils', {
@@ -46,53 +46,45 @@ export const useStoreUtils = defineStore('utils', {
     // 계산 기록의 왼쪽 부분 생성
     getLeftSideInHistory(history: ResultSnapshot, useLineBreak = false): string {
       const lineBreak = useLineBreak ? '\n' : '';
+
       const formattedPrev = this.toFormattedNumber(history.previousNumber);
       const formattedArg = history.argumentNumber ? this.toFormattedNumber(history.argumentNumber) : '';
+      const operator = Object.keys(operatorMap).find((key) => operatorMap[key] === history.operator) || '';
 
-      let result = '';
-      switch (history.operator) {
-        case '+':
-        case '-':
-        case '×':
-        case '÷':
-        case 'mod':
-          result = `${formattedPrev}${lineBreak} ${history.operator} ${formattedArg}`;
-          break;
-        case 'pow':
-          result = `${formattedPrev}${lineBreak} ^ ${formattedArg}`;
-          break;
-        case 'root':
-          result = `${formattedPrev}${lineBreak} ^ (1/${formattedArg})`;
-          break;
-        case '÷%':
-          result = `${formattedPrev}${lineBreak} ÷ ${formattedArg}${lineBreak} × 100`;
-          break;
-        case '×%':
-          result = `${formattedPrev}${lineBreak} × ${formattedArg}${lineBreak} ÷ 100`;
-          break;
-        case 'rec':
-          result = `1${lineBreak} ÷ ${formattedPrev}`;
-          break;
-        case 'pow2':
-          result = `${formattedPrev} ^ 2`;
-          break;
-        case 'exp10':
-          result = `${this.toFormattedNumber('10')} ^ ${formattedPrev}`;
-          break;
-        case 'sqrt':
-        case 'sin':
-        case 'cos':
-        case 'tan':
-        case 'fct':
-        case 'int':
-        case 'frac':
-          result = `${history.operator} ( ${formattedPrev} )`;
-          break;
+      switch (Array.isArray(history.operator) ? history.operator[0] : history.operator) {
+        case Operator.Plus:
+        case Operator.Minus:
+        case Operator.Mul:
+        case Operator.Div:
+        case Operator.Mod:
+          return `${formattedPrev}${lineBreak} ${operator} ${formattedArg}`;
+        case Operator.Pow:
+          return `${formattedPrev}${lineBreak} ^ ${formattedArg}`;
+        case Operator.Root:
+         return `${formattedPrev}${lineBreak} ^ (1/${formattedArg})`;
+        case Operator.Pct:
+          if (Array.isArray(history.operator) && history.operator[1] === Operator.Div) {
+            return `${formattedPrev}${lineBreak} / ${formattedArg}${lineBreak} × 100`;
+          } else {
+            return `${formattedPrev}${lineBreak} × ${formattedArg}%`;
+          }
+        case Operator.Rec:
+          return `1${lineBreak} ÷ ${formattedPrev}`;
+        case Operator.Pow2:
+          return `${formattedPrev} ^ 2`;
+        case Operator.Exp10:
+          return `${this.toFormattedNumber('10')} ^ ${formattedPrev}`;
+        case Operator.Sqrt:
+        case Operator.Sin:
+        case Operator.Cos:
+        case Operator.Tan:
+        case Operator.Fct:
+        case Operator.Int:
+        case Operator.Frac:
+          return `${operator} ( ${formattedPrev} )`;
         default:
-          result = formattedPrev;
+          return formattedPrev;
       }
-
-      return result;
     },
 
     // 계산 기록의 오른쪽 부분 생성

@@ -74,7 +74,7 @@
   // 결과 문자열 생성 함수
   const getResult = () => {
     if (isMainField.value) {
-      const currentNumber = calc.getCurrentNumber();
+      const currentNumber = calc.getBuffer();
       const formattedNumber = toFormattedNumber(currentNumber);
       return storeSettings.decimalPlaces === -2 && currentNumber.includes('.')
         ? `${formattedNumber.split('.')[0]}.${currentNumber.split('.')[1]}`
@@ -187,7 +187,9 @@
   // 감시자 설정
   watch(
     [
-      calc,
+      () => calc.getBuffer(),
+      () => calc.getOperatorString(),
+      () => calcHistory.getHistorySize(),
       () => storeSettings.useGrouping,
       () => storeSettings.decimalPlaces,
       () => storeSettings.showUnit,

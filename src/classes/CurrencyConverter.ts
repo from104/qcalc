@@ -3,7 +3,7 @@ import {CurrencyExchangeRates, CurrencyData, currencyBaseData} from './CurrencyB
 
 /**
  * CurrencyConverter 클래스
- * 
+ *
  * 이 클래스는 환율 정보를 관리하고 통화 변환 기능을 제공합니다.
  */
 export class CurrencyConverter {
@@ -12,19 +12,19 @@ export class CurrencyConverter {
 
   // 환율 정보 업데이트 주기 (12시간)
   private intervalToUpdate = 1000 * 60 * 60 * 12;
-  
+
   // 마지막 환율 정보 업데이트 시간
   private updatedTimeOfCurrencyExchangeRates = 0;
-  
+
   // 기본 환율 정보 (EUR 기준)
   private baseCurrencyExchangeRates: CurrencyExchangeRates = {};
-  
+
   // 기준 통화 (기본값: EUR)
   private baseCurrency = 'EUR';
-  
+
   // 현재 사용 중인 환율 정보
   private rates: CurrencyExchangeRates = {};
-  
+
   // 통화 데이터 (심볼, 설명 등)
   private currencies: CurrencyData = currencyBaseData;
 
@@ -40,8 +40,8 @@ export class CurrencyConverter {
    * 환율 정보가 비어있는지 확인하는 메소드
    * @returns {boolean} 환율 정보가 비어있으면 true, 그렇지 않으면 false
    */
-  isRatesEmpty() {
-    return Object.keys(this.baseCurrencyExchangeRates).length === 0;
+  isRatesEmpty(): boolean {
+    return !this.baseCurrencyExchangeRates || Object.keys(this.baseCurrencyExchangeRates).length === 0;
   }
 
   /**
@@ -118,9 +118,7 @@ export class CurrencyConverter {
 
     const baseRate = this.baseCurrencyExchangeRates[baseCurrency];
     return Object.fromEntries(
-      Object.entries(this.baseCurrencyExchangeRates).map(
-        ([currency, rate]) => [currency, rate / baseRate]
-      )
+      Object.entries(this.baseCurrencyExchangeRates).map(([currency, rate]) => [currency, rate / baseRate]),
     );
   }
 
@@ -174,7 +172,7 @@ export class CurrencyConverter {
     if (this.isRatesEmpty()) {
       return {};
     }
-    
+
     return Object.keys(this.rates).reduce((currencies, currency) => {
       if (this.currencies.hasOwnProperty(currency)) {
         currencies[currency] = this.currencies[currency];
