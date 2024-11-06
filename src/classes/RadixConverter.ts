@@ -1,4 +1,4 @@
-import {create, all, BigNumber} from 'mathjs';
+import { create, all, BigNumber } from 'mathjs';
 
 /**
  * BigNumber 설정으로 MathJS 인스턴스 생성
@@ -16,28 +16,23 @@ export enum Radix {
   Hexadecimal = 'hex',
 }
 
+export type RadixType = Radix;
+
 /**
  * 진법 변환을 처리하는 클래스
  * 10진수와 2진수, 8진수, 16진수 간의 상호 변환을 지원
  */
 export class RadixConverter {
   // 16진수 변환에 사용될 문자 집합
-  private static readonly HEX_DIGITS = '0123456789ABCDEF';
+  private readonly HEX_DIGITS = '0123456789ABCDEF';
   // 소수점 이하 최대 자릿수
-  private static readonly MAX_PRECISION = 32;
+  private readonly MAX_PRECISION = 32;
   // 지원하는 진법 타입
-  public static readonly RADIX_MAP = {
-    bin: 2,
-    oct: 8,
-    dec: 10,
-    hex: 16,
-  } as const;
-
-  private static readonly VALID_PATTERNS = {
-    [Radix.Binary]: /^-?[01]+(\.[01]+)?$/,
-    [Radix.Octal]: /^-?[0-7]+(\.[0-7]+)?$/,
-    [Radix.Decimal]: /^-?\d+(\.\d+)?$/,
-    [Radix.Hexadecimal]: /^-?[0-9A-Fa-f]+(\.[0-9A-Fa-f]+)?$/,
+  public readonly RADIX_MAP = {
+    [Radix.Binary]: 2,
+    [Radix.Octal]: 8,
+    [Radix.Decimal]: 10,
+    [Radix.Hexadecimal]: 16,
   } as const;
 
   /**
@@ -47,96 +42,104 @@ export class RadixConverter {
    * @returns 유효성 여부
    * @throws {Error} 지원하지 않는 진법인 경우
    */
-  public static isValidNumber(value: string, radix: Radix): boolean {
-    const pattern = this.VALID_PATTERNS[radix];
-    if (!pattern) {
+  public isValidRadixNumber(value: string, radix: Radix): boolean {
+    if (!Object.values(Radix).includes(radix)) {
       throw new Error('Unsupported radix type');
     }
-    return pattern.test(value);
+    const pattern = () => {
+      switch (radix) {
+        case Radix.Binary:
+          return /^[01]+(\.[01]*)?$/;
+        case Radix.Octal:
+          return /^[0-7]+(\.[0-7]*)?$/;
+        case Radix.Decimal:
+          return /^[0-9]+(\.[0-9]*)?$/;
+        case Radix.Hexadecimal:
+          return /^[0-9A-Fa-f]+(\.[0-9A-Fa-f]*)?$/;
+      }
+    };
+    return pattern().test(value);
   }
 
   /**
    * 2진수 문자열 유효성 검사
    */
-  public static isValidBinary(value: string): boolean {
-    return this.isValidNumber(value, Radix.Binary);
+  public isValidBinary(value: string): boolean {
+    return this.isValidRadixNumber(value, Radix.Binary);
   }
 
   /**
    * 8진수 문자열 유효성 검사
    */
-  public static isValidOctal(value: string): boolean {
-    return this.isValidNumber(value, Radix.Octal);
+  public isValidOctal(value: string): boolean {
+    return this.isValidRadixNumber(value, Radix.Octal);
   }
 
   /**
    * 10진수 문자열 유효성 검사
    */
-  public static isValidDecimal(value: string): boolean {
-    return this.isValidNumber(value, Radix.Decimal);
+  public isValidDecimal(value: string): boolean {
+    return this.isValidRadixNumber(value, Radix.Decimal);
   }
 
   /**
    * 16진수 문자열 유효성 검사
    */
-  public static isValidHexadecimal(value: string): boolean {
-    return this.isValidNumber(value, Radix.Hexadecimal);
+  public isValidHexadecimal(value: string): boolean {
+    return this.isValidRadixNumber(value, Radix.Hexadecimal);
   }
 
   /**
    * 10진수 → 2진수 변환
    */
-  public static convertDecimalToBinary(decimal: string): string {
+  public convertDecimalToBinary(decimal: string): string {
     return this.convertFromDecimal(decimal, Radix.Binary);
   }
 
   /**
    * 10진수 → 8진수 변환
    */
-  public static convertDecimalToOctal(decimal: string): string {
+  public convertDecimalToOctal(decimal: string): string {
     return this.convertFromDecimal(decimal, Radix.Octal);
   }
 
   /**
    * 10진수 → 16진수 변환
    */
-  public static convertDecimalToHexadecimal(decimal: string): string {
+  public convertDecimalToHexadecimal(decimal: string): string {
     return this.convertFromDecimal(decimal, Radix.Hexadecimal).toUpperCase();
   }
 
   /**
    * 2진수 → 10진수 변환
    */
-  public static convertBinaryToDecimal(binary: string): string {
+  public convertBinaryToDecimal(binary: string): string {
     return this.convertToDecimal(binary, Radix.Binary);
   }
 
   /**
    * 8진수 → 10진수 변환
    */
-  public static convertOctalToDecimal(octal: string): string {
+  public convertOctalToDecimal(octal: string): string {
     return this.convertToDecimal(octal, Radix.Octal);
   }
 
   /**
    * 16진수 → 10진수 변환
    */
-  public static convertHexadecimalToDecimal(hex: string): string {
+  public convertHexadecimalToDecimal(hex: string): string {
     return this.convertToDecimal(hex, Radix.Hexadecimal);
   }
 
   /**
    * 10진수를 지정된 진법으로 변환하는 내부 메서드
    * @param decimal 10진수 문자열
-   * @param notation 변환할 진법 ('bin' | 'oct' | 'hex')
+   * @param radix 변환할 진법 ('bin' | 'oct' | 'hex')
    * @returns 변환된 진법 문자열
    */
-  private static convertDecimalToRadix(
-    decimal: string | BigNumber,
-    notation: keyof typeof RadixConverter.RADIX_MAP,
-  ): string {
+  private convertDecimalToRadix(decimal: string | BigNumber, radix: Radix): string {
     if (!decimal) return '0';
-
+    if (radix === Radix.Decimal) return decimal.toString();
     // 입력값을 BigNumber로 변환하고 정수부와 소수부 분리
     const bignumber = MathB.bignumber(decimal);
     const isNegative = MathB.smaller(bignumber, 0);
@@ -145,30 +148,21 @@ export class RadixConverter {
     const fraction = MathB.subtract(absoluteValue, integer);
 
     // 정수부 변환 (MathJS format 함수 사용)
-    let integerPart =
-      notation === Radix.Decimal
-        ? MathB.format(integer, {
-            notation: 'fixed',
-            precision: this.MAX_PRECISION,
-          }).replace(/\.?0+$/, '')
-        : MathB.format(integer, {
-            notation: notation,
-            precision: this.MAX_PRECISION,
-          })
-            .slice(2)
-            .toUpperCase(); // 접두사(0b, 0o, 0x) 제거
+    const integerPart = MathB.format(integer, {
+      notation: radix,
+      precision: this.MAX_PRECISION,
+    })
+      .slice(2)
+      .toUpperCase(); // 접두사(0b, 0o, 0x) 제거
 
     // 소수부가 0이면 정수부만 반환
     if (MathB.equal(fraction, 0)) {
       // 10진수인 경우 소수점 이하 0을 제거
-      if (notation === Radix.Decimal) {
-        integerPart = integerPart.replace(/\.?0+$/, '');
-      }
       return isNegative ? `-${integerPart}` : integerPart;
     }
 
     // 소수부 변환
-    const fractionPart = this.convertFractionToRadix(fraction, notation);
+    const fractionPart = this.convertFractionToRadix(fraction, radix);
 
     // 결과 조합 (불필요한 0 제거)
     const result = `${integerPart}.${fractionPart}`;
@@ -178,27 +172,40 @@ export class RadixConverter {
 
   /**
    * 소수부를 지정된 진법으로 변환하는 보조 메서드
-   * @param fraction 소수부 BigNumber
-   * @param notation 변환할 진법
+   *
+   * @param fraction 변환할 소수부 (BigNumber 타입)
+   * @param radix 변환할 진법 (2진수, 8진수, 16진수)
    * @returns 변환된 소수부 문자열
+   *
+   * @description
+   * 1. 입력받은 소수를 지정된 진법의 기수(2, 8, 16)와 곱하면서 정수부 추출
+   * 2. 추출된 정수부를 결과 문자열에 추가 (16진수는 문자로 변환)
+   * 3. 남은 소수부에 대해 최대 정밀도까지 반복
+   * 4. 소수부가 0이 되면 조기 종료
    */
-  private static convertFractionToRadix(
-    fraction: math.BigNumber,
-    notation: keyof typeof RadixConverter.RADIX_MAP,
-  ): string {
-    const radix = this.RADIX_MAP[notation];
+  private convertFractionToRadix(fraction: math.BigNumber, radix: Radix): string {
+    // 진법에 따른 기수값 (2, 8, 16) 가져오기
+    const radixValue = this.RADIX_MAP[radix];
+
+    // 결과 문자열과 현재 처리중인 소수 초기화
     let result = '';
-    let currentFraction = fraction;
+    let remainingFraction = fraction;
 
-    // 최대 자릿수까지 소수부 계산
-    for (let i = 0; i < this.MAX_PRECISION && !MathB.equal(currentFraction, 0); i++) {
-      currentFraction = MathB.multiply(currentFraction, radix) as math.BigNumber;
-      const digit = MathB.floor(currentFraction);
+    // 최대 정밀도까지 소수부 변환 반복
+    for (let precision = 0; precision < this.MAX_PRECISION && !MathB.equal(remainingFraction, 0); precision++) {
+      // 현재 소수에 기수를 곱하여 정수부 추출
+      remainingFraction = MathB.multiply(remainingFraction, radixValue) as math.BigNumber;
+      const integerPart = MathB.floor(remainingFraction);
 
-      // 16진수의 경우 문자로 변환, 그 외는 숫자 그대로 사용
-      result += notation === 'hex' ? this.HEX_DIGITS[Number(digit.toFixed())] : digit.toString();
+      // 16진수면 해당하는 문자(0-F)로, 아니면 숫자 그대로 변환
+      const digitStr =
+        radix === Radix.Hexadecimal ? this.HEX_DIGITS[Number(integerPart.toFixed())] : integerPart.toString();
 
-      currentFraction = MathB.subtract(currentFraction, digit);
+      // 결과 문자열에 추가
+      result += digitStr;
+
+      // 정수부를 제외한 나머지 소수부만 남김
+      remainingFraction = MathB.subtract(remainingFraction, integerPart);
     }
 
     return result;
@@ -206,82 +213,189 @@ export class RadixConverter {
 
   /**
    * 지정된 진법을 10진수로 변환하는 내부 메서드
-   * @param value 변환할 진법 문자열
-   * @param notation 입력 진법
+   *
+   * @param value 변환할 진법 문자열 (예: "1010", "FF", "777" 등)
+   * @param radix 입력 진법 (2진수, 8진수, 16진수)
    * @returns 10진수 문자열
+   *
+   * @description
+   * 1. 입력값 검증
+   *    - 빈 문자열이나 0인 경우 "0" 반환
+   *    - 10진수인 경우 그대로 반환
+   *
+   * 2. 음수 처리
+   *    - 음수 부호("-") 확인 및 제거하여 절대값 계산
+   *
+   * 3. 정수부/소수부 분리
+   *    - "." 기준으로 정수부와 소수부 분리
+   *    - 소수부가 없는 경우 빈 문자열로 초기화
+   *
+   * 4. 진법 변환
+   *    - 정수부: parseInt() 사용하여 10진수로 변환 후 BigNumber 생성
+   *    - 소수부: convertFractionFromRadix() 메서드로 변환하여 정수부에 더함
+   *
+   * 5. 결과 반환
+   *    - 음수였던 경우 "-" 부호 다시 붙여서 반환
    */
-  private static convertRadixToDecimal(value: string, notation: keyof typeof RadixConverter.RADIX_MAP): string {
-    if (!value || value === '0' || value === '-0') return '0';
+  private convertRadixToDecimal(value: string, radix: Radix): string {
+    // 입력값이 없거나 0인 경우 처리
+    if (!value || value === '0' || value === '-0') {
+      return '0';
+    }
 
-    // 음수 부호 확인
+    // 이미 10진수인 경우 그대로 반환
+    if (radix === Radix.Decimal) {
+      return value;
+    }
+
+    // 숫자 끝에 소수점만 있는 경우 기억
+    const isOnlyFraction = value.endsWith('.');
+
+    // 음수 부호 확인 및 절대값 추출
     const isNegative = value.startsWith('-');
     const absValue = isNegative ? value.slice(1) : value;
 
+    // 정수부와 소수부 분리 ("." 기준)
     const [integerPart, fractionPart = ''] = absValue.split('.');
-    const radix = this.RADIX_MAP[notation];
 
-    // 정수부 변환
-    let result = MathB.bignumber(integerPart ? parseInt(integerPart, radix) : 0);
+    // 진법에 따른 기수값 (2, 8, 16) 가져오기
+    const radixValue = this.RADIX_MAP[radix];
 
-    // 소수부가 있는 경우 변환
+    // 정수부 변환 (빈 문자열이면 0으로 처리)
+    let result = MathB.bignumber(integerPart ? parseInt(integerPart, radixValue) : 0);
+
+    // 소수부가 존재하면 변환하여 더하기
     if (fractionPart) {
-      result = MathB.add(result, this.convertFractionFromRadix(fractionPart, notation));
+      result = MathB.add(result, this.convertFractionFromRadix(fractionPart, radix));
     }
 
-    // 음수인 경우 부호 적용
-    return isNegative ? `-${result.toString()}` : result.toString();
+    // 최종 결과 반환 (음수면 부호 추가)
+    return (isNegative ? '-' : '') + result.toString() + (isOnlyFraction ? '.' : '');
   }
 
   /**
    * 소수부를 10진수로 변환하는 보조 메서드
-   * @param fractionPart 소수부 문자열
-   * @param notation 입력 진법
-   * @returns 변환된 소수부 BigNumber
+   *
+   * @param fractionPart 소수부 문자열 (예: "5A3"와 같은 16진수 소수부)
+   * @param radix 입력 진법 (2진수, 8진수, 16진수 등)
+   * @returns 변환된 소수부의 BigNumber 값
+   * @description
+   * 1. 입력된 진법에 따른 기수값(radix) 가져오기
+   * 2. 16진수인 경우 대문자로 통일하여 처리
+   * 3. 각 자릿수를 순회하며:
+   *    - 현재 자릿수를 10진수로 변환
+   *    - (자릿수값) / (진법 ^ 자릿수위치)를 계산하여 누적
+   * 4. 최종 계산된 소수값 반환
    */
-  private static convertFractionFromRadix(
-    fractionPart: string,
-    notation: keyof typeof RadixConverter.RADIX_MAP,
-  ): math.BigNumber {
-    const radix = this.RADIX_MAP[notation];
-    const digits = notation === 'hex' ? fractionPart.toUpperCase() : fractionPart;
+  private convertFractionFromRadix(fractionPart: string, radix: Radix): math.BigNumber {
+    // 진법에 따른 기수값 (2, 8, 16) 가져오기
+    const radixValue = this.RADIX_MAP[radix];
 
-    return digits.split('').reduce((acc, digit, index) => {
-      const value = parseInt(digit, radix);
-      return MathB.add(acc, MathB.divide(value, MathB.pow(radix, index + 1)) as math.BigNumber);
+    // 16진수의 경우 대문자로 통일 (예: 'a' -> 'A')
+    const digits = radix === Radix.Hexadecimal ? fractionPart.toUpperCase() : fractionPart;
+
+    // 각 자릿수별로 계산하여 합산
+    return digits.split('').reduce((accumulator, currentDigit, position) => {
+      // 현재 자릿수를 10진수로 변환
+      const digitValue = parseInt(currentDigit, radixValue);
+
+      // 현재 자릿수의 가중치 계산: value / (radix^position)
+      const weightedValue = MathB.divide(digitValue, MathB.pow(radixValue, position + 1)) as math.BigNumber;
+
+      // 누적값에 현재 자릿수의 가중치를 더함
+      return MathB.add(accumulator, weightedValue);
     }, MathB.bignumber(0));
   }
 
   /**
-   * 10진수에서 다른 진법으로 변환하는 공통 메서드
+   * 10진수를 다른 진법으로 변환하는 공통 메서드
+   *
+   * @param decimal 변환할 10진수 문자열 (예: "123.45")
+   * @param toRadix 변환하고자 하는 목표 진법 (2진수, 8진수, 16진수)
+   * @returns 변환된 진법 문자열
+   * @throws {Error} 유효하지 않은 10진수 형식일 경우 에러 발생
+   *
+   * 동작 방식:
+   * 1. 입력된 10진수 문자열의 유효성을 검사
+   * 2. 유효하지 않은 경우 에러를 발생시킴
+   * 3. 유효한 경우 convertDecimalToRadix 메서드를 호출하여 실제 변환 수행
+   *
+   * 예시:
+   * - convertFromDecimal("123", Radix.Binary) => "1111011"
+   * - convertFromDecimal("123.45", Radix.Hexadecimal) => "7B.73"
    */
-  private static convertFromDecimal(decimal: string, toRadix: Radix): string {
+  private convertFromDecimal(decimal: string, toRadix: Radix): string {
+    // 입력된 10진수의 유효성 검사
+    // isValidDecimal 메서드를 통해 올바른 10진수 형식인지 확인
     if (!this.isValidDecimal(decimal)) {
       throw new Error('Invalid decimal number format');
     }
+
+    // 유효성 검사를 통과한 경우 실제 진법 변환을 수행
+    // convertDecimalToRadix 메서드에 decimal과 목표 진법을 전달
     return this.convertDecimalToRadix(decimal, toRadix);
   }
 
   /**
-   * 다른 진법에서 10진수로 변환하는 공통 메서드
+   * 임의의 진법에서 10진수로 변환하는 공통 메서드
+   *
+   * @param value 변환할 숫자 문자열
+   * @param fromRadix 입력값의 현재 진법
+   * @returns 변환된 10진수 문자열
+   * @throws 입력된 진법에 맞지 않는 형식일 경우 에러 발생
    */
-  private static convertToDecimal(value: string, fromRadix: Radix): string {
-    if (!this.isValidNumber(value, fromRadix)) {
+  private convertToDecimal(value: string, fromRadix: Radix): string {
+    // 입력값이 해당 진법에 유효한지 검사
+    if (!this.isValidRadixNumber(value, fromRadix)) {
       throw new Error(`Invalid ${fromRadix} number format`);
     }
+
+    // 실제 10진수 변환 수행
     return this.convertRadixToDecimal(value, fromRadix);
   }
 
   /**
-   * 임의의 진법 간 변환
+   * 임의의 진법 간 변환을 수행하는 메서드
+   *
+   * @param value 변환할 숫자 문자열 (예: "1010", "7B", "123")
+   * @param fromRadix 입력값의 현재 진법 (Binary, Octal, Decimal, Hexadecimal)
+   * @param toRadix 변환하고자 하는 목표 진법
+   * @returns 변환된 진법 문자열
+   * @throws {Error} 입력값이 현재 진법에 맞지 않는 형식일 경우 에러 발생
+   *
+   * 동작 방식:
+   * 1. 현재 진법과 목표 진법이 같으면 입력값을 그대로 반환
+   * 2. 다른 경우, 현재 진법에서 10진수로 먼저 변환 (convertToDecimal)
+   * 3. 변환된 10진수를 목표 진법으로 다시 변환 (convertFromDecimal)
+   *
+   * 예시:
+   * - convertRadix("1010", Radix.Binary, Radix.Decimal) => "10"
+   * - convertRadix("7B", Radix.Hexadecimal, Radix.Binary) => "1111011"
+   * - convertRadix("123", Radix.Decimal, Radix.Octal) => "173"
    */
-  public static convertRadix(
-    value: string,
-    fromRadix: keyof typeof RadixConverter.RADIX_MAP,
-    toRadix: keyof typeof RadixConverter.RADIX_MAP,
-  ): string {
-    if (toRadix === fromRadix) return value;
+  public convertRadix(value: string, fromRadix: Radix, toRadix: Radix): string {
+    // 동일한 진법 간 변환 시 추가 연산 없이 반환
+    if (toRadix === fromRadix) {
+      return value;
+    }
 
-    const decimal = this.convertToDecimal(value, fromRadix as Radix);
-    return this.convertFromDecimal(decimal, toRadix as Radix);
+    // 2단계 변환 수행:
+    // 1. 현재 진법 -> 10진수
+    const decimal = this.convertToDecimal(value, fromRadix);
+    // 2. 10진수 -> 목표 진법
+    return this.convertFromDecimal(decimal, toRadix);
   }
 }
+
+const converter = new RadixConverter();
+export const { convertRadix, isValidRadixNumber, isValidBinary, isValidOctal, isValidDecimal, isValidHexadecimal } =
+  converter;
+
+// console.log('1.11 ', converter.isValidRadixNumber('1.11', Radix.Decimal));
+// console.log('1 ', converter.isValidRadixNumber('1', Radix.Decimal));
+// console.log('A ', converter.isValidRadixNumber('A', Radix.Decimal));
+// console.log('A ', converter.isValidRadixNumber('A', Radix.Hexadecimal));
+// console.log('1010 ', converter.isValidRadixNumber('1010', Radix.Binary));
+// console.log('1010.1 ', converter.isValidRadixNumber('1010.1', Radix.Binary));
+
+console.log('0. ', converter.convertRadix('0.', Radix.Binary, Radix.Decimal));

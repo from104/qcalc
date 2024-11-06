@@ -1,28 +1,43 @@
-import {defineStore} from 'pinia';
-import {Calculator} from 'classes/Calculator';
+import { defineStore } from 'pinia';
+
+import { Calculator } from 'classes/Calculator';
+import { Radix } from 'classes/RadixConverter';
+
+import { useStoreRadix } from './store-radix';
+
+// const storeRadix = useStoreRadix();
 
 // 기본 스토어 정의
 export const useStoreBase = defineStore('base', {
   // 상태 정의
   state: () => ({
-    calc: new Calculator(),  // 계산기 인스턴스
-    cTab: 'calc',            // 현재 활성화된 탭
-    isHistoryDialogOpen: false,  // 히스토리 대화상자 열림 여부
-    isSettingDialogOpen: false,  // 설정 대화상자 열림 여부
-    buttonShift: false,      // Shift 버튼 상태
-    buttonShiftLock: false,  // Shift 잠금 상태
-    showMemory: false,       // 메모리 표시 여부
-    paddingOnResult: 0,      // 결과 패널의 상단 여백
+    calc: new Calculator(), // 계산기 인스턴스
+    cTab: 'calc', // 현재 활성화된 탭
+    isHistoryDialogOpen: false, // 히스토리 대화상자 열림 여부
+    isSettingDialogOpen: false, // 설정 대화상자 열림 여부
+    buttonShift: false, // Shift 버튼 상태
+    buttonShiftLock: false, // Shift 잠금 상태
+    showMemory: false, // 메모리 표시 여부
+    paddingOnResult: 0, // 결과 패널의 상단 여백
   }),
 
   // 액션 정의
   actions: {
     // 현재 탭 설정
     setCTab(tab: string): void {
-      if (['calc', 'unit', 'currency'].includes(tab)) {
+      if (['calc', 'unit', 'currency', 'radix'].includes(tab)) {
         this.cTab = tab;
       } else if (tab === '' || this.cTab === '') {
-        this.cTab = 'calc';  // 기본값으로 'calc' 설정
+        this.cTab = 'calc'; // 기본값으로 'calc' 설정
+      }
+      this.setCalcRadixByCTab();
+    },
+
+    setCalcRadixByCTab(): void {
+      if (this.cTab === 'radix') {
+        this.calc.setRadix(useStoreRadix().mainRadix);
+      } else {
+        this.calc.setRadix(Radix.Decimal);
       }
     },
 

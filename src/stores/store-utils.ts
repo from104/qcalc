@@ -1,15 +1,8 @@
 import { copyToClipboard } from 'quasar';
-import {defineStore} from 'pinia';
-import {create, all} from 'mathjs';
-import {useStoreSettings} from './store-settings';
-import {useStoreNotifications} from './store-notifications';
-import {Operator, operatorMap, ResultSnapshot} from 'src/classes/Calculator';
-
-// BigNumber 정밀도를 64로 설정한 MathJS 인스턴스 생성
-const MathB = create(all, {
-  number: 'BigNumber',
-  precision: 64,
-})
+import { defineStore } from 'pinia';
+import { useStoreSettings } from './store-settings';
+import { useStoreNotifications } from './store-notifications';
+import { Operator, operatorMap, ResultSnapshot } from 'src/classes/Calculator';
 
 // 유틸리티 관련 상태 및 동작을 관리하는 스토어 정의
 export const useStoreUtils = defineStore('utils', {
@@ -26,6 +19,47 @@ export const useStoreUtils = defineStore('utils', {
       const regex = new RegExp(`\\B(?=(\\d{${grouping}})+(?!\\d))`, 'g');
       return integer.replace(regex, separator) + (decimal ? `.${decimal}` : '');
     },
+    /**
+     * 숫자의 소수점 자릿수를 조정하는 함수
+     *
+     * @param number 변환할 숫자 문자열 (예: "100.123456789")
+     * @param decimalPlaces 원하는 소수점 자릿수 (음수는 모든 자릿수 표시, 0은 정수부만 표시, 양수는 지정된 자릿수까지 표시)
+     * @returns 지정된 소수점 자릿수로 변환된 문자열
+     *
+     * @description
+     * - decimalPlaces가 음수인 경우: 모든 소수점 자릿수 표시
+     * - decimalPlaces가 0인 경우: 정수부만 표시
+     * - decimalPlaces가 양수인 경우: 지정된 자릿수까지 표시
+     * @example
+     * formatDecimalPlaces('100.123456789', -2) => '100.123456789'
+     * formatDecimalPlaces('100.123456789', 0) => '100'
+     * formatDecimalPlaces('100.123456789', 2) => '100.12'
+     * formatDecimalPlaces('100.123', 5) => '100.12300'
+     */
+    formatDecimalPlaces(number: string, decimalPlaces: number): string {
+      // 숫자가 비어있으면 빈 문자열 반환
+      if (!number) return '';
+
+      // 모든 소수점 자릿수 표시 (decimalPlaces < 0)
+      if (decimalPlaces < 0) return number;
+
+      // 정수부만 표시 (0)
+      if (decimalPlaces === 0) return number.split('.')[0];
+
+      // 소수점이 없는 경우
+      if (!number.includes('.')) {
+        // 소수점 자릿수가 지정된 경우 소수점과 0을 추가
+        return decimalPlaces > 0 ? `${number}.${'0'.repeat(decimalPlaces)}` : number;
+      }
+
+      const [integer, decimal] = number.split('.');
+      
+      // 지정된 자릿수만큼 잘라내기
+      const truncatedDecimal = decimal.slice(0, decimalPlaces);
+      
+      // 부족한 자릿수만큼 0 추가
+      return `${integer}.${truncatedDecimal.padEnd(decimalPlaces, '0')}`;
+    },
 
     // 숫자를 포맷팅된 문자열로 변환
     toFormattedNumber(number: string): string {
@@ -33,13 +67,7 @@ export const useStoreUtils = defineStore('utils', {
       if (number === '') {
         return '';
       }
-      const bignumber = MathB.bignumber(number);
-      const formattedNumber = MathB.format(bignumber, {
-        precision: storeSettings.decimalPlaces === -2 ? 64 : storeSettings.decimalPlaces,
-        notation: storeSettings.decimalPlaces === -2 ? 'auto' : 'fixed',
-        lowerExp: -64,
-        upperExp: 64,
-      });
+      const formattedNumber = this.formatDecimalPlaces(number, storeSettings.decimalPlaces);
       return storeSettings.useGrouping ? this.numberGrouping(formattedNumber) : formattedNumber;
     },
 
@@ -61,7 +89,7 @@ export const useStoreUtils = defineStore('utils', {
         case Operator.Pow:
           return `${formattedPrev}${lineBreak} ^ ${formattedArg}`;
         case Operator.Root:
-         return `${formattedPrev}${lineBreak} ^ (1/${formattedArg})`;
+          return `${formattedPrev}${lineBreak} ^ (1/${formattedArg})`;
         case Operator.Pct:
           if (Array.isArray(history.operator) && history.operator[1] === Operator.Div) {
             return `${formattedPrev}${lineBreak} / ${formattedArg}${lineBreak} × 100`;

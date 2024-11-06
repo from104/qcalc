@@ -10,6 +10,7 @@
   import CalcPage from 'pages/CalcPage.vue';
   import UnitPage from 'pages/UnitPage.vue';
   import CurrencyPage from 'pages/CurrencyPage.vue';
+  import RadixPage from 'pages/RadixPage.vue';
 
   // Quasar 프레임워크 사용을 위한 설정
   import { useQuasar } from 'quasar';
@@ -33,6 +34,7 @@
     { name: 'calc', title: t('calc'), component: shallowRef(CalcPage) },
     { name: 'unit', title: t('unit'), component: shallowRef(UnitPage) },
     { name: 'currency', title: t('currency'), component: shallowRef(CurrencyPage) },
+    { name: 'radix', title: t('radix'), component: shallowRef(RadixPage) },
   ]);
 
   // 탭 오른쪽으로 이동하는 함수
@@ -45,7 +47,7 @@
   // 탭 왼쪽으로 이동하는 함수
   const moveTabLeft = () => {
     const index = tabs.findIndex((tab) => tab.name === storeBase.cTab);
-    const newTab = tabs[(index + tabs.length - 1) % tabs.length].name;
+    const newTab = tabs[(index - 1 + tabs.length) % tabs.length].name;
     storeBase.setCTab(newTab);
   };
 
@@ -56,6 +58,7 @@
     [['Control+1'], () => storeBase.setCTab('calc')],
     [['Control+2'], () => storeBase.setCTab('unit')],
     [['Control+3'], () => storeBase.setCTab('currency')],
+    [['Control+4'], () => storeBase.setCTab('radix')],
     [['Control+Tab', 'ArrowRight'], moveTabRight],
     [['Control+Shift+Tab', 'ArrowLeft'], moveTabLeft],
   ]);
@@ -104,6 +107,7 @@
           inline-label
           outside-arrows
           mobile-arrows
+          @update:model-value="storeBase.setCalcRadixByCTab()"
         >
           <q-tab
             v-for="tab in tabs"
@@ -148,8 +152,10 @@ ko:
   calc: 계산기
   unit: 단위변환
   currency: 환율
+  radix: 진법변환
 en: 
   calc: Calculator
   unit: Unit Conversion
   currency: Currency Exchange
+  radix: Radix Conversion
 </i18n>

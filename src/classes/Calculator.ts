@@ -1,6 +1,6 @@
-import {create, all, BigNumber} from 'mathjs';
-import {CalculatorHistory} from './CalculatorHistory';
-import {RadixConverter} from './RadixConverter';
+import { create, all, BigNumber } from 'mathjs';
+import { CalculatorHistory } from './CalculatorHistory';
+import { Radix, RadixConverter } from './RadixConverter';
 
 /**
  * MathJS 라이브러리 설정
@@ -11,8 +11,6 @@ const MathB = create(all, {
   number: 'BigNumber',
   precision: 64,
 });
-
-// const BigZero = MathB.bignumber(0);
 
 /**
  * 계산기에서 사용되는 연산자 열거형
@@ -162,6 +160,10 @@ export class Calculator {
 
   public readonly history!: CalculatorHistory; // 계산 히스토리 관리자
 
+  private _radix: Radix = Radix.Decimal; // 현재 사용 중인 진법 (10진수 기본)
+
+  private radixConverter: RadixConverter = new RadixConverter();
+
   get buffer(): string {
     return this._buffer;
   }
@@ -180,7 +182,14 @@ export class Calculator {
     this.setCurrentNumberToBuffer();
   }
 
-  private radix!: keyof typeof RadixConverter.RADIX_MAP | 'dec'; // 현재 사용 중인 진법 (10진수 기본)
+  get radix(): Radix {
+    return this._radix;
+  }
+
+  set radix(value: Radix) {
+    this._radix = value;
+    this.setCurrentNumberToBuffer();
+  }
 
   /**
    * 계산기 생성자
@@ -210,7 +219,6 @@ export class Calculator {
    * - shouldReset: 다음 입력 시 화면 초기화 필요 여부를 false로 설정
    */
   public clear(): void {
-    this.radix = 'dec';
     this.buffer = '0';
     this.currentNumber = '0';
     this.previousNumber = '0';
@@ -219,24 +227,24 @@ export class Calculator {
     this.shouldReset = false;
   }
 
-  public getRadix(): keyof typeof RadixConverter.RADIX_MAP | 'dec' {
+  public getRadix(): Radix {
     return this.radix;
   }
 
-  public setRadix(radix: keyof typeof RadixConverter.RADIX_MAP | 'dec' | number | string): void {
+  public setRadix(radix: Radix | number | string): void {
     if (typeof radix === 'number') {
       switch (radix) {
         case 2:
-          this.radix = 'bin';
+          this.radix = Radix.Binary;
           break;
         case 8:
-          this.radix = 'oct';
+          this.radix = Radix.Octal;
           break;
         case 16:
-          this.radix = 'hex';
+          this.radix = Radix.Hexadecimal;
           break;
         case 10:
-          this.radix = 'dec';
+          this.radix = Radix.Decimal;
           break;
         default:
           throw new Error('Unsupported radix');
@@ -244,12 +252,9 @@ export class Calculator {
     } else if (typeof radix === 'string') {
       const normalizedRadix = radix.toLowerCase();
       if (normalizedRadix === 'dec' || normalizedRadix === '10') {
-        this.radix = 'dec';
-      } else if (
-        Object.keys(RadixConverter.RADIX_MAP).includes(normalizedRadix) ||
-        ['2', '8', '16'].includes(normalizedRadix)
-      ) {
-        this.radix = this.convertToRadixKey(normalizedRadix);
+        this.radix = Radix.Decimal;
+      } else if (Object.values(Radix).includes(normalizedRadix as Radix) || ['2', '8', '16'].includes(normalizedRadix)) {
+        this.radix = this.convertToRadixKey(normalizedRadix) as Radix;
       } else {
         throw new Error('Unsupported radix');
       }
@@ -269,17 +274,17 @@ export class Calculator {
    * - 2진수는 'bin', 8진수는 'oct', 16진수는 'hex'로 변환
    * - 지원하지 않는 진수값이 입력되면 'Unsupported radix' 에러 발생
    */
-  private convertToRadixKey(value: string): keyof typeof RadixConverter.RADIX_MAP | 'dec' {
+  private convertToRadixKey(value: string): Radix {
     switch (value.toLowerCase()) {
       case '2':
       case 'bin':
-        return 'bin';
+        return Radix.Binary;
       case '8':
       case 'oct':
-        return 'oct';
+        return Radix.Octal;
       case '16':
       case 'hex':
-        return 'hex';
+        return Radix.Hexadecimal;
       default:
         throw new Error('Unsupported radix');
     }
@@ -408,7 +413,7 @@ export class Calculator {
   }
 
   /**
-   * 이전에 입력되었던 숫자를 문자열 형태로 반환하는 메서드
+   * 이전에 입력되었 숫자를 문자열 형태로 반환하는 메서드
    * @returns {string} 이전 연산에 사용된 숫자 값
    * @description
    * - 연산자 입력 전의 이전 숫자를 저장하고 있는 값을 반환
@@ -431,11 +436,11 @@ export class Calculator {
   }
 
   private setBufferToCurrentNumber(): void {
-    this._currentNumber = RadixConverter.convertRadix(this.buffer, this.radix, 'dec');
+    this._currentNumber = this.radixConverter.convertRadix(this.buffer, this.radix as Radix, Radix.Decimal);
   }
 
   private setCurrentNumberToBuffer(): void {
-    this._buffer = RadixConverter.convertRadix(this.currentNumber.toString(), this.radix, 'dec');
+    this._buffer = this.radixConverter.convertRadix(this.currentNumber.toString(), Radix.Decimal, this.radix as Radix);
   }
 
   /**
@@ -517,8 +522,7 @@ export class Calculator {
    * - shouldReset이 true인 경우:
    *   - 현재 숫자를 '0.'으로 초기화
    *   - shouldReset 플래그를 false로 설정
-   * - 현재 숫자에 소수점이 없는 경우:
-   *   - 현재 숫자 뒤에 소수점을 추가
+   * - 현재 숫자에 소수점이 없고, 현재 진법에서 유효한 경우에만 추가
    * - 이미 소수점이 있는 경우:
    *   - 아무 동작도 하지 않음 (중복 소수점 방지)
    */
@@ -528,10 +532,12 @@ export class Calculator {
       this.buffer = '0.';
       this.shouldReset = false;
     }
-    // 소수점이 없는 경우에만 추가
-    else if (!this.buffer.includes('.')) {
+    // 소수점이 없고, 현재 진법에서 유효한 경우에만 추가
+    else if (!this.buffer.includes('.') && 
+             this.radixConverter.isValidRadixNumber(this.buffer + '.', this.radix)) {
       this.buffer = this.buffer + '.';
     }
+
     this.setBufferToCurrentNumber();
   }
 
@@ -714,7 +720,7 @@ export class Calculator {
   }
 
   public pow(): void {
-    this.performOperation(Operator.Pow); // 거듭제곱 연산 수���
+    this.performOperation(Operator.Pow); // 거듭제곱 연산 수행
   }
 
   public root(): void {
@@ -948,7 +954,7 @@ export class Calculator {
    * 팩토리얼 계산을 수행하는 메서드
    *
    * 동작 방식:
-   * 1. 현재 ��자가 음수인지 확인
+   * 1. 현재 숫자가 음수인지 확인
    * 2. 음수일 경우 에러 발생
    * 3. 팩토리얼 계산 수행 (n!)
    * 4. 계산 결과를 기록에 추가하고 현재 숫자로 설정
@@ -978,9 +984,9 @@ export class Calculator {
   }
 
   /**
-   * 현재 숫자의 정수부를 계산하��� 메서드
+   * 현재 숫자의 정수부를 계산하는 메서드
    *
-   * ��작 방식:
+   * 동작 방식:
    * 1. 현재 숫자의 소수점 이하를 버림하여 정수부만 추출
    * 2. 계산 결과를 기록에 추가하고 현재 숫자로 설정
    *
@@ -1271,7 +1277,7 @@ export class Calculator {
    * 동작 과정:
    * 1. 메모리가 초기화 상태가 아닌 경우에만 실행
    * 2. 메모리의 숫자와 현재 숫자를 BigNumber로 변환하여 곱셈 수행
-   * 3. 계산 결과를 문자열로 변환하여 메모리에 저장
+   * 3. 계산 결���를 문자열로 변환하여 메모리에 저장
    * 4. 다음 입력을 위해 리셋 플래그 설정
    */
   public memoryMul(): void {
