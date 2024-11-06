@@ -10,6 +10,7 @@
   import { useStoreRadix } from 'src/stores/store-radix';
 
   import { UnitConverter } from 'src/classes/UnitConverter';
+  import { Radix } from 'src/classes/RadixConverter';
 
   import MyTooltip from 'components/MyTooltip.vue';
   import MenuItem from 'components/MenuItem.vue';
@@ -36,7 +37,7 @@
   const storeRadix = useStoreRadix();
 
   // 스토어에서 필요한 메서드와 속성 추출
-  const { calc, showMemoryOff, showMemoryOnWithTimer } = storeBase;
+  const { calc, cTab, showMemoryOff, showMemoryOnWithTimer } = storeBase;
   const { toFormattedNumber, getLeftSideInHistory, copyToClipboard } = storeUtils;
   const { initRecentCategoryAndUnit } = storeUnit;
   const { initRecentCurrency, currencyConverter } = storeCurrency;
@@ -182,6 +183,26 @@
   });
 
   /**
+   * 진법 표시를 위한 계산된 속성
+   * 현재 탭이 radix일 경우에만 진법을 표시
+   */
+  const radix = computed(() => {
+    if (cTab !== 'radix') return '';
+
+    const selectedRadix = isMainField.value
+      ? storeRadix.mainRadix
+      : storeRadix.subRadix;
+
+    switch (selectedRadix) {
+      case Radix.Binary: return '2';
+      case Radix.Octal: return '8';
+      case Radix.Hexadecimal: return '16';
+      case Radix.Decimal: return '10';
+      default: return '';
+    }
+  });
+
+  /**
    * 숫자만 표시하기 위한 계산된 속성
    * 필드와 애드온 타입에 따라 적절한 숫자를 반환
    */
@@ -281,6 +302,7 @@
       () => calc.getBuffer(),
       () => calc.getOperatorString(),
       () => calcHistory.getHistorySize(),
+      () => storeBase.cTab,
       () => storeSettings.useGrouping,
       () => storeSettings.decimalPlaces,
       () => storeSettings.showUnit,
@@ -301,6 +323,13 @@
       // UI 업데이트
       setNeedFieldTooltip();
       showMemoryOff();
+
+      // 메인 필드의 진법 변경 시 결과 업데이트
+      if (cTab === 'radix') {
+        calc.setRadix(storeRadix.mainRadix);
+      } else {
+        calc.setRadix(Radix.Decimal);
+      }
     },
   );
 
@@ -356,18 +385,19 @@
           :class="[isMainField ? 'text-h5' : '', selectResultColor()]"
           :style="`padding-top: ${storeBase.paddingOnResult}px;`"
         >
-          <span id="symbol">{{ symbol }}</span>
+          <span v-if="cTab === 'currency'" id="symbol">{{ symbol }}</span>
           <span v-if="isMainField && storeBase.showMemory" id="result" :class="selectResultColor()">
             {{ toFormattedNumber(calc.getMemoryNumber()) }}
           </span>
           <span v-else :id="isMainField ? 'result' : 'subResult'">{{ result }}</span>
-          <span id="unit">{{ unit }}</span>
+          <span v-if="cTab === 'unit'" id="unit">{{ unit }}</span>
+          <span v-if="cTab === 'radix'" id="radix">{{ radix }}</span>
           <q-menu context-menu auto-close touch-position class="shadow-6">
             <q-list class="noselect" dense style="min-width: 150px">
               <MenuItem
-                :action="() => copyToClipboard(symbol + result + unit, t('copiedDisplayedResult'))"
+                :action="() => copyToClipboard(`${symbol}${result}${unit}${cTab === 'radix' ? '('+radix+')' : ''}`, t('copiedDisplayedResult'))"
                 :title="t('copyDisplayedResult')"
-                :caption="symbol + result + unit"
+                :caption="`${symbol}${result}${unit}${cTab === 'radix' ? '('+radix+')' : ''}`"
               />
               <MenuItem
                 :action="() => copyToClipboard(onlyNumber, t('copiedOnlyNumber'))"
@@ -405,6 +435,13 @@
 
   #unit {
     font-size: 22px;
+  }
+
+  #radix {
+    font-size: 20px;
+    margin-left: 1px;
+    position: relative;
+    bottom: -3px;
   }
 
   .q-field {

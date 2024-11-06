@@ -64,7 +64,7 @@ export enum Operator {
  * 각 연산자에 대한 문자열 표현을 정의
  * 예: '+' -> Operator.Plus, '×' -> Operator.Mul
  */
-export const operatorMap: {[key: string]: Operator} = {
+export const operatorMap: { [key: string]: Operator } = {
   '': Operator.None,
   '+': Operator.Plus,
   '-': Operator.Minus,
@@ -97,7 +97,7 @@ export const operatorMap: {[key: string]: Operator} = {
  * - ln10: 10의 자연로그
  * - phi: 황금비
  */
-const constants: {[key: string]: string} = {
+const constants: { [key: string]: string } = {
   pi: MathB.pi.toString(),
   pi2: MathB.bignumber(MathB.pi).div(2).toString(),
   e: MathB.e.toString(),
@@ -253,7 +253,10 @@ export class Calculator {
       const normalizedRadix = radix.toLowerCase();
       if (normalizedRadix === 'dec' || normalizedRadix === '10') {
         this.radix = Radix.Decimal;
-      } else if (Object.values(Radix).includes(normalizedRadix as Radix) || ['2', '8', '16'].includes(normalizedRadix)) {
+      } else if (
+        Object.values(Radix).includes(normalizedRadix as Radix) ||
+        ['2', '8', '16'].includes(normalizedRadix)
+      ) {
         this.radix = this.convertToRadixKey(normalizedRadix) as Radix;
       } else {
         throw new Error('Unsupported radix');
@@ -446,74 +449,37 @@ export class Calculator {
   /**
    * 계산기에 숫자를 추가하는 메서드
    * @param digit - 추가할 숫자 (문자열 또는 숫자 타입)
+   * @throws {Error} 유효하지 않은 숫자가 입력된 경우 에러 발생
    * @description
-   * - 입력된 숫자를 파싱하여 유효성 검사 후 현재 숫자에 추가
+   * - 입력된 숫자를 파싱하여 현재 진법에 맞는 유효성 검사 후 현재 숫자에 추가
    * - 문자열이나 숫자 타입 모두 처리 가능
-   * - 유효하지 않은 입력은 무시됨
-   */
-  public addDigit(digit: number | string): void {
-    const parsedDigit = this.parseDigit(digit);
-    if (this.isValidDigit(parsedDigit)) {
-      this.updateCurrentNumber(parsedDigit);
-    }
-  }
-
-  /**
-   * 입력된 숫자를 파싱하여 정수로 변환하는 private 메서드
-   * @param digit - 변환할 숫자 (문자열 또는 숫자 타입)
-   * @returns {number} 파싱된 정수값 (0-9)
-   * @description
-   * - 문자열인 경우: 첫 번째 문자만 추출하여 정수로 변환, 실패 시 0 반환
-   * - 숫자인 경우: Math.floor()를 사용하여 소수점 이하 버림
-   */
-  private parseDigit(digit: number | string): string {
-    return typeof digit === 'string' ? digit.charAt(0) : Math.floor(digit).toString();
-  }
-
-  /**
-   * 숫자의 유효성을 검사하는 private 메서드
-   * @param digit - 검사할 숫자
-   * @returns {boolean} 유효성 여부
-   * @description
-   * - 현재 설정된 진법(this.radix)에 맞는 유효한 숫자인지 검사
-   * - 2진수: 0-1
-   * - 8진수: 0-7
-   * - 10진수: 0-9
-   * - 16진수: 0-9, A-F
-   * - 범위를 벗어나거나 소수점이 있는 경우 false 반환
-   */
-  private isValidDigit(digit: number | string): boolean {
-    switch (this.radix) {
-      case 'bin':
-        return Number(digit) >= 0 && Number(digit) <= 1;
-      case 'oct':
-        return Number(digit) >= 0 && Number(digit) <= 7;
-      case 'hex':
-        return (Number(digit) >= 0 && Number(digit) <= 9) || (typeof digit === 'string' && /^[A-Fa-f]$/.test(digit));
-      case 'dec':
-      default:
-        return Number(digit) >= 0 && Number(digit) <= 9;
-    }
-  }
-
-  /**
-   * 현재 숫자를 업데이트하는 private 메서드
-   * @param digitString - 추가할 숫자 문자열
-   * @description
+   * - 현재 진법에 따라 유효한 숫자 범위가 다름:
+   *   - 2진수: 0-1
+   *   - 8진수: 0-7
+   *   - 10진수: 0-9
+   *   - 16진수: 0-9, A-F
    * - 현재 숫자가 '0'이거나 shouldReset이 true인 경우:
    *   - 입력된 숫자로 현재 숫자를 대체
    *   - shouldReset 플래그를 false로 설정
    * - 그 외의 경우:
    *   - 현재 숫자 뒤에 새로운 숫자를 추가
    */
-  private updateCurrentNumber(digit: string): void {
-    if (this.currentNumber === '0' || this.shouldReset) {
-      this.buffer = digit;
+  public addDigit(digit: number | string): void {
+    // 입력된 숫자를 문자열로 파싱
+    const digitString = typeof digit === 'string' ? digit.charAt(0) : Math.floor(digit).toString();
+
+    // 유효하지 않은 숫자인 경우 에러 발생
+    if (!this.radixConverter.isValidRadixNumber(digitString, this.radix)) {
+      throw new Error('Invalid digit for current radix');
+    }
+
+    // 현재 숫자 업데이트
+    if (this.buffer === '0' || this.shouldReset) {
+      this.buffer = digitString;
       this.shouldReset = false;
     } else {
-      this.buffer = this.buffer + digit;
+      this.buffer = this.buffer + digitString;
     }
-    this.setBufferToCurrentNumber();
   }
 
   /**
@@ -533,12 +499,9 @@ export class Calculator {
       this.shouldReset = false;
     }
     // 소수점이 없고, 현재 진법에서 유효한 경우에만 추가
-    else if (!this.buffer.includes('.') && 
-             this.radixConverter.isValidRadixNumber(this.buffer + '.', this.radix)) {
+    else if (!this.buffer.includes('.') && this.radixConverter.isValidRadixNumber(this.buffer + '.', this.radix)) {
       this.buffer = this.buffer + '.';
     }
-
-    this.setBufferToCurrentNumber();
   }
 
   /**
@@ -792,7 +755,7 @@ export class Calculator {
     if (this.currentOperator === Operator.Div || this.currentOperator === Operator.Mul) {
       // 이전 계산 수행 및 결과 스냅샷 저장
       this.performPreCalculation();
-      const {previousNumber, argumentNumber} = this.resultSnapshot;
+      const { previousNumber, argumentNumber } = this.resultSnapshot;
 
       // 연산 기록 이동
       this.shiftHistory();
@@ -807,7 +770,7 @@ export class Calculator {
           : MathB.bignumber(this.previousNumber).div(100).toString(); // 곱셈: ÷ 100
 
       // 계산 결과를 기록에 추가하고 이전 숫자로 저장
-      this.previousNumber = this.addHistory({previousNumber, operator, argumentNumber, resultNumber});
+      this.previousNumber = this.addHistory({ previousNumber, operator, argumentNumber, resultNumber });
       this.setCurrentNumberFromPrevious();
     }
 
