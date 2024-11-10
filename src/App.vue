@@ -68,7 +68,7 @@
 
     // 설정에 따라 계산기 패널 초기화
     if (storeSettings.initPanel && storeBase.calc) {
-      storeBase.calc.clear();
+      storeBase.calc.reset();
     }
 
     // 일렉트론 환경에서만 '항상 위에 표시' 설정 적용
@@ -79,7 +79,7 @@
 </script>
 
 <template>
-  <router-view v-slot="{Component, route}">
+  <router-view v-slot="{ Component, route }">
     <transition :name="(route.meta?.transition as string) || ''" mode="default">
       <component :is="Component" :key="route.path" />
     </transition>

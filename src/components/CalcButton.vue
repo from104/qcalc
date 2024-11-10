@@ -16,7 +16,7 @@
   const { t } = useI18n();
 
   // props 기본값 설정
-  const props = withDefaults(defineProps<{type?: string}>(), {
+  const props = withDefaults(defineProps<{ type?: string }>(), {
     type: 'calc',
   });
 
@@ -103,7 +103,7 @@
   const buttons: Button = {
     a1: [false, 'x²', 'function', ['Control+q'], () => calc.pow2()],
     b1: [false, '√x', 'function', ['Control+w'], () => calc.sqrt()],
-    c1: [false, 'C', 'important', ['Control+e', 'Delete', 'Escape'], () => calc.clear()],
+    c1: [false, 'C', 'important', ['Control+e', 'Delete', 'Escape'], () => calc.reset()],
     d1: [true, 'mdi-backspace', 'important', ['Backspace', 'Control+r'], () => calc.deleteDigitOrDot()],
     a2: [true, 'mdi-plus-minus-variant', 'function', ['Control+a'], () => calc.changeSign()],
     b2: [false, '%', 'function', ['Control+s'], () => calc.percent()],
@@ -116,11 +116,11 @@
     a4: [false, '4', 'normal', ['4'], () => calc.addDigit(4)],
     b4: [false, '5', 'normal', ['5'], () => calc.addDigit(5)],
     c4: [false, '6', 'normal', ['6'], () => calc.addDigit(6)],
-    d4: [true, 'mdi-minus', 'function', ['-'], () => calc.minus()],
+    d4: [true, 'mdi-minus', 'function', ['-'], () => calc.sub()],
     a5: [false, '1', 'normal', ['1'], () => calc.addDigit(1)],
     b5: [false, '2', 'normal', ['2'], () => calc.addDigit(2)],
     c5: [false, '3', 'normal', ['3'], () => calc.addDigit(3)],
-    d5: [true, 'mdi-plus', 'function', ['+'], () => calc.plus()],
+    d5: [true, 'mdi-plus', 'function', ['+'], () => calc.add()],
     a6: [true, 'keyboard_capslock', 'important', ["'"], () => toggleButtonShift()],
     b6: [false, '0', 'normal', ['0'], () => calc.addDigit(0)],
     c6: [true, 'mdi-circle-small', 'normal', ['.'], () => calc.addDot()],
@@ -139,8 +139,8 @@
     d1: ['MR', ['Shift+Backspace', 'Shift+Control+r'], () => { calc.memoryRecall(); showMemory(); }],
     d2: ['M÷', ['Shift+Slash', 'Shift+NumpadDivide'], () => { calc.memoryDiv(); showMemory(); }],
     d3: ['M×', ['Shift+NumpadMultiply'], () => { calc.memoryMul(); showMemory(); }],
-    d4: ['M-', ['Shift+Minus', 'Shift+NumpadSubtract'], () => { calc.memoryMinus(); showMemory(); }],
-    d5: ['M+', ['Shift+Plus', 'Shift+NumpadAdd'], () => { calc.memoryPlus(); showMemory(); }],
+    d4: ['M-', ['Shift+Minus', 'Shift+NumpadSubtract'], () => { calc.memorySub(); showMemory(); }],
+    d5: ['M+', ['Shift+Plus', 'Shift+NumpadAdd'], () => { calc.memoryAdd(); showMemory(); }],
     a6: ['', [], () => null],
     b6: ['int', ['Shift+Digit0', 'Shift+Numpad0'], () => calc.int()],
     c6: ['frac', ['Shift+Period', 'Shift+NumpadDecimal'], () => calc.frac()],
@@ -171,32 +171,32 @@
       c5: ['e', ['Shift+Digit3', 'Shift+Numpad3'], () => calc.setConstant('e')],
     },
     unit: {
-      a2: ['×2', ['Shift+Control+a'], () => calc.mulN(2)],
-      b2: ['×3', ['Shift+Control+s'], () => calc.mulN(3)],
-      c2: ['×5', ['Shift+Control+d'], () => calc.mulN(5)],
-      a3: ['÷2', ['Shift+Digit7', 'Shift+Numpad7'], () => calc.divN(2)],
-      b3: ['÷3', ['Shift+Digit8', 'Shift+Numpad8'], () => calc.divN(3)],
-      c3: ['÷5', ['Shift+Digit9', 'Shift+Numpad9'], () => calc.divN(5)],
-      a4: ['×10', ['Shift+Digit4', 'Shift+Numpad4'], () => calc.mulN(10)],
-      b4: ['×100', ['Shift+Digit5', 'Shift+Numpad5'], () => calc.mulN(100)],
-      c4: ['×1000', ['Shift+Digit6', 'Shift+Numpad6'], () => calc.mulN(1000)],
-      a5: ['÷10', ['Shift+Digit1', 'Shift+Numpad1'], () => calc.divN(10)],
-      b5: ['÷100', ['Shift+Digit2', 'Shift+Numpad2'], () => calc.divN(100)],
-      c5: ['÷1000', ['Shift+Digit3', 'Shift+Numpad3'], () => calc.divN(1000)],
+      a2: ['×2', ['Shift+Control+a'], () => calc.mulNumber(2)],
+      b2: ['×3', ['Shift+Control+s'], () => calc.mulNumber(3)],
+      c2: ['×5', ['Shift+Control+d'], () => calc.mulNumber(5)],
+      a3: ['÷2', ['Shift+Digit7', 'Shift+Numpad7'], () => calc.divNumber(2)],
+      b3: ['÷3', ['Shift+Digit8', 'Shift+Numpad8'], () => calc.divNumber(3)],
+      c3: ['÷5', ['Shift+Digit9', 'Shift+Numpad9'], () => calc.divNumber(5)],
+      a4: ['×10', ['Shift+Digit4', 'Shift+Numpad4'], () => calc.mulNumber(10)],
+      b4: ['×100', ['Shift+Digit5', 'Shift+Numpad5'], () => calc.mulNumber(100)],
+      c4: ['×1000', ['Shift+Digit6', 'Shift+Numpad6'], () => calc.mulNumber(1000)],
+      a5: ['÷10', ['Shift+Digit1', 'Shift+Numpad1'], () => calc.divNumber(10)],
+      b5: ['÷100', ['Shift+Digit2', 'Shift+Numpad2'], () => calc.divNumber(100)],
+      c5: ['÷1000', ['Shift+Digit3', 'Shift+Numpad3'], () => calc.divNumber(1000)],
     },
     currency: {
-      a2: ['+5', ['Shift+Control+a'], () => calc.plusN(5)],
-      b2: ['+10', ['Shift+Control+s'], () => calc.plusN(10)],
-      c2: ['+100', ['Shift+Control+d'], () => calc.plusN(100)],
-      a3: ['-5', ['Shift+Digit7', 'Shift+Numpad7'], () => calc.minusN(5)],
-      b3: ['-10', ['Shift+Digit8', 'Shift+Numpad8'], () => calc.minusN(10)],
-      c3: ['-100', ['Shift+Digit9', 'Shift+Numpad9'], () => calc.minusN(100)],
-      a4: ['×10', ['Shift+Digit4', 'Shift+Numpad4'], () => calc.mulN(10)],
-      b4: ['×100', ['Shift+Digit5', 'Shift+Numpad5'], () => calc.mulN(100)],
-      c4: ['×1000', ['Shift+Digit6', 'Shift+Numpad6'], () => calc.mulN(1000)],
-      a5: ['÷10', ['Shift+Digit1', 'Shift+Numpad1'], () => calc.divN(10)],
-      b5: ['÷100', ['Shift+Digit2', 'Shift+Numpad2'], () => calc.divN(100)],
-      c5: ['÷1000', ['Shift+Digit3', 'Shift+Numpad3'], () => calc.divN(1000)],
+      a2: ['+5', ['Shift+Control+a'], () => calc.addNumber(5)],
+      b2: ['+10', ['Shift+Control+s'], () => calc.addNumber(10)],
+      c2: ['+100', ['Shift+Control+d'], () => calc.addNumber(100)],
+      a3: ['-5', ['Shift+Digit7', 'Shift+Numpad7'], () => calc.subNumber(5)],
+      b3: ['-10', ['Shift+Digit8', 'Shift+Numpad8'], () => calc.subNumber(10)],
+      c3: ['-100', ['Shift+Digit9', 'Shift+Numpad9'], () => calc.subNumber(100)],
+      a4: ['×10', ['Shift+Digit4', 'Shift+Numpad4'], () => calc.mulNumber(10)],
+      b4: ['×100', ['Shift+Digit5', 'Shift+Numpad5'], () => calc.mulNumber(100)],
+      c4: ['×1000', ['Shift+Digit6', 'Shift+Numpad6'], () => calc.mulNumber(1000)],
+      a5: ['÷10', ['Shift+Digit1', 'Shift+Numpad1'], () => calc.divNumber(10)],
+      b5: ['÷100', ['Shift+Digit2', 'Shift+Numpad2'], () => calc.divNumber(100)],
+      c5: ['÷1000', ['Shift+Digit3', 'Shift+Numpad3'], () => calc.divNumber(1000)],
     },
   };
 
@@ -213,23 +213,25 @@
     const buttonFunc = buttonsAddedFunc.value[id];
     if (buttonFunc[0] === 'MC') {
       notifyMsg(t('memoryCleared'));
-    } else if (buttonFunc[0] === 'MR' && !calc.getIsMemoryReset()) {
+    } else if (buttonFunc[0] === 'MR' && !calc.isMemoryReset) {
       notifyMsg(t('memoryRecalled'));
     }
   };
 
   // 시프트 버튼의 ID 찾기
-  const shiftID = computed(() => Object.keys(buttonsAddedFunc.value).find((key) => buttonsAddedFunc.value[key][0] === ''));
-
-  // 추가 기능 툴팁 표시를 위한 타이머 상태 객체
-  const timersOfTooltip: {[id: string]: boolean} = reactive(
-    Object.fromEntries(Object.keys(buttons).map((id) => [id, false]))
+  const shiftID = computed(() =>
+    Object.keys(buttonsAddedFunc.value).find((key) => buttonsAddedFunc.value[key][0] === ''),
   );
 
+  // 추가 기능 툴팁 표시를 위한 타이머 상태 객체
+  const timersOfTooltip: { [id: string]: boolean } = reactive(
+    Object.fromEntries(Object.keys(buttons).map((id) => [id, false])),
+  );
 
   // 추가 기능 툴팁 표시 함수
   const showTooltipOfFunc = (id: ButtonID) => {
-    if (timersOfTooltip[id] || id === shiftID.value || (!storeSettings.showButtonAddedLabel && storeBase.buttonShift)) return;
+    if (timersOfTooltip[id] || id === shiftID.value || (!storeSettings.showButtonAddedLabel && storeBase.buttonShift))
+      return;
     timersOfTooltip[id] = true;
     setTimeout(() => {
       timersOfTooltip[id] = false;
@@ -278,7 +280,7 @@
 
   // 메모리 표시 함수
   const showMemory = () => {
-    if (!calc.getIsMemoryReset()) {
+    if (!calc.isMemoryReset) {
       setTimeout(() => {
         showMemoryOnWithTimer();
       }, 10);
@@ -297,7 +299,7 @@
     }
   };
 
-  import {KeyBinding, KeyBindings} from 'classes/KeyBinding';
+  import { KeyBinding, KeyBindings } from 'classes/KeyBinding';
 
   // 주요 키 바인딩 설정
   const keyBindingsPrimary: KeyBindings = Object.entries(buttons).map(([id, [, , , keys]]) => [
@@ -335,7 +337,7 @@
         keyBinding.subscribe();
       }
     },
-    {immediate: true}
+    { immediate: true },
   );
 
   // 계산기 버튼 높이 설정
@@ -374,10 +376,14 @@
               : undefined
         "
         :class="[
-          storeBase.buttonShift && !storeSettings.showButtonAddedLabel && id !== shiftID ? 'char' : button[0] ? 'icon' : 'char',
+          storeBase.buttonShift && !storeSettings.showButtonAddedLabel && id !== shiftID
+            ? 'char'
+            : button[0]
+              ? 'icon'
+              : 'char',
           id === shiftID && storeBase.buttonShift ? 'button-shift' : '',
         ]"
-        :style="!storeSettings.showButtonAddedLabel || !buttonsAddedFunc[id][0] ? {paddingTop: '4px'} : {}"
+        :style="!storeSettings.showButtonAddedLabel || !buttonsAddedFunc[id][0] ? { paddingTop: '4px' } : {}"
         :color="`btn-${button[2]}`"
         @click="() => shiftFunc(id)"
         @touchstart="() => impactLight()"
@@ -487,6 +493,3 @@ en:
     background: v-bind(buttonShiftPressedColor) !important;
   }
 </style>
-
-
-

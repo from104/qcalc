@@ -35,9 +35,9 @@ export const useStoreBase = defineStore('base', {
 
     setCalcRadixByCTab(): void {
       if (this.cTab === 'radix') {
-        this.calc.setRadix(useStoreRadix().mainRadix);
+        this.calc.radix = useStoreRadix().mainRadix;
       } else {
-        this.calc.setRadix(Radix.Decimal);
+        this.calc.radix = Radix.Decimal;
       }
     },
 

@@ -204,9 +204,9 @@
     const history = calcHistory.getHistoryByID(id);
     const copyText =
       copyType === 'formattedNumber'
-        ? getRightSideInHistory(history.resultSnapshot)
+        ? getRightSideInHistory(history.calculationResult)
         : copyType === 'onlyNumber'
-          ? history.resultSnapshot.resultNumber
+          ? history.calculationResult.resultNumber
           : copyType === 'memo'
             ? (calcHistory.getMemo(id) as string)
             : '';
@@ -222,7 +222,7 @@
   // 메인 결과로 이동 함수
   const toMainResult = (id: number) => {
     const history = calcHistory.getHistoryByID(id);
-    calc.setCurrentNumber(history.resultSnapshot.resultNumber);
+    calc.setCurrentNumber(history.calculationResult.resultNumber);
   };
 
   // 서브 결과로 이동 함수
@@ -231,13 +231,13 @@
     if (storeBase.cTab === 'unit') {
       swapUnitValue();
       setTimeout(() => {
-        calc.setCurrentNumber(history.resultSnapshot.resultNumber);
+        calc.setCurrentNumber(history.calculationResult.resultNumber);
       }, 5);
       setTimeout(swapUnitValue, 10);
     } else if (storeBase.cTab === 'currency') {
       swapCurrencyValue();
       setTimeout(() => {
-        calc.setCurrentNumber(history.resultSnapshot.resultNumber);
+        calc.setCurrentNumber(history.calculationResult.resultNumber);
       }, 5);
       setTimeout(swapCurrencyValue, 10);
     }
@@ -319,10 +319,10 @@
                       <u>{{ history.memo }}</u>
                     </q-item-label>
                     <q-item-label style="white-space: pre-wrap">
-                      {{ getLeftSideInHistory(history.resultSnapshot, true) }}
+                      {{ getLeftSideInHistory(history.calculationResult, true) }}
                     </q-item-label>
                     <q-item-label>
-                      {{ ['=', getRightSideInHistory(history.resultSnapshot)].join(' ') }}
+                      {{ ['=', getRightSideInHistory(history.calculationResult)].join(' ') }}
                     </q-item-label>
                   </q-item-section>
                 </q-item>
@@ -359,12 +359,12 @@
                     <MenuItem
                       :title="t('copyDisplayedResult')"
                       :action="() => historyCopy(history.id as number, 'formattedNumber')"
-                      :caption="['=', getRightSideInHistory(history.resultSnapshot)].join(' ')"
+                      :caption="['=', getRightSideInHistory(history.calculationResult)].join(' ')"
                     />
                     <MenuItem
                       :title="t('copyResultNumber')"
                       :action="() => historyCopy(history.id as number, 'onlyNumber')"
-                      :caption="history.resultSnapshot.resultNumber"
+                      :caption="history.calculationResult.resultNumber"
                     />
                     <MenuItem separator />
                     <MenuItem :title="t('loadToMainPanel')" :action="() => toMainResult(history.id as number)" />

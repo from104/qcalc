@@ -387,15 +387,10 @@ export class RadixConverter {
   }
 }
 
-const converter = new RadixConverter();
-export const { convertRadix, isValidRadixNumber, isValidBinary, isValidOctal, isValidDecimal, isValidHexadecimal } =
-  converter;
-
-// console.log('1.11 ', converter.isValidRadixNumber('1.11', Radix.Decimal));
-// console.log('1 ', converter.isValidRadixNumber('1', Radix.Decimal));
-// console.log('A ', converter.isValidRadixNumber('A', Radix.Decimal));
-// console.log('A ', converter.isValidRadixNumber('A', Radix.Hexadecimal));
-// console.log('1010 ', converter.isValidRadixNumber('1010', Radix.Binary));
-// console.log('1010.1 ', converter.isValidRadixNumber('1010.1', Radix.Binary));
-
-console.log('0. ', converter.convertRadix('0.', Radix.Binary, Radix.Decimal));
+export const converter = new RadixConverter();
+export const convertRadix = converter.convertRadix.bind(converter);
+export const isValidRadixNumber = converter.isValidRadixNumber.bind(converter);
+export const isValidBinary = converter.isValidBinary.bind(converter);
+export const isValidOctal = converter.isValidOctal.bind(converter);
+export const isValidDecimal = converter.isValidDecimal.bind(converter);
+export const isValidHexadecimal = converter.isValidHexadecimal.bind(converter);

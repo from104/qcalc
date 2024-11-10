@@ -1,127 +1,9 @@
-import { create, all, BigNumber } from 'mathjs';
+import { match } from 'ts-pattern';
+
+import { BigNumber, Operator, CalculationResult, constants } from './CalculatorTypes';
+import { CalculatorMath } from './CalculatorMath';
 import { CalculatorHistory } from './CalculatorHistory';
 import { Radix, RadixConverter } from './RadixConverter';
-
-/**
- * MathJS 라이브러리 설정
- * - BigNumber 타입 사용으로 정밀한 계산 지원
- * - 정밀도 64비트로 설정하여 높은 정확도 보장
- */
-const MathB = create(all, {
-  number: 'BigNumber',
-  precision: 64,
-});
-
-/**
- * 계산기에서 사용되는 연산자 열거형
- * @enum {number}
- * @description
- * - None: 연산자 없음 (초기 상태)
- * - Plus: 덧셈 (+)
- * - Minus: 뺄셈 (-)
- * - Mul: 곱셈 (×)
- * - Div: 나눗셈 (÷)
- * - Pct: 퍼센트 (%)
- * - Pow: 거듭제곱 (x^y)
- * - Root: 제곱근 (y√x)
- * - Mod: 나머지 (mod)
- * - Rec: 역수 (1/x)
- * - Sqrt: 제곱근 (√x)
- * - Pow2: 제곱 (x²)
- * - Sin: 사인 함수
- * - Cos: 코사인 함수
- * - Tan: 탄젠트 함수
- * - Fct: 팩토리얼 (x!)
- * - Exp10: 10의 거듭제곱 (10^x)
- * - Int: 정수부 추출
- * - Frac: 소수부 추출
- */
-export enum Operator {
-  None,
-  Plus,
-  Minus,
-  Mul,
-  Div,
-  Pct,
-  Pow,
-  Root,
-  Mod,
-  Rec,
-  Sqrt,
-  Pow2,
-  Sin,
-  Cos,
-  Tan,
-  Fct,
-  Exp10,
-  Int,
-  Frac,
-}
-
-/**
- * 연산자와 문자열 간의 매핑 객체
- * @description
- * 각 연산자에 대한 문자열 표현을 정의
- * 예: '+' -> Operator.Plus, '×' -> Operator.Mul
- */
-export const operatorMap: { [key: string]: Operator } = {
-  '': Operator.None,
-  '+': Operator.Plus,
-  '-': Operator.Minus,
-  '×': Operator.Mul,
-  '÷': Operator.Div,
-  '%': Operator.Pct,
-  pow: Operator.Pow,
-  root: Operator.Root,
-  mod: Operator.Mod,
-  rec: Operator.Rec,
-  sqrt: Operator.Sqrt,
-  pow2: Operator.Pow2,
-  sin: Operator.Sin,
-  cos: Operator.Cos,
-  tan: Operator.Tan,
-  fct: Operator.Fct,
-  exp10: Operator.Exp10,
-  int: Operator.Int,
-  frac: Operator.Frac,
-};
-
-/**
- * 수학 상수 정의 객체
- * @description
- * 자주 사용되는 수학 상수들을 BigNumber 형식으로 저장
- * - pi: 원주율 (π)
- * - pi2: π/2
- * - e: 자연상수
- * - ln2: 2의 자연로그
- * - ln10: 10의 자연로그
- * - phi: 황금비
- */
-const constants: { [key: string]: string } = {
-  pi: MathB.pi.toString(),
-  pi2: MathB.bignumber(MathB.pi).div(2).toString(),
-  e: MathB.e.toString(),
-  ln2: MathB.log(2).toString(),
-  ln10: MathB.log(10).toString(),
-  phi: MathB.phi.toString(),
-};
-
-/**
- * 계산 결과 스냅샷 인터페이스
- * @interface
- * @description
- * 계산 과정과 결과를 저장하기 위한 데이터 구조
- * @property {BigNumber} previousNumber - 이전 숫자 (피연산자1)
- * @property {string} operator - 수행된 연산자
- * @property {BigNumber} [argumentNumber] - 현재 숫자 (피연산자2, 선택적)
- * @property {BigNumber} resultNumber - 계산 결과
- */
-export interface ResultSnapshot {
-  previousNumber: string;
-  operator: Operator | Operator[];
-  argumentNumber?: string;
-  resultNumber: string;
-}
 
 /**
  * 계산기 클래스
@@ -148,47 +30,142 @@ export interface ResultSnapshot {
  * @see {@link ResultSnapshot} 계산 결과 스냅샷 형식
  */
 export class Calculator {
-  private _buffer!: string; // 입력 버퍼
-  private _currentNumber!: string; // string -> BigNumber
+  private math: CalculatorMath = new CalculatorMath();
   private previousNumber!: string; // string -> BigNumber
   private repeatedNumber!: string; // string -> BigNumber
-  private memoryNumber!: string; // string -> BigNumber
-  private isMemoryReset!: boolean; // 메모리 초기화 상태 플래그
-  private currentOperator!: Operator; // 현재 선택된 연산자
-  private shouldReset!: boolean; // 다음 입력시 화면 리셋 필요 여부
-  private resultSnapshot!: ResultSnapshot; // 최근 계산 결과 스냅샷
+  private operator!: Operator; // 현재 선택된 연산자
+  private resultSnapshot!: CalculationResult; // 최근 계산 결과 스냅샷
 
   public readonly history!: CalculatorHistory; // 계산 히스토리 관리자
 
-  private _radix: Radix = Radix.Decimal; // 현재 사용 중인 진법 (10진수 기본)
-
+  // 진법 변환기를 초기화합니다.
   private radixConverter: RadixConverter = new RadixConverter();
 
+  // 입력 버퍼를 저장하는 변수입니다.
+  private _buffer!: string; // 입력 버퍼
+
+  // 입력 버퍼의 값을 가져오는 getter입니다.
   get buffer(): string {
     return this._buffer;
   }
 
+  // 입력 버퍼의 값을 설정하는 setter입니다.
+  // 버퍼가 변경되면 현재 숫자도 업데이트합니다.
   set buffer(value: string) {
     this._buffer = value;
     this.setBufferToCurrentNumber();
   }
 
+  private shouldResetBuffer!: boolean; // 다음 입력시 버퍼 리셋 필요 여부
+
+  private setShouldResetBuffer(): void {
+    this.shouldResetBuffer = true;
+  }
+
+  private setShouldNotResetBuffer(): void {
+    this.shouldResetBuffer = false;
+  }
+
+  // 현재 숫자를 저장하는 변수입니다.
+  private _currentNumber!: string; // string -> BigNumber
+
+  // 현재 숫자의 값을 가져오는 getter입니다.
   get currentNumber(): string {
     return this._currentNumber;
   }
 
+  // 현재 숫자의 값을 설정하는 setter입니다.
+  // 현재 숫자가 변경되면 버퍼도 업데이트합니다.
   set currentNumber(value: string) {
     this._currentNumber = value;
     this.setCurrentNumberToBuffer();
   }
 
+  // 메모리에 저장된 숫자를 나타내는 변수입니다.
+  private memoryNumber!: string; // string -> BigNumber
+
+  // 메모리가 초기화 상태인지 확인하는 getter입니다.
+  get isMemoryReset(): boolean {
+    return this.memoryNumber === '';
+  }
+
+  // 현재 사용 중인 진법을 저장하는 변수입니다.
+  private _radix: Radix = Radix.Decimal; // 현재 사용 중인 진법 (10진수 기본)
+
+  // 현재 진법의 값을 가져오는 getter입니다.
   get radix(): Radix {
     return this._radix;
   }
 
-  set radix(value: Radix) {
-    this._radix = value;
+  // 진법의 값을 설정하는 setter입니다.
+  // 진법이 변경되면 현재 숫자도 업데이트합니다.
+  set radix(radix: Radix) {
+    if (!Object.values(Radix).includes(radix)) {
+      throw new Error('Invalid radix value');
+    }
+    this._radix = radix;
     this.setCurrentNumberToBuffer();
+  }
+
+  private _wordSize!: number; // 비트 단위 연산 시 사용할 비트 수
+
+  get wordSize(): number {
+    return this._wordSize;
+  }
+
+  set wordSize(value: number) {
+    if ([4, 8, 16, 32, 64].includes(value)) {
+      this._wordSize = value;
+    } else {
+      throw new Error('Invalid word size');
+    }
+  }
+
+  /**
+   * 연산자를 문자열 형태로 변환하여 반환하는 메서드
+   *
+   * @param operator - 문자열로 변환할 연산자 객체
+   *                  (매개변수가 없을 경우 현재 연산자를 사용)
+   * @returns 연산자에 해당하는 문자열
+   *          (해당하는 연산자가 없을 경우 빈 문자열 반환)
+   *
+   * @example
+   * getOperatorString(Operator.Plus) // returns '+'
+   * getOperatorString(Operator.Minus) // returns '-'
+   */
+  public getOperatorString(operator: Operator = this.operator): string {
+    return operator;
+  }
+
+  /**
+   * 연산자 관련 상태를 초기화하는 메서드
+   *
+   * 초기화되는 항목:
+   * 1. currentOperator: 현재 연산자를 None으로 설정
+   * 2. repeatedNumber: 반복 계산에 사용되는 숫자를 '0'으로 초기화
+   * 3. shouldReset: 다음 입력 시 현재 숫자를 리셋해야 함을 표시
+   *
+   * 주로 새로운 계산을 시작하거나 에러 발생 시 호출됨
+   */
+  private resetOperatorState(): void {
+    this.operator = Operator.NONE;
+    this.repeatedNumber = '0';
+    this.setShouldResetBuffer();
+  }
+
+  /**
+   * 숫자 입력 관련 상태를 초기화하는 메서드
+   *
+   * 초기화되는 항목:
+   * 1. repeatedNumber: 반복 계산에 사용되는 숫자를 '0'으로 초기화
+   * 2. shouldReset: 다음 입력 시 현재 숫자를 리셋해야 함을 표시
+   *
+   * 주로 새로운 숫자 입력을 시작하기 전에 호출됨
+   * 연산자 상태는 유지한 채 입력 상태만 초기화할 때 사용
+   */
+  private resetInputState(): void {
+    this.repeatedNumber = '0';
+    this.setShouldResetBuffer();
   }
 
   /**
@@ -201,9 +178,13 @@ export class Calculator {
    */
   constructor() {
     // 기본 상태 초기화
-    this.clear();
+    this.reset();
     // 메모리 초기화
     this.memoryClear();
+
+    // 비트 단위 연산 시 사용할 비트 수 초기화
+    this.wordSize = 8;
+
     // 히스토리 관리 객체 생성
     this.history = new CalculatorHistory();
   }
@@ -212,85 +193,20 @@ export class Calculator {
    * 계산기 상태 초기화
    * @description
    * 계산기의 모든 상태를 초기 값으로 재설정합니다.
+   * - buffer: 입력 버퍼를 '0'으로 초기화
+   * - currentNumber: 현재 입력/표시 중인 숫자를 '0'으로 초기화
    * - previousNumber: 이전 계산에 사용된 숫자를 '0'으로 초기화
    * - repeatedNumber: 연속 계산에 사용되는 반복 숫자를 '0'으로 초기화
-   * - currentNumber: 현재 입력/표시 중인 숫자를 '0'으로 초기화
    * - currentOperator: 현재 선택된 연산자를 None으로 초기화
    * - shouldReset: 다음 입력 시 화면 초기화 필요 여부를 false로 설정
    */
-  public clear(): void {
+  public reset(): void {
     this.buffer = '0';
     this.currentNumber = '0';
     this.previousNumber = '0';
     this.repeatedNumber = '0';
-    this.currentOperator = Operator.None;
-    this.shouldReset = false;
-  }
-
-  public getRadix(): Radix {
-    return this.radix;
-  }
-
-  public setRadix(radix: Radix | number | string): void {
-    if (typeof radix === 'number') {
-      switch (radix) {
-        case 2:
-          this.radix = Radix.Binary;
-          break;
-        case 8:
-          this.radix = Radix.Octal;
-          break;
-        case 16:
-          this.radix = Radix.Hexadecimal;
-          break;
-        case 10:
-          this.radix = Radix.Decimal;
-          break;
-        default:
-          throw new Error('Unsupported radix');
-      }
-    } else if (typeof radix === 'string') {
-      const normalizedRadix = radix.toLowerCase();
-      if (normalizedRadix === 'dec' || normalizedRadix === '10') {
-        this.radix = Radix.Decimal;
-      } else if (
-        Object.values(Radix).includes(normalizedRadix as Radix) ||
-        ['2', '8', '16'].includes(normalizedRadix)
-      ) {
-        this.radix = this.convertToRadixKey(normalizedRadix) as Radix;
-      } else {
-        throw new Error('Unsupported radix');
-      }
-    } else {
-      this.radix = radix;
-    }
-  }
-
-  /**
-   * 문자열로 입력된 진수값을 RadixConverter에서 사용하는 키값으로 변환하는 메소드
-   * @param {string} value - 변환할 진수값 ('2', '8', '16' 또는 'bin', 'oct', 'hex')
-   * @returns {keyof typeof RadixConverter.RADIX_MAP | 'dec'} 변환된 진수 키값
-   * @throws {Error} 지원하지 않는 진수값이 입력된 경우 에러 발생
-   * @description
-   * - 입력된 문자열을 소문자로 정규화하여 처리
-   * - 숫자형 문자열('2', '8', '16')과 문자형('bin', 'oct', 'hex') 모두 처리 가능
-   * - 2진수는 'bin', 8진수는 'oct', 16진수는 'hex'로 변환
-   * - 지원하지 않는 진수값이 입력되면 'Unsupported radix' 에러 발생
-   */
-  private convertToRadixKey(value: string): Radix {
-    switch (value.toLowerCase()) {
-      case '2':
-      case 'bin':
-        return Radix.Binary;
-      case '8':
-      case 'oct':
-        return Radix.Octal;
-      case '16':
-      case 'hex':
-        return Radix.Hexadecimal;
-      default:
-        throw new Error('Unsupported radix');
-    }
+    this.operator = Operator.NONE;
+    this.setShouldNotResetBuffer();
   }
 
   /**
@@ -301,7 +217,7 @@ export class Calculator {
    * - 이전 계산 결과를 추적하고 복원하는데 사용
    * - ResultSnapshot 타입의 객체를 그대로 저장
    */
-  private saveResultSnapshot(history: ResultSnapshot): void {
+  private saveCalculationResult(history: CalculationResult): void {
     this.resultSnapshot = history;
   }
 
@@ -315,8 +231,8 @@ export class Calculator {
    * - 안전한 null 체크 후 히스토리 추가 수행
    * - 계산된 최종 결과값 반환
    */
-  private addHistory(history: ResultSnapshot): string {
-    this.saveResultSnapshot(history);
+  private addHistory(history: CalculationResult): string {
+    this.saveCalculationResult(history);
     this.history?.addHistory(history);
     return history.resultNumber;
   }
@@ -332,7 +248,7 @@ export class Calculator {
     // 결과 스냅샷을 기본 상태로 초기화
     this.resultSnapshot = {
       previousNumber: '', // 이전 숫자를 0으로 설정
-      operator: Operator.None, // 연산자를 빈 문자열로 설정
+      operator: Operator.NONE, // 연산자를 빈 문자열로 설정
       argumentNumber: '', // 인수 숫자를 0으로 설정
       resultNumber: '', // 결과 숫자를 0으로 설정
     };
@@ -392,16 +308,16 @@ export class Calculator {
 
   /**
    * 현재 숫자를 설정하는 메서드
-   * @param s - 설정할 숫자 문자열
+   * @param value - 설정할 숫자 문자열
    * @description
    * - 입력된 문자열을 최대 64자까지만 처리
    * - extractNumberString을 통해 유효한 숫자로 변환
    * - 초기화 플래그를 false로 설정
    */
-  public setCurrentNumber(s: string): void {
-    this.buffer = this.filterNumberCharacters(s.substring(0, 64));
+  public setCurrentNumber(value: string): void {
+    this.buffer = this.filterNumberCharacters(value.substring(0, 64));
 
-    this.shouldReset = false;
+    this.setShouldNotResetBuffer();
   }
 
   /**
@@ -412,7 +328,7 @@ export class Calculator {
    * - 숫자는 문자열 형태로 반환되어 정확한 표현이 가능
    */
   public getCurrentNumber(): string {
-    return this.currentNumber.toString();
+    return this.currentNumber;
   }
 
   /**
@@ -435,7 +351,7 @@ export class Calculator {
    * - 주로 연산자 입력 후나 계산 완료 후 새로운 숫자 입력을 위해 사용
    */
   public getShouldReset(): boolean {
-    return this.shouldReset;
+    return this.shouldResetBuffer;
   }
 
   private setBufferToCurrentNumber(): void {
@@ -474,9 +390,9 @@ export class Calculator {
     }
 
     // 현재 숫자 업데이트
-    if (this.buffer === '0' || this.shouldReset) {
+    if (this.buffer === '0' || this.shouldResetBuffer) {
       this.buffer = digitString;
-      this.shouldReset = false;
+      this.setShouldNotResetBuffer();
     } else {
       this.buffer = this.buffer + digitString;
     }
@@ -494,9 +410,9 @@ export class Calculator {
    */
   public addDot(): void {
     // 초기화가 필요한 경우
-    if (this.shouldReset) {
+    if (this.shouldResetBuffer) {
       this.buffer = '0.';
-      this.shouldReset = false;
+      this.setShouldNotResetBuffer();
     }
     // 소수점이 없고, 현재 진법에서 유효한 경우에만 추가
     else if (!this.buffer.includes('.') && this.radixConverter.isValidRadixNumber(this.buffer + '.', this.radix)) {
@@ -515,12 +431,11 @@ export class Calculator {
    *   - 현재 숫자의 마지막 문자를 제거
    */
   public deleteDigitOrDot(): void {
-    if (this.buffer.match(/^-?\d$/) || this.buffer === '-0') {
+    if (this.buffer.match(/^-?.$/) || this.buffer === '-0') {
       this.buffer = '0';
     } else {
       this.buffer = this.buffer.slice(0, -1);
     }
-    this.setBufferToCurrentNumber();
   }
 
   /**
@@ -538,15 +453,16 @@ export class Calculator {
   // }
 
   /**
-   * 현재 숫자의 부호를 변환하는 public 메서드
+   * 현재 ��자의 부호를 변환하는 public 메서드
    * @description
    * - 현재 숫자를 BigNumber 객체로 변환
    * - -1을 곱하여 부호를 반전
    * - 결과를 문자열로 변환하여 현재 숫자에 저장
    */
   public changeSign(): void {
-    this.buffer = /^-/.test(this.buffer) ? this.buffer.slice(1) : '-' + this.buffer;
-    this.setBufferToCurrentNumber();
+    if (this.buffer !== '0') {
+      this.buffer = /^-/.test(this.buffer) ? this.buffer.slice(1) : '-' + this.buffer;
+    }
   }
 
   /**
@@ -583,115 +499,54 @@ export class Calculator {
    */
   private performPreCalculation(): void {
     // 계산에 사용할 숫자 결정
-    const numberForCalc = this.shouldReset ? this.repeatedNumber : this.currentNumber;
+    const numberForCalc = this.shouldResetBuffer ? this.repeatedNumber : this.currentNumber;
 
     // 초기 상태면 계산 중단
-    if (this.shouldReset && numberForCalc === '0') {
+    if (this.shouldResetBuffer && numberForCalc === '0') {
       return;
     }
 
     // 반복 계산을 위한 숫자 저장
-    if (!this.shouldReset) {
+    if (!this.shouldResetBuffer) {
       this.repeatedNumber = numberForCalc;
     }
 
     // 계산 수행 및 이력 기록
-    const result = this.calculateResult(numberForCalc);
+    const result = this.performBinaryOperationCalculation(numberForCalc);
     this.previousNumber = this.addHistory({
       previousNumber: this.previousNumber.toString(),
-      operator: this.currentOperator,
+      operator: this.operator,
       argumentNumber: numberForCalc.toString(),
       resultNumber: result.toString(),
     });
   }
 
   /**
-   * 실제 계산을 수행하는 메서드
+   * 실제 이항 연산 계산을 수행하는 메서드
    * @param numberForCalc - 계산에 사용할 숫자 (문자열 형식)
    * @returns 계산 결과 (문자열 형식)
    * @throws 0으로 나누기를 시도할 때 오류 발생
    */
-  private calculateResult(numberForCalc: string): string {
+  private performBinaryOperationCalculation(numberForCalc: string): string {
     // 이전 숫자와 현재 숫자를 BigNumber 객체로 변환
-    const prev = this.previousNumber;
-    const curr = numberForCalc;
+    const pv = this.previousNumber;
+    const cv = numberForCalc;
 
     // 현재 연산자에 따라 계산 수행
-    switch (this.currentOperator) {
-      case Operator.Plus:
-        return MathB.bignumber(prev).add(curr).toString(); // 덧셈 연산
-      case Operator.Minus:
-        return MathB.bignumber(prev).sub(curr).toString(); // 뺄셈 연산
-      case Operator.Mul:
-        return MathB.bignumber(prev).mul(curr).toString(); // 곱셈 연산
-      case Operator.Div:
-        if (curr === '0') throw new Error('Cannot divide by zero.'); // 0으로 나누기 방지
-        return MathB.bignumber(prev).div(curr).toString(); // 나눗셈 연산
-      case Operator.Pow:
-        return MathB.bignumber(prev).pow(curr).toString(); // 거듭제곱 연산
-      case Operator.Root:
-        return MathB.bignumber(prev).pow(MathB.bignumber(1).div(curr)).toString(); // 루트 연산
-      case Operator.Mod:
-        return MathB.bignumber(prev).mod(curr).toString(); // 나머지 연산
-      default:
-        return this.previousNumber; // 기본값으로 이전 숫자 반환
-    }
-  }
-
-  /**
-   * 연산자를 적용하고 계산을 수행하는 메서드
-   * @param operator - 수행할 연산자 (Plus, Minus, Mul 등)
-   * @description
-   * 1. 현재 연산자가 없는 경우:
-   *    - 현재 입력된 숫자를 이전 숫자로 저장
-   * 2. 현재 연산자가 있는 경우:
-   *    - 이전 계산을 수행하고 결과를 현재 숫자로 설정
-   * 3. 새로운 연산자를 설정하고 다음 입력을 위해 초기화
-   */
-  private performOperation(operator: Operator) {
-    if (this.currentOperator === Operator.None) {
-      // 첫 번째 연산인 경우
-      this.setPreviousNumberFromCurrent();
-    } else {
-      // 연속된 연산인 경우
-      this.performPreCalculation();
-      this.setCurrentNumberFromPrevious();
-    }
-    // 새로운 연산자 설정 및 초기화
-    this.currentOperator = operator;
-    this.shouldReset = true;
-  }
-
-  /**
-   * 기본 산술 연산을 위한 공개 메서드들
-   * 각 메서드는 해당하는 연산자로 performOperation을 호출
-   */
-  public plus(): void {
-    this.performOperation(Operator.Plus); // 덧셈 연산 수행
-  }
-
-  public minus(): void {
-    this.performOperation(Operator.Minus); // 뺄셈 연산 수행
-  }
-
-  public mul(): void {
-    this.performOperation(Operator.Mul); // 곱셈 연산 수행
-  }
-
-  public div(): void {
-    this.performOperation(Operator.Div); // 나눗셈 연산 수행
-  }
-
-  public pow(): void {
-    this.performOperation(Operator.Pow); // 거듭제곱 연산 수행
-  }
-
-  public root(): void {
-    this.performOperation(Operator.Root); // 제곱근 연산 수행
-  }
-
-  public mod(): void {
-    this.performOperation(Operator.Mod); // 나머지 연산 수행
+    return match(this.operator)
+      .with(Operator.ADD, () => this.math.add(pv, cv)) // 덧셈 연산
+      .with(Operator.SUB, () => this.math.sub(pv, cv)) // 뺄셈 연산
+      .with(Operator.MUL, () => this.math.mul(pv, cv)) // 곱셈 연산
+      .with(Operator.DIV, () => this.math.div(pv, cv)) // 나눗셈 연산
+      .with(Operator.MOD, () => this.math.mod(pv, cv)) // 나머지 연산
+      .with(Operator.POW, () => this.math.pow(pv, cv)) // 거듭제곱 연산
+      .with(Operator.ROOT, () => this.math.root(pv, cv)) // 루트 연산
+      .with(Operator.BIT_SFT_L, () => this.math.bitShiftLeft(pv, cv, this.wordSize)) // 왼쪽 시프트 연산
+      .with(Operator.BIT_SFT_R, () => this.math.bitShiftRight(pv, cv, this.wordSize)) // 오른쪽 시프트 연산
+      .with(Operator.BIT_AND, () => this.math.bitAnd(pv, cv, this.wordSize))
+      .with(Operator.BIT_OR, () => this.math.bitOr(pv, cv, this.wordSize))
+      .with(Operator.BIT_XOR, () => this.math.bitXor(pv, cv, this.wordSize))
+      .otherwise(() => this.previousNumber); // 기본값으로 이전 숫자 반환
   }
 
   /**
@@ -708,31 +563,23 @@ export class Calculator {
    *    - 반복 계산용 숫자 초기화
    */
   public equal(): void {
-    if (this.currentOperator === Operator.None) {
+    if (this.operator === Operator.NONE) {
       this.setPreviousNumberFromCurrent();
     } else {
       this.performPreCalculation();
       this.setCurrentNumberFromPrevious();
-      this.currentOperator = Operator.None;
-      this.shouldReset = true;
+      this.operator = Operator.NONE;
+      this.setShouldResetBuffer();
       this.repeatedNumber = '0';
     }
   }
 
   /**
-   * 연산자를 문자열 형태로 변환하여 반환하는 메서드
-   *
-   * @param operator - 문자열로 변환할 연산자 객체
-   *                  (매개변수가 없을 경우 현재 연산자를 사용)
-   * @returns 연산자에 해당하는 문자열
-   *          (해당하는 연산자가 없을 경우 빈 문자열 반환)
-   *
-   * @example
-   * getOperatorString(Operator.Plus) // returns '+'
-   * getOperatorString(Operator.Minus) // returns '-'
+   * 단항 연산을 수행하는 공통 메서드
    */
-  public getOperatorString(operator: Operator = this.currentOperator): string {
-    return Object.keys(operatorMap).find((key) => operatorMap[key] === operator) || '';
+  private performUnaryOperation(operator: Operator, calculation: () => string): void {
+    this.currentNumber = this.calculateAndAddHistory(this.currentNumber, operator, calculation);
+    this.resetInputState();
   }
 
   /**
@@ -752,7 +599,7 @@ export class Calculator {
    * - 50 ÷ 20% = 250 (50 ÷ 0.2)
    */
   public percent(): void {
-    if (this.currentOperator === Operator.Div || this.currentOperator === Operator.Mul) {
+    if (this.operator === Operator.DIV || this.operator === Operator.MUL) {
       // 이전 계산 수행 및 결과 스냅샷 저장
       this.performPreCalculation();
       const { previousNumber, argumentNumber } = this.resultSnapshot;
@@ -761,13 +608,13 @@ export class Calculator {
       this.shiftHistory();
 
       // 연산자 문자열 생성 (예: ×%, ÷%)
-      const operator = [Operator.Pct, this.currentOperator];
+      const operator = [Operator.PCT, this.operator];
 
       // 현재 연산자에 따른 퍼센트 계산
       const resultNumber =
-        this.currentOperator === Operator.Div
-          ? MathB.bignumber(this.previousNumber).mul(100).toString() // 나눗셈: × 100
-          : MathB.bignumber(this.previousNumber).div(100).toString(); // 곱셈: ÷ 100
+        this.operator === Operator.DIV
+          ? BigNumber(this.previousNumber).mul(100).toString() // 나눗셈: × 100
+          : BigNumber(this.previousNumber).div(100).toString(); // 곱셈: ÷ 100
 
       // 계산 결과를 기록에 추가하고 이전 숫자로 저장
       this.previousNumber = this.addHistory({ previousNumber, operator, argumentNumber, resultNumber });
@@ -778,237 +625,96 @@ export class Calculator {
     this.resetOperatorState();
   }
 
-  /**
-   * 역수(reciprocal) 계산을 수행하는 메서드
-   * 현재 숫자의 역수(1/x)를 계산합니다.
-   *
-   * 동작 방식:
-   * 1. 현재 숫자가 0이 아닌지 확인 (0으로 나눌 수 없음)
-   * 2. 1을 현재 숫자로 나누어 역수 계산
-   * 3. 계산 결과를 기록에 추가하고 현재 숫자로 설정
-   * 4. 입력 상태 초기화
-   *
-   * @example
-   * 현재 숫자가 2일 때: 1/2 = 0.5
-   * 현재 숫자가 4일 때: 1/4 = 0.25
-   */
+  // 단항 연산자 메서드들
+  // 에러 검사를 위한 헬퍼 메서드
+  private checkError(condition: boolean, message: string): void {
+    if (condition) {
+      throw new Error(message);
+    }
+  }
+
   public rec(): void {
-    if (Number(this.currentNumber) !== 0) {
-      this.currentNumber = this.calculateAndAddHistory(this.currentNumber, Operator.Rec, () =>
-        MathB.bignumber(1).div(this.currentNumber).toString(),
-      );
-      this.resetInputState();
-    }
+    this.checkError(BigNumber(this.currentNumber).eq(0), 'Cannot divide by zero');
+    this.performUnaryOperation(Operator.REC, () => this.math.div('1', this.currentNumber));
   }
 
-  /**
-   * 제곱(square) 계산을 수행하는 메서드
-   * 현재 숫자를 2제곱(x²)합니다.
-   *
-   * 동작 방식:
-   * 1. 현재 숫자를 2번 곱하여 제곱 계산
-   * 2. 계산 결과를 기록에 추가하고 현재 숫자로 설정
-   * 3. 입력 상태 초기화
-   *
-   * @example
-   * 현재 숫자가 3일 때: 3² = 9
-   * 현재 숫자가 4일 때: 4² = 16
-   */
-  public pow2(): void {
-    this.currentNumber = this.calculateAndAddHistory(this.currentNumber, Operator.Pow2, () =>
-      MathB.bignumber(this.currentNumber).pow(2).toString(),
-    );
-    this.resetInputState();
-  }
-
-  /**
-   * 제곱근(square root) 계산을 수행하는 메서드
-   * 현재 숫자의 제곱근(√x)을 계산합니다.
-   *
-   * 동작 방식:
-   * 1. 현재 숫자가 음수가 아닌지 확인 (음수의 제곱근은 허수)
-   * 2. 현재 숫자의 제곱근을 계산
-   * 3. 계산 결과를 기록에 추가하고 현재 숫자로 설정
-   * 4. 입력 상태 초기화
-   *
-   * @throws {Error} 음수의 제곱근을 계산하려 할 때 에러 발생
-   *
-   * @example
-   * 현재 숫자가 9일 때: √9 = 3
-   * 현재 숫자가 16일 때: √16 = 4
-   */
   public sqrt(): void {
-    if (MathB.bignumber(this.currentNumber).lt(0)) {
-      throw new Error('The square root of a negative number is not allowed.');
-    }
-    this.currentNumber = this.calculateAndAddHistory(this.currentNumber, Operator.Sqrt, () =>
-      MathB.bignumber(this.currentNumber).sqrt().toString(),
-    );
-    this.resetInputState();
+    this.checkError(BigNumber(this.currentNumber).lt(0), 'The square root of a negative number is not allowed');
+    this.performUnaryOperation(Operator.SQRT, () => this.math.root(this.currentNumber, '2'));
   }
 
-  /**
-   * 각도를 라디안으로 변환하는 헬퍼 메서드
-   * 삼각수 계산에 사용됩니다.
-   *
-   * 변환 공식: radians = degrees × π ÷ 180
-   *
-   * @param degrees - 변환할 각도 (BigNumber)
-   * @returns 변환된 라디안 값 (BigNumber)
-   */
-  private degreesToRadians(degrees: BigNumber): BigNumber {
-    return degrees.times(MathB.pi).div(180);
+  public pow2(): void {
+    this.performUnaryOperation(Operator.POW2, () => BigNumber(this.currentNumber).pow(2).toString());
   }
 
-  /**
-   * 삼각함수 계산을 수행하는 공통 메서드
-   * sin, cos, tan 등의 삼각함수 계산에 사용됩니다.
-   *
-   * 동작 방식:
-   * 1. 현재 각도를 라디안으로 변환
-   * 2. 지정된 삼각함수를 사용하여 계산
-   * 3. 계산 결과를 기록에 추가하고 현재 숫자로 설정
-   * 4. 입력 상태 초기화
-   *
-   * @param operator - 수행할 삼각함수 연산자
-   * @param mathFunction - 사용할 수학 함수 (MathB의 삼각함수)
-   */
-  private calculateTrigonometricFunction(operator: Operator, mathFunction: (x: BigNumber) => BigNumber): void {
-    this.currentNumber = this.calculateAndAddHistory(this.currentNumber, operator, () => {
-      const radians = this.degreesToRadians(MathB.bignumber(this.currentNumber));
-      return mathFunction(radians).toString();
-    });
-    this.resetInputState();
-  }
-
-  /**
-   * 삼각함수 계산 메서드들
-   * 각 메서드는 해당하는 삼각함수 계산을 수행합니다.
-   * 입력된 각도는 도(degree) 단위로 처리됩니다.
-   */
-  public sin(): void {
-    this.calculateTrigonometricFunction(Operator.Sin, MathB.sin);
-  }
-  public cos(): void {
-    this.calculateTrigonometricFunction(Operator.Cos, MathB.cos);
-  }
-  public tan(): void {
-    this.calculateTrigonometricFunction(Operator.Tan, MathB.tan);
-  }
-
-  /**
-   * 공통 계산 함수
-   * 다양한 수학 연산에 사용되는 공통 계산 로직을 처리합니다.
-   *
-   * 동작 방식:
-   * 1. 지정된 계산 수행
-   * 2. 계산 결과를 기록에 추가하고 현재 숫자로 설정
-   * 3. 입력 상태 초기화
-   *
-   * @param operator - 수행할 연산자
-   * @param calculation - 실제 계산을 수행할 함수
-   */
-  private commonCalculation(operator: Operator, calculation: () => string): void {
-    this.currentNumber = this.calculateAndAddHistory(this.currentNumber, operator, calculation);
-    this.resetInputState();
-  }
-
-  /**
-   * 팩토리얼 계산을 수행하는 메서드
-   *
-   * 동작 방식:
-   * 1. 현재 숫자가 음수인지 확인
-   * 2. 음수일 경우 에러 발생
-   * 3. 팩토리얼 계산 수행 (n!)
-   * 4. 계산 결과를 기록에 추가하고 현재 숫자로 설정
-   *
-   * @throws {Error} 음수에 대한 팩토리얼 계산 시도 시 에러 발생
-   */
   public fct(): void {
-    if (Number(this.currentNumber) < 0) {
-      throw new Error('The factorial of a negative number is not allowed.');
-    }
-    this.commonCalculation(Operator.Fct, () => MathB.factorial(MathB.bignumber(this.currentNumber)).toString());
+    this.checkError(BigNumber(this.currentNumber).lt(0), 'The factorial of a negative number is not allowed');
+    this.performUnaryOperation(Operator.FCT, () => this.math.fct(this.currentNumber));
   }
 
-  /**
-   * 10의 거듭제곱 계산을 수행하는 메서드
-   *
-   * 동작 방식:
-   * 1. 현재 숫자를 지수로 사용하여 10^x 계산
-   * 2. 계산 결과를 기록에 추가하고 현재 숫자로 설정
-   *
-   * 예시:
-   * - 입력값이 2일 경우 10² = 100
-   * - 입력값이 -1일 경우 10⁻¹ = 0.1
-   */
   public exp10(): void {
-    this.commonCalculation(Operator.Exp10, () => MathB.bignumber(10).pow(this.currentNumber).toString());
+    this.performUnaryOperation(Operator.EXP10, () => this.math.exp10(this.currentNumber));
   }
 
-  /**
-   * 현재 숫자의 정수부를 계산하는 메서드
-   *
-   * 동작 방식:
-   * 1. 현재 숫자의 소수점 이하를 버림하여 정수부만 추출
-   * 2. 계산 결과를 기록에 추가하고 현재 숫자로 설정
-   *
-   * 예시:
-   * - 3.14 → 3
-   * - -3.14 → -3
-   */
   public int(): void {
-    this.commonCalculation(Operator.Int, () => MathB.bignumber(this.currentNumber).floor().toString());
+    this.performUnaryOperation(Operator.INT, () => this.math.int(this.currentNumber));
   }
 
-  /**
-   * 현재 숫자의 소수부를 계산하는 메서드
-   *
-   * 동작 방식:
-   * 1. 현재 숫자를 1로 나눈 나머지를 계산하여 소수부 추출
-   * 2. 계산 결과를 기록에 추가하고 현재 숫자로 설정
-   *
-   * 예시:
-   * - 3.14 → 0.14
-   * - -3.14 → -0.14
-   */
   public frac(): void {
-    this.commonCalculation(Operator.Frac, () => MathB.bignumber(this.currentNumber).mod(1).toString());
+    this.performUnaryOperation(Operator.FRAC, () => this.math.frac(this.currentNumber));
+  }
+
+  // 삼각함수 메서드들
+  public sin(): void {
+    this.performUnaryOperation(Operator.SIN, () => this.math.sin(this.currentNumber));
+  }
+
+  public cos(): void {
+    this.performUnaryOperation(Operator.COS, () => this.math.cos(this.currentNumber));
+  }
+
+  public tan(): void {
+    this.performUnaryOperation(Operator.TAN, () => this.math.tan(this.currentNumber));
+  }
+
+  public bitNot(): void {
+    this.performUnaryOperation(Operator.BIT_NOT, () => this.math.bitNot(this.currentNumber));
+  }
+
+  public bitComp(): void {
+    this.performUnaryOperation(Operator.BIT_COMP, () => this.math.bitComp(this.currentNumber));
   }
 
   /**
-   * 연산자 관련 상태를 초기화하는 메서드
-   *
-   * 초기화되는 항목:
-   * 1. currentOperator: 현재 연산자를 None으로 설정
-   * 2. repeatedNumber: 반복 계산에 사용되는 숫자를 '0'으로 초기화
-   * 3. shouldReset: 다음 입력 시 현재 숫자를 리셋해야 함을 표시
-   *
-   * 주로 새로운 계산을 시작하거나 에러 발생 시 호출됨
+   * 이항 연산을 수행하는 공통 메서드
    */
-  private resetOperatorState(): void {
-    this.currentOperator = Operator.None;
-    this.repeatedNumber = '0';
-    this.shouldReset = true;
+  private performBinaryOperation(operator: Operator): void {
+    if (this.operator === Operator.NONE) {
+      this.setPreviousNumberFromCurrent();
+    } else {
+      this.performPreCalculation();
+      this.setCurrentNumberFromPrevious();
+    }
+    this.operator = operator;
+    this.setShouldResetBuffer();
   }
 
-  /**
-   * 숫자 입력 관련 상태를 초기화하는 메서드
-   *
-   * 초기화되는 항목:
-   * 1. repeatedNumber: 반복 계산에 사용되는 숫자를 '0'으로 초기화
-   * 2. shouldReset: 다음 입력 시 현재 숫자를 리셋해야 함을 표시
-   *
-   * 주로 새로운 숫자 입력을 시작하기 전에 호출됨
-   * 연산자 상태는 유지한 채 입력 상태만 초기화할 때 사용
-   */
-  private resetInputState(): void {
-    this.repeatedNumber = '0';
-    this.shouldReset = true;
-  }
+  // 이항 연산자 메서드들
+  public add(): void { this.performBinaryOperation(Operator.ADD); }
+  public sub(): void { this.performBinaryOperation(Operator.SUB); }
+  public mul(): void { this.performBinaryOperation(Operator.MUL); }
+  public div(): void { this.performBinaryOperation(Operator.DIV); }
+  public pow(): void { this.performBinaryOperation(Operator.POW); }
+  public root(): void { this.performBinaryOperation(Operator.ROOT); }
+  public mod(): void { this.performBinaryOperation(Operator.MOD); }
+  public bitSftL(): void { this.performBinaryOperation(Operator.BIT_SFT_L); }
+  public bitSftR(): void { this.performBinaryOperation(Operator.BIT_SFT_R); }
+  public bitAnd(): void { this.performBinaryOperation(Operator.BIT_AND); }
+  public bitOr(): void { this.performBinaryOperation(Operator.BIT_OR); }
+  public bitXor(): void { this.performBinaryOperation(Operator.BIT_XOR); }
 
   /**
-   * 계산 결과를 히스토리에 추가하고 문자열로 반환하는 헬퍼 함수
+   * 계산 결과를 히스토리 추가하고 문자열로 반환하는 헬퍼 함수
    *
    * @param number 계산에 사용될 입력 숫자
    * @param operator 수행할 연산자 (예: 더하기, 빼기 등)
@@ -1033,101 +739,29 @@ export class Calculator {
     });
   }
 
-  /**
-   * 이항 연산을 간단하게 수행하는 공통 메서드
-   * @param operator 수행할 연산자
-   * @param n 연산에 사용할 숫자
-   */
-  private performBinaryOperation(operator: Operator, n: number): void {
-    switch (operator) {
-      case Operator.Plus:
-        this.plus();
-        break;
-      case Operator.Minus:
-        this.minus();
-        break;
-      case Operator.Mul:
-        this.mul();
-        break;
-      case Operator.Div:
-        this.div();
-        break;
-      case Operator.Pow:
-        this.pow();
-        break;
-      case Operator.Root:
-        this.root();
-        break;
-      case Operator.Mod:
-        this.mod();
-        break;
-      default:
-        throw new Error('Invalid operator');
-    }
-    this.setCurrentNumber(n.toString()); // 숫자를 현재 숫자로 설정
-    this.equal(); // 계산 수행 및 결과 설정
-  }
-
-  /**
-   * 숫자를 더하는 메서드
-   * @param n 더할 숫자
-   */
-  public plusN(n: number): void {
-    this.performBinaryOperation(Operator.Plus, n);
-  }
-
-  /**
-   * 숫자를 뺄하는 메서드
-   * @param n 뺄 숫자
-   */
-  public minusN(n: number): void {
-    this.performBinaryOperation(Operator.Minus, n);
-  }
-
-  /**
-   * 숫자를 곱하는 메서드
-   * @param n 곱할 숫자
-   */
-  public mulN(n: number): void {
-    this.performBinaryOperation(Operator.Mul, n);
-  }
-
-  /**
-   * 숫자를 나누는 메서드
-   * @param n 나눌 숫자
-   */
-  public divN(n: number): void {
-    this.performBinaryOperation(Operator.Div, n);
-  }
-
-  /**
-   * 숫자를 거듭제곱하는 메서드
-   * @param n 거듭제곱할 숫자
-   */
-  public powN(n: number): void {
-    this.performBinaryOperation(Operator.Pow, n);
-  }
-
-  /**
-   * 숫자의 제곱근을 계산하는 메서드
-   * @param n 제곱근을 계산할 숫자
-   */
-  public rootN(n: number): void {
-    this.performBinaryOperation(Operator.Root, n);
-  }
-
-  /**
-   * 숫자의 나머지를 계산하는 메서드
-   * @param n 나머지를 계산할 숫자
-   */
-  public modN(n: number): void {
-    this.performBinaryOperation(Operator.Mod, n);
+  // 숫자를 직접 사용하는 이항 연산 메서드들
+  public addNumber(n: number): void { this.executeWithNumber(Operator.ADD, n); }
+  public subNumber(n: number): void { this.executeWithNumber(Operator.SUB, n); }
+  public mulNumber(n: number): void { this.executeWithNumber(Operator.MUL, n); }
+  public divNumber(n: number): void { this.executeWithNumber(Operator.DIV, n); }
+  public powNumber(n: number): void { this.executeWithNumber(Operator.POW, n); }
+  public rootNumber(n: number): void { this.executeWithNumber(Operator.ROOT, n); }
+  public modNumber(n: number): void { this.executeWithNumber(Operator.MOD, n); }
+  public bitSftLNumber(n: number): void { this.executeWithNumber(Operator.BIT_SFT_L, n); }
+  public bitSftRNumber(n: number): void { this.executeWithNumber(Operator.BIT_SFT_R, n); }
+  public bitAndNumber(n: number): void { this.executeWithNumber(Operator.BIT_AND, n); }
+  public bitOrNumber(n: number): void { this.executeWithNumber(Operator.BIT_OR, n); }
+  public bitXorNumber(n: number): void { this.executeWithNumber(Operator.BIT_XOR, n); }
+  private executeWithNumber(operator: Operator, n: number): void {
+    this.performBinaryOperation(operator);
+    this.setCurrentNumber(n.toString());
+    this.equal();
   }
 
   /**
    * 수학 상수 값을 조회하는 메서드
    *
-   * @param constant - 조회할 상수의 이름 (예: 'PI', 'E' 등)
+   * @param constant - 조회 상수의 이름 (예: 'PI', 'E' 등)
    * @returns 요청한 상수의 문자열 값
    * @throws {Error} 존재하지 않는 상수를 요청할 경우 에러 발생
    *
@@ -1168,7 +802,6 @@ export class Calculator {
    */
   public memorySave(): void {
     this.memoryNumber = this.currentNumber;
-    this.isMemoryReset = false;
   }
 
   /**
@@ -1182,94 +815,37 @@ export class Calculator {
    * @throws {Error} 메모리가 초기화 상태일 때 호출하면 'Memory is empty' 에러 발생
    */
   public memoryRecall(): void {
-    if (this.isMemoryReset) {
-      throw new Error('Memory is empty');
-    } else {
-      this.currentNumber = this.memoryNumber;
-      this.shouldReset = false;
-    }
+    // 1. 메모리가 비어있으면 (this.isMemoryReset이 true이면)
+    // Error가 throw되고 여기서 함수 실행이 중단됨
+    this.checkError(this.isMemoryReset, 'Memory is empty');
+
+    // 2. 에러가 발생하지 않은 경우에만 아래 코드가 실행됨
+    this.currentNumber = this.memoryNumber;
+    this.setShouldNotResetBuffer();
   }
 
-  /**
-   * 계산기의 메모리를 초기화하는 메서드
-   *
-   * 동작 과정:
-   * 1. 메모리 값을 '0'으로 초기화
-   * 2. 메모리 초기화 상태를 true로 설정하여 메모리가 비어있음을 표시
-   */
   public memoryClear(): void {
-    this.memoryNumber = '0';
-    this.isMemoryReset = true;
+    this.memoryNumber = '';
   }
 
-  /**
-   * 메모리에 현재 표시된 숫자를 더하는 메서드
-   *
-   * 동작 과정:
-   * 1. 메모리가 초기화 상태가 아닌 경우에만 실행
-   * 2. 메모리의 숫자와 현재 숫자를 BigNumber로 변환하여 덧셈 수행
-   * 3. 계산 결과를 문자열로 변환하여 메모리에 저장
-   * 4. 다음 입력을 위해 리셋 플래그 설정
-   */
-  public memoryPlus(): void {
+  private performMemoryOperation(operation: (a: string, b: string) => string): void {
     if (!this.isMemoryReset) {
-      this.memoryNumber = MathB.bignumber(this.memoryNumber).add(this.currentNumber).toString();
-      this.shouldReset = true;
+      this.memoryNumber = operation(this.memoryNumber, this.currentNumber);
+      this.setShouldResetBuffer();
     }
   }
 
-  /**
-   * 메모리에서 현재 표시된 숫자를 빼는 메서드
-   *
-   * 동작 과정:
-   * 1. 메모리가 초기화 상태가 아닌 경우에만 실행
-   * 2. 메모리의 숫자와 현재 숫자를 BigNumber로 변환하여 뺄셈 수행
-   * 3. 계산 결과를 문자열로 변환하여 메모리에 저장
-   * 4. 다음 입력을 위해 리셋 플래그 설정
-   */
-  public memoryMinus(): void {
-    if (!this.isMemoryReset) {
-      this.memoryNumber = MathB.bignumber(this.memoryNumber).sub(this.currentNumber).toString();
-      this.shouldReset = true;
-    }
+  public memoryAdd(): void {
+    this.performMemoryOperation(this.math.add);
   }
-
-  /**
-   * 메모리의 숫자와 현재 표시된 숫자를 곱하는 메서드
-   *
-   * 동작 과정:
-   * 1. 메모리가 초기화 상태가 아닌 경우에만 실행
-   * 2. 메모리의 숫자와 현재 숫자를 BigNumber로 변환하여 곱셈 수행
-   * 3. 계산 결���를 문자열로 변환하여 메모리에 저장
-   * 4. 다음 입력을 위해 리셋 플래그 설정
-   */
+  public memorySub(): void {
+    this.performMemoryOperation(this.math.sub);
+  }
   public memoryMul(): void {
-    if (!this.isMemoryReset) {
-      this.memoryNumber = MathB.bignumber(this.memoryNumber).mul(this.currentNumber).toString();
-      this.shouldReset = true;
-    }
+    this.performMemoryOperation(this.math.mul);
   }
-
-  /**
-   * 메모리의 숫자를 현재 표시된 숫자로 나누는 메서드
-   *
-   * 동작 과정:
-   * 1. 메모리가 초기화 상태가 아닌 경우에만 실행
-   * 2. 현재 숫자가 0인지 확인하여 0으로 나누기 방지
-   * 3. 메모리의 숫자와 현재 숫자를 BigNumber로 변환하여 나눗셈 수행
-   * 4. 계산 결과를 문자열로 변환하여 메모리에 저장
-   * 5. 다음 입력을 위해 리셋 플래그 설정
-   *
-   * @throws {Error} 현재 숫자가 0일 경우 'Cannot divide by zero' 에러 발생
-   */
   public memoryDiv(): void {
-    if (!this.isMemoryReset) {
-      if (this.currentNumber === '0') {
-        throw new Error('Cannot divide by zero');
-      }
-      this.memoryNumber = MathB.bignumber(this.memoryNumber).div(this.currentNumber).toString();
-      this.shouldReset = true;
-    }
+    this.performMemoryOperation(this.math.div);
   }
 
   /**
@@ -1278,15 +854,6 @@ export class Calculator {
    * @returns {string} 메모리에 저장된 숫자를 문자열 형태로 반환
    */
   public getMemoryNumber(): string {
-    return this.memoryNumber.toString();
-  }
-
-  /**
-   * 메모리의 초기화 상태를 반환하는 메서드
-   *
-   * @returns {boolean} true: 메모리가 초기화된 상태, false: 메모리에 값이 있는 상태
-   */
-  public getIsMemoryReset(): boolean {
-    return this.isMemoryReset;
+    return this.memoryNumber;
   }
 }

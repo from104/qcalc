@@ -326,9 +326,9 @@
 
       // 메인 필드의 진법 변경 시 결과 업데이트
       if (cTab === 'radix') {
-        calc.setRadix(storeRadix.mainRadix);
+        calc.radix = storeRadix.mainRadix;
       } else {
-        calc.setRadix(Radix.Decimal);
+        calc.radix = Radix.Decimal;
       }
     },
   );
@@ -407,7 +407,7 @@
             </q-list>
           </q-menu>
           <MyTooltip v-if="needFieldTooltip">
-            {{ symbol + result + unit }}
+            {{ (symbol + result + unit) + (cTab === 'radix' ? '('+radix+')' : '') }}
           </MyTooltip>
         </div>
       </template>

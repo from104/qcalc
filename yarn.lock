@@ -12047,6 +12047,7 @@ __metadata:
     quasar: "npm:^2.17.1"
     tinykeys: "npm:3.0.0"
     ts-jest: "npm:^29.2.5"
+    ts-pattern: "npm:^5.5.0"
     tslib: "npm:^2.8.0"
     tsx: "npm:^4.19.2"
     typescript: "npm:5.6.3"
@@ -13986,6 +13987,13 @@ __metadata:
   bin:
     ts-jest: cli.js
   checksum: 10c0/acb62d168faec073e64b20873b583974ba8acecdb94681164eb346cef82ade8fb481c5b979363e01a97ce4dd1e793baf64d9efd90720bc941ad7fc1c3d6f3f68
+  languageName: node
+  linkType: hard
+
+"ts-pattern@npm:^5.5.0":
+  version: 5.5.0
+  resolution: "ts-pattern@npm:5.5.0"
+  checksum: 10c0/4ae1fbeadcf193e72b27419d5fe71f559c100e45710eabf29e2ff3a8fa9ba29adfcd6d5d7d8169b95e2b264683a2eb8d94dbd3c893357b045b52b0c34c2b7c72
   languageName: node
   linkType: hard
 
