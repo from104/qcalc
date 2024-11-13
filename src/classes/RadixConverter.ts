@@ -1,4 +1,5 @@
-import { create, all, BigNumber } from 'mathjs';
+import { create, all, bignumber } from 'mathjs';
+import { BigNumber, typeBigNumber } from './CalculatorTypes';
 
 /**
  * BigNumber 설정으로 MathJS 인스턴스 생성
@@ -6,7 +7,7 @@ import { create, all, BigNumber } from 'mathjs';
  */
 const MathB = create(all, {
   number: 'BigNumber',
-  precision: 64,
+  precision: 128,
 });
 
 export enum Radix {
@@ -26,7 +27,7 @@ export class RadixConverter {
   // 16진수 변환에 사용될 문자 집합
   private readonly HEX_DIGITS = '0123456789ABCDEF';
   // 소수점 이하 최대 자릿수
-  private readonly MAX_PRECISION = 32;
+  private readonly MAX_PRECISION = 128;
   // 지원하는 진법 타입
   public readonly RADIX_MAP = {
     [Radix.Binary]: 2,
@@ -137,7 +138,7 @@ export class RadixConverter {
    * @param radix 변환할 진법 ('bin' | 'oct' | 'hex')
    * @returns 변환된 진법 문자열
    */
-  private convertDecimalToRadix(decimal: string | BigNumber, radix: Radix): string {
+  private convertDecimalToRadix(decimal: string | typeBigNumber, radix: Radix): string {
     if (!decimal) return '0';
     if (radix === Radix.Decimal) return decimal.toString();
     // 입력값을 BigNumber로 변환하고 정수부와 소수부 분리
@@ -293,18 +294,17 @@ export class RadixConverter {
 
     // 16진수의 경우 대문자로 통일 (예: 'a' -> 'A')
     const digits = radix === Radix.Hexadecimal ? fractionPart.toUpperCase() : fractionPart;
-
     // 각 자릿수별로 계산하여 합산
-    return digits.split('').reduce((accumulator, currentDigit, position) => {
+    return digits.split('').reduce<typeBigNumber>((accumulator: typeBigNumber, currentDigit: string, position: number): typeBigNumber => {
       // 현재 자릿수를 10진수로 변환
       const digitValue = parseInt(currentDigit, radixValue);
 
       // 현재 자릿수의 가중치 계산: value / (radix^position)
-      const weightedValue = MathB.divide(digitValue, MathB.pow(radixValue, position + 1)) as math.BigNumber;
+      const weightedValue = MathB.divide(BigNumber(digitValue), MathB.pow(radixValue, position + 1)) as typeBigNumber;
 
       // 누적값에 현재 자릿수의 가중치를 더함
       return MathB.add(accumulator, weightedValue);
-    }, MathB.bignumber(0));
+    }, BigNumber(0));
   }
 
   /**

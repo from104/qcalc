@@ -26,7 +26,7 @@ export const useStoreCurrency = defineStore('currency', {
     },
 
     // 출발 통화와 도착 통화 교환
-    swapCurrencyValue(): void {
+    swapCurrency(): void {
       [this.recentCurrencyFrom, this.recentCurrencyTo] = [this.recentCurrencyTo, this.recentCurrencyFrom];
     },
   },

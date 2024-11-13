@@ -29,8 +29,8 @@
   const { calc } = storeBase;
   const { copyToClipboard, clickButtonById } = storeUtils;
   const { notifyError, notifyMsg } = storeNotifications;
-  const { swapUnitValue } = storeUnit;
-  const { swapCurrencyValue } = storeCurrency;
+  const { swapUnit } = storeUnit;
+  const { swapCurrency } = storeCurrency;
 
   /**
    * 선택된 텍스트 또는 계산 결과를 클립보드에 복사하는 함수
@@ -64,13 +64,13 @@
 
       if (target === 'sub') {
         if (storeBase.cTab === 'unit') {
-          swapUnitValue();
+          swapUnit();
           setTimeout(() => calc.setCurrentNumber(text), 5);
-          setTimeout(swapUnitValue, 10);
+          setTimeout(swapUnit, 10);
         } else if (storeBase.cTab === 'currency') {
-          swapCurrencyValue();
+          swapCurrency();
           setTimeout(() => calc.setCurrentNumber(text), 5);
-          setTimeout(swapCurrencyValue, 10);
+          setTimeout(swapCurrency, 10);
         }
         notifyMsg(t('pastedFromClipboardToSubPanel'));
       } else {

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-  import { ref, computed, onBeforeMount, onMounted, watch } from 'vue';
+  import { ref, computed, onBeforeMount, onMounted, watch, nextTick, onUnmounted } from 'vue';
   import { useI18n } from 'vue-i18n';
 
   import { useStoreBase } from 'src/stores/store-base';
@@ -45,6 +45,7 @@
 
   const calcHistory = calc.history;
   const needFieldTooltip = ref(false);
+  const fieldElement = ref<HTMLElement | null>(null);
 
   /**
    * 필드 툴팁 표시 여부를 결정하는 함수
@@ -54,13 +55,13 @@
    */
   const setNeedFieldTooltip = () => {
     // 필드 요소 가져오기
-    const field = document.getElementById(fieldID.value);
+    fieldElement.value = document.getElementById(fieldID.value);
 
     // 필드가 없으면 종료
-    if (!field) return false;
+    if (!fieldElement.value) return false;
 
     // 필드의 실제 너비가 콘텐츠 너비보다 작으면 툴팁 필요
-    needFieldTooltip.value = field.offsetWidth < field.scrollWidth;
+    needFieldTooltip.value = fieldElement.value.offsetWidth < fieldElement.value.scrollWidth;
     return true;
   };
 
@@ -126,24 +127,26 @@
       // 소수점 자릿수 설정이 -2이고 소수점이 있는 경우
       const hasSpecialDecimalPlaces = storeSettings.decimalPlaces === -2 && currentNumber.includes('.');
 
-      return hasSpecialDecimalPlaces ? `${formattedNumber.split('.')[0]}.${currentNumber.split('.')[1]}` : formattedNumber; 
+      return hasSpecialDecimalPlaces
+        ? `${formattedNumber.split('.')[0]}.${currentNumber.split('.')[1]}`
+        : formattedNumber;
     } else {
       // 서브 필드인 경우 애드온 타입에 따라 처리
       switch (props.addon) {
-      case 'unit':
-        initRecentCategoryAndUnit();
-        return toFormattedNumber(convertedUnitNumber());
+        case 'unit':
+          initRecentCategoryAndUnit();
+          return toFormattedNumber(convertedUnitNumber());
 
-      case 'currency':
-        initRecentCurrency();
-        return toFormattedNumber(convertedCurrencyNumber());
+        case 'currency':
+          initRecentCurrency();
+          return toFormattedNumber(convertedCurrencyNumber());
 
-      case 'radix':
-        initRecentRadix();
-        return toFormattedNumber(convertedRadixNumber());
+        case 'radix':
+          initRecentRadix();
+          return toFormattedNumber(convertedRadixNumber());
 
-      default:
-        return '';
+        default:
+          return '';
       }
     }
   };
@@ -189,16 +192,19 @@
   const radix = computed(() => {
     if (cTab !== 'radix') return '';
 
-    const selectedRadix = isMainField.value
-      ? storeRadix.mainRadix
-      : storeRadix.subRadix;
+    const selectedRadix = isMainField.value ? storeRadix.mainRadix : storeRadix.subRadix;
 
     switch (selectedRadix) {
-      case Radix.Binary: return '2';
-      case Radix.Octal: return '8';
-      case Radix.Hexadecimal: return '16';
-      case Radix.Decimal: return '10';
-      default: return '';
+      case Radix.Binary:
+        return '2';
+      case Radix.Octal:
+        return '8';
+      case Radix.Hexadecimal:
+        return '16';
+      case Radix.Decimal:
+        return '10';
+      default:
+        return '';
     }
   });
 
@@ -238,7 +244,7 @@
   };
 
   // 메모리 초기화 여부 계산된 속성
-  const isMemoryReset = computed(() => calc.getIsMemoryReset());
+  const isMemoryReset = computed(() => calc.isMemoryReset);
 
   /**
    * 이전 결과 문자열을 생성하는 함수
@@ -258,10 +264,10 @@
 
     // 마지막 계산 기록이 있고 초기화가 필요한 경우
     const isLastHistoryValid =
-      lastHistory !== null && shouldReset && calc.getCurrentNumber() === lastHistory.resultSnapshot.resultNumber;
+      lastHistory !== null && shouldReset && calc.getCurrentNumber() === lastHistory.calculationResult.resultNumber;
 
     if (isLastHistoryValid) {
-      return `${getLeftSideInHistory(lastHistory.resultSnapshot)} =`;
+      return `${getLeftSideInHistory(lastHistory.calculationResult)} =`;
     }
 
     // 연산자가 있고 초기화가 필요없는 경우
@@ -296,13 +302,14 @@
     return !needFieldTooltip.value ? resultColor.normal : resultColor.warning;
   };
 
+  const currentTab = computed(() => storeBase.cTab);
+
   // 감시자 설정
   watch(
     [
       () => calc.getBuffer(),
       () => calc.getOperatorString(),
       () => calcHistory.getHistorySize(),
-      () => storeBase.cTab,
       () => storeSettings.useGrouping,
       () => storeSettings.decimalPlaces,
       () => storeSettings.showUnit,
@@ -314,6 +321,7 @@
       () => storeCurrency.recentCurrencyTo,
       () => storeRadix.mainRadix,
       () => storeRadix.subRadix,
+      () => fieldElement.value,
     ],
     () => {
       // 결과값 업데이트
@@ -324,8 +332,7 @@
       setNeedFieldTooltip();
       showMemoryOff();
 
-      // 메인 필드의 진법 변경 시 결과 업데이트
-      if (cTab === 'radix') {
+      if (currentTab.value === 'radix') {
         calc.radix = storeRadix.mainRadix;
       } else {
         calc.radix = Radix.Decimal;
@@ -338,9 +345,16 @@
     window.addEventListener('resize', setNeedFieldTooltip);
   });
 
+  let tooltipInterval: NodeJS.Timeout;
   // 컴포넌트 마운트 후 초기 설정
   onMounted(() => {
-    setNeedFieldTooltip();
+    tooltipInterval = setInterval(setNeedFieldTooltip, 100);
+  });
+
+  // 컴포넌트 언마운트 시 이벤트 리스너 제거
+  onUnmounted(() => {
+    clearInterval(tooltipInterval);
+    window.removeEventListener('resize', setNeedFieldTooltip);
   });
 </script>
 
@@ -379,25 +393,31 @@
       <template #control>
         <div
           :id="fieldID"
-          v-mutation="setNeedFieldTooltip"
+          v-mutation="() => { setNeedFieldTooltip(); return true; }"
           v-mutation.characterData
           class="self-center no-outline full-width full-height ellipsis text-right q-pt-xs noselect"
           :class="[isMainField ? 'text-h5' : '', selectResultColor()]"
           :style="`padding-top: ${storeBase.paddingOnResult}px;`"
         >
-          <span v-if="cTab === 'currency'" id="symbol">{{ symbol }}</span>
+          <span v-if="currentTab === 'currency'" id="symbol">{{ symbol }}</span>
           <span v-if="isMainField && storeBase.showMemory" id="result" :class="selectResultColor()">
             {{ toFormattedNumber(calc.getMemoryNumber()) }}
           </span>
           <span v-else :id="isMainField ? 'result' : 'subResult'">{{ result }}</span>
-          <span v-if="cTab === 'unit'" id="unit">{{ unit }}</span>
-          <span v-if="cTab === 'radix'" id="radix">{{ radix }}</span>
+          <span v-if="currentTab === 'unit'" id="unit">{{ unit }}</span>
+          <span v-if="currentTab === 'radix'" id="radix">{{ radix }}</span>
           <q-menu context-menu auto-close touch-position class="shadow-6">
             <q-list class="noselect" dense style="min-width: 150px">
               <MenuItem
-                :action="() => copyToClipboard(`${symbol}${result}${unit}${cTab === 'radix' ? '('+radix+')' : ''}`, t('copiedDisplayedResult'))"
+                :action="
+                  () =>
+                    copyToClipboard(
+                      `${symbol}${result}${unit}${cTab === 'radix' ? '(' + radix + ')' : ''}`,
+                      t('copiedDisplayedResult'),
+                    )
+                "
                 :title="t('copyDisplayedResult')"
-                :caption="`${symbol}${result}${unit}${cTab === 'radix' ? '('+radix+')' : ''}`"
+                :caption="`${symbol}${result}${unit}${cTab === 'radix' ? '(' + radix + ')' : ''}`"
               />
               <MenuItem
                 :action="() => copyToClipboard(onlyNumber, t('copiedOnlyNumber'))"
@@ -407,7 +427,7 @@
             </q-list>
           </q-menu>
           <MyTooltip v-if="needFieldTooltip">
-            {{ (symbol + result + unit) + (cTab === 'radix' ? '('+radix+')' : '') }}
+            {{ symbol + result + unit + (cTab === 'radix' ? '(' + radix + ')' : '') }}
           </MyTooltip>
         </div>
       </template>

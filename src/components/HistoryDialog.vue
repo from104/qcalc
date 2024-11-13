@@ -32,8 +32,8 @@
   const { calc } = storeBase;
   const { clickButtonById, getRightSideInHistory, getLeftSideInHistory } = storeUtils;
   const { notifyMsg, notifyError } = storeNotifications;
-  const { swapUnitValue } = storeUnit;
-  const { swapCurrencyValue } = storeCurrency;
+  const { swapUnit } = storeUnit;
+  const { swapCurrency } = storeCurrency;
 
   const calcHistory = calc.history;
   
@@ -229,17 +229,17 @@
   const toSubResult = (id: number) => {
     const history = calcHistory.getHistoryByID(id);
     if (storeBase.cTab === 'unit') {
-      swapUnitValue();
+      swapUnit();
       setTimeout(() => {
         calc.setCurrentNumber(history.calculationResult.resultNumber);
       }, 5);
-      setTimeout(swapUnitValue, 10);
+      setTimeout(swapUnit, 10);
     } else if (storeBase.cTab === 'currency') {
-      swapCurrencyValue();
+      swapCurrency();
       setTimeout(() => {
         calc.setCurrentNumber(history.calculationResult.resultNumber);
       }, 5);
-      setTimeout(swapCurrencyValue, 10);
+      setTimeout(swapCurrency, 10);
     }
   };
 

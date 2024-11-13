@@ -31,7 +31,7 @@ export const useStoreRadix = defineStore('radix', {
     },
 
     // 진법 교환
-    swapRadixValue() {
+    swapRadix() {
       [this.mainRadix, this.subRadix] = [this.subRadix, this.mainRadix];
     },
 

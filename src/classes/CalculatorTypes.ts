@@ -1,16 +1,18 @@
-import { create, all } from 'mathjs';
+import { create, all, BigNumber as tBigNumber } from 'mathjs';
 
 /**
  * MathJS 라이브러리 설정
  * - BigNumber 타입 사용으로 정밀한 계산 지원
  * - 정밀도 64비트로 설정하여 높은 정확도 보장
  */
-const MathB = create(all, {
+export const MathB = create(all, {
   number: 'BigNumber',
-  precision: 64,
+  precision: 128,
 });
 
 export const BigNumber = MathB.bignumber;
+
+export type typeBigNumber = tBigNumber;
 
 /**
  * 계산기에서 사용되는 연산자 열거형

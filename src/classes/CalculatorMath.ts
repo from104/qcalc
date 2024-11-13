@@ -1,17 +1,6 @@
-import { create, all, BigNumber as typeBigNumber } from 'mathjs';
 import { match } from 'ts-pattern';
 import { convertRadix, Radix } from './RadixConverter';
-import { BigNumber } from './CalculatorTypes';
-
-/**
- * MathJS 라이브러리 설정
- * - BigNumber 타입 사용으로 정밀한 계산 지원
- * - 정밀도 64비트로 설정하여 높은 정확도 보장
- */
-const MathB = create(all, {
-  number: 'BigNumber',
-  precision: 64,
-});
+import { BigNumber, MathB, typeBigNumber } from './CalculatorTypes';
 
 /**
  * 계산기의 수학 연산을 담당하는 클래스

@@ -1,8 +1,10 @@
 import { copyToClipboard } from 'quasar';
 import { defineStore } from 'pinia';
+
 import { useStoreSettings } from './store-settings';
 import { useStoreNotifications } from './store-notifications';
-import { Operator, operatorMap, ResultSnapshot } from 'src/classes/Calculator';
+import { Operator, CalculationResult } from 'src/classes/CalculatorTypes';
+import { match } from 'ts-pattern';
 
 // 유틸리티 관련 상태 및 동작을 관리하는 스토어 정의
 export const useStoreUtils = defineStore('utils', {
@@ -72,51 +74,42 @@ export const useStoreUtils = defineStore('utils', {
     },
 
     // 계산 기록의 왼쪽 부분 생성
-    getLeftSideInHistory(history: ResultSnapshot, useLineBreak = false): string {
+    getLeftSideInHistory(history: CalculationResult, useLineBreak = false): string {
       const lineBreak = useLineBreak ? '\n' : '';
 
       const formattedPrev = this.toFormattedNumber(history.previousNumber);
       const formattedArg = history.argumentNumber ? this.toFormattedNumber(history.argumentNumber) : '';
-      const operator = Object.keys(operatorMap).find((key) => operatorMap[key] === history.operator) || '';
+      const operator = history.operator || '';
 
-      switch (Array.isArray(history.operator) ? history.operator[0] : history.operator) {
-        case Operator.Plus:
-        case Operator.Minus:
-        case Operator.Mul:
-        case Operator.Div:
-        case Operator.Mod:
-          return `${formattedPrev}${lineBreak} ${operator} ${formattedArg}`;
-        case Operator.Pow:
-          return `${formattedPrev}${lineBreak} ^ ${formattedArg}`;
-        case Operator.Root:
-          return `${formattedPrev}${lineBreak} ^ (1/${formattedArg})`;
-        case Operator.Pct:
-          if (Array.isArray(history.operator) && history.operator[1] === Operator.Div) {
+      return match(operator)
+        .with(Operator.ADD, Operator.SUB, Operator.MUL, Operator.DIV, Operator.MOD, 
+          (op) => `${formattedPrev}${lineBreak} ${op} ${formattedArg}`)
+        .with(Operator.BIT_AND, () => `${formattedPrev}${lineBreak} & ${formattedArg}`)
+        .with(Operator.BIT_OR, () => `${formattedPrev}${lineBreak} | ${formattedArg}`)
+        .with(Operator.BIT_XOR, () => `${formattedPrev}${lineBreak} ^ ${formattedArg}`)
+        .with(Operator.BIT_SFT_R, () => `${formattedPrev}${lineBreak} >> ${formattedArg}`)
+        .with(Operator.BIT_SFT_L, () => `${formattedPrev}${lineBreak} << ${formattedArg}`)
+        .with(Operator.BIT_NOT, () => `~ ${formattedPrev}`)
+        .with(Operator.POW, () => `${formattedPrev}${lineBreak} ^ ${formattedArg}`)
+        .with(Operator.ROOT, () => `${formattedPrev}${lineBreak} ^ (1/${formattedArg})`)
+        .with(Operator.PCT, () => {
+          if (Array.isArray(history.operator) && history.operator[1] === Operator.DIV) {
             return `${formattedPrev}${lineBreak} / ${formattedArg}${lineBreak} × 100`;
           } else {
             return `${formattedPrev}${lineBreak} × ${formattedArg}%`;
           }
-        case Operator.Rec:
-          return `1${lineBreak} ÷ ${formattedPrev}`;
-        case Operator.Pow2:
-          return `${formattedPrev} ^ 2`;
-        case Operator.Exp10:
-          return `${this.toFormattedNumber('10')} ^ ${formattedPrev}`;
-        case Operator.Sqrt:
-        case Operator.Sin:
-        case Operator.Cos:
-        case Operator.Tan:
-        case Operator.Fct:
-        case Operator.Int:
-        case Operator.Frac:
-          return `${operator} ( ${formattedPrev} )`;
-        default:
-          return formattedPrev;
-      }
+        })
+        .with(Operator.REC, () => `1${lineBreak} ÷ ${formattedPrev}`)
+        .with(Operator.POW2, () => `${formattedPrev} ^ 2`)
+        .with(Operator.EXP10, () => `${this.toFormattedNumber('10')} ^ ${formattedPrev}`)
+        .with(Operator.SQRT, Operator.SIN, Operator.COS, Operator.TAN, 
+              Operator.FCT, Operator.INT, Operator.FRAC, 
+              () => `${operator} ( ${formattedPrev} )`)
+        .otherwise(() => formattedPrev);
     },
 
     // 계산 기록의 오른쪽 부분 생성
-    getRightSideInHistory(history: ResultSnapshot): string {
+    getRightSideInHistory(history: CalculationResult): string {
       return this.toFormattedNumber(history.resultNumber);
     },
 

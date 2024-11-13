@@ -2,6 +2,7 @@
   import { ref, onMounted, onBeforeUnmount, reactive, watch, Ref } from 'vue';
   import MyTooltip from 'components/MyTooltip.vue';
   import { useI18n } from 'vue-i18n';
+  import { useStoreBase } from 'src/stores/store-base';
   import { useStoreSettings } from 'src/stores/store-settings';
   import { useStoreCurrency } from 'src/stores/store-currency';
   import { useStoreUtils } from 'src/stores/store-utils';
@@ -14,9 +15,10 @@
   const storeSettings = useStoreSettings();
   const storeCurrency = useStoreCurrency();
   const storeUtils = useStoreUtils();
-
+  const storeBase = useStoreBase();
   // 스토어에서 필요한 메서드 추출
-  const { currencyConverter, swapCurrencyValue, initRecentCurrency } = storeCurrency;
+  const { calc } = storeBase;
+  const { currencyConverter, swapCurrency, initRecentCurrency } = storeCurrency;
   const { clickButtonById, setInputBlurred, setInputFocused, blurElement } = storeUtils;
 
   // 단위 초기화
@@ -159,6 +161,16 @@
   // 'To' 통화 필터 설정
   const toFilteredCurrencyOptions = ref<CurrencyOptions[]>(toCurrencyOptions.values);
   const filterFnTo = createFilterFn(toFilteredCurrencyOptions, toCurrencyOptions);
+  
+  const swapCurrencyValue = () => {
+    const convertedValue = currencyConverter.convert(
+      Number(calc.currentNumber), 
+      storeCurrency.recentCurrencyFrom,
+      storeCurrency.recentCurrencyTo
+    );
+    calc.setCurrentNumber(convertedValue.toString());
+    swapCurrency();
+  };
 </script>
 
 <template>

@@ -1,24 +1,30 @@
 <script setup lang="ts">
   import { onMounted, onBeforeUnmount, reactive, watch } from 'vue';
   import { useI18n } from 'vue-i18n';
+
+  import { KeyBinding } from 'classes/KeyBinding';
   import { UnitConverter } from 'classes/UnitConverter';
-  import MyTooltip from 'components/MyTooltip.vue';
+
+  import { useStoreBase } from 'src/stores/store-base';
   import { useStoreUnit } from 'src/stores/store-unit';
   import { useStoreSettings } from 'src/stores/store-settings';
   import { useStoreUtils } from 'src/stores/store-utils';
-  import { KeyBinding } from 'classes/KeyBinding';
+
+  import MyTooltip from 'components/MyTooltip.vue';
 
   // i18n 설정
   const { t } = useI18n();
 
   // 스토어 인스턴스 생성
+  const storeBase = useStoreBase();
   const storeUnit = useStoreUnit();
   const storeSettings = useStoreSettings();
   const storeUtils = useStoreUtils();
 
   // 스토어에서 필요한 메서드 추출
+  const { calc } = storeBase;
   const { clickButtonById } = storeUtils;
-  const { swapUnitValue, initRecentCategoryAndUnit } = storeUnit;
+  const { swapUnit, initRecentCategoryAndUnit } = storeUnit;
 
   // 단위 초기화
   initRecentCategoryAndUnit();
@@ -98,6 +104,16 @@
     },
     { immediate: true }
   );
+
+  const swapUnitValue = () => {
+    calc.setCurrentNumber(UnitConverter.convert(
+      storeUnit.recentCategory,
+      calc.currentNumber,
+      storeUnit.recentUnitFrom[storeUnit.recentCategory],
+      storeUnit.recentUnitTo[storeUnit.recentCategory]
+    ));
+    swapUnit();
+  };
 </script>
 
 <template>

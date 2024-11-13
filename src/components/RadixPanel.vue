@@ -18,7 +18,7 @@
   const storeUtils = useStoreUtils();
 
   // 스토어에서 필요한 메서드 추출
-  const { swapRadixValue, initRecentRadix } = storeRadix;
+  const { swapRadix, initRecentRadix } = storeRadix;
   const { clickButtonById, setInputBlurred } = storeUtils;
 
   // 단위 초기화
@@ -96,6 +96,10 @@
     },
     { immediate: true },
   );
+
+  const swapRadixValue = () => {
+    swapRadix();
+  };
 </script>
 
 <template>

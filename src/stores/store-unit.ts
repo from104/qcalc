@@ -37,7 +37,7 @@ export const useStoreUnit = defineStore('unit', {
     },
 
     // 현재 카테고리의 변환 출발 단위와 도착 단위 교환
-    swapUnitValue(): void {
+    swapUnit(): void {
       const temp = this.recentUnitFrom[this.recentCategory];
       this.recentUnitFrom[this.recentCategory] = this.recentUnitTo[this.recentCategory];
       this.recentUnitTo[this.recentCategory] = temp;

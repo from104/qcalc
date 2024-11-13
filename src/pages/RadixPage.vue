@@ -10,7 +10,7 @@
       <ResultField field="main" addon="radix" />
       <RadixPanel />
       <ResultField field="sub" addon="radix" />
-      <CalcButton type="currency" />
+      <CalcButton type="radix" />
     </q-card>
   </q-page>
 </template>

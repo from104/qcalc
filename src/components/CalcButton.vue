@@ -96,114 +96,217 @@
 
   // 버튼 타입 정의
   type Button = {
-    [id: string]: [isIcon: boolean, label: string, color: string, keys: string[], handler: () => void];
+    [id: string]: [
+      isIcon: boolean,
+      label: string,
+      color: string,
+      keys: string[],
+      handler: () => void,
+      isDisabled: boolean,
+    ];
+  };
+  type ButtonType = {
+    [key in 'calc' | 'unit' | 'currency' | 'radix']: Button;
   };
 
   // prettier-ignore
-  const buttons: Button = {
-    a1: [false, 'x²', 'function', ['Control+q'], () => calc.pow2()],
-    b1: [false, '√x', 'function', ['Control+w'], () => calc.sqrt()],
-    c1: [false, 'C', 'important', ['Control+e', 'Delete', 'Escape'], () => calc.reset()],
-    d1: [true, 'mdi-backspace', 'important', ['Backspace', 'Control+r'], () => calc.deleteDigitOrDot()],
-    a2: [true, 'mdi-plus-minus-variant', 'function', ['Control+a'], () => calc.changeSign()],
-    b2: [false, '%', 'function', ['Control+s'], () => calc.percent()],
-    c2: [false, '1/x', 'function', ['Control+d'], () => calc.rec()],
-    d2: [true, 'mdi-division', 'function', ['/'], () => calc.div()],
-    a3: [false, '7', 'normal', ['7'], () => calc.addDigit(7)],
-    b3: [false, '8', 'normal', ['8'], () => calc.addDigit(8)],
-    c3: [false, '9', 'normal', ['9'], () => calc.addDigit(9)],
-    d3: [true, 'mdi-close', 'function', ['*'], () => calc.mul()],
-    a4: [false, '4', 'normal', ['4'], () => calc.addDigit(4)],
-    b4: [false, '5', 'normal', ['5'], () => calc.addDigit(5)],
-    c4: [false, '6', 'normal', ['6'], () => calc.addDigit(6)],
-    d4: [true, 'mdi-minus', 'function', ['-'], () => calc.sub()],
-    a5: [false, '1', 'normal', ['1'], () => calc.addDigit(1)],
-    b5: [false, '2', 'normal', ['2'], () => calc.addDigit(2)],
-    c5: [false, '3', 'normal', ['3'], () => calc.addDigit(3)],
-    d5: [true, 'mdi-plus', 'function', ['+'], () => calc.add()],
-    a6: [true, 'keyboard_capslock', 'important', ["'"], () => toggleButtonShift()],
-    b6: [false, '0', 'normal', ['0'], () => calc.addDigit(0)],
-    c6: [true, 'mdi-circle-small', 'normal', ['.'], () => calc.addDot()],
-    d6: [true, 'mdi-equal', 'important', ['=', 'Enter'], () => calc.equal()],
+  const commonButtons: Button = {
+    c1: [false, 'C', 'important', ['Control+e', 'Delete', 'Escape'], () => calc.reset(), false],
+    d1: [true, 'mdi-backspace', 'important', ['Backspace', 'Control+r'], () => calc.deleteDigitOrDot(), false],
+    a2: [true, 'mdi-plus-minus-variant', 'function', ['Control+a'], () => calc.changeSign(), false],
+    d2: [true, 'mdi-division', 'function', ['/'], () => calc.div(), false],
+    d3: [true, 'mdi-close', 'function', ['*'], () => calc.mul(), false],
+    d4: [true, 'mdi-minus', 'function', ['-'], () => calc.sub(), false],
+    d5: [true, 'mdi-plus', 'function', ['+'], () => calc.add(), false],
+    a6: [true, 'keyboard_capslock', 'important', ["'"], () => toggleButtonShift(), false],
+    b6: [false, '0', 'normal', ['0'], () => calc.addDigit(0), false],
+    c6: [true, 'mdi-circle-small', 'normal', ['.'], () => calc.addDot(), false],
+    d6: [true, 'mdi-equal', 'important', ['=', 'Enter'], () => calc.equal(), false],
   };
 
+  const buttonsForType: ButtonType = {
+    calc: {
+      a1: [false, 'x²', 'function', ['Control+q'], () => calc.pow2(), false],
+      b1: [false, '√x', 'function', ['Control+w'], () => calc.sqrt(), false],
+      b2: [false, '%', 'function', ['Control+s'], () => calc.percent(), false],
+      c2: [false, '1/x', 'function', ['Control+d'], () => calc.rec(), false],
+      a3: [false, '7', 'normal', ['7'], () => calc.addDigit(7), false],
+      b3: [false, '8', 'normal', ['8'], () => calc.addDigit(8), false],
+      c3: [false, '9', 'normal', ['9'], () => calc.addDigit(9), false],
+      a4: [false, '4', 'normal', ['4'], () => calc.addDigit(4), false],
+      b4: [false, '5', 'normal', ['5'], () => calc.addDigit(5), false],
+      c4: [false, '6', 'normal', ['6'], () => calc.addDigit(6), false],
+      a5: [false, '1', 'normal', ['1'], () => calc.addDigit(1), false],
+      b5: [false, '2', 'normal', ['2'], () => calc.addDigit(2), false],
+      c5: [false, '3', 'normal', ['3'], () => calc.addDigit(3), false],
+    },
+    unit: {
+      a1: [false, 'x²', 'function', ['Control+q'], () => calc.pow2(), false],
+      b1: [false, '√x', 'function', ['Control+w'], () => calc.sqrt(), false],
+      b2: [false, '%', 'function', ['Control+s'], () => calc.percent(), false],
+      c2: [false, '1/x', 'function', ['Control+d'], () => calc.rec(), false],
+      a3: [false, '7', 'normal', ['7'], () => calc.addDigit(7), false],
+      b3: [false, '8', 'normal', ['8'], () => calc.addDigit(8), false],
+      c3: [false, '9', 'normal', ['9'], () => calc.addDigit(9), false],
+      a4: [false, '4', 'normal', ['4'], () => calc.addDigit(4), false],
+      b4: [false, '5', 'normal', ['5'], () => calc.addDigit(5), false],
+      c4: [false, '6', 'normal', ['6'], () => calc.addDigit(6), false],
+      a5: [false, '1', 'normal', ['1'], () => calc.addDigit(1), false],
+      b5: [false, '2', 'normal', ['2'], () => calc.addDigit(2), false],
+      c5: [false, '3', 'normal', ['3'], () => calc.addDigit(3), false],
+    },
+    currency: {
+      a1: [false, 'x²', 'function', ['Control+q'], () => calc.pow2(), false],
+      b1: [false, '√x', 'function', ['Control+w'], () => calc.sqrt(), false],
+      b2: [false, '%', 'function', ['Control+s'], () => calc.percent(), false],
+      c2: [false, '1/x', 'function', ['Control+d'], () => calc.rec(), false],
+      a3: [false, '7', 'normal', ['7'], () => calc.addDigit(7), false],
+      b3: [false, '8', 'normal', ['8'], () => calc.addDigit(8), false],
+      c3: [false, '9', 'normal', ['9'], () => calc.addDigit(9), false],
+      a4: [false, '4', 'normal', ['4'], () => calc.addDigit(4), false],
+      b4: [false, '5', 'normal', ['5'], () => calc.addDigit(5), false],
+      c4: [false, '6', 'normal', ['6'], () => calc.addDigit(6), false],
+      a5: [false, '1', 'normal', ['1'], () => calc.addDigit(1), false],
+      b5: [false, '2', 'normal', ['2'], () => calc.addDigit(2), false],
+      c5: [false, '3', 'normal', ['3'], () => calc.addDigit(3), false],
+   },
+    radix: {
+      a1: [false, 'x²', 'function', ['Control+q'], () => calc.pow2(), false],
+      b1: [false, '√x', 'function', ['Control+w'], () => calc.sqrt(), false],
+      b2: [false, '%', 'function', ['Control+s'], () => calc.percent(), false],
+      c2: [false, '1/x', 'function', ['Control+d'], () => calc.rec(), false],
+      a3: [false, '7', 'normal', ['7'], () => calc.addDigit(7), false],
+      b3: [false, '8', 'normal', ['8'], () => calc.addDigit(8), false],
+      c3: [false, '9', 'normal', ['9'], () => calc.addDigit(9), false],
+      a4: [false, '4', 'normal', ['4'], () => calc.addDigit(4), false],
+      b4: [false, '5', 'normal', ['5'], () => calc.addDigit(5), false],
+      c4: [false, '6', 'normal', ['6'], () => calc.addDigit(6), false],
+      a5: [false, '1', 'normal', ['1'], () => calc.addDigit(1), false],
+      b5: [false, '2', 'normal', ['2'], () => calc.addDigit(2), false],
+      c5: [false, '3', 'normal', ['3'], () => calc.addDigit(3), false],
+    },
+  };
+
+  const buttons = computed(() => {
+    const unsortedButtons = {
+      ...commonButtons,
+      ...buttonsForType[props.type as keyof typeof buttonsForType],
+    };
+
+    // 엑셀 셀 순서로 정렬 (a1, b1, c1... a2, b2, c2... 순서)
+    return Object.fromEntries(
+      Object.entries(unsortedButtons).sort(([keyA], [keyB]) => {
+        const rowA = parseInt(keyA.slice(1));
+        const rowB = parseInt(keyB.slice(1));
+        const colA = keyA.charAt(0);
+        const colB = keyB.charAt(0);
+
+        if (rowA === rowB) {
+          return colA.localeCompare(colB);
+        }
+        return rowA - rowB;
+      })
+    );
+  });
+
   type ButtonAddedFunc = {
-    [id: string]: [label: string, keys: string[], handler: () => void];
+    [key: string]: [
+      label: string,
+      keys: string[],
+      handler: () => void,
+      isDisabled: boolean,
+    ];
+  };
+
+  type ButtonAddedFuncType = {
+    [key in 'calc' | 'unit' | 'currency' | 'radix']: ButtonAddedFunc;
   };
 
   // 공통으로 사용할 기본 버튼 기능
   const commonButtonsAddedFunc: ButtonAddedFunc = {
-    a1: ['xⁿ', ['Shift+Control+q'], () => calc.pow()],
-    b1: ['ⁿ√x', ['Shift+Control+w'], () => calc.root()],
-    c1: ['MC', ['Shift+Control+e', 'Shift+Delete', 'Shift+Escape'], () => calc.memoryClear()],
-    d1: ['MR', ['Shift+Backspace', 'Shift+Control+r'], () => { calc.memoryRecall(); showMemory(); }],
-    d2: ['M÷', ['Shift+Slash', 'Shift+NumpadDivide'], () => { calc.memoryDiv(); showMemory(); }],
-    d3: ['M×', ['Shift+NumpadMultiply'], () => { calc.memoryMul(); showMemory(); }],
-    d4: ['M-', ['Shift+Minus', 'Shift+NumpadSubtract'], () => { calc.memorySub(); showMemory(); }],
-    d5: ['M+', ['Shift+Plus', 'Shift+NumpadAdd'], () => { calc.memoryAdd(); showMemory(); }],
-    a6: ['', [], () => null],
-    b6: ['int', ['Shift+Digit0', 'Shift+Numpad0'], () => calc.int()],
-    c6: ['frac', ['Shift+Period', 'Shift+NumpadDecimal'], () => calc.frac()],
-    d6: ['MS', ['Shift+Equal', 'Shift+Enter', 'Shift+NumpadEnter'], () => { calc.memorySave(); showMemory(); }],
+    c1: ['MC', ['Shift+Control+e', 'Shift+Delete', 'Shift+Escape'], () => calc.memoryClear(), false],
+    d1: ['MR', ['Shift+Backspace', 'Shift+Control+r'], () => { calc.memoryRecall(); showMemory(); }, false],
+    d2: ['M÷', ['Shift+Slash', 'Shift+NumpadDivide'], () => { calc.memoryDiv(); showMemory(); }, false],
+    d3: ['M×', ['Shift+NumpadMultiply'], () => { calc.memoryMul(); showMemory(); }, false],
+    d4: ['M-', ['Shift+Minus', 'Shift+NumpadSubtract'], () => { calc.memorySub(); showMemory(); }, false],
+    d5: ['M+', ['Shift+Plus', 'Shift+NumpadAdd'], () => { calc.memoryAdd(); showMemory(); }, false],
+    a6: ['', [], () => null, false],
+    b6: ['int', ['Shift+Digit0', 'Shift+Numpad0'], () => calc.int(), false],
+    c6: ['frac', ['Shift+Period', 'Shift+NumpadDecimal'], () => calc.frac(), false],
+    d6: ['MS', ['Shift+Equal', 'Shift+Enter', 'Shift+NumpadEnter'], () => { calc.memorySave(); showMemory(); }, false],
   };
 
-  type NumberButtonFunc = {
-    [key: string]: [string, string[], () => void];
-  };
-
-  type CalcTypes = {
-    [key in 'calc' | 'unit' | 'currency']: NumberButtonFunc;
-  };
-
-  const numberButtonsAddedFunc: CalcTypes = {
+  const buttonsAddedFuncForType: ButtonAddedFuncType = {
     calc: {
-      a2: ['10ⁿ', ['Shift+Control+a'], () => calc.exp10()],
-      b2: ['x%y', ['Shift+Control+s'], () => calc.mod()],
-      c2: ['x!', ['Shift+Control+d'], () => calc.fct()],
-      a3: ['sin', ['Shift+Digit7', 'Shift+Numpad7'], () => calc.sin()],
-      b3: ['cos', ['Shift+Digit8', 'Shift+Numpad8'], () => calc.cos()],
-      c3: ['tan', ['Shift+Digit9', 'Shift+Numpad9'], () => calc.tan()],
-      a4: ['Pi/2', ['Shift+Digit4', 'Shift+Numpad4'], () => calc.setConstant('pi2')],
-      b4: ['ln10', ['Shift+Digit5', 'Shift+Numpad5'], () => calc.setConstant('ln10')],
-      c4: ['ln2', ['Shift+Digit6', 'Shift+Numpad6'], () => calc.setConstant('ln2')],
-      a5: ['Pi', ['Shift+Digit1', 'Shift+Numpad1'], () => calc.setConstant('pi')],
-      b5: ['phi', ['Shift+Digit2', 'Shift+Numpad2'], () => calc.setConstant('phi')],
-      c5: ['e', ['Shift+Digit3', 'Shift+Numpad3'], () => calc.setConstant('e')],
+      a1: ['xⁿ', ['Shift+Control+q'], () => calc.pow(), false],
+      b1: ['ⁿ√x', ['Shift+Control+w'], () => calc.root(), false],
+      a2: ['10ⁿ', ['Shift+Control+a'], () => calc.exp10(), false],
+      b2: ['x%y', ['Shift+Control+s'], () => calc.mod(), false],
+      c2: ['x!', ['Shift+Control+d'], () => calc.fct(), false],
+      a3: ['sin', ['Shift+Digit7', 'Shift+Numpad7'], () => calc.sin(), false],
+      b3: ['cos', ['Shift+Digit8', 'Shift+Numpad8'], () => calc.cos(), false],
+      c3: ['tan', ['Shift+Digit9', 'Shift+Numpad9'], () => calc.tan(), false],
+      a4: ['Pi/2', ['Shift+Digit4', 'Shift+Numpad4'], () => calc.setConstant('pi2'), false],
+      b4: ['ln10', ['Shift+Digit5', 'Shift+Numpad5'], () => calc.setConstant('ln10'), false],
+      c4: ['ln2', ['Shift+Digit6', 'Shift+Numpad6'], () => calc.setConstant('ln2'), false],
+      a5: ['Pi', ['Shift+Digit1', 'Shift+Numpad1'], () => calc.setConstant('pi'), false],
+      b5: ['phi', ['Shift+Digit2', 'Shift+Numpad2'], () => calc.setConstant('phi'), false],
+      c5: ['e', ['Shift+Digit3', 'Shift+Numpad3'], () => calc.setConstant('e'), false],
     },
     unit: {
-      a2: ['×2', ['Shift+Control+a'], () => calc.mulNumber(2)],
-      b2: ['×3', ['Shift+Control+s'], () => calc.mulNumber(3)],
-      c2: ['×5', ['Shift+Control+d'], () => calc.mulNumber(5)],
-      a3: ['÷2', ['Shift+Digit7', 'Shift+Numpad7'], () => calc.divNumber(2)],
-      b3: ['÷3', ['Shift+Digit8', 'Shift+Numpad8'], () => calc.divNumber(3)],
-      c3: ['÷5', ['Shift+Digit9', 'Shift+Numpad9'], () => calc.divNumber(5)],
-      a4: ['×10', ['Shift+Digit4', 'Shift+Numpad4'], () => calc.mulNumber(10)],
-      b4: ['×100', ['Shift+Digit5', 'Shift+Numpad5'], () => calc.mulNumber(100)],
-      c4: ['×1000', ['Shift+Digit6', 'Shift+Numpad6'], () => calc.mulNumber(1000)],
-      a5: ['÷10', ['Shift+Digit1', 'Shift+Numpad1'], () => calc.divNumber(10)],
-      b5: ['÷100', ['Shift+Digit2', 'Shift+Numpad2'], () => calc.divNumber(100)],
-      c5: ['÷1000', ['Shift+Digit3', 'Shift+Numpad3'], () => calc.divNumber(1000)],
+      a1: ['xⁿ', ['Shift+Control+q'], () => calc.pow(), false],
+      b1: ['ⁿ√x', ['Shift+Control+w'], () => calc.root(), false],
+      a2: ['×2', ['Shift+Control+a'], () => calc.mulNumber(2), false],
+      b2: ['×3', ['Shift+Control+s'], () => calc.mulNumber(3), false],
+      c2: ['×5', ['Shift+Control+d'], () => calc.mulNumber(5), false],
+      a3: ['÷2', ['Shift+Digit7', 'Shift+Numpad7'], () => calc.divNumber(2), false],
+      b3: ['÷3', ['Shift+Digit8', 'Shift+Numpad8'], () => calc.divNumber(3), false],
+      c3: ['÷5', ['Shift+Digit9', 'Shift+Numpad9'], () => calc.divNumber(5), false],
+      a4: ['×10', ['Shift+Digit4', 'Shift+Numpad4'], () => calc.mulNumber(10), false],
+      b4: ['×100', ['Shift+Digit5', 'Shift+Numpad5'], () => calc.mulNumber(100), false],
+      c4: ['×1000', ['Shift+Digit6', 'Shift+Numpad6'], () => calc.mulNumber(1000), false],
+      a5: ['÷10', ['Shift+Digit1', 'Shift+Numpad1'], () => calc.divNumber(10), false],
+      b5: ['÷100', ['Shift+Digit2', 'Shift+Numpad2'], () => calc.divNumber(100), false],
+      c5: ['÷1000', ['Shift+Digit3', 'Shift+Numpad3'], () => calc.divNumber(1000), false],
     },
     currency: {
-      a2: ['+5', ['Shift+Control+a'], () => calc.addNumber(5)],
-      b2: ['+10', ['Shift+Control+s'], () => calc.addNumber(10)],
-      c2: ['+100', ['Shift+Control+d'], () => calc.addNumber(100)],
-      a3: ['-5', ['Shift+Digit7', 'Shift+Numpad7'], () => calc.subNumber(5)],
-      b3: ['-10', ['Shift+Digit8', 'Shift+Numpad8'], () => calc.subNumber(10)],
-      c3: ['-100', ['Shift+Digit9', 'Shift+Numpad9'], () => calc.subNumber(100)],
-      a4: ['×10', ['Shift+Digit4', 'Shift+Numpad4'], () => calc.mulNumber(10)],
-      b4: ['×100', ['Shift+Digit5', 'Shift+Numpad5'], () => calc.mulNumber(100)],
-      c4: ['×1000', ['Shift+Digit6', 'Shift+Numpad6'], () => calc.mulNumber(1000)],
-      a5: ['÷10', ['Shift+Digit1', 'Shift+Numpad1'], () => calc.divNumber(10)],
-      b5: ['÷100', ['Shift+Digit2', 'Shift+Numpad2'], () => calc.divNumber(100)],
-      c5: ['÷1000', ['Shift+Digit3', 'Shift+Numpad3'], () => calc.divNumber(1000)],
+      a1: ['xⁿ', ['Shift+Control+q'], () => calc.pow(), false],
+      b1: ['ⁿ√x', ['Shift+Control+w'], () => calc.root(), false],
+      a2: ['+5', ['Shift+Control+a'], () => calc.addNumber(5), false],
+      b2: ['+10', ['Shift+Control+s'], () => calc.addNumber(10), false],
+      c2: ['+100', ['Shift+Control+d'], () => calc.addNumber(100), false],
+      a3: ['-5', ['Shift+Digit7', 'Shift+Numpad7'], () => calc.subNumber(5), false],
+      b3: ['-10', ['Shift+Digit8', 'Shift+Numpad8'], () => calc.subNumber(10), false],
+      c3: ['-100', ['Shift+Digit9', 'Shift+Numpad9'], () => calc.subNumber(100), false],
+      a4: ['×10', ['Shift+Digit4', 'Shift+Numpad4'], () => calc.mulNumber(10), false],
+      b4: ['×100', ['Shift+Digit5', 'Shift+Numpad5'], () => calc.mulNumber(100), false],
+      c4: ['×1000', ['Shift+Digit6', 'Shift+Numpad6'], () => calc.mulNumber(1000), false],
+      a5: ['÷10', ['Shift+Digit1', 'Shift+Numpad1'], () => calc.divNumber(10), false],
+      b5: ['÷100', ['Shift+Digit2', 'Shift+Numpad2'], () => calc.divNumber(100), false],
+      c5: ['÷1000', ['Shift+Digit3', 'Shift+Numpad3'], () => calc.divNumber(1000), false],
+    },
+    radix: {
+      a1: ['xⁿ', ['Shift+Control+q'], () => calc.pow(), false],
+      b1: ['ⁿ√x', ['Shift+Control+w'], () => calc.root(), false],
+      a2: ['x>>y', ['Shift+Control+a'], () => calc.bitSftR(), false],
+      b2: ['x<<y', ['Shift+Control+s'], () => calc.bitSftL(), false],
+      c2: ['~x', ['Shift+Control+d'], () => calc.bitNot(), false],
+      a3: ['x|y', ['Shift+Digit7', 'Shift+Numpad7'], () => calc.bitOr(), false],
+      b3: ['x^y', ['Shift+Digit8', 'Shift+Numpad8'], () => calc.bitXor(), false],
+      c3: ['x&y', ['Shift+Digit9', 'Shift+Numpad9'], () => calc.bitAnd(), false],
+      a4: ['D', ['Shift+Digit4', 'Shift+Numpad4'], () => calc.addDigit('D'), false],
+      b4: ['E', ['Shift+Digit5', 'Shift+Numpad5'], () => calc.addDigit('E'), false],
+      c4: ['F', ['Shift+Digit6', 'Shift+Numpad6'], () => calc.addDigit('F'), false],
+      a5: ['A', ['Shift+Digit1', 'Shift+Numpad1'], () => calc.addDigit('A'), false],
+      b5: ['B', ['Shift+Digit2', 'Shift+Numpad2'], () => calc.addDigit('B'), false],
+      c5: ['C', ['Shift+Digit3', 'Shift+Numpad3'], () => calc.addDigit('C'), false],
     },
   };
 
   // prop type에 따라 적절한 버튼 기능 선택
   const buttonsAddedFunc = computed(() => ({
     ...commonButtonsAddedFunc,
-    ...numberButtonsAddedFunc[props.type as keyof typeof numberButtonsAddedFunc],
+    ...buttonsAddedFuncForType[props.type as keyof typeof buttonsAddedFuncForType],
   }));
 
   type ButtonID = keyof typeof commonButtonsAddedFunc;
@@ -251,7 +354,7 @@
       }
       if (!storeBase.buttonShiftLock) offButtonShift();
     } else {
-      funcWithError(buttons[id][4]);
+      funcWithError(buttons.value[id][4]);
     }
   };
 
@@ -269,7 +372,7 @@
       return;
     }
     if (storeBase.buttonShift) {
-      funcWithError(buttons[id][4]);
+      funcWithError(buttons.value[id][4]);
       if (!storeBase.buttonShiftLock) offButtonShift();
     } else {
       funcWithError(buttonsAddedFunc.value[id][2]);
@@ -302,7 +405,7 @@
   import { KeyBinding, KeyBindings } from 'classes/KeyBinding';
 
   // 주요 키 바인딩 설정
-  const keyBindingsPrimary: KeyBindings = Object.entries(buttons).map(([id, [, , , keys]]) => [
+  const keyBindingsPrimary: KeyBindings = Object.entries(buttons.value).map(([id, [, , , keys]]) => [
     keys,
     () => buttonClickByKey(id, false),
   ]);
@@ -342,7 +445,7 @@
 
   // 계산기 버튼 높이 설정
   const baseHeight = ref('136px');
-  if (props.type === 'unit' || props.type === 'currency') {
+  if (['unit', 'currency', 'radix'].includes(props.type)) {
     baseHeight.value = '234px';
   }
 </script>

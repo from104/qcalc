@@ -10,24 +10,6 @@ import { Radix, RadixConverter } from './RadixConverter';
  * @class
  * @description
  * 고급 수학 계산 기능을 제공하는 계산기 구현
- *
- * 주요 기능:
- * - 기본 산술 연산 (덧셈, 뺄셈, 곱셈, 나눗셈)
- * - 고급 수학 함수 (삼각함수, 지수/로그, 팩토리얼 등)
- * - 메모리 기능 (저장, 호출, 더하기, 빼기, 초기화)
- * - 계산 히스토리 관리 (저장, 조회, 삭제)
- * - BigNumber를 사용한 정밀 계산
- *
- * 특징:
- * - 연속 계산 지원 (이전 결과에 이어서 계산)
- * - 자동 소수점 처리 및 정밀도 관리
- * - 오류 처리 및 예외 상황 대응
- * - 메모리 기능을 통한 중간 결과 저장
- * - 계산 히스토리의 영구 저장 및 관리
- *
- * @see {@link CalculatorHistory} 계산 히스토리 관리
- * @see {@link Operator} 지원되는 연산자 목록
- * @see {@link ResultSnapshot} 계산 결과 스냅샷 형식
  */
 export class Calculator {
   private math: CalculatorMath = new CalculatorMath();
