@@ -1,5 +1,7 @@
 import { defineStore } from 'pinia';
+import { WordSize } from 'src/classes/CalculatorTypes';
 import { RadixConverter, Radix, RadixType } from 'src/classes/RadixConverter';
+import { useStoreBase } from './store-base';
 
 const radixConverter = new RadixConverter();
 // 유틸리티 관련 상태 및 동작을 관리하는 스토어 정의
@@ -7,7 +9,7 @@ const radixConverter = new RadixConverter();
 export const useStoreRadix = defineStore('radix', {
   // 상태 정의
   state: () => ({
-    wordSize: 32, // 비트 크기
+    wordSize: 32 as WordSize, // 비트 크기
     radixList: Object.values(Radix), // 진법 목록
     mainRadix: Radix.Decimal, // 기본 진법
     subRadix: Radix.Hexadecimal, // 보조 진법
@@ -43,6 +45,13 @@ export const useStoreRadix = defineStore('radix', {
     // 문자열이 유효한 진법 문자열인지 검사
     isValidRadixNumber(value: string, radix: RadixType): boolean {
       return radixConverter.isValidRadixNumber(value, radix);
+    },
+
+    // 워드 크기 설정
+    setWordSize(value: WordSize) {
+      this.wordSize = value;
+      const { calc } = useStoreBase(); // 여기서 호출
+      calc.wordSize = value;
     },
   },
 

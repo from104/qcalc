@@ -200,7 +200,7 @@ export class CalculatorMath {
    */
   public truncateToBitSize(a: string, wordSize: number = 8): string {
     this.validateNonNegativeNumbers(a);
-    return BigNumber(a).mod(BigNumber(2).pow(wordSize)).toString();
+    return BigNumber(a).mod(BigNumber(2).pow(wordSize)).floor().toString();
   }
 
   /**
@@ -251,12 +251,8 @@ export class CalculatorMath {
    */
   private bitAndOrXor(a: string, b: string, operator: 'and' | 'or' | 'xor', wordSize: number = 8): string {
     this.validateNonNegativeNumbers(a, b);
-    const [aBin, bBin] = [a, b].map(
-      (n) => convertRadix(
-        this.int(this.abs(n)),
-        Radix.Decimal,
-        Radix.Binary,
-      ),
+    const [aBin, bBin] = [a, b].map((n) =>
+      convertRadix(this.int(this.abs(n)), Radix.Decimal, Radix.Binary),
     ) as string[];
     const maxLength = Math.max(aBin.length, bBin.length);
     const [aPadded, bPadded] = [aBin, bBin].map((bin) => (bin as string).padStart(maxLength, '0'));
@@ -274,10 +270,7 @@ export class CalculatorMath {
       })
       .join('');
 
-    return this.truncateToBitSize(
-      convertRadix(resultBin, Radix.Binary, Radix.Decimal),
-      wordSize,
-    );
+    return this.truncateToBitSize(convertRadix(resultBin, Radix.Binary, Radix.Decimal), wordSize);
   }
 
   /**
@@ -321,18 +314,12 @@ export class CalculatorMath {
    */
   public bitNot(a: string, wordSize: number = 8): string {
     this.validateNonNegativeNumbers(a);
-    const binary = convertRadix(
-      this.int(this.abs(a)),
-      Radix.Decimal,
-      Radix.Binary,
-    );
+    const binary = convertRadix(this.int(this.abs(a)), Radix.Decimal, Radix.Binary);
     // 워드 사이즈에 맞게 이진수 패딩
     const paddedBinary = binary.padStart(wordSize, '0');
 
-    const invertedBinary = [...paddedBinary]
-      .map(bit => bit === '1' ? '0' : '1')
-      .join('');
-    
+    const invertedBinary = [...paddedBinary].map((bit) => (bit === '1' ? '0' : '1')).join('');
+
     return convertRadix(invertedBinary, Radix.Binary, Radix.Decimal);
   }
 
@@ -344,9 +331,6 @@ export class CalculatorMath {
    */
   public bitComp(a: string, wordSize: number = 8): string {
     this.validateNonNegativeNumbers(a);
-    return this.truncateToBitSize(
-      this.add(this.bitNot(a, wordSize), '1'),
-      wordSize,
-    );
+    return this.truncateToBitSize(this.add(this.bitNot(a, wordSize), '1'), wordSize);
   }
 }

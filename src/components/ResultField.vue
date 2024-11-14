@@ -241,6 +241,11 @@
     mod: 'mdi-alpha-m-box',
     pow: 'mdi-chevron-up-box',
     root: 'mdi-square-root-box',
+    bitSftR: 'mdi-chevron-right-box',
+    bitSftL: 'mdi-chevron-left-box',
+    bitAnd: 'mdi-alpha-a-box',
+    bitOr: 'mdi-alpha-o-box',
+    bitXor: 'mdi-alpha-x-box',
   };
 
   // 메모리 초기화 여부 계산된 속성

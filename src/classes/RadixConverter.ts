@@ -1,5 +1,6 @@
 import { create, all, bignumber } from 'mathjs';
 import { BigNumber, typeBigNumber } from './CalculatorTypes';
+import { match } from 'ts-pattern';
 
 /**
  * BigNumber 설정으로 MathJS 인스턴스 생성
@@ -50,13 +51,13 @@ export class RadixConverter {
     const pattern = () => {
       switch (radix) {
         case Radix.Binary:
-          return /^[01]+(\.[01]*)?$/;
+          return /^-?[01]+(\.[01]*)?$/; // 음수 허용
         case Radix.Octal:
-          return /^[0-7]+(\.[0-7]*)?$/;
+          return /^-?[0-7]+(\.[0-7]*)?$/; // 음수 허용
         case Radix.Decimal:
-          return /^[0-9]+(\.[0-9]*)?$/;
+          return /^-?[0-9]+(\.[0-9]*)?$/; // 음수 허용
         case Radix.Hexadecimal:
-          return /^[0-9A-Fa-f]+(\.[0-9A-Fa-f]*)?$/;
+          return /^-?[0-9A-Fa-f]+(\.[0-9A-Fa-f]*)?$/; // 음수 허용
       }
     };
     return pattern().test(value);
@@ -149,16 +150,10 @@ export class RadixConverter {
     const fraction = MathB.subtract(absoluteValue, integer);
 
     // 정수부 변환 (MathJS format 함수 사용)
-    const integerPart = MathB.format(integer, {
-      notation: radix,
-      precision: this.MAX_PRECISION,
-    })
-      .slice(2)
-      .toUpperCase(); // 접두사(0b, 0o, 0x) 제거
+    const integerPart = BigInt(integer.toString()).toString(this.RADIX_MAP[radix]).toUpperCase();
 
     // 소수부가 0이면 정수부만 반환
     if (MathB.equal(fraction, 0)) {
-      // 10진수인 경우 소수점 이하 0을 제거
       return isNegative ? `-${integerPart}` : integerPart;
     }
 
@@ -260,10 +255,14 @@ export class RadixConverter {
     const [integerPart, fractionPart = ''] = absValue.split('.');
 
     // 진법에 따른 기수값 (2, 8, 16) 가져오기
-    const radixValue = this.RADIX_MAP[radix];
+    const radixPrefix = match(radix)
+      .with(Radix.Binary, () => '0b')
+      .with(Radix.Octal, () => '0o')
+      .with(Radix.Hexadecimal, () => '0x')
+      .exhaustive();
 
     // 정수부 변환 (빈 문자열이면 0으로 처리)
-    let result = MathB.bignumber(integerPart ? parseInt(integerPart, radixValue) : 0);
+    let result = MathB.bignumber(integerPart ? BigInt(radixPrefix + integerPart) : 0n);
 
     // 소수부가 존재하면 변환하여 더하기
     if (fractionPart) {
@@ -295,16 +294,18 @@ export class RadixConverter {
     // 16진수의 경우 대문자로 통일 (예: 'a' -> 'A')
     const digits = radix === Radix.Hexadecimal ? fractionPart.toUpperCase() : fractionPart;
     // 각 자릿수별로 계산하여 합산
-    return digits.split('').reduce<typeBigNumber>((accumulator: typeBigNumber, currentDigit: string, position: number): typeBigNumber => {
-      // 현재 자릿수를 10진수로 변환
-      const digitValue = parseInt(currentDigit, radixValue);
+    return digits
+      .split('')
+      .reduce<typeBigNumber>((accumulator: typeBigNumber, currentDigit: string, position: number): typeBigNumber => {
+        // 현재 자릿수를 10진수로 변환
+        const digitValue = parseInt(currentDigit, radixValue);
 
-      // 현재 자릿수의 가중치 계산: value / (radix^position)
-      const weightedValue = MathB.divide(BigNumber(digitValue), MathB.pow(radixValue, position + 1)) as typeBigNumber;
+        // 현재 자릿수의 가중치 계산: value / (radix^position)
+        const weightedValue = MathB.divide(BigNumber(digitValue), MathB.pow(radixValue, position + 1)) as typeBigNumber;
 
-      // 누적값에 현재 자릿수의 가중치를 더함
-      return MathB.add(accumulator, weightedValue);
-    }, BigNumber(0));
+        // 누적값에 현재 자릿수의 가중치를 더함
+        return MathB.add(accumulator, weightedValue);
+      }, BigNumber(0));
   }
 
   /**
@@ -394,3 +395,14 @@ export const isValidBinary = converter.isValidBinary.bind(converter);
 export const isValidOctal = converter.isValidOctal.bind(converter);
 export const isValidDecimal = converter.isValidDecimal.bind(converter);
 export const isValidHexadecimal = converter.isValidHexadecimal.bind(converter);
+
+// console.log(
+//   converter.convertRadix(
+//     '1111111111111111111111111111111111111111111111111111111111111100',
+//     Radix.Binary,
+//     Radix.Decimal,
+//   ),
+// );
+// console.log(converter.convertRadix('18446744073709551612', Radix.Decimal, Radix.Binary));
+
+// console.log(BigInt('0b1111111111111111111111111111111111111111111111111111111111111100').toString(10));

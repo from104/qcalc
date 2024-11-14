@@ -111,3 +111,5 @@ export interface CalculationResult {
   argumentNumber?: string;
   resultNumber: string;
 }
+
+export type WordSize = 4 | 8 | 16 | 32 | 64;

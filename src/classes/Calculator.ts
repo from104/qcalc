@@ -1,6 +1,6 @@
 import { match } from 'ts-pattern';
 
-import { BigNumber, Operator, CalculationResult, constants } from './CalculatorTypes';
+import { BigNumber, Operator, CalculationResult, constants, WordSize } from './CalculatorTypes';
 import { CalculatorMath } from './CalculatorMath';
 import { CalculatorHistory } from './CalculatorHistory';
 import { Radix, RadixConverter } from './RadixConverter';
@@ -89,18 +89,14 @@ export class Calculator {
     this.setCurrentNumberToBuffer();
   }
 
-  private _wordSize!: number; // 비트 단위 연산 시 사용할 비트 수
+  private _wordSize!: WordSize; // 비트 단위 연산 시 사용할 비트 수
 
-  get wordSize(): number {
+  get wordSize(): WordSize {
     return this._wordSize;
   }
 
-  set wordSize(value: number) {
-    if ([4, 8, 16, 32, 64].includes(value)) {
-      this._wordSize = value;
-    } else {
-      throw new Error('Invalid word size');
-    }
+  set wordSize(value: WordSize) {
+    this._wordSize = value;
   }
 
   /**
@@ -660,11 +656,11 @@ export class Calculator {
   }
 
   public bitNot(): void {
-    this.performUnaryOperation(Operator.BIT_NOT, () => this.math.bitNot(this.currentNumber));
+    this.performUnaryOperation(Operator.BIT_NOT, () => this.math.bitNot(this.currentNumber, this.wordSize));
   }
 
   public bitComp(): void {
-    this.performUnaryOperation(Operator.BIT_COMP, () => this.math.bitComp(this.currentNumber));
+    this.performUnaryOperation(Operator.BIT_COMP, () => this.math.bitComp(this.currentNumber, this.wordSize));
   }
 
   /**
@@ -682,18 +678,42 @@ export class Calculator {
   }
 
   // 이항 연산자 메서드들
-  public add(): void { this.performBinaryOperation(Operator.ADD); }
-  public sub(): void { this.performBinaryOperation(Operator.SUB); }
-  public mul(): void { this.performBinaryOperation(Operator.MUL); }
-  public div(): void { this.performBinaryOperation(Operator.DIV); }
-  public pow(): void { this.performBinaryOperation(Operator.POW); }
-  public root(): void { this.performBinaryOperation(Operator.ROOT); }
-  public mod(): void { this.performBinaryOperation(Operator.MOD); }
-  public bitSftL(): void { this.performBinaryOperation(Operator.BIT_SFT_L); }
-  public bitSftR(): void { this.performBinaryOperation(Operator.BIT_SFT_R); }
-  public bitAnd(): void { this.performBinaryOperation(Operator.BIT_AND); }
-  public bitOr(): void { this.performBinaryOperation(Operator.BIT_OR); }
-  public bitXor(): void { this.performBinaryOperation(Operator.BIT_XOR); }
+  public add(): void {
+    this.performBinaryOperation(Operator.ADD);
+  }
+  public sub(): void {
+    this.performBinaryOperation(Operator.SUB);
+  }
+  public mul(): void {
+    this.performBinaryOperation(Operator.MUL);
+  }
+  public div(): void {
+    this.performBinaryOperation(Operator.DIV);
+  }
+  public pow(): void {
+    this.performBinaryOperation(Operator.POW);
+  }
+  public root(): void {
+    this.performBinaryOperation(Operator.ROOT);
+  }
+  public mod(): void {
+    this.performBinaryOperation(Operator.MOD);
+  }
+  public bitSftL(): void {
+    this.performBinaryOperation(Operator.BIT_SFT_L);
+  }
+  public bitSftR(): void {
+    this.performBinaryOperation(Operator.BIT_SFT_R);
+  }
+  public bitAnd(): void {
+    this.performBinaryOperation(Operator.BIT_AND);
+  }
+  public bitOr(): void {
+    this.performBinaryOperation(Operator.BIT_OR);
+  }
+  public bitXor(): void {
+    this.performBinaryOperation(Operator.BIT_XOR);
+  }
 
   /**
    * 계산 결과를 히스토리 추가하고 문자열로 반환하는 헬퍼 함수
@@ -722,18 +742,42 @@ export class Calculator {
   }
 
   // 숫자를 직접 사용하는 이항 연산 메서드들
-  public addNumber(n: number): void { this.executeWithNumber(Operator.ADD, n); }
-  public subNumber(n: number): void { this.executeWithNumber(Operator.SUB, n); }
-  public mulNumber(n: number): void { this.executeWithNumber(Operator.MUL, n); }
-  public divNumber(n: number): void { this.executeWithNumber(Operator.DIV, n); }
-  public powNumber(n: number): void { this.executeWithNumber(Operator.POW, n); }
-  public rootNumber(n: number): void { this.executeWithNumber(Operator.ROOT, n); }
-  public modNumber(n: number): void { this.executeWithNumber(Operator.MOD, n); }
-  public bitSftLNumber(n: number): void { this.executeWithNumber(Operator.BIT_SFT_L, n); }
-  public bitSftRNumber(n: number): void { this.executeWithNumber(Operator.BIT_SFT_R, n); }
-  public bitAndNumber(n: number): void { this.executeWithNumber(Operator.BIT_AND, n); }
-  public bitOrNumber(n: number): void { this.executeWithNumber(Operator.BIT_OR, n); }
-  public bitXorNumber(n: number): void { this.executeWithNumber(Operator.BIT_XOR, n); }
+  public addNumber(n: number): void {
+    this.executeWithNumber(Operator.ADD, n);
+  }
+  public subNumber(n: number): void {
+    this.executeWithNumber(Operator.SUB, n);
+  }
+  public mulNumber(n: number): void {
+    this.executeWithNumber(Operator.MUL, n);
+  }
+  public divNumber(n: number): void {
+    this.executeWithNumber(Operator.DIV, n);
+  }
+  public powNumber(n: number): void {
+    this.executeWithNumber(Operator.POW, n);
+  }
+  public rootNumber(n: number): void {
+    this.executeWithNumber(Operator.ROOT, n);
+  }
+  public modNumber(n: number): void {
+    this.executeWithNumber(Operator.MOD, n);
+  }
+  public bitSftLNumber(n: number): void {
+    this.executeWithNumber(Operator.BIT_SFT_L, n);
+  }
+  public bitSftRNumber(n: number): void {
+    this.executeWithNumber(Operator.BIT_SFT_R, n);
+  }
+  public bitAndNumber(n: number): void {
+    this.executeWithNumber(Operator.BIT_AND, n);
+  }
+  public bitOrNumber(n: number): void {
+    this.executeWithNumber(Operator.BIT_OR, n);
+  }
+  public bitXorNumber(n: number): void {
+    this.executeWithNumber(Operator.BIT_XOR, n);
+  }
   private executeWithNumber(operator: Operator, n: number): void {
     this.performBinaryOperation(operator);
     this.setCurrentNumber(n.toString());
