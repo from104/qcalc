@@ -128,7 +128,6 @@
       <q-tab-panels
         v-model="storeBase.cTab"
         animated
-        keep-alive
         infinite
         :swipeable="$q.platform.is.mobile"
       >

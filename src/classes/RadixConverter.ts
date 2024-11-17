@@ -301,7 +301,7 @@ export class RadixConverter {
         const digitValue = parseInt(currentDigit, radixValue);
 
         // 현재 자릿수의 가중치 계산: value / (radix^position)
-        const weightedValue = MathB.divide(BigNumber(digitValue), MathB.pow(radixValue, position + 1)) as typeBigNumber;
+        const weightedValue = MathB.divide(BigNumber(digitValue), MathB.pow(BigNumber(radixValue), position + 1)) as typeBigNumber;
 
         // 누적값에 현재 자릿수의 가중치를 더함
         return MathB.add(accumulator, weightedValue);
