@@ -1,12 +1,18 @@
 <script setup lang="ts">
-  import { onMounted, onBeforeUnmount, ref, watch, reactive, computed } from 'vue';
+  import { onMounted, onBeforeUnmount, ref, watch, reactive, computed, nextTick } from 'vue';
   import { useQuasar, colors } from 'quasar';
   import { useI18n } from 'vue-i18n';
+
   import { Haptics, ImpactStyle } from 'capacitor/@capacitor/haptics';
-  import { useStoreSettings } from 'src/stores/store-settings';
+
+  import { KeyBinding, KeyBindings } from 'classes/KeyBinding';
+  import { Radix } from 'classes/RadixConverter';
+
   import { useStoreBase } from 'src/stores/store-base';
+  import { useStoreSettings } from 'src/stores/store-settings';
   import { useStoreNotifications } from 'src/stores/store-notifications';
   import { useStoreUtils } from 'src/stores/store-utils';
+  import { useStoreRadix } from 'src/stores/store-radix';
 
   // Quasar 인스턴스 및 색상 유틸리티 초기화
   const $q = useQuasar();
@@ -24,6 +30,7 @@
   const storeSettings = useStoreSettings();
   const storeBase = useStoreBase();
   const storeNotifications = useStoreNotifications();
+  const storeRadix = useStoreRadix();
   const storeUtils = useStoreUtils();
 
   // 스토어에서 필요한 메서드 추출
@@ -37,23 +44,24 @@
     toggleButtonShift,
   } = storeBase;
   const { notifyError, notifyMsg } = storeNotifications;
+  const { convertRadix } = storeRadix;
   const { clickButtonById } = storeUtils;
 
   // 햅틱 피드백 함수
-  const impactLight = async () => {
+  const hapticFeedbackLight = async () => {
     if ($q.platform.is.capacitor && storeSettings.hapticsMode) {
       await Haptics.impact({ style: ImpactStyle.Light });
     }
   };
 
-  const impactMedium = async () => {
+  const hapticFeedbackMedium = async () => {
     if ($q.platform.is.capacitor && storeSettings.hapticsMode) {
       await Haptics.impact({ style: ImpactStyle.Medium });
     }
   };
 
   // 에러 처리 함수
-  const funcWithError = (func: () => void) => {
+  const executeActionWithErrorHandling = (action: () => void) => {
     const errorMessages: { [key: string]: string } = {
       'Cannot divide by zero.': 'cannotDivideByZero',
       'The square root of a negative number is not allowed.': 'squareRootOfANegativeNumberIsNotAllowed',
@@ -61,7 +69,7 @@
       'No memory to recall.': 'noMemoryToRecall',
     };
     try {
-      func();
+      action();
     } catch (e: unknown) {
       if (e instanceof Error) {
         if (errorMessages[e.message]) {
@@ -74,25 +82,25 @@
   };
 
   // 버튼 색상 정의
-  const buttonColors: { [key: string]: string } = {
+  const calculatorButtonColors: { [key: string]: string } = {
     important: '#cb9247',
     function: '#1d8fb6',
     normal: '#5e9e7d',
   };
 
-  const buttonShiftPressedColor = lighten(buttonColors.important, -30);
+  const shiftButtonPressedColor = lighten(calculatorButtonColors.important, -30);
 
   // 버튼 타입 정의
-  type CalculatorButton = {
+  type CalculatorButtonDefinition = {
     [id: string]: [label: string, color: string, keys: string[], action: () => void, isDisabled: boolean];
   };
 
-  type CalculatorMode = {
-    [key in 'unit' | 'currency' | 'radix']: CalculatorButton;
+  type CalculatorModeButtons = {
+    [key in 'unit' | 'currency' | 'radix']: CalculatorButtonDefinition;
   };
 
   // prettier-ignore
-  const commonButtons: CalculatorButton = {
+  const standardButtons: CalculatorButtonDefinition = {
     a1: ['x²', 'function', ['Control+q'], () => calc.pow2(), false],
     b1: ['√x', 'function', ['Control+w'], () => calc.sqrt(), false],
     c1: ['C', 'important', ['Control+e', 'Delete', 'Escape'], () => calc.reset(), false],
@@ -120,7 +128,7 @@
   };
 
   // prettier-ignore
-  const specializedButtons: CalculatorMode = {
+  const modeSpecificButtons: CalculatorModeButtons = {
     unit: {},
     currency: {},
     radix: {
@@ -132,60 +140,87 @@
     },
   };
 
-const activeButtons = computed(() => {
-  const transformButtons = (buttons: CalculatorButton) => {
+  // mainRadix의 변경을 감지하는 computed 속성 추가
+  const currentRadixBase = computed(() => {
+    return {
+      [Radix.Binary]: 2,
+      [Radix.Octal]: 8,
+      [Radix.Decimal]: 10,
+      [Radix.Hexadecimal]: 16,
+    }[storeRadix.mainRadix] ?? 10;
+  });
+
+  // isButtonDisabledForBase 함수를 computed 속성 사용하도록 수정
+  const isButtonDisabledForCurrentBase = (label: string) => {
+    if (props.type !== 'radix') return false;
+
+    const value = label.match(/^[0-9A-F]+$/)?.[0];
+    if (!value) return false;
+    
+    return Number(convertRadix(value, Radix.Hexadecimal, Radix.Decimal)) >= currentRadixBase.value;
+  };
+
+  // 버튼 변환 함수 추출
+  const transformButtonDefinitions = (buttons: CalculatorButtonDefinition) => {
     return Object.fromEntries(
       Object.entries(buttons).map(([id, [label, color, keys, action, isDisabled]]) => [
         id,
-        { label, color, keys, action, isDisabled },
-      ])
+        { label, color, shortcutKeys: keys, action, isDisabled: isDisabled || isButtonDisabledForCurrentBase(label) },
+      ]),
     );
   };
 
-  return {
-    ...transformButtons(commonButtons),
-    ...transformButtons(specializedButtons[props.type as keyof typeof specializedButtons] ?? {}),
+  // 활성화된 버튼 계산 함수
+  const calculateActiveButtonSet = () => {
+    const modeSpecificButtonsForType = modeSpecificButtons[props.type as keyof typeof modeSpecificButtons] ?? {};
+    
+    return {
+      ...transformButtonDefinitions(standardButtons),
+      ...transformButtonDefinitions(modeSpecificButtonsForType),
     };
-  });
+  };
 
-  type AddedButtonFunction = {
+  // activeButtons를 ref로 변경
+  const activeButtonSet = reactive(calculateActiveButtonSet());
+
+  type ExtendedButtonFunction = {
     [key: string]: [label: string, shortcutKeys: string[], action: () => void, isDisabled: boolean];
   };
 
-  type AddedButtonFunctionType = {
-    [key in 'unit' | 'currency' | 'radix']: AddedButtonFunction;
+  type ExtendedButtonFunctionsByMode = {
+    [key in 'unit' | 'currency' | 'radix']: ExtendedButtonFunction;
   };
 
   // 공통으로 사용할 기본 버튼 기능
   // prettier-ignore
-  const additionalButtonFunctions: AddedButtonFunction = {
+  const standardExtendedFunctions: ExtendedButtonFunction = {
     a1: ['xⁿ', ['Shift+Control+q'], () => calc.pow(), false],
     b1: ['ⁿ√x', ['Shift+Control+w'], () => calc.root(), false],
     c1: ['MC', ['Shift+Control+e', 'Shift+Delete', 'Shift+Escape'], () => calc.memoryClear(), false],
-    d1: [ 'MR', ['Shift+Backspace', 'Shift+Control+r'], () => { calc.memoryRecall(); showMemory(); }, false ],
+    d1: [ 'MR', ['Shift+Backspace', 'Shift+Control+r'], () => { calc.memoryRecall(); displayMemoryStatus(); }, false ],
     a2: ['10ⁿ', ['Shift+Control+a'], () => calc.exp10(), false],
     b2: ['x%y', ['Shift+Control+s'], () => calc.mod(), false],
     c2: ['x!', ['Shift+Control+d'], () => calc.fct(), false],
-    d2: [ 'M÷', ['Shift+Slash', 'Shift+NumpadDivide'], () => { calc.memoryDiv(); showMemory(); }, false ],
+    d2: [ 'M÷', ['Shift+Slash', 'Shift+NumpadDivide'], () => { calc.memoryDiv(); displayMemoryStatus(); }, false ],
     a3: ['sin', ['Shift+Digit7', 'Shift+Numpad7'], () => calc.sin(), false],
     b3: ['cos', ['Shift+Digit8', 'Shift+Numpad8'], () => calc.cos(), false],
     c3: ['tan', ['Shift+Digit9', 'Shift+Numpad9'], () => calc.tan(), false],
-    d3: [ 'M×', ['Shift+NumpadMultiply'], () => { calc.memoryMul(); showMemory(); }, false ],
+    d3: [ 'M×', ['Shift+NumpadMultiply'], () => { calc.memoryMul(); displayMemoryStatus(); }, false ],
     a4: ['Pi/2', ['Shift+Digit4', 'Shift+Numpad4'], () => calc.setConstant('pi2'), false],
     b4: ['ln10', ['Shift+Digit5', 'Shift+Numpad5'], () => calc.setConstant('ln10'), false],
     c4: ['ln2', ['Shift+Digit6', 'Shift+Numpad6'], () => calc.setConstant('ln2'), false],
-    d4: [ 'M-', ['Shift+Minus', 'Shift+NumpadSubtract'], () => { calc.memorySub(); showMemory(); }, false ],
+    d4: [ 'M-', ['Shift+Minus', 'Shift+NumpadSubtract'], () => { calc.memorySub(); displayMemoryStatus(); }, false ],
     a5: ['Pi', ['Shift+Digit1', 'Shift+Numpad1'], () => calc.setConstant('pi'), false],
     b5: ['phi', ['Shift+Digit2', 'Shift+Numpad2'], () => calc.setConstant('phi'), false],
     c5: ['e', ['Shift+Digit3', 'Shift+Numpad3'], () => calc.setConstant('e'), false],
-    d5: [ 'M+', ['Shift+Plus', 'Shift+NumpadAdd'], () => { calc.memoryAdd(); showMemory(); }, false ],
+    d5: [ 'M+', ['Shift+Plus', 'Shift+NumpadAdd'], () => { calc.memoryAdd(); displayMemoryStatus(); }, false ],
     a6: ['', [], () => null, false],
     b6: ['int', ['Shift+Digit0', 'Shift+Numpad0'], () => calc.int(), false],
     c6: ['frac', ['Shift+Period', 'Shift+NumpadDecimal'], () => calc.frac(), false],
-    d6: [ 'MS', ['Shift+Equal', 'Shift+Enter', 'Shift+NumpadEnter'], () => { calc.memorySave(); showMemory(); }, false ],
+    d6: [ 'MS', ['Shift+Equal', 'Shift+Enter', 'Shift+NumpadEnter'], () => { calc.memorySave(); displayMemoryStatus(); }, false ],
   };
 
-  const buttonsAddedFuncByCategory: AddedButtonFunctionType = {
+  const modeSpecificExtendedFunctions: ExtendedButtonFunctionsByMode = {
     unit: {
       a2: ['×2', ['Shift+Control+a'], () => calc.mulNumber(2), false],
       b2: ['×3', ['Shift+Control+s'], () => calc.mulNumber(3), false],
@@ -219,7 +254,7 @@ const activeButtons = computed(() => {
       b1: ['x>>1', ['Shift+Control+w'], () => calc.bitSftRNumber(1), false],
       a2: ['x<<4', ['Shift+Control+a'], () => calc.bitSftLNumber(4), false],
       b2: ['x>>4', ['Shift+Control+s'], () => calc.bitSftRNumber(4), false],
-      c2: ['~x', ['Shift+Control+d'], () => calc.bitNot(), false],
+      c2: ['!x', ['Shift+Control+d'], () => calc.bitNot(), false],
       a4: ['D', ['Shift+Digit4', 'Shift+Numpad4'], () => calc.addDigit('D'), false],
       b4: ['E', ['Shift+Digit5', 'Shift+Numpad5'], () => calc.addDigit('E'), false],
       c4: ['F', ['Shift+Digit6', 'Shift+Numpad6'], () => calc.addDigit('F'), false],
@@ -229,26 +264,34 @@ const activeButtons = computed(() => {
     },
   };
 
-  // prop type에 따라 적절한 버튼 기능 선택
-  const transformAddedButtonFunctions = (buttons: AddedButtonFunction) => {
+  // 추가 버튼 기능 변환 함수
+  const transformExtendedFunctions = (buttons: ExtendedButtonFunction) => {
     return Object.fromEntries(
       Object.entries(buttons).map(([id, [label, shortcutKeys, action, isDisabled]]) => [
         id,
-        { label, shortcutKeys, action, isDisabled },
-      ])
+        { label, shortcutKeys, action, isDisabled: isDisabled || isButtonDisabledForCurrentBase(label) },
+      ]),
     );
   };
 
-  const addedButtonFunctions = computed(() => ({
-    ...transformAddedButtonFunctions(additionalButtonFunctions),
-    ...transformAddedButtonFunctions(buttonsAddedFuncByCategory[props.type as keyof typeof buttonsAddedFuncByCategory] ?? {}),
-  }));
+  // 활성화된 추가 버튼 기능 계산 함수
+  const calculateExtendedFunctionSet = () => {
+    const categoryButtons = modeSpecificExtendedFunctions[props.type as keyof typeof modeSpecificExtendedFunctions] ?? {};
+    
+    return {
+      ...transformExtendedFunctions(standardExtendedFunctions),
+      ...transformExtendedFunctions(categoryButtons),
+    };
+  };
 
-  type ButtonID = keyof typeof additionalButtonFunctions;
+  // addedButtonFunctions를 ref로 변경
+  const extendedFunctionSet = reactive(calculateExtendedFunctionSet());
+
+  type ButtonID = keyof typeof standardExtendedFunctions;
 
   // 버튼 클릭 시 알림 표시 함수
-  const showButtonNotify = (id: ButtonID) => {
-    const buttonFunc = addedButtonFunctions.value[id];
+  const displayButtonNotification = (id: ButtonID) => {
+    const buttonFunc = extendedFunctionSet[id];
     if (buttonFunc.label === 'MC') {
       notifyMsg(t('memoryCleared'));
     } else if (buttonFunc.label === 'MR' && !calc.isMemoryReset) {
@@ -257,30 +300,32 @@ const activeButtons = computed(() => {
   };
 
   // 시프트 버튼의 ID 찾기
-  const shiftID = computed(() =>
-    Object.keys(addedButtonFunctions.value).find((key) => addedButtonFunctions.value[key].label === ''),
+  const shiftButtonId = computed(() =>
+    Object.keys(extendedFunctionSet).find((key) => extendedFunctionSet[key].label === ''),
   );
 
   // 추가 기능 툴팁 표시를 위한 타이머 상태 객체
-  const timersOfTooltip: { [id: string]: boolean } = reactive(
-    Object.fromEntries(Object.keys(activeButtons.value).map((id) => [id, false])),
+  const tooltipTimers: { [id: string]: boolean } = reactive(
+    Object.fromEntries(Object.keys(activeButtonSet).map((id) => [id, false])),
   );
 
   // 추가 기능 툴팁 표시 함수
-  const showTooltipOfFunc = (id: ButtonID) => {
-    if (timersOfTooltip[id] || id === shiftID.value || (!storeSettings.showButtonAddedLabel && storeBase.buttonShift))
+  const displayActionTooltip = (id: ButtonID) => {
+    if (tooltipTimers[id] || id === shiftButtonId.value || (!storeSettings.showButtonAddedLabel && storeBase.buttonShift))
       return;
-    timersOfTooltip[id] = true;
+    tooltipTimers[id] = true;
     setTimeout(() => {
-      timersOfTooltip[id] = false;
+      tooltipTimers[id] = false;
     }, 1000);
   };
 
   // 버튼 시프트 상태에 따른 기능 실행
-  const shiftFunc = (id: ButtonID) => {
-    const isShiftButton = id === shiftID.value;
-    const isDisabled = storeBase.buttonShift ? addedButtonFunctions.value[id].isDisabled : activeButtons.value[id].isDisabled;
-    const action = storeBase.buttonShift ? addedButtonFunctions.value[id].action : activeButtons.value[id].action;
+  const handleShiftFunction = (id: ButtonID) => {
+    const isShiftButton = id === shiftButtonId.value;
+    const isDisabled = storeBase.buttonShift
+      ? extendedFunctionSet[id].isDisabled
+      : activeButtonSet[id].isDisabled;
+    const action = storeBase.buttonShift ? extendedFunctionSet[id].action : activeButtonSet[id].action;
 
     if (isShiftButton) {
       toggleButtonShift();
@@ -289,60 +334,60 @@ const activeButtons = computed(() => {
     }
 
     if (isDisabled) {
-      showDisabledButtonNotify();
+      displayDisabledButtonNotification();
       return;
     }
 
-    funcWithError(action);
+    executeActionWithErrorHandling(action);
 
     if (storeBase.buttonShift) {
-      showTooltipOfFunc(id);
-      showButtonNotify(id);
+      displayActionTooltip(id);
+      displayButtonNotification(id);
       if (!storeBase.buttonShiftLock) offButtonShift();
     }
   };
 
   // 버튼 길게 누르기 기능
-const holdFunc = (id: ButtonID) => {
-  impactMedium();
-  const isShiftButton = id === shiftID.value;
-  const isShiftActive = storeBase.buttonShift;
-  const isShiftLocked = storeBase.buttonShiftLock;
-  if (isShiftButton) {
-    if (isShiftLocked) {
-      offButtonShiftLock();
-    } else {
-      onButtonShiftLock();
+  const handleLongPress = (id: ButtonID) => {
+    hapticFeedbackMedium();
+    const isShiftButton = id === shiftButtonId.value;
+    const isShiftActive = storeBase.buttonShift;
+    const isShiftLocked = storeBase.buttonShiftLock;
+    if (isShiftButton) {
+      if (isShiftLocked) {
+        offButtonShiftLock();
+      } else {
+        onButtonShiftLock();
+      }
+      if (isShiftLocked) {
+        offButtonShift();
+      } else {
+        onButtonShift();
+      }
+      return;
     }
-    if (isShiftLocked) {
-      offButtonShift();
-    } else {
-      onButtonShift();
+
+    const buttonFunctions = isShiftActive ? activeButtonSet : extendedFunctionSet;
+    const buttonAction = buttonFunctions[id].action;
+    const isDisabled = buttonFunctions[id].isDisabled;
+
+    if (isDisabled) {
+      displayDisabledButtonNotification();
+      return;
     }
-    return;
-  }
 
-  const buttonFunctions = isShiftActive ? activeButtons.value : addedButtonFunctions.value;
-  const buttonAction = buttonFunctions[id].action;
-  const isDisabled = buttonFunctions[id].isDisabled;
+    executeActionWithErrorHandling(buttonAction);
 
-  if (isDisabled) {
-    showDisabledButtonNotify();
-    return;
-  }
-
-  funcWithError(buttonAction);
-
-  if (isShiftActive) {
-    if (!isShiftLocked) offButtonShift();
-  } else {
-    showTooltipOfFunc(id);
-    showButtonNotify(id);
-  }
-};
+    if (isShiftActive) {
+      if (!isShiftLocked) offButtonShift();
+    } else {
+      displayActionTooltip(id);
+      displayButtonNotification(id);
+    }
+  };
 
   // 메모리 표시 함수
-  const showMemory = () => {
+  const displayMemoryStatus = () => {
     if (!calc.isMemoryReset) {
       setTimeout(() => {
         showMemoryOnWithTimer();
@@ -351,7 +396,7 @@ const holdFunc = (id: ButtonID) => {
   };
 
   // 키 입력에 따른 버튼 클릭 함수
-  const buttonClickByKey = (id: ButtonID, isShift: boolean) => {
+  const triggerButtonClickByKey = (id: ButtonID, isShift: boolean) => {
     if (isShift) {
       toggleButtonShift();
       setTimeout(() => {
@@ -362,18 +407,17 @@ const holdFunc = (id: ButtonID) => {
     }
   };
 
-  import { KeyBinding, KeyBindings } from 'classes/KeyBinding';
 
   // 주요 키 바인딩 설정
-  const keyBindingsPrimary: KeyBindings = Object.entries(activeButtons.value).map(([id, button]) => [
-    button.keys,
-    () => buttonClickByKey(id, false),
+  const keyBindingsPrimary: KeyBindings = Object.entries(activeButtonSet).map(([id, button]) => [
+    button.shortcutKeys,
+    () => triggerButtonClickByKey(id, false),
   ]);
 
   // 보조 키 바인딩 설정
-  const keyBindingsSecondary: KeyBindings = Object.entries(addedButtonFunctions.value).map(([id, button]) => [
+  const keyBindingsSecondary: KeyBindings = Object.entries(extendedFunctionSet).map(([id, button]) => [
     button.shortcutKeys,
-    () => buttonClickByKey(id, true),
+    () => triggerButtonClickByKey(id, true),
   ]);
 
   // 모든 키 바인딩 통합
@@ -403,85 +447,101 @@ const holdFunc = (id: ButtonID) => {
     { immediate: true },
   );
 
+  // 컴포넌트 최상단에 key를 위한 ref 추가
+  const componentKey = ref(0);
+
+  watch(() => storeRadix.mainRadix, async () => {
+    console.log('mainRadix changed:', storeRadix.mainRadix);
+    Object.assign(activeButtonSet, calculateActiveButtonSet());
+    Object.assign(extendedFunctionSet, calculateExtendedFunctionSet());
+    
+    await nextTick();
+    componentKey.value++;
+    },
+    { immediate: true },
+  );
+
   // 계산기 버튼 높이 설정
   const baseHeight = ref('136px');
   if (['unit', 'currency', 'radix'].includes(props.type)) {
     baseHeight.value = '234px';
   }
 
-  const showDisabledButtonNotify = () => {
+  const displayDisabledButtonNotification = () => {
     notifyMsg(t('disabledButton'));
   };
 </script>
 
 <template>
   <q-card-section
+    :key="componentKey"
     v-touch-swipe:9e-2:12:50.up="() => (storeBase.isHistoryDialogOpen = true)"
     v-touch-swipe:9e-2:12:50.down="() => (storeBase.isSettingDialogOpen = true)"
     v-blur
     class="row wrap justify-center q-pt-xs q-pb-none q-px-none"
   >
-    <div v-for="(button, id) in activeButtons" :key="id" class="col-3 row wrap justify-center q-pa-sm">
+    <div v-for="(button, id) in activeButtonSet" :key="id" class="col-3 row wrap justify-center q-pa-sm">
       <q-btn
         :id="'btn-' + id"
-        v-touch-hold.mouse="() => holdFunc(id)"
+        v-touch-hold.mouse="() => handleLongPress(id)"
         class="shadow-2 noselect col-12 button"
         no-caps
         push
         :label="
-          storeBase.buttonShift && !storeSettings.showButtonAddedLabel && id !== shiftID
-            ? addedButtonFunctions[id].label
+          storeBase.buttonShift && !storeSettings.showButtonAddedLabel && id !== shiftButtonId
+            ? extendedFunctionSet[id].label
             : button.label.charAt(0) === '@'
               ? undefined
               : button.label
         "
         :icon="
-          storeBase.buttonShift && !storeSettings.showButtonAddedLabel && id !== shiftID
+          storeBase.buttonShift && !storeSettings.showButtonAddedLabel && id !== shiftButtonId
             ? undefined
             : button.label.charAt(0) === '@'
               ? button.label.slice(1)
               : undefined
         "
         :class="[
-          storeBase.buttonShift && !storeSettings.showButtonAddedLabel && id !== shiftID
+          storeBase.buttonShift && !storeSettings.showButtonAddedLabel && id !== shiftButtonId
             ? 'char'
             : button.label.charAt(0) === '@'
               ? 'icon'
               : 'char',
-          id === shiftID && storeBase.buttonShift ? 'button-shift' : '',
-          button.isDisabled ? 'disabled-button' : '',
+          id === shiftButtonId && storeBase.buttonShift ? 'button-shift' : '',
+          storeBase.buttonShift && !storeSettings.showButtonAddedLabel && !extendedFunctionSet[id].isDisabled
+            ? ''
+            : button.isDisabled || storeBase.buttonShift
+              ? 'disabled-button'
+              : '',
         ]"
-        
-        :style="[
-          !storeSettings.showButtonAddedLabel || !addedButtonFunctions[id].label ? { paddingTop: '4px' } : {},
-        ]"
+        :style="[!storeSettings.showButtonAddedLabel || !extendedFunctionSet[id].label ? { paddingTop: '4px' } : {}]"
         :color="`btn-${button.color}`"
-        @click="() => button.isDisabled ? showDisabledButtonNotify() : shiftFunc(id)"
-        @touchstart="() => impactLight()"
+        @click="() => (button.isDisabled ? displayDisabledButtonNotification() : handleShiftFunction(id))"
+        @touchstart="() => hapticFeedbackLight()"
       >
         <span
-          v-if="storeSettings.showButtonAddedLabel && addedButtonFunctions[id]"
+          v-if="storeSettings.showButtonAddedLabel && extendedFunctionSet[id]"
           class="top-label"
           :class="[
             `top-label-${button.label.charAt(0) === '@' ? 'icon' : 'char'}`,
-            addedButtonFunctions[id].isDisabled ? 'disabled-button-added-label' : '',
-            storeBase.buttonShift ? 'shifted-button-added-label' : '',
+            extendedFunctionSet[id].isDisabled ? 'disabled-button-added-label' : '',
+            storeBase.buttonShift && !extendedFunctionSet[id].isDisabled ? 'shifted-button-added-label' : '',
           ]"
         >
-          {{ addedButtonFunctions[id].label }}
+          {{ extendedFunctionSet[id].label }}
         </span>
         <q-tooltip
-          :model-value="timersOfTooltip[id]"
+          :model-value="tooltipTimers[id]"
           no-parent-event
           class="noselect"
-          :style="`background: ${buttonColors[button.color]}; border: 2px outset ${buttonColors[button.color]}; border-radius: 10px;`"
+          :style="`background: ${calculatorButtonColors[button.color]}; border: 2px outset ${calculatorButtonColors[button.color]}; border-radius: 10px;`"
           anchor="top middle"
           self="center middle"
           transition-show="jump-up"
           transition-hide="jump-down"
           transition-duration="200"
         >
-          {{ addedButtonFunctions[id].label }}
+          {{ extendedFunctionSet[id].label }}
         </q-tooltip>
       </q-btn>
     </div>
@@ -519,23 +579,23 @@ en:
 
   .icon {
     font-size: calc(min(calc((100vh - v-bind('baseHeight')) / 6 * 0.25), calc((100vw - 40px) / 4 * 0.3)) * 0.8);
-    padding-top: calc(((100vh - v-bind('baseHeight')) / 6 - 15px) * 0.3); /* Lower the content by 4px */
+    padding-top: calc(((100vh - v-bind('baseHeight')) / 6 - 13px) * 0.3); /* Lower the content by 4px */
   }
 
   .char {
     font-size: calc(min(calc((100vh - v-bind('baseHeight')) / 6 * 0.26), calc((100vw - 40px) / 4 * 0.3)) * 1.2);
-    padding-top: calc(((100vh - v-bind('baseHeight')) / 6 - 25px) * 0.3); /* Lower the content by 4px */
+    padding-top: calc(((100vh - v-bind('baseHeight')) / 6 - 29px) * 0.3); /* Lower the content by 4px */
   }
 
   .top-label {
     text-align: center;
     position: absolute;
     font-size: calc(min(calc((100vh - v-bind('baseHeight')) / 6 * 0.26), calc((100vw - 40px) / 4 * 0.3)) * 1.2 * 0.7);
-    color: rgba(255, 255, 255, 0.5);
+    color: rgba(255, 255, 255, 0.7);
   }
 
   .top-label-icon {
-    top: calc(((100vh - v-bind('baseHeight')) / 6) * 0.15 - 9px);
+    top: calc(((100vh - v-bind('baseHeight')) / 6) * 0.15 - 11px);
   }
 
   .top-label-char {
@@ -543,32 +603,32 @@ en:
   }
 
   .bg-btn-important {
-    background: v-bind('buttonColors.important') !important; // 아이콘의 밝은 녹색
+    background: v-bind('calculatorButtonColors.important') !important; // 아이콘의 밝은 녹색
   }
 
   .bg-btn-function {
-    background: v-bind('buttonColors.function') !important; // 아이콘의 밝은 파란색과 어울리게 조정
+    background: v-bind('calculatorButtonColors.function') !important; // 아이콘의 밝은 파란색과 어울리게 조정
   }
 
   .bg-btn-normal {
-    background: v-bind('buttonColors.normal') !important; // 어두운 색
+    background: v-bind('calculatorButtonColors.normal') !important; // 어두운 색
   }
 
   .button-shift {
-    background: v-bind(buttonShiftPressedColor) !important;
+    background: v-bind(shiftButtonPressedColor) !important;
   }
 
   .disabled-button {
     &:deep(.q-btn__content) {
-      color: rgba(255, 255, 255, 0.5) !important;
+      color: rgba(255, 255, 255, 0.4) !important;
     }
   }
-  
+
   .disabled-button-added-label {
     color: rgba(255, 255, 255, 0.3) !important;
   }
 
   .shifted-button-added-label {
-    color: rgba(255, 255, 255, 0.7) !important;
+    color: rgba(255, 255, 255, 0.85) !important;
   }
 </style>
