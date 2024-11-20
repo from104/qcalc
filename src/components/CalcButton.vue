@@ -103,7 +103,7 @@
   const standardButtons: CalculatorButtonDefinition = {
     a1: ['x²', 'function', ['Control+q'], () => calc.pow2(), false],
     b1: ['√x', 'function', ['Control+w'], () => calc.sqrt(), false],
-    c1: ['C', 'important', ['Control+e', 'Delete', 'Escape'], () => calc.reset(), false],
+    c1: ['Ｃ', 'important', ['Control+e', 'Delete', 'Escape'], () => calc.reset(), false],
     d1: ['@mdi-backspace', 'important', ['Backspace', 'Control+r'], () => calc.deleteDigitOrDot(), false],
     a2: ['@mdi-plus-minus-variant', 'function', ['Control+a'], () => calc.changeSign(), false],
     b2: ['%', 'function', ['Control+s'], () => calc.percent(), false],
@@ -170,18 +170,15 @@
     );
   };
 
-  // 활성화된 버튼 계산 함수
-  const calculateActiveButtonSet = () => {
+  // activeButtonSet을 computed로 변경
+  const activeButtonSet = computed(() => {
     const modeSpecificButtonsForType = modeSpecificButtons[props.type as keyof typeof modeSpecificButtons] ?? {};
     
     return {
       ...transformButtonDefinitions(standardButtons),
       ...transformButtonDefinitions(modeSpecificButtonsForType),
     };
-  };
-
-  // activeButtons를 ref로 변경
-  const activeButtonSet = reactive(calculateActiveButtonSet());
+  });
 
   type ExtendedButtonFunction = {
     [key: string]: [label: string, shortcutKeys: string[], action: () => void, isDisabled: boolean];
@@ -274,24 +271,21 @@
     );
   };
 
-  // 활성화된 추가 버튼 기능 계산 함수
-  const calculateExtendedFunctionSet = () => {
+  // extendedFunctionSet을 computed로 변경
+  const extendedFunctionSet = computed(() => {
     const categoryButtons = modeSpecificExtendedFunctions[props.type as keyof typeof modeSpecificExtendedFunctions] ?? {};
     
     return {
       ...transformExtendedFunctions(standardExtendedFunctions),
       ...transformExtendedFunctions(categoryButtons),
     };
-  };
-
-  // addedButtonFunctions를 ref로 변경
-  const extendedFunctionSet = reactive(calculateExtendedFunctionSet());
+  });
 
   type ButtonID = keyof typeof standardExtendedFunctions;
 
   // 버튼 클릭 시 알림 표시 함수
   const displayButtonNotification = (id: ButtonID) => {
-    const buttonFunc = extendedFunctionSet[id];
+    const buttonFunc = extendedFunctionSet.value[id];
     if (buttonFunc.label === 'MC') {
       notifyMsg(t('memoryCleared'));
     } else if (buttonFunc.label === 'MR' && !calc.isMemoryReset) {
@@ -301,12 +295,12 @@
 
   // 시프트 버튼의 ID 찾기
   const shiftButtonId = computed(() =>
-    Object.keys(extendedFunctionSet).find((key) => extendedFunctionSet[key].label === ''),
+    Object.keys(extendedFunctionSet.value).find((key) => extendedFunctionSet.value[key].label === ''),
   );
 
   // 추가 기능 툴팁 표시를 위한 타이머 상태 객체
   const tooltipTimers: { [id: string]: boolean } = reactive(
-    Object.fromEntries(Object.keys(activeButtonSet).map((id) => [id, false])),
+    Object.fromEntries(Object.keys(activeButtonSet.value).map((id) => [id, false])),
   );
 
   // 추가 기능 툴팁 표시 함수
@@ -323,9 +317,9 @@
   const handleShiftFunction = (id: ButtonID) => {
     const isShiftButton = id === shiftButtonId.value;
     const isDisabled = storeBase.buttonShift
-      ? extendedFunctionSet[id].isDisabled
-      : activeButtonSet[id].isDisabled;
-    const action = storeBase.buttonShift ? extendedFunctionSet[id].action : activeButtonSet[id].action;
+      ? extendedFunctionSet.value[id].isDisabled
+      : activeButtonSet.value[id].isDisabled;
+    const action = storeBase.buttonShift ? extendedFunctionSet.value[id].action : activeButtonSet.value[id].action;
 
     if (isShiftButton) {
       toggleButtonShift();
@@ -367,7 +361,7 @@
       return;
     }
 
-    const buttonFunctions = isShiftActive ? activeButtonSet : extendedFunctionSet;
+    const buttonFunctions = isShiftActive ? activeButtonSet.value : extendedFunctionSet.value;
     const buttonAction = buttonFunctions[id].action;
     const isDisabled = buttonFunctions[id].isDisabled;
 
@@ -409,13 +403,13 @@
 
 
   // 주요 키 바인딩 설정
-  const keyBindingsPrimary: KeyBindings = Object.entries(activeButtonSet).map(([id, button]) => [
+  const keyBindingsPrimary: KeyBindings = Object.entries(activeButtonSet.value).map(([id, button]) => [
     button.shortcutKeys,
     () => triggerButtonClickByKey(id, false),
   ]);
 
   // 보조 키 바인딩 설정
-  const keyBindingsSecondary: KeyBindings = Object.entries(extendedFunctionSet).map(([id, button]) => [
+  const keyBindingsSecondary: KeyBindings = Object.entries(extendedFunctionSet.value).map(([id, button]) => [
     button.shortcutKeys,
     () => triggerButtonClickByKey(id, true),
   ]);
@@ -447,20 +441,6 @@
     { immediate: true },
   );
 
-  // 컴포넌트 최상단에 key를 위한 ref 추가
-  const componentKey = ref(0);
-
-  watch(() => storeRadix.mainRadix, async () => {
-    console.log('mainRadix changed:', storeRadix.mainRadix);
-    Object.assign(activeButtonSet, calculateActiveButtonSet());
-    Object.assign(extendedFunctionSet, calculateExtendedFunctionSet());
-    
-    await nextTick();
-    componentKey.value++;
-    },
-    { immediate: true },
-  );
-
   // 계산기 버튼 높이 설정
   const baseHeight = ref('136px');
   if (['unit', 'currency', 'radix'].includes(props.type)) {
@@ -474,7 +454,6 @@
 
 <template>
   <q-card-section
-    :key="componentKey"
     v-touch-swipe:9e-2:12:50.up="() => (storeBase.isHistoryDialogOpen = true)"
     v-touch-swipe:9e-2:12:50.down="() => (storeBase.isSettingDialogOpen = true)"
     v-blur
