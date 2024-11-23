@@ -1,10 +1,14 @@
 import { copyToClipboard } from 'quasar';
 import { defineStore } from 'pinia';
-
-import { useStoreSettings } from './store-settings';
-import { useStoreNotifications } from './store-notifications';
-import { Operator, CalculationResult } from 'src/classes/CalculatorTypes';
 import { match } from 'ts-pattern';
+
+import { useStoreBase } from './store-base';
+import { useStoreSettings } from './store-settings';
+import { useStoreRadix } from './store-radix';
+import { useStoreNotifications } from './store-notifications';
+
+import { Operator, CalculationResult } from 'classes/CalculatorTypes';
+import { RadixConverter, Radix } from 'classes/RadixConverter';
 
 // 유틸리티 관련 상태 및 동작을 관리하는 스토어 정의
 export const useStoreUtils = defineStore('utils', {
@@ -16,10 +20,11 @@ export const useStoreUtils = defineStore('utils', {
   // 액션 정의
   actions: {
     // 숫자에 그룹화 적용
-    numberGrouping(number: string, grouping: number = 3, separator: string = ','): string {
+    numberGrouping(number: string): string {
+      const storeSettings = useStoreSettings();
       const [integer, decimal] = number.split('.');
-      const regex = new RegExp(`\\B(?=(\\d{${grouping}})+(?!\\d))`, 'g');
-      return integer.replace(regex, separator) + (decimal ? `.${decimal}` : '');
+      const regex = new RegExp(`\\B(?=([\\da-fA-F]{${storeSettings.groupingUnit}})+(?![\\da-fA-F]))`, 'g');
+      return integer.replace(regex, ',') + (decimal ? `.${decimal}` : '');
     },
     /**
      * 숫자의 소수점 자릿수를 조정하는 함수
@@ -38,62 +43,81 @@ export const useStoreUtils = defineStore('utils', {
      * formatDecimalPlaces('100.123456789', 2) => '100.12'
      * formatDecimalPlaces('100.123', 5) => '100.12300'
      */
+    /**
+     * 숫자 문자열의 소수점 자릿수를 지정된 값으로 포맷팅하는 메서드
+     * @param number 포맷팅할 숫자 문자열
+     * @param decimalPlaces 표시할 소수점 자릿수 (-1: 모두 표시, 0: 정수만, n: n자리)
+     */
     formatDecimalPlaces(number: string, decimalPlaces: number): string {
-      // 숫자가 비어있으면 빈 문자열 반환
       if (!number) return '';
-
-      // 모든 소수점 자릿수 표시 (decimalPlaces < 0)
       if (decimalPlaces < 0) return number;
-
-      // 정수부만 표시 (0)
       if (decimalPlaces === 0) return number.split('.')[0];
 
-      // 소수점이 없는 경우
+      // 소수점이 없는 경우 처리
       if (!number.includes('.')) {
-        // 소수점 자릿수가 지정된 경우 소수점과 0을 추가
         return decimalPlaces > 0 ? `${number}.${'0'.repeat(decimalPlaces)}` : number;
       }
 
+      // 소수점이 있는 경우 처리
       const [integer, decimal] = number.split('.');
-      
-      // 지정된 자릿수만큼 잘라내기
-      const truncatedDecimal = decimal.slice(0, decimalPlaces);
-      
-      // 부족한 자릿수만큼 0 추가
-      return `${integer}.${truncatedDecimal.padEnd(decimalPlaces, '0')}`;
+      const truncatedDecimal = decimal.slice(0, decimalPlaces).padEnd(decimalPlaces, '0');
+
+      return `${integer}.${truncatedDecimal}`;
     },
 
-    // 숫자를 포맷팅된 문자열로 변환
+    /**
+     * 숫자 문자열을 설정에 따라 포맷팅하여 반환하는 메서드
+     * @param number 포맷팅할 숫자 문자열
+     */
     toFormattedNumber(number: string): string {
+      if (!number) return '';
+
       const storeSettings = useStoreSettings();
-      if (number === '') {
-        return '';
-      }
       const formattedNumber = this.formatDecimalPlaces(number, storeSettings.decimalPlaces);
+
       return storeSettings.useGrouping ? this.numberGrouping(formattedNumber) : formattedNumber;
     },
 
+    // 라디스 모드인 경우 숫자를 10진수로 변환하는 메서드
+    convertIfRadix(num: string): string {
+      const storeBase = useStoreBase();
+      const storeRadix = useStoreRadix();
+      const isRadixMode = storeBase.cTab === 'radix';
+      return isRadixMode ? storeRadix.convertRadix(num, Radix.Decimal, storeRadix.mainRadix) : num;
+    },
+
     // 계산 기록의 왼쪽 부분 생성
-    getLeftSideInHistory(history: CalculationResult, useLineBreak = false): string {
+    getLeftSideInHistory(result: CalculationResult, useLineBreak = false): string {
       const lineBreak = useLineBreak ? '\n' : '';
 
-      const formattedPrev = this.toFormattedNumber(history.previousNumber);
-      const formattedArg = history.argumentNumber ? this.toFormattedNumber(history.argumentNumber) : '';
-      const operator = history.operator || '';
+      const previousNumber = this.convertIfRadix(result.previousNumber);
+      const argumentNumber = result.argumentNumber ? this.convertIfRadix(result.argumentNumber) : '';
+      const formattedPrev = this.toFormattedNumber(previousNumber);
+      const formattedArg = this.toFormattedNumber(argumentNumber);
+      const operator = result.operator || '';
 
       return match(operator)
-        .with(Operator.ADD, Operator.SUB, Operator.MUL, Operator.DIV, Operator.MOD, 
-          (op) => `${formattedPrev}${lineBreak} ${op} ${formattedArg}`)
+        .with(
+          Operator.ADD,
+          Operator.SUB,
+          Operator.MUL,
+          Operator.DIV,
+          Operator.MOD,
+          (op) => `${formattedPrev}${lineBreak} ${op} ${formattedArg}`,
+        )
+        .with(Operator.BIT_NOT, () => `! ${formattedPrev}`)
         .with(Operator.BIT_AND, () => `${formattedPrev}${lineBreak} & ${formattedArg}`)
         .with(Operator.BIT_OR, () => `${formattedPrev}${lineBreak} | ${formattedArg}`)
         .with(Operator.BIT_XOR, () => `${formattedPrev}${lineBreak} ^ ${formattedArg}`)
+        .with(Operator.BIT_NAND, () => `! (${formattedPrev}${lineBreak} & ${formattedArg})`)
+        .with(Operator.BIT_NOR, () => `! (${formattedPrev}${lineBreak} | ${formattedArg})`)
+        .with(Operator.BIT_XNOR, () => `! (${formattedPrev}${lineBreak} ^ ${formattedArg})`)
         .with(Operator.BIT_SFT_R, () => `${formattedPrev}${lineBreak} >> ${formattedArg}`)
         .with(Operator.BIT_SFT_L, () => `${formattedPrev}${lineBreak} << ${formattedArg}`)
-        .with(Operator.BIT_NOT, () => `~ ${formattedPrev}`)
         .with(Operator.POW, () => `${formattedPrev}${lineBreak} ^ ${formattedArg}`)
         .with(Operator.ROOT, () => `${formattedPrev}${lineBreak} ^ (1/${formattedArg})`)
         .with(Operator.PCT, () => {
-          if (Array.isArray(history.operator) && history.operator[1] === Operator.DIV) {
+          if (Array.isArray(result.operator) && result.operator[1] === Operator.DIV) {
             return `${formattedPrev}${lineBreak} / ${formattedArg}${lineBreak} × 100`;
           } else {
             return `${formattedPrev}${lineBreak} × ${formattedArg}%`;
@@ -102,15 +126,22 @@ export const useStoreUtils = defineStore('utils', {
         .with(Operator.REC, () => `1${lineBreak} ÷ ${formattedPrev}`)
         .with(Operator.POW2, () => `${formattedPrev} ^ 2`)
         .with(Operator.EXP10, () => `${this.toFormattedNumber('10')} ^ ${formattedPrev}`)
-        .with(Operator.SQRT, Operator.SIN, Operator.COS, Operator.TAN, 
-              Operator.FCT, Operator.INT, Operator.FRAC, 
-              () => `${operator} ( ${formattedPrev} )`)
+        .with(
+          Operator.SQRT,
+          Operator.SIN,
+          Operator.COS,
+          Operator.TAN,
+          Operator.FCT,
+          Operator.INT,
+          Operator.FRAC,
+          () => `${operator} ( ${formattedPrev} )`,
+        )
         .otherwise(() => formattedPrev);
     },
 
     // 계산 기록의 오른쪽 부분 생성
-    getRightSideInHistory(history: CalculationResult): string {
-      return this.toFormattedNumber(history.resultNumber);
+    getRightSideInHistory(result: CalculationResult): string {
+      return this.toFormattedNumber(this.convertIfRadix(result.resultNumber));
     },
 
     // 현재 포커스된 요소의 포커스 해제

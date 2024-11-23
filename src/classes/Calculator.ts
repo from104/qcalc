@@ -115,6 +115,10 @@ export class Calculator {
     return operator;
   }
 
+  public getOperator(): Operator {
+    return this.operator;
+  }
+
   /**
    * 연산자 관련 상태를 초기화하는 메서드
    *
@@ -165,6 +169,9 @@ export class Calculator {
 
     // 히스토리 관리 객체 생성
     this.history = new CalculatorHistory();
+
+    // shouldResetBuffer 초기화 추가
+    this.setShouldNotResetBuffer();
   }
 
   /**
@@ -507,23 +514,26 @@ export class Calculator {
    */
   private performBinaryOperationCalculation(numberForCalc: string): string {
     // 이전 숫자와 현재 숫자를 BigNumber 객체로 변환
-    const pv = this.previousNumber;
-    const cv = numberForCalc;
+    const prevValue = this.previousNumber;
+    const currentValue = numberForCalc;
 
     // 현재 연산자에 따라 계산 수행
     return match(this.operator)
-      .with(Operator.ADD, () => this.math.add(pv, cv)) // 덧셈 연산
-      .with(Operator.SUB, () => this.math.sub(pv, cv)) // 뺄셈 연산
-      .with(Operator.MUL, () => this.math.mul(pv, cv)) // 곱셈 연산
-      .with(Operator.DIV, () => this.math.div(pv, cv)) // 나눗셈 연산
-      .with(Operator.MOD, () => this.math.mod(pv, cv)) // 나머지 연산
-      .with(Operator.POW, () => this.math.pow(pv, cv)) // 거듭제곱 연산
-      .with(Operator.ROOT, () => this.math.root(pv, cv)) // 루트 연산
-      .with(Operator.BIT_SFT_L, () => this.math.bitShiftLeft(pv, cv, this.wordSize)) // 왼쪽 시프트 연산
-      .with(Operator.BIT_SFT_R, () => this.math.bitShiftRight(pv, cv, this.wordSize)) // 오른쪽 시프트 연산
-      .with(Operator.BIT_AND, () => this.math.bitAnd(pv, cv, this.wordSize))
-      .with(Operator.BIT_OR, () => this.math.bitOr(pv, cv, this.wordSize))
-      .with(Operator.BIT_XOR, () => this.math.bitXor(pv, cv, this.wordSize))
+      .with(Operator.ADD, () => this.math.add(prevValue, currentValue))
+      .with(Operator.SUB, () => this.math.sub(prevValue, currentValue))
+      .with(Operator.MUL, () => this.math.mul(prevValue, currentValue))
+      .with(Operator.DIV, () => this.math.div(prevValue, currentValue))
+      .with(Operator.MOD, () => this.math.mod(prevValue, currentValue))
+      .with(Operator.POW, () => this.math.pow(prevValue, currentValue))
+      .with(Operator.ROOT, () => this.math.root(prevValue, currentValue))
+      .with(Operator.BIT_SFT_L, () => this.math.bitShiftLeft(prevValue, currentValue, this.wordSize))
+      .with(Operator.BIT_SFT_R, () => this.math.bitShiftRight(prevValue, currentValue, this.wordSize))
+      .with(Operator.BIT_AND, () => this.math.bitAnd(prevValue, currentValue, this.wordSize))
+      .with(Operator.BIT_OR, () => this.math.bitOr(prevValue, currentValue, this.wordSize))
+      .with(Operator.BIT_XOR, () => this.math.bitXor(prevValue, currentValue, this.wordSize))
+      .with(Operator.BIT_NAND, () => this.math.bitNand(prevValue, currentValue, this.wordSize))
+      .with(Operator.BIT_NOR, () => this.math.bitNor(prevValue, currentValue, this.wordSize))
+      .with(Operator.BIT_XNOR, () => this.math.bitXnor(prevValue, currentValue, this.wordSize))
       .otherwise(() => this.previousNumber); // 기본값으로 이전 숫자 반환
   }
 
@@ -659,10 +669,6 @@ export class Calculator {
     this.performUnaryOperation(Operator.BIT_NOT, () => this.math.bitNot(this.currentNumber, this.wordSize));
   }
 
-  public bitComp(): void {
-    this.performUnaryOperation(Operator.BIT_COMP, () => this.math.bitComp(this.currentNumber, this.wordSize));
-  }
-
   /**
    * 이항 연산을 수행하는 공통 메서드
    */
@@ -713,6 +719,15 @@ export class Calculator {
   }
   public bitXor(): void {
     this.performBinaryOperation(Operator.BIT_XOR);
+  }
+  public bitNand(): void {
+    this.performBinaryOperation(Operator.BIT_NAND);
+  }
+  public bitNor(): void {
+    this.performBinaryOperation(Operator.BIT_NOR);
+  }
+  public bitXnor(): void {
+    this.performBinaryOperation(Operator.BIT_XNOR);
   }
 
   /**
@@ -777,6 +792,15 @@ export class Calculator {
   }
   public bitXorNumber(n: number): void {
     this.executeWithNumber(Operator.BIT_XOR, n);
+  }
+  public bitNandNumber(n: number): void {
+    this.executeWithNumber(Operator.BIT_NAND, n);
+  }
+  public bitNorNumber(n: number): void {
+    this.executeWithNumber(Operator.BIT_NOR, n);
+  }
+  public bitXnorNumber(n: number): void {
+    this.executeWithNumber(Operator.BIT_XNOR, n);
   }
   private executeWithNumber(operator: Operator, n: number): void {
     this.performBinaryOperation(operator);

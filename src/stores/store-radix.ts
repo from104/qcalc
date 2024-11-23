@@ -11,24 +11,25 @@ export const useStoreRadix = defineStore('radix', {
   state: () => ({
     wordSize: 32 as WordSize, // 비트 크기
     radixList: Object.values(Radix), // 진법 목록
-    mainRadix: Radix.Decimal, // 기본 진법
-    subRadix: Radix.Hexadecimal, // 보조 진법
+    mainRadix: Radix.Decimal as RadixType, // 기본 진법
+    subRadix: Radix.Hexadecimal as RadixType, // 보조 진법
   }),
 
   // 액션 정의
   actions: {
     // 최근 진법 초기화
     initRecentRadix() {
-      if (!Object.values(Radix).includes(this.mainRadix)) {
+      const radixValues = Object.values(Radix);
+      const isValidRadix = (radix: RadixType) => radixValues.includes(radix);
+
+      if (!isValidRadix(this.mainRadix)) {
         this.mainRadix = Radix.Decimal;
       }
-      if (!Object.values(Radix).includes(this.subRadix)) {
+      if (!isValidRadix(this.subRadix)) {
         this.subRadix = Radix.Hexadecimal;
       }
       if (this.mainRadix === this.subRadix) {
-        const currentIndex = this.radixList.indexOf(this.mainRadix);
-        const nextIndex = (currentIndex + 1) % this.radixList.length;
-        this.subRadix = this.radixList[nextIndex];
+        this.subRadix = this.radixList[(this.radixList.indexOf(this.mainRadix) + 1) % this.radixList.length];
       }
     },
 

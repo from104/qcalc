@@ -49,6 +49,13 @@
       icon: 'currency_exchange',
       action: () => { storeBase.cTab = 'currency'; },
     },
+    radix: {
+      title: t('item.radix.title'),
+      caption: t('item.radix.caption'),
+      shortcut: 'Ctrl-4',
+      icon: 'transform',
+      action: () => { storeBase.cTab = 'radix'; },
+    },
     separator1: { separator: true },
     settings: {
       title: t('item.settings.title'),
@@ -114,6 +121,9 @@ ko:
     currency:
       title: '통화 환전'
       caption: '통화 환전기'
+    radix:
+      title: '진법 변환'
+      caption: '진법 변환기'
     settings:
       title: '설정'
       caption: '설정'
@@ -134,6 +144,9 @@ en:
     currency:
       title: 'Currency Converter'
       caption: 'Currency Converter'
+    radix:
+      title: 'Radix Converter'
+      caption: 'Radix Converter'  
     settings:
       title: 'Settings'
       caption: 'Settings'

@@ -154,13 +154,13 @@
 
 <i18n lang="yaml5">
 ko:
-  calc: 계산기
-  unit: 단위변환
+  calc: 기본
+  unit: 단위
   currency: 환율
-  radix: 진법변환
-en: 
-  calc: Calculator
-  unit: Unit Conversion
-  currency: Currency Exchange
-  radix: Radix Conversion
+  radix: 진법
+en:
+  calc: Basic
+  unit: Unit
+  currency: Currency
+  radix: Radix
 </i18n>

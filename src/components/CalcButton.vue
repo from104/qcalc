@@ -13,6 +13,8 @@
   import { useStoreNotifications } from 'src/stores/store-notifications';
   import { useStoreUtils } from 'src/stores/store-utils';
   import { useStoreRadix } from 'src/stores/store-radix';
+import { BigNumber, Operator } from 'src/classes/CalculatorTypes';
+import { match } from 'ts-pattern';
 
   // Quasar 인스턴스 및 색상 유틸리티 초기화
   const $q = useQuasar();
@@ -90,7 +92,42 @@
 
   const shiftButtonPressedColor = lighten(calculatorButtonColors.important, -30);
 
-  // 버튼 타입 정의
+  // 비트 연산 사전  처리 메서드
+  const bitOperationPreprocessing = (action: () => void, isBinary: boolean = true) => {
+    calc.currentNumber = BigNumber(calc.currentNumber).abs().floor().toString();
+    if (isBinary) {
+      notifyMsg(t('bitOperationPreprocessingReady'));
+    } else {
+      notifyMsg(t('bitOperationPreprocessingCompleted'));
+    }
+
+    action();
+  };
+
+  const equalForBitOperation = () => {
+    const isBitwiseOperationwithBinary =
+      match(calc.getOperator())
+      .with(
+        Operator.BIT_AND,
+        Operator.BIT_OR, 
+        Operator.BIT_XOR, 
+        Operator.BIT_NAND, 
+        Operator.BIT_NOR, 
+        Operator.BIT_XNOR, 
+        Operator.BIT_SFT_L, 
+        Operator.BIT_SFT_R, 
+        () => true,
+      )
+      .otherwise(() => false);
+
+    if (isBitwiseOperationwithBinary) {
+      bitOperationPreprocessing(() => calc.equal(), false);
+    } else {
+      calc.equal();
+    }
+  };
+
+  // 버튼 타입 정의 
   type CalculatorButtonDefinition = {
     [id: string]: [label: string, color: string, keys: string[], action: () => void, isDisabled: boolean];
   };
@@ -124,7 +161,7 @@
     a6: ['@keyboard_capslock', 'important', ["'"], () => null, false],
     b6: ['0', 'normal', ['0'], () => calc.addDigit(0), false],
     c6: ['@mdi-circle-small', 'normal', ['.'], () => calc.addDot(), false],
-    d6: ['@mdi-equal', 'important', ['=', 'Enter'], () => calc.equal(), false],
+    d6: ['@mdi-equal', 'important', ['=', 'Enter'], () => equalForBitOperation(), false],
   };
 
   // prettier-ignore
@@ -132,11 +169,11 @@
     unit: {},
     currency: {},
     radix: {
-      a1: ['x<<y', 'function', ['Control+q'], () => calc.bitSftL(), false],
-      b1: ['x>>y', 'function', ['Control+w'], () => calc.bitSftR(), false],
-      a2: ['x&y', 'function', ['Control+a'], () => calc.bitAnd(), false],
-      b2: ['x|y', 'function', ['Control+s'], () => calc.bitOr(), false],
-      c2: ['x^y', 'function', ['Control+d'], () => calc.bitXor(), false],
+      a1: ['x<<y', 'function', ['Control+q'], () => bitOperationPreprocessing(() => calc.bitSftL()), false],
+      b1: ['x>>y', 'function', ['Control+w'], () => bitOperationPreprocessing(() => calc.bitSftR()), false],
+      a2: ['x&y', 'function', ['Control+a'], () => bitOperationPreprocessing(() => calc.bitAnd()), false],
+      b2: ['x|y', 'function', ['Control+s'], () => bitOperationPreprocessing(() => calc.bitOr()), false],
+      c2: ['x^y', 'function', ['Control+d'], () => bitOperationPreprocessing(() => calc.bitXor()), false],
     },
   };
 
@@ -247,11 +284,14 @@
       c5: ['÷1000', ['Shift+Digit3', 'Shift+Numpad3'], () => calc.divNumber(1000), false],
     },
     radix: {
-      a1: ['x<<1', ['Shift+Control+q'], () => calc.bitSftLNumber(1), false],
-      b1: ['x>>1', ['Shift+Control+w'], () => calc.bitSftRNumber(1), false],
-      a2: ['x<<4', ['Shift+Control+a'], () => calc.bitSftLNumber(4), false],
-      b2: ['x>>4', ['Shift+Control+s'], () => calc.bitSftRNumber(4), false],
-      c2: ['!x', ['Shift+Control+d'], () => calc.bitNot(), false],
+      a1: ['x<<1', ['Shift+Control+q'], () => bitOperationPreprocessing(() => calc.bitSftLNumber(1), false), false],
+      b1: ['x>>1', ['Shift+Control+w'], () => bitOperationPreprocessing(() => calc.bitSftRNumber(1), false), false],
+      a2: ['x<<4', ['Shift+Control+a'], () => bitOperationPreprocessing(() => calc.bitSftLNumber(4), false), false],
+      b2: ['x>>4', ['Shift+Control+s'], () => bitOperationPreprocessing(() => calc.bitSftRNumber(4), false), false],
+      c2: ['!x', ['Shift+Control+d'], () => bitOperationPreprocessing(() => calc.bitNot(), false), false],
+      a3: ['!x&y', ['Shift+Digit7', 'Shift+Numpad7'], () => bitOperationPreprocessing(() => calc.bitNand()), false],
+      b3: ['!x|y', ['Shift+Digit8', 'Shift+Numpad8'], () => bitOperationPreprocessing(() => calc.bitNor()), false],
+      c3: ['!x^y', ['Shift+Digit9', 'Shift+Numpad9'], () => bitOperationPreprocessing(() => calc.bitXnor()), false],
       a4: ['D', ['Shift+Digit4', 'Shift+Numpad4'], () => calc.addDigit('D'), false],
       b4: ['E', ['Shift+Digit5', 'Shift+Numpad5'], () => calc.addDigit('E'), false],
       c4: ['F', ['Shift+Digit6', 'Shift+Numpad6'], () => calc.addDigit('F'), false],
@@ -532,6 +572,8 @@ ko:
   cannotDivideByZero: '0으로 나눌 수 없습니다.'
   squareRootOfANegativeNumberIsNotAllowed: '음수의 제곱근은 허용되지 않습니다.'
   factorialOfANegativeNumberIsNotAllowed: '음수의 팩토리얼은 허용되지 않습니다.'
+  bitOperationPreprocessingCompleted: '비트 연산을 위해 절대값 정수로 계산을 완료되었습니다.'
+  bitOperationPreprocessingReady: '비트 연산을 위해 절대값 정수로 계산을 준비하였습니다.'
   memoryCleared: '메모리를 초기화했습니다.'
   memoryRecalled: '메모리를 불러왔습니다.'
   memorySaved: '메모리에 저장되었습니다.'
@@ -541,6 +583,8 @@ en:
   cannotDivideByZero: 'Cannot divide by zero'
   squareRootOfANegativeNumberIsNotAllowed: 'The square root of a negative number is not allowed.'
   factorialOfANegativeNumberIsNotAllowed: 'The factorial of a negative number is not allowed.'
+  bitOperationPreprocessingCompleted: 'Bit operation preprocessing completed.'
+  bitOperationPreprocessingReady: 'Bit operation preprocessing ready.'
   memoryCleared: 'Memory cleared.'
   memoryRecalled: 'Memory recalled.'
   memorySaved: 'Memory saved.'

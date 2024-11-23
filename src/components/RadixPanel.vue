@@ -5,10 +5,10 @@
   import { Radix } from 'classes/RadixConverter';
   import { useStoreSettings } from 'src/stores/store-settings';
   import { useStoreRadix } from 'src/stores/store-radix';
+  import { useStoreBase } from 'src/stores/store-base';
   import { useStoreUtils } from 'src/stores/store-utils';
 
   import MyTooltip from 'components/MyTooltip.vue';
-import { WordSize } from 'src/classes/CalculatorTypes';
 
   // i18n 설정
   const { t } = useI18n();
@@ -17,21 +17,28 @@ import { WordSize } from 'src/classes/CalculatorTypes';
   const storeSettings = useStoreSettings();
   const storeRadix = useStoreRadix();
   const storeUtils = useStoreUtils();
-
+  const storeBase = useStoreBase();
   // 스토어에서 필요한 메서드 추출
   const { swapRadix, initRecentRadix } = storeRadix;
   const { clickButtonById, setInputBlurred } = storeUtils;
+  const { calc } = storeBase;
 
   // 단위 초기화
   initRecentRadix();
 
-  // 언어 변경 시 통화 이름 업데이트
-  watch([() => storeSettings.locale], () => {});
+  // 언어 변경 시 비트 표시 업데이트
+  watch([() => storeSettings.locale], () => {
+    wordSizeOptions.values.forEach((option, index) => {
+      const value = index === 0 ? '∞' : (option.value).toString();
+      option.label = `${value} ${t('bit')}`;
+    });
+  });
 
   // 키 바인딩 설정
   const keyBinding = new KeyBinding([
     [['Alt+w'], () => clickButtonById('btn-swap-radix')],
-    [['Alt+y'], () => storeSettings.toggleShowSymbol()],
+    [['Alt+y'], () => storeSettings.toggleShowRadix()],
+    [['Ctrl+Alt+y'], () => storeSettings.setRadixType(storeSettings.radixType == 'prefix' ? 'suffix' : 'prefix')],
   ]);
 
   // 입력 포커스에 따른 키 바인딩 활성화/비활성화
@@ -65,13 +72,10 @@ import { WordSize } from 'src/classes/CalculatorTypes';
 
   // 워드사이즈 옵션 초기화
   const wordSizeOptions = reactive({
-    values: [
-      { value: 4, label: '4 bit' },
-      { value: 8, label: '8 bit' },
-      { value: 16, label: '16 bit' },
-      { value: 32, label: '32 bit' },
-      { value: 64, label: '64 bit' },
-    ],
+    values: [0, 4, 8, 16, 32, 64].map(value => ({
+      value,
+      label: `${value || '∞'} ${t('bit')}`
+    })),
   } as { values: WordSizeOption[] });
 
   // 진법 옵션 타입 정의
@@ -108,10 +112,10 @@ import { WordSize } from 'src/classes/CalculatorTypes';
         label: t(`radixLabel.${radix}`),
         disable: storeRadix.mainRadix === radix,
       }));
+      calc.radix = storeRadix.mainRadix;
     },
     { immediate: true },
   );
-
 </script>
 
 <template>
@@ -130,7 +134,7 @@ import { WordSize } from 'src/classes/CalculatorTypes';
       :label-color="!storeSettings.darkMode ? 'primary' : 'grey-1'"
       :class="!storeSettings.darkMode ? 'bg-blue-grey-2' : 'bg-blue-grey-6'"
       :popup-content-class="!storeSettings.darkMode ? 'bg-blue-grey-2' : 'bg-blue-grey-6'"
-      class="col-3 q-pa-none q-pl-xs shadow-2"
+      class="col-3 q-pa-none shadow-2"
       :options-selected-class="!storeSettings.darkMode ? 'text-primary' : 'text-grey-1'"
       @update:model-value="storeRadix.setWordSize($event)"
     />
@@ -193,6 +197,19 @@ import { WordSize } from 'src/classes/CalculatorTypes';
   </q-card-section>
 </template>
 
+<style scoped lang="scss">
+  $left: 2px;
+  :deep(.q-field__control) {
+    padding-left: $left !important;
+    font-size: 0.81rem;
+    .q-field__native {
+      padding-left: $left !important;
+    }
+    .q-field__append {
+      padding-left: $left !important;
+    }
+  }
+</style>
 <i18n lang="yaml5">
   ko:
     tooltipSwap: 진법 바꾸기
@@ -204,6 +221,7 @@ import { WordSize } from 'src/classes/CalculatorTypes';
       main: 변환 전
       sub: 변환 후
       wordSize: 워드크기
+    bit: 비트
   en:
     tooltipSwap: Swap Radix
     radixLabel:
@@ -214,4 +232,5 @@ import { WordSize } from 'src/classes/CalculatorTypes';
       main: Before
       sub: After
       wordSize: Word Size
+    bit: Bit
 </i18n>

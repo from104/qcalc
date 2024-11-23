@@ -62,7 +62,9 @@ export enum Operator {
   BIT_OR = 'bitOr',
   BIT_XOR = 'bitXor',
   BIT_NOT = 'bitNot',
-  BIT_COMP = 'bitComp',
+  BIT_NAND = 'bitNand',
+  BIT_NOR = 'bitNor',
+  BIT_XNOR = 'bitXnor',
   REC = 'rec',
   SQRT = 'sqrt',
   POW2 = 'pow2',
@@ -112,4 +114,4 @@ export interface CalculationResult {
   resultNumber: string;
 }
 
-export type WordSize = 4 | 8 | 16 | 32 | 64;
+export type WordSize = 0 | 4 | 8 | 16 | 32 | 64;

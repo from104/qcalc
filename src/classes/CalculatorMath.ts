@@ -200,7 +200,9 @@ export class CalculatorMath {
    */
   public truncateToBitSize(a: string, wordSize: number = 8): string {
     this.validateNonNegativeNumbers(a);
-    return BigNumber(a).mod(BigNumber(2).pow(wordSize)).floor().toString();
+    return wordSize === 0
+      ? BigNumber(a).floor().toString()
+      : BigNumber(a).mod(BigNumber(2).pow(wordSize)).floor().toString();
   }
 
   /**
@@ -316,21 +318,33 @@ export class CalculatorMath {
     this.validateNonNegativeNumbers(a);
     const binary = convertRadix(this.int(this.abs(a)), Radix.Decimal, Radix.Binary);
     // 워드 사이즈에 맞게 이진수 패딩
-    const paddedBinary = binary.padStart(wordSize, '0');
+    const paddedBinary = binary.padStart(Math.max(binary.length, wordSize), '0');
 
     const invertedBinary = [...paddedBinary].map((bit) => (bit === '1' ? '0' : '1')).join('');
 
-    return convertRadix(invertedBinary, Radix.Binary, Radix.Decimal);
+    return this.truncateToBitSize(
+      convertRadix(invertedBinary, Radix.Binary, Radix.Decimal),
+      wordSize,
+    );
   }
 
   /**
-   * 2의 보수 연산을 수행하는 메서드
-   * @param a 2의 보수를 구할 숫자 (문자열)
+   * NAND, NOR, NXOR 비트 연산을 수행하는 메서드
+   * @param a 첫 번째 숫자 (문자열)
+   * @param b 두 번째 숫자 (문자열)
    * @param wordSize 비트 크기 (기본값: 8)
-   * @returns 2의 보수 연산 결과 (문자열)
+   * @returns 비트 연산 결과 (문자열)
    */
-  public bitComp(a: string, wordSize: number = 8): string {
-    this.validateNonNegativeNumbers(a);
-    return this.truncateToBitSize(this.add(this.bitNot(a, wordSize), '1'), wordSize);
+
+  public bitNand(a: string, b: string, wordSize: number = 8): string {
+    return this.bitNot(this.bitAnd(a, b, wordSize), wordSize);
+  }
+
+  public bitNor(a: string, b: string, wordSize: number = 8): string {
+    return this.bitNot(this.bitOr(a, b, wordSize), wordSize);
+  }
+
+  public bitXnor(a: string, b: string, wordSize: number = 8): string {
+    return this.bitNot(this.bitXor(a, b, wordSize), wordSize);
   }
 }

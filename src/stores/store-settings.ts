@@ -5,19 +5,24 @@ import { Dark } from 'quasar';
 export const useStoreSettings = defineStore('settings', {
   // 상태 정의
   state: () => ({
-    darkMode: false,           // 다크 모드 상태
-    alwaysOnTop: false,        // 항상 위에 표시 상태
-    useGrouping: true,         // 숫자 그룹화 사용 여부
-    decimalPlaces: -2,         // 소수점 자릿수 (-2는 자동)
-    useSystemLocale: true,     // 시스템 로케일 사용 여부
-    locale: '',                // 현재 로케일
-    userLocale: '',            // 사용자 지정 로케일
-    initPanel: false,          // 초기 패널 표시 여부
-    showUnit: true,            // 단위 표시 여부
-    showSymbol: true,          // 기호 표시 여부
-    paddingOnResult: 20,       // 결과 패딩 값
+    darkMode: false, // 다크 모드 상태
+    alwaysOnTop: false, // 항상 위에 표시 상태
+    useGrouping: true, // 숫자 그룹화 사용 여부
+    groupingUnit: 3 as 3 | 4, // 숫자 그룹화 단위 갯수 (3, 4)
+    decimalPlaces: -2, // 소수점 자릿수 (-2는 자동)
+    useSystemLocale: true, // 시스템 로케일 사용 여부
+    locale: '', // 현재 로케일
+    userLocale: '', // 사용자 지정 로케일
+    initPanel: false, // 초기 패널 표시 여부
+    showUnit: true, // 단위 표시 여부
+    showSymbol: true, // 기호 표시 여부
+    // 진법 표시 방법 (기본, 접두사, 접미사)
+    showRadix: true,
+    // 진법 표시 형식 - 앞에(0xff, 0o765, 0b1010 등), 뒤에(ff(16), 765(8), 1010(2) 등)
+    radixType: 'prefix' as 'prefix' | 'suffix',
+    paddingOnResult: 20, // 결과 패딩 값
     showButtonAddedLabel: true, // 버튼 추가 레이블 표시 여부
-    hapticsMode: true,         // 햅틱 피드백 모드
+    hapticsMode: true, // 햅틱 피드백 모드
   }),
 
   // 액션 정의
@@ -59,6 +64,11 @@ export const useStoreSettings = defineStore('settings', {
       this.useGrouping = !this.useGrouping;
     },
 
+    // 숫자 그룹화 단위 설정
+    setGroupingUnit(groupingUnit: 3 | 4) {
+      this.groupingUnit = groupingUnit;
+    },
+
     // 버튼 추가 레이블 표시 토글
     toggleButtonAddedLabel() {
       this.showButtonAddedLabel = !this.showButtonAddedLabel;
@@ -89,6 +99,16 @@ export const useStoreSettings = defineStore('settings', {
     // 기호 표시 토글
     toggleShowSymbol(): void {
       this.showSymbol = !this.showSymbol;
+    },
+
+    // 진법 표시 토글
+    toggleShowRadix(): void {
+      this.showRadix = !this.showRadix;
+    },
+
+    // 진법 표시 형식 설정
+    setRadixType(radixType: 'prefix' | 'suffix'): void {
+      this.radixType = radixType;
     },
 
     // 햅틱 피드백 모드 설정

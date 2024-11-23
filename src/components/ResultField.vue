@@ -38,7 +38,7 @@
 
   // 스토어에서 필요한 메서드와 속성 추출
   const { calc, cTab, showMemoryOff, showMemoryOnWithTimer } = storeBase;
-  const { toFormattedNumber, getLeftSideInHistory, copyToClipboard } = storeUtils;
+  const { toFormattedNumber, convertIfRadix, getLeftSideInHistory, copyToClipboard } = storeUtils;
   const { initRecentCategoryAndUnit } = storeUnit;
   const { initRecentCurrency, currencyConverter } = storeCurrency;
   const { convertRadix, initRecentRadix } = storeRadix;
@@ -189,23 +189,42 @@
    * 진법 표시를 위한 계산된 속성
    * 현재 탭이 radix일 경우에만 진법을 표시
    */
-  const radix = computed(() => {
-    if (cTab !== 'radix') return '';
+  const radixPrefix = computed(() => {
+    return cTab === 'radix' && storeSettings.showRadix && storeSettings.radixType === 'prefix'
+      ? {
+          [Radix.Binary]: '0b',
+          [Radix.Octal]: '0o',
+          [Radix.Hexadecimal]: '0x',
+          [Radix.Decimal]: '',
+        }[isMainField.value ? storeRadix.mainRadix : storeRadix.subRadix]
+      : '';
+  });
 
-    const selectedRadix = isMainField.value ? storeRadix.mainRadix : storeRadix.subRadix;
+  const radixSuffix = computed(() => {
+    return cTab === 'radix' && storeSettings.showRadix && storeSettings.radixType === 'suffix'
+      ? {
+          [Radix.Binary]: '2',
+          [Radix.Octal]: '8',
+          [Radix.Hexadecimal]: '16',
+          [Radix.Decimal]: '10',
+        }[isMainField.value ? storeRadix.mainRadix : storeRadix.subRadix]
+      : '';
+  });
 
-    switch (selectedRadix) {
-      case Radix.Binary:
-        return '2';
-      case Radix.Octal:
-        return '8';
-      case Radix.Hexadecimal:
-        return '16';
-      case Radix.Decimal:
-        return '10';
-      default:
-        return '';
-    }
+  const displayedResult = computed(
+    () => {
+      // 진법 접두사, 기호, 결과값, 단위를 순서대로 연결
+      const baseString = `${radixPrefix.value}${symbol.value}${result.value}${unit.value}`;
+
+      // 진법 접미사 조건 확인
+      const shouldShowSuffix = cTab === 'radix' &&
+        storeSettings.showRadix &&
+        storeSettings.radixType === 'suffix';
+
+      // 진법 접미사 추가 여부에 따라 최종 문자열 반환                       
+      return shouldShowSuffix
+        ? `${baseString}(${radixSuffix.value})`
+        : baseString;
   });
 
   /**
@@ -213,20 +232,39 @@
    * 필드와 애드온 타입에 따라 적절한 숫자를 반환
    */
   const onlyNumber = computed(() => {
-    // 메인 필드인 경우 현재 입력된 숫자 반환
+    // 진법 모드에서 접두사/접미사를 포함한 결과 문자열 생성
+    const getRadixResult = (number: string) => {
+      const prefix = radixPrefix.value;
+      const suffix = radixSuffix.value;
+      const suffixString = suffix ? `(${suffix})` : '';
+      return `${prefix}${number}${suffixString}`;
+    };
+
+    // 메인 필드 처리
     if (props.field === 'main') {
+      if (props.addon === 'radix') {
+        const convertedNumber = convertRadix(
+          calc.getCurrentNumber(), 
+          Radix.Decimal, 
+          storeRadix.mainRadix
+        );
+        return getRadixResult(convertedNumber);
+      }
       return calc.getCurrentNumber();
     }
 
-    // 애드온 타입에 따른 변환된 숫자 반환
-    const addonTypeMap = {
+    // 서브 필드 처리
+    const converters = {
       unit: convertedUnitNumber,
-      currency: convertedCurrencyNumber,
-      radix: convertedRadixNumber,
+      currency: convertedCurrencyNumber, 
+      radix: convertedRadixNumber
     };
 
-    const converter = addonTypeMap[props.addon as keyof typeof addonTypeMap];
-    return converter ? converter() : '';
+    const converter = converters[props.addon as keyof typeof converters];
+    const result = converter?.() || '';
+
+    // 진법 모드인 경우 접두사/접미사 추가
+    return props.addon === 'radix' ? getRadixResult(result) : result;
   });
 
   // 연산자 문자열 계산된 속성
@@ -234,18 +272,21 @@
 
   // 연산자 아이콘 매핑
   const operatorIcons: { [key: string]: string } = {
-    '+': 'mdi-plus-box',
-    '-': 'mdi-minus-box',
-    '×': 'mdi-close-box',
-    '÷': 'mdi-division-box',
-    mod: 'mdi-alpha-m-box',
-    pow: 'mdi-chevron-up-box',
-    root: 'mdi-square-root-box',
-    bitSftR: 'mdi-chevron-right-box',
-    bitSftL: 'mdi-chevron-left-box',
-    bitAnd: 'mdi-alpha-a-box',
-    bitOr: 'mdi-alpha-o-box',
-    bitXor: 'mdi-alpha-x-box',
+    '+': 'mdi-plus-box-outline',
+    '-': 'mdi-minus-box-outline',
+    '×': 'mdi-close-box-outline',
+    '÷': 'mdi-division-box-outline',
+    mod: 'mdi-alpha-m-box-outline',
+    pow: 'mdi-exponent',
+    root: 'mdi-square-root',
+    bitSftR: 'mdi-chevron-right-box-outline',
+    bitSftL: 'mdi-chevron-left-box-outline',
+    bitAnd: 'mdi-numeric-8-box-outline',
+    bitOr: 'mdi-zip-box-outline',
+    bitXor: 'mdi-chevron-up-box-outline',
+    bitNand: 'mdi-numeric-8-box',
+    bitNor: 'mdi-zip-box',
+    bitXnor: 'mdi-chevron-up-box', 
   };
 
   // 메모리 초기화 여부 계산된 속성
@@ -277,7 +318,7 @@
 
     // 연산자가 있고 초기화가 필요없는 경우
     if (hasOperator && !shouldReset) {
-      return toFormattedNumber(calc.getPreviousNumber());
+      return toFormattedNumber(convertIfRadix(calc.getPreviousNumber()));
     }
 
     return '';
@@ -316,6 +357,7 @@
       () => calc.getOperatorString(),
       () => calcHistory.getHistorySize(),
       () => storeSettings.useGrouping,
+      () => storeSettings.groupingUnit,
       () => storeSettings.decimalPlaces,
       () => storeSettings.showUnit,
       () => storeUnit.recentCategory,
@@ -404,25 +446,20 @@
           :class="[isMainField ? 'text-h5' : '', selectResultColor()]"
           :style="`padding-top: ${storeBase.paddingOnResult}px;`"
         >
+          <span v-if="currentTab === 'radix'" id="radixPrefix">{{ radixPrefix }}</span>
           <span v-if="currentTab === 'currency'" id="symbol">{{ symbol }}</span>
           <span v-if="isMainField && storeBase.showMemory" id="result" :class="selectResultColor()">
             {{ toFormattedNumber(calc.getMemoryNumber()) }}
           </span>
           <span v-else :id="isMainField ? 'result' : 'subResult'">{{ result }}</span>
           <span v-if="currentTab === 'unit'" id="unit">{{ unit }}</span>
-          <span v-if="currentTab === 'radix'" id="radix">{{ radix }}</span>
+          <span v-if="currentTab === 'radix'" id="radixSuffix">{{ radixSuffix }}</span>
           <q-menu context-menu auto-close touch-position class="shadow-6">
             <q-list class="noselect" dense style="min-width: 150px">
               <MenuItem
-                :action="
-                  () =>
-                    copyToClipboard(
-                      `${symbol}${result}${unit}${cTab === 'radix' ? '(' + radix + ')' : ''}`,
-                      t('copiedDisplayedResult'),
-                    )
-                "
+                :action="() => copyToClipboard(displayedResult, t('copiedDisplayedResult'))"
                 :title="t('copyDisplayedResult')"
-                :caption="`${symbol}${result}${unit}${cTab === 'radix' ? '(' + radix + ')' : ''}`"
+                :caption="displayedResult"
               />
               <MenuItem
                 :action="() => copyToClipboard(onlyNumber, t('copiedOnlyNumber'))"
@@ -432,7 +469,7 @@
             </q-list>
           </q-menu>
           <MyTooltip v-if="needFieldTooltip">
-            {{ symbol + result + unit + (cTab === 'radix' ? '(' + radix + ')' : '') }}
+            {{ symbol + result + unit + (cTab === 'radix' ? '(' + radixSuffix + ')' : '') }}
           </MyTooltip>
         </div>
       </template>
@@ -462,7 +499,13 @@
     font-size: 22px;
   }
 
-  #radix {
+  #radixPrefix {
+    font-size: 34px;
+    padding-right: 0.3rem;
+    font-style: italic;
+  }
+
+  #radixSuffix {
     font-size: 20px;
     margin-left: 1px;
     position: relative;
@@ -481,7 +524,7 @@
 
 <i18n>
   ko:
-    copiedDisplayedResult: '표시된 결과가 복사되었습니다.'
+    copiedDisplayedResult: '표시된 결과가 복사되습니다.'
     copyDisplayedResult: '표시된 결과 복사'
     copiedOnlyNumber: '결과 숫자가 복사되었습니다.'
     copyOnlyNumber: '결과 숫자 복사'    
