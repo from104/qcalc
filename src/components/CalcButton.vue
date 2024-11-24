@@ -2,19 +2,19 @@
   import { onMounted, onBeforeUnmount, ref, watch, reactive, computed, nextTick } from 'vue';
   import { useQuasar, colors } from 'quasar';
   import { useI18n } from 'vue-i18n';
+  import { match } from 'ts-pattern';
 
   import { Haptics, ImpactStyle } from 'capacitor/@capacitor/haptics';
 
   import { KeyBinding, KeyBindings } from 'classes/KeyBinding';
   import { Radix } from 'classes/RadixConverter';
+  import { BigNumber, Operator } from 'src/classes/CalculatorTypes';
 
   import { useStoreBase } from 'src/stores/store-base';
   import { useStoreSettings } from 'src/stores/store-settings';
   import { useStoreNotifications } from 'src/stores/store-notifications';
   import { useStoreUtils } from 'src/stores/store-utils';
   import { useStoreRadix } from 'src/stores/store-radix';
-import { BigNumber, Operator } from 'src/classes/CalculatorTypes';
-import { match } from 'ts-pattern';
 
   // Quasar 인스턴스 및 색상 유틸리티 초기화
   const $q = useQuasar();
@@ -289,9 +289,9 @@ import { match } from 'ts-pattern';
       a2: ['x<<4', ['Shift+Control+a'], () => bitOperationPreprocessing(() => calc.bitSftLNumber(4), false), false],
       b2: ['x>>4', ['Shift+Control+s'], () => bitOperationPreprocessing(() => calc.bitSftRNumber(4), false), false],
       c2: ['!x', ['Shift+Control+d'], () => bitOperationPreprocessing(() => calc.bitNot(), false), false],
-      a3: ['!x&y', ['Shift+Digit7', 'Shift+Numpad7'], () => bitOperationPreprocessing(() => calc.bitNand()), false],
-      b3: ['!x|y', ['Shift+Digit8', 'Shift+Numpad8'], () => bitOperationPreprocessing(() => calc.bitNor()), false],
-      c3: ['!x^y', ['Shift+Digit9', 'Shift+Numpad9'], () => bitOperationPreprocessing(() => calc.bitXnor()), false],
+      a3: ['!(x&y)', ['Shift+Digit7', 'Shift+Numpad7'], () => bitOperationPreprocessing(() => calc.bitNand()), false],
+      b3: ['!(x|y)', ['Shift+Digit8', 'Shift+Numpad8'], () => bitOperationPreprocessing(() => calc.bitNor()), false],
+      c3: ['!(x^y)', ['Shift+Digit9', 'Shift+Numpad9'], () => bitOperationPreprocessing(() => calc.bitXnor()), false],
       a4: ['D', ['Shift+Digit4', 'Shift+Numpad4'], () => calc.addDigit('D'), false],
       b4: ['E', ['Shift+Digit5', 'Shift+Numpad5'], () => calc.addDigit('E'), false],
       c4: ['F', ['Shift+Digit6', 'Shift+Numpad6'], () => calc.addDigit('F'), false],

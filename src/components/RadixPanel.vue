@@ -38,7 +38,7 @@
   const keyBinding = new KeyBinding([
     [['Alt+w'], () => clickButtonById('btn-swap-radix')],
     [['Alt+y'], () => storeSettings.toggleShowRadix()],
-    [['Ctrl+Alt+y'], () => storeSettings.setRadixType(storeSettings.radixType == 'prefix' ? 'suffix' : 'prefix')],
+    [['Control+Alt+y'], () => storeSettings.setRadixType(storeSettings.radixType == 'prefix' ? 'suffix' : 'prefix')],
   ]);
 
   // 입력 포커스에 따른 키 바인딩 활성화/비활성화

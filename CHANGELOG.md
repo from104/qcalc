@@ -8,15 +8,17 @@ The format is based on [Keep a Changelog] and this project follows [Semantic Ver
 
 ### Added
 
-- 
+- Introduced a new "Radix" mode, supporting numeral conversions (Binary, Octal, Decimal, Hexadecimal) and bitwise operations such as AND, OR, XOR, and NOT.
 
 ### Changed
 
-- Modified button addition functionality based on calculator type to provide users with clearer and more intuitive button layouts and features
+- Updated each calculator mode (e.g., Basic, Unit Conversion, Currency, Radix) to offer unique features, providing clearer and more intuitive button layouts and functionality.
+- Modified number grouping to allow for either 3 or 4 digits per group.
 
 ### Fixed
 
-- Corrected a bug in trigonometric function calculations, ensuring accurate results and reliability in advanced math operations.
+- Resolved accuracy issues in trigonometric and factorial calculations.
+- Fixed an edge case causing errors during decimal point inputs in specific scenarios.
 
 ## [0.9.1] 2024-06-29
 
