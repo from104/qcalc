@@ -1,5 +1,5 @@
 <script setup lang="ts">
-  import { onMounted, onBeforeUnmount, ref, watch, reactive, computed, nextTick } from 'vue';
+  import { onMounted, onBeforeUnmount, ref, watch, reactive, computed } from 'vue';
   import { useQuasar, colors } from 'quasar';
   import { useI18n } from 'vue-i18n';
   import { match } from 'ts-pattern';
@@ -36,16 +36,9 @@
   const storeUtils = useStoreUtils();
 
   // 스토어에서 필요한 메서드 추출
-  const {
-    calc,
-    offButtonShift,
-    offButtonShiftLock,
-    onButtonShift,
-    onButtonShiftLock,
-    showMemoryOnWithTimer,
-    toggleButtonShift,
-  } = storeBase;
-  const { notifyError, notifyMsg } = storeNotifications;
+  const { calc, disableShift, disableShiftLock, enableShift, enableShiftLock, showMemoryTemporarily, toggleShiftLock } =
+    storeBase;
+  const { showError, showMessage } = storeNotifications;
   const { convertRadix } = storeRadix;
   const { clickButtonById } = storeUtils;
 
@@ -75,9 +68,9 @@
     } catch (e: unknown) {
       if (e instanceof Error) {
         if (errorMessages[e.message]) {
-          notifyError(t(errorMessages[e.message]));
+          showError(t(errorMessages[e.message]));
         } else {
-          notifyError(e.message);
+          showError(e.message);
         }
       }
     }
@@ -94,28 +87,28 @@
 
   // 비트 연산 사전  처리 메서드
   const bitOperationPreprocessing = (action: () => void, isBinary: boolean = true) => {
-    calc.currentNumber = BigNumber(calc.currentNumber).abs().floor().toString();
-    if (isBinary) {
-      notifyMsg(t('bitOperationPreprocessingReady'));
-    } else {
-      notifyMsg(t('bitOperationPreprocessingCompleted'));
+    if (BigNumber(calc.currentNumber).abs().floor().toString() !== calc.currentNumber) {
+      calc.currentNumber = BigNumber(calc.currentNumber).abs().floor().toString();
+      if (isBinary) {
+        showMessage(t('bitOperationPreprocessingReady'));
+      } else {
+        showMessage(t('bitOperationPreprocessingCompleted'));
+      }
     }
-
     action();
   };
 
   const equalForBitOperation = () => {
-    const isBitwiseOperationwithBinary =
-      match(calc.getOperator())
+    const isBitwiseOperationwithBinary = match(calc.getCurrentOperator())
       .with(
         Operator.BIT_AND,
-        Operator.BIT_OR, 
-        Operator.BIT_XOR, 
-        Operator.BIT_NAND, 
-        Operator.BIT_NOR, 
-        Operator.BIT_XNOR, 
-        Operator.BIT_SFT_L, 
-        Operator.BIT_SFT_R, 
+        Operator.BIT_OR,
+        Operator.BIT_XOR,
+        Operator.BIT_NAND,
+        Operator.BIT_NOR,
+        Operator.BIT_XNOR,
+        Operator.BIT_SFT_L,
+        Operator.BIT_SFT_R,
         () => true,
       )
       .otherwise(() => false);
@@ -127,7 +120,7 @@
     }
   };
 
-  // 버튼 타입 정의 
+  // 버튼 타입 정의
   type CalculatorButtonDefinition = {
     [id: string]: [label: string, color: string, keys: string[], action: () => void, isDisabled: boolean];
   };
@@ -179,12 +172,14 @@
 
   // mainRadix의 변경을 감지하는 computed 속성 추가
   const currentRadixBase = computed(() => {
-    return {
-      [Radix.Binary]: 2,
-      [Radix.Octal]: 8,
-      [Radix.Decimal]: 10,
-      [Radix.Hexadecimal]: 16,
-    }[storeRadix.mainRadix] ?? 10;
+    return (
+      {
+        [Radix.Binary]: 2,
+        [Radix.Octal]: 8,
+        [Radix.Decimal]: 10,
+        [Radix.Hexadecimal]: 16,
+      }[storeRadix.sourceRadix] ?? 10
+    );
   });
 
   // isButtonDisabledForBase 함수를 computed 속성 사용하도록 수정
@@ -193,7 +188,7 @@
 
     const value = label.match(/^[0-9A-F]+$/)?.[0];
     if (!value) return false;
-    
+
     return Number(convertRadix(value, Radix.Hexadecimal, Radix.Decimal)) >= currentRadixBase.value;
   };
 
@@ -210,7 +205,7 @@
   // activeButtonSet을 computed로 변경
   const activeButtonSet = computed(() => {
     const modeSpecificButtonsForType = modeSpecificButtons[props.type as keyof typeof modeSpecificButtons] ?? {};
-    
+
     return {
       ...transformButtonDefinitions(standardButtons),
       ...transformButtonDefinitions(modeSpecificButtonsForType),
@@ -313,8 +308,9 @@
 
   // extendedFunctionSet을 computed로 변경
   const extendedFunctionSet = computed(() => {
-    const categoryButtons = modeSpecificExtendedFunctions[props.type as keyof typeof modeSpecificExtendedFunctions] ?? {};
-    
+    const categoryButtons =
+      modeSpecificExtendedFunctions[props.type as keyof typeof modeSpecificExtendedFunctions] ?? {};
+
     return {
       ...transformExtendedFunctions(standardExtendedFunctions),
       ...transformExtendedFunctions(categoryButtons),
@@ -327,9 +323,9 @@
   const displayButtonNotification = (id: ButtonID) => {
     const buttonFunc = extendedFunctionSet.value[id];
     if (buttonFunc.label === 'MC') {
-      notifyMsg(t('memoryCleared'));
-    } else if (buttonFunc.label === 'MR' && !calc.isMemoryReset) {
-      notifyMsg(t('memoryRecalled'));
+      showMessage(t('memoryCleared'));
+    } else if (buttonFunc.label === 'MR' && !calc.isMemoryEmpty) {
+      showMessage(t('memoryRecalled'));
     }
   };
 
@@ -345,7 +341,11 @@
 
   // 추가 기능 툴팁 표시 함수
   const displayActionTooltip = (id: ButtonID) => {
-    if (tooltipTimers[id] || id === shiftButtonId.value || (!storeSettings.showButtonAddedLabel && storeBase.buttonShift))
+    if (
+      tooltipTimers[id] ||
+      id === shiftButtonId.value ||
+      (!storeSettings.showButtonAddedLabel && storeBase.isShiftPressed)
+    )
       return;
     tooltipTimers[id] = true;
     setTimeout(() => {
@@ -356,14 +356,14 @@
   // 버튼 시프트 상태에 따른 기능 실행
   const handleShiftFunction = (id: ButtonID) => {
     const isShiftButton = id === shiftButtonId.value;
-    const isDisabled = storeBase.buttonShift
+    const isDisabled = storeBase.isShiftPressed
       ? extendedFunctionSet.value[id].isDisabled
       : activeButtonSet.value[id].isDisabled;
-    const action = storeBase.buttonShift ? extendedFunctionSet.value[id].action : activeButtonSet.value[id].action;
+    const action = storeBase.isShiftPressed ? extendedFunctionSet.value[id].action : activeButtonSet.value[id].action;
 
     if (isShiftButton) {
-      toggleButtonShift();
-      offButtonShiftLock();
+      toggleShiftLock();
+      disableShift();
       return;
     }
 
@@ -374,10 +374,10 @@
 
     executeActionWithErrorHandling(action);
 
-    if (storeBase.buttonShift) {
+    if (storeBase.isShiftPressed) {
       displayActionTooltip(id);
       displayButtonNotification(id);
-      if (!storeBase.buttonShiftLock) offButtonShift();
+      if (!storeBase.isShiftLocked) disableShift();
     }
   };
 
@@ -385,18 +385,18 @@
   const handleLongPress = (id: ButtonID) => {
     hapticFeedbackMedium();
     const isShiftButton = id === shiftButtonId.value;
-    const isShiftActive = storeBase.buttonShift;
-    const isShiftLocked = storeBase.buttonShiftLock;
+    const isShiftActive = storeBase.isShiftPressed;
+    const isShiftLocked = storeBase.isShiftLocked;
     if (isShiftButton) {
       if (isShiftLocked) {
-        offButtonShiftLock();
+        disableShiftLock();
       } else {
-        onButtonShiftLock();
+        enableShiftLock();
       }
       if (isShiftLocked) {
-        offButtonShift();
+        disableShift();
       } else {
-        onButtonShift();
+        enableShift();
       }
       return;
     }
@@ -413,7 +413,7 @@
     executeActionWithErrorHandling(buttonAction);
 
     if (isShiftActive) {
-      if (!isShiftLocked) offButtonShift();
+      if (!isShiftLocked) disableShift();
     } else {
       displayActionTooltip(id);
       displayButtonNotification(id);
@@ -422,9 +422,9 @@
 
   // 메모리 표시 함수
   const displayMemoryStatus = () => {
-    if (!calc.isMemoryReset) {
+    if (!calc.isMemoryEmpty) {
       setTimeout(() => {
-        showMemoryOnWithTimer();
+        showMemoryTemporarily();
       }, 10);
     }
   };
@@ -432,7 +432,7 @@
   // 키 입력에 따른 버튼 클릭 함수
   const triggerButtonClickByKey = (id: ButtonID, isShift: boolean) => {
     if (isShift) {
-      toggleButtonShift();
+      toggleShiftLock();
       setTimeout(() => {
         clickButtonById('btn-' + id);
       }, 5);
@@ -440,7 +440,6 @@
       clickButtonById('btn-' + id);
     }
   };
-
 
   // 주요 키 바인딩 설정
   const keyBindingsPrimary: KeyBindings = Object.entries(activeButtonSet.value).map(([id, button]) => [
@@ -488,7 +487,7 @@
   }
 
   const displayDisabledButtonNotification = () => {
-    notifyMsg(t('disabledButton'));
+    showMessage(t('disabledButton'));
   };
 </script>
 
@@ -507,29 +506,29 @@
         no-caps
         push
         :label="
-          storeBase.buttonShift && !storeSettings.showButtonAddedLabel && id !== shiftButtonId
+          storeBase.isShiftPressed && !storeSettings.showButtonAddedLabel && id !== shiftButtonId
             ? extendedFunctionSet[id].label
             : button.label.charAt(0) === '@'
               ? undefined
               : button.label
         "
         :icon="
-          storeBase.buttonShift && !storeSettings.showButtonAddedLabel && id !== shiftButtonId
+          storeBase.isShiftPressed && !storeSettings.showButtonAddedLabel && id !== shiftButtonId
             ? undefined
             : button.label.charAt(0) === '@'
               ? button.label.slice(1)
               : undefined
         "
         :class="[
-          storeBase.buttonShift && !storeSettings.showButtonAddedLabel && id !== shiftButtonId
+          storeBase.isShiftPressed && !storeSettings.showButtonAddedLabel && id !== shiftButtonId
             ? 'char'
             : button.label.charAt(0) === '@'
               ? 'icon'
               : 'char',
-          id === shiftButtonId && storeBase.buttonShift ? 'button-shift' : '',
-          storeBase.buttonShift && !storeSettings.showButtonAddedLabel && !extendedFunctionSet[id].isDisabled
+          id === shiftButtonId && storeBase.isShiftPressed ? 'button-shift' : '',
+          storeBase.isShiftPressed && !storeSettings.showButtonAddedLabel && !extendedFunctionSet[id].isDisabled
             ? ''
-            : button.isDisabled || storeBase.buttonShift
+            : button.isDisabled || storeBase.isShiftPressed
               ? 'disabled-button'
               : '',
         ]"
@@ -544,7 +543,7 @@
           :class="[
             `top-label-${button.label.charAt(0) === '@' ? 'icon' : 'char'}`,
             extendedFunctionSet[id].isDisabled ? 'disabled-button-added-label' : '',
-            storeBase.buttonShift && !extendedFunctionSet[id].isDisabled ? 'shifted-button-added-label' : '',
+            storeBase.isShiftPressed && !extendedFunctionSet[id].isDisabled ? 'shifted-button-added-label' : '',
           ]"
         >
           {{ extendedFunctionSet[id].label }}

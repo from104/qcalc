@@ -11,22 +11,22 @@ export class CurrencyConverter {
   private accessKey = process.env.FREECURRENCY_API_KEY;
 
   // 환율 정보 업데이트 주기 (12시간)
-  private intervalToUpdate = 1000 * 60 * 60 * 12;
+  private updateInterval = 1000 * 60 * 60 * 12;
 
   // 마지막 환율 정보 업데이트 시간
-  private updatedTimeOfCurrencyExchangeRates = 0;
+  private lastUpdatedTime = 0;
 
   // 기본 환율 정보 (EUR 기준)
-  private baseCurrencyExchangeRates: CurrencyExchangeRates = {};
+  private baseExchangeRates: CurrencyExchangeRates = {};
 
   // 기준 통화 (기본값: EUR)
-  private baseCurrency = 'EUR';
+  private currentBaseCurrency = 'EUR';
 
   // 현재 사용 중인 환율 정보
-  private rates: CurrencyExchangeRates = {};
+  private currentRates: CurrencyExchangeRates = {};
 
   // 통화 데이터 (심볼, 설명 등)
-  private currencies: CurrencyData = currencyBaseData;
+  private currencyData: CurrencyData = currencyBaseData;
 
   /**
    * 생성자
@@ -41,7 +41,7 @@ export class CurrencyConverter {
    * @returns {boolean} 환율 정보가 비어있으면 true, 그렇지 않으면 false
    */
   isRatesEmpty(): boolean {
-    return !this.baseCurrencyExchangeRates || Object.keys(this.baseCurrencyExchangeRates).length === 0;
+    return !this.baseExchangeRates || Object.keys(this.baseExchangeRates).length === 0;
   }
 
   /**
@@ -52,17 +52,17 @@ export class CurrencyConverter {
     try {
       if (
         this.isRatesEmpty() ||
-        Date.now() - this.updatedTimeOfCurrencyExchangeRates > this.intervalToUpdate ||
+        Date.now() - this.lastUpdatedTime > this.updateInterval ||
         force
       ) {
         const api = new Freecurrencyapi(this.accessKey);
         const data = await api.latest({base_currency: 'EUR'});
-        this.baseCurrencyExchangeRates = data.data;
-        this.rates = this.getRates(this.baseCurrency);
-        this.updatedTimeOfCurrencyExchangeRates = Date.now();
+        this.baseExchangeRates = data.data;
+        this.currentRates = this.getRates(this.currentBaseCurrency);
+        this.lastUpdatedTime = Date.now();
       }
     } catch (error) {
-      this.rates = {};
+      this.currentRates = {};
       console.log(error);
     }
   }
@@ -72,7 +72,7 @@ export class CurrencyConverter {
    * @returns {string[]} 통화 코드 배열
    */
   getCurrencyLists(): string[] {
-    return this.isRatesEmpty() ? [] : Object.keys(this.baseCurrencyExchangeRates);
+    return this.isRatesEmpty() ? [] : Object.keys(this.baseExchangeRates);
   }
 
   /**
@@ -83,11 +83,11 @@ export class CurrencyConverter {
     if (this.isRatesEmpty()) {
       throw new Error('Exchange rates are not available');
     }
-    if (!this.baseCurrencyExchangeRates[baseCurrency]) {
+    if (!this.baseExchangeRates[baseCurrency]) {
       throw new Error('Invalid base currency');
     }
-    this.baseCurrency = baseCurrency;
-    this.rates = this.getRates(baseCurrency);
+    this.currentBaseCurrency = baseCurrency;
+    this.currentRates = this.getRates(baseCurrency);
   }
 
   /**
@@ -95,7 +95,7 @@ export class CurrencyConverter {
    * @returns {string} 현재 기준 통화
    */
   getBase() {
-    return this.baseCurrency;
+    return this.currentBaseCurrency;
   }
 
   /**
@@ -109,16 +109,16 @@ export class CurrencyConverter {
     }
 
     if (baseCurrency === 'EUR') {
-      return this.baseCurrencyExchangeRates;
+      return this.baseExchangeRates;
     }
 
-    if (!this.baseCurrencyExchangeRates.hasOwnProperty(baseCurrency)) {
+    if (!this.baseExchangeRates.hasOwnProperty(baseCurrency)) {
       throw new Error('Invalid base currency');
     }
 
-    const baseRate = this.baseCurrencyExchangeRates[baseCurrency];
+    const baseRate = this.baseExchangeRates[baseCurrency];
     return Object.fromEntries(
-      Object.entries(this.baseCurrencyExchangeRates).map(([currency, rate]) => [currency, rate / baseRate]),
+      Object.entries(this.baseExchangeRates).map(([currency, rate]) => [currency, rate / baseRate]),
     );
   }
 
@@ -134,13 +134,13 @@ export class CurrencyConverter {
     }
 
     const actualTo = to ?? from;
-    const actualFrom = to ? from : this.baseCurrency;
+    const actualFrom = to ? from : this.currentBaseCurrency;
 
-    if (!this.rates[actualTo] || !this.rates[actualFrom]) {
+    if (!this.currentRates[actualTo] || !this.currentRates[actualFrom]) {
       throw new Error('Invalid currency');
     }
 
-    return this.rates[actualTo] / this.rates[actualFrom];
+    return this.currentRates[actualTo] / this.currentRates[actualFrom];
   }
 
   /**
@@ -161,7 +161,7 @@ export class CurrencyConverter {
    * @returns {string} 포맷팅된 금액 문자열
    */
   format(amount: number, currency: string): string {
-    return `${this.currencies[currency].symbol}${amount.toFixed(2)}`;
+    return `${this.currencyData[currency].symbol}${amount.toFixed(2)}`;
   }
 
   /**
@@ -173,9 +173,9 @@ export class CurrencyConverter {
       return {};
     }
 
-    return Object.keys(this.rates).reduce((currencies, currency) => {
-      if (this.currencies.hasOwnProperty(currency)) {
-        currencies[currency] = this.currencies[currency];
+    return Object.keys(this.currentRates).reduce((currencies, currency) => {
+      if (this.currencyData.hasOwnProperty(currency)) {
+        currencies[currency] = this.currencyData[currency];
       }
       return currencies;
     }, {} as CurrencyData);
@@ -190,10 +190,10 @@ export class CurrencyConverter {
     if (this.isRatesEmpty()) {
       throw new Error('Exchange rates are not available');
     }
-    if (!this.currencies[currency] || !this.rates[currency]) {
+    if (!this.currencyData[currency] || !this.currentRates[currency]) {
       throw new Error(`Invalid currency: ${currency}`);
     }
-    return this.currencies[currency].symbol;
+    return this.currencyData[currency].symbol;
   }
 
   /**
@@ -205,9 +205,9 @@ export class CurrencyConverter {
     if (this.isRatesEmpty()) {
       throw new Error('Exchange rates are not available');
     }
-    if (!this.currencies[currency] || !this.rates[currency]) {
+    if (!this.currencyData[currency] || !this.currentRates[currency]) {
       throw new Error(`Invalid currency: ${currency}`);
     }
-    return this.currencies[currency].desc;
+    return this.currencyData[currency].desc;
   }
 }

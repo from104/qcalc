@@ -15,8 +15,8 @@ export class Calculator {
   private math: CalculatorMath = new CalculatorMath();
   private previousNumber!: string; // string -> BigNumber
   private repeatedNumber!: string; // string -> BigNumber
-  private operator!: Operator; // 현재 선택된 연산자
-  private resultSnapshot!: CalculationResult; // 최근 계산 결과 스냅샷
+  private currentOperator!: Operator; // 현재 선택된 연산자
+  private calculationSnapshot!: CalculationResult; // 최근 계산 결과 스냅샷
 
   public readonly history!: CalculatorHistory; // 계산 히스토리 관리자
 
@@ -24,28 +24,28 @@ export class Calculator {
   private radixConverter: RadixConverter = new RadixConverter();
 
   // 입력 버퍼를 저장하는 변수입니다.
-  private _buffer!: string; // 입력 버퍼
+  private _inputBuffer!: string; // 입력 버퍼
 
   // 입력 버퍼의 값을 가져오는 getter입니다.
-  get buffer(): string {
-    return this._buffer;
+  get inputBuffer(): string {
+    return this._inputBuffer;
   }
 
   // 입력 버퍼의 값을 설정하는 setter입니다.
   // 버퍼가 변경되면 현재 숫자도 업데이트합니다.
-  set buffer(value: string) {
-    this._buffer = value;
+  set inputBuffer(value: string) {
+    this._inputBuffer = value;
     this.setBufferToCurrentNumber();
   }
 
-  private shouldResetBuffer!: boolean; // 다음 입력시 버퍼 리셋 필요 여부
+  private needsBufferReset!: boolean; // 다음 입력시 버퍼 리셋 필요 여부
 
-  private setShouldResetBuffer(): void {
-    this.shouldResetBuffer = true;
+  private setNeedsBufferReset(): void {
+    this.needsBufferReset = true;
   }
 
-  private setShouldNotResetBuffer(): void {
-    this.shouldResetBuffer = false;
+  private setDoesNotNeedBufferReset(): void {
+    this.needsBufferReset = false;
   }
 
   // 현재 숫자를 저장하는 변수입니다.
@@ -67,25 +67,25 @@ export class Calculator {
   private memoryNumber!: string; // string -> BigNumber
 
   // 메모리가 초기화 상태인지 확인하는 getter입니다.
-  get isMemoryReset(): boolean {
+  get isMemoryEmpty(): boolean {
     return this.memoryNumber === '';
   }
 
   // 현재 사용 중인 진법을 저장하는 변수입니다.
-  private _radix: Radix = Radix.Decimal; // 현재 사용 중인 진법 (10진수 기본)
+  private _currentRadix: Radix = Radix.Decimal; // 현재 사용 중인 진법 (10진수 기본)
 
   // 현재 진법의 값을 가져오는 getter입니다.
-  get radix(): Radix {
-    return this._radix;
+  get currentRadix(): Radix {
+    return this._currentRadix;
   }
 
   // 진법의 값을 설정하는 setter입니다.
   // 진법이 변경되면 현재 숫자도 업데이트합니다.
-  set radix(radix: Radix) {
+  set currentRadix(radix: Radix) {
     if (!Object.values(Radix).includes(radix)) {
       throw new Error('Invalid radix value');
     }
-    this._radix = radix;
+    this._currentRadix = radix;
     this.setCurrentNumberToBuffer();
   }
 
@@ -111,12 +111,12 @@ export class Calculator {
    * getOperatorString(Operator.Plus) // returns '+'
    * getOperatorString(Operator.Minus) // returns '-'
    */
-  public getOperatorString(operator: Operator = this.operator): string {
+  public getOperatorString(operator: Operator = this.currentOperator): string {
     return operator;
   }
 
-  public getOperator(): Operator {
-    return this.operator;
+  public getCurrentOperator(): Operator {
+    return this.currentOperator;
   }
 
   /**
@@ -125,14 +125,14 @@ export class Calculator {
    * 초기화되는 항목:
    * 1. currentOperator: 현재 연산자를 None으로 설정
    * 2. repeatedNumber: 반복 계산에 사용되는 숫자를 '0'으로 초기화
-   * 3. shouldReset: 다음 입력 시 현재 숫자를 리셋해야 함을 표시
+   * 3. needsBufferReset: 다음 입력 시 현재 숫자를 리셋해야 함을 표시
    *
    * 주로 새로운 계산을 시작하거나 에러 발생 시 호출됨
    */
   private resetOperatorState(): void {
-    this.operator = Operator.NONE;
+    this.currentOperator = Operator.NONE;
     this.repeatedNumber = '0';
-    this.setShouldResetBuffer();
+    this.setNeedsBufferReset();
   }
 
   /**
@@ -140,14 +140,14 @@ export class Calculator {
    *
    * 초기화되는 항목:
    * 1. repeatedNumber: 반복 계산에 사용되는 숫자를 '0'으로 초기화
-   * 2. shouldReset: 다음 입력 시 현재 숫자를 리셋해야 함을 표시
+   * 2. needsBufferReset: 다음 입력 시 현재 숫자를 리셋해야 함을 표시
    *
    * 주로 새로운 숫자 입력을 시작하기 전에 호출됨
    * 연산자 상태는 유지한 채 입력 상태만 초기화할 때 사용
    */
   private resetInputState(): void {
     this.repeatedNumber = '0';
-    this.setShouldResetBuffer();
+    this.setNeedsBufferReset();
   }
 
   /**
@@ -170,28 +170,28 @@ export class Calculator {
     // 히스토리 관리 객체 생성
     this.history = new CalculatorHistory();
 
-    // shouldResetBuffer 초기화 추가
-    this.setShouldNotResetBuffer();
+    // needsBufferReset 초기화 추가
+    this.setDoesNotNeedBufferReset();
   }
 
   /**
    * 계산기 상태 초기화
    * @description
    * 계산기의 모든 상태를 초기 값으로 재설정합니다.
-   * - buffer: 입력 버퍼를 '0'으로 초기화
+   * - inputBuffer: 입력 버퍼를 '0'으로 초기화
    * - currentNumber: 현재 입력/표시 중인 숫자를 '0'으로 초기화
    * - previousNumber: 이전 계산에 사용된 숫자를 '0'으로 초기화
    * - repeatedNumber: 연속 계산에 사용되는 반복 숫자를 '0'으로 초기화
    * - currentOperator: 현재 선택된 연산자를 None으로 초기화
-   * - shouldReset: 다음 입력 시 화면 초기화 필요 여부를 false로 설정
+   * - needsBufferReset: 다음 입력 시 화면 초기화 필요 여부를 false로 설정
    */
   public reset(): void {
-    this.buffer = '0';
+    this.inputBuffer = '0';
     this.currentNumber = '0';
     this.previousNumber = '0';
     this.repeatedNumber = '0';
-    this.operator = Operator.NONE;
-    this.setShouldNotResetBuffer();
+    this.currentOperator = Operator.NONE;
+    this.setDoesNotNeedBufferReset();
   }
 
   /**
@@ -203,7 +203,7 @@ export class Calculator {
    * - ResultSnapshot 타입의 객체를 그대로 저장
    */
   private saveCalculationResult(history: CalculationResult): void {
-    this.resultSnapshot = history;
+    this.calculationSnapshot = history;
   }
 
   /**
@@ -229,17 +229,17 @@ export class Calculator {
    * - 결과 스냅샷을 기본값으로 초기화
    * - 계산기의 메모리 관리를 위해 사용됨
    */
-  private shiftHistory(): void {
+  private removeFirstHistory(): void {
     // 결과 스냅샷을 기본 상태로 초기화
-    this.resultSnapshot = {
+    this.calculationSnapshot = {
       previousNumber: '', // 이전 숫자를 0으로 설정
       operator: Operator.NONE, // 연산자를 빈 문자열로 설정
       argumentNumber: '', // 인수 숫자를 0으로 설정
       resultNumber: '', // 결과 숫자를 0으로 설정
     };
 
-    // 히스토리 관리자의 shiftHistory 메서드 호출
-    this.history?.shiftHistory();
+    // 히스토리 관리자의 removeFirst 메서드 호출
+    this.history?.removeFirst();
   }
 
   /**
@@ -254,7 +254,7 @@ export class Calculator {
   private filterNumberCharacters(originalString: string): string {
     // 숫자, 소수점, 음수 부호만 추출
     let onlyNumber = (() => {
-      switch (this.radix) {
+      switch (this.currentRadix) {
         case 'hex':
           return originalString.replace(/[^0-9a-fA-F.\-]/gm, '').toUpperCase();
         case 'oct':
@@ -287,8 +287,8 @@ export class Calculator {
     return (isNegative ? '-' : '') + result;
   }
 
-  public getBuffer(): string {
-    return this._buffer;
+  public getInputBuffer(): string {
+    return this._inputBuffer;
   }
 
   /**
@@ -300,9 +300,9 @@ export class Calculator {
    * - 초기화 플래그를 false로 설정
    */
   public setCurrentNumber(value: string): void {
-    this.buffer = this.filterNumberCharacters(value.substring(0, 64));
+    this.inputBuffer = this.filterNumberCharacters(value.substring(0, 64));
 
-    this.setShouldNotResetBuffer();
+    this.setDoesNotNeedBufferReset();
   }
 
   /**
@@ -335,16 +335,20 @@ export class Calculator {
    * - false: 다음 숫자 입력 시 현재 숫자에 이어서 입력
    * - 주로 연산자 입력 후나 계산 완료 후 새로운 숫자 입력을 위해 사용
    */
-  public getShouldReset(): boolean {
-    return this.shouldResetBuffer;
+  public getNeedsBufferReset(): boolean {
+    return this.needsBufferReset;
   }
 
   private setBufferToCurrentNumber(): void {
-    this._currentNumber = this.radixConverter.convertRadix(this.buffer, this.radix as Radix, Radix.Decimal);
+    this._currentNumber = this.radixConverter.convertRadix(this.inputBuffer, this.currentRadix as Radix, Radix.Decimal);
   }
 
   private setCurrentNumberToBuffer(): void {
-    this._buffer = this.radixConverter.convertRadix(this.currentNumber.toString(), Radix.Decimal, this.radix as Radix);
+    this._inputBuffer = this.radixConverter.convertRadix(
+      this.currentNumber.toString(),
+      Radix.Decimal,
+      this.currentRadix as Radix,
+    );
   }
 
   /**
@@ -359,9 +363,9 @@ export class Calculator {
    *   - 8진수: 0-7
    *   - 10진수: 0-9
    *   - 16진수: 0-9, A-F
-   * - 현재 숫자가 '0'이거나 shouldReset이 true인 경우:
+   * - 현재 숫자가 '0'이거나 needsBufferReset이 true인 경우:
    *   - 입력된 숫자로 현재 숫자를 대체
-   *   - shouldReset 플래그를 false로 설정
+   *   - needsBufferReset 플래그를 false로 설정
    * - 그 외의 경우:
    *   - 현재 숫자 뒤에 새로운 숫자를 추가
    */
@@ -370,38 +374,35 @@ export class Calculator {
     const digitString = typeof digit === 'string' ? digit.charAt(0) : Math.floor(digit).toString();
 
     // 유효하지 않은 숫자인 경우 에러 발생
-    if (!this.radixConverter.isValidRadixNumber(digitString, this.radix)) {
+    if (!this.radixConverter.isValidRadixNumber(digitString, this.currentRadix)) {
       throw new Error('Invalid digit for current radix');
     }
 
     // 현재 숫자 업데이트
-    if (this.buffer === '0' || this.shouldResetBuffer) {
-      this.buffer = digitString;
-      this.setShouldNotResetBuffer();
+    if (this.inputBuffer === '0' || this.needsBufferReset) {
+      this.inputBuffer = digitString;
+      this.setDoesNotNeedBufferReset();
     } else {
-      this.buffer = this.buffer + digitString;
+      this.inputBuffer = this.inputBuffer + digitString;
     }
   }
 
   /**
    * 소수점을 추가하는 public 메서드
    * @description
-   * - shouldReset이 true인 경우:
+   * - needsBufferReset이 true인 경우:
    *   - 현재 숫자를 '0.'으로 초기화
-   *   - shouldReset 플래그를 false로 설정
+   *   - needsBufferReset 플래그를 false로 설정
    * - 현재 숫자에 소수점이 없고, 현재 진법에서 유효한 경우에만 추가
    * - 이미 소수점이 있는 경우:
    *   - 아무 동작도 하지 않음 (중복 소수점 방지)
    */
   public addDot(): void {
-    // 초기화가 필요한 경우
-    if (this.shouldResetBuffer) {
-      this.buffer = '0.';
-      this.setShouldNotResetBuffer();
-    }
-    // 소수점이 없고, 현재 진법에서 유효한 경우에만 추가
-    else if (!this.buffer.includes('.') && this.radixConverter.isValidRadixNumber(this.buffer + '.', this.radix)) {
-      this.buffer = this.buffer + '.';
+    if (this.needsBufferReset) {
+      this.inputBuffer = '0.';
+      this.setDoesNotNeedBufferReset();
+    } else if (!this.inputBuffer.includes('.')) {
+      this.inputBuffer = this.inputBuffer + '.';
     }
   }
 
@@ -416,10 +417,10 @@ export class Calculator {
    *   - 현재 숫자의 마지막 문자를 제거
    */
   public deleteDigitOrDot(): void {
-    if (this.buffer.match(/^-?.$/) || this.buffer === '-0') {
-      this.buffer = '0';
+    if (this.inputBuffer.match(/^-?.$/) || this.inputBuffer === '-0') {
+      this.inputBuffer = '0';
     } else {
-      this.buffer = this.buffer.slice(0, -1);
+      this.inputBuffer = this.inputBuffer.slice(0, -1);
     }
   }
 
@@ -438,15 +439,15 @@ export class Calculator {
   // }
 
   /**
-   * 현재 ��자의 부호를 변환하는 public 메서드
+   * 현재 숫자의 부호를 변환하는 public 메서드
    * @description
    * - 현재 숫자를 BigNumber 객체로 변환
    * - -1을 곱하여 부호를 반전
    * - 결과를 문자열로 변환하여 현재 숫자에 저장
    */
   public changeSign(): void {
-    if (this.buffer !== '0') {
-      this.buffer = /^-/.test(this.buffer) ? this.buffer.slice(1) : '-' + this.buffer;
+    if (this.inputBuffer !== '0') {
+      this.inputBuffer = /^-/.test(this.inputBuffer) ? this.inputBuffer.slice(1) : '-' + this.inputBuffer;
     }
   }
 
@@ -475,24 +476,24 @@ export class Calculator {
    * 사전 계산을 수행하는 private 메서드
    * @description
    * - 계산에 사용할 숫자 결정:
-   *   - shouldReset이 true면 repeatedNumber 사용
-   *   - shouldReset이 false면 currentNumber 사용
-   * - 초기 상태(shouldReset=true, numberForCalc='0')면 계산 중단
-   * - shouldReset이 false일 때 현재 숫자를 반복 숫자로 저장
+   *   - needsBufferReset이 true면 repeatedNumber 사용
+   *   - needsBufferReset이 false면 currentNumber 사용
+   * - 초기 상태(needsBufferReset=true, numberForCalc='0')면 계산 중단
+   * - needsBufferReset이 false일 때 현재 숫자를 반복 숫자로 저장
    * - calculateResult()로 실제 계산 수행
    * - 계산 이력에 기록하고 결과를 이전 숫자로 저장
    */
   private performPreCalculation(): void {
     // 계산에 사용할 숫자 결정
-    const numberForCalc = this.shouldResetBuffer ? this.repeatedNumber : this.currentNumber;
+    const numberForCalc = this.needsBufferReset ? this.repeatedNumber : this.currentNumber;
 
     // 초기 상태면 계산 중단
-    if (this.shouldResetBuffer && numberForCalc === '0') {
+    if (this.needsBufferReset && numberForCalc === '0') {
       return;
     }
 
     // 반복 계산을 위한 숫자 저장
-    if (!this.shouldResetBuffer) {
+    if (!this.needsBufferReset) {
       this.repeatedNumber = numberForCalc;
     }
 
@@ -500,7 +501,7 @@ export class Calculator {
     const result = this.performBinaryOperationCalculation(numberForCalc);
     this.previousNumber = this.addHistory({
       previousNumber: this.previousNumber.toString(),
-      operator: this.operator,
+      operator: this.currentOperator,
       argumentNumber: numberForCalc.toString(),
       resultNumber: result.toString(),
     });
@@ -518,7 +519,7 @@ export class Calculator {
     const currentValue = numberForCalc;
 
     // 현재 연산자에 따라 계산 수행
-    return match(this.operator)
+    return match(this.currentOperator)
       .with(Operator.ADD, () => this.math.add(prevValue, currentValue))
       .with(Operator.SUB, () => this.math.sub(prevValue, currentValue))
       .with(Operator.MUL, () => this.math.mul(prevValue, currentValue))
@@ -526,14 +527,14 @@ export class Calculator {
       .with(Operator.MOD, () => this.math.mod(prevValue, currentValue))
       .with(Operator.POW, () => this.math.pow(prevValue, currentValue))
       .with(Operator.ROOT, () => this.math.root(prevValue, currentValue))
-      .with(Operator.BIT_SFT_L, () => this.math.bitShiftLeft(prevValue, currentValue, this.wordSize))
-      .with(Operator.BIT_SFT_R, () => this.math.bitShiftRight(prevValue, currentValue, this.wordSize))
-      .with(Operator.BIT_AND, () => this.math.bitAnd(prevValue, currentValue, this.wordSize))
-      .with(Operator.BIT_OR, () => this.math.bitOr(prevValue, currentValue, this.wordSize))
-      .with(Operator.BIT_XOR, () => this.math.bitXor(prevValue, currentValue, this.wordSize))
-      .with(Operator.BIT_NAND, () => this.math.bitNand(prevValue, currentValue, this.wordSize))
-      .with(Operator.BIT_NOR, () => this.math.bitNor(prevValue, currentValue, this.wordSize))
-      .with(Operator.BIT_XNOR, () => this.math.bitXnor(prevValue, currentValue, this.wordSize))
+      .with(Operator.BIT_SFT_L, () => this.math.bitwiseLeftShift(prevValue, currentValue, this.wordSize))
+      .with(Operator.BIT_SFT_R, () => this.math.bitwiseRightShift(prevValue, currentValue, this.wordSize))
+      .with(Operator.BIT_AND, () => this.math.bitwiseAnd(prevValue, currentValue, this.wordSize))
+      .with(Operator.BIT_OR, () => this.math.bitwiseOr(prevValue, currentValue, this.wordSize))
+      .with(Operator.BIT_XOR, () => this.math.bitwiseXor(prevValue, currentValue, this.wordSize))
+      .with(Operator.BIT_NAND, () => this.math.bitwiseNand(prevValue, currentValue, this.wordSize))
+      .with(Operator.BIT_NOR, () => this.math.bitwiseNor(prevValue, currentValue, this.wordSize))
+      .with(Operator.BIT_XNOR, () => this.math.bitwiseXnor(prevValue, currentValue, this.wordSize))
       .otherwise(() => this.previousNumber); // 기본값으로 이전 숫자 반환
   }
 
@@ -551,13 +552,13 @@ export class Calculator {
    *    - 반복 계산용 숫자 초기화
    */
   public equal(): void {
-    if (this.operator === Operator.NONE) {
+    if (this.currentOperator === Operator.NONE) {
       this.setPreviousNumberFromCurrent();
     } else {
       this.performPreCalculation();
       this.setCurrentNumberFromPrevious();
-      this.operator = Operator.NONE;
-      this.setShouldResetBuffer();
+      this.currentOperator = Operator.NONE;
+      this.setNeedsBufferReset();
       this.repeatedNumber = '0';
     }
   }
@@ -587,20 +588,20 @@ export class Calculator {
    * - 50 ÷ 20% = 250 (50 ÷ 0.2)
    */
   public percent(): void {
-    if (this.operator === Operator.DIV || this.operator === Operator.MUL) {
+    if (this.currentOperator === Operator.DIV || this.currentOperator === Operator.MUL) {
       // 이전 계산 수행 및 결과 스냅샷 저장
       this.performPreCalculation();
-      const { previousNumber, argumentNumber } = this.resultSnapshot;
+      const { previousNumber, argumentNumber } = this.calculationSnapshot;
 
       // 연산 기록 이동
-      this.shiftHistory();
+      this.removeFirstHistory();
 
       // 연산자 문자열 생성 (예: ×%, ÷%)
-      const operator = [Operator.PCT, this.operator];
+      const operator = [Operator.PCT, this.currentOperator];
 
       // 현재 연산자에 따른 퍼센트 계산
       const resultNumber =
-        this.operator === Operator.DIV
+        this.currentOperator === Operator.DIV
           ? BigNumber(this.previousNumber).mul(100).toString() // 나눗셈: × 100
           : BigNumber(this.previousNumber).div(100).toString(); // 곱셈: ÷ 100
 
@@ -637,7 +638,7 @@ export class Calculator {
 
   public fct(): void {
     this.checkError(BigNumber(this.currentNumber).lt(0), 'The factorial of a negative number is not allowed');
-    this.performUnaryOperation(Operator.FCT, () => this.math.fct(this.currentNumber));
+    this.performUnaryOperation(Operator.FCT, () => this.math.fact(this.currentNumber));
   }
 
   public exp10(): void {
@@ -666,21 +667,21 @@ export class Calculator {
   }
 
   public bitNot(): void {
-    this.performUnaryOperation(Operator.BIT_NOT, () => this.math.bitNot(this.currentNumber, this.wordSize));
+    this.performUnaryOperation(Operator.BIT_NOT, () => this.math.bitwiseNot(this.currentNumber, this.wordSize));
   }
 
   /**
    * 이항 연산을 수행하는 공통 메서드
    */
   private performBinaryOperation(operator: Operator): void {
-    if (this.operator === Operator.NONE) {
+    if (this.currentOperator === Operator.NONE) {
       this.setPreviousNumberFromCurrent();
     } else {
       this.performPreCalculation();
       this.setCurrentNumberFromPrevious();
     }
-    this.operator = operator;
-    this.setShouldResetBuffer();
+    this.currentOperator = operator;
+    this.setNeedsBufferReset();
   }
 
   // 이항 연산자 메서드들
@@ -835,7 +836,7 @@ export class Calculator {
    *
    * 동작 과정:
    * 1. getConstant()를 호출하여 상수 값을 가져옴
-   * 2. 현재 계산기의 값(currentNumber)을 해당 상수 값으로 업데이트
+   * 2. 현재 계산기의 값(currentValue)을 해당 상수 값으로 업데이트
    */
   public setConstant(constant: string): void {
     this.setCurrentNumber(this.getConstant(constant));
@@ -847,8 +848,8 @@ export class Calculator {
    * 현재 계산기에 표시된 숫자를 메모리에 저장하는 메서드
    *
    * 동작 과정:
-   * 1. 현재 숫자(currentNumber)를 메모리(memoryNumber)에 저장
-   * 2. 메모리 초기화 상태(isMemoryReset)를 false로 설정하여 메모리 사용 가능 상태로 변경
+   * 1. 현재 숫자(currentValue)를 메모리(memoryValue)에 저장
+   * 2. 메모리 초기화 상태(isMemoryEmpty)를 false로 설정하여 메모리 사용 가능 상태로 변경
    */
   public memorySave(): void {
     this.memoryNumber = this.currentNumber;
@@ -862,16 +863,16 @@ export class Calculator {
    * 2. 초기화 상태면 에러 발생
    * 3. 아니면 메모리의 숫자를 현재 숫자로 설정하고 리셋 플래그 해제
    *
-   * @throws {Error} 메모리가 초기화 상태일 때 호출하면 'Memory is empty' 에러 발생
+   * @throws {Error} 메모리가 초기화 상태일 때 ���출하면 'Memory is empty' 에러 발생
    */
   public memoryRecall(): void {
-    // 1. 메모리가 비어있으면 (this.isMemoryReset이 true이면)
+    // 1. 메모리가 비어있으면 (this.isMemoryEmpty이 true이면)
     // Error가 throw되고 여기서 함수 실행이 중단됨
-    this.checkError(this.isMemoryReset, 'Memory is empty');
+    this.checkError(this.isMemoryEmpty, 'Memory is empty');
 
     // 2. 에러가 발생하지 않은 경우에만 아래 코드가 실행됨
     this.currentNumber = this.memoryNumber;
-    this.setShouldNotResetBuffer();
+    this.setDoesNotNeedBufferReset();
   }
 
   public memoryClear(): void {
@@ -879,9 +880,9 @@ export class Calculator {
   }
 
   private performMemoryOperation(operation: (a: string, b: string) => string): void {
-    if (!this.isMemoryReset) {
+    if (!this.isMemoryEmpty) {
       this.memoryNumber = operation(this.memoryNumber, this.currentNumber);
-      this.setShouldResetBuffer();
+      this.setNeedsBufferReset();
     }
   }
 

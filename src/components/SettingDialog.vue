@@ -25,7 +25,7 @@
   const storeUtils = useStoreUtils();
 
   // 스토어에서 필요한 함수들을 구조 분해 할당으로 가져옵니다.
-  const { notifyMsg } = storeNotifications;
+  const { showMessage } = storeNotifications;
   const { toggleAlwaysOnTop, setInitPanel, setDarkMode, setAlwaysOnTop, setHapticsMode, setDecimalPlaces } =
     storeSettings;
 
@@ -38,21 +38,21 @@
   const systemLocale = ref(navigator.language.substring(0, 2));
 
   // 언어 옵션을 반응형 배열로 정의합니다.
-  const localeOptions = reactive([
+  const languageOptions = reactive([
     { value: 'ko', label: t('message.ko') },
     { value: 'en', label: t('message.en') },
   ]);
 
   // 시스템 로케일 사용 여부와 사용자 로케일이 변경될 때마다 언어 옵션 라벨을 업데이트합니다.
   watch([() => storeSettings.useSystemLocale, () => storeSettings.userLocale], () => {
-    localeOptions.forEach((option) => {
+    languageOptions.forEach((option) => {
       option.label = t('message.' + option.value);
     });
     storeSettings.locale = locale.value as string;
   });
 
   // 로케일을 설정하는 함수입니다.
-  const setLocale = () => {
+  const setLanguage = () => {
     if (storeSettings.useSystemLocale) {
       locale.value = systemLocale.value;
     } else {
@@ -61,14 +61,14 @@
   };
 
   // '항상 위에' 설정을 토글하고 알림을 표시하는 함수입니다.
-  const toggleAlwaysOnTopWithNotify = () => {
+  const toggleAlwaysOnTopWithNotification = () => {
     if ($q.platform.is.electron) {
       toggleAlwaysOnTop();
 
       if (storeSettings.alwaysOnTop) {
-        notifyMsg(t('alwaysOnTopOn'));
+        showMessage(t('alwaysOnTopOn'));
       } else {
-        notifyMsg(t('alwaysOnTopOff'));
+        showMessage(t('alwaysOnTopOff'));
       }
     }
   };
@@ -78,15 +78,16 @@
 
   // 키 바인딩을 설정합니다.
   const keyBinding = new KeyBinding([
-    [['Alt+t'], toggleAlwaysOnTopWithNotify],
+    [['Alt+t'], toggleAlwaysOnTopWithNotification],
     [['Alt+i'], storeSettings.toggleInitPanel],
     [['Alt+d'], storeSettings.toggleDarkMode],
+    [['Alt+p'], storeSettings.toggleHapticsMode],
     [['Alt+s'], () => { storeBase.isSettingDialogOpen = true; }],
     [[';'], storeSettings.toggleButtonAddedLabel],
     [[','], storeSettings.toggleUseGrouping],
-    [['Ctrl+,'], () => storeSettings.setGroupingUnit(storeSettings.groupingUnit == 3 ? 4 : 3)],
-    [['['], storeSettings.decDecimalPlaces],
-    [[']'], storeSettings.incDecimalPlaces],
+    [['Alt+,'], () => storeSettings.setGroupingUnit(storeSettings.groupingUnit == 3 ? 4 : 3)],
+    [['['], storeSettings.decrementDecimalPlaces],
+    [[']'], storeSettings.incrementDecimalPlaces],
   ]);
 
   // 입력 포커스 상태에 따라 키 바인딩을 활성화/비활성화합니다.
@@ -104,7 +105,7 @@
 
   // 컴포넌트가 마운트되기 전에 실행되는 훅입니다.
   onBeforeMount(() => {
-    setLocale();
+    setLanguage();
 
     // 초기 실행 시 로케일 설정
     if (storeSettings.locale === '') {
@@ -143,7 +144,7 @@
       <q-card-section class="full-width">
         <q-list v-blur dense>
           <q-item v-if="$q.platform.is.electron" class="q-py-none">
-            <q-item-label class="self-center">{{ t('alwaysOnTop') }} (T)</q-item-label>
+            <q-item-label class="self-center">{{ t('alwaysOnTop') }} (Alt-T)</q-item-label>
             <q-space />
             <q-toggle
               v-model="storeSettings.alwaysOnTop"
@@ -154,7 +155,7 @@
           </q-item>
 
           <q-item class="q-py-none">
-            <q-item-label class="self-center">{{ t('initPanel') }} (N)</q-item-label>
+            <q-item-label class="self-center">{{ t('initPanel') }} (Alt-I)</q-item-label>
             <q-space />
             <q-toggle
               v-model="storeSettings.initPanel"
@@ -165,13 +166,13 @@
           </q-item>
 
           <q-item class="q-py-none">
-            <q-item-label class="self-center">{{ t('darkMode') }} (K)</q-item-label>
+            <q-item-label class="self-center">{{ t('darkMode') }} (Alt-D)</q-item-label>
             <q-space />
             <q-toggle v-model="storeSettings.darkMode" keep-color dense @click="setDarkMode(storeSettings.darkMode)" />
           </q-item>
 
           <q-item v-if="$q.platform.is.capacitor" class="q-py-none">
-            <q-item-label class="self-center">{{ t('hapticsMode') }} (K)</q-item-label>
+            <q-item-label class="self-center">{{ t('hapticsMode') }} (Alt-P)</q-item-label>
             <q-space />
             <q-toggle
               v-model="storeSettings.hapticsMode"
@@ -196,7 +197,7 @@
           </q-item>
 
           <q-item class="q-py-none">
-            <q-item-label class="self-center">{{ t('groupingUnit') }} (??)</q-item-label>
+            <q-item-label class="self-center">{{ t('groupingUnit') }} (Alt-,)</q-item-label>
             <q-space />
             <q-slider
               v-model="storeSettings.groupingUnit"
@@ -254,37 +255,37 @@
             </q-slider>
           </q-item>
 
-          <template v-if="storeBase.cTab == 'unit'">
+          <template v-if="storeBase.currentTab == 'unit'">
             <q-separator spaced="sm" />
 
             <q-item class="q-py-none">
-              <q-item-label class="self-center"> {{ t('showUnit') }} (b) </q-item-label>
+              <q-item-label class="self-center"> {{ t('showUnit') }} (Alt-Y) </q-item-label>
               <q-space />
               <q-toggle v-model="storeSettings.showUnit" keep-color dense />
             </q-item>
           </template>
 
-          <template v-else-if="storeBase.cTab == 'currency'">
+          <template v-else-if="storeBase.currentTab == 'currency'">
             <q-separator spaced="sm" />
 
             <q-item class="q-py-none">
-              <q-item-label class="self-center"> {{ t('showSymbol') }} (o) </q-item-label>
+              <q-item-label class="self-center"> {{ t('showSymbol') }} (Alt-Y) </q-item-label>
               <q-space />
               <q-toggle v-model="storeSettings.showSymbol" keep-color dense />
             </q-item>
           </template>
 
-          <template v-else-if="storeBase.cTab == 'radix'">
+          <template v-else-if="storeBase.currentTab == 'radix'">
             <q-separator spaced="sm" />
 
             <q-item class="q-py-none">
-              <q-item-label class="self-center"> {{ t('showRadix') }} (??) </q-item-label>
+              <q-item-label class="self-center"> {{ t('showRadix') }} (Alt-Y) </q-item-label>
               <q-space />
               <q-toggle v-model="storeSettings.showRadix" keep-color dense />
             </q-item>
 
             <q-item class="q-py-none">
-              <q-item-label class="self-center"> {{ t('radixType') }} (??) </q-item-label>
+              <q-item-label class="self-center"> {{ t('radixType') }} (Alt-U) </q-item-label>
               <q-space />
               <q-select
                 v-model="storeSettings.radixType"
@@ -310,7 +311,7 @@
           <q-item class="q-py-none">
             <q-item-label class="self-center">{{ t('useSystemLocale') }}</q-item-label>
             <q-space />
-            <q-toggle v-model="storeSettings.useSystemLocale" keep-color dense @click="setLocale()" />
+            <q-toggle v-model="storeSettings.useSystemLocale" keep-color dense @click="setLanguage()" />
           </q-item>
 
           <q-item>
@@ -321,7 +322,7 @@
             <q-select
               v-model="storeSettings.userLocale"
               :disable="storeSettings.useSystemLocale"
-              :options="localeOptions"
+              :options="languageOptions"
               dense
               emit-value
               map-options
@@ -330,7 +331,7 @@
               :options-selected-class="!storeSettings.darkMode ? 'text-primary' : 'text-grey-1'"
               :popup-content-class="!storeSettings.darkMode ? 'bg-blue-grey-2' : 'bg-blue-grey-6'"
               :class="!storeSettings.darkMode ? 'bg-blue-grey-2' : 'bg-blue-grey-6'"
-              @update:model-value="setLocale()"
+              @update:model-value="setLanguage()"
             />
           </q-item>
         </q-list>
@@ -385,7 +386,7 @@ ko:
   showUnit: '단위 표시'
   showSymbol: '기호 표시'
   showRadix: '진법 표시'
-  radixType: '진법 표시 형식'
+  radixType: '진법 형식'
   prefix: '앞에'
   suffix: '뒤에'
   useSystemLocale: '시스템 언어 사용'

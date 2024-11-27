@@ -13,7 +13,7 @@
   import { KeyBinding } from 'classes/KeyBinding';
 
   // Quasar 인스턴스 초기화
-  const $q = useQuasar();
+  const quasar = useQuasar();
 
   // i18n 설정
   const { t } = useI18n();
@@ -28,14 +28,14 @@
   // 스토어에서 필요한 메서드와 속성 추출
   const { calc } = storeBase;
   const { copyToClipboard, clickButtonById } = storeUtils;
-  const { notifyError, notifyMsg } = storeNotifications;
-  const { swapUnit } = storeUnit;
-  const { swapCurrency } = storeCurrency;
+  const { showError, showMessage } = storeNotifications;
+  const { swapUnits } = storeUnit;
+  const { swapCurrencies } = storeCurrency;
 
   /**
    * 선택된 텍스트 또는 계산 결과를 클립보드에 복사하는 함수
    */
-  const doCopy = () => {
+  const handleCopy = () => {
     const resultText = document.getElementById('result')?.textContent ?? '';
     const selectedText = document.getSelection()?.toString() ?? '';
     const textToClipboard = selectedText || resultText;
@@ -48,37 +48,37 @@
    * 클립보드의 내용을 메인 또는 서브 패널에 붙여넣는 함수
    * @param {('main'|'sub')} target - 붙여넣을 대상 패널
    */
-  const doPaste = async (target: 'main' | 'sub' = 'main'): Promise<void> => {
+  const handlePaste = async (target: 'main' | 'sub' = 'main'): Promise<void> => {
     try {
-      let text = '';
-      if ($q.platform.is.capacitor) {
-        text = await AndroidInterface.getFromClipboard();
+      let clipboardText = '';
+      if (quasar.platform.is.capacitor) {
+        clipboardText = await AndroidInterface.getFromClipboard();
       } else {
-        text = await navigator.clipboard.readText();
+        clipboardText = await navigator.clipboard.readText();
       }
 
-      if (!text) {
-        notifyError(t('clipboardIsEmptyOrContainsDataThatCannotBePasted.'));
+      if (!clipboardText) {
+        showError(t('clipboardIsEmptyOrContainsDataThatCannotBePasted.'));
         return;
       }
 
       if (target === 'sub') {
-        if (storeBase.cTab === 'unit') {
-          swapUnit();
-          setTimeout(() => calc.setCurrentNumber(text), 5);
-          setTimeout(swapUnit, 10);
-        } else if (storeBase.cTab === 'currency') {
-          swapCurrency();
-          setTimeout(() => calc.setCurrentNumber(text), 5);
-          setTimeout(swapCurrency, 10);
+        if (storeBase.currentTab === 'unit') {
+          swapUnits();
+          setTimeout(() => calc.setCurrentNumber(clipboardText), 5);
+          setTimeout(swapUnits, 10);
+        } else if (storeBase.currentTab === 'currency') {
+          swapCurrencies();
+          setTimeout(() => calc.setCurrentNumber(clipboardText), 5);
+          setTimeout(swapCurrencies, 10);
         }
-        notifyMsg(t('pastedFromClipboardToSubPanel'));
+        showMessage(t('pastedFromClipboardToSubPanel'));
       } else {
-        calc.setCurrentNumber(text);
-        notifyMsg(t('pastedFromClipboard'));
+        calc.setCurrentNumber(clipboardText);
+        showMessage(t('pastedFromClipboard'));
       }
     } catch (error) {
-      notifyError(t('failedToPasteFromClipboard'));
+      showError(t('failedToPasteFromClipboard'));
     }
   };
 
@@ -101,7 +101,7 @@
     icon="content_copy"
     class="q-ma-none q-pa-none q-pl-xs"
     :disable="storeBase.isSettingDialogOpen"
-    @click="doCopy"
+    @click="handleCopy"
   >
     <MyTooltip>{{ t('tooltipCopy') }}</MyTooltip>
   </q-btn>
@@ -111,12 +111,12 @@
     icon="content_paste"
     class="q-ma-none q-pa-none q-pl-xs"
     :disable="storeBase.isSettingDialogOpen"
-    @click="doPaste()"
+    @click="handlePaste()"
   >
-    <q-menu v-if="storeBase.cTab !== 'calc'" context-menu auto-close class="z-max shadow-6">
+    <q-menu v-if="storeBase.currentTab !== 'calc'" context-menu auto-close class="z-max shadow-6">
       <q-list dense style="max-width: 200px">
-        <MenuItem :action="() => doPaste('main')" :title="t('pasteToMainPanel')" />
-        <MenuItem :action="() => doPaste('sub')" :title="t('pasteToSubPanel')" />
+        <MenuItem :action="() => handlePaste('main')" :title="t('pasteToMainPanel')" />
+        <MenuItem :action="() => handlePaste('sub')" :title="t('pasteToSubPanel')" />
       </q-list>
     </q-menu>
     <MyTooltip>{{ t('tooltipPaste') }}</MyTooltip>

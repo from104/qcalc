@@ -24,13 +24,13 @@
   // 스토어에서 필요한 메서드 추출
   const { calc } = storeBase;
   const { clickButtonById } = storeUtils;
-  const { swapUnit, initRecentCategoryAndUnit } = storeUnit;
+  const { swapUnits, initRecentUnits } = storeUnit;
 
   // 단위 초기화
-  initRecentCategoryAndUnit();
+  initRecentUnits();
 
   // 범주 이름을 현재 언어에 맞게 초기화
-  const categories = reactive(
+  const categoryList = reactive(
     UnitConverter.categories.map((category) => ({
       value: category,
       label: t(`categories.${category}`),
@@ -39,80 +39,80 @@
 
   // 언어 변경 시 범주 이름 업데이트
   watch(() => storeSettings.locale, () => {
-    categories.forEach((category) => {
+    categoryList.forEach((category) => {
       category.label = t(`categories.${category.value}`);
     });
   });
 
   // 키 바인딩 설정
-  const keyBinding = new KeyBinding([
+  const keyBindingManager = new KeyBinding([
     [['Alt+w'], () => clickButtonById('btn-swap-unit')],
     [['Alt+y'], () => storeSettings.toggleShowUnit()],
   ]);
 
   // 컴포넌트 마운트 시 실행
   onMounted(() => {
-    initRecentCategoryAndUnit();
-    keyBinding.subscribe();
+    initRecentUnits();
+    keyBindingManager.subscribe();
   });
 
   // 컴포넌트 언마운트 전 실행
   onBeforeUnmount(() => {
-    keyBinding.unsubscribe();
+    keyBindingManager.unsubscribe();
   });
 
   // 단위 옵션 타입 정의
-  type UnitOptions = {
+  type UnitOption = {
     value: string;
     label: string;
     disable?: boolean;
   };
 
-  type ReactiveUnitOptions = {
-    values: UnitOptions[];
+  type ReactiveUnitOptionList = {
+    values: UnitOption[];
   };
 
   // 단위 옵션 초기화
-  const fromUnitOptions = reactive({ values: [] } as ReactiveUnitOptions);
-  const toUnitOptions = reactive({ values: [] } as ReactiveUnitOptions);
+  const sourceUnitOptions = reactive({ values: [] } as ReactiveUnitOptionList);
+  const targetUnitOptions = reactive({ values: [] } as ReactiveUnitOptionList);
 
   // 단위 변경 시 옵션 업데이트
   watch(
     [
-      () => storeUnit.recentUnitFrom[storeUnit.recentCategory],
-      () => storeUnit.recentUnitTo[storeUnit.recentCategory],
+      () => storeUnit.sourceUnits[storeUnit.selectedCategory],
+      () => storeUnit.targetUnits[storeUnit.selectedCategory],
     ],
     () => {
-      const category = storeUnit.recentCategory;
-      const unitList = UnitConverter.getUnitLists(category);
+      const currentCategory = storeUnit.selectedCategory;
+      const availableUnits = UnitConverter.getUnitLists(currentCategory);
 
       // 'From' 단위 옵션 설정
-      fromUnitOptions.values = unitList.map((unit) => ({
+      sourceUnitOptions.values = availableUnits.map((unit) => ({
         value: unit,
         label: unit,
-        desc: UnitConverter.getUnitDesc(category, unit),
-        disable: storeUnit.recentUnitTo[category] === unit,
+        desc: UnitConverter.getUnitDesc(currentCategory, unit),
+        disable: storeUnit.targetUnits[currentCategory] === unit,
       }));
 
       // 'To' 단위 옵션 설정
-      toUnitOptions.values = unitList.map((unit) => ({
+      targetUnitOptions.values = availableUnits.map((unit) => ({
         value: unit,
         label: unit,
-        desc: UnitConverter.getUnitDesc(category, unit),
-        disable: storeUnit.recentUnitFrom[category] === unit,
+        desc: UnitConverter.getUnitDesc(currentCategory, unit),
+        disable: storeUnit.sourceUnits[currentCategory] === unit,
       }));
     },
     { immediate: true }
   );
 
-  const swapUnitValue = () => {
+  const handleUnitSwap = () => {
     calc.setCurrentNumber(UnitConverter.convert(
-      storeUnit.recentCategory,
+      storeUnit.selectedCategory,
       calc.currentNumber,
-      storeUnit.recentUnitFrom[storeUnit.recentCategory],
-      storeUnit.recentUnitTo[storeUnit.recentCategory]
+      storeUnit.sourceUnits[storeUnit.selectedCategory],
+      storeUnit.targetUnits[storeUnit.selectedCategory]
     ));
-    swapUnit();
+    swapUnits();
   };
 </script>
 
@@ -120,8 +120,8 @@
   <q-card-section v-blur class="row q-px-sm q-pt-none q-pb-sm">
     <!-- 카테고리 -->
     <q-select
-      v-model="storeUnit.recentCategory"
-      :options="categories"
+      v-model="storeUnit.selectedCategory"
+      :options="categoryList"
       :label="t('category')"
       stack-label
       dense
@@ -140,9 +140,9 @@
 
     <!-- 원본 단위 -->
     <q-select
-      v-model="storeUnit.recentUnitFrom[storeUnit.recentCategory]"
-      :options="fromUnitOptions.values"
-      :label="t(`unitDesc.${storeUnit.recentCategory}.${storeUnit.recentUnitFrom[storeUnit.recentCategory]}`)"
+      v-model="storeUnit.sourceUnits[storeUnit.selectedCategory]"
+      :options="sourceUnitOptions.values"
+      :label="t(`unitDesc.${storeUnit.selectedCategory}.${storeUnit.sourceUnits[storeUnit.selectedCategory]}`)"
       stack-label
       dense
       options-dense
@@ -158,14 +158,14 @@
         <q-item v-bind="scope.itemProps">
           <q-item-section>
             <q-item-label caption>
-              {{ t(`unitDesc.${storeUnit.recentCategory}.${scope.opt.label}`) }}
+              {{ t(`unitDesc.${storeUnit.selectedCategory}.${scope.opt.label}`) }}
             </q-item-label>
             <q-item-label>{{ scope.opt.label }}</q-item-label>
           </q-item-section>
         </q-item>
       </template>
       <MyTooltip>
-        {{ t(`unitDesc.${storeUnit.recentCategory}.${storeUnit.recentUnitFrom[storeUnit.recentCategory]}`) }}
+        {{ t(`unitDesc.${storeUnit.selectedCategory}.${storeUnit.sourceUnits[storeUnit.selectedCategory]}`) }}
       </MyTooltip>
     </q-select>
 
@@ -178,16 +178,16 @@
       icon="swap_horiz"
       size="md"
       class="col-1 q-mx-none q-px-sm"
-      @click="swapUnitValue()"
+      @click="handleUnitSwap()"
     >
       <MyTooltip>{{ t('tooltipSwap') }}</MyTooltip>
     </q-btn>
 
     <!-- 대상 단위 -->
     <q-select
-      v-model="storeUnit.recentUnitTo[storeUnit.recentCategory]"
-      :options="toUnitOptions.values"
-      :label="t(`unitDesc.${storeUnit.recentCategory}.${storeUnit.recentUnitTo[storeUnit.recentCategory]}`)"
+      v-model="storeUnit.targetUnits[storeUnit.selectedCategory]"
+      :options="targetUnitOptions.values"
+      :label="t(`unitDesc.${storeUnit.selectedCategory}.${storeUnit.targetUnits[storeUnit.selectedCategory]}`)"
       stack-label
       dense
       options-dense
@@ -203,14 +203,14 @@
         <q-item v-bind="scope.itemProps">
           <q-item-section>
             <q-item-label caption>
-              {{ t(`unitDesc.${storeUnit.recentCategory}.${scope.opt.label}`) }}
+              {{ t(`unitDesc.${storeUnit.selectedCategory}.${scope.opt.label}`) }}
             </q-item-label>
             <q-item-label>{{ scope.opt.label }}</q-item-label>
           </q-item-section>
         </q-item>
       </template>
       <MyTooltip>
-        {{ t(`unitDesc.${storeUnit.recentCategory}.${storeUnit.recentUnitTo[storeUnit.recentCategory]}`) }}
+        {{ t(`unitDesc.${storeUnit.selectedCategory}.${storeUnit.targetUnits[storeUnit.selectedCategory]}`) }}
       </MyTooltip>
     </q-select>
 

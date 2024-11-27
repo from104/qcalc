@@ -28,8 +28,8 @@ export const useStoreSettings = defineStore('settings', {
   // 액션 정의
   actions: {
     // 다크 모드 설정
-    setDarkMode(darkMode: boolean) {
-      this.darkMode = darkMode;
+    setDarkMode(isDark: boolean) {
+      this.darkMode = isDark;
       Dark.set(this.darkMode);
     },
 
@@ -39,8 +39,8 @@ export const useStoreSettings = defineStore('settings', {
     },
 
     // 항상 위에 표시 설정
-    setAlwaysOnTop(alwaysOnTop: boolean) {
-      this.alwaysOnTop = alwaysOnTop;
+    setAlwaysOnTop(isAlwaysOnTop: boolean) {
+      this.alwaysOnTop = isAlwaysOnTop;
       window.myAPI.setAlwaysOnTop(this.alwaysOnTop);
     },
 
@@ -50,8 +50,8 @@ export const useStoreSettings = defineStore('settings', {
     },
 
     // 초기 패널 설정
-    setInitPanel(initPanel: boolean) {
-      this.initPanel = initPanel;
+    setInitPanel(isInitPanel: boolean) {
+      this.initPanel = isInitPanel;
     },
 
     // 초기 패널 토글
@@ -65,8 +65,8 @@ export const useStoreSettings = defineStore('settings', {
     },
 
     // 숫자 그룹화 단위 설정
-    setGroupingUnit(groupingUnit: 3 | 4) {
-      this.groupingUnit = groupingUnit;
+    setGroupingUnit(digitCount: 3 | 4) {
+      this.groupingUnit = digitCount;
     },
 
     // 버튼 추가 레이블 표시 토글
@@ -75,19 +75,19 @@ export const useStoreSettings = defineStore('settings', {
     },
 
     // 소수점 자릿수 설정
-    setDecimalPlaces(decimalPlaces: number) {
-      if ([-2, 0, 2, 4, 6].includes(decimalPlaces)) {
-        this.decimalPlaces = decimalPlaces;
+    setDecimalPlaces(places: number) {
+      if ([-2, 0, 2, 4, 6].includes(places)) {
+        this.decimalPlaces = places;
       }
     },
 
     // 소수점 자릿수 증가
-    incDecimalPlaces() {
+    incrementDecimalPlaces() {
       this.setDecimalPlaces(this.decimalPlaces + 2);
     },
 
     // 소수점 자릿수 감소
-    decDecimalPlaces() {
+    decrementDecimalPlaces() {
       this.setDecimalPlaces(this.decimalPlaces - 2);
     },
 
@@ -107,13 +107,18 @@ export const useStoreSettings = defineStore('settings', {
     },
 
     // 진법 표시 형식 설정
-    setRadixType(radixType: 'prefix' | 'suffix'): void {
-      this.radixType = radixType;
+    setRadixType(displayType: 'prefix' | 'suffix'): void {
+      this.radixType = displayType;
     },
 
     // 햅틱 피드백 모드 설정
-    setHapticsMode(hapticsMode: boolean): void {
-      this.hapticsMode = hapticsMode;
+    setHapticsMode(isEnabled: boolean): void {
+      this.hapticsMode = isEnabled;
+    },
+
+    // 햅틱 피드백 모드 토글
+    toggleHapticsMode(): void {
+      this.setHapticsMode(!this.hapticsMode);
     },
   },
 

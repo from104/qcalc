@@ -26,11 +26,11 @@ export type RadixType = Radix;
  */
 export class RadixConverter {
   // 16진수 변환에 사용될 문자 집합
-  private readonly HEX_DIGITS = '0123456789ABCDEF';
+  private readonly hexDigits = '0123456789ABCDEF';
   // 소수점 이하 최대 자릿수
-  private readonly MAX_PRECISION = 128;
+  private readonly maxPrecision = 128;
   // 지원하는 진법 타입
-  public readonly RADIX_MAP = {
+  public readonly radixMap = {
     [Radix.Binary]: 2,
     [Radix.Octal]: 8,
     [Radix.Decimal]: 10,
@@ -44,23 +44,15 @@ export class RadixConverter {
    * @returns 유효성 여부
    * @throws {Error} 지원하지 않는 진법인 경우
    */
-  public isValidRadixNumber(value: string, radix: Radix): boolean {
-    if (!Object.values(Radix).includes(radix)) {
-      throw new Error('Unsupported radix type');
-    }
-    const pattern = () => {
-      switch (radix) {
-        case Radix.Binary:
-          return /^-?[01]+(\.[01]*)?$/; // 음수 허용
-        case Radix.Octal:
-          return /^-?[0-7]+(\.[0-7]*)?$/; // 음수 허용
-        case Radix.Decimal:
-          return /^-?[0-9]+(\.[0-9]*)?$/; // 음수 허용
-        case Radix.Hexadecimal:
-          return /^-?[0-9A-Fa-f]+(\.[0-9A-Fa-f]*)?$/; // 음수 허용
-      }
+  public isValidRadixNumber(number: string, radix: Radix): boolean {
+    const patterns = {
+      [Radix.Binary]: /^-?[01]+(\.[01]*)?$/,
+      [Radix.Octal]: /^-?[0-7]+(\.[0-7]*)?$/,
+      [Radix.Decimal]: /^-?\d+(\.\d*)?$/,
+      [Radix.Hexadecimal]: /^-?[0-9A-Fa-f]+(\.[0-9A-Fa-f]*)?$/,
     };
-    return pattern().test(value);
+
+    return patterns[radix].test(number);
   }
 
   /**
@@ -143,22 +135,22 @@ export class RadixConverter {
     if (!decimal) return '0';
     if (radix === Radix.Decimal) return decimal.toString();
     // 입력값을 BigNumber로 변환하고 정수부와 소수부 분리
-    const bignumber = MathB.bignumber(decimal);
-    const isNegative = MathB.smaller(bignumber, 0);
-    const absoluteValue = MathB.abs(bignumber);
-    const integer = MathB.floor(absoluteValue);
-    const fraction = MathB.subtract(absoluteValue, integer);
+    const bigNumberValue = MathB.bignumber(decimal);
+    const isNegative = MathB.smaller(bigNumberValue, 0);
+    const absoluteValue = MathB.abs(bigNumberValue);
+    const integerPartValue = MathB.floor(absoluteValue);
+    const fractionPartValue = MathB.subtract(absoluteValue, integerPartValue);
 
     // 정수부 변환 (MathJS format 함수 사용)
-    const integerPart = BigInt(integer.toString()).toString(this.RADIX_MAP[radix]).toUpperCase();
+    const integerPart = BigInt(integerPartValue.toString()).toString(this.radixMap[radix]).toUpperCase();
 
     // 소수부가 0이면 정수부만 반환
-    if (MathB.equal(fraction, 0)) {
+    if (MathB.equal(fractionPartValue, 0)) {
       return isNegative ? `-${integerPart}` : integerPart;
     }
 
     // 소수부 변환
-    const fractionPart = this.convertFractionToRadix(fraction, radix);
+    const fractionPart = this.convertFractionToRadix(fractionPartValue, radix);
 
     // 결과 조합 (불필요한 0 제거)
     const result = `${integerPart}.${fractionPart}`;
@@ -181,21 +173,21 @@ export class RadixConverter {
    */
   private convertFractionToRadix(fraction: math.BigNumber, radix: Radix): string {
     // 진법에 따른 기수값 (2, 8, 16) 가져오기
-    const radixValue = this.RADIX_MAP[radix];
+    const radixValue = this.radixMap[radix];
 
     // 결과 문자열과 현재 처리중인 소수 초기화
     let result = '';
     let remainingFraction = fraction;
 
     // 최대 정밀도까지 소수부 변환 반복
-    for (let precision = 0; precision < this.MAX_PRECISION && !MathB.equal(remainingFraction, 0); precision++) {
+    for (let precision = 0; precision < this.maxPrecision && !MathB.equal(remainingFraction, 0); precision++) {
       // 현재 소수에 기수를 곱하여 정수부 추출
       remainingFraction = MathB.multiply(remainingFraction, radixValue) as math.BigNumber;
       const integerPart = MathB.floor(remainingFraction);
 
       // 16진수면 해당하는 문자(0-F)로, 아니면 숫자 그대로 변환
       const digitStr =
-        radix === Radix.Hexadecimal ? this.HEX_DIGITS[Number(integerPart.toFixed())] : integerPart.toString();
+        radix === Radix.Hexadecimal ? this.hexDigits[Number(integerPart.toFixed())] : integerPart.toString();
 
       // 결과 문자열에 추가
       result += digitStr;
@@ -260,9 +252,8 @@ export class RadixConverter {
       .with(Radix.Octal, () => '0o')
       .with(Radix.Hexadecimal, () => '0x')
       .exhaustive();
-
     // 정수부 변환 (빈 문자열이면 0으로 처리)
-    let result = MathB.bignumber(integerPart ? BigInt(radixPrefix + integerPart) : 0n);
+    let result = MathB.bignumber(integerPart ? BigInt(radixPrefix + integerPart).toString() : '0');
 
     // 소수부가 존재하면 변환하여 더하기
     if (fractionPart) {
@@ -289,7 +280,7 @@ export class RadixConverter {
    */
   private convertFractionFromRadix(fractionPart: string, radix: Radix): math.BigNumber {
     // 진법에 따른 기수값 (2, 8, 16) 가져오기
-    const radixValue = this.RADIX_MAP[radix];
+    const radixValue = this.radixMap[radix];
 
     // 16진수의 경우 대문자로 통일 (예: 'a' -> 'A')
     const digits = radix === Radix.Hexadecimal ? fractionPart.toUpperCase() : fractionPart;
@@ -301,7 +292,10 @@ export class RadixConverter {
         const digitValue = parseInt(currentDigit, radixValue);
 
         // 현재 자릿수의 가중치 계산: value / (radix^position)
-        const weightedValue = MathB.divide(BigNumber(digitValue), MathB.pow(BigNumber(radixValue), position + 1)) as typeBigNumber;
+        const weightedValue = MathB.divide(
+          BigNumber(digitValue),
+          MathB.pow(BigNumber(radixValue), position + 1),
+        ) as typeBigNumber;
 
         // 누적값에 현재 자릿수의 가중치를 더함
         return MathB.add(accumulator, weightedValue);

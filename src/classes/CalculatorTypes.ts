@@ -3,7 +3,7 @@ import { create, all, BigNumber as tBigNumber } from 'mathjs';
 /**
  * MathJS 라이브러리 설정
  * - BigNumber 타입 사용으로 정밀한 계산 지원
- * - 정밀도 64비트로 설정하여 높은 정확도 보장
+ * - 정밀도 128비트로 설정하여 높은 정확도 보장
  */
 export const MathB = create(all, {
   number: 'BigNumber',
@@ -17,84 +17,48 @@ export type typeBigNumber = tBigNumber;
 /**
  * 계산기에서 사용되는 연산자 열거형
  * @enum {string}
- * @description
- * 각 연산자에 대한 문자열 표현과 설명:
- * - NONE: 연산자 없음 ('')
- * - ADD: 덧셈 ('+')
- * - SUB: 뺄셈 ('-')
- * - MUL: 곱셈 ('×')
- * - DIV: 나눗셈 ('÷')
- * - PCT: 퍼센트 ('%')
- * - POW: 거듭제곱 ('pow')
- * - ROOT: 제곱근 ('root')
- * - MOD: 나머지 ('mod')
- * - BIT_SFT_R: 오른쪽 시프트 ('bitSftR')
- * - BIT_SFT_L: 왼쪽 시프트 ('bitSftL')
- * - BIT_AND: 비트 AND ('bitAnd')
- * - BIT_OR: 비트 OR ('bitOr')
- * - BIT_XOR: 비트 XOR ('bitXor')
- * - BIT_NOT: 비트 NOT ('bitNot')
- * - BIT_COMP: 비트 보수 ('bitComp')
- * - REC: 역수 ('rec')
- * - SQRT: 제곱근 ('sqrt')
- * - POW2: 제곱 ('pow2')
- * - SIN: 사인 함수 ('sin')
- * - COS: 코사인 함수 ('cos')
- * - TAN: 탄젠트 함수 ('tan')
- * - FCT: 팩토리얼 ('fct')
- * - EXP10: 10의 거듭제곱 ('exp10')
- * - INT: 정수부 추출 ('int')
- * - FRAC: 소수부 추출 ('frac')
  */
 export enum Operator {
-  NONE = '',
-  ADD = '+',
-  SUB = '-',
-  MUL = '×',
-  DIV = '÷',
-  PCT = '%',
-  POW = 'pow',
-  ROOT = 'root',
-  MOD = 'mod',
-  BIT_SFT_R = 'bitSftR',
-  BIT_SFT_L = 'bitSftL',
-  BIT_AND = 'bitAnd',
-  BIT_OR = 'bitOr',
-  BIT_XOR = 'bitXor',
-  BIT_NOT = 'bitNot',
-  BIT_NAND = 'bitNand',
-  BIT_NOR = 'bitNor',
-  BIT_XNOR = 'bitXnor',
-  REC = 'rec',
-  SQRT = 'sqrt',
-  POW2 = 'pow2',
-  SIN = 'sin',
-  COS = 'cos',
-  TAN = 'tan',
-  FCT = 'fct',
-  EXP10 = 'exp10',
-  INT = 'int',
-  FRAC = 'frac'
+  NONE = '', // 연산자 없음
+  ADD = '+', // 덧셈
+  SUB = '-', // 뺄셈
+  MUL = '×', // 곱셈
+  DIV = '÷', // 나눗셈
+  PCT = '%', // 퍼센트
+  POW = 'pow', // 거듭제곱
+  ROOT = 'root', // 제곱근
+  MOD = 'mod', // 나머지
+  BIT_SFT_R = 'bitSftR', // 오른쪽 시프트
+  BIT_SFT_L = 'bitSftL', // 왼쪽 시프트
+  BIT_AND = 'bitAnd', // 비트 AND
+  BIT_OR = 'bitOr', // 비트 OR
+  BIT_XOR = 'bitXor', // 비트 XOR
+  BIT_NOT = 'bitNot', // 비트 NOT
+  BIT_NAND = 'bitNand', // 비트 NAND
+  BIT_NOR = 'bitNor', // 비트 NOR 
+  BIT_XNOR = 'bitXnor', // 비트 XNOR
+  REC = 'rec', // 역수
+  SQRT = 'sqrt', // 제곱근
+  POW2 = 'pow2', // 제곱
+  SIN = 'sin', // 사인 함수
+  COS = 'cos', // 코사인 함수
+  TAN = 'tan', // 탄젠트 함수
+  FCT = 'fct', // 팩토리얼
+  EXP10 = 'exp10', // 10의 거듭제곱
+  INT = 'int', // 정수부 추출
+  FRAC = 'frac' // 소수부 추출
 }
 
 /**
  * 수학 상수 정의 객체
- * @description
- * 자주 사용되는 수학 상수들을 BigNumber 형식으로 저장
- * - pi: 원주율 (π)
- * - pi2: π/2
- * - e: 자연상수
- * - ln2: 2의 자연로그
- * - ln10: 10의 자연로그
- * - phi: 황금비
  */
 export const constants: { [key: string]: string } = {
-  pi: MathB.pi.toString(),
-  pi2: MathB.bignumber(MathB.pi).div(2).toString(),
-  e: MathB.e.toString(),
-  ln2: MathB.log(2).toString(),
-  ln10: MathB.log(10).toString(),
-  phi: MathB.phi.toString(),
+  pi: MathB.pi.toString(), // 원주율
+  pi2: MathB.bignumber(MathB.pi).div(2).toString(), // 원주율의 절반
+  e: MathB.e.toString(), // 자연로그의 밑
+  ln2: MathB.log(2).toString(), // 자연로그 2
+  ln10: MathB.log(10).toString(), // 자연로그 10
+  phi: MathB.phi.toString(), // 황금비
 };
 
 /**
@@ -114,4 +78,16 @@ export interface CalculationResult {
   resultNumber: string;
 }
 
+/**
+ * 단어 크기 열거형
+ * @enum {number}
+ * @description
+ * 계산기에서 사용되는 단어 크기를 정의하는 열거형
+ * @property {number} 0 - 무제한
+ * @property {number} 4 - 4비트
+ * @property {number} 8 - 8비트
+ * @property {number} 16 - 16비트
+ * @property {number} 32 - 32비트
+ * @property {number} 64 - 64비트
+ */
 export type WordSize = 0 | 4 | 8 | 16 | 32 | 64;

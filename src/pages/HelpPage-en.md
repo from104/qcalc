@@ -31,8 +31,8 @@
 - CS-r: call memory
 - CS-e, S-Delete, S-Escape: clear memory
 - S-{+,-,*,/}: Add, subtract, multiply, divide in memory
-- A-w: Reverse unit or currency symbols.
-- A-y: Toggle display of units or currency symbols
+- A-w: Reverse unit or currency symbols. radix
+- A-y: Toggle display of units or currency symbols, radix
 - A-h: Open the history of calculation results (up to 100)
 - d: Clear calculation result history
 
@@ -66,7 +66,7 @@
 - SC-w: x>>1 (left shift by 1)
 - SC-a: x<<4 (right shift by 4)
 - SC-s: x>>4 (left shift by 4)
-- CA-y: Toggle radix display format (prefix or suffix)
+- A-u: Toggle radix display format (prefix or suffix)
 
 ### Other functions
 
@@ -79,9 +79,10 @@
 - A-t: Always toggle the above functions
 - A-i: toggle panel initialization on startup
 - A-d: Toggle dark mode
+- A-p: Toggle Haptic mode
 - ;: Show additional functions of the button
 - ,: Display number grouping (,)
-- C-,: Change number grouping unit (3 or 4)
+- A-,: Change number grouping unit (3 or 4)
 - [, ]: Adjust decimal point fixation (no limit to 6 digits)
 - "'": Activate additional functions of the button
 

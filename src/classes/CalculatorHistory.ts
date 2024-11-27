@@ -50,13 +50,13 @@ export class CalculatorHistory {
    * 계산기의 모든 히스토리 항목들을 저장하는 배열
    * 가장 최근 항목이 배열의 앞쪽에 위치합니다.
    */
-  private histories: History[] = [];
+  private records: History[] = [];
 
   /**
    * 히스토리의 최대 저장 개수
    * 메모리 관리를 위해 100개로 제한합니다.
    */
-  private readonly HISTORY_MAX_SIZE = 100;
+  private readonly MAX_RECORDS = 100;
 
   /**
    * 새로운 계산 결과를 히스토리에 추가합니다.
@@ -69,24 +69,24 @@ export class CalculatorHistory {
   public addHistory(history: CalculationResult): void {
     try {
       // 새로운 히스토리 항목의 고유 ID 생성
-      const historyId = this.generateNewId();
+      const newId = this.generateNewId();
 
       // 새로운 히스토리 객체 생성
       // - id: 고유한 식별자
       // - resultSnapshot: 계산 결과 데이터
       // - memo: 사용자 메모 (초기값: 빈 문자열)
-      const newHistory: History = {
-        id: historyId,
+      const newRecord: History = {
+        id: newId,
         calculationResult: history,
         memo: '',
       };
 
       // 새로운 히스토리를 배열의 맨 앞에 추가 (LIFO 구조)
-      this.histories.unshift(newHistory);
+      this.records.unshift(newRecord);
 
-      // 히스토리 크기가 최대 제한(HISTORY_MAX_SIZE)을 초과하는 경우
+      // 히스토리 크기가 최대 제한(MAX_RECORDS)을 초과하는 경우
       // 오래된 항목을 제거하여 크기 조정
-      this.trimHistoryIfNeeded();
+      this.trimRecordsIfNeeded();
     } catch (error) {
       throw new Error('Failed to add history item');
     }
@@ -98,9 +98,9 @@ export class CalculatorHistory {
    *
    * @throws {Error} 히스토리 항목 제거 중 오류가 발생한 경우
    */
-  public shiftHistory(): void {
+  public removeFirst(): void {
     try {
-      this.histories.shift();
+      this.records.shift();
     } catch (error) {
       throw new Error('Failed to remove history item');
     }
@@ -111,8 +111,8 @@ export class CalculatorHistory {
    *
    * @returns {number} 히스토리 배열의 현재 길이
    */
-  public getHistorySize(): number {
-    return this.histories.length;
+  public getCount(): number {
+    return this.records.length;
   }
 
   /**
@@ -121,8 +121,8 @@ export class CalculatorHistory {
    *
    * @returns {History[]} 전체 히스토리 항목 배열
    */
-  public getHistories(): History[] {
-    return this.histories;
+  public getAllRecords(): History[] {
+    return this.records;
   }
 
   /**
@@ -132,8 +132,8 @@ export class CalculatorHistory {
    * @returns {number} 히스토리 배열에서의 인덱스 위치
    * @throws {Error} 주어진 ID에 해당하는 히스토리를 찾을 수 없는 경우
    */
-  public getHistoryIndexByID(id: number): number {
-    const index = this.histories.findIndex((history) => history.id === id);
+  public findIndexById(id: number): number {
+    const index = this.records.findIndex((record) => record.id === id);
     if (index === -1) throw new Error('History item not found');
     return index;
   }
@@ -145,11 +145,11 @@ export class CalculatorHistory {
    * @returns {History} 해당 인덱스의 히스토리 항목
    * @throws {Error} 유효하지 않은 인덱스가 전달된 경우
    */
-  public getHistoryByIndex(index: number): History {
-    if (index < 0 || index >= this.histories.length) {
+  public getRecordByIndex(index: number): History {
+    if (index < 0 || index >= this.records.length) {
       throw new Error('Invalid history index');
     }
-    return this.histories[index];
+    return this.records[index];
   }
 
   /**
@@ -159,8 +159,8 @@ export class CalculatorHistory {
    * @returns {History} 해당 ID의 히스토리 항목
    * @throws {Error} 해당 ID의 히스토리를 찾을 수 없는 경우
    */
-  public getHistoryByID(id: number): History {
-    return this.getHistoryByIndex(this.getHistoryIndexByID(id));
+  public getRecordById(id: number): History {
+    return this.getRecordByIndex(this.findIndexById(id));
   }
 
   /**
@@ -169,17 +169,17 @@ export class CalculatorHistory {
    * @param {number} id - 삭제하고자 하는 히스토리 항목의 고유 ID
    * @throws {Error} 해당 ID의 히스토리를 찾을 수 없는 경우
    */
-  public deleteHistory(id: number): void {
-    const index = this.getHistoryIndexByID(id);
-    this.histories.splice(index, 1);
+  public deleteRecord(id: number): void {
+    const index = this.findIndexById(id);
+    this.records.splice(index, 1);
   }
 
   /**
    * 저장된 모든 히스토리 항목을 삭제합니다.
    * 히스토리 배열을 빈 배열로 초기화합니다.
    */
-  public clearHistory(): void {
-    this.histories = [];
+  public clearRecords(): void {
+    this.records = [];
   }
 
   /**
@@ -190,8 +190,8 @@ export class CalculatorHistory {
    * @throws {Error} 해당 ID의 히스토리를 찾을 수 없는 경우 'History item not found' 에러 발생
    */
   public setMemo(id: number, memo: string): void {
-    const index = this.getHistoryIndexByID(id);
-    this.histories[index].memo = memo;
+    const index = this.findIndexById(id);
+    this.records[index].memo = memo;
   }
 
   /**
@@ -202,8 +202,8 @@ export class CalculatorHistory {
    * @throws {Error} 해당 ID의 히스토리를 찾을 수 없는 경우 'History item not found' 에러 발생
    */
   public getMemo(id: number): string | null {
-    const index = this.getHistoryIndexByID(id);
-    return this.histories[index].memo || null;
+    const index = this.findIndexById(id);
+    return this.records[index].memo || null;
   }
 
   /**
@@ -213,8 +213,8 @@ export class CalculatorHistory {
    * @throws {Error} 해당 ID의 히스토리를 찾을 수 없는 경우 'History item not found' 에러 발생
    */
   public deleteMemo(id: number): void {
-    const index = this.getHistoryIndexByID(id);
-    delete this.histories[index].memo;
+    const index = this.findIndexById(id);
+    delete this.records[index].memo;
   }
 
   /**
@@ -224,23 +224,23 @@ export class CalculatorHistory {
    * @private
    */
   private generateNewId(): number {
-    if (this.histories.length === 0) {
+    if (this.records.length === 0) {
       return 1;
     }
 
-    const maxId = Math.max(...(this.histories.map((history) => history.id) as number[]));
+    const maxId = Math.max(...(this.records.map((record) => record.id) as number[]));
     return maxId + 1;
   }
 
   /**
    * 히스토리 크기가 최대 제한을 초과하는 경우 가장 오래된 항목을 제거합니다.
-   * HISTORY_MAX_SIZE를 초과하는 경우 마지막 항목이 삭제됩니다.
+   * MAX_RECORDS를 초과하는 경우 마지막 항목이 삭제됩니다.
    *
    * @private
    */
-  private trimHistoryIfNeeded(): void {
-    if (this.histories.length > this.HISTORY_MAX_SIZE) {
-      this.histories.pop();
+  private trimRecordsIfNeeded(): void {
+    if (this.records.length > this.MAX_RECORDS) {
+      this.records.pop();
     }
   }
 }

@@ -6,7 +6,7 @@
       type: String,
       default: ''
     },
-    // 메뉴 아이템의 부가 설명
+    // 메뉴 아이템의 부가 설명 
     caption: {
       type: String,
       default: ''
@@ -27,7 +27,7 @@
       default: () => {}
     },
     // 구분선 여부
-    separator: {
+    isSeparator: {
       type: Boolean,
       default: false
     },
@@ -35,7 +35,7 @@
 </script>
 
 <template>
-  <q-item v-if="!separator" clickable @click="action()">
+  <q-item v-if="!isSeparator" clickable @click="action()">
     <q-item-section v-if="icon" class="col-3" avatar>
       <q-icon :name="icon" />
     </q-item-section>

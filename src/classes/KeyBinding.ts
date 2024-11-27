@@ -8,9 +8,9 @@ export type KeyBindings = [string[], () => void][]; // [키바인딩 배열, 콜
  * 키 바인딩을 관리하고 구독/해제하는 기능을 제공합니다.
  */
 export class KeyBinding {
-  private isSubscribe = false; // 현재 구독 상태
-  private keyBindings: KeyBindings = []; // 키 바인딩 목록
-  private unsubscribeMethod: () => void = () => {}; // 구독 해제 메서드
+  private isSubscribed = false; // 현재 구독 상태
+  private keyBindingsList: KeyBindings = []; // 키 바인딩 목록
+  private unsubscribeCallback: () => void = () => {}; // 구독 해제 메서드
 
   /**
    * KeyBinding 클래스의 생성자
@@ -29,22 +29,22 @@ export class KeyBinding {
    * @param keybindings 추가할 키 바인딩 목록
    */
   addKeyBindings(keybindings: KeyBindings) {
-    if (this.isSubscribe) {
+    if (this.isSubscribed) {
       this.unsubscribe(); // 이미 구독 중이면 해제
     }
-    this.keyBindings = keybindings;
+    this.keyBindingsList = keybindings;
   }
 
   /**
    * 키 바인딩을 구독하는 메서드
    */
   subscribe() {
-    if (this.isSubscribe) return; // 이미 구독 중이면 중단
+    if (this.isSubscribed) return; // 이미 구독 중이면 중단
 
     const keyBindingMaps: KeyBindingMap = {};
 
     // 키 바인딩 맵 생성
-    this.keyBindings.forEach((keybinding) => {
+    this.keyBindingsList.forEach((keybinding) => {
       const [keys, handler] = keybinding;
       keys.forEach((key) => {
         keyBindingMaps[key] = handler;
@@ -52,20 +52,20 @@ export class KeyBinding {
     });
 
     // tinykeys를 사용하여 키 바인딩 설정 및 구독 해제 메서드 저장
-    this.unsubscribeMethod = tinykeys(window, keyBindingMaps);
+    this.unsubscribeCallback = tinykeys(window, keyBindingMaps);
 
-    this.isSubscribe = true;
+    this.isSubscribed = true;
   }
 
   /**
    * 키 바인딩 구독을 해제하는 메서드
    */
   unsubscribe() {
-    if (this.isSubscribe) {
-      this.unsubscribeMethod(); // 구독 해제
-      this.unsubscribeMethod = () => {}; // 메서드 초기화
+    if (this.isSubscribed) {
+      this.unsubscribeCallback(); // 구독 해제
+      this.unsubscribeCallback = () => {}; // 메서드 초기화
 
-      this.isSubscribe = false;
+      this.isSubscribed = false;
     }
   }
 
@@ -73,7 +73,7 @@ export class KeyBinding {
    * 구독 상태를 토글하는 메서드
    */
   toggle() {
-    if (this.isSubscribe) {
+    if (this.isSubscribed) {
       this.unsubscribe();
     } else {
       this.subscribe();
@@ -85,7 +85,7 @@ export class KeyBinding {
    */
   clear() {
     this.unsubscribe();
-    this.keyBindings = [];
+    this.keyBindingsList = [];
   }
 
   /**
@@ -93,6 +93,6 @@ export class KeyBinding {
    * @returns {boolean} 구독 상태
    */
   getSubscribe() {
-    return this.isSubscribe;
+    return this.isSubscribed;
   }
 }

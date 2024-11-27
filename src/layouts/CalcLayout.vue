@@ -39,26 +39,26 @@
 
   // 탭 오른쪽으로 이동하는 함수
   const moveTabRight = () => {
-    const index = tabs.findIndex((tab) => tab.name === storeBase.cTab);
-    const newTab = tabs[(index + 1) % tabs.length].name;
-    storeBase.setCTab(newTab);
+    const currentIndex = tabs.findIndex((tab) => tab.name === storeBase.currentTab);
+    const nextTab = tabs[(currentIndex + 1) % tabs.length].name;
+    storeBase.setCurrentTab(nextTab);
   };
 
   // 탭 왼쪽으로 이동하는 함수
   const moveTabLeft = () => {
-    const index = tabs.findIndex((tab) => tab.name === storeBase.cTab);
-    const newTab = tabs[(index - 1 + tabs.length) % tabs.length].name;
-    storeBase.setCTab(newTab);
+    const currentIndex = tabs.findIndex((tab) => tab.name === storeBase.currentTab);
+    const prevTab = tabs[(currentIndex - 1 + tabs.length) % tabs.length].name;
+    storeBase.setCurrentTab(prevTab);
   };
 
   // 키 바인딩 설정
   import { KeyBinding } from 'classes/KeyBinding';
 
   const keyBinding = new KeyBinding([
-    [['Control+1'], () => storeBase.setCTab('calc')],
-    [['Control+2'], () => storeBase.setCTab('unit')],
-    [['Control+3'], () => storeBase.setCTab('currency')],
-    [['Control+4'], () => storeBase.setCTab('radix')],
+    [['Control+1'], () => storeBase.setCurrentTab('calc')],
+    [['Control+2'], () => storeBase.setCurrentTab('unit')],
+    [['Control+3'], () => storeBase.setCurrentTab('currency')],
+    [['Control+4'], () => storeBase.setCurrentTab('radix')],
     [['Control+Tab', 'ArrowRight'], moveTabRight],
     [['Control+Shift+Tab', 'ArrowLeft'], moveTabLeft],
   ]);
@@ -97,7 +97,7 @@
     <q-header class="z-top noselect" elevated>
       <q-toolbar v-blur>
         <q-tabs
-          v-model="storeBase.cTab"
+          v-model="storeBase.currentTab"
           align="left"
           class="col-8 q-px-none"
           active-color="text-primary"
@@ -107,7 +107,7 @@
           inline-label
           outside-arrows
           mobile-arrows
-          @update:model-value="storeBase.setCalcRadixByCTab()"
+          @update:model-value="storeBase.setCurrentTab($event)"
         >
           <q-tab
             v-for="tab in tabs"
@@ -126,7 +126,7 @@
 
     <q-page-container style="padding-bottom: 0px">
       <q-tab-panels
-        v-model="storeBase.cTab"
+        v-model="storeBase.currentTab"
         animated
         infinite
         :swipeable="$q.platform.is.mobile"

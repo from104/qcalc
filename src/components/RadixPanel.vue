@@ -19,7 +19,7 @@
   const storeUtils = useStoreUtils();
   const storeBase = useStoreBase();
   // 스토어에서 필요한 메서드 추출
-  const { swapRadix, initRecentRadix } = storeRadix;
+  const { swapRadixes, initRecentRadix } = storeRadix;
   const { clickButtonById, setInputBlurred } = storeUtils;
   const { calc } = storeBase;
 
@@ -29,7 +29,7 @@
   // 언어 변경 시 비트 표시 업데이트
   watch([() => storeSettings.locale], () => {
     wordSizeOptions.values.forEach((option, index) => {
-      const value = index === 0 ? '∞' : (option.value).toString();
+      const value = index === 0 ? '∞' : option.value.toString();
       option.label = `${value} ${t('bit')}`;
     });
   });
@@ -38,7 +38,7 @@
   const keyBinding = new KeyBinding([
     [['Alt+w'], () => clickButtonById('btn-swap-radix')],
     [['Alt+y'], () => storeSettings.toggleShowRadix()],
-    [['Control+Alt+y'], () => storeSettings.setRadixType(storeSettings.radixType == 'prefix' ? 'suffix' : 'prefix')],
+    [['Alt+u'], () => storeSettings.setRadixType(storeSettings.radixType == 'prefix' ? 'suffix' : 'prefix')],
   ]);
 
   // 입력 포커스에 따른 키 바인딩 활성화/비활성화
@@ -55,7 +55,7 @@
 
   onMounted(() => {
     initRecentRadix();
-    storeRadix.setWordSize(storeRadix.wordSize);
+    storeRadix.updateWordSize(storeRadix.wordSize);
     keyBinding.subscribe();
   });
 
@@ -72,54 +72,54 @@
 
   // 워드사이즈 옵션 초기화
   const wordSizeOptions = reactive({
-    values: [0, 4, 8, 16, 32, 64].map(value => ({
+    values: [0, 4, 8, 16, 32, 64].map((value) => ({
       value,
-      label: `${value || '∞'} ${t('bit')}`
+      label: `${value || '∞'} ${t('bit')}`,
     })),
   } as { values: WordSizeOption[] });
 
   // 진법 옵션 타입 정의
-  type RadixOptions = {
+  type RadixOption = {
     value: string;
     label: string;
     disable?: boolean;
   };
 
-  type ReactiveRadixOptions = {
-    values: RadixOptions[];
+  type ReactiveRadixOptionList = {
+    values: RadixOption[];
   };
 
   // 진법 옵션 초기화
-  const fromRadixOptions = reactive({ values: [] } as ReactiveRadixOptions);
-  const toRadixOptions = reactive({ values: [] } as ReactiveRadixOptions);
+  const sourceRadixOptions = reactive({ values: [] } as ReactiveRadixOptionList);
+  const targetRadixOptions = reactive({ values: [] } as ReactiveRadixOptionList);
 
   // 진법 옵션 업데이트
   watch(
-    [() => storeRadix.mainRadix, () => storeRadix.subRadix],
+    [() => storeRadix.sourceRadix, () => storeRadix.targetRadix],
     () => {
       const radixList = Object.values(Radix);
 
       // 'From' 진법 옵션 설정
-      fromRadixOptions.values = radixList.map((radix) => ({
+      sourceRadixOptions.values = radixList.map((radix) => ({
         value: radix,
         label: t(`radixLabel.${radix}`),
-        disable: storeRadix.subRadix === radix,
+        disable: storeRadix.targetRadix === radix,
       }));
 
       // 'To' 진법 옵션 설정
-      toRadixOptions.values = radixList.map((radix) => ({
+      targetRadixOptions.values = radixList.map((radix) => ({
         value: radix,
         label: t(`radixLabel.${radix}`),
-        disable: storeRadix.mainRadix === radix,
+        disable: storeRadix.sourceRadix === radix,
       }));
-      calc.radix = storeRadix.mainRadix;
+      calc.currentRadix = storeRadix.sourceRadix;
     },
     { immediate: true },
   );
 </script>
 
 <template>
-  <q-card-section class="row q-px-sm q-pt-none q-pb-sm">
+  <q-card-section v-blur class="row q-px-sm q-pt-none q-pb-sm">
     <!-- 워드사이즈 선택 -->
     <q-select
       v-model="storeRadix.wordSize"
@@ -136,7 +136,7 @@
       :popup-content-class="!storeSettings.darkMode ? 'bg-blue-grey-2' : 'bg-blue-grey-6'"
       class="col-3 q-pa-none shadow-2"
       :options-selected-class="!storeSettings.darkMode ? 'text-primary' : 'text-grey-1'"
-      @update:model-value="storeRadix.setWordSize($event)"
+      @update:model-value="storeRadix.updateWordSize($event)"
     />
 
     <!-- 원본 방향 -->
@@ -144,8 +144,8 @@
 
     <!-- 원본 진법 -->
     <q-select
-      v-model="storeRadix.mainRadix"
-      :options="fromRadixOptions.values"
+      v-model="storeRadix.sourceRadix"
+      :options="sourceRadixOptions.values"
       dense
       options-dense
       emit-value
@@ -169,15 +169,15 @@
       icon="swap_horiz"
       size="md"
       class="col-1 q-mx-none q-px-sm blur"
-      @click="swapRadix()"
+      @click="swapRadixes()"
     >
       <MyTooltip>{{ t('tooltipSwap') }}</MyTooltip>
     </q-btn>
 
     <!-- 대상 진법 -->
     <q-select
-      v-model="storeRadix.subRadix"
-      :options="toRadixOptions.values"
+      v-model="storeRadix.targetRadix"
+      :options="targetRadixOptions.values"
       dense
       options-dense
       emit-value

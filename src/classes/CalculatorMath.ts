@@ -13,47 +13,47 @@ export class CalculatorMath {
 
   /**
    * 절대값을 계산하는 메서드
-   * @param a 절대값을 구할 숫자 (문자열)
+   * @param value 절대값을 구할 숫자 (문자열)
    * @returns 절대값 결과 (문자열)
    */
-  public abs(a: string): string {
-    return BigNumber(a).abs().toString();
+  public abs(value: string): string {
+    return BigNumber(value).abs().toString();
   }
 
   /**
    * 정수 부분을 추출하는 메서드
-   * @param a 정수 부분을 구할 숫자 (문자열)
+   * @param value 정수 부분을 구할 숫자 (문자열)
    * @returns 정수 부분 (문자열)
    */
-  public int(a: string): string {
-    return BigNumber(a).floor().toString();
+  public int(value: string): string {
+    return BigNumber(value).floor().toString();
   }
 
   /**
    * 소수 부분을 추출하는 메서드
-   * @param a 소수 부분을 구할 숫자 (문자열)
+   * @param value 소수 부분을 구할 숫자 (문자열)
    * @returns 소수 부분 (문자열)
    */
-  public frac(a: string): string {
-    return BigNumber(a).mod(1).toString();
+  public frac(value: string): string {
+    return BigNumber(value).mod(1).toString();
   }
 
   /**
    * 팩토리얼을 계산하는 메서드
-   * @param a 팩토리얼을 구할 숫자 (문자열)
+   * @param value 팩토리얼을 구할 숫자 (문자열)
    * @returns 팩토리얼 결과 (문자열)
    */
-  public fct(a: string): string {
-    return MathB.factorial(BigNumber(a)).toString();
+  public fact(value: string): string {
+    return MathB.factorial(BigNumber(value)).toString();
   }
 
   /**
    * 10의 거듭제곱을 계산하는 메서드
-   * @param a 지수 (문자열)
-   * @returns 10^a 결과 (문자열)
+   * @param exponent 지수 (문자열)
+   * @returns 10^exponent 결과 (문자열)
    */
-  public exp10(a: string): string {
-    return BigNumber(10).pow(BigNumber(a)).toString();
+  public exp10(exponent: string): string {
+    return BigNumber(10).pow(BigNumber(exponent)).toString();
   }
 
   /**
@@ -65,35 +65,35 @@ export class CalculatorMath {
    * @param degrees 변환할 각도 (문자열)
    * @returns 라디안 값 (typeof BigNumber)
    */
-  private degreesToRadians(degrees: string): typeBigNumber {
+  private convertDegreesToRadians(degrees: string): typeBigNumber {
     return BigNumber(degrees).times(MathB.pi).div(180);
   }
 
   /**
    * 사인 값을 계산하는 메서드
-   * @param a 각도 (문자열)
-   * @returns sin(a) 결과 (문자열)
+   * @param angle 각도 (문자열)
+   * @returns sin(angle) 결과 (문자열)
    */
-  public sin(a: string): string {
-    return this.degreesToRadians(a).sin().toString();
+  public sin(angle: string): string {
+    return this.convertDegreesToRadians(angle).sin().toString();
   }
 
   /**
    * 코사인 값을 계산하는 메서드
-   * @param a 각도 (문자열)
-   * @returns cos(a) 결과 (문자열)
+   * @param angle 각도 (문자열)
+   * @returns cos(angle) 결과 (문자열)
    */
-  public cos(a: string): string {
-    return this.degreesToRadians(a).cos().toString();
+  public cos(angle: string): string {
+    return this.convertDegreesToRadians(angle).cos().toString();
   }
 
   /**
    * 탄젠트 값을 계산하는 메서드
-   * @param a 각도 (문자열)
-   * @returns tan(a) 결과 (문자열)
+   * @param angle 각도 (문자열)
+   * @returns tan(angle) 결과 (문자열)
    */
-  public tan(a: string): string {
-    return this.degreesToRadians(a).tan().toString();
+  public tan(angle: string): string {
+    return this.convertDegreesToRadians(angle).tan().toString();
   }
 
   /**
@@ -102,79 +102,79 @@ export class CalculatorMath {
 
   /**
    * 덧셈을 수행하는 메서드
-   * @param a 첫 번째 숫자 (문자열)
-   * @param b 두 번째 숫자 (문자열)
-   * @returns a + b 결과 (문자열)
+   * @param augend 첫 번째 숫자 (문자열)
+   * @param addend 두 번째 숫자 (문자열)
+   * @returns augend + addend 결과 (문자열)
    */
-  public add(a: string, b: string): string {
-    return BigNumber(a).add(BigNumber(b)).toString();
+  public add(augend: string, addend: string): string {
+    return BigNumber(augend).add(BigNumber(addend)).toString();
   }
 
   /**
    * 뺄셈을 수행하는 메서드
-   * @param a 첫 번째 숫자 (문자열)
-   * @param b 두 번째 숫자 (문자열)
-   * @returns a - b 결과 (문자열)
+   * @param minuend 첫 번째 숫자 (문자열)
+   * @param subtrahend 두 번째 숫자 (문자열)
+   * @returns minuend - subtrahend 결과 (문자열)
    */
-  public sub(a: string, b: string): string {
-    return BigNumber(a).sub(BigNumber(b)).toString();
+  public sub(minuend: string, subtrahend: string): string {
+    return BigNumber(minuend).sub(BigNumber(subtrahend)).toString();
   }
 
   /**
    * 곱셈을 수행하는 메서드
-   * @param a 첫 번째 숫자 (문자열)
-   * @param b 두 번째 숫자 (문자열)
-   * @returns a × b 결과 (문자열)
+   * @param multiplicand 첫 번째 숫자 (문자열)
+   * @param multiplier 두 번째 숫자 (문자열)
+   * @returns multiplicand × multiplier 결과 (문자열)
    */
-  public mul(a: string, b: string): string {
-    return BigNumber(a).mul(BigNumber(b)).toString();
+  public mul(multiplicand: string, multiplier: string): string {
+    return BigNumber(multiplicand).mul(BigNumber(multiplier)).toString();
   }
 
   /**
    * 나눗셈을 수행하는 메서드
-   * @param a 분자 (문자열)
-   * @param b 분모 (문자열)
-   * @returns a ÷ b 결과 (문자열)
+   * @param dividend 분자 (문자열)
+   * @param divisor 분모 (문자열)
+   * @returns dividend ÷ divisor 결과 (문자열)
    * @throws 0으로 나누려고 할 때 에러 발생
    */
-  public div(a: string, b: string): string {
-    if (b === '0') throw new Error('Division by zero');
-    return BigNumber(a).div(BigNumber(b)).toString();
+  public div(dividend: string, divisor: string): string {
+    if (divisor === '0') throw new Error('Division by zero');
+    return BigNumber(dividend).div(BigNumber(divisor)).toString();
   }
 
   /**
    * 나머지를 계산하는 메서드
-   * @param a 분자 (문자열)
-   * @param b 분모 (문자열)
-   * @returns a mod b 결과 (문자열)
+   * @param dividend 분자 (문자열)
+   * @param divisor 분모 (문자열)
+   * @returns dividend mod divisor 결과 (문자열)
    * @throws 0으로 나누려고 할 때 에러 발생
    */
-  public mod(a: string, b: string): string {
-    if (b === '0') throw new Error('Division by zero');
-    return BigNumber(a).mod(BigNumber(b)).toString();
+  public mod(dividend: string, divisor: string): string {
+    if (divisor === '0') throw new Error('Division by zero');
+    return BigNumber(dividend).mod(BigNumber(divisor)).toString();
   }
 
   /**
    * 거듭제곱을 계산하는 메서드
-   * @param a 밑 (문자열)
-   * @param b 지수 (문자열)
-   * @returns a^b 결과 (문자열)
+   * @param base 밑 (문자열)
+   * @param exponent 지수 (문자열)
+   * @returns base^exponent 결과 (문자열)
    */
-  public pow(a: string, b: string): string {
-    return BigNumber(a).pow(BigNumber(b)).toString();
+  public pow(base: string, exponent: string): string {
+    return BigNumber(base).pow(BigNumber(exponent)).toString();
   }
 
   /**
    * 제곱근을 계산하는 메서드
-   * @param a 숫자 (문자열)
-   * @param b 제곱근의 차수 (문자열)
-   * @returns a의 b제곱근 결과 (문자열)
+   * @param radicand 숫자 (문자열)
+   * @param index 제곱근의 차수 (문자열)
+   * @returns radicand의 index제곱근 결과 (문자열)
    * @throws 음수의 제곱근을 계산하려 할 때 에러 발생
    */
-  public root(a: string, b: string): string {
-    if (BigNumber(b).lt(0) && this.mod(this.int(a), '2') === '0')
+  public root(radicand: string, index: string): string {
+    if (BigNumber(index).lt(0) && this.mod(this.int(radicand), '2') === '0')
       throw new Error('The root of a negative number is not allowed.');
-    return BigNumber(a).pow(BigNumber(1).div(b)).toString();
+    return BigNumber(radicand).pow(BigNumber(1).div(index)).toString();
   }
 
   /**
@@ -186,6 +186,12 @@ export class CalculatorMath {
    * @param values 검사할 숫자들 (문자열 배열)
    * @throws 음수가 입력되면 에러 발생
    */
+  private validatePositiveNumbers(...values: string[]): void {
+    if (values.some((value) => BigNumber(value).isNegative())) {
+      throw new Error('Negative numbers are not allowed in bit operations');
+    }
+  }
+
   private validateNonNegativeNumbers(...values: string[]): void {
     if (values.some((value) => BigNumber(value).isNegative())) {
       throw new Error('Negative numbers are not allowed in bit operations');
@@ -194,31 +200,31 @@ export class CalculatorMath {
 
   /**
    * 주어진 숫자를 지정된 비트 크기로 자르는 메서드
-   * @param a 자를 숫자 (문자열)
+   * @param value 자를 숫자 (문자열)
    * @param wordSize 비트 크기 (기본값: 8)
    * @returns 비트 크기로 자른 결과 (문자열)
    */
-  public truncateToBitSize(a: string, wordSize: number = 8): string {
-    this.validateNonNegativeNumbers(a);
+  public truncateToBitSize(value: string, wordSize: number = 8): string {
+    this.validateNonNegativeNumbers(value);
     return wordSize === 0
-      ? BigNumber(a).floor().toString()
-      : BigNumber(a).mod(BigNumber(2).pow(wordSize)).floor().toString();
+      ? BigNumber(value).floor().toString()
+      : BigNumber(value).mod(BigNumber(2).pow(wordSize)).floor().toString();
   }
 
   /**
    * 비트 왼쪽 시프트 연산을 수행하는 메서드
-   * @param a 시프트할 숫자 (문자열)
-   * @param b 시프트할 비트 수 (문자열)
+   * @param value 시프트할 숫자 (문자열)
+   * @param shiftAmount 시프트할 비트 수 (문자열)
    * @param wordSize 비트 크기 (기본값: 8)
    * @returns 시프트 연산 결과 (문자열)
    */
-  public bitShiftLeft(a: string, b: string, wordSize: number = 8): string {
-    this.validateNonNegativeNumbers(a, b);
+  public bitwiseLeftShift(value: string, shiftAmount: string, wordSize: number = 8): string {
+    this.validateNonNegativeNumbers(value, shiftAmount);
     return this.truncateToBitSize(
-      BigNumber(a)
+      BigNumber(value)
         .abs()
         .floor()
-        .mul(BigNumber(2).pow(BigNumber(b).abs().floor()))
+        .mul(BigNumber(2).pow(BigNumber(shiftAmount).abs().floor()))
         .toString(),
       wordSize,
     );
@@ -226,18 +232,18 @@ export class CalculatorMath {
 
   /**
    * 비트 오른쪽 시프트 연산을 수행하는 메서드
-   * @param a 시프트할 숫자 (문자열)
-   * @param b 시프트할 비트 수 (문자열)
+   * @param value 시프트할 숫자 (문자열)
+   * @param shiftAmount 시프트할 비트 수 (문자열)
    * @param wordSize 비트 크기 (기본값: 8)
    * @returns 시프트 연산 결과 (문자열)
    */
-  public bitShiftRight(a: string, b: string, wordSize: number = 8): string {
-    this.validateNonNegativeNumbers(a, b);
+  public bitwiseRightShift(value: string, shiftAmount: string, wordSize: number = 8): string {
+    this.validatePositiveNumbers(value, shiftAmount);
     return this.truncateToBitSize(
-      BigNumber(a)
+      BigNumber(value)
         .abs()
         .floor()
-        .div(BigNumber(2).pow(BigNumber(b).abs().floor()))
+        .div(BigNumber(2).pow(BigNumber(shiftAmount).abs().floor()))
         .toString(),
       wordSize,
     );
@@ -245,106 +251,109 @@ export class CalculatorMath {
 
   /**
    * AND, OR, XOR 비트 연산을 수행하는 내부 메서드
-   * @param a 첫 번째 숫자 (문자열)
-   * @param b 두 번째 숫자 (문자열)
-   * @param operator 수행할 연산자 ('and' | 'or' | 'xor')
+   * @param firstValue 첫 번째 숫자 (문자열)
+   * @param secondValue 두 번째 숫자 (문자열)
+   * @param operation 수행할 연산자 ('and' | 'or' | 'xor')
    * @param wordSize 비트 크기 (기본값: 8)
    * @returns 비트 연산 결과 (문자열)
    */
-  private bitAndOrXor(a: string, b: string, operator: 'and' | 'or' | 'xor', wordSize: number = 8): string {
-    this.validateNonNegativeNumbers(a, b);
-    const [aBin, bBin] = [a, b].map((n) =>
+  private performBitOperation(
+    firstValue: string,
+    secondValue: string,
+    operation: 'and' | 'or' | 'xor',
+    wordSize: number = 8,
+  ): string {
+    this.validatePositiveNumbers(firstValue, secondValue);
+    const [firstBinary, secondBinary] = [firstValue, secondValue].map((n) =>
       convertRadix(this.int(this.abs(n)), Radix.Decimal, Radix.Binary),
     ) as string[];
-    const maxLength = Math.max(aBin.length, bBin.length);
-    const [aPadded, bPadded] = [aBin, bBin].map((bin) => (bin as string).padStart(maxLength, '0'));
+    const maxLength = Math.max(firstBinary.length, secondBinary.length);
+    const [firstPadded, secondPadded] = [firstBinary, secondBinary].map((binary) =>
+      (binary as string).padStart(maxLength, '0'),
+    );
 
-    const resultBin = [...aPadded]
-      .map((_, i) => {
-        const [aBit, bBit] = [aPadded[i] === '1', bPadded[i] === '1'];
-        return match(operator)
-          .with('and', () => aBit && bBit)
-          .with('or', () => aBit || bBit)
-          .with('xor', () => aBit !== bBit)
+    const resultBinary = [...firstPadded]
+      .map((_, index) => {
+        const [firstBit, secondBit] = [firstPadded[index] === '1', secondPadded[index] === '1'];
+        return match(operation)
+          .with('and', () => firstBit && secondBit)
+          .with('or', () => firstBit || secondBit)
+          .with('xor', () => firstBit !== secondBit)
           .run()
           ? '1'
           : '0';
       })
       .join('');
 
-    return this.truncateToBitSize(convertRadix(resultBin, Radix.Binary, Radix.Decimal), wordSize);
+    return this.truncateToBitSize(convertRadix(resultBinary, Radix.Binary, Radix.Decimal), wordSize);
   }
 
   /**
    * AND 비트 연산을 수행하는 메서드
-   * @param a 첫 번째 숫자 (문자열)
-   * @param b 두 번째 숫자 (문자열)
+   * @param firstValue 첫 번째 숫자 (문자열)
+   * @param secondValue 두 번째 숫자 (문자열)
    * @param wordSize 비트 크기 (기본값: 8)
    * @returns AND 연산 결과 (문자열)
    */
-  public bitAnd(a: string, b: string, wordSize: number = 8): string {
-    return this.bitAndOrXor(a, b, 'and', wordSize);
+  public bitwiseAnd(firstValue: string, secondValue: string, wordSize: number = 8): string {
+    return this.performBitOperation(firstValue, secondValue, 'and', wordSize);
   }
 
   /**
    * OR 비트 연산을 수행하는 메서드
-   * @param a 첫 번째 숫자 (문자열)
-   * @param b 두 번째 숫자 (문자열)
+   * @param firstValue 첫 번째 숫자 (문자열)
+   * @param secondValue 두 번째 숫자 (문자열)
    * @param wordSize 비트 크기 (기본값: 8)
    * @returns OR 연산 결과 (문자열)
    */
-  public bitOr(a: string, b: string, wordSize: number = 8): string {
-    return this.bitAndOrXor(a, b, 'or', wordSize);
+  public bitwiseOr(firstValue: string, secondValue: string, wordSize: number = 8): string {
+    return this.performBitOperation(firstValue, secondValue, 'or', wordSize);
   }
 
   /**
    * XOR 비트 연산을 수행하는 메서드
-   * @param a 첫 번째 숫자 (문자열)
-   * @param b 두 번째 숫자 (문자열)
+   * @param firstValue 첫 번째 숫자 (문자열)
+   * @param secondValue 두 번째 숫자 (문자열)
    * @param wordSize 비트 크기 (기본값: 8)
    * @returns XOR 연산 결과 (문자열)
    */
-  public bitXor(a: string, b: string, wordSize: number = 8): string {
-    return this.bitAndOrXor(a, b, 'xor', wordSize);
+  public bitwiseXor(firstValue: string, secondValue: string, wordSize: number = 8): string {
+    return this.performBitOperation(firstValue, secondValue, 'xor', wordSize);
   }
 
   /**
    * NOT 비트 연산을 수행하는 메서드
-   * @param a 비트 반전할 숫자 (문자열)
+   * @param value 비트 반전할 숫자 (문자열)
    * @param wordSize 비트 크기 (기본값: 8)
    * @returns NOT 연산 결과 (문자열)
    */
-  public bitNot(a: string, wordSize: number = 8): string {
-    this.validateNonNegativeNumbers(a);
-    const binary = convertRadix(this.int(this.abs(a)), Radix.Decimal, Radix.Binary);
-    // 워드 사이즈에 맞게 이진수 패딩
+  public bitwiseNot(value: string, wordSize: number = 8): string {
+    this.validatePositiveNumbers(value);
+    const binary = convertRadix(this.int(this.abs(value)), Radix.Decimal, Radix.Binary);
     const paddedBinary = binary.padStart(Math.max(binary.length, wordSize), '0');
 
     const invertedBinary = [...paddedBinary].map((bit) => (bit === '1' ? '0' : '1')).join('');
 
-    return this.truncateToBitSize(
-      convertRadix(invertedBinary, Radix.Binary, Radix.Decimal),
-      wordSize,
-    );
+    return this.truncateToBitSize(convertRadix(invertedBinary, Radix.Binary, Radix.Decimal), wordSize);
   }
 
   /**
    * NAND, NOR, NXOR 비트 연산을 수행하는 메서드
-   * @param a 첫 번째 숫자 (문자열)
-   * @param b 두 번째 숫자 (문자열)
+   * @param firstValue 첫 번째 숫자 (문자열)
+   * @param secondValue 두 번째 숫자 (문자열)
    * @param wordSize 비트 크기 (기본값: 8)
    * @returns 비트 연산 결과 (문자열)
    */
 
-  public bitNand(a: string, b: string, wordSize: number = 8): string {
-    return this.bitNot(this.bitAnd(a, b, wordSize), wordSize);
+  public bitwiseNand(firstValue: string, secondValue: string, wordSize: number = 8): string {
+    return this.bitwiseNot(this.bitwiseAnd(firstValue, secondValue, wordSize), wordSize);
   }
 
-  public bitNor(a: string, b: string, wordSize: number = 8): string {
-    return this.bitNot(this.bitOr(a, b, wordSize), wordSize);
+  public bitwiseNor(firstValue: string, secondValue: string, wordSize: number = 8): string {
+    return this.bitwiseNot(this.bitwiseOr(firstValue, secondValue, wordSize), wordSize);
   }
 
-  public bitXnor(a: string, b: string, wordSize: number = 8): string {
-    return this.bitNot(this.bitXor(a, b, wordSize), wordSize);
+  public bitwiseXnor(firstValue: string, secondValue: string, wordSize: number = 8): string {
+    return this.bitwiseNot(this.bitwiseXor(firstValue, secondValue, wordSize), wordSize);
   }
 }

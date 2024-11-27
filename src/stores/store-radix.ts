@@ -11,31 +11,31 @@ export const useStoreRadix = defineStore('radix', {
   state: () => ({
     wordSize: 32 as WordSize, // 비트 크기
     radixList: Object.values(Radix), // 진법 목록
-    mainRadix: Radix.Decimal as RadixType, // 기본 진법
-    subRadix: Radix.Hexadecimal as RadixType, // 보조 진법
+    sourceRadix: Radix.Decimal as RadixType, // 기본 진법
+    targetRadix: Radix.Hexadecimal as RadixType, // 보조 진법
   }),
 
   // 액션 정의
   actions: {
     // 최근 진법 초기화
     initRecentRadix() {
-      const radixValues = Object.values(Radix);
-      const isValidRadix = (radix: RadixType) => radixValues.includes(radix);
+      const availableRadixes = Object.values(Radix);
+      const isValidRadixType = (radix: RadixType) => availableRadixes.includes(radix);
 
-      if (!isValidRadix(this.mainRadix)) {
-        this.mainRadix = Radix.Decimal;
+      if (!isValidRadixType(this.sourceRadix)) {
+        this.sourceRadix = Radix.Decimal;
       }
-      if (!isValidRadix(this.subRadix)) {
-        this.subRadix = Radix.Hexadecimal;
+      if (!isValidRadixType(this.targetRadix)) {
+        this.targetRadix = Radix.Hexadecimal;
       }
-      if (this.mainRadix === this.subRadix) {
-        this.subRadix = this.radixList[(this.radixList.indexOf(this.mainRadix) + 1) % this.radixList.length];
+      if (this.sourceRadix === this.targetRadix) {
+        this.targetRadix = this.radixList[(this.radixList.indexOf(this.sourceRadix) + 1) % this.radixList.length];
       }
     },
 
     // 진법 교환
-    swapRadix() {
-      [this.mainRadix, this.subRadix] = [this.subRadix, this.mainRadix];
+    swapRadixes() {
+      [this.sourceRadix, this.targetRadix] = [this.targetRadix, this.sourceRadix];
     },
 
     // 문자열을 원하는 진법으로 변환
@@ -44,12 +44,12 @@ export const useStoreRadix = defineStore('radix', {
     },
 
     // 문자열이 유효한 진법 문자열인지 검사
-    isValidRadixNumber(value: string, radix: RadixType): boolean {
+    validateRadixNumber(value: string, radix: RadixType): boolean {
       return radixConverter.isValidRadixNumber(value, radix);
     },
 
     // 워드 크기 설정
-    setWordSize(value: WordSize) {
+    updateWordSize(value: WordSize) {
       this.wordSize = value;
       const { calc } = useStoreBase(); // 여기서 호출
       calc.wordSize = value;

@@ -1,3 +1,4 @@
+import { convertRadix } from './../classes/RadixConverter';
 import { copyToClipboard } from 'quasar';
 import { defineStore } from 'pinia';
 import { match } from 'ts-pattern';
@@ -8,7 +9,7 @@ import { useStoreRadix } from './store-radix';
 import { useStoreNotifications } from './store-notifications';
 
 import { Operator, CalculationResult } from 'classes/CalculatorTypes';
-import { RadixConverter, Radix } from 'classes/RadixConverter';
+import { Radix } from 'classes/RadixConverter';
 
 // 유틸리티 관련 상태 및 동작을 관리하는 스토어 정의
 export const useStoreUtils = defineStore('utils', {
@@ -20,16 +21,16 @@ export const useStoreUtils = defineStore('utils', {
   // 액션 정의
   actions: {
     // 숫자에 그룹화 적용
-    numberGrouping(number: string): string {
+    numberGrouping(value: string): string {
       const storeSettings = useStoreSettings();
-      const [integer, decimal] = number.split('.');
-      const regex = new RegExp(`\\B(?=([\\da-fA-F]{${storeSettings.groupingUnit}})+(?![\\da-fA-F]))`, 'g');
-      return integer.replace(regex, ',') + (decimal ? `.${decimal}` : '');
+      const [integerPart, decimalPart] = value.split('.');
+      const groupingPattern = new RegExp(`\\B(?=([\\da-fA-F]{${storeSettings.groupingUnit}})+(?![\\da-fA-F]))`, 'g');
+      return integerPart.replace(groupingPattern, ',') + (decimalPart ? `.${decimalPart}` : '');
     },
     /**
      * 숫자의 소수점 자릿수를 조정하는 함수
      *
-     * @param number 변환할 숫자 문자열 (예: "100.123456789")
+     * @param value 변환할 숫자 문자열 (예: "100.123456789")
      * @param decimalPlaces 원하는 소수점 자릿수 (음수는 모든 자릿수 표시, 0은 정수부만 표시, 양수는 지정된 자릿수까지 표시)
      * @returns 지정된 소수점 자릿수로 변환된 문자열
      *
@@ -45,55 +46,60 @@ export const useStoreUtils = defineStore('utils', {
      */
     /**
      * 숫자 문자열의 소수점 자릿수를 지정된 값으로 포맷팅하는 메서드
-     * @param number 포맷팅할 숫자 문자열
+     * @param value 포맷팅할 숫자 문자열
      * @param decimalPlaces 표시할 소수점 자릿수 (-1: 모두 표시, 0: 정수만, n: n자리)
      */
-    formatDecimalPlaces(number: string, decimalPlaces: number): string {
-      if (!number) return '';
-      if (decimalPlaces < 0) return number;
-      if (decimalPlaces === 0) return number.split('.')[0];
+    formatDecimalPlaces(value: string, decimalPlaces: number): string {
+      if (!value) return '';
+      if (decimalPlaces < 0) return value;
+      if (decimalPlaces === 0) return value.split('.')[0];
 
       // 소수점이 없는 경우 처리
-      if (!number.includes('.')) {
-        return decimalPlaces > 0 ? `${number}.${'0'.repeat(decimalPlaces)}` : number;
+      if (!value.includes('.')) {
+        return decimalPlaces > 0 ? `${value}.${'0'.repeat(decimalPlaces)}` : value;
       }
 
       // 소수점이 있는 경우 처리
-      const [integer, decimal] = number.split('.');
-      const truncatedDecimal = decimal.slice(0, decimalPlaces).padEnd(decimalPlaces, '0');
+      const [integerPart, decimalPart] = value.split('.');
+      const formattedDecimal = decimalPart.slice(0, decimalPlaces).padEnd(decimalPlaces, '0');
 
-      return `${integer}.${truncatedDecimal}`;
+      return `${integerPart}.${formattedDecimal}`;
     },
 
     /**
      * 숫자 문자열을 설정에 따라 포맷팅하여 반환하는 메서드
-     * @param number 포맷팅할 숫자 문자열
+     * @param value 포맷팅할 숫자 문자열
      */
-    toFormattedNumber(number: string): string {
-      if (!number) return '';
+    toFormattedNumber(value: string): string {
+      if (!value) return '';
 
       const storeSettings = useStoreSettings();
-      const formattedNumber = this.formatDecimalPlaces(number, storeSettings.decimalPlaces);
+      const formattedValue = this.formatDecimalPlaces(value, storeSettings.decimalPlaces);
 
-      return storeSettings.useGrouping ? this.numberGrouping(formattedNumber) : formattedNumber;
+      return storeSettings.useGrouping ? this.numberGrouping(formattedValue) : formattedValue;
     },
 
     // 라디스 모드인 경우 숫자를 10진수로 변환하는 메서드
-    convertIfRadix(num: string): string {
+    convertIfRadix(value: string): string {
       const storeBase = useStoreBase();
       const storeRadix = useStoreRadix();
-      const isRadixMode = storeBase.cTab === 'radix';
-      return isRadixMode ? storeRadix.convertRadix(num, Radix.Decimal, storeRadix.mainRadix) : num;
+      const isRadixMode = storeBase.currentTab === 'radix';
+
+      console.log('storeBase:', storeBase.currentTab);
+      console.log('storeRadix:', storeRadix.sourceRadix);
+      console.log('value:', value);
+      console.log('isRadixMode:', isRadixMode);
+      return isRadixMode ? convertRadix(value, Radix.Decimal, storeRadix.sourceRadix) : value;
     },
 
     // 계산 기록의 왼쪽 부분 생성
     getLeftSideInHistory(result: CalculationResult, useLineBreak = false): string {
       const lineBreak = useLineBreak ? '\n' : '';
 
-      const previousNumber = this.convertIfRadix(result.previousNumber);
-      const argumentNumber = result.argumentNumber ? this.convertIfRadix(result.argumentNumber) : '';
-      const formattedPrev = this.toFormattedNumber(previousNumber);
-      const formattedArg = this.toFormattedNumber(argumentNumber);
+      const prevValue = this.convertIfRadix(result.previousNumber);
+      const argValue = result.argumentNumber ? this.convertIfRadix(result.argumentNumber) : '';
+      const formattedPrev = this.toFormattedNumber(prevValue);
+      const formattedArg = this.toFormattedNumber(argValue);
       const operator = result.operator || '';
 
       return match(operator)
@@ -146,13 +152,13 @@ export const useStoreUtils = defineStore('utils', {
 
     // 현재 포커스된 요소의 포커스 해제
     blurElement(): void {
-      const el = document.activeElement as HTMLElement;
-      el?.blur();
+      const element = document.activeElement as HTMLElement;
+      element?.blur();
     },
 
     // 지정된 ID를 가진 버튼 클릭
-    clickButtonById(id: string): void {
-      const button = document.getElementById(id);
+    clickButtonById(buttonId: string): void {
+      const button = document.getElementById(buttonId);
       if (button) {
         button.click();
       }
@@ -162,7 +168,7 @@ export const useStoreUtils = defineStore('utils', {
     copyToClipboard(text: string, message: string): void {
       copyToClipboard(text);
       const storeNotifications = useStoreNotifications();
-      storeNotifications.notifyMsg(message);
+      storeNotifications.showMessage(message);
     },
 
     // 입력 필드 포커스 상태 설정 (약간의 지연 적용)

@@ -23,7 +23,7 @@
     shortcut?: string;
     icon?: string;
     action?: () => void;
-    separator?: boolean;
+    isSeparator?: boolean;
   }
 
   // 메뉴 아이템 정의
@@ -33,30 +33,30 @@
       caption: t('item.calc.caption'),
       shortcut: 'Ctrl-1',
       icon: 'calculate',
-      action: () => { storeBase.cTab = 'calc'; },
+      action: () => { storeBase.currentTab = 'calc'; },
     },
     unit: {
       title: t('item.unit.title'),
       caption: t('item.unit.caption'),
       shortcut: 'Ctrl-2',
       icon: 'swap_vert',
-      action: () => { storeBase.cTab = 'unit'; },
+      action: () => { storeBase.currentTab = 'unit'; },
     },
     currency: {
       title: t('item.currency.title'),
       caption: t('item.currency.caption'),
       shortcut: 'Ctrl-3',
       icon: 'currency_exchange',
-      action: () => { storeBase.cTab = 'currency'; },
+      action: () => { storeBase.currentTab = 'currency'; },
     },
     radix: {
       title: t('item.radix.title'),
       caption: t('item.radix.caption'),
       shortcut: 'Ctrl-4',
       icon: 'transform',
-      action: () => { storeBase.cTab = 'radix'; },
+      action: () => { storeBase.currentTab = 'radix'; },
     },
-    separator1: { separator: true },
+    separator1: { isSeparator: true },
     settings: {
       title: t('item.settings.title'),
       caption: t('item.settings.caption'),
@@ -64,7 +64,7 @@
       icon: 'settings',
       action: () => { storeBase.isSettingDialogOpen = true; },
     },
-    separator2: { separator: true },
+    separator2: { isSeparator: true },
     help: {
       title: t('item.help.title'),
       caption: t('item.help.caption'),
@@ -82,7 +82,7 @@
   // 언어 변경 시 메뉴 아이템 텍스트 업데이트 함수
   const updateLocale = () => {
     Object.keys(items).forEach((item) => {
-      if (!items[item].separator) {
+      if (!items[item].isSeparator) {
         items[item].title = t(`item.${item}.title`);
         items[item].caption = t(`item.${item}.caption`);
       }

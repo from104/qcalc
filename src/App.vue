@@ -52,11 +52,11 @@
 
     // 운영체제별 결과창 패딩 최적화
     if ($q.platform.is.win) {
-      storeBase.paddingOnResult = 8;
+      storeBase.resultPanelPadding = 8;
     } else if ($q.platform.is.linux) {
-      storeBase.paddingOnResult = 3;
+      storeBase.resultPanelPadding = 3;
     } else {
-      storeBase.paddingOnResult = 0;
+      storeBase.resultPanelPadding = 0;
     }
 
     // 현재 언어로 앱 제목 설정
