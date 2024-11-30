@@ -85,10 +85,6 @@ export const useStoreUtils = defineStore('utils', {
       const storeRadix = useStoreRadix();
       const isRadixMode = storeBase.currentTab === 'radix';
 
-      console.log('storeBase:', storeBase.currentTab);
-      console.log('storeRadix:', storeRadix.sourceRadix);
-      console.log('value:', value);
-      console.log('isRadixMode:', isRadixMode);
       return isRadixMode ? convertRadix(value, Radix.Decimal, storeRadix.sourceRadix) : value;
     },
 
