@@ -19,7 +19,7 @@ export const useStoreSettings = defineStore('settings', {
     // 진법 표시 방법 (기본, 접두사, 접미사)
     showRadix: true,
     // 진법 표시 형식 - 앞에(0xff, 0o765, 0b1010 등), 뒤에(ff(16), 765(8), 1010(2) 등)
-    radixType: 'prefix' as 'prefix' | 'suffix',
+    radixType: 'suffix' as 'prefix' | 'suffix',
     paddingOnResult: 20, // 결과 패딩 값
     showButtonAddedLabel: true, // 버튼 추가 레이블 표시 여부
     hapticsMode: true, // 햅틱 피드백 모드

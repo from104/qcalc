@@ -81,6 +81,11 @@ check_android_env() {
     fi
 }
 
+# .env 파일 로드
+if [ -f .env ]; then
+    export $(grep -v '^#' .env | xargs)
+fi
+
 # Linux 버드 함수
 build_linux() {
     echo "Building Linux version..."
@@ -104,7 +109,7 @@ build_windows() {
     quasar build -m electron -T win32
     if [ $? -eq 0 ]; then
         echo "Windows build completed successfully"
-        mv dist/electron/Packaged/*.exe "$BUILD_DIR/QCalc-$VERSION-win32.exe"
+        mv dist/electron/Packaged/*.exe "$BUILD_DIR/QCalc-$VERSION-win.exe"
     else
         echo "Windows build failed"
         exit 1
@@ -120,9 +125,10 @@ build_android() {
     if [ $? -eq 0 ]; then
         echo "Android build completed successfully"
         
-        KEYSTORE_PATH="src-capacitor/android/app/my-release-key.jks"
-        if [ ! -f "$KEYSTORE_PATH" ]; then
-            echo "Warning: Keystore file not found at $KEYSTORE_PATH"
+        # .env 파일에서 MY_JKS_KEY_FILE 가져오기
+        MY_JKS_KEY_FILE=${MY_JKS_KEY_FILE:-"src-capacitor/android/app/my-release-key.jks"}
+        if [ ! -f "$MY_JKS_KEY_FILE" ]; then
+            echo "Warning: Keystore file not found at $MY_JKS_KEY_FILE"
             echo "Android app will be unsigned"
         else
             echo "Building signed APK..."
