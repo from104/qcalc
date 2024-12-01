@@ -1,6 +1,47 @@
 @echo off
 setlocal enabledelayedexpansion
 
+:: Node.js와 Yarn 설치 여부 및 버전 체크
+echo Checking Node.js and Yarn installation...
+
+:: Node.js 설치 확인
+where node >nul 2>nul
+if %ERRORLEVEL% NEQ 0 (
+    echo Error: Node.js is not installed
+    echo Please install Node.js version 20 or higher
+    exit /b 1
+)
+
+:: Yarn 설치 확인
+where yarn >nul 2>nul
+if %ERRORLEVEL% NEQ 0 (
+    echo Error: Yarn is not installed
+    echo Please install Yarn version 4.0.0 or higher
+    exit /b 1
+)
+
+:: Node.js 버전 체크
+for /f "tokens=1,2,3 delims=." %%a in ('node -v') do (
+    set NODE_MAJOR=%%a
+    set NODE_MAJOR=!NODE_MAJOR:~1!
+)
+if !NODE_MAJOR! LSS 20 (
+    echo Error: Node.js version 20 or higher is required
+    echo Current version: !NODE_MAJOR!
+    exit /b 1
+)
+
+:: Yarn 버전 체크
+for /f "tokens=1,2,3 delims=." %%a in ('yarn -v') do (
+    set YARN_MAJOR=%%a
+    if %%a LSS 4 (
+        echo Error: Yarn version 4.0.0 or higher is required
+        echo Current version: %%a.%%b.%%c
+        exit /b 1
+    )
+)
+echo Version check passed
+
 :: 버전 정보 추출
 for /f "tokens=2 delims=:, " %%a in ('findstr "version" package.json') do (
     set VERSION=%%~a

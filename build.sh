@@ -1,8 +1,44 @@
 #!/bin/bash
 
+# 버전 체크 함수 
+check_versions() {
+    # Node.js 설치 확인
+    if ! command -v node &> /dev/null; then
+        echo "Error: Node.js가 설치되어 있지 않습니다."
+        echo "https://nodejs.org 에서 Node.js를 설치해주세요."
+        exit 1
+    fi
+
+    # Yarn 설치 확인
+    if ! command -v yarn &> /dev/null; then
+        echo "Error: Yarn이 설치되어 있지 않습니다."
+        echo "npm install -g yarn 명령어로 Yarn을 설치해주세요."
+        exit 1
+    fi
+
+    # Node.js 버전 체크
+    NODE_VERSION=$(node -v | cut -d'v' -f2)
+    if [ "$(printf '%s\n' "20.0.0" "$NODE_VERSION" | sort -V | head -n1)" != "20.0.0" ]; then
+        echo "Error: Node.js 20.0.0 이상이 필요합니다."
+        echo "현재 버전: $NODE_VERSION"
+        exit 1
+    fi
+
+    # Yarn 버전 체크
+    YARN_VERSION=$(yarn -v)
+    if [ "$(printf '%s\n' "4.0.0" "$YARN_VERSION" | sort -V | head -n1)" != "4.0.0" ]; then
+        echo "Error: Yarn 4.0.0 이상이 필요합니다."
+        echo "현재 버전: $YARN_VERSION"
+        exit 1
+    fi
+}
+
 # 버전 정보 추출
 VERSION=$(grep '"version"' package.json | sed -E 's/.*"version": "(.*)".*/\1/')
 echo "Building version $VERSION..."
+
+# 빌전 체크 실행
+check_versions
 
 # 빌드 디렉토리 생성
 BUILD_DIR="./package"

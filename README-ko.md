@@ -1,6 +1,8 @@
-# 퀘이사를 이용해 만든 간단한 계산기
+# 퀘이사를 이용해 만든 간단한 계산기 (v0.10.0)
 
-예전에 졸업과제로 만들었던 안드로이드용 계산기의 소스를 활용해 만든 간단한 계산기 입니다. vue3(quasar v2), typescript, electron 등을 이용해 만들었습니다.
+MIT License
+
+예전에 졸업과제로 만들었던 안드로이드용 계산기의 소스를 활용해 만든 간단한 계산기입니다. Vue3(Quasar v2), TypeScript, Electron 등 최신 웹 기술을 이용해 데스크톱과 모바일 환경에서 모두 사용 가능하도록 만들었습니다.
 
 ## 스크린샷
 
@@ -184,9 +186,67 @@ FREECURRENCY_API_KEY=<당신의_키>
 1. Android Studio에서 프로젝트가 열리면, `Sync Project with Gradle Files`를 클릭하여 프로젝트를 동기화합니다.
 2. `MainActivity.java` 또는 `MainActivity.kt` 파일을 열고, 필요한 패키지 및 설정을 확인합니다.
 
+#### Android 키스토어 설정
+
+릴리스 빌드를 위해서는 키스토어 설정이 필요합니다. 프로젝트 루트에 `.env` 파일을 생성하고 다음 변수들을 추가하세요:
+
+```plaintext
+MY_JKS_KEY_FILE=/path/to/your/keystore.jks
+MY_JKS_STORE_PASSWORD=your_store_password
+MY_JKS_KEY_ALIAS=your_key_alias
+MY_JKS_KEY_PASSWORD=your_key_password
+```
+
+이러한 환경 변수들은 릴리스 APK에 서명하는 빌드 과정에서 사용됩니다. 다음 사항들을 반드시 지켜주세요:
+- `.env` 파일을 버전 관리에 절대 커밋하지 마세요
+- 키스토어 파일을 안전하게 보관하세요
+- 키스토어 비밀번호를 잘 기억해두세요
+
 #### 빌드 및 실행
 
 1. Android 기기를 USB 디버깅 모드로 연결하거나 Android 에뮬레이터를 실행합니다.
 2. Android Studio에서 `Run` 버튼을 클릭하여 앱을 빌드하고 실행합니다.
 
 이 과정을 통해 Android Studio에서 추가적인 개발 및 빌드를 수행할 수 있습니다.
+
+#### 빌드 스크립트 사용하기
+
+프로젝트 루트에는 빌드 자동화를 위한 스크립트가 포함되어 있습니다:
+
+##### Linux 사용자 (build.sh)
+
+```bash
+# 스크립트에 실행 권한 부여
+chmod +x build.sh
+
+# 스크립트 실행
+./build.sh
+```
+
+##### Windows 사용자 (build.bat)
+
+```batch
+# 명령 프롬프트에서 실행
+build.bat
+```
+
+빌드 스크립트는 다음과 같은 작업을 자동으로 수행합니다:
+
+- 프로젝트 버전 확인
+- 필요한 의존성 설치
+- Android 개발 환경 확인 (안드로이드 빌드 시)
+- 빌드 디렉토리 생성 및 정리
+- 플랫폼별 빌드 수행
+
+주의사항:
+
+- Android 빌드를 위해서는 ANDROID_HOME 환경변수가 올바르게 설정되어 있어야 합니다.
+- 키스토어 설정이 필요한 경우 .env 파일이 올바르게 구성되어 있어야 합니다.
+- 빌드 스크립트는 현재 설치된 Node.js 버전과 호환되는지 자동으로 확인합니다.
+
+### 개발 환경 요구사항
+
+- Node.js 20.0 이상
+- Yarn 패키지 매니저
+- VSCode(Feat. Copilot) 또는 Cursor AI (권장)
+- Android Studio (안드로이드 빌드 시)

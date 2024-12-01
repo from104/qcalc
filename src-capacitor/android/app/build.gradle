@@ -18,10 +18,10 @@ android {
     }
     signingConfigs {
         release {
-            keyAlias 'Kihyun'
-            keyPassword 'ntkdmes@apk'
-            storeFile file('my-release-key.jks')
-            storePassword 'ntkdmes@apk'
+            keyAlias System.getenv('MY_JKS_KEY_ALIAS') ?: 'Kihyun'
+            keyPassword System.getenv('MY_JKS_KEY_PASSWORD') ?: 'defaultPassword'
+            storeFile file(System.getenv('MY_JKS_KEY_FILE') ?: "${System.properties['user.home']}/Android/my-release-key.jks")
+            storePassword System.getenv('MY_JKS_STORE_PASSWORD') ?: 'defaultPassword'
         }
     }
     buildTypes {
