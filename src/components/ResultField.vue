@@ -119,7 +119,6 @@
    * - 메인 필드인 경우: 현재 버퍼값을 포맷팅하여 반환
    * - 서브 필드인 경우: 각 애드온(단위/통화/진법)에 따라 변환된 결과를 반환
    */
-  // const getResult = () => {
   const result = computed(() => {
     // 메인 필드인 경우
     if (isMainField) {
@@ -132,7 +131,7 @@
 
       const result = hasSpecialDecimalPlaces
         ? `${formattedNumber.split('.')[0]}.${currentNumber.split('.')[1]}`
-        : formattedNumber;
+          : formattedNumber;
 
       return result;
     } else {
@@ -155,8 +154,6 @@
       }
     }
   });
-
-  // const result = ref(getResult());
 
   /**
    * 통화 기호를 표시하는 계산된 속성
@@ -268,25 +265,30 @@
 
   // 연산자 아이콘 매핑
   const operatorIcons: { [key: string]: string } = {
-    '+': 'mdi-plus-box-outline',
-    '-': 'mdi-minus-box-outline',
-    '×': 'mdi-close-box-outline',
-    '÷': 'mdi-division-box-outline',
-    mod: 'mdi-alpha-m-box-outline',
-    pow: 'mdi-exponent',
-    root: 'mdi-square-root',
-    bitSftR: 'mdi-chevron-right-box-outline',
-    bitSftL: 'mdi-chevron-left-box-outline',
-    bitAnd: 'mdi-numeric-8-box-outline',
-    bitOr: 'mdi-zip-box-outline',
-    bitXor: 'mdi-chevron-up-box-outline',
-    bitNand: 'mdi-numeric-8-box',
-    bitNor: 'mdi-zip-box',
-    bitXnor: 'mdi-chevron-up-box',
+    '+': 'mdi-plus-box',
+    '-': 'mdi-minus-box',
+    '×': 'mdi-close-box',
+    '÷': 'mdi-division-box',
+    mod: 'mdi-alpha-m-box',
+    pow: 'mdi-exponent-box',
+    root: 'mdi-square-root-box',
+    bitSftR: 'mdi-chevron-right-box',
+    bitSftL: 'mdi-chevron-left-box',
+    bitAnd: 'mdi-numeric-8-box',
+    bitOr: 'mdi-zip-box',
+    bitXor: 'mdi-chevron-up-box',
+    bitNand: 'mdi-numeric-8-box-outline',
+    bitNor: 'mdi-zip-box-outline',
+    bitXnor: 'mdi-chevron-up-box-outline',
   };
 
   // 메모리 초기화 여부 계산된 속성
   const isMemoryEmpty = computed(() => calc.isMemoryEmpty);
+
+  // 메모리 값 계산된 속성
+  const memoryValue = computed(() =>
+    toFormattedNumber(convertIfRadix(calc.getMemoryNumber()))
+  );
 
   /**
    * 계산 인자나 계산 결과에 대한 식을 문자열로 생성하는 함수
@@ -351,16 +353,10 @@
   watch(
     [
       () => storeBase.currentTab,
-      () => storeBase.isMemoryVisible,
     ],
     () => {
-      // 결과값 업데이트
-      // result.value = getResult();
-      // previousResult.value = getPreviousResult();
-
       // UI 업데이트
       checkNeedFieldTooltip();
-      hideMemory();
 
       if (computedCurrentTab.value === 'radix') {
         calc.currentRadix = storeRadix.sourceRadix;
@@ -379,7 +375,7 @@
   let tooltipInterval: NodeJS.Timeout;
   // 컴포넌트 마운트 후 초기 설정
   onMounted(() => {
-    tooltipInterval = setInterval(checkNeedFieldTooltip, 5);
+    tooltipInterval = setInterval(checkNeedFieldTooltip, 50);
     checkNeedFieldTooltip();
   });
 
@@ -438,10 +434,9 @@
         >
           <span v-if="currentTab === 'radix'" id="radixPrefix">{{ radixPrefix }}</span>
           <span v-if="currentTab === 'currency'" id="symbol">{{ symbol }}</span>
-          <span v-if="isMainField && storeBase.isMemoryVisible" id="result" :class="getResultColor()">
-            {{ toFormattedNumber(calc.getMemoryNumber()) }}
+          <span :id="isMainField ? 'result' : 'subResult'" :class="getResultColor()">
+            {{ isMainField && storeBase.isMemoryVisible ? memoryValue : result }}
           </span>
-          <span v-else :id="isMainField ? 'result' : 'subResult'">{{ result }}</span>
           <span v-if="currentTab === 'unit'" id="unit">{{ unit }}</span>
           <span v-if="currentTab === 'radix'" id="radixSuffix">{{ radixSuffix }}</span>
           <q-menu context-menu auto-close touch-position class="shadow-6">
