@@ -122,15 +122,15 @@
   const result = computed(() => {
     // 메인 필드인 경우
     if (isMainField) {
-      const currentNumber = calc.getInputBuffer();
+      const inputBuffer = calc.getInputBuffer();
 
-      const formattedNumber = toFormattedNumber(currentNumber);
+      const formattedNumber = toFormattedNumber(inputBuffer);
 
       // 소수점 자릿수 설정이 -2이고 소수점이 있는 경우
-      const hasSpecialDecimalPlaces = storeSettings.decimalPlaces === -2 && currentNumber.includes('.');
+      const hasSpecialDecimalPlaces = storeSettings.decimalPlaces === -2 && inputBuffer.includes('.');
 
       const result = hasSpecialDecimalPlaces
-        ? `${formattedNumber.split('.')[0]}.${currentNumber.split('.')[1]}`
+        ? `${formattedNumber.split('.')[0]}.${inputBuffer.split('.')[1]}`
           : formattedNumber;
 
       return result;
@@ -323,8 +323,6 @@
     return '';
   });
 
-  // const previousResult = ref(getPreviousResult());
-
   // 결과 색상 정의
   const resultColors = {
     normal: 'text-light-green-8',
@@ -351,9 +349,7 @@
 
   // 감시자 설정
   watch(
-    [
-      () => storeBase.currentTab,
-    ],
+    () => storeBase.currentTab,
     () => {
       // UI 업데이트
       checkNeedFieldTooltip();
