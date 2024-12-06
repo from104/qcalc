@@ -2,13 +2,7 @@
   import { ref, computed, onBeforeMount, onMounted, watch, onUnmounted } from 'vue';
   import { useI18n } from 'vue-i18n';
 
-  import { useStoreBase } from 'src/stores/store-base';
-  import { useStoreSettings } from 'src/stores/store-settings';
-  import { useStoreUtils } from 'src/stores/store-utils';
-  import { useStoreUnit } from 'src/stores/store-unit';
-  import { useStoreCurrency } from 'src/stores/store-currency';
-  import { useStoreRadix } from 'src/stores/store-radix';
-
+  import { useStore } from 'src/stores/store';
   import { UnitConverter } from 'src/classes/UnitConverter';
   import { Radix } from 'src/classes/RadixConverter';
 
@@ -29,19 +23,22 @@
   const fieldID = `${props.field}Field`;
 
   // 스토어 인스턴스 생성
-  const storeBase = useStoreBase();
-  const storeSettings = useStoreSettings();
-  const storeUtils = useStoreUtils();
-  const storeUnit = useStoreUnit();
-  const storeCurrency = useStoreCurrency();
-  const storeRadix = useStoreRadix();
+  const store = useStore();
 
   // 스토어에서 필요한 메서드와 속성 추출
-  const { calc, currentTab, hideMemory, showMemoryTemporarily } = storeBase;
-  const { toFormattedNumber, convertIfRadix, getLeftSideInHistory, copyToClipboard } = storeUtils;
-  const { initRecentUnits } = storeUnit;
-  const { initRecentCurrencies } = storeCurrency;
-  const { initRecentRadix } = storeRadix;
+  const {
+    calc,
+    currentTab,
+    hideMemory,
+    showMemoryTemporarily,
+    toFormattedNumber,
+    convertIfRadix,
+    getLeftSideInHistory,
+    copyToClipboard,
+    initRecentUnits,
+    initRecentCurrencies,
+    initRecentRadix,
+  } = store;
 
   const calcHistory = calc.history;
   const needFieldTooltip = ref(false);
@@ -74,7 +71,7 @@
    * - 현재 카테고리의 시작 단위에서 목표 단위로 변환
    */
   const getConvertedUnitNumber = () => {
-    const { selectedCategory, sourceUnits, targetUnits } = storeUnit;
+    const { selectedCategory, sourceUnits, targetUnits } = store;
 
     return UnitConverter.convert(
       selectedCategory,
@@ -93,10 +90,10 @@
    */
   const getConvertedCurrencyNumber = () => {
     const currentNumber = Number(calc.getCurrentNumber());
-    const fromCurrency = storeCurrency.sourceCurrency;
-    const toCurrency = storeCurrency.targetCurrency;
+    const fromCurrency = store.sourceCurrency;
+    const toCurrency = store.targetCurrency;
 
-    return storeCurrency.converter.convert(currentNumber, fromCurrency, toCurrency).toString();
+    return store.converter.convert(currentNumber, fromCurrency, toCurrency).toString();
   };
 
   // 진법 변환 결과 계산 함수
@@ -108,7 +105,7 @@
    * - 현재 버퍼의 값을 메인 진법에서 서브 진법으로 변환
    */
   const getConvertedRadixNumber = () => {
-    return storeRadix.convertRadix(calc.getInputBuffer(), storeRadix.sourceRadix, storeRadix.targetRadix);
+    return store.convertRadix(calc.getInputBuffer(), store.sourceRadix, store.targetRadix);
   };
 
   /**
@@ -127,7 +124,7 @@
       const formattedNumber = toFormattedNumber(inputBuffer);
 
       // 소수점 자릿수 설정이 -2이고 소수점이 있는 경우
-      const hasSpecialDecimalPlaces = storeSettings.decimalPlaces === -2 && inputBuffer.includes('.');
+      const hasSpecialDecimalPlaces = store.decimalPlaces === -2 && inputBuffer.includes('.');
 
       const result = hasSpecialDecimalPlaces
         ? `${formattedNumber.split('.')[0]}.${inputBuffer.split('.')[1]}`
@@ -164,12 +161,12 @@
    * - 메인 필드면 시작 통화의 기호를, 서브 필드면 대상 통화의 기호를 반환
    */
   const symbol = computed(() => {
-    const isShowingCurrencySymbol = storeSettings.showSymbol && props.addon === 'currency';
+    const isShowingCurrencySymbol = store.showSymbol && props.addon === 'currency';
     if (!isShowingCurrencySymbol) return '';
 
-    const currencyCode = isMainField ? storeCurrency.sourceCurrency : storeCurrency.targetCurrency;
+    const currencyCode = isMainField ? store.sourceCurrency : store.targetCurrency;
 
-    return storeCurrency.converter.getSymbol(currencyCode);
+    return store.converter.getSymbol(currencyCode);
   });
 
   /**
@@ -177,12 +174,12 @@
    * 단위 표시 설정이 켜져있고 단위 애드온인 경우에만 단위를 표시
    */
   const unit = computed(() => {
-    const shouldShowUnit = storeSettings.showUnit && props.addon === 'unit';
+    const shouldShowUnit = store.showUnit && props.addon === 'unit';
     if (!shouldShowUnit) return '';
 
     const selectedUnit = isMainField
-      ? storeUnit.sourceUnits[storeUnit.selectedCategory]
-      : storeUnit.targetUnits[storeUnit.selectedCategory];
+      ? store.sourceUnits[store.selectedCategory]
+      : store.targetUnits[store.selectedCategory];
 
     return ` ${selectedUnit}`;
   });
@@ -192,25 +189,15 @@
    * 현재 탭이 radix일 경우에만 진법을 표시
    */
   const radixPrefix = computed(() => {
-    return currentTab === 'radix' && storeSettings.showRadix && storeSettings.radixType === 'prefix'
-      ? {
-          [Radix.Binary]: '0b',
-          [Radix.Octal]: '0o',
-          [Radix.Hexadecimal]: '0x',
-          [Radix.Decimal]: '',
-        }[isMainField ? storeRadix.sourceRadix : storeRadix.targetRadix]
-      : '';
+    const radix = isMainField ? store.sourceRadix : store.targetRadix;
+    return currentTab === 'radix' && store.showRadix && store.radixType === 'prefix'
+      ? store.getRadixPrefix(radix) : '';
   });
 
   const radixSuffix = computed(() => {
-    return currentTab === 'radix' && storeSettings.showRadix && storeSettings.radixType === 'suffix'
-      ? {
-          [Radix.Binary]: '2',
-          [Radix.Octal]: '8',
-          [Radix.Hexadecimal]: '16',
-          [Radix.Decimal]: '10',
-        }[isMainField ? storeRadix.sourceRadix : storeRadix.targetRadix]
-      : '';
+    const radix = isMainField ? store.sourceRadix : store.targetRadix;
+    return currentTab === 'radix' && store.showRadix && store.radixType === 'suffix'
+      ? store.getRadixSuffix(radix) : '';
   });
 
   const displayedResult = computed(() => {
@@ -218,7 +205,7 @@
     const baseString = `${radixPrefix.value}${symbol.value}${result.value}${unit.value}`;
 
     // 진법 접미사 조건 확인
-    const shouldShowSuffix = currentTab === 'radix' && storeSettings.showRadix && storeSettings.radixType === 'suffix';
+    const shouldShowSuffix = currentTab === 'radix' && store.showRadix && store.radixType === 'suffix';
 
     // 진법 접미사 추가 여부에 따라 최종 문자열 반환
     return shouldShowSuffix ? `${baseString}(${radixSuffix.value})` : baseString;
@@ -240,7 +227,7 @@
     // 메인 필드 처리
     if (props.field === 'main') {
       if (props.addon === 'radix') {
-        const convertedNumber = storeRadix.convertRadix(calc.getCurrentNumber(), Radix.Decimal, storeRadix.sourceRadix);
+        const convertedNumber = store.convertRadix(calc.getCurrentNumber(), Radix.Decimal, store.sourceRadix);
         return getRadixResult(convertedNumber);
       }
       return calc.getCurrentNumber();
@@ -339,23 +326,23 @@
 
   // 결과 색상 선택 함수
   const getResultColor = () => {
-    if (isMainField && storeBase.isMemoryVisible) {
+    if (isMainField && store.isMemoryVisible) {
       return !needFieldTooltip.value ? resultColors.normalDark : resultColors.warningDark;
     }
     return !needFieldTooltip.value ? resultColors.normal : resultColors.warning;
   };
 
-  const computedCurrentTab = computed(() => storeBase.currentTab);
+  const computedCurrentTab = computed(() => store.currentTab);
 
   // 감시자 설정
   watch(
-    () => storeBase.currentTab,
+    () => store.currentTab,
     () => {
       // UI 업데이트
       checkNeedFieldTooltip();
 
       if (computedCurrentTab.value === 'radix') {
-        calc.currentRadix = storeRadix.sourceRadix;
+        calc.currentRadix = store.sourceRadix;
       } else {
         calc.currentRadix = Radix.Decimal;
       }
@@ -426,12 +413,12 @@
           v-mutation.characterData
           class="self-center no-outline full-width full-height ellipsis text-right q-pt-xs noselect"
           :class="[isMainField ? 'text-h5' : '', getResultColor()]"
-          :style="`padding-top: ${storeBase.resultPanelPadding}px;`"
+          :style="`padding-top: ${store.resultPanelPadding}px;`"
         >
           <span v-if="currentTab === 'radix'" id="radixPrefix">{{ radixPrefix }}</span>
           <span v-if="currentTab === 'currency'" id="symbol">{{ symbol }}</span>
           <span :id="isMainField ? 'result' : 'subResult'" :class="getResultColor()">
-            {{ isMainField && storeBase.isMemoryVisible ? memoryValue : result }}
+            {{ isMainField && store.isMemoryVisible ? memoryValue : result }}
           </span>
           <span v-if="currentTab === 'unit'" id="unit">{{ unit }}</span>
           <span v-if="currentTab === 'radix'" id="radixSuffix">{{ radixSuffix }}</span>

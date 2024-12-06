@@ -13,21 +13,14 @@
   const $q = useQuasar();
 
   // 애플리케이션의 여러 스토어들을 가져옵니다.
-  import { useStoreBase } from 'src/stores/store-base';
-  import { useStoreSettings } from 'src/stores/store-settings';
-  import { useStoreNotifications } from 'src/stores/store-notifications';
-  import { useStoreUtils } from 'src/stores/store-utils';
+  import { useStore } from 'src/stores/store';
 
   // 스토어 인스턴스들을 생성합니다.
-  const storeBase = useStoreBase();
-  const storeSettings = useStoreSettings();
-  const storeNotifications = useStoreNotifications();
-  const storeUtils = useStoreUtils();
+  const store = useStore();
 
   // 스토어에서 필요한 함수들을 구조 분해 할당으로 가져옵니다.
-  const { showMessage } = storeNotifications;
-  const { toggleAlwaysOnTop, setInitPanel, setDarkMode, setAlwaysOnTop, setHapticsMode, setDecimalPlaces } =
-    storeSettings;
+  const { showMessage } = store;
+  const { toggleAlwaysOnTop, setInitPanel, setDarkMode, setAlwaysOnTop, setHapticsMode, setDecimalPlaces } = store;
 
   // i18n 설정을 위한 훅을 가져옵니다.
   import { useI18n } from 'vue-i18n';
@@ -44,19 +37,19 @@
   ]);
 
   // 시스템 로케일 사용 여부와 사용자 로케일이 변경될 때마다 언어 옵션 라벨을 업데이트합니다.
-  watch([() => storeSettings.useSystemLocale, () => storeSettings.userLocale], () => {
+  watch([() => store.useSystemLocale, () => store.userLocale], () => {
     languageOptions.forEach((option) => {
       option.label = t('message.' + option.value);
     });
-    storeSettings.locale = locale.value as string;
+    store.locale = locale.value as string;
   });
 
   // 로케일을 설정하는 함수입니다.
   const setLanguage = () => {
-    if (storeSettings.useSystemLocale) {
+    if (store.useSystemLocale) {
       locale.value = systemLocale.value;
     } else {
-      locale.value = storeSettings.userLocale;
+      locale.value = store.userLocale;
     }
   };
 
@@ -65,7 +58,7 @@
     if ($q.platform.is.electron) {
       toggleAlwaysOnTop();
 
-      if (storeSettings.alwaysOnTop) {
+      if (store.alwaysOnTop) {
         showMessage(t('alwaysOnTopOn'));
       } else {
         showMessage(t('alwaysOnTopOff'));
@@ -79,22 +72,22 @@
   // 키 바인딩을 설정합니다.
   const keyBinding = new KeyBinding([
     [['Alt+t'], toggleAlwaysOnTopWithNotification],
-    [['Alt+i'], storeSettings.toggleInitPanel],
-    [['Alt+d'], storeSettings.toggleDarkMode],
-    [['Alt+p'], storeSettings.toggleHapticsMode],
-    [['Alt+s'], () => { storeBase.isSettingDialogOpen = true; }],
-    [[';'], storeSettings.toggleButtonAddedLabel],
-    [[','], storeSettings.toggleUseGrouping],
-    [['Alt+,'], () => storeSettings.setGroupingUnit(storeSettings.groupingUnit == 3 ? 4 : 3)],
-    [['['], storeSettings.decrementDecimalPlaces],
-    [[']'], storeSettings.incrementDecimalPlaces],
+    [['Alt+i'], store.toggleInitPanel],
+    [['Alt+d'], store.toggleDarkMode],
+    [['Alt+p'], store.toggleHapticsMode],
+    [['Alt+s'], () => { store.isSettingDialogOpen = true; }],
+    [[';'], store.toggleButtonAddedLabel],
+    [[','], store.toggleUseGrouping],
+    [['Alt+,'], () => store.setGroupingUnit(store.groupingUnit == 3 ? 4 : 3)],
+    [['['], store.decrementDecimalPlaces],
+    [[']'], store.incrementDecimalPlaces],
   ]);
 
   // 입력 포커스 상태에 따라 키 바인딩을 활성화/비활성화합니다.
   watch(
-    () => storeUtils.inputFocused,
+    () => store.inputFocused,
     () => {
-      if (storeUtils.inputFocused) {
+      if (store.inputFocused) {
         keyBinding.unsubscribe();
       } else {
         keyBinding.subscribe();
@@ -108,11 +101,11 @@
     setLanguage();
 
     // 초기 실행 시 로케일 설정
-    if (storeSettings.locale === '') {
-      storeSettings.locale = systemLocale.value;
+    if (store.locale === '') {
+      store.locale = systemLocale.value;
     }
-    if (storeSettings.userLocale === '') {
-      storeSettings.userLocale = systemLocale.value;
+    if (store.userLocale === '') {
+      store.userLocale = systemLocale.value;
     }
   });
 
@@ -129,17 +122,17 @@
 
 <template>
   <q-dialog
-    v-model="storeBase.isSettingDialogOpen"
+    v-model="store.isSettingDialogOpen"
     style="z-index: 15"
     transition-show="slide-down"
     transition-hide="slide-up"
   >
-    <q-card id="setting" v-touch-swipe:9e-2:12:50.up="() => (storeBase.isSettingDialogOpen = false)" class="full-width">
+    <q-card id="setting" v-touch-swipe:9e-2:12:50.up="() => (store.isSettingDialogOpen = false)" class="full-width">
       <q-bar v-blur dark class="full-width noselect text-white bg-primary">
         <q-icon name="settings" size="sm" />
         <div>{{ t('message.settings') }}</div>
         <q-space />
-        <q-btn dense flat icon="close" size="md" @click="storeBase.isSettingDialogOpen = false" />
+        <q-btn dense flat icon="close" size="md" @click="store.isSettingDialogOpen = false" />
       </q-bar>
       <q-card-section class="full-width">
         <q-list v-blur dense>
@@ -147,10 +140,10 @@
             <q-item-label class="self-center">{{ t('alwaysOnTop') }} (Alt-T)</q-item-label>
             <q-space />
             <q-toggle
-              v-model="storeSettings.alwaysOnTop"
+              v-model="store.alwaysOnTop"
               keep-color
               dense
-              @click="setAlwaysOnTop(storeSettings.alwaysOnTop)"
+              @click="setAlwaysOnTop(store.alwaysOnTop)"
             />
           </q-item>
 
@@ -158,27 +151,27 @@
             <q-item-label class="self-center">{{ t('initPanel') }} (Alt-I)</q-item-label>
             <q-space />
             <q-toggle
-              v-model="storeSettings.initPanel"
+              v-model="store.initPanel"
               keep-color
               dense
-              @click="setInitPanel(storeSettings.initPanel)"
+              @click="setInitPanel(store.initPanel)"
             />
           </q-item>
 
           <q-item class="q-py-none">
             <q-item-label class="self-center">{{ t('darkMode') }} (Alt-D)</q-item-label>
             <q-space />
-            <q-toggle v-model="storeSettings.darkMode" keep-color dense @click="setDarkMode(storeSettings.darkMode)" />
+            <q-toggle v-model="store.darkMode" keep-color dense @click="setDarkMode(store.darkMode)" />
           </q-item>
 
           <q-item v-if="$q.platform.is.capacitor" class="q-py-none">
             <q-item-label class="self-center">{{ t('hapticsMode') }} (Alt-P)</q-item-label>
             <q-space />
             <q-toggle
-              v-model="storeSettings.hapticsMode"
+              v-model="store.hapticsMode"
               keep-color
               dense
-              @click="setHapticsMode(storeSettings.hapticsMode)"
+              @click="setHapticsMode(store.hapticsMode)"
             />
           </q-item>
 
@@ -187,24 +180,24 @@
           <q-item class="q-py-none">
             <q-item-label class="self-center">{{ t('showButtonAddedLabel') }} (;)</q-item-label>
             <q-space />
-            <q-toggle v-model="storeSettings.showButtonAddedLabel" keep-color dense />
+            <q-toggle v-model="store.showButtonAddedLabel" keep-color dense />
           </q-item>
 
           <q-item class="q-py-none">
             <q-item-label class="self-center">{{ t('useGrouping') }} (,)</q-item-label>
             <q-space />
-            <q-toggle v-model="storeSettings.useGrouping" keep-color dense />
+            <q-toggle v-model="store.useGrouping" keep-color dense />
           </q-item>
 
           <q-item class="q-py-none">
             <q-item-label class="self-center">{{ t('groupingUnit') }} (Alt-,)</q-item-label>
             <q-space />
             <q-slider
-              v-model="storeSettings.groupingUnit"
+              v-model="store.groupingUnit"
               :min="3"
               :max="4"
               :step="1"
-              :disable="!storeSettings.useGrouping"
+              :disable="!store.useGrouping"
               dense
               class="col-2 q-pr-sm q-pt-xs"
               marker-labels
@@ -215,22 +208,22 @@
             <MyTooltip>
               {{ t('decimalPlacesStat') }}:
               {{
-                storeSettings.decimalPlaces == -2
+                store.decimalPlaces == -2
                   ? t('noLimit')
-                  : `${storeSettings.decimalPlaces} ${t('toNDecimalPlaces')}`
+                  : `${store.decimalPlaces} ${t('toNDecimalPlaces')}`
               }}
             </MyTooltip>
             <q-item-label class="q-pt-xs self-start">{{ t('decimalPlaces') }} ([,])</q-item-label>
             <q-space />
             <q-slider
-              v-model="storeSettings.decimalPlaces"
+              v-model="store.decimalPlaces"
               :min="-2"
               :step="2"
               :max="6"
               marker-labels
               class="col-5 q-pr-sm"
               dense
-              @change="setDecimalPlaces(storeSettings.decimalPlaces)"
+              @change="setDecimalPlaces(store.decimalPlaces)"
             >
               <template #marker-label-group="{ markerList }">
                 <div
@@ -255,40 +248,40 @@
             </q-slider>
           </q-item>
 
-          <template v-if="storeBase.currentTab == 'unit'">
+          <template v-if="store.currentTab == 'unit'">
             <q-separator spaced="sm" />
 
             <q-item class="q-py-none">
               <q-item-label class="self-center"> {{ t('showUnit') }} (Alt-Y) </q-item-label>
               <q-space />
-              <q-toggle v-model="storeSettings.showUnit" keep-color dense />
+              <q-toggle v-model="store.showUnit" keep-color dense />
             </q-item>
           </template>
 
-          <template v-else-if="storeBase.currentTab == 'currency'">
+          <template v-else-if="store.currentTab == 'currency'">
             <q-separator spaced="sm" />
 
             <q-item class="q-py-none">
               <q-item-label class="self-center"> {{ t('showSymbol') }} (Alt-Y) </q-item-label>
               <q-space />
-              <q-toggle v-model="storeSettings.showSymbol" keep-color dense />
+              <q-toggle v-model="store.showSymbol" keep-color dense />
             </q-item>
           </template>
 
-          <template v-else-if="storeBase.currentTab == 'radix'">
+          <template v-else-if="store.currentTab == 'radix'">
             <q-separator spaced="sm" />
 
             <q-item class="q-py-none">
               <q-item-label class="self-center"> {{ t('showRadix') }} (Alt-Y) </q-item-label>
               <q-space />
-              <q-toggle v-model="storeSettings.showRadix" keep-color dense />
+              <q-toggle v-model="store.showRadix" keep-color dense />
             </q-item>
 
             <q-item class="q-py-none">
               <q-item-label class="self-center"> {{ t('radixType') }} (Alt-U) </q-item-label>
               <q-space />
               <q-select
-                v-model="storeSettings.radixType"
+                v-model="store.radixType"
                 :options="[
                   { label: t('prefix'), value: 'prefix' },
                   { label: t('suffix'), value: 'suffix' },
@@ -297,11 +290,11 @@
                 emit-value
                 map-options
                 options-dense
-                :disable="!storeSettings.showRadix"
-                :label-color="!storeSettings.darkMode ? 'primary' : 'grey-1'"
-                :options-selected-class="!storeSettings.darkMode ? 'text-primary' : 'text-grey-1'"
-                :popup-content-class="!storeSettings.darkMode ? 'bg-blue-grey-2' : 'bg-blue-grey-6'"
-                :class="!storeSettings.darkMode ? 'bg-blue-grey-2' : 'bg-blue-grey-6'"
+                :disable="!store.showRadix"
+                :label-color="!store.darkMode ? 'primary' : 'grey-1'"
+                :options-selected-class="!store.darkMode ? 'text-primary' : 'text-grey-1'"
+                :popup-content-class="!store.darkMode ? 'bg-blue-grey-2' : 'bg-blue-grey-6'"
+                :class="!store.darkMode ? 'bg-blue-grey-2' : 'bg-blue-grey-6'"
               />
             </q-item>
           </template>
@@ -311,7 +304,7 @@
           <q-item class="q-py-none">
             <q-item-label class="self-center">{{ t('useSystemLocale') }}</q-item-label>
             <q-space />
-            <q-toggle v-model="storeSettings.useSystemLocale" keep-color dense @click="setLanguage()" />
+            <q-toggle v-model="store.useSystemLocale" keep-color dense @click="setLanguage()" />
           </q-item>
 
           <q-item>
@@ -320,17 +313,17 @@
             </q-item-label>
             <q-space />
             <q-select
-              v-model="storeSettings.userLocale"
-              :disable="storeSettings.useSystemLocale"
+              v-model="store.userLocale"
+              :disable="store.useSystemLocale"
               :options="languageOptions"
               dense
               emit-value
               map-options
               options-dense
-              :label-color="!storeSettings.darkMode ? 'primary' : 'grey-1'"
-              :options-selected-class="!storeSettings.darkMode ? 'text-primary' : 'text-grey-1'"
-              :popup-content-class="!storeSettings.darkMode ? 'bg-blue-grey-2' : 'bg-blue-grey-6'"
-              :class="!storeSettings.darkMode ? 'bg-blue-grey-2' : 'bg-blue-grey-6'"
+              :label-color="!store.darkMode ? 'primary' : 'grey-1'"
+              :options-selected-class="!store.darkMode ? 'text-primary' : 'text-grey-1'"
+              :popup-content-class="!store.darkMode ? 'bg-blue-grey-2' : 'bg-blue-grey-6'"
+              :class="!store.darkMode ? 'bg-blue-grey-2' : 'bg-blue-grey-6'"
               @update:model-value="setLanguage()"
             />
           </q-item>

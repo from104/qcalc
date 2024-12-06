@@ -17,13 +17,9 @@
   const $q = useQuasar();
 
   // 스토어 가져오기
-  import { useStoreBase } from 'src/stores/store-base';
-  import { useStoreSettings } from 'src/stores/store-settings';
-  import { useStoreUtils } from 'src/stores/store-utils';
+  import { useStore } from 'src/stores/store';
 
-  const storeBase = useStoreBase();
-  const storeSettings = useStoreSettings();
-  const storeUtils = useStoreUtils();
+  const store = useStore();
 
   // 다국어 지원을 위한 i18n 설정
   import { useI18n } from 'vue-i18n';
@@ -39,35 +35,35 @@
 
   // 탭 오른쪽으로 이동하는 함수
   const moveTabRight = () => {
-    const currentIndex = tabs.findIndex((tab) => tab.name === storeBase.currentTab);
+    const currentIndex = tabs.findIndex((tab) => tab.name === store.currentTab);
     const nextTab = tabs[(currentIndex + 1) % tabs.length].name;
-    storeBase.setCurrentTab(nextTab);
+    store.setCurrentTab(nextTab);
   };
 
   // 탭 왼쪽으로 이동하는 함수
   const moveTabLeft = () => {
-    const currentIndex = tabs.findIndex((tab) => tab.name === storeBase.currentTab);
+    const currentIndex = tabs.findIndex((tab) => tab.name === store.currentTab);
     const prevTab = tabs[(currentIndex - 1 + tabs.length) % tabs.length].name;
-    storeBase.setCurrentTab(prevTab);
+    store.setCurrentTab(prevTab);
   };
 
   // 키 바인딩 설정
   import { KeyBinding } from 'classes/KeyBinding';
 
   const keyBinding = new KeyBinding([
-    [['Control+1'], () => storeBase.setCurrentTab('calc')],
-    [['Control+2'], () => storeBase.setCurrentTab('unit')],
-    [['Control+3'], () => storeBase.setCurrentTab('currency')],
-    [['Control+4'], () => storeBase.setCurrentTab('radix')],
+    [['Control+1'], () => store.setCurrentTab('calc')],
+    [['Control+2'], () => store.setCurrentTab('unit')],
+    [['Control+3'], () => store.setCurrentTab('currency')],
+    [['Control+4'], () => store.setCurrentTab('radix')],
     [['Control+Tab', 'ArrowRight'], moveTabRight],
     [['Control+Shift+Tab', 'ArrowLeft'], moveTabLeft],
   ]);
 
   // 입력 포커스 상태에 따라 키 바인딩 활성화/비활성화
   watch(
-    () => storeUtils.inputFocused,
+    () => store.inputFocused,
     () => {
-      if (storeUtils.inputFocused) {
+      if (store.inputFocused) {
         keyBinding.unsubscribe();
       } else {
         keyBinding.subscribe();
@@ -78,7 +74,7 @@
 
   // 언어 변경 시 탭 이름 업데이트
   watch(
-    () => storeSettings.locale,
+    () => store.locale,
     () => {
       tabs.forEach((tab) => {
         tab.title = t(tab.name);
@@ -97,7 +93,7 @@
     <q-header class="z-top noselect" elevated>
       <q-toolbar v-blur>
         <q-tabs
-          v-model="storeBase.currentTab"
+          v-model="store.currentTab"
           align="left"
           class="col-8 q-px-none"
           active-color="text-primary"
@@ -107,14 +103,14 @@
           inline-label
           outside-arrows
           mobile-arrows
-          @update:model-value="storeBase.setCurrentTab($event)"
+          @update:model-value="store.setCurrentTab($event)"
         >
           <q-tab
             v-for="tab in tabs"
             :key="tab.name"
             :label="tab.title"
             :name="tab.name"
-            :disable="storeBase.isSettingDialogOpen"
+            :disable="store.isSettingDialogOpen"
             class="q-px-xs"
             dense
           />
@@ -126,7 +122,7 @@
 
     <q-page-container style="padding-bottom: 0px">
       <q-tab-panels
-        v-model="storeBase.currentTab"
+        v-model="store.currentTab"
         animated
         infinite
         :swipeable="$q.platform.is.mobile"

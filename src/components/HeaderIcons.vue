@@ -5,11 +5,7 @@
   import MyTooltip from 'components/MyTooltip.vue';
   import MenuItem from 'components/MenuItem.vue';
   import MenuPanel from './MenuPanel.vue';
-  import { useStoreBase } from 'src/stores/store-base';
-  import { useStoreUtils } from 'src/stores/store-utils';
-  import { useStoreNotifications } from 'src/stores/store-notifications';
-  import { useStoreUnit } from 'src/stores/store-unit';
-  import { useStoreCurrency } from 'src/stores/store-currency';
+  import { useStore } from 'src/stores/store';
   import { KeyBinding } from 'classes/KeyBinding';
 
   // Quasar 인스턴스 초기화
@@ -19,18 +15,18 @@
   const { t } = useI18n();
 
   // 스토어 인스턴스 초기화
-  const storeBase = useStoreBase();
-  const storeUtils = useStoreUtils();
-  const storeNotifications = useStoreNotifications();
-  const storeUnit = useStoreUnit();
-  const storeCurrency = useStoreCurrency();
+  const store = useStore();
 
   // 스토어에서 필요한 메서드와 속성 추출
-  const { calc } = storeBase;
-  const { copyToClipboard, clickButtonById } = storeUtils;
-  const { showError, showMessage } = storeNotifications;
-  const { swapUnits } = storeUnit;
-  const { swapCurrencies } = storeCurrency;
+  const {
+    calc,
+    copyToClipboard,
+    clickButtonById,
+    showError,
+    showMessage,
+    swapUnits,
+    swapCurrencies,
+  } = store;
 
   /**
    * 선택된 텍스트 또는 계산 결과를 클립보드에 복사하는 함수
@@ -63,11 +59,11 @@
       }
 
       if (target === 'sub') {
-        if (storeBase.currentTab === 'unit') {
+        if (store.currentTab === 'unit') {
           swapUnits();
           setTimeout(() => calc.setCurrentNumber(clipboardText), 5);
           setTimeout(swapUnits, 10);
-        } else if (storeBase.currentTab === 'currency') {
+        } else if (store.currentTab === 'currency') {
           swapCurrencies();
           setTimeout(() => calc.setCurrentNumber(clipboardText), 5);
           setTimeout(swapCurrencies, 10);
@@ -100,7 +96,7 @@
     flat
     icon="content_copy"
     class="q-ma-none q-pa-none q-pl-xs"
-    :disable="storeBase.isSettingDialogOpen"
+    :disable="store.isSettingDialogOpen"
     @click="handleCopy"
   >
     <MyTooltip>{{ t('tooltipCopy') }}</MyTooltip>
@@ -110,10 +106,10 @@
     flat
     icon="content_paste"
     class="q-ma-none q-pa-none q-pl-xs"
-    :disable="storeBase.isSettingDialogOpen"
+    :disable="store.isSettingDialogOpen"
     @click="handlePaste()"
   >
-    <q-menu v-if="storeBase.currentTab !== 'calc'" context-menu auto-close class="z-max shadow-6">
+    <q-menu v-if="store.currentTab !== 'calc'" context-menu auto-close class="z-max shadow-6">
       <q-list dense style="max-width: 200px">
         <MenuItem :action="() => handlePaste('main')" :title="t('pasteToMainPanel')" />
         <MenuItem :action="() => handlePaste('sub')" :title="t('pasteToSubPanel')" />
@@ -126,12 +122,12 @@
     flat
     icon="history"
     class="q-ma-none q-pa-none q-pl-xs"
-    :disable="storeBase.isSettingDialogOpen"
-    @click="storeBase.isHistoryDialogOpen = !storeBase.isHistoryDialogOpen"
+    :disable="store.isSettingDialogOpen"
+    @click="store.isHistoryDialogOpen = !store.isHistoryDialogOpen"
   >
     <MyTooltip>{{ t('openHistoryDialog') }}</MyTooltip>
   </q-btn>
-  <q-btn id="btn-menu" flat icon="more_vert" class="q-ma-none q-pa-none q-pl-xs" :disable="storeBase.isSettingDialogOpen">
+  <q-btn id="btn-menu" flat icon="more_vert" class="q-ma-none q-pa-none q-pl-xs" :disable="store.isSettingDialogOpen">
     <q-menu auto-close transition-show="slide-left" transition-hide="slide-right" :offset="[0, 10]" class="shadow-6">
       <MenuPanel />
     </q-menu>

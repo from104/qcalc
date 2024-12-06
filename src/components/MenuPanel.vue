@@ -2,16 +2,14 @@
   import { onMounted, reactive, watch } from 'vue';
   import MenuItem from 'components/MenuItem.vue';
   import { useRouter } from 'vue-router';
-  import { useStoreBase } from 'src/stores/store-base';
-  import { useStoreSettings } from 'src/stores/store-settings';
+  import { useStore } from 'src/stores/store';
   import { useI18n } from 'vue-i18n';
 
   // 라우터 인스턴스 초기화
   const router = useRouter();
 
   // 스토어 인스턴스 초기화
-  const storeBase = useStoreBase();
-  const storeSettings = useStoreSettings();
+  const store = useStore();
 
   // i18n 설정
   const { t } = useI18n();
@@ -33,28 +31,28 @@
       caption: t('item.calc.caption'),
       shortcut: 'Ctrl-1',
       icon: 'calculate',
-      action: () => { storeBase.currentTab = 'calc'; },
+      action: () => { store.currentTab = 'calc'; },
     },
     unit: {
       title: t('item.unit.title'),
       caption: t('item.unit.caption'),
       shortcut: 'Ctrl-2',
       icon: 'swap_vert',
-      action: () => { storeBase.currentTab = 'unit'; },
+      action: () => { store.currentTab = 'unit'; },
     },
     currency: {
       title: t('item.currency.title'),
       caption: t('item.currency.caption'),
       shortcut: 'Ctrl-3',
       icon: 'currency_exchange',
-      action: () => { storeBase.currentTab = 'currency'; },
+      action: () => { store.currentTab = 'currency'; },
     },
     radix: {
       title: t('item.radix.title'),
       caption: t('item.radix.caption'),
       shortcut: 'Ctrl-4',
       icon: 'transform',
-      action: () => { storeBase.currentTab = 'radix'; },
+      action: () => { store.currentTab = 'radix'; },
     },
     separator1: { isSeparator: true },
     settings: {
@@ -62,7 +60,7 @@
       caption: t('item.settings.caption'),
       shortcut: 'Alt-s',
       icon: 'settings',
-      action: () => { storeBase.isSettingDialogOpen = true; },
+      action: () => { store.isSettingDialogOpen = true; },
     },
     separator2: { isSeparator: true },
     help: {
@@ -91,7 +89,7 @@
 
   // 언어 변경 감지 및 메뉴 아이템 텍스트 업데이트
   watch(
-    () => storeSettings.locale,
+    () => store.locale,
     () => {
       updateLocale();
     },
