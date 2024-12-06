@@ -14,48 +14,59 @@ const radixConverter = new RadixConverter();
 export const useStore = defineStore('store', {
   // 상태 정의
   state: () => ({
-    calc: new Calculator(), // 계산기 인스턴스
-    currentTab: 'calc', // 현재 활성화된 탭
-    isHistoryDialogOpen: false, // 히스토리 대화상자 열림 여부
-    isSettingDialogOpen: false, // 설정 대화상자 열림 여부
-    isShiftPressed: false, // Shift 버튼 상태
-    isShiftLocked: false, // Shift 잠금 상태
-    isMemoryVisible: false, // 메모리 표시 여부
-    resultPanelPadding: 0, // 결과 패널의 상단 여백
-    darkMode: false, // 다크 모드 상태
-    alwaysOnTop: false, // 항상 위에 표시 상태
-    useGrouping: true, // 숫자 그룹화 사용 여부
-    groupingUnit: 3 as 3 | 4, // 숫자 그룹화 단위 갯수 (3, 4)
-    decimalPlaces: -2, // 소수점 자릿수 (-2는 자동)
-    useSystemLocale: true, // 시스템 로케일 사용 여부
-    locale: '', // 현재 로케일
-    userLocale: '', // 사용자 지정 로케일
-    initPanel: false, // 초기 패널 표시 여부
-    showUnit: true, // 단위 표시 여부
-    showSymbol: true, // 기호 표시 여부
-    // 진법 표시 방법 (기본, 접두사, 접미사)
+    // 계산기 관련
+    calc: new Calculator(),
+    currentTab: 'calc',
+    isHistoryDialogOpen: false,
+    isMemoryVisible: false,
+    resultPanelPadding: 0,
+    paddingOnResult: 20,
+    
+    // UI 상태 관련
+    isSettingDialogOpen: false,
+    isShiftPressed: false,
+    isShiftLocked: false,
+    inputFocused: false,
+    initPanel: false,
+    showButtonAddedLabel: true,
+    hapticsMode: true,
+    
+    // 테마/디스플레이 관련
+    darkMode: false,
+    alwaysOnTop: false,
+    
+    // 숫자 표시 관련
+    useGrouping: true,
+    groupingUnit: 3 as 3 | 4,
+    decimalPlaces: -2,
+    useSystemLocale: true,
+    locale: '',
+    userLocale: '',
+    
+    // 단위 변환 관련
+    selectedCategory: '',
+    sourceUnits: {} as { [key: string]: string },
+    targetUnits: {} as { [key: string]: string },
+    showUnit: true,
+    showSymbol: true,
+    
+    // 통화 변환 관련
+    converter: new CurrencyConverter(),
+    sourceCurrency: 'USD',
+    targetCurrency: 'KRW',
+    
+    // 진법 변환 관련
+    wordSize: 32 as WordSize,
+    radixList: Object.values(Radix),
+    sourceRadix: Radix.Decimal as RadixType,
+    targetRadix: Radix.Hexadecimal as RadixType,
     showRadix: true,
-    // 진법 표시 형식 - 앞에(0xff, 0o765, 0b1010 등), 뒤에(ff(16), 765(8), 1010(2) 등)
     radixType: 'suffix' as 'prefix' | 'suffix',
-    paddingOnResult: 20, // 결과 패딩 값
-    showButtonAddedLabel: true, // 버튼 추가 레이블 표시 여부
-    hapticsMode: true, // 햅틱 피드백 모드
-    selectedCategory: '', // 최근 선택한 카테고리
-    sourceUnits: {} as { [key: string]: string }, // 각 카테고리별 최근 선택한 변환 출발 단위
-    targetUnits: {} as { [key: string]: string }, // 각 카테고리별 최근 선택한 변환 도착 단위
-    converter: new CurrencyConverter(), // 통화 변환기 인스턴스
-    sourceCurrency: 'USD', // 최근 사용한 출발 통화
-    targetCurrency: 'KRW', // 최근 사용한 도착 통화
-    wordSize: 32 as WordSize, // 비트 크기
-    radixList: Object.values(Radix), // 진법 목록
-    sourceRadix: Radix.Decimal as RadixType, // 기본 진법
-    targetRadix: Radix.Hexadecimal as RadixType, // 보조 진법
-    inputFocused: false, // 입력 필드 포커스 상태
   }),
 
   // 액션 정의
   actions: {
-    // 현재 탭 설정
+    // 탭 관리
     setCurrentTab(tab: string): void {
       if (['calc', 'unit', 'currency', 'radix'].includes(tab)) {
         this.currentTab = tab;
@@ -73,43 +84,37 @@ export const useStore = defineStore('store', {
       }
     },
 
-    // Shift 버튼 토글
+    // Shift 키 관련
     toggleShift(): void {
       console.log('toggleShift');
       this.isShiftPressed = !this.isShiftPressed;
     },
 
-    // Shift 버튼 활성화
     enableShift(): void {
       this.isShiftPressed = true;
     },
 
-    // Shift 버튼 비활성화
     disableShift(): void {
       this.isShiftPressed = false;
     },
 
-    // Shift 잠금 토글
     toggleShiftLock(): void {
       this.isShiftLocked = !this.isShiftLocked;
     },
 
-    // Shift 잠금 활성화
     enableShiftLock(): void {
       this.isShiftLocked = true;
     },
 
-    // Shift 잠금 비활성화
     disableShiftLock(): void {
       this.isShiftLocked = false;
     },
 
-    // 메모리 표시 끄기
+    // 메모리 표시 관련
     hideMemory(): void {
       this.isMemoryVisible = false;
     },
 
-    // 메모리 표시 켜기 (2초 후 자동으로 꺼짐)
     showMemoryTemporarily(): void {
       this.isMemoryVisible = true;
       setTimeout(() => {
@@ -117,34 +122,13 @@ export const useStore = defineStore('store', {
       }, 2000);
     },
 
-    // 숫자에 그룹화 적용
+    // 숫자 포맷팅 관련
     numberGrouping(value: string): string {
       const [integerPart, decimalPart] = value.split('.');
       const groupingPattern = new RegExp(`\\B(?=([\\da-fA-F]{${this.groupingUnit}})+(?![\\da-fA-F]))`, 'g');
       return integerPart.replace(groupingPattern, ',') + (decimalPart ? `.${decimalPart}` : '');
     },
-    /**
-     * 숫자의 소수점 자릿수를 조정하는 함수
-     *
-     * @param value 변환할 숫자 문자열 (예: "100.123456789")
-     * @param decimalPlaces 원하는 소수점 자릿수 (음수는 모든 자릿수 표시, 0은 정수부만 표시, 양수는 지정된 자릿수까지 표시)
-     * @returns 지정된 소수점 자릿수로 변환된 문자열
-     *
-     * @description
-     * - decimalPlaces가 음수인 경우: 모든 소수점 자릿수 표시
-     * - decimalPlaces가 0인 경우: 정수부만 표시
-     * - decimalPlaces가 양수인 경우: 지정된 자릿수까지 표시
-     * @example
-     * formatDecimalPlaces('100.123456789', -2) => '100.123456789'
-     * formatDecimalPlaces('100.123456789', 0) => '100'
-     * formatDecimalPlaces('100.123456789', 2) => '100.12'
-     * formatDecimalPlaces('100.123', 5) => '100.12300'
-     */
-    /**
-     * 숫자 문자열의 소수점 자릿수를 지정된 값으로 포맷팅하는 메서드
-     * @param value 포맷팅할 숫자 문자열
-     * @param decimalPlaces 표시할 소수점 자릿수 (-1: 모두 표시, 0: 정수만, n: n자리)
-     */
+
     formatDecimalPlaces(value: string, decimalPlaces: number): string {
       if (!value) return '';
       if (decimalPlaces < 0) return value;
@@ -162,10 +146,6 @@ export const useStore = defineStore('store', {
       return `${integerPart}.${formattedDecimal}`;
     },
 
-    /**
-     * 숫자 문자열을 설정에 따라 포맷팅하여 반환하는 메서드
-     * @param value 포맷팅할 숫자 문자열
-     */
     toFormattedNumber(value: string): string {
       if (!value) return '';
 
@@ -174,14 +154,64 @@ export const useStore = defineStore('store', {
       return this.useGrouping ? this.numberGrouping(formattedValue) : formattedValue;
     },
 
-    // 라디스 모드인 경우 숫자를 10진수로 변환하는 메서드
+    // 진법 변환 관련
     convertIfRadix(value: string): string {
       const isRadixMode = this.currentTab === 'radix';
 
       return isRadixMode ? this.convertRadix(value, Radix.Decimal, this.sourceRadix) : value;
     },
 
-    // 계산 기록의 왼쪽 부분 생성
+    convertRadix(value: string, fromRadix: RadixType, toRadix: RadixType): string {
+      return radixConverter.convertRadix(value, fromRadix, toRadix);
+    },
+
+    validateRadixNumber(value: string, radix: RadixType): boolean {
+      return radixConverter.isValidRadixNumber(value, radix);
+    },
+
+    getRadixPrefix(radix: RadixType) {
+      return {
+        [Radix.Binary]: '0b',
+        [Radix.Octal]: '0o',
+        [Radix.Hexadecimal]: '0x',
+        [Radix.Decimal]: '',
+      }[radix];
+    },
+
+    getRadixSuffix(radix: RadixType) {
+      return {
+        [Radix.Binary]: '2',
+        [Radix.Octal]: '8',
+        [Radix.Hexadecimal]: '16',
+        [Radix.Decimal]: '10',
+      }[radix];
+    },
+
+    initRecentRadix() {
+      const availableRadixes = Object.values(Radix);
+      const isValidRadixType = (radix: RadixType) => availableRadixes.includes(radix);
+
+      if (!isValidRadixType(this.sourceRadix)) {
+        this.sourceRadix = Radix.Decimal;
+      }
+      if (!isValidRadixType(this.targetRadix)) {
+        this.targetRadix = Radix.Hexadecimal;
+      }
+      if (this.sourceRadix === this.targetRadix) {
+        this.targetRadix = this.radixList[(this.radixList.indexOf(this.sourceRadix) + 1) % this.radixList.length];
+      }
+    },
+
+    swapRadixes() {
+      [this.sourceRadix, this.targetRadix] = [this.targetRadix, this.sourceRadix];
+    },
+
+    updateWordSize(value: WordSize) {
+      this.wordSize = value;
+      this.calc.wordSize = value;
+    },
+
+    // 계산 기록 관련
     getLeftSideInHistory(result: CalculationResult, useLineBreak = false): string {
       const radixPrefix =
         this.currentTab === 'radix' && this.showRadix && this.radixType === 'prefix'
@@ -243,7 +273,6 @@ export const useStore = defineStore('store', {
         .otherwise(() => formattedPrev);
     },
 
-    // 계산 기록의 오른쪽 부분 생성
     getRightSideInHistory(result: CalculationResult): string {
       const radixPrefix =
         this.currentTab === 'radix' && this.showRadix && this.radixType === 'prefix'
@@ -256,13 +285,12 @@ export const useStore = defineStore('store', {
       return radixPrefix + this.toFormattedNumber(this.convertIfRadix(result.resultNumber)) + radixSuffix;
     },
 
-    // 현재 포커스된 요소의 포커스 해제
+    // UI 포커스 관련
     blurElement(): void {
       const element = document.activeElement as HTMLElement;
       element?.blur();
     },
 
-    // 지정된 ID를 가진 버튼 클릭
     clickButtonById(buttonId: string): void {
       const button = document.getElementById(buttonId);
       if (button) {
@@ -270,25 +298,23 @@ export const useStore = defineStore('store', {
       }
     },
 
-    // 텍스트를 클립보드에 복사하고 알림 표시
-    copyToClipboard(text: string, message: string): void {
-      copyToClipboard(text);
-      this.showMessage(message);
-    },
-
-    // 입력 필드 포커스 상태 설정 (약간의 지연 적용)
     setInputFocused(): void {
       setTimeout(() => {
         this.inputFocused = true;
       }, 10);
     },
 
-    // 입력 필드 포커스 해제 상태 설정
     setInputBlurred(): void {
       this.inputFocused = false;
     },
 
-    // 최근 카테고리와 단위 초기화
+    // 클립보드 관련
+    copyToClipboard(text: string, message: string): void {
+      copyToClipboard(text);
+      this.showMessage(message);
+    },
+
+    // 단위 변환 관련
     initRecentUnits(): void {
       // 최근 카테고리가 설정되지 않은 경우, 첫 번째 카테고리로 설정
       if (this.selectedCategory === '') {
@@ -312,162 +338,112 @@ export const useStore = defineStore('store', {
       }
     },
 
-    // 현재 카테고리의 변환 출발 단위와 도착 단위 교환
     swapUnits(): void {
       const temp = this.sourceUnits[this.selectedCategory];
       this.sourceUnits[this.selectedCategory] = this.targetUnits[this.selectedCategory];
       this.targetUnits[this.selectedCategory] = temp;
     },
-    // 다크 모드 설정
+
+    // 테마/디스플레이 설정
     setDarkMode(isDark: boolean) {
       this.darkMode = isDark;
       Dark.set(this.darkMode);
     },
 
-    // 다크 모드 토글
     toggleDarkMode() {
       this.setDarkMode(!this.darkMode);
     },
 
-    // 항상 위에 표시 설정
     setAlwaysOnTop(isAlwaysOnTop: boolean) {
       this.alwaysOnTop = isAlwaysOnTop;
       window.myAPI.setAlwaysOnTop(this.alwaysOnTop);
     },
 
-    // 항상 위에 표시 토글
     toggleAlwaysOnTop() {
       this.setAlwaysOnTop(!this.alwaysOnTop);
     },
 
-    // 초기 패널 설정
     setInitPanel(isInitPanel: boolean) {
       this.initPanel = isInitPanel;
     },
 
-    // 초기 패널 토글
     toggleInitPanel() {
       this.setInitPanel(!this.initPanel);
     },
 
-    // 숫자 그룹화 사용 토글
+    // 숫자 표시 설정
     toggleUseGrouping() {
       this.useGrouping = !this.useGrouping;
     },
 
-    // 숫자 그룹화 단위 설정
     setGroupingUnit(digitCount: 3 | 4) {
       this.groupingUnit = digitCount;
     },
 
-    // 버튼 추가 레이블 표시 토글
-    toggleButtonAddedLabel() {
-      this.showButtonAddedLabel = !this.showButtonAddedLabel;
-    },
-
-    // 소수점 자릿수 설정
     setDecimalPlaces(places: number) {
       if ([-2, 0, 2, 4, 6].includes(places)) {
         this.decimalPlaces = places;
       }
     },
 
-    // 소수점 자릿수 증가
     incrementDecimalPlaces() {
       this.setDecimalPlaces(this.decimalPlaces + 2);
     },
 
-    // 소수점 자릿수 감소
     decrementDecimalPlaces() {
       this.setDecimalPlaces(this.decimalPlaces - 2);
     },
 
-    // 단위 표시 토글
+    // UI 표시 설정
     toggleShowUnit(): void {
       this.showUnit = !this.showUnit;
     },
 
-    // 기호 표시 토글
     toggleShowSymbol(): void {
       this.showSymbol = !this.showSymbol;
     },
 
-    // 진법 표시 토글
     toggleShowRadix(): void {
       this.showRadix = !this.showRadix;
     },
 
-    // 진법 표시 형식 설정
     setRadixType(displayType: 'prefix' | 'suffix'): void {
       this.radixType = displayType;
     },
 
-    // 햅틱 피드백 모드 설정
+    toggleButtonAddedLabel() {
+      this.showButtonAddedLabel = !this.showButtonAddedLabel;
+    },
+
+    // 햅틱 피드백 설정
     setHapticsMode(isEnabled: boolean): void {
       this.hapticsMode = isEnabled;
     },
 
-    // 햅틱 피드백 모드 토글
     toggleHapticsMode(): void {
       this.setHapticsMode(!this.hapticsMode);
     },
-    // 최근 진법 초기화
-    initRecentRadix() {
-      const availableRadixes = Object.values(Radix);
-      const isValidRadixType = (radix: RadixType) => availableRadixes.includes(radix);
 
-      if (!isValidRadixType(this.sourceRadix)) {
-        this.sourceRadix = Radix.Decimal;
-      }
-      if (!isValidRadixType(this.targetRadix)) {
-        this.targetRadix = Radix.Hexadecimal;
-      }
-      if (this.sourceRadix === this.targetRadix) {
-        this.targetRadix = this.radixList[(this.radixList.indexOf(this.sourceRadix) + 1) % this.radixList.length];
-      }
+    // 통화 변환 관련
+    initRecentCurrencies(): void {
+      const availableCurrencies = this.converter.getCurrencyLists();
+      // 출발 통화 초기화
+      this.sourceCurrency =
+        this.sourceCurrency !== '' && availableCurrencies.includes(this.sourceCurrency)
+          ? this.sourceCurrency // 유효한 경우 기존 값 유지
+          : 'USD'; // 유효하지 않은 경우 기본값 'USD'로 설정
+      // 도착 통화 초기화
+      this.targetCurrency =
+        this.targetCurrency !== '' && availableCurrencies.includes(this.targetCurrency)
+          ? this.targetCurrency // 유효한 경우 기존 값 유지
+          : 'KRW'; // 유효하지 않은 경우 기본값 'KRW'로 설정
     },
 
-    // 진법 교환
-    swapRadixes() {
-      [this.sourceRadix, this.targetRadix] = [this.targetRadix, this.sourceRadix];
+    swapCurrencies(): void {
+      [this.sourceCurrency, this.targetCurrency] = [this.targetCurrency, this.sourceCurrency];
     },
 
-    // 문자열을 원하는 진법으로 변환
-    convertRadix(value: string, fromRadix: RadixType, toRadix: RadixType): string {
-      return radixConverter.convertRadix(value, fromRadix, toRadix);
-    },
-
-    // 문자열이 유효한 진법 문자열인지 검사
-    validateRadixNumber(value: string, radix: RadixType): boolean {
-      return radixConverter.isValidRadixNumber(value, radix);
-    },
-
-    // 워드 크기 설정
-    updateWordSize(value: WordSize) {
-      this.wordSize = value;
-      this.calc.wordSize = value;
-    },
-
-    // 진법 접두사 얻기
-    getRadixPrefix(radix: RadixType) {
-      return {
-        [Radix.Binary]: '0b',
-        [Radix.Octal]: '0o',
-        [Radix.Hexadecimal]: '0x',
-        [Radix.Decimal]: '',
-      }[radix];
-    },
-
-    // 진법 접미사 얻기
-    getRadixSuffix(radix: RadixType) {
-      return {
-        [Radix.Binary]: '2',
-        [Radix.Octal]: '8',
-        [Radix.Hexadecimal]: '16',
-        [Radix.Decimal]: '10',
-      }[radix];
-    },
-    // 일반 메시지 알림을 표시하는 함수
+    // 알림 관련
     showMessage(
       message: string, // 표시할 메시지 내용
       duration = 500, // 알림 표시 시간 (기본값: 500ms)
@@ -491,7 +467,6 @@ export const useStore = defineStore('store', {
       });
     },
 
-    // 오류 메시지 알림을 표시하는 함수
     showError(
       message: string, // 표시할 오류 메시지 내용
       duration = 500, // 알림 표시 시간 (기본값: 500ms)
@@ -513,25 +488,6 @@ export const useStore = defineStore('store', {
         timeout: duration, // 표시 시간
         color: 'negative', // 알림 색상 (부정적인 메시지)
       });
-    },
-    // 최근 사용한 통화 초기화
-    initRecentCurrencies(): void {
-      const availableCurrencies = this.converter.getCurrencyLists();
-      // 출발 통화 초기화
-      this.sourceCurrency =
-        this.sourceCurrency !== '' && availableCurrencies.includes(this.sourceCurrency)
-          ? this.sourceCurrency // 유효한 경우 기존 값 유지
-          : 'USD'; // 유효하지 않은 경우 기본값 'USD'로 설정
-      // 도착 통화 초기화
-      this.targetCurrency =
-        this.targetCurrency !== '' && availableCurrencies.includes(this.targetCurrency)
-          ? this.targetCurrency // 유효한 경우 기존 값 유지
-          : 'KRW'; // 유효하지 않은 경우 기본값 'KRW'로 설정
-    },
-
-    // 출발 통화와 도착 통화 교환
-    swapCurrencies(): void {
-      [this.sourceCurrency, this.targetCurrency] = [this.targetCurrency, this.sourceCurrency];
     },
   },
 
