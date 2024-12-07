@@ -42,9 +42,6 @@
     convertRadix,
     clickButtonById,
   } = store;
-  // const { showError, showMessage } = storeNotifications;
-  // const { convertRadix } = storeRadix;
-  // const { clickButtonById } = storeUtils;
 
   // 햅틱 피드백 함수
   const hapticFeedbackLight = async () => {
