@@ -3,12 +3,14 @@ interface Props {
   textColor?: string
   bgColor?: string
   delay?: number
+  text?: string
 }
 
 withDefaults(defineProps<Props>(), {
   textColor: 'green-10',
   bgColor: 'green-2',
-  delay: 500
+  delay: 500,
+  text: ''
 })
 </script>
 
@@ -20,6 +22,7 @@ withDefaults(defineProps<Props>(), {
     self="bottom middle"
     :delay="delay"
   >
-    <slot />
+    <template v-if="text">{{ text }}</template>
+    <slot v-else />
   </q-tooltip>
 </template>

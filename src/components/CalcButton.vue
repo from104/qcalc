@@ -12,6 +12,8 @@
 
   import { useStore } from 'src/stores/store';
 
+  import MyTooltip from 'components/MyTooltip.vue';
+
   // Quasar 인스턴스 및 색상 유틸리티 초기화
   const $q = useQuasar();
   const { lighten } = colors;
@@ -244,7 +246,7 @@
     b5: ['phi', ['Shift+Digit2', 'Shift+Numpad2'], () => calc.setConstant('phi'), false],
     c5: ['e', ['Shift+Digit3', 'Shift+Numpad3'], () => calc.setConstant('e'), false],
     d5: [ 'M+', ['Shift+Plus', 'Shift+NumpadAdd'], () => { calc.memoryAdd(); displayMemoryStatus(); }, false ],
-    a6: ['', [], () => null, false],
+    a6: ['', ['\''], () => null, false],
     b6: ['int', ['Shift+Digit0', 'Shift+Numpad0'], () => calc.int(), false],
     c6: ['frac', ['Shift+Period', 'Shift+NumpadDecimal'], () => calc.frac(), false],
     d6: [ 'MS', ['Shift+Equal', 'Shift+Enter', 'Shift+NumpadEnter'], () => { calc.memorySave(); displayMemoryStatus(); }, false ],
@@ -490,6 +492,27 @@
   const displayDisabledButtonNotification = () => {
     showMessage(t('disabledButton'));
   };
+
+  const getTooltipsOfKeys = (btnId: ButtonID, isShift: boolean) => {
+    const buttonFunctions = isShift ? extendedFunctionSet.value : activeButtonSet.value;
+    const shortcutKeys = buttonFunctions[btnId].shortcutKeys;
+    
+    return shortcutKeys.map((key) => {
+      if (key === '+') return '+';
+      const parts = key.split('+');
+      const modifiers = parts.slice(0, -1)
+        .map(part => {
+          if (part === 'Shift') return 'S';
+          if (part === 'Control') return 'C';
+          if (part === 'Alt') return 'A';
+          return part;
+        })
+        .join('');
+      
+      const lastPart = parts[parts.length - 1].replace('Digit', '').replace('Numpad', 'N');
+      return modifiers + (modifiers ? '-' : '') + lastPart;
+    }).join(', ');
+  };
 </script>
 
 <template>
@@ -562,6 +585,14 @@
         >
           {{ extendedFunctionSet[id].label }}
         </q-tooltip>
+        <MyTooltip>
+          {{
+            store.isShiftPressed ? 
+              extendedFunctionSet[id].isDisabled ? t('disabledButton') : getTooltipsOfKeys(id, true)
+            :
+              activeButtonSet[id].isDisabled ? t('disabledButton') : getTooltipsOfKeys(id, false)
+          }}
+        </MyTooltip>
       </q-btn>
     </div>
   </q-card-section>
@@ -578,7 +609,7 @@ ko:
   memoryRecalled: '메모리를 불러왔습니다.'
   memorySaved: '메모리에 저장되었습니다.'
   noMemoryToRecall: '불러올 메모리가 없습니다.'
-  disabledButton: '버튼이 비활성화되었습니다.'
+  disabledButton: '비활성화된 버튼'
 en:
   cannotDivideByZero: 'Cannot divide by zero'
   squareRootOfANegativeNumberIsNotAllowed: 'The square root of a negative number is not allowed.'
@@ -589,7 +620,7 @@ en:
   memoryRecalled: 'Memory recalled.'
   memorySaved: 'Memory saved.'
   noMemoryToRecall: 'No memory to recall.'
-  disabledButton: 'Button is disabled.'
+  disabledButton: 'Disabled button'
 </i18n>
 
 <style scoped lang="scss">
