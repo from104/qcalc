@@ -128,7 +128,7 @@
 
       const result = hasSpecialDecimalPlaces
         ? `${formattedNumber.split('.')[0]}.${inputBuffer.split('.')[1]}`
-          : formattedNumber;
+        : formattedNumber;
 
       return result;
     } else {
@@ -190,14 +190,14 @@
    */
   const radixPrefix = computed(() => {
     const radix = isMainField ? store.sourceRadix : store.targetRadix;
-    return currentTab === 'radix' && store.showRadix && store.radixType === 'prefix'
-      ? store.getRadixPrefix(radix) : '';
+    return currentTab === 'radix' && store.showRadix && store.radixType === 'prefix' ? store.getRadixPrefix(radix) : '';
   });
 
   const radixSuffix = computed(() => {
     const radix = isMainField ? store.sourceRadix : store.targetRadix;
     return currentTab === 'radix' && store.showRadix && store.radixType === 'suffix'
-      ? store.getRadixSuffix(radix) : '';
+      ? store.getRadixSuffix(radix)
+      : '';
   });
 
   const displayedResult = computed(() => {
@@ -273,9 +273,7 @@
   const isMemoryEmpty = computed(() => calc.isMemoryEmpty);
 
   // 메모리 값 계산된 속성
-  const memoryValue = computed(() =>
-    toFormattedNumber(convertIfRadix(calc.getMemoryNumber()))
-  );
+  const memoryValue = computed(() => toFormattedNumber(convertIfRadix(calc.getMemoryNumber())));
 
   /**
    * 계산 인자나 계산 결과에 대한 식을 문자열로 생성하는 함수
@@ -421,7 +419,12 @@
             {{ isMainField && store.isMemoryVisible ? memoryValue : result }}
           </span>
           <span v-if="currentTab === 'unit'" id="unit">{{ unit }}</span>
-          <span v-if="currentTab === 'radix'" id="radixSuffix">{{ radixSuffix }}</span>
+          <span
+            v-if="currentTab === 'radix' && store.showRadix && store.radixType === 'suffix'"
+            id="radixSuffix"
+          >
+            {{ radixSuffix }}
+          </span>
           <q-menu context-menu auto-close touch-position class="shadow-6">
             <q-list class="noselect" dense style="min-width: 150px">
               <MenuItem
@@ -478,6 +481,9 @@
     margin-left: 1px;
     position: relative;
     bottom: -3px;
+    min-width: 2ch; /* 2글자 폭 확보 */
+    display: inline-block; /* 폭 설정을 위해 필요 */
+    text-align: left; /* 왼쪽 정렬 (선택사항) */
   }
 
   .q-field {
