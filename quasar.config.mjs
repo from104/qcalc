@@ -130,13 +130,13 @@ export default configure(function (/* ctx */) {
         linux: {
           target: ['AppImage', 'snap'],
           category: 'Utility',
-          snap: {
-            confinement: 'strict',
-            grade: 'beta',
-          },
         },
         win: {
           target: ['nsis'],
+        },
+        snap: {
+          confinement: 'strict',
+          grade: 'devel',
         },
       },
     },
