@@ -1,6 +1,24 @@
 @echo off
 setlocal enabledelayedexpansion
 
+:: 개발 중 표시
+echo ===================================
+echo WARNING: This build script is under development
+echo Current status: ALPHA
+echo ===================================
+echo.
+
+echo Build script is currently disabled for testing
+echo Please wait until development is complete
+exit /b 1
+
+:: 개발 중 확인
+set /p CONTINUE="Do you want to continue? (Y/N): "
+if /i not "!CONTINUE!"=="Y" (
+    echo Build process cancelled by user
+    exit /b 0
+)
+
 :: Node.js와 Yarn 설치 여부 및 버전 체크
 echo Checking Node.js and Yarn installation...
 
@@ -122,9 +140,16 @@ goto :eof
 set BUILD_TYPE=%1
 if "%BUILD_TYPE%"=="" set BUILD_TYPE=all
 
+:: 개발 중인 기능 체크
+if "%BUILD_TYPE%"=="android" (
+    echo Android build is currently under development
+    echo This feature is not fully implemented yet
+    exit /b 1
+)
+
 if "%BUILD_TYPE%"=="all" (
     call :build_windows
-    call :build_android
+    echo Android build is skipped (under development)
 ) else if "%BUILD_TYPE%"=="win" (
     call :build_windows
 ) else if "%BUILD_TYPE%"=="android" (

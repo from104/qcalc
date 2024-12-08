@@ -4,11 +4,12 @@ All notable changes to this project are recorded in this file.
 
 The format is based on [Keep a Changelog] and this project follows [Semantic Versioning].
 
-## [0.10.0] 2024-11-28
+## [0.10.0] 2024-12-11
 
 ### Added
 
 - Introduced a new "Radix" mode, supporting numeral conversions (Binary, Octal, Decimal, Hexadecimal) and bitwise operations such as AND, OR, XOR, and NOT.
+- Added shortcut key tooltips to buttons
 
 ### Changed
 

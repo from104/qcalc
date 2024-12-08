@@ -211,18 +211,19 @@
     return shouldShowSuffix ? `${baseString}(${radixSuffix.value})` : baseString;
   });
 
+  // 진법 모드에서 접두사/접미사를 포함한 결과 문자열 생성
+  const getRadixResult = (number: string) => {
+    const prefix = radixPrefix.value;
+    const suffix = radixSuffix.value;
+    const suffixString = suffix ? `(${suffix})` : '';
+    return `${prefix}${number}${suffixString}`;
+  };
+
   /**
    * 숫자만 표시하기 위한 계산된 속성
    * 필드와 애드온 타입에 따라 적절한 숫자를 반환
    */
   const onlyNumber = computed(() => {
-    // 진법 모드에서 접두사/접미사를 포함한 결과 문자열 생성
-    const getRadixResult = (number: string) => {
-      const prefix = radixPrefix.value;
-      const suffix = radixSuffix.value;
-      const suffixString = suffix ? `(${suffix})` : '';
-      return `${prefix}${number}${suffixString}`;
-    };
 
     // 메인 필드 처리
     if (props.field === 'main') {
@@ -302,7 +303,8 @@
 
     // 연산자가 있고 초기화가 필요없는 경우
     if (hasOperator && !needsReset) {
-      return toFormattedNumber(convertIfRadix(calc.getPreviousNumber()));
+      const convrtedPreviousNumber = toFormattedNumber(convertIfRadix(calc.getPreviousNumber()));
+      return props.addon === 'radix' ? getRadixResult(convrtedPreviousNumber) : convrtedPreviousNumber;
     }
 
     return '';

@@ -93,6 +93,7 @@ build_linux() {
     if [ $? -eq 0 ]; then
         echo "Linux build completed successfully"
         mv dist/electron/Packaged/*.AppImage "$BUILD_DIR/QCalc-$VERSION-linux.AppImage"
+        mv dist/electron/Packaged/*.snap "$BUILD_DIR/QCalc-$VERSION-linux.snap"
     else
         echo "Linux build failed"
         exit 1
