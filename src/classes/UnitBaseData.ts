@@ -1,19 +1,28 @@
+// mathjs 라이브러리에서 필요한 함수와 타입을 가져옵니다.
 import {create, all, BigNumber} from 'mathjs';
 
+// MathB 객체를 생성합니다. 이는 BigNumber를 사용하여 높은 정밀도의 수학 연산을 수행합니다.
 export const MathB = create(all, {
-  number: 'BigNumber',
-  precision: 64,
+  number: 'BigNumber', // 기본 숫자 타입을 BigNumber로 설정
+  precision: 64,       // 64비트 정밀도 사용
 });
 
+// BigNumberType은 number, BigNumber, 또는 string 타입 중 하나일 수 있습니다.
+// 이는 다양한 형태의 숫자 입력을 허용하기 위함입니다.
 export type BigNumberType = number | BigNumber | string;
 
+// Unit 인터페이스는 각 단위에 대한 정보를 정의합니다.
 interface Unit {
   [unit: string]: {
+    // value는 숫자이거나 함수일 수 있습니다.
+    // 함수인 경우, 원래 값과 역변환 여부를 인자로 받아 BigNumber를 반환합니다.
     value: number | ((originalValue: BigNumberType, isReverse?: boolean) => BigNumber);
-    desc: string;
+    desc: string; // 단위에 대한 설명
   };
 }
 
+// UnitBaseData 타입은 문자열 키와 Unit 타입 값을 가지는 객체입니다.
+// 이는 여러 단위 카테고리(예: 길이, 넓이, 부피 등)를 포함할 수 있습니다.
 export type UnitBaseData = Record<string, Unit>;
 
 // 단위 범주 목록별 단위 목록

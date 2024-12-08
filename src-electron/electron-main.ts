@@ -1,59 +1,65 @@
+// 필요한 모듈 가져오기
 import {fileURLToPath} from 'url';
 import path from 'path';
 import os from 'os';
 import {app, BrowserWindow, nativeTheme, ipcMain, screen} from 'electron';
+import windowState from 'electron-window-state';
 
+// 현재 디렉토리 경로 설정
 const currentDir = fileURLToPath(new URL('.', import.meta.url));
 
-// needed in case process is undefined under Linux
+// 플랫폼 확인 (Linux에서 process가 정의되지 않은 경우를 대비)
 const platform = process.platform || os.platform();
 
+// Windows에서 다크 모드일 때 DevTools Extensions 제거 시도
 try {
   if (platform === 'win32' && nativeTheme.shouldUseDarkColors === true) {
-    require('fs').unlinkSync(path.join(app.getPath('userData'), 'DevTools Extensions'));
+    const fs = await import('fs');
+    const path = await import('path');
+    fs.unlinkSync(path.join(app.getPath('userData'), 'DevTools Extensions'));
   }
 } catch (_) {
-  /* empty */
+  // 오류 발생 시 무시
 }
 
-import windowState from 'electron-window-state';
-import { c } from 'vite/dist/node/types.d-aGj9QkWt';
-
+// 메인 윈도우 변수 선언
 let mainWindow: BrowserWindow | undefined;
 
+// 아이콘 경로 설정
 const iconPath = path.resolve(currentDir, 'icons/icon.png');
 
+// 기본 윈도우 크기 설정
 const defaultWindowWidth = 352;
 const defaultWindowHeight = 604;
 
-// 플랫폼에 따라 창 크기 보정
+// 플랫폼에 따른 윈도우 크기 조정
 const adjustedWidth = platform === 'win32' ? -15 : 0;
 const adjustedHeight = platform === 'win32' ? -40 : 0;
 
-// 플랫폼에 따라 창 위치 보정
+// 플랫폼에 따른 윈도우 위치 조정
 const adjustedY = platform === 'linux' ? -38 : 0;
 const adjustedX = platform === 'linux' ? 0 : 0;
 
-// 창 생성
+// 윈도우 생성 함수
 async function createWindow() {
   try {
     // 화면 크기와 방향 확인
     const {width, height} = screen.getPrimaryDisplay().workAreaSize;
     const isLandscape = width > height;
 
-    // 최대 창 크기 설정
+    // 최대 윈도우 크기 설정
     const maxWindowHeight = isLandscape ? Math.floor((height / 3) * 2) : Math.floor(height / 3);
     const maxWindowWidth = isLandscape ? Math.floor(width / 4) : Math.floor(width / 3);
 
+    // 윈도우 상태 관리 설정
     const mainWindowState = windowState({
       defaultWidth: defaultWindowWidth,
       defaultHeight: defaultWindowHeight,
     });
-    /**
-     * Initial window options
-     */
+
+    // 메인 윈도우 생성
     mainWindow = new BrowserWindow({
-      icon: path.resolve(iconPath), // tray icon
+      icon: path.resolve(iconPath), // 트레이 아이콘
       x: mainWindowState.x + adjustedX,
       y: mainWindowState.y + adjustedY,
       width: mainWindowState.width + adjustedWidth,
@@ -68,7 +74,7 @@ async function createWindow() {
       show: false,
       webPreferences: {
         contextIsolation: true,
-        // More info: https://v2.quasar.dev/quasar-cli-vite/developing-electron-apps/electron-preload-script
+        // 프리로드 스크립트 설정
         preload: path.resolve(
           currentDir,
           path.join(
@@ -79,30 +85,36 @@ async function createWindow() {
       },
     });
 
+    // 윈도우 상태 관리
     mainWindowState.manage(mainWindow);
 
+    // 메뉴 제거
     mainWindow.removeMenu();
 
+    // 개발 모드와 프로덕션 모드에 따른 로딩 설정
     if (process.env.DEV) {
       mainWindow.loadURL(process.env.APP_URL);
     } else {
       mainWindow.loadFile('index.html');
     }
 
+    // 디버깅 모드 설정
     if (process.env.DEBUGGING) {
-      // if on DEV or Production with debug enabled
+      // 개발 모드 또는 디버그가 활성화된 프로덕션 모드
       mainWindow.webContents.openDevTools();
     } else {
-      // we're on production; no access to devtools pls
+      // 프로덕션 모드: 개발자 도구 접근 제한
       mainWindow.webContents.on('devtools-opened', () => {
         mainWindow?.webContents.closeDevTools();
       });
     }
 
+    // 윈도우 닫힘 이벤트 처리
     mainWindow.on('closed', () => {
       mainWindow = undefined;
     });
 
+    // 윈도우 준비 완료 시 표시
     mainWindow.once('ready-to-show', () => {
       mainWindow?.show();
     });
@@ -111,27 +123,31 @@ async function createWindow() {
   }
 }
 
+// 앱 준비 완료 시 실행
 app
   .whenReady()
   .then(() => {
     createWindow().catch((err) => {
-      console.error('Failed to create window during app readiness:', err);
+      console.error('Failed to create window during app preparation:', err);
     });
+
+    // 항상 위에 표시 토글 이벤트 처리
     ipcMain.on('toggle-always-on-top', (_event, res) => {
       mainWindow?.setAlwaysOnTop(res);
-      // console.log('ipcMain: ' + res);
     });
   })
   .catch((err) => {
-    console.error('Failed during app readiness:', err);
+    console.error('Error occurred during app preparation:', err);
   });
 
+// 모든 윈도우가 닫힐 때 앱 종료 (macOS 제외)
 app.on('window-all-closed', () => {
   if (platform !== 'darwin') {
     app.quit();
   }
 });
 
+// 앱 활성화 시 윈도우 생성 (macOS)
 app.on('activate', () => {
   if (mainWindow === undefined) {
     createWindow().catch((err) => {

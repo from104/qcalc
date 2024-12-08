@@ -1,88 +1,101 @@
 import {BigNumber} from 'mathjs';
 import {BigNumberType, MathB, unitBaseData, UnitBaseData} from './UnitBaseData';
 
-// 단위 변환기 클래스
+/**
+ * UnitConverter 클래스
+ * 다양한 단위 간의 변환을 수행하는 정적 메서드를 제공합니다.
+ */
 export class UnitConverter {
-  // 단위 변환 범주 목록
+  /**
+   * 사용 가능한 단위 변환 범주 목록을 반환합니다.
+   * @returns {string[]} 단위 변환 범주 목록
+   */
   static get categories() {
     return Object.keys(unitBaseData);
   }
 
-  // 단위 변환 범주 목록별 단위 목록
+  /**
+   * 모든 단위 변환 범주와 해당 단위 목록을 반환합니다.
+   * @returns {UnitBaseData} 단위 변환 범주별 단위 목록
+   */
   static get units() {
     return unitBaseData;
   }
 
-  // 범주 별 단위 목록
+  /**
+   * 특정 범주의 단위 목록을 반환합니다.
+   * @param {string} category - 단위 범주
+   * @returns {string[]} 해당 범주의 단위 목록
+   * @throws {Error} 유효하지 않은 범주일 경우 에러를 발생시킵니다.
+   */
   static getUnitLists(category: string) {
-    // 예외 처리
     if (!this.categories.includes(category)) {
       throw new Error(`Invalid category: ${category}`);
     }
     return Object.keys(this.units[category]);
   }
 
-  // 단위 값 반환
-  static getUnitValue(category: string, unit: string): BigNumber | ((value: BigNumberType, toBase?: boolean) => BigNumber){
-    // 예외 처리
-    if (!this.categories.includes(category)) {
-      throw new Error(`Invalid category: ${category}`);
-    }
-    if (!this.getUnitLists(category).includes(unit)) {
-      throw new Error(`Invalid unit: ${unit}`);
+  /**
+   * 특정 범주와 단위의 값을 반환합니다.
+   * @param {string} category - 단위 범주
+   * @param {string} unit - 단위
+   * @returns {BigNumber | ((value: BigNumberType, toBase?: boolean) => BigNumber)} 단위 값 또는 변환 함수
+   * @throws {Error} 유효하지 않은 범주나 단위일 경우 에러를 발생시킵니다.
+   */
+  static getUnitValue(category: string, unit: string): BigNumber | ((value: BigNumberType, toBase?: boolean) => BigNumber) {
+    if (!this.categories.includes(category) || !this.units[category]?.[unit]) {
+      throw new Error(`Invalid category or unit: ${category}, ${unit}`);
     }
     const unitValue = this.units[category][unit].value;
     return typeof unitValue === 'function' ? unitValue : MathB.bignumber(unitValue);
   }
 
-  // 단위 설명 반환
-  static getUnitDesc(category: string, unit: string) {
-    // 예외 처리
-    if (!this.categories.includes(category)) {
-      throw new Error(`Invalid category: ${category}`);
-    }
-    if (!this.getUnitLists(category).includes(unit)) {
-      throw new Error(`Invalid unit: ${unit}`);
+  /**
+   * 특정 범주와 단위의 설명을 반환합니다.
+   * @param {string} category - 단위 범주
+   * @param {string} unit - 단위
+   * @returns {string} 단위 설명
+   * @throws {Error} 유효하지 않은 범주나 단위일 경우 에러를 발생시킵니다.
+   */
+  static getUnitDesc(category: string, unit: string): string {
+    if (!this.categories.includes(category) || !this.units[category]?.[unit]) {
+      throw new Error(`Invalid category or unit: ${category}, ${unit}`);
     }
     return this.units[category][unit].desc;
   }
-
-  // 단위 변환
+  /**
+   * 한 단위에서 다른 단위로 값을 변환합니다.
+   * @param {T} category - 단위 범주
+   * @param {BigNumberType} originalValue - 변환할 원래 값
+   * @param {string} from - 원래 단위
+   * @param {string} to - 변환할 단위
+   * @returns {string} 변환된 값 (문자열 형태)
+   * @throws {Error} 유효하지 않은 단위일 경우 에러를 발생시킵니다.
+   */
   static convert<T extends keyof UnitBaseData>(
     category: T,
     originalValue: BigNumberType,
     from: string,
     to: string,
   ): string {
-    // fromUnit과 toUnit이 유효한 단위인지 확인
-    const fromUnitValue = this.getUnitValue(category, from);
-    if (!fromUnitValue) {
-      throw new Error(`Invalid fromUnit: ${from}`);
-    }
-    const toUnitValue = this.getUnitValue(category, to);
-    if (!toUnitValue) {
-      throw new Error(`Invalid toUnit: ${to}`);
-    }
+    // Check validity of fromUnit and toUnit at once
+    const [fromUnitValue, toUnitValue] = [from, to].map(unit => {
+      const value = this.getUnitValue(category, unit);
+      if (!value) {
+        throw new Error(`Invalid unit: ${unit}`);
+      }
+      return value;
+    });
 
-    // fromUnit의 기준 단위로 값 변환
-    let baseValue = MathB.bignumber(originalValue);
-    if (typeof fromUnitValue === 'function') {
-      baseValue = fromUnitValue(originalValue, true);
-    } else {
-      baseValue = baseValue.mul(fromUnitValue);
-    }
+    // fromUnit에서 기준 단위로, 그리고 기준 단위에서 toUnit으로 값 변환
+    const baseValue = typeof fromUnitValue === 'function'
+      ? fromUnitValue(originalValue, true)
+      : MathB.bignumber(originalValue).mul(fromUnitValue);
 
-    // 기준 단위에서 toUnit으로 값 변환
-    let convertedValue = baseValue;
-    if (typeof toUnitValue === 'function') {
-      convertedValue = toUnitValue(convertedValue.toString());
-    } else {
-      convertedValue = convertedValue.div(toUnitValue);
-    }
+    const convertedValue = typeof toUnitValue === 'function'
+      ? toUnitValue(baseValue.toString())
+      : baseValue.div(toUnitValue);
 
     return convertedValue.toString();
   }
 }
-
-// console.log(UnitConverter.convert('길이', 1, 'm', 'km'));
-// console.log(UnitConverter.convert('온도', 100, 'F', 'K'));

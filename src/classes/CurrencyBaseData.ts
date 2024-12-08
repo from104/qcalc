@@ -1,12 +1,29 @@
-// 환율 정보를 저장하는 인터페이스
+/**
+ * 통화 정보를 저장하는 인터페이스
+ * 
+ * @interface Currency
+ * @description
+ * 이 인터페이스는 각 통화에 대한 정보를 저장합니다.
+ * 키는 통화 코드(예: 'USD', 'EUR')이며, 값은 해당 통화의 설명과 기호를 포함하는 객체입니다.
+ */
 interface Currency {
   [currency: string]: {
+    /** 통화의 설명 (예: 'United States Dollar') */
     desc: string;
+    /** 통화의 기호 (예: '$') */
     symbol: string;
   };
 }
 
-// 환율 정보를 저장하는 타입
+/**
+ * 통화 데이터를 저장하는 타입
+ * 
+ * @type CurrencyData
+ * @description
+ * 이 타입은 Currency 인터페이스를 기반으로 하며,
+ * 애플리케이션 전체에서 통화 정보를 일관되게 관리하는 데 사용됩니다.
+ * 이를 통해 환율 변환, 통화 표시 등의 기능을 구현할 때 타입 안정성을 보장할 수 있습니다.
+ */
 export type CurrencyData = Currency;
 
 // 환율에 대한 기본 데이터
@@ -187,4 +204,3 @@ export const currencyBaseData: CurrencyData = {
 export interface CurrencyExchangeRates {
   [key: string]: number;
 }
-

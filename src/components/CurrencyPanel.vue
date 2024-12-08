@@ -1,56 +1,58 @@
 <script setup lang="ts">
-  import {ref, onMounted, onBeforeUnmount, reactive, watch, Ref} from 'vue';
-
+  import { ref, onMounted, onBeforeUnmount, reactive, watch, Ref } from 'vue';
   import MyTooltip from 'components/MyTooltip.vue';
+  import { useI18n } from 'vue-i18n';
+  import { useStore } from 'src/stores/store';
+  import { KeyBinding } from 'classes/KeyBinding';
 
-  import {useI18n} from 'vue-i18n';
-  const {t} = useI18n();
+  // i18n 설정
+  const { t } = useI18n();
 
-  import {useCalcStore} from 'stores/calc-store';
-  const store = useCalcStore();
-
+  // 스토어 인스턴스 초기화
+  const store = useStore();
+  // 스토어에서 필요한 메서드 추출
   const {
-    currencyConverter,
-    initRecentCurrency,
+    calc,
+    converter,
+    swapCurrencies,
+    initRecentCurrencies,
     clickButtonById,
-    showSymbolToggle,
     setInputBlurred,
     setInputFocused,
     blurElement,
-    swapCurrencyValue,
   } = store;
+  
 
   // 단위 초기화
-  initRecentCurrency();
+  initRecentCurrencies();
 
-  // 통화 이름을 언어에 맞게 초기화
+  // 통화 설명을 위한 인터페이스 정의
   interface CurrencyDescription {
     [key: string]: string;
   }
 
-  const descOfCurrency = reactive<CurrencyDescription>(
-    currencyConverter.getCurrencyLists().reduce((acc: CurrencyDescription, currency) => {
+  // 통화 이름을 현재 언어에 맞게 초기화
+  const currencyDescriptions = reactive<CurrencyDescription>(
+    converter.getCurrencyLists().reduce((acc: CurrencyDescription, currency) => {
       acc[currency] = t(`currencyDesc.${currency}`);
       return acc;
     }, {}),
   );
 
-  // 통화 이름을 언어에 맞게 바꾸기 위한 감시
+  // 언어 변경 시 통화 이름 업데이트
   watch([() => store.locale], () => {
-    // 통화 이름을 언어에 맞게 초기화
-    currencyConverter.getCurrencyLists().forEach((currency) => {
-      descOfCurrency[currency] = t(`currencyDesc.${currency}`);
+    converter.getCurrencyLists().forEach((currency) => {
+      currencyDescriptions[currency] = t(`currencyDesc.${currency}`);
     });
   });
 
-  // 키바인딩 생성
-  import {KeyBinding} from 'classes/KeyBinding';
+  // 키 바인딩 설정
   const keyBinding = new KeyBinding([
     [['Alt+w'], () => clickButtonById('btn-swap-currency')],
-    [['Alt+y'], () => showSymbolToggle()],
+    [['Alt+y'], () => store.toggleShowSymbol()],
   ]);
 
-  // inputFocused 값이 바뀌면 키바인딩을 추가하거나 제거합니다.
+  // 입력 포커스에 따른 키 바인딩 활성화/비활성화
   watch(
     () => store.inputFocused,
     () => {
@@ -60,36 +62,35 @@
         keyBinding.subscribe();
       }
     },
-    // { immediate: true }
   );
-  let updateRatesTimer: number | undefined;
+
+  let rateUpdateTimer: number | undefined;
 
   onMounted(() => {
-    initRecentCurrency();
-
+    initRecentCurrencies();
     keyBinding.subscribe();
 
-    // 환율 정보 업데이트
+    // 초기 환율 정보 업데이트
     (async () => {
-      await currencyConverter.updateRates();
+      await converter.updateRates();
     })();
 
-    // 환율 정보 업데이트 주기마다 환율 정보 업데이트
-    updateRatesTimer = window.setInterval(
+    // 주기적으로 환율 정보 업데이트 (1시간마다)
+    rateUpdateTimer = window.setInterval(
       async () => {
-        await currencyConverter.updateRates();
+        await converter.updateRates();
       },
       1000 * 60 * 60 * 1,
     );
   });
 
-  // dom 요소가 언마운트되기 전에 키바인딩 제거
   onBeforeUnmount(() => {
     keyBinding.unsubscribe();
     setInputBlurred();
-    clearInterval(updateRatesTimer);
+    clearInterval(rateUpdateTimer);
   });
 
+  // 통화 옵션 타입 정의
   type CurrencyOptions = {
     value: string;
     label: string;
@@ -101,43 +102,42 @@
     values: CurrencyOptions[];
   };
 
-  const fromCurrencyOptions = reactive({values: []} as ReactiveCurrencyOptions);
-  const toCurrencyOptions = reactive({values: []} as ReactiveCurrencyOptions);
+  // 통화 옵션 초기화
+  const sourceCurrencyOptions = reactive({ values: [] } as ReactiveCurrencyOptions);
+  const targetCurrencyOptions = reactive({ values: [] } as ReactiveCurrencyOptions);
 
+  // 통화 옵션 업데이트
   watch(
-    [() => store.recentCurrencyFrom, () => store.recentCurrencyTo],
+    [() => store.sourceCurrency, () => store.targetCurrency],
     () => {
-      const currencyList = currencyConverter.getCurrencyLists();
+      const currencyList = converter.getCurrencyLists();
 
-      fromCurrencyOptions.values = currencyList.map((currency) => ({
+      // 'From' 통화 옵션 설정
+      sourceCurrencyOptions.values = currencyList.map((currency) => ({
         value: currency,
         label: currency,
-        desc: descOfCurrency[currency],
-        disable: store.recentCurrencyTo === currency,
+        desc: currencyDescriptions[currency],
+        disable: store.targetCurrency === currency,
       }));
 
-      toCurrencyOptions.values = currencyList.map((currency) => ({
+      // 'To' 통화 옵션 설정
+      targetCurrencyOptions.values = currencyList.map((currency) => ({
         value: currency,
         label: currency,
-        desc: descOfCurrency[currency],
-        disable: store.recentCurrencyFrom === currency,
+        desc: currencyDescriptions[currency],
+        disable: store.sourceCurrency === currency,
       }));
 
       // 변환기에 기준 통화 설정
-      currencyConverter.setBase(store.recentCurrencyFrom);
+      converter.setBase(store.sourceCurrency);
     },
-    {immediate: true},
+    { immediate: true },
   );
 
   // 통화 선택 필터 함수 생성
-  // 검색어를 사용하여 통화 목록을 필터링하는 함수를 생성합니다.
-  // options 매개변수는 Ref<CurrencyOptions[]> 타입으로 선언되어 있으며, reactiveOptions 매개변수는 ReactiveCurrencyOptions 타입으로 선언되어 있습니다.
   const createFilterFn = (options: Ref<CurrencyOptions[]>, reactiveOptions: ReactiveCurrencyOptions) => {
-    // 검색어(val), 업데이트 함수(update), 중단 함수(abort)를 매개변수로 받는 함수를 반환합니다.
     return (val: string, update: (fn: () => void) => void, abort: () => void) => {
-      // 검색어의 길이가 1보다 작으면 검색을 중단하고, 검색어의 길이가 1 이상이면 검색을 시작합니다.
       if (val.length < 1) {
-        // 검색어가 없으면 options 배열에 모든 값을 저장합니다.
         update(() => {
           options.value = reactiveOptions.values;
         });
@@ -145,29 +145,34 @@
         return;
       }
 
-      // 검색어를 소문자로 변환하여 needle 변수에 저장합니다.
-      const needle = val.toLowerCase();
-
-      // options 배열에서 검색어가 포함된 항목만 필터링하여 options 배열에 저장합니다.
+      const searchTerm = val.toLowerCase();
       update(() => {
         options.value = reactiveOptions.values.filter((v) => {
-          const labelMatch = v.label.toLowerCase().indexOf(needle) > -1;
-          const descMatch = v.desc.toLowerCase().indexOf(needle) > -1;
+          const labelMatch = v.label.toLowerCase().indexOf(searchTerm) > -1;
+          const descMatch = v.desc.toLowerCase().indexOf(searchTerm) > -1;
           return labelMatch || descMatch;
         });
       });
     };
   };
 
-  // fromCurrencyOptions.values 배열을 사용하여 fromFilteredCurrencyOptions 배열을 생성합니다.
-  const fromFilteredCurrencyOptions = ref<CurrencyOptions[]>(fromCurrencyOptions.values);
-  // createFilterFn 함수를 사용하여 filterFnFrom 함수를 생성합니다.
-  const filterFnFrom = createFilterFn(fromFilteredCurrencyOptions, fromCurrencyOptions);
+  // 'From' 통화 필터 설정
+  const filteredSourceCurrencyOptions = ref<CurrencyOptions[]>(sourceCurrencyOptions.values);
+  const sourceFilterFn = createFilterFn(filteredSourceCurrencyOptions, sourceCurrencyOptions);
 
-  // toCurrencyOptions.values 배열을 사용하여 toFilteredCurrencyOptions 배열을 생성합니다.
-  const toFilteredCurrencyOptions = ref<CurrencyOptions[]>(toCurrencyOptions.values);
-  // createFilterFn 함수를 사용하여 filterFnTo 함수를 생성합니다.
-  const filterFnTo = createFilterFn(toFilteredCurrencyOptions, toCurrencyOptions);
+  // 'To' 통화 필터 설정
+  const filteredTargetCurrencyOptions = ref<CurrencyOptions[]>(targetCurrencyOptions.values);
+  const targetFilterFn = createFilterFn(filteredTargetCurrencyOptions, targetCurrencyOptions);
+  
+  const handleCurrencySwap = () => {
+    const convertedValue = converter.convert(
+      Number(calc.currentNumber), 
+      store.sourceCurrency,
+      store.targetCurrency
+    );
+    calc.setCurrentNumber(convertedValue.toString());
+    swapCurrencies();
+  };
 </script>
 
 <template>
@@ -177,9 +182,9 @@
 
     <!-- 원본 통화 -->
     <q-select
-      v-model="store.recentCurrencyFrom"
-      :options="fromFilteredCurrencyOptions"
-      :label="descOfCurrency[store.recentCurrencyFrom]"
+      v-model="store.sourceCurrency"
+      :options="filteredSourceCurrencyOptions"
+      :label="currencyDescriptions[store.sourceCurrency]"
       stack-label
       dense
       options-dense
@@ -194,7 +199,7 @@
       class="col-4 q-pl-sm shadow-2"
       :popup-content-class="!store.darkMode ? 'bg-blue-grey-2' : 'bg-blue-grey-6'"
       :class="!store.darkMode ? 'bg-blue-grey-2' : 'bg-blue-grey-6'"
-      @filter="filterFnFrom"
+      @filter="sourceFilterFn"
       @focus="setInputFocused()"
       @blur="setInputBlurred()"
       @keyup.enter="blurElement()"
@@ -203,14 +208,14 @@
       <template #option="scope">
         <q-item v-bind="scope.itemProps">
           <q-item-section>
-            <q-item-label caption>{{ descOfCurrency[scope.opt.label] }}</q-item-label>
+            <q-item-label caption>{{ currencyDescriptions[scope.opt.label] }}</q-item-label>
             <q-item-label>{{ scope.opt.label }}</q-item-label>
           </q-item-section>
         </q-item>
       </template>
       <MyTooltip>
         <div class="text-left" style="white-space: pre-wrap">
-          {{ `${descOfCurrency[store.recentCurrencyFrom]}\n${store.recentCurrencyFrom}` }}
+          {{ `${currencyDescriptions[store.sourceCurrency]}\n${store.sourceCurrency}` }}
         </div>
       </MyTooltip>
     </q-select>
@@ -224,16 +229,16 @@
       icon="swap_horiz"
       size="md"
       class="col-2 q-mx-none q-px-sm"
-      @click="swapCurrencyValue()"
+      @click="handleCurrencySwap()"
     >
       <MyTooltip>{{ t('tooltipSwap') }}</MyTooltip>
     </q-btn>
 
     <!-- 대상 통화 -->
     <q-select
-      v-model="store.recentCurrencyTo"
-      :options="toFilteredCurrencyOptions"
-      :label="descOfCurrency[store.recentCurrencyTo]"
+      v-model="store.targetCurrency"
+      :options="filteredTargetCurrencyOptions"
+      :label="currencyDescriptions[store.targetCurrency]"
       stack-label
       dense
       options-dense
@@ -248,7 +253,7 @@
       :popup-content-class="!store.darkMode ? 'bg-blue-grey-2' : 'bg-blue-grey-6'"
       class="col-4 q-pl-sm shadow-2"
       :options-selected-class="!store.darkMode ? 'text-primary' : 'text-grey-1'"
-      @filter="filterFnTo"
+      @filter="targetFilterFn"
       @keyup.enter="blurElement()"
       @update:model-value="blurElement()"
       @focus="setInputFocused()"
@@ -257,9 +262,9 @@
       <template #option="scope">
         <q-item v-bind="scope.itemProps">
           <q-item-section>
-            <q-item-label caption>{{ descOfCurrency[scope.opt.label] }}</q-item-label>
+            <q-item-label caption>{{ currencyDescriptions[scope.opt.label] }}</q-item-label>
             <q-item-label>
-              {{ `${scope.opt.label}, ${currencyConverter.getRate(scope.opt.label).toFixed(4)}` }}
+              {{ `${scope.opt.label}, ${converter.getRate(scope.opt.label).toFixed(4)}` }}
             </q-item-label>
           </q-item-section>
         </q-item>
@@ -267,7 +272,7 @@
       <MyTooltip>
         <div class="text-left" style="white-space: pre-wrap">
           {{
-            `${descOfCurrency[store.recentCurrencyTo]}\n${store.recentCurrencyTo}, ${currencyConverter.getRate(store.recentCurrencyTo).toFixed(4)}`
+            `${currencyDescriptions[store.targetCurrency]}\n${store.targetCurrency}, ${converter.getRate(store.targetCurrency).toFixed(4)}`
           }}
         </div>
       </MyTooltip>

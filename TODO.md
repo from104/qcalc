@@ -2,12 +2,18 @@
 
 ## Todo
 
-- [ ] Programmer's calculator
 - [ ] Ads function (monetization)
 - [ ] Theme function
 - [ ] Automatic updates (electron)
 - [ ] Mobile app implementation (capacitor:ios)
 - [ ] Search calculation result history
+- [ ] Add accessibility features
+  - [ ] Apply aria-label
+  - [ ] Voice output of results
+  - [ ] Voice control of calculator
+  - [ ] High contrast mode
+  - [x] Haptic mode
+
 
 ## In Progress
 
@@ -25,3 +31,4 @@
 - [x] Settings dialog
 - [x] Additional functions per button
 - [x] Ability to edit and note calculation history individually
+- [x] Programmer's calculator

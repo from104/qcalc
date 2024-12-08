@@ -1,112 +1,107 @@
 <script setup lang="ts">
-  import {onMounted, onBeforeUnmount, ref, computed, watch, reactive, h} from 'vue';
+  import {
+    onMounted,
+    onBeforeUnmount,
+    ref,
+    computed,
+    watch,
+    reactive,
+  } from 'vue';
 
-  // import MyTooltip from 'components/MyTooltip.vue';
-
-  import {useI18n} from 'vue-i18n';
-  const {t} = useI18n();
-
+  import { useI18n } from 'vue-i18n';
   import MenuItem from 'components/MenuItem.vue';
+  import { useStore } from 'src/stores/store';
+  import { KeyBinding } from 'classes/KeyBinding';
+  import { useQuasar, copyToClipboard } from 'quasar';
 
-  // 스토어 가져오기
-  import {useCalcStore} from 'stores/calc-store';
-  const store = useCalcStore();
+  // i18n 설정
+  const { t } = useI18n();
 
-  // 계산기 오브젝트를 스토어에서 가져오기 위한 변수 선언
+  // 스토어 인스턴스 초기화
+  const store = useStore();
+
+  // 스토어에서 필요한 메서드와 속성 추출
   const {
     calc,
     clickButtonById,
     getRightSideInHistory,
     getLeftSideInHistory,
-    notifyMsg,
-    notifyError,
-    swapUnitValue,
-    swapCurrencyValue,
+    showMessage,
+    showError,
+    swapUnits,
+    swapCurrencies,
   } = store;
 
-  // 계산 결과 배열
-  const histories = computed(() => calc.getHistories());
+  const calcHistory = calc.history;
+  
+  // 계산 결과 배열 (반응형)
+  const histories = computed(() => calcHistory.getAllRecords());
 
-  // 계산 결과 메뉴가 열려있는지 여부
-  const historyMenu: {[id: number]: boolean} = reactive(Object.fromEntries(histories.value.map((h) => [h.id, false])));
+  // 계산 결과 메뉴의 열림 상태를 관리하는 반응형 객체
+  const historyMenu = reactive(Object.fromEntries(histories.value.map((h) => [h.id, false])));
 
+  // histories 변경 감시
   watch(
     () => histories,
     (newHistories) => {
+      // 새로운 히스토리 항목에 대한 메뉴 상태 초기화
       newHistories.value.forEach((h) => {
-        if (h.id) {
-          if (historyMenu[h.id] === undefined) {
-            historyMenu[h.id] = false;
-          }
-        } else {
+        if (h.id && historyMenu[h.id] === undefined) {
+          historyMenu[h.id] = false;
         }
       });
 
+      // 삭제된 히스토리 항목의 메뉴 상태 제거
       for (const id in historyMenu) {
         if (!newHistories.value.some((h) => h.id === parseInt(id))) {
           delete historyMenu[id];
         }
       }
     },
-    {deep: true}, // 깊은 감시를 위해 deep 옵션을 true로 설정
-  ); // 계산 결과를 지울지 묻는 다이얼로그 표시 여부
+    { deep: true } // 깊은 감시 설정
+  );
 
-  const doDeleteHistory = ref(false);
+  // 계산 결과 삭제 확인 다이얼로그 표시 여부
+  const showDeleteConfirm = ref(false);
 
   // 계산 결과 맨 위로 가는 아이콘 표시 여부
-  const isGoToTopInHistory = ref(false);
+  const showScrollToTop = ref(false);
 
-  // 계산 결과 창 스크롤 위치에 따라 아이콘 표시 설정
-  const onScroll = (evt: Event) => {
-    isGoToTopInHistory.value = (evt.target as HTMLDivElement).scrollTop > 50;
+  // 계산 결과 창 스크롤 이벤트 핸들러
+  const handleScroll = (evt: Event) => {
+    showScrollToTop.value = (evt.target as HTMLDivElement).scrollTop > 50;
   };
 
   // 계산 결과 창 스크롤 위치를 최상단으로 이동
-  const goToTopInHistory = () => {
+  const scrollToTop = () => {
     document.getElementById('history')?.scrollTo({
       top: 0,
       behavior: 'smooth',
     });
   };
 
-  // 상태를 저장할 변수를 함수 외부에 선언
-  let touchStartY = 0;
-
-  // 이벤트 처리 함수의 타입을 명시적으로 선언
-  const handleTouchStart = (event: TouchEvent) => {
-    touchStartY = event.touches[0].clientY;
-  };
-
-  const handleTouchEnd = (event: TouchEvent) => {
-    const touchEndY = event.changedTouches[0].clientY;
-    // 아래로 100px 이상 끌어내렸을 경우 다이얼로그 닫기
-    if (touchEndY - touchStartY > 30) {
-      // store의 타입이 명시적으로 선언되어 있지 않으므로, 이 부분은 가정에 따라 달라질 수 있습니다.
-      // 여기서는 store가 이미 적절한 타입으로 선언되어 있고, isHistoryDialogOpen이 boolean 타입의 속성이라고 가정합니다.
-      store.isHistoryDialogOpen = false;
-    }
-  };
-
-  // 스크롤 위치를 저장할 변수
+  // 터치 시작 위치 저장 변수
   let lastScrollPosition = 0;
 
+  // 히스토리 다이얼로그 열림/닫힘 상태 감시
   watch(
     () => store.isHistoryDialogOpen,
     (isOpen) => {
       if (isOpen) {
-        // 다이얼로그가 열릴 때 시간을 약간 지연하여 저장된 스크롤 위치로 이동
+        // 다이얼로그가 열릴 때 저장된 스크롤 위치로 이동 (약간의 지연 적용)
         setTimeout(() => {
           document.getElementById('history')?.scrollTo({top: lastScrollPosition});
         }, 50);
       } else {
-        // 다이얼로그가 닫힐 때 현재 스크롤 위치를 저장
+        // 다이얼로그가 닫힐 때 현재 스크롤 위치 저장
         lastScrollPosition = document.getElementById('history')?.scrollTop ?? 0;
-        // 최상단으로 가는 아이콘을 히스토리 숨길 때 함께 숨김
-        isGoToTopInHistory.value = false;
+        // 최상단으로 가는 아이콘 숨김
+        showScrollToTop.value = false;
       }
     },
   );
 
+  // 히스토리 스크롤 함수
   const scrollHistory = (offset: number | 'top' | 'bottom') => {
     if (store.isHistoryDialogOpen) {
       const historyElement = document.getElementById('history');
@@ -124,11 +119,10 @@
     }
   };
 
-  import {KeyBinding} from 'classes/KeyBinding';
-  // prettier-ignore
+  // 키 바인딩 설정
   const keyBinding = new KeyBinding([
-    [['Alt+h'], () => { !doDeleteHistory.value && clickButtonById('btn-history'); }],
-    [['d'], () => { store.isHistoryDialogOpen && clickButtonById('btn-delete-history'); }],
+    [['Alt+h'], () => { if (!showDeleteConfirm.value) clickButtonById('btn-history'); }],
+    [['d'], () => { if (store.isHistoryDialogOpen) clickButtonById('btn-delete-history'); }],
     [['ArrowUp'], () => scrollHistory(-50)],
     [['ArrowDown'], () => scrollHistory(50)],
     [['PageUp'], () => scrollHistory(-400)],
@@ -137,7 +131,7 @@
     [['End'], () => scrollHistory('bottom')],
   ]);
 
-  // inputFocused 값이 바뀌면 키바인딩을 추가하거나 제거합니다.
+  // 입력 포커스 상태에 따른 키 바인딩 활성화/비활성화
   watch(
     () => store.inputFocused,
     () => {
@@ -147,115 +141,111 @@
         keyBinding.subscribe();
       }
     },
-    {immediate: true},
+    { immediate: true },
   );
 
-  // dom 요소가 마운트 되었을 때
+  // 컴포넌트 마운트 시 키 바인딩 활성화
   onMounted(() => {
     keyBinding.subscribe();
   });
 
-  // dom 요소가 언마운트되기 전에 키바인딩 제거
+  // 컴포넌트 언마운트 시 키 바인딩 비활성화
   onBeforeUnmount(() => {
     keyBinding.unsubscribe();
   });
 
-  const editDialog = ref(false);
-  const memo = ref('');
-  const editSlide = ref('');
+  // 메모 편집 관련 상태 변수
+  const showMemoDialog = ref(false);
+  const memoText = ref('');
+  const memoSlideDirection = ref('');
+  let selectedMemoId = 0;
 
-  let slidedID = 0;
-
-  const memoDialog = (id: number) => {
-    // console.log('memoDialog', id);
-    slidedID = id;
-
-    if (calc.getMemo(id)) {
-      memo.value = calc.getMemo(id) as string;
-    } else {
-      memo.value = '';
-    }
-    editDialog.value = true;
+  // 메모 다이얼로그 열기 함수
+  const openMemoDialog = (id: number) => {
+    selectedMemoId = id;
+    memoText.value = calcHistory.getMemo(id) as string || '';
+    showMemoDialog.value = true;
   };
 
-  const onLeft = ({reset}: {reset: () => void}, id: number) => {
-    console.log('onLeft', id);
-    memoDialog(id);
-
-    setTimeout(() => {
-      reset();
-    }, 500);
+  // 슬라이드 왼쪽 동작 핸들러
+  const handleLeftSlide = ({ reset }: { reset: () => void }, id: number) => {
+    openMemoDialog(id);
+    setTimeout(reset, 500);
   };
 
-  const editConfirm = () => {
-    calc.setMemo(slidedID, memo.value);
-    editSlide.value = 'slide-right';
-    editDialog.value = false;
-    memo.value = '';
-    slidedID = 0;
+  // 메모 편집 확인 함수
+  const saveMemo = () => {
+    calcHistory.setMemo(selectedMemoId, memoText.value);
+    memoSlideDirection.value = 'slide-right';
+    showMemoDialog.value = false;
+    memoText.value = '';
+    selectedMemoId = 0;
   };
 
-  const editCancel = () => {
-    editSlide.value = 'slide-left';
-    editDialog.value = false;
-    memo.value = '';
-    slidedID = 0;
+  // 메모 편집 취소 함수
+  const cancelMemo = () => {
+    memoSlideDirection.value = 'slide-left';
+    showMemoDialog.value = false;
+    memoText.value = '';
+    selectedMemoId = 0;
   };
 
-  const memoDelete = (id: number) => {
-    calc.deleteMemo(id);
-    memo.value = '';
+  // 메모 삭제 함수
+  const deleteMemo = (id: number) => {
+    calcHistory.deleteMemo(id);
+    memoText.value = '';
   };
 
-  import {copyToClipboard} from 'quasar';
-  const historyCopy = async (id: number, copyType: 'formattedNumber' | 'onlyNumber' | 'memo'): Promise<void> => {
-    const history = calc.getHistoryByID(id);
+  // 히스토리 항목 복사 함수
+  const copyHistoryItem = async (id: number, copyType: 'formattedNumber' | 'onlyNumber' | 'memo'): Promise<void> => {
+    const history = calcHistory.getRecordById(id);
     const copyText =
       copyType === 'formattedNumber'
-        ? getRightSideInHistory(history)
+        ? getRightSideInHistory(history.calculationResult)
         : copyType === 'onlyNumber'
-          ? history.resultNumber
+          ? history.calculationResult.resultNumber
           : copyType === 'memo'
-            ? (calc.getMemo(id) as string)
+            ? (calcHistory.getMemo(id) as string)
             : '';
     try {
       await copyToClipboard(copyText);
-      notifyMsg(t('copySuccess'));
+      showMessage(t('copySuccess'));
     } catch (error) {
       console.error(error);
-      notifyError(t('copyFailure'));
+      showError(t('copyFailure'));
     }
   };
 
-  const toMainResult = (id: number) => {
-    const history = calc.getHistoryByID(id);
-    calc.setCurrentNumber(history.resultNumber);
+  // 메인 결과로 이동 함수
+  const loadToMainPanel = (id: number) => {
+    const history = calcHistory.getRecordById(id);
+    calc.setCurrentNumber(history.calculationResult.resultNumber);
   };
 
-  const toSubResult = (id: number) => {
-    const history = calc.getHistoryByID(id);
-    if (store.cTab === 'unit') {
-      swapUnitValue();
+  // 서브 결과로 이동 함수
+  const loadToSubPanel = (id: number) => {
+    const history = calcHistory.getRecordById(id);
+    if (store.currentTab === 'unit') {
+      swapUnits();
       setTimeout(() => {
-        calc.setCurrentNumber(history.resultNumber);
+        calc.setCurrentNumber(history.calculationResult.resultNumber);
       }, 5);
+      setTimeout(swapUnits, 10);
+    } else if (store.currentTab === 'currency') {
+      swapCurrencies();
       setTimeout(() => {
-        swapUnitValue();
-      }, 10);
-    } else if (store.cTab === 'currency') {
-      swapCurrencyValue();
-      setTimeout(() => {
-        calc.setCurrentNumber(history.resultNumber);
+        calc.setCurrentNumber(history.calculationResult.resultNumber);
       }, 5);
-      setTimeout(() => {
-        swapCurrencyValue();
-      }, 10);
+      setTimeout(swapCurrencies, 10);
     }
   };
 
-  const deleteHistory = (id: number) => {
-    calc.deleteHistory(id);
+  // 히스토리 항목 삭제 함수
+  const deleteHistoryItem = (id: number) => {
+    calcHistory.deleteRecord(id);
   };
+
+  const $q = useQuasar();
 </script>
 
 <template>
@@ -270,28 +260,28 @@
         flat
         icon="delete_outline"
         size="md"
-        :disable="doDeleteHistory || histories.length == 0"
-        @click="doDeleteHistory = true"
+        :disable="showDeleteConfirm || histories.length == 0"
+        @click="showDeleteConfirm = true"
       />
       <q-btn icon="close" size="md" dense flat @click="store.isHistoryDialogOpen = false" />
     </q-bar>
     <q-card
       id="history"
-      v-touch-swipe:9e-2:12:50.down="() => (store.isHistoryDialogOpen = false)"
+        v-touch-swipe:9e-2:12:50.down="() => (store.isHistoryDialogOpen = false)"
       square
       class="full-width row justify-center items-start relative-position scrollbar-custom"
-      @scroll="onScroll"
+      @scroll="handleScroll"
     >
       <transition name="slide-fade">
         <q-btn
-          v-if="isGoToTopInHistory"
+          v-if="showScrollToTop"
           round
           glossy
           color="secondary"
           icon="publish"
           class="fixed q-ma-md"
           style="z-index: 12"
-          @click="goToTopInHistory"
+          @click="scrollToTop"
         />
       </transition>
       <q-card-section class="full-width q-pt-xs">
@@ -310,8 +300,8 @@
                 :key="history.id"
                 left-color="positive"
                 right-color="negative"
-                @left="({reset}) => onLeft({reset}, history.id as number)"
-                @right="calc.deleteHistory(history.id as number)"
+                @left="({reset}) => handleLeftSlide({reset}, history.id as number)"
+                @right="deleteHistoryItem(history.id as number)"
               >
                 <template #left>
                   <q-icon name="edit_note" />
@@ -328,10 +318,10 @@
                       <u>{{ history.memo }}</u>
                     </q-item-label>
                     <q-item-label style="white-space: pre-wrap">
-                      {{ getLeftSideInHistory(history, true) }}
+                      {{ getLeftSideInHistory(history.calculationResult, true) }}
                     </q-item-label>
                     <q-item-label>
-                      {{ ['=', getRightSideInHistory(history)].join(' ') }}
+                      {{ ['=', getRightSideInHistory(history.calculationResult)].join(' ') }}
                     </q-item-label>
                   </q-item-section>
                 </q-item>
@@ -347,43 +337,43 @@
                     <MenuItem
                       v-if="!history.memo"
                       :title="t('addMemo')"
-                      :action="() => memoDialog(history.id as number)"
+                      :action="() => openMemoDialog(history.id as number)"
                     />
                     <MenuItem
                       v-if="history.memo"
                       :title="t('editMemo')"
-                      :action="() => memoDialog(history.id as number)"
+                      :action="() => openMemoDialog(history.id as number)"
                     />
                     <MenuItem
                       v-if="history.memo"
                       :title="t('copyMemo')"
-                      :action="() => historyCopy(history.id as number, 'memo')"
+                      :action="() => copyHistoryItem(history.id as number, 'memo')"
                     />
                     <MenuItem
                       v-if="history.memo"
                       :title="t('deleteMemo')"
-                      :action="() => memoDelete(history.id as number)"
+                      :action="() => deleteMemo(history.id as number)"
                     />
                     <MenuItem separator />
                     <MenuItem
                       :title="t('copyDisplayedResult')"
-                      :action="() => historyCopy(history.id as number, 'formattedNumber')"
-                      :caption="getRightSideInHistory(history)"
+                      :action="() => copyHistoryItem(history.id as number, 'formattedNumber')"
+                      :caption="['=', getRightSideInHistory(history.calculationResult)].join(' ')"
                     />
                     <MenuItem
                       :title="t('copyResultNumber')"
-                      :action="() => historyCopy(history.id as number, 'onlyNumber')"
-                      :caption="history.resultNumber"
+                      :action="() => copyHistoryItem(history.id as number, 'onlyNumber')"
+                      :caption="history.calculationResult.resultNumber"
                     />
                     <MenuItem separator />
-                    <MenuItem :title="t('loadToMainPanel')" :action="() => toMainResult(history.id as number)" />
+                    <MenuItem :title="t('loadToMainPanel')" :action="() => loadToMainPanel(history.id as number)" />
                     <MenuItem
-                      v-if="store.cTab === 'unit' || store.cTab === 'currency'"
+                      v-if="store.currentTab === 'unit' || store.currentTab === 'currency'"
                       :title="t('loadToSubPanel')"
-                      :action="() => toSubResult(history.id as number)"
+                      :action="() => loadToSubPanel(history.id as number)"
                     />
                     <MenuItem separator />
-                    <MenuItem :title="t('deleteResult')" :action="() => deleteHistory(history.id as number)" />
+                    <MenuItem :title="t('deleteResult')" :action="() => deleteHistoryItem(history.id as number)" />
                   </q-list>
                 </q-menu>
               </q-slide-item>
@@ -395,33 +385,33 @@
   </q-dialog>
 
   <!-- 기록 전체 삭제 다이얼로그 -->
-  <q-dialog v-model="doDeleteHistory" persistent transition-show="scale" transition-hide="scale" style="z-index: 15">
+  <q-dialog v-model="showDeleteConfirm" persistent transition-show="scale" transition-hide="scale" style="z-index: 15">
     <q-card class="noselect text-center text-white bg-negative" style="width: 200px">
       <q-card-section>{{ t('doYouDeleteHistory') }} </q-card-section>
       <q-card-actions align="center" class="text-negative bg-white">
         <q-btn v-close-popup flat :label="t('message.no')" />
-        <q-btn v-close-popup flat :label="t('message.yes')" autofocus @click="calc.clearHistory()" />
+        <q-btn v-close-popup flat :label="t('message.yes')" autofocus @click="calcHistory.clearRecords()" />
       </q-card-actions>
     </q-card>
   </q-dialog>
 
   <!-- 기록의 메모 수정 다이얼로그 -->
   <q-dialog
-    v-model="editDialog"
+    v-model="showMemoDialog"
     persistent
     transition-show="slide-right"
-    :transition-hide="editSlide"
+    :transition-hide="memoSlideDirection"
     style="z-index: 15"
   >
     <q-card class="noselect text-center" style="width: 250px">
       <q-bar v-blur dark class="full-width justify-between nnoselect text-body1 text-white bg-primary">
-        <q-btn dense flat icon="replay" size="sm" @click="editCancel" />
+        <q-btn dense flat icon="replay" size="sm" @click="cancelMemo" />
         <div>{{ t('memo') }}</div>
-        <q-btn dense flat icon="check" size="sm" @click="editConfirm" />
+        <q-btn dense flat icon="check" size="sm" @click="saveMemo" />
       </q-bar>
       <q-card-section>
         <q-input
-          v-model="memo"
+          v-model="memoText"
           clearable
           filled
           dense
@@ -433,7 +423,7 @@
           @keyup.enter="
             {
               store.setInputBlurred;
-              editConfirm();
+              saveMemo();
             }
           "
         />

@@ -1,69 +1,68 @@
 <script setup lang="ts">
-  import {onMounted, reactive, watch} from 'vue';
-
+  import { onMounted, reactive, watch } from 'vue';
   import MenuItem from 'components/MenuItem.vue';
+  import { useRouter } from 'vue-router';
+  import { useStore } from 'src/stores/store';
+  import { useI18n } from 'vue-i18n';
 
-  import {useRouter} from 'vue-router';
+  // 라우터 인스턴스 초기화
   const router = useRouter();
 
-  import {useCalcStore} from 'src/stores/calc-store';
-  const store = useCalcStore();
+  // 스토어 인스턴스 초기화
+  const store = useStore();
 
-  import {useI18n} from 'vue-i18n';
-  const {t} = useI18n();
+  // i18n 설정
+  const { t } = useI18n();
 
-  interface Item {
+  // 메뉴 아이템 인터페이스 정의
+  interface MenuItem {
     title?: string;
     caption?: string;
     shortcut?: string;
     icon?: string;
     action?: () => void;
-    separator?: boolean;
+    isSeparator?: boolean;
   }
 
-  const items: {[key: string]: Item} = reactive({
+  // 메뉴 아이템 정의
+  const items: { [key: string]: MenuItem } = reactive({
     calc: {
       title: t('item.calc.title'),
       caption: t('item.calc.caption'),
       shortcut: 'Ctrl-1',
       icon: 'calculate',
-      action: () => {
-        store.cTab = 'calc';
-      },
+      action: () => { store.currentTab = 'calc'; },
     },
     unit: {
       title: t('item.unit.title'),
       caption: t('item.unit.caption'),
       shortcut: 'Ctrl-2',
       icon: 'swap_vert',
-      action: () => {
-        store.cTab = 'unit';
-      },
+      action: () => { store.currentTab = 'unit'; },
     },
     currency: {
       title: t('item.currency.title'),
       caption: t('item.currency.caption'),
       shortcut: 'Ctrl-3',
       icon: 'currency_exchange',
-      action: () => {
-        store.cTab = 'currency';
-      },
+      action: () => { store.currentTab = 'currency'; },
     },
-    separator1: {
-      separator: true,
+    radix: {
+      title: t('item.radix.title'),
+      caption: t('item.radix.caption'),
+      shortcut: 'Ctrl-4',
+      icon: 'transform',
+      action: () => { store.currentTab = 'radix'; },
     },
+    separator1: { isSeparator: true },
     settings: {
       title: t('item.settings.title'),
       caption: t('item.settings.caption'),
       shortcut: 'Alt-s',
       icon: 'settings',
-      action: () => {
-        store.isSettingDialogOpen = true;
-      },
+      action: () => { store.isSettingDialogOpen = true; },
     },
-    separator2: {
-      separator: true,
-    },
+    separator2: { isSeparator: true },
     help: {
       title: t('item.help.title'),
       caption: t('item.help.caption'),
@@ -78,15 +77,17 @@
     },
   });
 
-  // updateLocale() 함수는 items 객체의 title과 caption 속성을 각 언어에 맞게 업데이트
+  // 언어 변경 시 메뉴 아이템 텍스트 업데이트 함수
   const updateLocale = () => {
     Object.keys(items).forEach((item) => {
-      items[item].title = t(`item.${item}.title`);
-      items[item].caption = t(`item.${item}.caption`);
+      if (!items[item].isSeparator) {
+        items[item].title = t(`item.${item}.title`);
+        items[item].caption = t(`item.${item}.caption`);
+      }
     });
   };
 
-  // store.locale이 변경될 때마다 updateLocale() 함수를 실행
+  // 언어 변경 감지 및 메뉴 아이템 텍스트 업데이트
   watch(
     () => store.locale,
     () => {
@@ -94,6 +95,7 @@
     },
   );
 
+  // 컴포넌트 마운트 시 초기 언어 설정
   onMounted(() => {
     updateLocale();
   });
@@ -117,6 +119,9 @@ ko:
     currency:
       title: '통화 환전'
       caption: '통화 환전기'
+    radix:
+      title: '진법 변환'
+      caption: '진법 변환기'
     settings:
       title: '설정'
       caption: '설정'
@@ -137,6 +142,9 @@ en:
     currency:
       title: 'Currency Converter'
       caption: 'Currency Converter'
+    radix:
+      title: 'Radix Converter'
+      caption: 'Radix Converter'  
     settings:
       title: 'Settings'
       caption: 'Settings'
