@@ -86,7 +86,7 @@ export default configure(function (/* ctx */) {
 
     // 개발 서버 설정
     devServer: {
-      open: true, // 브라우저 자동 실행
+      open: true, // 브라우저 자동 실���
     },
 
     // Quasar 프레임워크 설정
@@ -130,13 +130,18 @@ export default configure(function (/* ctx */) {
         linux: {
           target: ['AppImage', 'snap'],
           category: 'Utility',
-          snap: {
-            confinement: 'strict',
-            grade: 'beta',
-          },
         },
         win: {
           target: ['nsis'],
+          signAndEditExecutable: false,
+          signtoolOptions: {
+            publisherName: 'ATIT',
+            sign: false,
+          },
+        },
+        snap: {
+          confinement: 'strict',
+          grade: 'devel',
         },
       },
     },
