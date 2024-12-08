@@ -5,10 +5,7 @@
   import { KeyBinding } from 'classes/KeyBinding';
   import { UnitConverter } from 'classes/UnitConverter';
 
-  import { useStoreBase } from 'src/stores/store-base';
-  import { useStoreUnit } from 'src/stores/store-unit';
-  import { useStoreSettings } from 'src/stores/store-settings';
-  import { useStoreUtils } from 'src/stores/store-utils';
+  import { useStore } from 'src/stores/store';
 
   import MyTooltip from 'components/MyTooltip.vue';
 
@@ -16,15 +13,10 @@
   const { t } = useI18n();
 
   // 스토어 인스턴스 생성
-  const storeBase = useStoreBase();
-  const storeUnit = useStoreUnit();
-  const storeSettings = useStoreSettings();
-  const storeUtils = useStoreUtils();
+  const store = useStore();
 
   // 스토어에서 필요한 메서드 추출
-  const { calc } = storeBase;
-  const { clickButtonById } = storeUtils;
-  const { swapUnits, initRecentUnits } = storeUnit;
+  const { calc, clickButtonById, swapUnits, initRecentUnits } = store;
 
   // 단위 초기화
   initRecentUnits();
@@ -38,7 +30,7 @@
   );
 
   // 언어 변경 시 범주 이름 업데이트
-  watch(() => storeSettings.locale, () => {
+  watch(() => store.locale, () => {
     categoryList.forEach((category) => {
       category.label = t(`categories.${category.value}`);
     });
@@ -47,7 +39,7 @@
   // 키 바인딩 설정
   const keyBindingManager = new KeyBinding([
     [['Alt+w'], () => clickButtonById('btn-swap-unit')],
-    [['Alt+y'], () => storeSettings.toggleShowUnit()],
+    [['Alt+y'], () => store.toggleShowUnit()],
   ]);
 
   // 컴포넌트 마운트 시 실행
@@ -79,11 +71,11 @@
   // 단위 변경 시 옵션 업데이트
   watch(
     [
-      () => storeUnit.sourceUnits[storeUnit.selectedCategory],
-      () => storeUnit.targetUnits[storeUnit.selectedCategory],
+      () => store.sourceUnits[store.selectedCategory],
+      () => store.targetUnits[store.selectedCategory],
     ],
     () => {
-      const currentCategory = storeUnit.selectedCategory;
+      const currentCategory = store.selectedCategory;
       const availableUnits = UnitConverter.getUnitLists(currentCategory);
 
       // 'From' 단위 옵션 설정
@@ -91,7 +83,7 @@
         value: unit,
         label: unit,
         desc: UnitConverter.getUnitDesc(currentCategory, unit),
-        disable: storeUnit.targetUnits[currentCategory] === unit,
+        disable: store.targetUnits[currentCategory] === unit,
       }));
 
       // 'To' 단위 옵션 설정
@@ -99,7 +91,7 @@
         value: unit,
         label: unit,
         desc: UnitConverter.getUnitDesc(currentCategory, unit),
-        disable: storeUnit.sourceUnits[currentCategory] === unit,
+        disable: store.sourceUnits[currentCategory] === unit,
       }));
     },
     { immediate: true }
@@ -107,10 +99,10 @@
 
   const handleUnitSwap = () => {
     calc.setCurrentNumber(UnitConverter.convert(
-      storeUnit.selectedCategory,
+      store.selectedCategory,
       calc.currentNumber,
-      storeUnit.sourceUnits[storeUnit.selectedCategory],
-      storeUnit.targetUnits[storeUnit.selectedCategory]
+      store.sourceUnits[store.selectedCategory],
+      store.targetUnits[store.selectedCategory]
     ));
     swapUnits();
   };
@@ -120,7 +112,7 @@
   <q-card-section v-blur class="row q-px-sm q-pt-none q-pb-sm">
     <!-- 카테고리 -->
     <q-select
-      v-model="storeUnit.selectedCategory"
+      v-model="store.selectedCategory"
       :options="categoryList"
       :label="t('category')"
       stack-label
@@ -129,10 +121,10 @@
       emit-value
       map-options
       class="col-3 q-pl-sm shadow-2 text-black"
-      :class="!storeSettings.darkMode ? 'bg-blue-grey-2' : 'bg-blue-grey-6'"
-      :popup-content-class="!storeSettings.darkMode ? 'bg-blue-grey-2' : 'bg-blue-grey-6'"
-      :options-selected-class="!storeSettings.darkMode ? 'text-primary' : 'text-grey-1'"
-      :label-color="!storeSettings.darkMode ? 'primary' : 'grey-1'"
+      :class="!store.darkMode ? 'bg-blue-grey-2' : 'bg-blue-grey-6'"
+      :popup-content-class="!store.darkMode ? 'bg-blue-grey-2' : 'bg-blue-grey-6'"
+      :options-selected-class="!store.darkMode ? 'text-primary' : 'text-grey-1'"
+      :label-color="!store.darkMode ? 'primary' : 'grey-1'"
     />
 
     <!-- 원본 방향 -->
@@ -140,32 +132,32 @@
 
     <!-- 원본 단위 -->
     <q-select
-      v-model="storeUnit.sourceUnits[storeUnit.selectedCategory]"
+      v-model="store.sourceUnits[store.selectedCategory]"
       :options="sourceUnitOptions.values"
-      :label="t(`unitDesc.${storeUnit.selectedCategory}.${storeUnit.sourceUnits[storeUnit.selectedCategory]}`)"
+      :label="t(`unitDesc.${store.selectedCategory}.${store.sourceUnits[store.selectedCategory]}`)"
       stack-label
       dense
       options-dense
       emit-value
       map-options
       class="col-3 q-pl-sm shadow-2"
-      :class="!storeSettings.darkMode ? 'bg-blue-grey-2' : 'bg-blue-grey-6'"
-      :popup-content-class="!storeSettings.darkMode ? 'bg-blue-grey-2' : 'bg-blue-grey-6'"
-      :options-selected-class="!storeSettings.darkMode ? 'text-primary' : 'text-grey-1'"
-      :label-color="!storeSettings.darkMode ? 'primary' : 'grey-1'"
+      :class="!store.darkMode ? 'bg-blue-grey-2' : 'bg-blue-grey-6'"
+      :popup-content-class="!store.darkMode ? 'bg-blue-grey-2' : 'bg-blue-grey-6'"
+      :options-selected-class="!store.darkMode ? 'text-primary' : 'text-grey-1'"
+      :label-color="!store.darkMode ? 'primary' : 'grey-1'"
     >
       <template #option="scope">
         <q-item v-bind="scope.itemProps">
           <q-item-section>
             <q-item-label caption>
-              {{ t(`unitDesc.${storeUnit.selectedCategory}.${scope.opt.label}`) }}
+              {{ t(`unitDesc.${store.selectedCategory}.${scope.opt.label}`) }}
             </q-item-label>
             <q-item-label>{{ scope.opt.label }}</q-item-label>
           </q-item-section>
         </q-item>
       </template>
       <MyTooltip>
-        {{ t(`unitDesc.${storeUnit.selectedCategory}.${storeUnit.sourceUnits[storeUnit.selectedCategory]}`) }}
+        {{ t(`unitDesc.${store.selectedCategory}.${store.sourceUnits[store.selectedCategory]}`) }}
       </MyTooltip>
     </q-select>
 
@@ -185,32 +177,32 @@
 
     <!-- 대상 단위 -->
     <q-select
-      v-model="storeUnit.targetUnits[storeUnit.selectedCategory]"
+      v-model="store.targetUnits[store.selectedCategory]"
       :options="targetUnitOptions.values"
-      :label="t(`unitDesc.${storeUnit.selectedCategory}.${storeUnit.targetUnits[storeUnit.selectedCategory]}`)"
+      :label="t(`unitDesc.${store.selectedCategory}.${store.targetUnits[store.selectedCategory]}`)"
       stack-label
       dense
       options-dense
       emit-value
       map-options
       class="col-3 q-pl-sm shadow-2"
-      :class="!storeSettings.darkMode ? 'bg-blue-grey-2' : 'bg-blue-grey-6'"
-      :popup-content-class="!storeSettings.darkMode ? 'bg-blue-grey-2' : 'bg-blue-grey-6'"
-      :options-selected-class="!storeSettings.darkMode ? 'text-primary' : 'text-grey-1'"
-      :label-color="!storeSettings.darkMode ? 'primary' : 'grey-1'"
+      :class="!store.darkMode ? 'bg-blue-grey-2' : 'bg-blue-grey-6'"
+      :popup-content-class="!store.darkMode ? 'bg-blue-grey-2' : 'bg-blue-grey-6'"
+      :options-selected-class="!store.darkMode ? 'text-primary' : 'text-grey-1'"
+      :label-color="!store.darkMode ? 'primary' : 'grey-1'"
     >
       <template #option="scope">
         <q-item v-bind="scope.itemProps">
           <q-item-section>
             <q-item-label caption>
-              {{ t(`unitDesc.${storeUnit.selectedCategory}.${scope.opt.label}`) }}
+              {{ t(`unitDesc.${store.selectedCategory}.${scope.opt.label}`) }}
             </q-item-label>
             <q-item-label>{{ scope.opt.label }}</q-item-label>
           </q-item-section>
         </q-item>
       </template>
       <MyTooltip>
-        {{ t(`unitDesc.${storeUnit.selectedCategory}.${storeUnit.targetUnits[storeUnit.selectedCategory]}`) }}
+        {{ t(`unitDesc.${store.selectedCategory}.${store.targetUnits[store.selectedCategory]}`) }}
       </MyTooltip>
     </q-select>
 

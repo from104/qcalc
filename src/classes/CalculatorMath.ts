@@ -3,8 +3,25 @@ import { convertRadix, Radix } from './RadixConverter';
 import { BigNumber, MathB, typeBigNumber } from './CalculatorTypes';
 
 /**
- * 계산기의 수학 연산을 담당하는 클래스
- * 기본 산술 연산부터 고급 수학 함수까지 다양한 계산 기능 제공
+ * 계산기 수학 연산 클래스
+ * @description
+ * 계산기에서 사용되는 모든 수학적 연산을 처리하는 클래스
+ * 
+ * 제공하는 주요 기능:
+ * 1. 기본 산술 연산
+ *    - 덧셈, 뺄셈, 곱셈, 나눗셈
+ *    - 나머지, 거듭제곱
+ * 2. 고급 수학 함수
+ *    - 삼각함수 (sin, cos, tan)
+ *    - 지수/로그
+ *    - 팩토리얼
+ * 3. 비트 연산
+ *    - AND, OR, XOR, NOT
+ *    - 시프트 연산
+ * 
+ * 특징:
+ * - BigNumber 사용으로 높은 정밀도 보장
+ * - 문자열 기반 입/출력으로 정확한 값 처리
  */
 export class CalculatorMath {
   /**
@@ -253,7 +270,7 @@ export class CalculatorMath {
    * AND, OR, XOR 비트 연산을 수행하는 내부 메서드
    * @param firstValue 첫 번째 숫자 (문자열)
    * @param secondValue 두 번째 숫자 (문자열)
-   * @param operation 수행할 연산자 ('and' | 'or' | 'xor')
+   * @param operation 수행할 연���자 ('and' | 'or' | 'xor')
    * @param wordSize 비트 크기 (기본값: 8)
    * @returns 비트 연산 결과 (문자열)
    */

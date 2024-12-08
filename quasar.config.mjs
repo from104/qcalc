@@ -36,23 +36,19 @@ export default configure(function (/* ctx */) {
     css: ['app.scss'],
 
     // Quasar 추가 기능
-    extras: [
-      'mdi-v5',
-      'roboto-font',
-      'material-icons',
-    ],
+    extras: ['mdi-v5', 'roboto-font', 'material-icons'],
 
     // 빌드 설정
     build: {
       // .env 파일 사용
       env: dotenv.config().parsed,
-      
+
       // 폴더 별칭 설정
       alias: {
         classes: path.join(__dirname, 'src/classes'),
         capacitor: path.join(__dirname, 'src-capacitor/node_modules'),
       },
-      
+
       // 대상 브라우저 및 Node 버전
       target: {
         browser: ['es2020', 'edge79', 'firefox68', 'chrome67', 'safari14'],
@@ -64,20 +60,27 @@ export default configure(function (/* ctx */) {
       // Vite 플러그인 설정
       vitePlugins: [
         // Vue I18n 플러그인
-        ['@intlify/vite-plugin-vue-i18n', {
-          compositionOnly: true,
-          include: path.resolve(__dirname, './src/i18n/**'),
-          defaultSFCLang: 'yml',
-        }],
+        [
+          '@intlify/vite-plugin-vue-i18n',
+          {
+            compositionOnly: true,
+            include: path.resolve(__dirname, './src/i18n/**'),
+            defaultSFCLang: 'yml',
+          },
+        ],
         // 타입스크립트 및 ESLint 검사 플러그인
-        ['vite-plugin-checker', {
-          vueTsc: {
-            tsconfigPath: 'tsconfig.vue-tsc.json',
+        [
+          'vite-plugin-checker',
+          {
+            vueTsc: {
+              tsconfigPath: 'tsconfig.vue-tsc.json',
+            },
+            eslint: {
+              lintCommand: 'eslint "./**/*.{js,ts,mjs,cjs,vue}"',
+            },
           },
-          eslint: {
-            lintCommand: 'eslint "./**/*.{js,ts,mjs,cjs,vue}"',
-          },
-        }, { server: false }],
+          { server: false },
+        ],
       ],
     },
 
@@ -127,6 +130,10 @@ export default configure(function (/* ctx */) {
         linux: {
           target: ['AppImage', 'snap'],
           category: 'Utility',
+          snap: {
+            confinement: 'strict',
+            grade: 'beta',
+          },
         },
         win: {
           target: ['nsis'],

@@ -12,7 +12,7 @@
   - [ ] Voice output of results
   - [ ] Voice control of calculator
   - [ ] High contrast mode
-  - [ ] Haptic mode
+  - [x] Haptic mode
 
 
 ## In Progress

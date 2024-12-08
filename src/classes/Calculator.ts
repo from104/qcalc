@@ -251,10 +251,10 @@ export class Calculator {
    * - 음수 처리 및 소수점 정규화 수행
    * - BigNumber 형식으로 변환하여 정확한 숫자 표현 보장
    */
-  private filterNumberCharacters(originalString: string): string {
+  private filterNumberCharacters(originalString: string, radix: Radix = this.currentRadix): string {
     // 숫자, 소수점, 음수 부호만 추출
     let onlyNumber = (() => {
-      switch (this.currentRadix) {
+      switch (radix) {
         case 'hex':
           return originalString.replace(/[^0-9a-fA-F.\-]/gm, '').toUpperCase();
         case 'oct':
@@ -300,8 +300,7 @@ export class Calculator {
    * - 초기화 플래그를 false로 설정
    */
   public setCurrentNumber(value: string): void {
-    this.inputBuffer = this.filterNumberCharacters(value.substring(0, 64));
-
+    this.currentNumber = this.filterNumberCharacters(value.substring(0, 64), Radix.Decimal);
     this.setDoesNotNeedBufferReset();
   }
 
@@ -804,9 +803,19 @@ export class Calculator {
     this.executeWithNumber(Operator.BIT_XNOR, n);
   }
   private executeWithNumber(operator: Operator, n: number): void {
+    console.log('operator:', operator);
+    console.log('n:', n);
+    console.log('currentNumber:', this.currentNumber);
+    console.log('previousNumber:', this.previousNumber);
+    console.log('currentOperator:', this.currentOperator);
     this.performBinaryOperation(operator);
+    console.log('After performBinaryOperation - currentNumber:', this.currentNumber);
+    console.log('After performBinaryOperation - previousNumber:', this.previousNumber);
+    console.log('After performBinaryOperation - currentOperator:', this.currentOperator);
     this.setCurrentNumber(n.toString());
+    console.log('After setCurrentNumber - currentNumber:', this.currentNumber);
     this.equal();
+    console.log('Final result:', this.currentNumber);
   }
 
   /**

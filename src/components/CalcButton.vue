@@ -10,11 +10,9 @@
   import { Radix } from 'classes/RadixConverter';
   import { BigNumber, Operator } from 'src/classes/CalculatorTypes';
 
-  import { useStoreBase } from 'src/stores/store-base';
-  import { useStoreSettings } from 'src/stores/store-settings';
-  import { useStoreNotifications } from 'src/stores/store-notifications';
-  import { useStoreUtils } from 'src/stores/store-utils';
-  import { useStoreRadix } from 'src/stores/store-radix';
+  import { useStore } from 'src/stores/store';
+
+  import MyTooltip from 'components/MyTooltip.vue';
 
   // Quasar 인스턴스 및 색상 유틸리티 초기화
   const $q = useQuasar();
@@ -29,28 +27,33 @@
   });
 
   // 스토어 인스턴스 초기화
-  const storeSettings = useStoreSettings();
-  const storeBase = useStoreBase();
-  const storeNotifications = useStoreNotifications();
-  const storeRadix = useStoreRadix();
-  const storeUtils = useStoreUtils();
+  const store = useStore();
 
   // 스토어에서 필요한 메서드 추출
-  const { calc, disableShift, disableShiftLock, enableShift, enableShiftLock, showMemoryTemporarily, toggleShiftLock } =
-    storeBase;
-  const { showError, showMessage } = storeNotifications;
-  const { convertRadix } = storeRadix;
-  const { clickButtonById } = storeUtils;
+  const { 
+    calc, 
+    disableShift, 
+    disableShiftLock, 
+    enableShift, 
+    enableShiftLock, 
+    toggleShift,
+    toggleShiftLock,
+    showMemoryTemporarily, 
+    showError,
+    showMessage,
+    convertRadix,
+    clickButtonById,
+  } = store;
 
   // 햅틱 피드백 함수
   const hapticFeedbackLight = async () => {
-    if ($q.platform.is.capacitor && storeSettings.hapticsMode) {
+    if ($q.platform.is.capacitor && store.hapticsMode) {
       await Haptics.impact({ style: ImpactStyle.Light });
     }
   };
 
   const hapticFeedbackMedium = async () => {
-    if ($q.platform.is.capacitor && storeSettings.hapticsMode) {
+    if ($q.platform.is.capacitor && store.hapticsMode) {
       await Haptics.impact({ style: ImpactStyle.Medium });
     }
   };
@@ -151,7 +154,7 @@
     b5: ['2', 'normal', ['2'], () => calc.addDigit(2), false],
     c5: ['3', 'normal', ['3'], () => calc.addDigit(3), false],
     d5: ['@mdi-plus', 'function', ['+'], () => calc.add(), false],
-    a6: ['@keyboard_capslock', 'important', ["'"], () => null, false],
+    a6: ['@keyboard_capslock', 'important', ["'"], null, false],
     b6: ['0', 'normal', ['0'], () => calc.addDigit(0), false],
     c6: ['@mdi-circle-small', 'normal', ['.'], () => calc.addDot(), false],
     d6: ['@mdi-equal', 'important', ['=', 'Enter'], () => equalForBitOperation(), false],
@@ -178,7 +181,7 @@
         [Radix.Octal]: 8,
         [Radix.Decimal]: 10,
         [Radix.Hexadecimal]: 16,
-      }[storeRadix.sourceRadix] ?? 10
+      }[store.sourceRadix] ?? 10
     );
   });
 
@@ -243,7 +246,7 @@
     b5: ['phi', ['Shift+Digit2', 'Shift+Numpad2'], () => calc.setConstant('phi'), false],
     c5: ['e', ['Shift+Digit3', 'Shift+Numpad3'], () => calc.setConstant('e'), false],
     d5: [ 'M+', ['Shift+Plus', 'Shift+NumpadAdd'], () => { calc.memoryAdd(); displayMemoryStatus(); }, false ],
-    a6: ['', [], () => null, false],
+    a6: ['', ['\''], () => null, false],
     b6: ['int', ['Shift+Digit0', 'Shift+Numpad0'], () => calc.int(), false],
     c6: ['frac', ['Shift+Period', 'Shift+NumpadDecimal'], () => calc.frac(), false],
     d6: [ 'MS', ['Shift+Equal', 'Shift+Enter', 'Shift+NumpadEnter'], () => { calc.memorySave(); displayMemoryStatus(); }, false ],
@@ -344,7 +347,7 @@
     if (
       tooltipTimers[id] ||
       id === shiftButtonId.value ||
-      (!storeSettings.showButtonAddedLabel && storeBase.isShiftPressed)
+      (!store.showButtonAddedLabel && store.isShiftPressed)
     )
       return;
     tooltipTimers[id] = true;
@@ -356,14 +359,14 @@
   // 버튼 시프트 상태에 따른 기능 실행
   const handleShiftFunction = (id: ButtonID) => {
     const isShiftButton = id === shiftButtonId.value;
-    const isDisabled = storeBase.isShiftPressed
+    const isDisabled = store.isShiftPressed
       ? extendedFunctionSet.value[id].isDisabled
       : activeButtonSet.value[id].isDisabled;
-    const action = storeBase.isShiftPressed ? extendedFunctionSet.value[id].action : activeButtonSet.value[id].action;
+    const action = store.isShiftPressed ? extendedFunctionSet.value[id].action : activeButtonSet.value[id].action;
 
     if (isShiftButton) {
-      toggleShiftLock();
-      disableShift();
+      toggleShift();
+      disableShiftLock();
       return;
     }
 
@@ -374,10 +377,10 @@
 
     executeActionWithErrorHandling(action);
 
-    if (storeBase.isShiftPressed) {
+    if (store.isShiftPressed) {
       displayActionTooltip(id);
       displayButtonNotification(id);
-      if (!storeBase.isShiftLocked) disableShift();
+      if (!store.isShiftLocked) disableShift();
     }
   };
 
@@ -385,8 +388,8 @@
   const handleLongPress = (id: ButtonID) => {
     hapticFeedbackMedium();
     const isShiftButton = id === shiftButtonId.value;
-    const isShiftActive = storeBase.isShiftPressed;
-    const isShiftLocked = storeBase.isShiftLocked;
+    const isShiftActive = store.isShiftPressed;
+    const isShiftLocked = store.isShiftLocked;
     if (isShiftButton) {
       if (isShiftLocked) {
         disableShiftLock();
@@ -469,7 +472,7 @@
 
   // 입력 포커스 상태에 따른 키 바인딩 관리
   watch(
-    () => storeUtils.inputFocused,
+    () => store.inputFocused,
     (focused) => {
       if (focused) {
         keyBinding.unsubscribe();
@@ -489,12 +492,33 @@
   const displayDisabledButtonNotification = () => {
     showMessage(t('disabledButton'));
   };
+
+  const getTooltipsOfKeys = (btnId: ButtonID, isShift: boolean) => {
+    const buttonFunctions = isShift ? extendedFunctionSet.value : activeButtonSet.value;
+    const shortcutKeys = buttonFunctions[btnId].shortcutKeys;
+    
+    return shortcutKeys.map((key) => {
+      if (key === '+') return '+';
+      const parts = key.split('+');
+      const modifiers = parts.slice(0, -1)
+        .map(part => {
+          if (part === 'Shift') return 'S';
+          if (part === 'Control') return 'C';
+          if (part === 'Alt') return 'A';
+          return part;
+        })
+        .join('');
+      
+      const lastPart = parts[parts.length - 1].replace('Digit', '').replace('Numpad', 'N');
+      return modifiers + (modifiers ? '-' : '') + lastPart;
+    }).join(', ');
+  };
 </script>
 
 <template>
   <q-card-section
-    v-touch-swipe:9e-2:12:50.up="() => (storeBase.isHistoryDialogOpen = true)"
-    v-touch-swipe:9e-2:12:50.down="() => (storeBase.isSettingDialogOpen = true)"
+    v-touch-swipe:9e-2:12:50.up="() => (store.isHistoryDialogOpen = true)"
+    v-touch-swipe:9e-2:12:50.down="() => (store.isSettingDialogOpen = true)"
     v-blur
     class="row wrap justify-center q-pt-xs q-pb-none q-px-none"
   >
@@ -506,44 +530,44 @@
         no-caps
         push
         :label="
-          storeBase.isShiftPressed && !storeSettings.showButtonAddedLabel && id !== shiftButtonId
+          store.isShiftPressed && !store.showButtonAddedLabel && id !== shiftButtonId
             ? extendedFunctionSet[id].label
             : button.label.charAt(0) === '@'
               ? undefined
               : button.label
         "
         :icon="
-          storeBase.isShiftPressed && !storeSettings.showButtonAddedLabel && id !== shiftButtonId
+          store.isShiftPressed && !store.showButtonAddedLabel && id !== shiftButtonId
             ? undefined
             : button.label.charAt(0) === '@'
               ? button.label.slice(1)
               : undefined
         "
         :class="[
-          storeBase.isShiftPressed && !storeSettings.showButtonAddedLabel && id !== shiftButtonId
+          store.isShiftPressed && !store.showButtonAddedLabel && id !== shiftButtonId
             ? 'char'
             : button.label.charAt(0) === '@'
               ? 'icon'
               : 'char',
-          id === shiftButtonId && storeBase.isShiftPressed ? 'button-shift' : '',
-          storeBase.isShiftPressed && !storeSettings.showButtonAddedLabel && !extendedFunctionSet[id].isDisabled
+          id === shiftButtonId && store.isShiftPressed ? 'button-shift' : '',
+          store.isShiftPressed && !store.showButtonAddedLabel && !extendedFunctionSet[id].isDisabled
             ? ''
-            : button.isDisabled || storeBase.isShiftPressed
+            : button.isDisabled || store.isShiftPressed
               ? 'disabled-button'
               : '',
         ]"
-        :style="[!storeSettings.showButtonAddedLabel || !extendedFunctionSet[id].label ? { paddingTop: '4px' } : {}]"
+        :style="[!store.showButtonAddedLabel || !extendedFunctionSet[id].label ? { paddingTop: '4px' } : {}]"
         :color="`btn-${button.color}`"
         @click="() => (button.isDisabled ? displayDisabledButtonNotification() : handleShiftFunction(id))"
         @touchstart="() => hapticFeedbackLight()"
       >
         <span
-          v-if="storeSettings.showButtonAddedLabel && extendedFunctionSet[id]"
+          v-if="store.showButtonAddedLabel && extendedFunctionSet[id]"
           class="top-label"
           :class="[
             `top-label-${button.label.charAt(0) === '@' ? 'icon' : 'char'}`,
             extendedFunctionSet[id].isDisabled ? 'disabled-button-added-label' : '',
-            storeBase.isShiftPressed && !extendedFunctionSet[id].isDisabled ? 'shifted-button-added-label' : '',
+            store.isShiftPressed && !extendedFunctionSet[id].isDisabled ? 'shifted-button-added-label' : '',
           ]"
         >
           {{ extendedFunctionSet[id].label }}
@@ -561,6 +585,14 @@
         >
           {{ extendedFunctionSet[id].label }}
         </q-tooltip>
+        <MyTooltip>
+          {{
+            store.isShiftPressed ? 
+              extendedFunctionSet[id].isDisabled ? t('disabledButton') : getTooltipsOfKeys(id, true)
+            :
+              activeButtonSet[id].isDisabled ? t('disabledButton') : getTooltipsOfKeys(id, false)
+          }}
+        </MyTooltip>
       </q-btn>
     </div>
   </q-card-section>
@@ -577,7 +609,7 @@ ko:
   memoryRecalled: '메모리를 불러왔습니다.'
   memorySaved: '메모리에 저장되었습니다.'
   noMemoryToRecall: '불러올 메모리가 없습니다.'
-  disabledButton: '버튼이 비활성화되었습니다.'
+  disabledButton: '비활성화된 버튼'
 en:
   cannotDivideByZero: 'Cannot divide by zero'
   squareRootOfANegativeNumberIsNotAllowed: 'The square root of a negative number is not allowed.'
@@ -588,7 +620,7 @@ en:
   memoryRecalled: 'Memory recalled.'
   memorySaved: 'Memory saved.'
   noMemoryToRecall: 'No memory to recall.'
-  disabledButton: 'Button is disabled.'
+  disabledButton: 'Disabled button'
 </i18n>
 
 <style scoped lang="scss">

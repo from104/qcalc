@@ -10,11 +10,7 @@
 
   import { useI18n } from 'vue-i18n';
   import MenuItem from 'components/MenuItem.vue';
-  import { useStoreBase } from 'src/stores/store-base';
-  import { useStoreUtils } from 'src/stores/store-utils';
-  import { useStoreNotifications } from 'src/stores/store-notifications';
-  import { useStoreUnit } from 'src/stores/store-unit';
-  import { useStoreCurrency } from 'src/stores/store-currency';
+  import { useStore } from 'src/stores/store';
   import { KeyBinding } from 'classes/KeyBinding';
   import { useQuasar, copyToClipboard } from 'quasar';
 
@@ -22,18 +18,19 @@
   const { t } = useI18n();
 
   // 스토어 인스턴스 초기화
-  const storeBase = useStoreBase();
-  const storeUtils = useStoreUtils();
-  const storeNotifications = useStoreNotifications();
-  const storeUnit = useStoreUnit();
-  const storeCurrency = useStoreCurrency();
+  const store = useStore();
 
   // 스토어에서 필요한 메서드와 속성 추출
-  const { calc } = storeBase;
-  const { clickButtonById, getRightSideInHistory, getLeftSideInHistory } = storeUtils;
-  const { showMessage, showError } = storeNotifications;
-  const { swapUnits } = storeUnit;
-  const { swapCurrencies } = storeCurrency;
+  const {
+    calc,
+    clickButtonById,
+    getRightSideInHistory,
+    getLeftSideInHistory,
+    showMessage,
+    showError,
+    swapUnits,
+    swapCurrencies,
+  } = store;
 
   const calcHistory = calc.history;
   
@@ -88,7 +85,7 @@
 
   // 히스토리 다이얼로그 열림/닫힘 상태 감시
   watch(
-    () => storeBase.isHistoryDialogOpen,
+    () => store.isHistoryDialogOpen,
     (isOpen) => {
       if (isOpen) {
         // 다이얼로그가 열릴 때 저장된 스크롤 위치로 이동 (약간의 지연 적용)
@@ -106,7 +103,7 @@
 
   // 히스토리 스크롤 함수
   const scrollHistory = (offset: number | 'top' | 'bottom') => {
-    if (storeBase.isHistoryDialogOpen) {
+    if (store.isHistoryDialogOpen) {
       const historyElement = document.getElementById('history');
       if (historyElement) {
         if (offset === 'top') {
@@ -125,7 +122,7 @@
   // 키 바인딩 설정
   const keyBinding = new KeyBinding([
     [['Alt+h'], () => { if (!showDeleteConfirm.value) clickButtonById('btn-history'); }],
-    [['d'], () => { if (storeBase.isHistoryDialogOpen) clickButtonById('btn-delete-history'); }],
+    [['d'], () => { if (store.isHistoryDialogOpen) clickButtonById('btn-delete-history'); }],
     [['ArrowUp'], () => scrollHistory(-50)],
     [['ArrowDown'], () => scrollHistory(50)],
     [['PageUp'], () => scrollHistory(-400)],
@@ -136,9 +133,9 @@
 
   // 입력 포커스 상태에 따른 키 바인딩 활성화/비활성화
   watch(
-    () => storeUtils.inputFocused,
+    () => store.inputFocused,
     () => {
-      if (storeUtils.inputFocused) {
+      if (store.inputFocused) {
         keyBinding.unsubscribe();
       } else {
         keyBinding.subscribe();
@@ -228,13 +225,13 @@
   // 서브 결과로 이동 함수
   const loadToSubPanel = (id: number) => {
     const history = calcHistory.getRecordById(id);
-    if (storeBase.currentTab === 'unit') {
+    if (store.currentTab === 'unit') {
       swapUnits();
       setTimeout(() => {
         calc.setCurrentNumber(history.calculationResult.resultNumber);
       }, 5);
       setTimeout(swapUnits, 10);
-    } else if (storeBase.currentTab === 'currency') {
+    } else if (store.currentTab === 'currency') {
       swapCurrencies();
       setTimeout(() => {
         calc.setCurrentNumber(history.calculationResult.resultNumber);
@@ -252,7 +249,7 @@
 </script>
 
 <template>
-  <q-dialog v-model="storeBase.isHistoryDialogOpen" style="z-index: 10" position="bottom" transition-duration="300">
+  <q-dialog v-model="store.isHistoryDialogOpen" style="z-index: 10" position="bottom" transition-duration="300">
     <q-bar v-blur dark class="full-width noselect text-white bg-primary">
       <q-icon name="history" size="sm" />
       <div>{{ t('history') }}</div>
@@ -266,11 +263,11 @@
         :disable="showDeleteConfirm || histories.length == 0"
         @click="showDeleteConfirm = true"
       />
-      <q-btn icon="close" size="md" dense flat @click="storeBase.isHistoryDialogOpen = false" />
+      <q-btn icon="close" size="md" dense flat @click="store.isHistoryDialogOpen = false" />
     </q-bar>
     <q-card
       id="history"
-      v-touch-swipe:9e-2:12:50.down="() => (storeBase.isHistoryDialogOpen = false)"
+        v-touch-swipe:9e-2:12:50.down="() => (store.isHistoryDialogOpen = false)"
       square
       class="full-width row justify-center items-start relative-position scrollbar-custom"
       @scroll="handleScroll"
@@ -371,7 +368,7 @@
                     <MenuItem separator />
                     <MenuItem :title="t('loadToMainPanel')" :action="() => loadToMainPanel(history.id as number)" />
                     <MenuItem
-                      v-if="storeBase.currentTab === 'unit' || storeBase.currentTab === 'currency'"
+                      v-if="store.currentTab === 'unit' || store.currentTab === 'currency'"
                       :title="t('loadToSubPanel')"
                       :action="() => loadToSubPanel(history.id as number)"
                     />
@@ -421,11 +418,11 @@
           autofocus
           clear-icon="close"
           color="primary"
-          @focus="storeUtils.setInputFocused"
-          @blur="storeUtils.setInputBlurred"
+          @focus="store.setInputFocused"
+          @blur="store.setInputBlurred"
           @keyup.enter="
             {
-              storeUtils.setInputBlurred;
+              store.setInputBlurred;
               saveMemo();
             }
           "

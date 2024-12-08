@@ -3,10 +3,7 @@
   import { useI18n } from 'vue-i18n';
   import { KeyBinding } from 'classes/KeyBinding';
   import { Radix } from 'classes/RadixConverter';
-  import { useStoreSettings } from 'src/stores/store-settings';
-  import { useStoreRadix } from 'src/stores/store-radix';
-  import { useStoreBase } from 'src/stores/store-base';
-  import { useStoreUtils } from 'src/stores/store-utils';
+  import { useStore } from 'src/stores/store';
 
   import MyTooltip from 'components/MyTooltip.vue';
 
@@ -14,20 +11,22 @@
   const { t } = useI18n();
 
   // 스토어 인스턴스 초기화
-  const storeSettings = useStoreSettings();
-  const storeRadix = useStoreRadix();
-  const storeUtils = useStoreUtils();
-  const storeBase = useStoreBase();
+  const store = useStore();
+  
   // 스토어에서 필요한 메서드 추출
-  const { swapRadixes, initRecentRadix } = storeRadix;
-  const { clickButtonById, setInputBlurred } = storeUtils;
-  const { calc } = storeBase;
+  const {
+    swapRadixes,
+    initRecentRadix,
+    clickButtonById,
+    setInputBlurred,
+    calc,
+  } = store;
 
   // 단위 초기화
   initRecentRadix();
 
   // 언어 변경 시 비트 표시 업데이트
-  watch([() => storeSettings.locale], () => {
+  watch([() => store.locale], () => {
     wordSizeOptions.values.forEach((option, index) => {
       const value = index === 0 ? '∞' : option.value.toString();
       option.label = `${value} ${t('bit')}`;
@@ -37,15 +36,15 @@
   // 키 바인딩 설정
   const keyBinding = new KeyBinding([
     [['Alt+w'], () => clickButtonById('btn-swap-radix')],
-    [['Alt+y'], () => storeSettings.toggleShowRadix()],
-    [['Alt+u'], () => storeSettings.setRadixType(storeSettings.radixType == 'prefix' ? 'suffix' : 'prefix')],
+    [['Alt+y'], () => store.toggleShowRadix()],
+    [['Alt+u'], () => store.setRadixType(store.radixType == 'prefix' ? 'suffix' : 'prefix')],
   ]);
 
   // 입력 포커스에 따른 키 바인딩 활성화/비활성화
   watch(
-    () => storeUtils.inputFocused,
+    () => store.inputFocused,
     () => {
-      if (storeUtils.inputFocused) {
+      if (store.inputFocused) {
         keyBinding.unsubscribe();
       } else {
         keyBinding.subscribe();
@@ -55,7 +54,7 @@
 
   onMounted(() => {
     initRecentRadix();
-    storeRadix.updateWordSize(storeRadix.wordSize);
+    store.updateWordSize(store.wordSize);
     keyBinding.subscribe();
   });
 
@@ -95,7 +94,7 @@
 
   // 진법 옵션 업데이트
   watch(
-    [() => storeRadix.sourceRadix, () => storeRadix.targetRadix],
+    [() => store.sourceRadix, () => store.targetRadix],
     () => {
       const radixList = Object.values(Radix);
 
@@ -103,16 +102,16 @@
       sourceRadixOptions.values = radixList.map((radix) => ({
         value: radix,
         label: t(`radixLabel.${radix}`),
-        disable: storeRadix.targetRadix === radix,
+        disable: store.targetRadix === radix,
       }));
 
       // 'To' 진법 옵션 설정
       targetRadixOptions.values = radixList.map((radix) => ({
         value: radix,
         label: t(`radixLabel.${radix}`),
-        disable: storeRadix.sourceRadix === radix,
+        disable: store.sourceRadix === radix,
       }));
-      calc.currentRadix = storeRadix.sourceRadix;
+      calc.currentRadix = store.sourceRadix;
     },
     { immediate: true },
   );
@@ -122,7 +121,7 @@
   <q-card-section v-blur class="row q-px-sm q-pt-none q-pb-sm">
     <!-- 워드사이즈 선택 -->
     <q-select
-      v-model="storeRadix.wordSize"
+      v-model="store.wordSize"
       :options="wordSizeOptions.values"
       dense
       options-dense
@@ -131,12 +130,12 @@
       option-value="value"
       option-label="label"
       :label="t('radixLabel.wordSize')"
-      :label-color="!storeSettings.darkMode ? 'primary' : 'grey-1'"
-      :class="!storeSettings.darkMode ? 'bg-blue-grey-2' : 'bg-blue-grey-6'"
-      :popup-content-class="!storeSettings.darkMode ? 'bg-blue-grey-2' : 'bg-blue-grey-6'"
+      :label-color="!store.darkMode ? 'primary' : 'grey-1'"
+      :class="!store.darkMode ? 'bg-blue-grey-2' : 'bg-blue-grey-6'"
+      :popup-content-class="!store.darkMode ? 'bg-blue-grey-2' : 'bg-blue-grey-6'"
       class="col-3 q-pa-none shadow-2"
-      :options-selected-class="!storeSettings.darkMode ? 'text-primary' : 'text-grey-1'"
-      @update:model-value="storeRadix.updateWordSize($event)"
+      :options-selected-class="!store.darkMode ? 'text-primary' : 'text-grey-1'"
+      @update:model-value="store.updateWordSize($event)"
     />
 
     <!-- 원본 방향 -->
@@ -144,7 +143,7 @@
 
     <!-- 원본 진법 -->
     <q-select
-      v-model="storeRadix.sourceRadix"
+      v-model="store.sourceRadix"
       :options="sourceRadixOptions.values"
       dense
       options-dense
@@ -153,11 +152,11 @@
       option-value="value"
       option-label="label"
       :label="t('radixLabel.main')"
-      :label-color="!storeSettings.darkMode ? 'primary' : 'grey-1'"
-      :options-selected-class="!storeSettings.darkMode ? 'text-primary' : 'text-grey-1'"
+      :label-color="!store.darkMode ? 'primary' : 'grey-1'"
+      :options-selected-class="!store.darkMode ? 'text-primary' : 'text-grey-1'"
       class="col-3 q-pl-xs-sm shadow-2"
-      :popup-content-class="!storeSettings.darkMode ? 'bg-blue-grey-2' : 'bg-blue-grey-6'"
-      :class="!storeSettings.darkMode ? 'bg-blue-grey-2' : 'bg-blue-grey-6'"
+      :popup-content-class="!store.darkMode ? 'bg-blue-grey-2' : 'bg-blue-grey-6'"
+      :class="!store.darkMode ? 'bg-blue-grey-2' : 'bg-blue-grey-6'"
     />
 
     <!-- 원본, 대상 진법 바꾸기 버튼 -->
@@ -176,7 +175,7 @@
 
     <!-- 대상 진법 -->
     <q-select
-      v-model="storeRadix.targetRadix"
+      v-model="store.targetRadix"
       :options="targetRadixOptions.values"
       dense
       options-dense
@@ -185,11 +184,11 @@
       option-value="value"
       option-label="label"
       :label="t('radixLabel.sub')"
-      :label-color="!storeSettings.darkMode ? 'primary' : 'grey-1'"
-      :class="!storeSettings.darkMode ? 'bg-blue-grey-2' : 'bg-blue-grey-6'"
-      :popup-content-class="!storeSettings.darkMode ? 'bg-blue-grey-2' : 'bg-blue-grey-6'"
+      :label-color="!store.darkMode ? 'primary' : 'grey-1'"
+      :class="!store.darkMode ? 'bg-blue-grey-2' : 'bg-blue-grey-6'"
+      :popup-content-class="!store.darkMode ? 'bg-blue-grey-2' : 'bg-blue-grey-6'"
       class="col-3 q-pl-xs-sm shadow-2"
-      :options-selected-class="!storeSettings.darkMode ? 'text-primary' : 'text-grey-1'"
+      :options-selected-class="!store.darkMode ? 'text-primary' : 'text-grey-1'"
     />
 
     <!-- 대상 방향 -->

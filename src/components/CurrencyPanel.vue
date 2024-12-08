@@ -2,24 +2,26 @@
   import { ref, onMounted, onBeforeUnmount, reactive, watch, Ref } from 'vue';
   import MyTooltip from 'components/MyTooltip.vue';
   import { useI18n } from 'vue-i18n';
-  import { useStoreBase } from 'src/stores/store-base';
-  import { useStoreSettings } from 'src/stores/store-settings';
-  import { useStoreCurrency } from 'src/stores/store-currency';
-  import { useStoreUtils } from 'src/stores/store-utils';
+  import { useStore } from 'src/stores/store';
   import { KeyBinding } from 'classes/KeyBinding';
 
   // i18n 설정
   const { t } = useI18n();
 
   // 스토어 인스턴스 초기화
-  const storeSettings = useStoreSettings();
-  const storeCurrency = useStoreCurrency();
-  const storeUtils = useStoreUtils();
-  const storeBase = useStoreBase();
+  const store = useStore();
   // 스토어에서 필요한 메서드 추출
-  const { calc } = storeBase;
-  const { converter, swapCurrencies, initRecentCurrencies } = storeCurrency;
-  const { clickButtonById, setInputBlurred, setInputFocused, blurElement } = storeUtils;
+  const {
+    calc,
+    converter,
+    swapCurrencies,
+    initRecentCurrencies,
+    clickButtonById,
+    setInputBlurred,
+    setInputFocused,
+    blurElement,
+  } = store;
+  
 
   // 단위 초기화
   initRecentCurrencies();
@@ -38,7 +40,7 @@
   );
 
   // 언어 변경 시 통화 이름 업데이트
-  watch([() => storeSettings.locale], () => {
+  watch([() => store.locale], () => {
     converter.getCurrencyLists().forEach((currency) => {
       currencyDescriptions[currency] = t(`currencyDesc.${currency}`);
     });
@@ -47,14 +49,14 @@
   // 키 바인딩 설정
   const keyBinding = new KeyBinding([
     [['Alt+w'], () => clickButtonById('btn-swap-currency')],
-    [['Alt+y'], () => storeSettings.toggleShowSymbol()],
+    [['Alt+y'], () => store.toggleShowSymbol()],
   ]);
 
   // 입력 포커스에 따른 키 바인딩 활성화/비활성화
   watch(
-    () => storeUtils.inputFocused,
+    () => store.inputFocused,
     () => {
-      if (storeUtils.inputFocused) {
+      if (store.inputFocused) {
         keyBinding.unsubscribe();
       } else {
         keyBinding.subscribe();
@@ -106,7 +108,7 @@
 
   // 통화 옵션 업데이트
   watch(
-    [() => storeCurrency.sourceCurrency, () => storeCurrency.targetCurrency],
+    [() => store.sourceCurrency, () => store.targetCurrency],
     () => {
       const currencyList = converter.getCurrencyLists();
 
@@ -115,7 +117,7 @@
         value: currency,
         label: currency,
         desc: currencyDescriptions[currency],
-        disable: storeCurrency.targetCurrency === currency,
+        disable: store.targetCurrency === currency,
       }));
 
       // 'To' 통화 옵션 설정
@@ -123,11 +125,11 @@
         value: currency,
         label: currency,
         desc: currencyDescriptions[currency],
-        disable: storeCurrency.sourceCurrency === currency,
+        disable: store.sourceCurrency === currency,
       }));
 
       // 변환기에 기준 통화 설정
-      converter.setBase(storeCurrency.sourceCurrency);
+      converter.setBase(store.sourceCurrency);
     },
     { immediate: true },
   );
@@ -165,8 +167,8 @@
   const handleCurrencySwap = () => {
     const convertedValue = converter.convert(
       Number(calc.currentNumber), 
-      storeCurrency.sourceCurrency,
-      storeCurrency.targetCurrency
+      store.sourceCurrency,
+      store.targetCurrency
     );
     calc.setCurrentNumber(convertedValue.toString());
     swapCurrencies();
@@ -180,9 +182,9 @@
 
     <!-- 원본 통화 -->
     <q-select
-      v-model="storeCurrency.sourceCurrency"
+      v-model="store.sourceCurrency"
       :options="filteredSourceCurrencyOptions"
-      :label="currencyDescriptions[storeCurrency.sourceCurrency]"
+      :label="currencyDescriptions[store.sourceCurrency]"
       stack-label
       dense
       options-dense
@@ -192,11 +194,11 @@
       use-input
       fill-input
       hide-selected
-      :label-color="!storeSettings.darkMode ? 'primary' : 'grey-1'"
-      :options-selected-class="!storeSettings.darkMode ? 'text-primary' : 'text-grey-1'"
+      :label-color="!store.darkMode ? 'primary' : 'grey-1'"
+      :options-selected-class="!store.darkMode ? 'text-primary' : 'text-grey-1'"
       class="col-4 q-pl-sm shadow-2"
-      :popup-content-class="!storeSettings.darkMode ? 'bg-blue-grey-2' : 'bg-blue-grey-6'"
-      :class="!storeSettings.darkMode ? 'bg-blue-grey-2' : 'bg-blue-grey-6'"
+      :popup-content-class="!store.darkMode ? 'bg-blue-grey-2' : 'bg-blue-grey-6'"
+      :class="!store.darkMode ? 'bg-blue-grey-2' : 'bg-blue-grey-6'"
       @filter="sourceFilterFn"
       @focus="setInputFocused()"
       @blur="setInputBlurred()"
@@ -213,7 +215,7 @@
       </template>
       <MyTooltip>
         <div class="text-left" style="white-space: pre-wrap">
-          {{ `${currencyDescriptions[storeCurrency.sourceCurrency]}\n${storeCurrency.sourceCurrency}` }}
+          {{ `${currencyDescriptions[store.sourceCurrency]}\n${store.sourceCurrency}` }}
         </div>
       </MyTooltip>
     </q-select>
@@ -234,9 +236,9 @@
 
     <!-- 대상 통화 -->
     <q-select
-      v-model="storeCurrency.targetCurrency"
+      v-model="store.targetCurrency"
       :options="filteredTargetCurrencyOptions"
-      :label="currencyDescriptions[storeCurrency.targetCurrency]"
+      :label="currencyDescriptions[store.targetCurrency]"
       stack-label
       dense
       options-dense
@@ -246,11 +248,11 @@
       use-input
       fill-input
       hide-selected
-      :label-color="!storeSettings.darkMode ? 'primary' : 'grey-1'"
-      :class="!storeSettings.darkMode ? 'bg-blue-grey-2' : 'bg-blue-grey-6'"
-      :popup-content-class="!storeSettings.darkMode ? 'bg-blue-grey-2' : 'bg-blue-grey-6'"
+      :label-color="!store.darkMode ? 'primary' : 'grey-1'"
+      :class="!store.darkMode ? 'bg-blue-grey-2' : 'bg-blue-grey-6'"
+      :popup-content-class="!store.darkMode ? 'bg-blue-grey-2' : 'bg-blue-grey-6'"
       class="col-4 q-pl-sm shadow-2"
-      :options-selected-class="!storeSettings.darkMode ? 'text-primary' : 'text-grey-1'"
+      :options-selected-class="!store.darkMode ? 'text-primary' : 'text-grey-1'"
       @filter="targetFilterFn"
       @keyup.enter="blurElement()"
       @update:model-value="blurElement()"
@@ -270,7 +272,7 @@
       <MyTooltip>
         <div class="text-left" style="white-space: pre-wrap">
           {{
-            `${currencyDescriptions[storeCurrency.targetCurrency]}\n${storeCurrency.targetCurrency}, ${converter.getRate(storeCurrency.targetCurrency).toFixed(4)}`
+            `${currencyDescriptions[store.targetCurrency]}\n${store.targetCurrency}, ${converter.getRate(store.targetCurrency).toFixed(4)}`
           }}
         </div>
       </MyTooltip>

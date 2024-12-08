@@ -21,8 +21,25 @@ export enum Radix {
 export type RadixType = Radix;
 
 /**
- * 진법 변환을 처리하는 클래스
- * 10진수와 2진수, 8진수, 16진수 간의 상호 변환을 지원
+ * 진법 변환 클래스
+ * @description
+ * 다양한 진법 간의 숫자 변환을 처리하는 클래스
+ * 
+ * 지원하는 진법:
+ * - 2진수 (Binary)
+ * - 8진수 (Octal)
+ * - 10진수 (Decimal)
+ * - 16진수 (Hexadecimal)
+ * 
+ * 주요 기능:
+ * - 진법 간 상호 변환
+ * - 유효성 검사
+ * - 소수점 이하 자리 처리
+ * - 음수 처리
+ * 
+ * @example
+ * const converter = new RadixConverter();
+ * const binary = converter.convertDecimalToBinary("42");  // "101010"
  */
 export class RadixConverter {
   // 16진수 변환에 사용될 문자 집합
