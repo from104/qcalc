@@ -1,12 +1,12 @@
 import { match } from 'ts-pattern';
 import { convertRadix, Radix } from './RadixConverter';
-import { BigNumber, MathB, typeBigNumber } from './CalculatorTypes';
+import { BigNumber, MathB, BigNumberType } from './CalculatorTypes';
 
 /**
  * 계산기 수학 연산 클래스
  * @description
  * 계산기에서 사용되는 모든 수학적 연산을 처리하는 클래스
- * 
+ *
  * 제공하는 주요 기능:
  * 1. 기본 산술 연산
  *    - 덧셈, 뺄셈, 곱셈, 나눗셈
@@ -18,7 +18,7 @@ import { BigNumber, MathB, typeBigNumber } from './CalculatorTypes';
  * 3. 비트 연산
  *    - AND, OR, XOR, NOT
  *    - 시프트 연산
- * 
+ *
  * 특징:
  * - BigNumber 사용으로 높은 정밀도 보장
  * - 문자열 기반 입/출력으로 정확한 값 처리
@@ -82,7 +82,7 @@ export class CalculatorMath {
    * @param degrees 변환할 각도 (문자열)
    * @returns 라디안 값 (typeof BigNumber)
    */
-  private convertDegreesToRadians(degrees: string): typeBigNumber {
+  private convertDegreesToRadians(degrees: string): BigNumberType {
     return BigNumber(degrees).times(MathB.pi).div(180);
   }
 

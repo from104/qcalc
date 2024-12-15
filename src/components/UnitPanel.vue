@@ -4,7 +4,8 @@
 
   import { KeyBinding } from 'classes/KeyBinding';
   import { UnitConverter } from 'classes/UnitConverter';
-
+  import { BigNumber } from 'classes/CalculatorTypes';
+  
   import { useStore } from 'src/stores/store';
 
   import MyTooltip from 'components/MyTooltip.vue';
@@ -100,7 +101,7 @@
   const handleUnitSwap = () => {
     calc.setCurrentNumber(UnitConverter.convert(
       store.selectedCategory,
-      calc.currentNumber,
+      BigNumber(calc.currentNumber),
       store.sourceUnits[store.selectedCategory],
       store.targetUnits[store.selectedCategory]
     ));

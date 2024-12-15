@@ -92,6 +92,10 @@ ko:
       '°F': '화씨'
       K: '켈빈'
       '°R': '랭킨'
+      '°De': '열씨'
+      '°N': '뉴튼'
+      '°Rø': '로머'
+      '°Ré': '레오모'
     energy:
       J: '줄'
       kJ: '킬로줄'
@@ -302,6 +306,10 @@ en:
       '°F': 'Fahrenheit'
       K: 'Kelvin'
       '°R': 'Rankine'
+      '°De': 'Delisle'
+      '°N': 'Newton'
+      '°Rø': 'Romer'
+      '°Ré': 'Réaumur'
     energy:
       J: 'Joule'
       kJ: 'Kilojoule'

@@ -1,5 +1,5 @@
-import {BigNumber} from 'mathjs';
-import {BigNumberType, MathB, unitBaseData, UnitBaseData} from './UnitBaseData';
+import { BigNumberType, BigNumber } from './CalculatorTypes';
+import { unitBaseData, UnitBaseData } from './UnitBaseData';
 
 /**
  * UnitConverter 클래스
@@ -42,12 +42,15 @@ export class UnitConverter {
    * @returns {BigNumber | ((value: BigNumberType, toBase?: boolean) => BigNumber)} 단위 값 또는 변환 함수
    * @throws {Error} 유효하지 않은 범주나 단위일 경우 에러를 발생시킵니다.
    */
-  static getUnitValue(category: string, unit: string): BigNumber | ((value: BigNumberType, toBase?: boolean) => BigNumber) {
+  static getUnitValue(
+    category: string,
+    unit: string,
+  ): BigNumberType | ((value: BigNumberType, toBase?: boolean) => BigNumberType) {
     if (!this.categories.includes(category) || !this.units[category]?.[unit]) {
       throw new Error(`Invalid category or unit: ${category}, ${unit}`);
     }
     const unitValue = this.units[category][unit].value;
-    return typeof unitValue === 'function' ? unitValue : MathB.bignumber(unitValue);
+    return typeof unitValue === 'function' ? unitValue : BigNumber(unitValue);
   }
 
   /**
@@ -79,7 +82,7 @@ export class UnitConverter {
     to: string,
   ): string {
     // Check validity of fromUnit and toUnit at once
-    const [fromUnitValue, toUnitValue] = [from, to].map(unit => {
+    const [fromUnitValue, toUnitValue] = [from, to].map((unit) => {
       const value = this.getUnitValue(category, unit);
       if (!value) {
         throw new Error(`Invalid unit: ${unit}`);
@@ -88,13 +91,12 @@ export class UnitConverter {
     });
 
     // fromUnit에서 기준 단위로, 그리고 기준 단위에서 toUnit으로 값 변환
-    const baseValue = typeof fromUnitValue === 'function'
-      ? fromUnitValue(originalValue, true)
-      : MathB.bignumber(originalValue).mul(fromUnitValue);
+    const baseValue =
+      typeof fromUnitValue === 'function'
+        ? fromUnitValue(originalValue, true)
+        : BigNumber(originalValue).mul(fromUnitValue);
 
-    const convertedValue = typeof toUnitValue === 'function'
-      ? toUnitValue(baseValue.toString())
-      : baseValue.div(toUnitValue);
+    const convertedValue = typeof toUnitValue === 'function' ? toUnitValue(baseValue) : baseValue.div(toUnitValue);
 
     return convertedValue.toString();
   }

@@ -12,7 +12,7 @@ export const MathB = create(all, {
 
 export const BigNumber = MathB.bignumber;
 
-export type typeBigNumber = tBigNumber;
+export type BigNumberType = tBigNumber;
 
 /**
  * 계산기에서 사용되는 연산자 열거형
@@ -35,7 +35,7 @@ export enum Operator {
   BIT_XOR = 'bitXor', // 비트 XOR
   BIT_NOT = 'bitNot', // 비트 NOT
   BIT_NAND = 'bitNand', // 비트 NAND
-  BIT_NOR = 'bitNor', // 비트 NOR 
+  BIT_NOR = 'bitNor', // 비트 NOR
   BIT_XNOR = 'bitXnor', // 비트 XNOR
   REC = 'rec', // 역수
   SQRT = 'sqrt', // 제곱근
@@ -46,7 +46,7 @@ export enum Operator {
   FCT = 'fct', // 팩토리얼
   EXP10 = 'exp10', // 10의 거듭제곱
   INT = 'int', // 정수부 추출
-  FRAC = 'frac' // 소수부 추출
+  FRAC = 'frac', // 소수부 추출
 }
 
 /**

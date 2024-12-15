@@ -1,5 +1,6 @@
 <script setup lang="ts">
   import { ref, onMounted, onBeforeUnmount, reactive, watch, Ref } from 'vue';
+  import { BigNumber } from 'classes/CalculatorTypes';
   import MyTooltip from 'components/MyTooltip.vue';
   import { useI18n } from 'vue-i18n';
   import { useStore } from 'src/stores/store';
@@ -166,7 +167,7 @@
   
   const handleCurrencySwap = () => {
     const convertedValue = converter.convert(
-      Number(calc.currentNumber), 
+      BigNumber(calc.currentNumber), 
       store.sourceCurrency,
       store.targetCurrency
     );

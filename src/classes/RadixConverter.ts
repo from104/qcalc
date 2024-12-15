@@ -1,5 +1,5 @@
 import { create, all, bignumber } from 'mathjs';
-import { BigNumber, typeBigNumber } from './CalculatorTypes';
+import { BigNumber, BigNumberType } from './CalculatorTypes';
 import { match } from 'ts-pattern';
 
 /**
@@ -24,19 +24,19 @@ export type RadixType = Radix;
  * 진법 변환 클래스
  * @description
  * 다양한 진법 간의 숫자 변환을 처리하는 클래스
- * 
+ *
  * 지원하는 진법:
  * - 2진수 (Binary)
  * - 8진수 (Octal)
  * - 10진수 (Decimal)
  * - 16진수 (Hexadecimal)
- * 
+ *
  * 주요 기능:
  * - 진법 간 상호 변환
  * - 유효성 검사
  * - 소수점 이하 자리 처리
  * - 음수 처리
- * 
+ *
  * @example
  * const converter = new RadixConverter();
  * const binary = converter.convertDecimalToBinary("42");  // "101010"
@@ -148,7 +148,7 @@ export class RadixConverter {
    * @param radix 변환할 진법 ('bin' | 'oct' | 'hex')
    * @returns 변환된 진법 문자열
    */
-  private convertDecimalToRadix(decimal: string | typeBigNumber, radix: Radix): string {
+  private convertDecimalToRadix(decimal: string | BigNumberType, radix: Radix): string {
     if (!decimal) return '0';
     if (radix === Radix.Decimal) return decimal.toString();
     // 입력값을 BigNumber로 변환하고 정수부와 소수부 분리
@@ -304,7 +304,7 @@ export class RadixConverter {
     // 각 자릿수별로 계산하여 합산
     return digits
       .split('')
-      .reduce<typeBigNumber>((accumulator: typeBigNumber, currentDigit: string, position: number): typeBigNumber => {
+      .reduce<BigNumberType>((accumulator: BigNumberType, currentDigit: string, position: number): BigNumberType => {
         // 현재 자릿수를 10진수로 변환
         const digitValue = parseInt(currentDigit, radixValue);
 
@@ -312,7 +312,7 @@ export class RadixConverter {
         const weightedValue = MathB.divide(
           BigNumber(digitValue),
           MathB.pow(BigNumber(radixValue), position + 1),
-        ) as typeBigNumber;
+        ) as BigNumberType;
 
         // 누적값에 현재 자릿수의 가중치를 더함
         return MathB.add(accumulator, weightedValue);

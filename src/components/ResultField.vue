@@ -5,7 +5,7 @@
   import { useStore } from 'src/stores/store';
   import { UnitConverter } from 'src/classes/UnitConverter';
   import { Radix } from 'src/classes/RadixConverter';
-
+  import { BigNumber } from 'classes/CalculatorTypes';
   import MyTooltip from 'components/MyTooltip.vue';
   import MenuItem from 'components/MenuItem.vue';
 
@@ -75,7 +75,7 @@
 
     return UnitConverter.convert(
       selectedCategory,
-      calc.getCurrentNumber(),
+      BigNumber(calc.getCurrentNumber()),
       sourceUnits[selectedCategory],
       targetUnits[selectedCategory],
     );
@@ -89,7 +89,7 @@
    * - 현재 숫자를 시작 통화에서 목표 통화로 변환
    */
   const getConvertedCurrencyNumber = () => {
-    const currentNumber = Number(calc.getCurrentNumber());
+    const currentNumber = BigNumber(calc.getCurrentNumber());
     const fromCurrency = store.sourceCurrency;
     const toCurrency = store.targetCurrency;
 
