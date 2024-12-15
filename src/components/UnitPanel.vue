@@ -5,7 +5,7 @@
   import { KeyBinding } from 'classes/KeyBinding';
   import { UnitConverter } from 'classes/UnitConverter';
   import { BigNumber } from 'classes/CalculatorTypes';
-  
+
   import { useStore } from 'src/stores/store';
 
   import MyTooltip from 'components/MyTooltip.vue';
@@ -27,15 +27,18 @@
     UnitConverter.categories.map((category) => ({
       value: category,
       label: t(`categories.${category}`),
-    }))
+    })),
   );
 
   // 언어 변경 시 범주 이름 업데이트
-  watch(() => store.locale, () => {
-    categoryList.forEach((category) => {
-      category.label = t(`categories.${category.value}`);
-    });
-  });
+  watch(
+    () => store.locale,
+    () => {
+      categoryList.forEach((category) => {
+        category.label = t(`categories.${category.value}`);
+      });
+    },
+  );
 
   // 키 바인딩 설정
   const keyBindingManager = new KeyBinding([
@@ -71,10 +74,7 @@
 
   // 단위 변경 시 옵션 업데이트
   watch(
-    [
-      () => store.sourceUnits[store.selectedCategory],
-      () => store.targetUnits[store.selectedCategory],
-    ],
+    [() => store.sourceUnits[store.selectedCategory], () => store.targetUnits[store.selectedCategory]],
     () => {
       const currentCategory = store.selectedCategory;
       const availableUnits = UnitConverter.getUnitLists(currentCategory);
@@ -95,16 +95,18 @@
         disable: store.sourceUnits[currentCategory] === unit,
       }));
     },
-    { immediate: true }
+    { immediate: true },
   );
 
   const handleUnitSwap = () => {
-    calc.setCurrentNumber(UnitConverter.convert(
-      store.selectedCategory,
-      BigNumber(calc.currentNumber),
-      store.sourceUnits[store.selectedCategory],
-      store.targetUnits[store.selectedCategory]
-    ));
+    calc.setCurrentNumber(
+      UnitConverter.convert(
+        store.selectedCategory,
+        BigNumber(calc.currentNumber),
+        store.sourceUnits[store.selectedCategory],
+        store.targetUnits[store.selectedCategory],
+      ),
+    );
     swapUnits();
   };
 </script>
@@ -122,10 +124,10 @@
       emit-value
       map-options
       class="col-3 q-pl-sm shadow-2 text-black"
-      :class="!store.darkMode ? 'bg-blue-grey-2' : 'bg-blue-grey-6'"
-      :popup-content-class="!store.darkMode ? 'bg-blue-grey-2' : 'bg-blue-grey-6'"
-      :options-selected-class="!store.darkMode ? 'text-primary' : 'text-grey-1'"
-      :label-color="!store.darkMode ? 'primary' : 'grey-1'"
+      :class="!store.isDarkMode() ? 'bg-blue-grey-2' : 'bg-blue-grey-6'"
+      :popup-content-class="!store.isDarkMode() ? 'bg-blue-grey-2' : 'bg-blue-grey-6'"
+      :options-selected-class="!store.isDarkMode() ? 'text-primary' : 'text-grey-1'"
+      :label-color="!store.isDarkMode() ? 'primary' : 'grey-1'"
     />
 
     <!-- 원본 방향 -->
@@ -142,10 +144,10 @@
       emit-value
       map-options
       class="col-3 q-pl-sm shadow-2"
-      :class="!store.darkMode ? 'bg-blue-grey-2' : 'bg-blue-grey-6'"
-      :popup-content-class="!store.darkMode ? 'bg-blue-grey-2' : 'bg-blue-grey-6'"
-      :options-selected-class="!store.darkMode ? 'text-primary' : 'text-grey-1'"
-      :label-color="!store.darkMode ? 'primary' : 'grey-1'"
+      :class="!store.isDarkMode() ? 'bg-blue-grey-2' : 'bg-blue-grey-6'"
+      :popup-content-class="!store.isDarkMode() ? 'bg-blue-grey-2' : 'bg-blue-grey-6'"
+      :options-selected-class="!store.isDarkMode() ? 'text-primary' : 'text-grey-1'"
+      :label-color="!store.isDarkMode() ? 'primary' : 'grey-1'"
     >
       <template #option="scope">
         <q-item v-bind="scope.itemProps">
@@ -187,10 +189,10 @@
       emit-value
       map-options
       class="col-3 q-pl-sm shadow-2"
-      :class="!store.darkMode ? 'bg-blue-grey-2' : 'bg-blue-grey-6'"
-      :popup-content-class="!store.darkMode ? 'bg-blue-grey-2' : 'bg-blue-grey-6'"
-      :options-selected-class="!store.darkMode ? 'text-primary' : 'text-grey-1'"
-      :label-color="!store.darkMode ? 'primary' : 'grey-1'"
+      :class="!store.isDarkMode() ? 'bg-blue-grey-2' : 'bg-blue-grey-6'"
+      :popup-content-class="!store.isDarkMode() ? 'bg-blue-grey-2' : 'bg-blue-grey-6'"
+      :options-selected-class="!store.isDarkMode() ? 'text-primary' : 'text-grey-1'"
+      :label-color="!store.isDarkMode() ? 'primary' : 'grey-1'"
     >
       <template #option="scope">
         <q-item v-bind="scope.itemProps">

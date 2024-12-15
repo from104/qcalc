@@ -73,6 +73,17 @@
     if ($q.platform.is.electron) {
       setAlwaysOnTop(store.alwaysOnTop);
     }
+
+    // 시스템 다크모드 변경 감지
+    const darkModeMediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+    darkModeMediaQuery.addEventListener('change', () => {
+      if (store.darkMode === 'system') {
+        store.updateDarkMode();
+      }
+    });
+
+    // 초기 다크모드 상태 설정
+    store.updateDarkMode();
   });
 </script>
 

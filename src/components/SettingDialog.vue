@@ -27,7 +27,7 @@
   const { locale } = useI18n({ useScope: 'global' });
   const { t } = useI18n();
 
-  // 시스템 로케일을 참조로 저장합니다.
+  // ��스템 로케일을 참조로 저장합니다.
   const systemLocale = ref(navigator.language.substring(0, 2));
 
   // 언어 옵션을 반응형 배열로 정의합니다.
@@ -66,16 +66,26 @@
     }
   };
 
+  const toggleDarkModeWithNotification = () => {
+    store.toggleDarkMode();
+
+    if (store.darkMode == 'system') {
+      showMessage(t('darkMode.message.system'));
+    } else {
+      showMessage(t('darkMode.message.' + store.darkMode));
+    }
+  };
+
   // 키 바인딩 클래스를 가져옵니다.
   import { KeyBinding } from 'classes/KeyBinding';
 
-  // 키 바인딩을 설정합니다.
+  // 키 ��인딩을 설정합니다.
   const keyBinding = new KeyBinding([
     [['Alt+t'], toggleAlwaysOnTopWithNotification],
     [['Alt+i'], store.toggleInitPanel],
-    [['Alt+d'], store.toggleDarkMode],
+    [['Alt+d'], toggleDarkModeWithNotification],
     [['Alt+p'], store.toggleHapticsMode],
-    [['Alt+s'], () => { store.isSettingDialogOpen = true; }],
+    [['Alt+s'], () => { store.isSettingDialogOpen = true; }, ],
     [[';'], store.toggleButtonAddedLabel],
     [[','], store.toggleUseGrouping],
     [['Alt+,'], () => store.setGroupingUnit(store.groupingUnit == 3 ? 4 : 3)],
@@ -114,7 +124,7 @@
     keyBinding.subscribe();
   });
 
-  // 컴포넌트가 언마운트되기 전에 실행되는 훅입니다.
+  // 컴포넌트가 언마운��되기 전에 실행되는 훅입니다.
   onBeforeUnmount(() => {
     keyBinding.unsubscribe();
   });
@@ -139,40 +149,41 @@
           <q-item v-if="$q.platform.is.electron" class="q-py-none">
             <q-item-label class="self-center">{{ t('alwaysOnTop') }} (Alt-T)</q-item-label>
             <q-space />
-            <q-toggle
-              v-model="store.alwaysOnTop"
-              keep-color
-              dense
-              @click="setAlwaysOnTop(store.alwaysOnTop)"
-            />
+            <q-toggle v-model="store.alwaysOnTop" keep-color dense @click="setAlwaysOnTop(store.alwaysOnTop)" />
           </q-item>
 
           <q-item class="q-py-none">
             <q-item-label class="self-center">{{ t('initPanel') }} (Alt-I)</q-item-label>
             <q-space />
-            <q-toggle
-              v-model="store.initPanel"
-              keep-color
-              dense
-              @click="setInitPanel(store.initPanel)"
-            />
+            <q-toggle v-model="store.initPanel" keep-color dense @click="setInitPanel(store.initPanel)" />
           </q-item>
 
           <q-item class="q-py-none">
-            <q-item-label class="self-center">{{ t('darkMode') }} (Alt-D)</q-item-label>
+            <q-item-label class="self-center">{{ t('darkMode.title') }} (Alt-D)</q-item-label>
             <q-space />
-            <q-toggle v-model="store.darkMode" keep-color dense @click="setDarkMode(store.darkMode)" />
+            <q-select
+              v-model="store.darkMode"
+              :options="[
+                { label: t('darkMode.light'), value: 'light' },
+                { label: t('darkMode.dark'), value: 'dark' },
+                { label: t('darkMode.system'), value: 'system' },
+              ]"
+              dense
+              options-dense
+              emit-value
+              map-options
+              :label-color="!store.isDarkMode() ? 'primary' : 'grey-1'"
+              :options-selected-class="!store.isDarkMode() ? 'text-primary' : 'text-grey-1'"
+              :popup-content-class="!store.isDarkMode() ? 'bg-blue-grey-2' : 'bg-blue-grey-6'"
+              :class="!store.isDarkMode() ? 'bg-blue-grey-2' : 'bg-blue-grey-6'"
+              @update:model-value="setDarkMode"
+            />
           </q-item>
 
           <q-item v-if="$q.platform.is.capacitor" class="q-py-none">
             <q-item-label class="self-center">{{ t('hapticsMode') }} (Alt-P)</q-item-label>
             <q-space />
-            <q-toggle
-              v-model="store.hapticsMode"
-              keep-color
-              dense
-              @click="setHapticsMode(store.hapticsMode)"
-            />
+            <q-toggle v-model="store.hapticsMode" keep-color dense @click="setHapticsMode(store.hapticsMode)" />
           </q-item>
 
           <q-separator spaced="sm" />
@@ -207,11 +218,7 @@
           <q-item class="q-py-none">
             <MyTooltip>
               {{ t('decimalPlacesStat') }}:
-              {{
-                store.decimalPlaces == -2
-                  ? t('noLimit')
-                  : `${store.decimalPlaces} ${t('toNDecimalPlaces')}`
-              }}
+              {{ store.decimalPlaces == -2 ? t('noLimit') : `${store.decimalPlaces} ${t('toNDecimalPlaces')}` }}
             </MyTooltip>
             <q-item-label class="q-pt-xs self-start">{{ t('decimalPlaces') }} ([,])</q-item-label>
             <q-space />
@@ -291,10 +298,10 @@
                 map-options
                 options-dense
                 :disable="!store.showRadix"
-                :label-color="!store.darkMode ? 'primary' : 'grey-1'"
-                :options-selected-class="!store.darkMode ? 'text-primary' : 'text-grey-1'"
-                :popup-content-class="!store.darkMode ? 'bg-blue-grey-2' : 'bg-blue-grey-6'"
-                :class="!store.darkMode ? 'bg-blue-grey-2' : 'bg-blue-grey-6'"
+                :label-color="!store.isDarkMode() ? 'primary' : 'grey-1'"
+                :options-selected-class="!store.isDarkMode() ? 'text-primary' : 'text-grey-1'"
+                :popup-content-class="!store.isDarkMode() ? 'bg-blue-grey-2' : 'bg-blue-grey-6'"
+                :class="!store.isDarkMode() ? 'bg-blue-grey-2' : 'bg-blue-grey-6'"
               />
             </q-item>
           </template>
@@ -320,10 +327,10 @@
               emit-value
               map-options
               options-dense
-              :label-color="!store.darkMode ? 'primary' : 'grey-1'"
-              :options-selected-class="!store.darkMode ? 'text-primary' : 'text-grey-1'"
-              :popup-content-class="!store.darkMode ? 'bg-blue-grey-2' : 'bg-blue-grey-6'"
-              :class="!store.darkMode ? 'bg-blue-grey-2' : 'bg-blue-grey-6'"
+              :label-color="!store.isDarkMode() ? 'primary' : 'grey-1'"
+              :options-selected-class="!store.isDarkMode() ? 'text-primary' : 'text-grey-1'"
+              :popup-content-class="!store.isDarkMode() ? 'bg-blue-grey-2' : 'bg-blue-grey-6'"
+              :class="!store.isDarkMode() ? 'bg-blue-grey-2' : 'bg-blue-grey-6'"
               @update:model-value="setLanguage()"
             />
           </q-item>
@@ -367,7 +374,15 @@ ko:
   alwaysOnTopOn: '항상 위 켜짐'
   alwaysOnTopOff: '항상 위 꺼짐'
   initPanel: '시작 시 패널 초기화'
-  darkMode: '다크 모드'
+  darkMode:
+    title: '다크 모드'
+    light: '밝은'
+    dark: '어두운'
+    system: '시스템'
+    message:
+      system: '다크 모드를 시스템에 따릅니다.'
+      dark: '다크 모드를 켭니다.'
+      light: '다크 모드를 끕니다.'
   hapticsMode: '진동 모드'
   showButtonAddedLabel: '버튼 추가 라벨 표시'
   useGrouping: '숫자 묶음 표시'
@@ -389,7 +404,15 @@ en:
   alwaysOnTopOn: 'Always on top ON'
   alwaysOnTopOff: 'Always on top OFF'
   initPanel: 'Init panel at startup'
-  darkMode: 'Dark mode'
+  darkMode:
+    title: 'Dark mode'
+    light: 'Light'
+    dark: 'Dark'
+    system: 'System'
+    message:
+      system: 'Dark mode follows system.'
+      dark: 'Dark mode ON.'
+      light: 'Dark mode OFF.'
   hapticsMode: 'Haptics mode'
   showButtonAddedLabel: 'Show button added label'
   useGrouping: 'Use grouping'
