@@ -82,7 +82,7 @@
       }
     });
 
-    // ���기 다크모드 상태 설정
+    // 다크모드 상태 설정
     store.updateDarkMode();
   });
 </script>
@@ -107,18 +107,14 @@
     overflow: hidden; /* 스크롤바 숨기기 */
   }
 
-  .slide-right-enter-from {
+  .slide-right-enter-from,
+  .slide-right-leave-from {
     transform: translateX(0);
     opacity: 0;
   }
 
-  .slide-right-enter-to {
-    transform: translateX(0);
-    opacity: 1;
-  }
-
+  .slide-right-enter-to,
   .slide-right-leave-from {
-    transform: translateX(0);
     opacity: 1;
   }
 
@@ -132,18 +128,13 @@
     opacity: 0;
   }
 
-  .slide-left-enter-to {
-    transform: translateX(0);
-    opacity: 1;
-  }
-
+  .slide-left-enter-to,
   .slide-left-leave-from {
     transform: translateX(0);
     opacity: 1;
   }
 
   .slide-left-leave-to {
-    transform: translateX(0);
     opacity: 0;
   }
 </style>
