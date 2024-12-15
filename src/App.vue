@@ -82,7 +82,7 @@
       }
     });
 
-    // 초기 다크모드 상태 설정
+    // ���기 다크모드 상태 설정
     store.updateDarkMode();
   });
 </script>
@@ -95,30 +95,55 @@
   </router-view>
 </template>
 
-<style>
+<style scoped lang="scss">
   .slide-right-enter-active,
-  .slide-right-leave-active {
-    transition: transform 0.3s ease;
-  }
-  .slide-right-enter,
-  .slide-right-leave-to {
-    transform: translateX(100%);
-  }
-  .slide-right-enter-to,
-  .slide-right-leave {
-    transform: translateX(0);
-  }
-
+  .slide-right-leave-active,
   .slide-left-enter-active,
   .slide-left-leave-active {
-    transition: transform 0.3s ease;
+    transition: transform 0.5s ease, opacity 0.5s ease;
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    overflow: hidden; /* 스크롤바 숨기기 */
   }
-  .slide-left-enter,
-  .slide-left-leave-to {
-    transform: translateX(-100%);
-  }
-  .slide-left-enter-to,
-  .slide-left-leave {
+
+  .slide-right-enter-from {
     transform: translateX(0);
+    opacity: 0;
+  }
+
+  .slide-right-enter-to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+
+  .slide-right-leave-from {
+    transform: translateX(0);
+    opacity: 1;
+  }
+
+  .slide-right-leave-to {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+
+  .slide-left-enter-from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+
+  .slide-left-enter-to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+
+  .slide-left-leave-from {
+    transform: translateX(0);
+    opacity: 1;
+  }
+
+  .slide-left-leave-to {
+    transform: translateX(0);
+    opacity: 0;
   }
 </style>
