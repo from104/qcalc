@@ -4,6 +4,20 @@ All notable changes to this project are recorded in this file.
 
 The format is based on [Keep a Changelog] and this project follows [Semantic Versioning].
 
+## [0.10.1] 2024-12-15
+
+### Added
+
+- Added temperature units: Delisle (°De), Newton (°N), Romer (°Rø), Réaumur (°Ré).
+
+### Changed
+
+- Increased currency conversion precision from Number to BigNumber.
+
+### Fixed
+
+- Fixed display error in percentage functionality.
+
 ## [0.10.0] 2024-12-11
 
 ### Added
