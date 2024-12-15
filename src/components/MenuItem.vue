@@ -27,7 +27,7 @@
       default: () => {}
     },
     // 구분선 여부
-    isSeparator: {
+    separator: {
       type: Boolean,
       default: false
     },
@@ -35,7 +35,7 @@
 </script>
 
 <template>
-  <q-item v-if="!isSeparator" clickable @click="action()">
+  <q-item v-if="!separator" clickable @click="action()">
     <q-item-section v-if="icon" class="col-3" avatar>
       <q-icon :name="icon" />
     </q-item-section>

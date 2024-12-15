@@ -1,12 +1,5 @@
 <script setup lang="ts">
-  import {
-    onMounted,
-    onBeforeUnmount,
-    ref,
-    computed,
-    watch,
-    reactive,
-  } from 'vue';
+  import { onMounted, onBeforeUnmount, ref, computed, watch, reactive } from 'vue';
 
   import { useI18n } from 'vue-i18n';
   import MenuItem from 'components/MenuItem.vue';
@@ -33,7 +26,7 @@
   } = store;
 
   const calcHistory = calc.history;
-  
+
   // 계산 결과 배열 (반응형)
   const histories = computed(() => calcHistory.getAllRecords());
 
@@ -58,7 +51,7 @@
         }
       }
     },
-    { deep: true } // 깊은 감시 설정
+    { deep: true }, // 깊은 감시 설정
   );
 
   // 계산 결과 삭제 확인 다이얼로그 표시 여부
@@ -90,7 +83,7 @@
       if (isOpen) {
         // 다이얼로그가 열릴 때 저장된 스크롤 위치로 이동 (약간의 지연 적용)
         setTimeout(() => {
-          document.getElementById('history')?.scrollTo({top: lastScrollPosition});
+          document.getElementById('history')?.scrollTo({ top: lastScrollPosition });
         }, 50);
       } else {
         // 다이얼로그가 닫힐 때 현재 스크롤 위치 저장
@@ -121,8 +114,18 @@
 
   // 키 바인딩 설정
   const keyBinding = new KeyBinding([
-    [['Alt+h'], () => { if (!showDeleteConfirm.value) clickButtonById('btn-history'); }],
-    [['d'], () => { if (store.isHistoryDialogOpen) clickButtonById('btn-delete-history'); }],
+    [
+      ['Alt+h'],
+      () => {
+        if (!showDeleteConfirm.value) clickButtonById('btn-history');
+      },
+    ],
+    [
+      ['d'],
+      () => {
+        if (store.isHistoryDialogOpen) clickButtonById('btn-delete-history');
+      },
+    ],
     [['ArrowUp'], () => scrollHistory(-50)],
     [['ArrowDown'], () => scrollHistory(50)],
     [['PageUp'], () => scrollHistory(-400)],
@@ -163,7 +166,7 @@
   // 메모 다이얼로그 열기 함수
   const openMemoDialog = (id: number) => {
     selectedMemoId = id;
-    memoText.value = calcHistory.getMemo(id) as string || '';
+    memoText.value = (calcHistory.getMemo(id) as string) || '';
     showMemoDialog.value = true;
   };
 
@@ -267,7 +270,7 @@
     </q-bar>
     <q-card
       id="history"
-        v-touch-swipe:9e-2:12:50.down="() => (store.isHistoryDialogOpen = false)"
+      v-touch-swipe:9e-2:12:50.down="() => (store.isHistoryDialogOpen = false)"
       square
       class="full-width row justify-center items-start relative-position scrollbar-custom"
       @scroll="handleScroll"
@@ -293,14 +296,14 @@
               </q-item-label>
             </q-item-section>
           </q-item>
-          <q-list v-else separator>
+          <q-list v-else separator style="position: relative">
             <transition-group name="history-list">
               <q-slide-item
                 v-for="history in histories"
                 :key="history.id"
                 left-color="positive"
                 right-color="negative"
-                @left="({reset}) => handleLeftSlide({reset}, history.id as number)"
+                @left="({ reset }) => handleLeftSlide({ reset }, history.id as number)"
                 @right="deleteHistoryItem(history.id as number)"
               >
                 <template #left>
@@ -358,7 +361,7 @@
                     <MenuItem
                       :title="t('copyDisplayedResult')"
                       :action="() => copyHistoryItem(history.id as number, 'formattedNumber')"
-                      :caption="['=', getRightSideInHistory(history.calculationResult)].join(' ')"
+                      :caption="getRightSideInHistory(history.calculationResult)"
                     />
                     <MenuItem
                       :title="t('copyResultNumber')"
@@ -461,17 +464,15 @@
     transition: all 0.3s ease;
   }
 
+  .history-list-leave-active {
+    position: absolute; // 이 부분이 중요합니다
+  }
+
   .history-list-enter-from,
   .history-list-leave-to {
     opacity: 0;
-  }
-
-  .history-list-enter-from {
     transform: translateY(-20px);
-  }
-
-  .history-list-leave-to {
-    transform: translateX(-20px);
+    width: 100%;
   }
 </style>
 
