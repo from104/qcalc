@@ -228,7 +228,7 @@ export const useStore = defineStore('store', {
       const argValue = result.argumentNumber ? this.convertIfRadix(result.argumentNumber) : '';
       const formattedPrev = radixPrefix + this.toFormattedNumber(prevValue) + radixSuffix;
       const formattedArg = radixPrefix + this.toFormattedNumber(argValue) + radixSuffix;
-      const operator = result.operator || '';
+      const operator = Array.isArray(result.operator) ? result.operator[0] : result.operator || '';
 
       return match(operator)
         .with(
