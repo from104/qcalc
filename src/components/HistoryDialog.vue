@@ -471,7 +471,7 @@
   .history-list-enter-from,
   .history-list-leave-to {
     opacity: 0;
-    transform: translateY(-20px);
+    transform: translateY(-50%);
     width: 100%;
   }
 </style>
