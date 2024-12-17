@@ -442,7 +442,7 @@
             </q-list>
           </q-menu>
           <MyTooltip v-if="needFieldTooltip">
-            {{ symbol + result + unit + (currentTab === 'radix' ? '(' + radixSuffix + ')' : '') }}
+            {{ displayedResult }}
           </MyTooltip>
         </div>
       </template>
@@ -452,20 +452,20 @@
 
 <style scoped lang="scss">
   @font-face {
-    font-family: 'digital-7-mono-italic';
+    font-family: 'resultFont';
     src: url('/digital-7.monoitalic.ttf') format('truetype');
   }
 
   #symbol {
-    font-size: 36px;
+    font-size: 34px;
     font-family: 'Courier New', Courier, monospace;
-    padding-right: 0.3rem;
+    // padding-right: 0.3rem;
   }
 
   #result,
   #subResult {
-    font-family: 'digital-7-mono-italic';
-    font-size: 38px;
+    font-family: 'resultFont';
+    font-size: 36px;
   }
 
   #unit {
@@ -473,9 +473,8 @@
   }
 
   #radixPrefix {
-    font-size: 34px;
-    padding-right: 0.3rem;
-    font-style: italic;
+    font-size: 32px;
+    padding-right: 0.1rem;
   }
 
   #radixSuffix {
