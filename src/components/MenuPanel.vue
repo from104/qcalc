@@ -21,7 +21,7 @@
     shortcut?: string;
     icon?: string;
     action?: () => void;
-    isSeparator?: boolean;
+    separator?: boolean;
   }
 
   // 메뉴 아이템 정의
@@ -54,7 +54,7 @@
       icon: 'transform',
       action: () => { store.currentTab = 'radix'; },
     },
-    separator1: { isSeparator: true },
+    separator1: { separator: true },
     settings: {
       title: t('item.settings.title'),
       caption: t('item.settings.caption'),
@@ -62,7 +62,7 @@
       icon: 'settings',
       action: () => { store.isSettingDialogOpen = true; },
     },
-    separator2: { isSeparator: true },
+    separator2: { separator: true },
     help: {
       title: t('item.help.title'),
       caption: t('item.help.caption'),
@@ -80,7 +80,7 @@
   // 언어 변경 시 메뉴 아이템 텍스트 업데이트 함수
   const updateLocale = () => {
     Object.keys(items).forEach((item) => {
-      if (!items[item].isSeparator) {
+      if (!items[item].separator) {
         items[item].title = t(`item.${item}.title`);
         items[item].caption = t(`item.${item}.caption`);
       }
