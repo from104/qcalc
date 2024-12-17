@@ -43,6 +43,8 @@
     },
   );
 
+  const isFirstNavigation = ref(true);
+
   // 컴포넌트 마운트 직전 초기화 작업 수행
   onBeforeMount(() => {
     // 저장된 언어 설정 적용
@@ -84,12 +86,20 @@
 
     // 다크모드 상태 설정
     store.updateDarkMode();
+
+    // 첫 번째 네비게이션 후에 플래그를 false로 설정
+    setTimeout(() => {
+      isFirstNavigation.value = false;
+    }, 100);
   });
 </script>
 
 <template>
   <router-view v-slot="{ Component, route }">
-    <transition :name="(route.meta?.transition as string) || ''" mode="default">
+    <transition 
+      :name="isFirstNavigation ? '' : (route.meta?.transition as string) || ''" 
+      mode="default"
+    >
       <component :is="Component" :key="route.path" />
     </transition>
   </router-view>
@@ -100,41 +110,36 @@
   .slide-right-leave-active,
   .slide-left-enter-active,
   .slide-left-leave-active {
-    transition: transform 0.5s ease, opacity 0.5s ease;
+    transition: transform 0.5s ease;
     position: absolute;
     width: 100%;
     height: 100%;
     overflow: hidden; /* 스크롤바 숨기기 */
   }
 
-  .slide-right-enter-from,
-  .slide-right-leave-from {
-    transform: translateX(0);
-    opacity: 0;
+  .slide-right-enter-from {
+    transform: translateX(-100%);
   }
 
   .slide-right-enter-to,
   .slide-right-leave-from {
-    opacity: 1;
+    transform: translateX(0);
   }
 
   .slide-right-leave-to {
     transform: translateX(100%);
-    opacity: 0;
   }
 
   .slide-left-enter-from {
     transform: translateX(100%);
-    opacity: 0;
   }
 
   .slide-left-enter-to,
   .slide-left-leave-from {
     transform: translateX(0);
-    opacity: 1;
   }
 
   .slide-left-leave-to {
-    opacity: 0;
+    transform: translateX(-100%);
   }
 </style>
