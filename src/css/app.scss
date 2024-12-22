@@ -37,3 +37,12 @@ body {
   scrollbar-width: none; /* Firefox */
   overflow: hidden; /* 스크롤바 숨기기 */
 }
+
+body {
+  background-color: #ffffff;
+  @media (prefers-color-scheme: dark) {
+    background-color: var(--q-dark-page);
+  }
+}
+
+

@@ -252,7 +252,7 @@
 </script>
 
 <template>
-  <q-dialog v-model="store.isHistoryDialogOpen" style="z-index: 10" position="bottom" transition-duration="300">
+  <q-card class="full-width">
     <q-bar v-blur dark class="full-width noselect text-white bg-primary">
       <q-icon name="history" size="sm" />
       <div>{{ t('history') }}</div>
@@ -266,9 +266,8 @@
         :disable="showDeleteConfirm || histories.length == 0"
         @click="showDeleteConfirm = true"
       />
-      <q-btn icon="close" size="md" dense flat @click="store.isHistoryDialogOpen = false" />
     </q-bar>
-    <q-card
+    <q-card-section
       id="history"
       v-touch-swipe:9e-2:12:50.down="() => (store.isHistoryDialogOpen = false)"
       square
@@ -384,8 +383,8 @@
           </q-list>
         </transition>
       </q-card-section>
-    </q-card>
-  </q-dialog>
+    </q-card-section>
+  </q-card>
 
   <!-- 기록 전체 삭제 다이얼로그 -->
   <q-dialog v-model="showDeleteConfirm" persistent transition-show="scale" transition-hide="scale" style="z-index: 15">

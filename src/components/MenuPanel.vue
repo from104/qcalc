@@ -1,9 +1,10 @@
 <script setup lang="ts">
   import { onMounted, reactive, watch } from 'vue';
-  import MenuItem from 'components/MenuItem.vue';
   import { useRouter } from 'vue-router';
   import { useStore } from 'src/stores/store';
   import { useI18n } from 'vue-i18n';
+
+  import MenuItem from 'components/MenuItem.vue';
 
   // 라우터 인스턴스 초기화
   const router = useRouter();
@@ -60,7 +61,7 @@
       caption: t('item.settings.caption'),
       shortcut: 'Alt-s',
       icon: 'settings',
-      action: () => { store.isSettingDialogOpen = true; },
+      action:  () => router.push('/settings'),
     },
     separator2: { separator: true },
     help: {

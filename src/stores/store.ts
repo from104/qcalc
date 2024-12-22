@@ -523,3 +523,5 @@ export const useStore = defineStore('store', {
   // 상태 지속성 설정
   persist: true,
 });
+
+export default useStore;
