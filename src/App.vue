@@ -1,8 +1,9 @@
 <script setup lang="ts">
   // Vue 핵심 기능 및 컴포지션 API 가져오기
-  import { ref, watch, onBeforeMount } from 'vue';
+  import { ref, watch, onBeforeMount, onMounted, onBeforeUnmount } from 'vue';
   import { useI18n } from 'vue-i18n';
   import { useMeta, useQuasar } from 'quasar';
+  import { useRouter, Router, RouteLocationNormalizedLoaded } from 'vue-router';
 
   // 상태 관리를 위한 스토어 가져오기
   import { useStore } from 'src/stores/store';
@@ -92,24 +93,129 @@
       isFirstNavigation.value = false;
     }, 100);
   });
+
+  // 스토어에서 필요한 함수들을 구조 분해 할당으로 가져옵니다.
+  const { showMessage, toggleAlwaysOnTop } = store;
+
+  // '항상 위에' 설정을 토글하고 알림을 표시하는 함수입니다.
+  const toggleAlwaysOnTopWithNotification = () => {
+    if ($q.platform.is.electron) {
+      toggleAlwaysOnTop();
+
+      if (store.alwaysOnTop) {
+        showMessage(t('alwaysOnTopOn'));
+      } else {
+        showMessage(t('alwaysOnTopOff'));
+      }
+    }
+  };
+
+  // 다크모드 토글 함수
+  const toggleDarkModeWithNotification = () => {
+    store.toggleDarkMode();
+
+    if (store.darkMode == 'system') {
+      showMessage(t('darkMode.message.system'));
+    } else {
+      showMessage(t('darkMode.message.' + store.darkMode));
+    }
+  };
+
+  // 키 바인딩 클래스를 가져옵니다.
+  import { KeyBinding } from 'classes/KeyBinding';
+
+  // 키 바인딩을 설정합니다.
+  const keyBinding = new KeyBinding([
+    [['Alt+t'], toggleAlwaysOnTopWithNotification],
+    [['Alt+i'], store.toggleInitPanel],
+    [['Alt+d'], toggleDarkModeWithNotification],
+    [['Alt+p'], store.toggleHapticsMode],
+    [['Alt+s'], () => store.router.push('/settings')],
+    [[';'], store.toggleButtonAddedLabel],
+    [[','], store.toggleUseGrouping],
+    [['Alt+,'], () => store.setGroupingUnit(store.groupingUnit === 3 ? 4 : 3)],
+    [['['], store.decrementDecimalPlaces],
+    [[']'], store.incrementDecimalPlaces],
+  ]);
+
+  // 입력 포커스 상태에 따라 키 바인딩을 활성화/비활성화합니다.
+  watch(
+    () => store.inputFocused,
+    () => {
+      if (store.inputFocused) {
+        keyBinding.unsubscribe();
+      } else {
+        keyBinding.subscribe();
+      }
+    },
+    { immediate: true },
+  );
+
+  // 컴포넌트가 마운트된 후 실행되는 훅입니다.
+  onMounted(() => {
+    keyBinding.subscribe();
+  });
+
+  // 컴포넌트가 언마운트되기 전에 실행되는 훅입니다.
+  onBeforeUnmount(() => {
+    keyBinding.unsubscribe();
+  });
+
+  // 로케일을 설정하는 함수입니다.
+  const setLanguage = () => {
+    if (store.useSystemLocale) {
+      locale.value = systemLocale.value;
+    } else {
+      locale.value = store.userLocale;
+    }
+  };
+
+  // 시스템 로케일을 참조로 저장합니다.
+  const systemLocale = ref(navigator.language.substring(0, 2));
+
+  // 컴포넌트가 마운트되기 전에 실행되는 훅입니다.
+  onBeforeMount(() => {
+    setLanguage();
+
+    // 초기 실행 시 로케일 설정
+    if (store.locale === '') {
+      store.locale = systemLocale.value;
+    }
+    if (store.userLocale === '') {
+      store.userLocale = systemLocale.value;
+    }
+  });
+  import { computed } from 'vue';
+  import { useRoute } from 'vue-router';
+
+  interface RouteMeta {
+    getTransition?: (navigationMethod: string) => string;
+    navigationMethod?: string;
+  }
+
+  const route = useRoute() as RouteLocationNormalizedLoaded & { meta: RouteMeta };
+
+  const transitionName = computed(() => {
+    return route.meta.getTransition?.(route.meta.navigationMethod) || 'move-forward';
+  });
 </script>
 
 <template>
-  <router-view v-slot="{ Component, route }">
+  <router-view v-slot="{ Component, route: routeProps }">
     <transition 
-      :name="isFirstNavigation ? '' : (route.meta?.transition as string) || ''" 
+      :name="isFirstNavigation ? '' : transitionName || ''" 
       mode="default"
     >
-      <component :is="Component" :key="route.path" />
+      <component :is="Component" :key="routeProps.path" />
     </transition>
   </router-view>
 </template>
 
 <style scoped lang="scss">
-  .slide-right-enter-active,
-  .slide-right-leave-active,
-  .slide-left-enter-active,
-  .slide-left-leave-active {
+  .move-back-enter-active,
+  .move-back-leave-active,
+  .move-forward-enter-active,
+  .move-forward-leave-active {
     transition: transform 0.5s ease;
     position: absolute;
     width: 100%;
@@ -117,29 +223,29 @@
     overflow: hidden; /* 스크롤바 숨기기 */
   }
 
-  .slide-right-enter-from {
+  .move-back-enter-from {
     transform: translateX(-100%);
   }
 
-  .slide-right-enter-to,
-  .slide-right-leave-from {
+  .move-back-enter-to,
+  .move-back-leave-from {
     transform: translateX(0);
   }
 
-  .slide-right-leave-to {
+  .move-back-leave-to {
     transform: translateX(100%);
   }
 
-  .slide-left-enter-from {
+  .move-forward-enter-from {
     transform: translateX(100%);
   }
 
-  .slide-left-enter-to,
-  .slide-left-leave-from {
+  .move-forward-enter-to,
+  .move-forward-leave-from {
     transform: translateX(0);
   }
 
-  .slide-left-leave-to {
+  .move-forward-leave-to {
     transform: translateX(-100%);
   }
 </style>

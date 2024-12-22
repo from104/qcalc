@@ -19,16 +19,12 @@
   const store = useStore();
 
   // 스토어에서 필요한 함수들을 구조 분해 할당으로 가져옵니다.
-  const { showMessage } = store;
-  const { toggleAlwaysOnTop, setInitPanel, setDarkMode, setAlwaysOnTop, setHapticsMode, setDecimalPlaces } = store;
+  const { setInitPanel, setDarkMode, setAlwaysOnTop, setHapticsMode, setDecimalPlaces } = store;
 
   // i18n 설정을 위한 훅을 가져옵니다.
   import { useI18n } from 'vue-i18n';
   const { locale } = useI18n({ useScope: 'global' });
   const { t } = useI18n();
-
-  // 시스템 로케일을 참조로 저장합니다.
-  const systemLocale = ref(navigator.language.substring(0, 2));
 
   // 언어 옵션을 반응형 배열로 정의합니다.
   const languageOptions = reactive([
@@ -44,6 +40,9 @@
     store.locale = locale.value as string;
   });
 
+  // 시스템 로케일을 참조로 저장합니다.
+  const systemLocale = ref(navigator.language.substring(0, 2));
+
   // 로케일을 설정하는 함수입니다.
   const setLanguage = () => {
     if (store.useSystemLocale) {
@@ -52,82 +51,6 @@
       locale.value = store.userLocale;
     }
   };
-
-  // '항상 위에' 설정을 토글하고 알림을 표시하는 함수입니다.
-  const toggleAlwaysOnTopWithNotification = () => {
-    if ($q.platform.is.electron) {
-      toggleAlwaysOnTop();
-
-      if (store.alwaysOnTop) {
-        showMessage(t('alwaysOnTopOn'));
-      } else {
-        showMessage(t('alwaysOnTopOff'));
-      }
-    }
-  };
-
-  const toggleDarkModeWithNotification = () => {
-    store.toggleDarkMode();
-
-    if (store.darkMode == 'system') {
-      showMessage(t('darkMode.message.system'));
-    } else {
-      showMessage(t('darkMode.message.' + store.darkMode));
-    }
-  };
-
-  // 키 바인딩 클래스를 가져옵니다.
-  import { KeyBinding } from 'classes/KeyBinding';
-
-  // 키 바인딩을 설정합니다.
-  const keyBinding = new KeyBinding([
-    [['Alt+t'], toggleAlwaysOnTopWithNotification],
-    [['Alt+i'], store.toggleInitPanel],
-    [['Alt+d'], toggleDarkModeWithNotification],
-    [['Alt+p'], store.toggleHapticsMode],
-    [['Alt+s'], () => { store.isSettingDialogOpen = true; }, ],
-    [[';'], store.toggleButtonAddedLabel],
-    [[','], store.toggleUseGrouping],
-    [['Alt+,'], () => store.setGroupingUnit(store.groupingUnit == 3 ? 4 : 3)],
-    [['['], store.decrementDecimalPlaces],
-    [[']'], store.incrementDecimalPlaces],
-  ]);
-
-  // 입력 포커스 상태에 따라 키 바인딩을 활성화/비활성화합니다.
-  watch(
-    () => store.inputFocused,
-    () => {
-      if (store.inputFocused) {
-        keyBinding.unsubscribe();
-      } else {
-        keyBinding.subscribe();
-      }
-    },
-    { immediate: true },
-  );
-
-  // 컴포넌트가 마운트되기 전에 실행되는 훅입니다.
-  onBeforeMount(() => {
-    setLanguage();
-
-    // 초기 실행 시 로케일 설정
-    if (store.locale === '') {
-      store.locale = systemLocale.value;
-    }
-    if (store.userLocale === '') {
-      store.userLocale = systemLocale.value;
-    }
-  });
-
-  // 컴포넌트가 마운트된 후 실행되는 훅입니다.
-  onMounted(() => {
-    keyBinding.subscribe();
-  });
-
-  // 컴포넌트가 언마운트되기 전에 실행되는 훅입니다.
-  onBeforeUnmount(() => {
-    keyBinding.unsubscribe();
-  });
 </script>
 
 <template>

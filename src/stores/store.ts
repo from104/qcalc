@@ -1,13 +1,13 @@
 import { defineStore } from 'pinia';
 import { Notify, Dark, copyToClipboard } from 'quasar';
 import { match } from 'ts-pattern';
+import { type Router, useRouter } from 'vue-router';
 
 import { WordSize, Operator, CalculationResult } from 'classes/CalculatorTypes';
 import { Calculator } from 'classes/Calculator';
 import { UnitConverter } from 'classes/UnitConverter';
 import { CurrencyConverter } from 'classes/CurrencyConverter';
 import { RadixConverter, Radix, RadixType } from 'src/classes/RadixConverter';
-import { boolean } from 'mathjs';
 
 const radixConverter = new RadixConverter();
 
@@ -34,6 +34,7 @@ export const useStore = defineStore('store', {
     initPanel: false,
     showButtonAddedLabel: true,
     hapticsMode: true,
+    router: useRouter(),
 
     // 테마/디스플레이 관련
     darkMode: 'system' as DarkModeType,
