@@ -48,7 +48,7 @@
     <q-header id="header" class="z-top noselect" elevated>
       <q-toolbar v-blur>
         <q-btn flat dense round icon="arrow_back" @click="router.back()" />
-        <q-toolbar-title>{{ t(pageTitleMessage) }}</q-toolbar-title>
+        <q-toolbar-title class="text-h6">{{ t(pageTitleMessage) }}</q-toolbar-title>
       </q-toolbar>
     </q-header>
     <q-page-container style="padding-bottom: 0px">

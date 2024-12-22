@@ -252,8 +252,7 @@
 </script>
 
 <template>
-  <q-card class="full-width">
-    <q-bar v-blur dark class="full-width noselect text-white bg-primary">
+    <!-- <q-bar v-blur dark class="full-width noselect text-white bg-primary">
       <q-icon name="history" size="sm" />
       <div>{{ t('history') }}</div>
       <q-space />
@@ -266,125 +265,120 @@
         :disable="showDeleteConfirm || histories.length == 0"
         @click="showDeleteConfirm = true"
       />
-    </q-bar>
-    <q-card-section
-      id="history"
-      v-touch-swipe:9e-2:12:50.down="() => (store.isHistoryDialogOpen = false)"
-      square
-      class="full-width row justify-center items-start relative-position scrollbar-custom"
-      @scroll="handleScroll"
-    >
-      <transition name="slide-fade">
-        <q-btn
-          v-if="showScrollToTop"
-          round
-          glossy
-          color="secondary"
-          icon="publish"
-          class="fixed q-ma-md"
-          style="z-index: 12"
-          @click="scrollToTop"
-        />
-      </transition>
-      <q-card-section class="full-width q-pt-xs">
-        <transition name="slide-fade" mode="out-in">
-          <q-item v-if="histories.length == 0" class="text-center">
-            <q-item-section>
-              <q-item-label>
-                <span>{{ t('noHistory') }}</span>
-              </q-item-label>
-            </q-item-section>
-          </q-item>
-          <q-list v-else separator style="position: relative">
-            <transition-group name="history-list">
-              <q-slide-item
-                v-for="history in histories"
-                :key="history.id"
-                left-color="positive"
-                right-color="negative"
-                @left="({ reset }) => handleLeftSlide({ reset }, history.id as number)"
-                @right="deleteHistoryItem(history.id as number)"
-              >
-                <template #left>
-                  <q-icon name="edit_note" />
-                </template>
-                <template #right>
-                  <q-icon name="delete_outline" />
-                </template>
-                <q-item
-                  v-touch-hold.mouse="() => (historyMenu[history.id as number] = true)"
-                  class="text-right q-pa-sm"
-                >
-                  <q-item-section class="q-mr-none q-px-none">
-                    <q-item-label v-if="history.memo">
-                      <u>{{ history.memo }}</u>
-                    </q-item-label>
-                    <q-item-label style="white-space: pre-wrap">
-                      {{ getLeftSideInHistory(history.calculationResult, true) }}
-                    </q-item-label>
-                    <q-item-label>
-                      {{ ['=', getRightSideInHistory(history.calculationResult)].join(' ') }}
-                    </q-item-label>
-                  </q-item-section>
-                </q-item>
-                <q-menu
-                  v-model="historyMenu[history.id as number]"
-                  class="shadow-6"
-                  :context-menu="$q.platform.is.desktop"
-                  auto-close
-                  anchor="center left"
-                  self="top left"
-                >
-                  <q-list dense class="noselect" style="max-width: 200px">
-                    <MenuItem
-                      v-if="!history.memo"
-                      :title="t('addMemo')"
-                      :action="() => openMemoDialog(history.id as number)"
-                    />
-                    <MenuItem
-                      v-if="history.memo"
-                      :title="t('editMemo')"
-                      :action="() => openMemoDialog(history.id as number)"
-                    />
-                    <MenuItem
-                      v-if="history.memo"
-                      :title="t('copyMemo')"
-                      :action="() => copyHistoryItem(history.id as number, 'memo')"
-                    />
-                    <MenuItem
-                      v-if="history.memo"
-                      :title="t('deleteMemo')"
-                      :action="() => deleteMemo(history.id as number)"
-                    />
-                    <MenuItem separator />
-                    <MenuItem
-                      :title="t('copyDisplayedResult')"
-                      :action="() => copyHistoryItem(history.id as number, 'formattedNumber')"
-                      :caption="getRightSideInHistory(history.calculationResult)"
-                    />
-                    <MenuItem
-                      :title="t('copyResultNumber')"
-                      :action="() => copyHistoryItem(history.id as number, 'onlyNumber')"
-                      :caption="history.calculationResult.resultNumber"
-                    />
-                    <MenuItem separator />
-                    <MenuItem :title="t('loadToMainPanel')" :action="() => loadToMainPanel(history.id as number)" />
-                    <MenuItem
-                      v-if="store.currentTab === 'unit' || store.currentTab === 'currency'"
-                      :title="t('loadToSubPanel')"
-                      :action="() => loadToSubPanel(history.id as number)"
-                    />
-                    <MenuItem separator />
-                    <MenuItem :title="t('deleteResult')" :action="() => deleteHistoryItem(history.id as number)" />
-                  </q-list>
-                </q-menu>
-              </q-slide-item>
-            </transition-group>
-          </q-list>
-        </transition>
-      </q-card-section>
-    </q-card-section>
-  </q-card>
+    </q-bar> -->
+  <q-card-section
+    id="history"
+    square
+    class="full-width row justify-center items-start relative-position scrollbar-custom q-py-none"
+    @scroll="handleScroll"
+  >
+    <transition name="slide-fade">
+      <q-btn
+        v-if="showScrollToTop"
+        round
+        glossy
+        color="secondary"
+        icon="publish"
+        class="fixed q-ma-md"
+        @click="scrollToTop"
+      />
+    </transition>
+    <transition name="slide-fade" mode="out-in">
+      <q-item v-if="histories.length == 0" class="text-center">
+        <q-item-section>
+          <q-item-label>
+            <span>{{ t('noHistory') }}</span>
+          </q-item-label>
+        </q-item-section>
+      </q-item>
+      <q-list v-else id="history-list" separator class="full-width">
+          <transition-group name="history-list">
+          <q-slide-item
+            v-for="history in histories"
+            :key="history.id"
+            left-color="positive"
+            right-color="negative"
+            @left="({ reset }) => handleLeftSlide({ reset }, history.id as number)"
+            @right="deleteHistoryItem(history.id as number)"
+          >
+            <template #left>
+              <q-icon name="edit_note" />
+            </template>
+            <template #right>
+              <q-icon name="delete_outline" />
+            </template>
+            <q-item
+              v-touch-hold.mouse="() => (historyMenu[history.id as number] = true)"
+              class="text-right q-pa-sm"
+            >
+              <q-item-section class="q-mr-none q-px-none">
+                <q-item-label v-if="history.memo">
+                  <u>{{ history.memo }}</u>
+                </q-item-label>
+                <q-item-label style="white-space: pre-wrap">
+                  {{ getLeftSideInHistory(history.calculationResult, true) }}
+                </q-item-label>
+                <q-item-label>
+                  {{ ['=', getRightSideInHistory(history.calculationResult)].join(' ') }}
+                </q-item-label>
+              </q-item-section>
+            </q-item>
+            <q-menu
+              v-model="historyMenu[history.id as number]"
+              class="shadow-6"
+              :context-menu="$q.platform.is.desktop"
+              auto-close
+              anchor="center left"
+              self="top left"
+            >
+              <q-list dense class="noselect" style="max-width: 200px">
+                <MenuItem
+                  v-if="!history.memo"
+                  :title="t('addMemo')"
+                  :action="() => openMemoDialog(history.id as number)"
+                />
+                <MenuItem
+                  v-if="history.memo"
+                  :title="t('editMemo')"
+                  :action="() => openMemoDialog(history.id as number)"
+                />
+                <MenuItem
+                  v-if="history.memo"
+                  :title="t('copyMemo')"
+                  :action="() => copyHistoryItem(history.id as number, 'memo')"
+                />
+                <MenuItem
+                  v-if="history.memo"
+                  :title="t('deleteMemo')"
+                  :action="() => deleteMemo(history.id as number)"
+                />
+                <MenuItem separator />
+                <MenuItem
+                  :title="t('copyDisplayedResult')"
+                  :action="() => copyHistoryItem(history.id as number, 'formattedNumber')"
+                  :caption="getRightSideInHistory(history.calculationResult)"
+                />
+                <MenuItem
+                  :title="t('copyResultNumber')"
+                  :action="() => copyHistoryItem(history.id as number, 'onlyNumber')"
+                  :caption="history.calculationResult.resultNumber"
+                />
+                <MenuItem separator />
+                <MenuItem :title="t('loadToMainPanel')" :action="() => loadToMainPanel(history.id as number)" />
+                <MenuItem
+                  v-if="store.currentTab === 'unit' || store.currentTab === 'currency'"
+                  :title="t('loadToSubPanel')"
+                  :action="() => loadToSubPanel(history.id as number)"
+                />
+                <MenuItem separator />
+                <MenuItem :title="t('deleteResult')" :action="() => deleteHistoryItem(history.id as number)" />
+              </q-list>
+            </q-menu>
+          </q-slide-item>
+        </transition-group>
+      </q-list>
+    </transition>
+  </q-card-section>
 
   <!-- 기록 전체 삭제 다이얼로그 -->
   <q-dialog v-model="showDeleteConfirm" persistent transition-show="scale" transition-hide="scale" style="z-index: 15">
@@ -440,9 +434,9 @@
   }
 
   #history {
-    max-height: calc(100vh - 170px);
-    min-height: calc(100vh - 170px);
-    max-width: calc(100vw - 45px);
+    max-height: 100%;
+    min-height: 100%;
+    max-width: 100%;
     overflow: overlay;
   }
 
@@ -472,6 +466,13 @@
     opacity: 0;
     transform: translateY(-50%);
     width: 100%;
+  }
+
+  #history-list {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+    overflow: hidden;
+    position: relative;
   }
 </style>
 

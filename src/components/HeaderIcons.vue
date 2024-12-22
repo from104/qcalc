@@ -123,7 +123,7 @@
     icon="history"
     class="q-ma-none q-pa-none q-pl-xs"
     :disable="store.isSettingDialogOpen"
-    @click="store.isHistoryDialogOpen = !store.isHistoryDialogOpen"
+    @click="store.router.push('/history')"
   >
     <MyTooltip>{{ t('openHistoryDialog') }}</MyTooltip>
   </q-btn>

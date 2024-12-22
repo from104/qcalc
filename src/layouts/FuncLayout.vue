@@ -59,9 +59,9 @@
 <template>
   <q-layout view="hHh lpR fFf">
     <q-header id="header" class="z-top noselect" elevated>
-      <q-toolbar v-blur>
+      <q-toolbar v-blur class="q-px-sm">
         <q-btn flat dense round icon="arrow_back" @click="router.back()" />
-        <q-toolbar-title>{{ t(pageTitleMessage) }}</q-toolbar-title>
+        <q-toolbar-title class="text-h6">{{ t(pageTitleMessage) }}</q-toolbar-title>
       </q-toolbar>
     </q-header>
     <q-page-container style="padding-bottom: 0px">
