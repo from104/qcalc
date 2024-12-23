@@ -13,59 +13,53 @@ type AppRouteRecordRaw = RouteRecordRaw & {
 };
 
 // 라우트 설정을 정의합니다.
+const getTransition = (navigationMethod: string) => {
+  return navigationMethod === 'back' ? 'move-back' : 'move-forward';
+};
+
 const routes: AppRouteRecordRaw[] = [
   {
     name: 'calc', // 계산기 페이지의 라우트 이름
     path: '/', // 루트 경로
     component: () => import('layouts/CalcLayout.vue'), // 동적 임포트를 사용하여 컴포넌트 로드
     meta: { 
-      getTransition: (navigationMethod: string) => {
-        return navigationMethod === 'back' ? 'move-back' : 'move-forward';
-      },
+      getTransition,
       navigationMethod: ''
     }, // 페이지 전환 효과 설정
   },
   {
     name: 'help', // 도움말 페이지의 라우트 이름
     path: '/help', // '/help' 경로
-    component: () => import('layouts/InfoLayout.vue'), // 정보 레이아웃 컴포넌트 사용
+    component: () => import('layouts/SubLayout.vue'), // 정보 레이아웃 컴포넌트 사용
     meta: { 
-      getTransition: (navigationMethod: string) => {
-        return navigationMethod === 'back' ? 'move-back' : 'move-forward';
-      },
+      getTransition,
       navigationMethod: ''
     }, // 왼쪽으로 슬라이드 전환 효과
   },
   {
     name: 'about', // 소개 페이지의 라우트 이름
     path: '/about', // '/about' 경로
-    component: () => import('layouts/InfoLayout.vue'), // 정보 레이아웃 컴포넌트 재사용
+    component: () => import('layouts/SubLayout.vue'), // 정보 레이아웃 컴포넌트 재사용
     meta: { 
-      getTransition: (navigationMethod: string) => {
-        return navigationMethod === 'back' ? 'move-back' : 'move-forward';
-      },
+      getTransition,
       navigationMethod: ''
     }, // 왼쪽으로 슬라이드 전환 효과
   },
   {
     name: 'history',
     path: '/history',
-    component: () => import('layouts/FuncLayout.vue'),
+    component: () => import('layouts/SubLayout.vue'),
     meta: { 
-      getTransition: (navigationMethod: string) => {
-        return navigationMethod === 'back' ? 'move-back' : 'move-forward';
-      },
+      getTransition,
       navigationMethod: ''
     },
   },
   {
     name: 'settings',
     path: '/settings',
-    component: () => import('layouts/FuncLayout.vue'),
+    component: () => import('layouts/SubLayout.vue'),
     meta: { 
-      getTransition: (navigationMethod: string) => {
-        return navigationMethod === 'back' ? 'move-back' : 'move-forward';
-      },
+      getTransition,
       navigationMethod: ''
     },
   },

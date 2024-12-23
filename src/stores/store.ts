@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia';
 import { Notify, Dark, copyToClipboard } from 'quasar';
 import { match } from 'ts-pattern';
-import { type Router, useRouter } from 'vue-router';
+import { useRoute, useRouter } from 'vue-router';
 
 import { WordSize, Operator, CalculationResult } from 'classes/CalculatorTypes';
 import { Calculator } from 'classes/Calculator';
@@ -26,6 +26,10 @@ export const useStore = defineStore('store', {
     resultPanelPadding: 0,
     paddingOnResult: 20,
 
+    // Vue Router 관련
+    router: useRouter(),
+    route: useRoute(),
+
     // UI 상태 관련
     isSettingDialogOpen: false,
     isShiftPressed: false,
@@ -34,7 +38,6 @@ export const useStore = defineStore('store', {
     initPanel: false,
     showButtonAddedLabel: true,
     hapticsMode: true,
-    router: useRouter(),
 
     // 테마/디스플레이 관련
     darkMode: 'system' as DarkModeType,

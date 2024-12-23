@@ -1,11 +1,12 @@
 <script setup lang="ts">
   import { onMounted, onBeforeUnmount, ref, computed, watch, reactive } from 'vue';
-
   import { useI18n } from 'vue-i18n';
-  import MenuItem from 'components/MenuItem.vue';
+  import { useQuasar, copyToClipboard } from 'quasar';
+
   import { useStore } from 'src/stores/store';
   import { KeyBinding } from 'classes/KeyBinding';
-  import { useQuasar, copyToClipboard } from 'quasar';
+
+  import MenuItem from 'components/MenuItem.vue';
 
   // i18n 설정
   const { t } = useI18n();
