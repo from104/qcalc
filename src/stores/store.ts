@@ -43,6 +43,12 @@ export const useStore = defineStore('store', {
     darkMode: 'system' as DarkModeType,
     alwaysOnTop: false,
 
+    // 계산 결과 관련
+    // 전체 계산 결과 삭제 확인 다이얼로그 표시 여부
+    isDeleteHistoryConfirmOpen: false,
+    // 계산 결과 창 스크롤 위치 저장
+    historyLastScrollPosition: 0,
+
     // 숫자 표시 관련
     useGrouping: true,
     groupingUnit: 3 as 3 | 4,
@@ -162,7 +168,7 @@ export const useStore = defineStore('store', {
       return this.useGrouping ? this.numberGrouping(formattedValue) : formattedValue;
     },
 
-    // 진법 변환 관련
+    // 진법 ��환 관련
     convertIfRadix(value: string): string {
       const isRadixMode = this.currentTab === 'radix';
 
@@ -521,6 +527,11 @@ export const useStore = defineStore('store', {
         timeout: duration, // 표시 시간
         color: 'negative', // 알림 색상 (부정적인 메시지)
       });
+    },
+
+    // 전체 계산 결과 삭제 확인 다이얼로그 표시 여부
+    setDeleteHistoryConfirmOpen(value: boolean) {
+      this.isDeleteHistoryConfirmOpen = value;
     },
   },
 

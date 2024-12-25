@@ -26,37 +26,32 @@
     swapCurrencies,
   } = store;
 
-  const calcHistory = calc.history;
-
   // 계산 결과 배열 (반응형)
-  const histories = computed(() => calcHistory.getAllRecords());
+  const records = computed(() => calc.history.getAllRecords());
 
   // 계산 결과 메뉴의 열림 상태를 관리하는 반응형 객체
-  const historyMenu = reactive(Object.fromEntries(histories.value.map((h) => [h.id, false])));
+  const recordMenu = reactive(Object.fromEntries(records.value.map((h) => [h.id, false])));
 
   // histories 변경 감시
   watch(
-    () => histories,
-    (newHistories) => {
+    () => records,
+    (newRecords) => {
       // 새로운 히스토리 항목에 대한 메뉴 상태 초기화
-      newHistories.value.forEach((h) => {
-        if (h.id && historyMenu[h.id] === undefined) {
-          historyMenu[h.id] = false;
+      newRecords.value.forEach((h) => {
+        if (h.id && recordMenu[h.id] === undefined) {
+          recordMenu[h.id] = false;
         }
       });
 
       // 삭제된 히스토리 항목의 메뉴 상태 제거
-      for (const id in historyMenu) {
-        if (!newHistories.value.some((h) => h.id === parseInt(id))) {
-          delete historyMenu[id];
+      for (const id in recordMenu) {
+        if (!newRecords.value.some((h) => h.id === parseInt(id))) {
+          delete recordMenu[id];
         }
       }
     },
     { deep: true }, // 깊은 감시 설정
   );
-
-  // 계산 결과 삭제 확인 다이얼로그 표시 여부
-  const showDeleteConfirm = ref(false);
 
   // 계산 결과 맨 위로 가는 아이콘 표시 여부
   const showScrollToTop = ref(false);
@@ -74,65 +69,40 @@
     });
   };
 
-  // 터치 시작 위치 저장 변수
-  let lastScrollPosition = 0;
-
-  // 히스토리 다이얼로그 열림/닫힘 상태 감시
-  watch(
-    () => store.isHistoryDialogOpen,
-    (isOpen) => {
-      if (isOpen) {
-        // 다이얼로그가 열릴 때 저장된 스크롤 위치로 이동 (약간의 지연 적용)
-        setTimeout(() => {
-          document.getElementById('history')?.scrollTo({ top: lastScrollPosition });
-        }, 50);
-      } else {
-        // 다이얼로그가 닫힐 때 현재 스크롤 위치 저장
-        lastScrollPosition = document.getElementById('history')?.scrollTop ?? 0;
-        // 최상단으로 가는 아이콘 숨김
-        showScrollToTop.value = false;
-      }
-    },
-  );
-
   // 히스토리 스크롤 함수
-  const scrollHistory = (offset: number | 'top' | 'bottom') => {
-    if (store.isHistoryDialogOpen) {
-      const historyElement = document.getElementById('history');
-      if (historyElement) {
-        if (offset === 'top') {
-          offset = -historyElement.scrollTop;
-        } else if (offset === 'bottom') {
-          offset = historyElement.scrollHeight - historyElement.scrollTop;
-        }
-        historyElement.scrollTo({
-          top: historyElement.scrollTop + offset,
-          behavior: 'smooth',
-        });
-      }
-    }
-  };
+  const scrollToRecord = (offset: number | 'top' | 'bottom') => {
+    const recordElement = document.getElementById('history');
+    if (!recordElement) return;
 
+    const currentScroll = recordElement.scrollTop;
+    let targetScroll: number;
+
+    if (offset === 'top') {
+      targetScroll = 0;
+    } else if (offset === 'bottom') {
+      targetScroll = recordElement.scrollHeight - recordElement.clientHeight;
+    } else {
+      targetScroll = Math.max(0, Math.min(currentScroll + offset, recordElement.scrollHeight - recordElement.clientHeight));
+    }
+
+    console.log('targetScroll', targetScroll);
+    recordElement.scrollTo({
+      top: targetScroll,
+      behavior: 'smooth'
+    });
+  };
+  
   // 키 바인딩 설정
   const keyBinding = new KeyBinding([
-    [
-      ['Alt+h'],
-      () => {
-        if (!showDeleteConfirm.value) clickButtonById('btn-history');
-      },
-    ],
-    [
-      ['d'],
-      () => {
-        if (store.isHistoryDialogOpen) clickButtonById('btn-delete-history');
-      },
-    ],
-    [['ArrowUp'], () => scrollHistory(-50)],
-    [['ArrowDown'], () => scrollHistory(50)],
-    [['PageUp'], () => scrollHistory(-400)],
-    [['PageDown'], () => scrollHistory(400)],
-    [['Home'], () => scrollHistory('top')],
-    [['End'], () => scrollHistory('bottom')],
+    [['d'], () => {
+      if (calc.history.getAllRecords().length > 0) store.isDeleteHistoryConfirmOpen = true;
+    }],
+    [['ArrowUp'], () => scrollToRecord(-50)],
+    [['ArrowDown'], () => scrollToRecord(50)],
+    [['PageUp'], () => scrollToRecord(-400)],
+    [['PageDown'], () => scrollToRecord(400)],
+    [['Home'], () => scrollToRecord('top')],
+    [['End'], () => scrollToRecord('bottom')],
   ]);
 
   // 입력 포커스 상태에 따른 키 바인딩 활성화/비활성화
@@ -151,11 +121,18 @@
   // 컴포넌트 마운트 시 키 바인딩 활성화
   onMounted(() => {
     keyBinding.subscribe();
+    setTimeout(() => {
+      document.getElementById('history')?.scrollTo({ top: store.historyLastScrollPosition });
+    }, 50);
+    showScrollToTop.value = false;
   });
 
   // 컴포넌트 언마운트 시 키 바인딩 비활성화
   onBeforeUnmount(() => {
     keyBinding.unsubscribe();
+    store.historyLastScrollPosition = document.getElementById('history')?.scrollTop ?? 0;
+
+    store.isDeleteHistoryConfirmOpen = false;
   });
 
   // 메모 편집 관련 상태 변수
@@ -167,7 +144,7 @@
   // 메모 다이얼로그 열기 함수
   const openMemoDialog = (id: number) => {
     selectedMemoId = id;
-    memoText.value = (calcHistory.getMemo(id) as string) || '';
+    memoText.value = (calc.history.getMemo(id) as string) || '';
     showMemoDialog.value = true;
   };
 
@@ -179,7 +156,7 @@
 
   // 메모 편집 확인 함수
   const saveMemo = () => {
-    calcHistory.setMemo(selectedMemoId, memoText.value);
+    calc.history.setMemo(selectedMemoId, memoText.value);
     memoSlideDirection.value = 'slide-right';
     showMemoDialog.value = false;
     memoText.value = '';
@@ -196,20 +173,20 @@
 
   // 메모 삭제 함수
   const deleteMemo = (id: number) => {
-    calcHistory.deleteMemo(id);
+    calc.history.deleteMemo(id);
     memoText.value = '';
   };
 
   // 히스토리 항목 복사 함수
   const copyHistoryItem = async (id: number, copyType: 'formattedNumber' | 'onlyNumber' | 'memo'): Promise<void> => {
-    const history = calcHistory.getRecordById(id);
+    const history = calc.history.getRecordById(id);
     const copyText =
       copyType === 'formattedNumber'
         ? getRightSideInHistory(history.calculationResult)
         : copyType === 'onlyNumber'
           ? history.calculationResult.resultNumber
           : copyType === 'memo'
-            ? (calcHistory.getMemo(id) as string)
+            ? (calc.history.getMemo(id) as string)
             : '';
     try {
       await copyToClipboard(copyText);
@@ -222,13 +199,13 @@
 
   // 메인 결과로 이동 함수
   const loadToMainPanel = (id: number) => {
-    const history = calcHistory.getRecordById(id);
+    const history = calc.history.getRecordById(id);
     calc.setCurrentNumber(history.calculationResult.resultNumber);
   };
 
   // 서브 결과로 이동 함수
   const loadToSubPanel = (id: number) => {
-    const history = calcHistory.getRecordById(id);
+    const history = calc.history.getRecordById(id);
     if (store.currentTab === 'unit') {
       swapUnits();
       setTimeout(() => {
@@ -246,14 +223,20 @@
 
   // 히스토리 항목 삭제 함수
   const deleteHistoryItem = (id: number) => {
-    calcHistory.deleteRecord(id);
+    calc.history.deleteRecord(id);
   };
 
   const $q = useQuasar();
+
+    // 헤더의 높이를 동적으로 계산하는 computed 속성입니다.
+  const calculatedHeaderHeight = computed(() => {
+    const headerElement = document.getElementById('header');
+    return headerElement ? headerElement.clientHeight + 'px' : '0px';
+  });
 </script>
 
 <template>
-    <!-- <q-bar v-blur dark class="full-width noselect text-white bg-primary">
+  <!-- <q-bar v-blur dark class="full-width noselect text-white bg-primary">
       <q-icon name="history" size="sm" />
       <div>{{ t('history') }}</div>
       <q-space />
@@ -270,7 +253,7 @@
   <q-card-section
     id="history"
     square
-    class="full-width row justify-center items-start relative-position scrollbar-custom q-py-none"
+    class="full-width row justify-center items-start relative-position scrollbar-custom q-py-none q-pt-md"
     @scroll="handleScroll"
   >
     <transition name="slide-fade">
@@ -281,11 +264,12 @@
         color="secondary"
         icon="publish"
         class="fixed q-ma-md"
+        style="z-index: 15" 
         @click="scrollToTop"
       />
     </transition>
     <transition name="slide-fade" mode="out-in">
-      <q-item v-if="histories.length == 0" class="text-center">
+      <q-item v-if="records.length == 0" class="text-center">
         <q-item-section>
           <q-item-label>
             <span>{{ t('noHistory') }}</span>
@@ -293,9 +277,9 @@
         </q-item-section>
       </q-item>
       <q-list v-else id="history-list" separator class="full-width">
-          <transition-group name="history-list">
+        <transition-group name="history-list">
           <q-slide-item
-            v-for="history in histories"
+            v-for="history in records"
             :key="history.id"
             left-color="positive"
             right-color="negative"
@@ -308,10 +292,7 @@
             <template #right>
               <q-icon name="delete_outline" />
             </template>
-            <q-item
-              v-touch-hold.mouse="() => (historyMenu[history.id as number] = true)"
-              class="text-right q-pa-sm"
-            >
+            <q-item v-touch-hold.mouse="() => (recordMenu[history.id as number] = true)" class="text-right q-pa-sm">
               <q-item-section class="q-mr-none q-px-none">
                 <q-item-label v-if="history.memo">
                   <u>{{ history.memo }}</u>
@@ -325,7 +306,7 @@
               </q-item-section>
             </q-item>
             <q-menu
-              v-model="historyMenu[history.id as number]"
+              v-model="recordMenu[history.id as number]"
               class="shadow-6"
               :context-menu="$q.platform.is.desktop"
               auto-close
@@ -382,12 +363,12 @@
   </q-card-section>
 
   <!-- 기록 전체 삭제 다이얼로그 -->
-  <q-dialog v-model="showDeleteConfirm" persistent transition-show="scale" transition-hide="scale" style="z-index: 15">
-    <q-card class="noselect text-center text-white bg-negative" style="width: 200px">
+  <q-dialog v-model="store.isDeleteHistoryConfirmOpen" transition-show="scale" transition-hide="scale" style="z-index: 15">
+    <q-card class="noselect text-center text-white bg-negative" style="width: 240px">
       <q-card-section>{{ t('doYouDeleteHistory') }} </q-card-section>
       <q-card-actions align="center" class="text-negative bg-white">
-        <q-btn v-close-popup flat :label="t('message.no')" />
-        <q-btn v-close-popup flat :label="t('message.yes')" autofocus @click="calcHistory.clearRecords()" />
+        <q-btn v-close-popup flat :label="t('message.no')" autofocus />
+        <q-btn v-close-popup flat :label="t('message.yes')" @click="calc.history.clearRecords()" />
       </q-card-actions>
     </q-card>
   </q-dialog>
@@ -430,15 +411,9 @@
 </template>
 
 <style scoped lang="scss">
-  .q-bar {
-    max-width: calc(100vw - 45px);
-  }
-
   #history {
-    max-height: 100%;
-    min-height: 100%;
-    max-width: 100%;
-    overflow: overlay;
+    max-height: calc(100vh - v-bind('calculatedHeaderHeight'));
+    overflow: auto;
   }
 
   .slide-fade-enter-active,

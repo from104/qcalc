@@ -5,7 +5,10 @@
 </script>
 
 <template>
-  <q-page class="q-pa-md">
-    <HistoryCard />
+  <q-page class="q-pa-none">
+    <q-card flat square>
+      <HistoryCard />
+    </q-card>
   </q-page>
 </template>
+

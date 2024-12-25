@@ -1,6 +1,6 @@
 <script setup lang="ts">
   // Vue Composition API에서 필요한 함수들을 가져옵니다.
-  import { onMounted, onUnmounted, computed } from 'vue';
+  import { onMounted, onUnmounted, computed, ComputedRef } from 'vue';
 
   // ts-pattern 라이브러리를 가져옵니다.
   import { match } from 'ts-pattern';
@@ -26,24 +26,49 @@
     }
   };
 
-  // 현재 라우트에 따라 제목 메시지와 표시할 컴포넌트를 결정합니다.
-  const pageTitleMessage = computed(() => {
-    return match(store.route.name)
-      .with('help', () => 'message.help')
-      .with('about', () => 'message.about')
-      .with('history', () => 'message.history')
-      .with('settings', () => 'message.settings')
-      .otherwise(() => '');
+  interface PageButton {
+    icon: string;
+    disabled: ComputedRef<boolean>;
+    action: () => void;
+  }
+
+  interface PageConfig {
+    component: typeof HelpPage | typeof AboutPage | typeof HistoryPage | typeof SettingPage;
+    buttons?: PageButton[];
+  }
+
+  // computed 속성 추가
+  const isHistoryDisabled = computed(() => {
+    return store.calc.history.getAllRecords().length === 0 || store.isDeleteHistoryConfirmOpen;
   });
+
+  const PAGE_CONFIG: Record<string, PageConfig> = {
+    help: {
+      component: HelpPage,
+    },
+    about: {
+      component: AboutPage,
+    },
+    history: {
+      component: HistoryPage,
+      buttons: [
+        {
+          icon: 'delete_outline',
+          disabled: isHistoryDisabled,
+          action: () => {
+            store.isDeleteHistoryConfirmOpen = true;
+          },
+        },
+      ],
+    },
+    settings: {
+      component: SettingPage,
+    },
+  } as const;
 
   // 현재 라우트에 따라 표시할 컴포넌트를 결정합니다.
   const CurrentPageComponent = computed(() => {
-    return match(store.route.name)
-      .with('help', () => HelpPage)
-      .with('about', () => AboutPage)
-      .with('history', () => HistoryPage)
-      .with('settings', () => SettingPage)
-      .otherwise(() => null);
+    return PAGE_CONFIG[store.route.name as keyof typeof PAGE_CONFIG]?.component ?? null;
   });
 
   // 컴포넌트가 마운트될 때 ESC 키 이벤트 리스너를 추가합니다.
@@ -51,15 +76,9 @@
     window.addEventListener('keydown', handleEscapeKey);
   });
 
-  // 컴포넌트가 언마운트될 때 ESC 키 이벤트 리스너를 제거합니다.
+  // 컴포넌트가 언마운트될 때 ESC 키 이벤트 리스너를 제거��니다.
   onUnmounted(() => {
     window.removeEventListener('keydown', handleEscapeKey);
-  });
-
-  // 헤더의 높이를 동적으로 계산하는 computed 속성입니다.
-  const calculatedHeaderHeight = computed(() => {
-    const headerElement = document.getElementById('header');
-    return headerElement ? headerElement.clientHeight + 'px' : '0px';
   });
 </script>
 
@@ -68,11 +87,23 @@
     <q-header id="header" class="z-top noselect" elevated>
       <q-toolbar v-blur class="q-px-sm">
         <q-btn flat dense round icon="arrow_back" @click="store.router.back()" />
-        <q-toolbar-title class="text-h6">{{ t(pageTitleMessage) }}</q-toolbar-title>
+        <q-toolbar-title class="text-h6">{{ t(`message.${String(store.route.name)}`) }}</q-toolbar-title>
+        <q-space />
+        <q-btn
+          v-for="button in PAGE_CONFIG[store.route.name as keyof typeof PAGE_CONFIG]?.buttons"
+          :key="button.icon"
+          dense
+          flat
+          size="md"
+          style="z-index: 1000"
+          :icon="button.icon"
+          :disable="button.disabled.value"
+          @click="button.action"
+        />
       </q-toolbar>
     </q-header>
     <q-page-container style="padding-bottom: 0px">
-      <q-scroll-area id="area">
+      <q-scroll-area id="scroll-area">
         <component :is="CurrentPageComponent" />
       </q-scroll-area>
     </q-page-container>
@@ -80,8 +111,7 @@
 </template>
 
 <style scoped lang="scss">
-  #area {
-    height: calc(100vh - v-bind('calculatedHeaderHeight')) !important;
-    // height: 100%;
+  #scroll-area {
+    height: 100vh;
   }
 </style>

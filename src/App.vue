@@ -63,10 +63,6 @@
     // 현재 언어로 앱 제목 설정
     updateTitle();
 
-    // 모든 다이얼로그 초기 상태를 닫힘으로 설정
-    store.isHistoryDialogOpen = false;
-    store.isSettingDialogOpen = false;
-
     // 설정에 따라 계산기 패널 초기화
     if (store.initPanel && store.calc) {
       store.calc.reset();
@@ -130,7 +126,10 @@
     [['Alt+i'], store.toggleInitPanel],
     [['Alt+d'], toggleDarkModeWithNotification],
     [['Alt+p'], store.toggleHapticsMode],
-    [['Alt+s'], () => store.router.push('/settings')],
+    [['F1'], () => store.router.push('/help')],
+    [['F2'], () => store.router.push('/about')],
+    [['F3'], () => store.router.push('/settings')],
+    [['F4'], () => store.router.push('/history')],
     [[';'], store.toggleButtonAddedLabel],
     [[','], store.toggleUseGrouping],
     [['Alt+,'], () => store.setGroupingUnit(store.groupingUnit === 3 ? 4 : 3)],

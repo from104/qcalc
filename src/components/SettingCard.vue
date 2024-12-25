@@ -1,6 +1,6 @@
 <script lang="ts" setup>
   // Vue 3의 Composition API에서 필요한 함수들을 가져옵니다.
-  import { onMounted, onBeforeMount, reactive, watch, onBeforeUnmount, ref } from 'vue';
+  import { reactive, watch, ref } from 'vue';
 
   // 패키지 버전 정보를 가져옵니다.
   import { version } from '../../package.json';
