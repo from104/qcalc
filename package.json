@@ -40,7 +40,7 @@
     "@capacitor/android": "^6.2.0",
     "@capacitor/core": "^6.2.0",
     "@everapi/freecurrencyapi-js": "^1.0.1",
-    "@quasar/cli": "^2.4.1",
+    "@quasar/cli": "^2.2.3",
     "@quasar/extras": "1.16.13",
     "@quasar/quasar-ui-qmarkdown": "2.0.1",
     "axios": "^1.7.8",

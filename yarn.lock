@@ -1942,7 +1942,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@quasar/cli@npm:^2.4.1":
+"@quasar/cli@npm:^2.2.3":
   version: 2.4.1
   resolution: "@quasar/cli@npm:2.4.1"
   dependencies:
@@ -10691,7 +10691,7 @@ __metadata:
     "@jest/globals": "npm:^29.7.0"
     "@modyfi/vite-plugin-yaml": "npm:^1.1.0"
     "@quasar/app-vite": "npm:2.0.0-rc.4"
-    "@quasar/cli": "npm:^2.4.1"
+    "@quasar/cli": "npm:^2.2.3"
     "@quasar/extras": "npm:1.16.13"
     "@quasar/quasar-app-extension-qmarkdown": "npm:^2.0.0-beta.10"
     "@quasar/quasar-ui-qmarkdown": "npm:2.0.1"
