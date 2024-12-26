@@ -3,7 +3,7 @@
   import { ref, watch, onBeforeMount, onMounted, onBeforeUnmount } from 'vue';
   import { useI18n } from 'vue-i18n';
   import { useMeta, useQuasar } from 'quasar';
-  import { useRouter, Router, RouteLocationNormalizedLoaded } from 'vue-router';
+  import { RouteLocationNormalizedLoaded } from 'vue-router';
 
   // 상태 관리를 위한 스토어 가져오기
   import { useStore } from 'src/stores/store';
