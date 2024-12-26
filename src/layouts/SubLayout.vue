@@ -2,8 +2,13 @@
   // Vue Composition API에서 필요한 함수들을 가져옵니다.
   import { onMounted, onUnmounted, computed, ComputedRef } from 'vue';
 
-  // ts-pattern 라이브러리를 가져옵니다.
-  import { match } from 'ts-pattern';
+  // router 인스턴스 가져오기
+  import { useRouter } from 'vue-router'
+  const router = useRouter()
+
+  // route 인스턴스 가져오기
+  import { useRoute } from 'vue-router'
+  const route = useRoute()
 
   // 스토어 인스턴스를 가져옵니다.
   import { useStore } from 'src/stores/store';
@@ -22,7 +27,7 @@
   // ESC 키를 눌렀을 때 이전 페이지로 돌아가는 함수입니다.
   const handleEscapeKey = (event: KeyboardEvent) => {
     if (event.key === 'Escape') {
-      store.router.back();
+      router.back();
     }
   };
 
@@ -68,7 +73,7 @@
 
   // 현재 라우트에 따라 표시할 컴포넌트를 결정합니다.
   const CurrentPageComponent = computed(() => {
-    return PAGE_CONFIG[store.route.name as keyof typeof PAGE_CONFIG]?.component ?? null;
+    return PAGE_CONFIG[route.name as keyof typeof PAGE_CONFIG]?.component ?? null;
   });
 
   // 컴포넌트가 마운트될 때 ESC 키 이벤트 리스너를 추가합니다.
@@ -86,11 +91,11 @@
   <q-layout view="hHh lpR fFf">
     <q-header id="header" class="z-top noselect" elevated>
       <q-toolbar v-blur class="q-px-sm">
-        <q-btn flat dense round icon="arrow_back" @click="store.router.back()" />
-        <q-toolbar-title class="text-h6">{{ t(`message.${String(store.route.name)}`) }}</q-toolbar-title>
+        <q-btn flat dense round icon="arrow_back" @click="router.back()" />
+        <q-toolbar-title class="text-h6">{{ t(`message.${String(route.name)}`) }}</q-toolbar-title>
         <q-space />
         <q-btn
-          v-for="button in PAGE_CONFIG[store.route.name as keyof typeof PAGE_CONFIG]?.buttons"
+          v-for="button in PAGE_CONFIG[route.name as keyof typeof PAGE_CONFIG]?.buttons"
           :key="button.icon"
           dense
           flat

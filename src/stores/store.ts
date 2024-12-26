@@ -26,9 +26,9 @@ export const useStore = defineStore('store', {
     resultPanelPadding: 0,
     paddingOnResult: 20,
 
-    // Vue Router 관련
-    router: useRouter(),
-    route: useRoute(),
+    // // Vue Router 관련
+    // router: useRouter(),
+    // route: useRoute(),
 
     // UI 상태 관련
     isSettingDialogOpen: false,

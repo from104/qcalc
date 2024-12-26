@@ -116,6 +116,10 @@
       showMessage(t('darkMode.message.' + store.darkMode));
     }
   };
+  import { useRouter } from 'vue-router'
+
+// router 인스턴스 가져오기
+const router = useRouter()
 
   // 키 바인딩 클래스를 가져옵니다.
   import { KeyBinding } from 'classes/KeyBinding';
@@ -126,10 +130,10 @@
     [['Alt+i'], store.toggleInitPanel],
     [['Alt+d'], toggleDarkModeWithNotification],
     [['Alt+p'], store.toggleHapticsMode],
-    [['F1'], () => store.router.push('/help')],
-    [['F2'], () => store.router.push('/about')],
-    [['F3'], () => store.router.push('/settings')],
-    [['F4'], () => store.router.push('/history')],
+    [['F1'], () => router.push('/help')],
+    [['F2'], () => router.push('/about')],
+    [['F3'], () => router.push('/settings')],
+    [['F4'], () => router.push('/history')],
     [[';'], store.toggleButtonAddedLabel],
     [[','], store.toggleUseGrouping],
     [['Alt+,'], () => store.setGroupingUnit(store.groupingUnit === 3 ? 4 : 3)],
