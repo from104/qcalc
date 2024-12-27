@@ -49,7 +49,7 @@ async function createWindow() {
 
     // 최대 윈도우 크기 설정
     const maxWindowHeight = isLandscape ? Math.floor((height / 3) * 2) : Math.floor(height / 3);
-    const maxWindowWidth = isLandscape ? Math.floor(width / 4) : Math.floor(width / 3);
+    const maxWindowWidth = isLandscape ? Math.floor(width / 2) : Math.floor(width / 3 * 2);
 
     // 윈도우 상태 관리 설정
     const mainWindowState = windowState({

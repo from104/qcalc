@@ -19,55 +19,61 @@ const getTransition = (navigationMethod: string) => {
 
 const routes: AppRouteRecordRaw[] = [
   {
-    name: 'calc', // 계산기 페이지의 라우트 이름
-    path: '/', // 루트 경로
-    component: () => import('layouts/CalcLayout.vue'), // 동적 임포트를 사용하여 컴포넌트 로드
-    meta: { 
-      getTransition,
-      navigationMethod: ''
-    }, // 페이지 전환 효과 설정
-  },
-  {
-    name: 'help', // 도움말 페이지의 라우트 이름
-    path: '/help', // '/help' 경로
-    component: () => import('layouts/SubLayout.vue'), // 정보 레이아웃 컴포넌트 사용
-    meta: { 
-      getTransition,
-      navigationMethod: ''
-    }, // 왼쪽으로 슬라이드 전환 효과
-  },
-  {
-    name: 'about', // 소개 페이지의 라우트 이름
-    path: '/about', // '/about' 경로
-    component: () => import('layouts/SubLayout.vue'), // 정보 레이아웃 컴포넌트 재사용
-    meta: { 
-      getTransition,
-      navigationMethod: ''
-    }, // 왼쪽으로 슬라이드 전환 효과
-  },
-  {
-    name: 'history',
-    path: '/history',
-    component: () => import('layouts/SubLayout.vue'),
-    meta: { 
-      getTransition,
-      navigationMethod: ''
-    },
-  },
-  {
-    name: 'settings',
-    path: '/settings',
-    component: () => import('layouts/SubLayout.vue'),
-    meta: { 
-      getTransition,
-      navigationMethod: ''
-    },
+    path: '/',
+    component: () => import('layouts/NarrowLayout.vue'),
+    children: [
+      {
+        path: '',
+        name: 'index',
+        component: () => import('layouts/NarrowLayout.vue'),
+        meta: {
+          getTransition,
+          navigationMethod: '',
+        },
+      },
+      {
+        name: 'help',
+        path: '/help',
+        component: () => import('layouts/NarrowLayout.vue'),
+        meta: {
+          getTransition,
+          navigationMethod: '',
+        },
+      },
+      {
+        name: 'about',
+        path: '/about',
+        component: () => import('layouts/NarrowLayout.vue'),
+        meta: {
+          getTransition,
+          navigationMethod: '',
+        },
+      },
+      {
+        name: 'history',
+        path: '/history',
+        component: () => import('layouts/NarrowLayout.vue'),
+        meta: {
+          getTransition,
+          navigationMethod: '',
+        },
+      },
+      {
+        name: 'settings',
+        path: '/settings',
+        component: () => import('layouts/NarrowLayout.vue'),
+        meta: {
+          getTransition,
+          navigationMethod: '',
+        },
+      },
+    ],
   },
 
   // 404 에러 페이지 라우트 (항상 마지막에 위치해야 함)
   {
-    path: '/:catchAll(.*)*', // 모든 일치하지 않는 경로를 캐치
-    component: () => import('pages/ErrorNotFound.vue'), // 404 에러 페이지 컴포넌트
+    path: '/:catchAll(.*)*',
+    component: () => import('pages/ErrorNotFound.vue'),
   },
 ];
 
