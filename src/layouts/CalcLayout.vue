@@ -1,9 +1,7 @@
 <script setup lang="ts">
-  import { onMounted, reactive, shallowRef, watch } from 'vue';
+  import { onBeforeUnmount, onMounted, reactive, shallowRef, watch } from 'vue';
 
   // 컴포넌트 가져오기
-  import HistoryDialog from 'components/HistoryDialog.vue';
-  import SettingDialog from 'components/SettingDialog.vue';
   import HeaderIcons from 'components/HeaderIcons.vue';
 
   // 페이지 컴포넌트 가져오기
@@ -86,6 +84,11 @@
   onMounted(() => {
     keyBinding.subscribe();
   });
+
+  // 컴포넌트 언마운트 시 키 바인딩 비활성화
+  onBeforeUnmount(() => {
+    keyBinding.unsubscribe();
+  });
 </script>
 
 <template>
@@ -131,8 +134,6 @@
           <component :is="tab.component" />
         </q-tab-panel>
       </q-tab-panels>
-      <SettingDialog />
-      <HistoryDialog />
     </q-page-container>
   </q-layout>
 </template>

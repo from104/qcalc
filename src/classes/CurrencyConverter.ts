@@ -1,5 +1,7 @@
 import Freecurrencyapi from '@everapi/freecurrencyapi-js';
-import {CurrencyExchangeRates, CurrencyData, currencyBaseData} from './CurrencyBaseData';
+
+import { BigNumberType, BigNumber } from './CalculatorTypes';
+import { CurrencyExchangeRates, CurrencyData, currencyBaseData } from './CurrencyBaseData';
 
 /**
  * CurrencyConverter 클래스
@@ -50,13 +52,9 @@ export class CurrencyConverter {
    */
   async updateRates(force = false) {
     try {
-      if (
-        this.isRatesEmpty() ||
-        Date.now() - this.lastUpdatedTime > this.updateInterval ||
-        force
-      ) {
+      if (this.isRatesEmpty() || Date.now() - this.lastUpdatedTime > this.updateInterval || force) {
         const api = new Freecurrencyapi(this.accessKey);
-        const data = await api.latest({base_currency: 'EUR'});
+        const data = await api.latest({ base_currency: 'EUR' });
         this.baseExchangeRates = data.data;
         this.currentRates = this.getRates(this.currentBaseCurrency);
         this.lastUpdatedTime = Date.now();
@@ -145,13 +143,13 @@ export class CurrencyConverter {
 
   /**
    * 주어진 금액을 한 통화에서 다른 통화로 변환하는 메소드
-   * @param {number} amount - 변환할 금액
+   * @param {BigNumberType} amount - 변환할 금액
    * @param {string} from - 출발 통화
    * @param {string} to - 도착 통화
    * @returns {number} 변환된 금액
    */
-  convert(amount: number, from: string, to: string): number {
-    return amount * this.getRate(from, to);
+  convert(amount: BigNumberType, from: string, to: string): BigNumberType {
+    return amount.times(this.getRate(from, to));
   }
 
   /**
@@ -160,7 +158,7 @@ export class CurrencyConverter {
    * @param {string} currency - 통화 코드
    * @returns {string} 포맷팅된 금액 문자열
    */
-  format(amount: number, currency: string): string {
+  format(amount: BigNumberType, currency: string): string {
     return `${this.currencyData[currency].symbol}${amount.toFixed(2)}`;
   }
 

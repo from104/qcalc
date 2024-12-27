@@ -1,5 +1,6 @@
 <script setup lang="ts">
   import { ref, onMounted, onBeforeUnmount, reactive, watch, Ref } from 'vue';
+  import { BigNumber } from 'classes/CalculatorTypes';
   import MyTooltip from 'components/MyTooltip.vue';
   import { useI18n } from 'vue-i18n';
   import { useStore } from 'src/stores/store';
@@ -21,7 +22,6 @@
     setInputFocused,
     blurElement,
   } = store;
-  
 
   // 단위 초기화
   initRecentCurrencies();
@@ -163,13 +163,9 @@
   // 'To' 통화 필터 설정
   const filteredTargetCurrencyOptions = ref<CurrencyOptions[]>(targetCurrencyOptions.values);
   const targetFilterFn = createFilterFn(filteredTargetCurrencyOptions, targetCurrencyOptions);
-  
+
   const handleCurrencySwap = () => {
-    const convertedValue = converter.convert(
-      Number(calc.currentNumber), 
-      store.sourceCurrency,
-      store.targetCurrency
-    );
+    const convertedValue = converter.convert(BigNumber(calc.currentNumber), store.sourceCurrency, store.targetCurrency);
     calc.setCurrentNumber(convertedValue.toString());
     swapCurrencies();
   };
@@ -194,11 +190,11 @@
       use-input
       fill-input
       hide-selected
-      :label-color="!store.darkMode ? 'primary' : 'grey-1'"
-      :options-selected-class="!store.darkMode ? 'text-primary' : 'text-grey-1'"
       class="col-4 q-pl-sm shadow-2"
-      :popup-content-class="!store.darkMode ? 'bg-blue-grey-2' : 'bg-blue-grey-6'"
-      :class="!store.darkMode ? 'bg-blue-grey-2' : 'bg-blue-grey-6'"
+      :label-color="!store.isDarkMode() ? 'primary' : 'grey-1'"
+      :options-selected-class="!store.isDarkMode() ? 'text-primary' : 'text-grey-1'"
+      :popup-content-class="!store.isDarkMode() ? 'bg-blue-grey-2' : 'bg-blue-grey-6'"
+      :class="!store.isDarkMode() ? 'bg-blue-grey-2' : 'bg-blue-grey-6'"
       @filter="sourceFilterFn"
       @focus="setInputFocused()"
       @blur="setInputBlurred()"
@@ -248,11 +244,11 @@
       use-input
       fill-input
       hide-selected
-      :label-color="!store.darkMode ? 'primary' : 'grey-1'"
-      :class="!store.darkMode ? 'bg-blue-grey-2' : 'bg-blue-grey-6'"
-      :popup-content-class="!store.darkMode ? 'bg-blue-grey-2' : 'bg-blue-grey-6'"
       class="col-4 q-pl-sm shadow-2"
-      :options-selected-class="!store.darkMode ? 'text-primary' : 'text-grey-1'"
+      :label-color="!store.isDarkMode() ? 'primary' : 'grey-1'"
+      :class="!store.isDarkMode() ? 'bg-blue-grey-2' : 'bg-blue-grey-6'"
+      :popup-content-class="!store.isDarkMode() ? 'bg-blue-grey-2' : 'bg-blue-grey-6'"
+      :options-selected-class="!store.isDarkMode() ? 'text-primary' : 'text-grey-1'"
       @filter="targetFilterFn"
       @keyup.enter="blurElement()"
       @update:model-value="blurElement()"

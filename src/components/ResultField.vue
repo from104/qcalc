@@ -5,7 +5,7 @@
   import { useStore } from 'src/stores/store';
   import { UnitConverter } from 'src/classes/UnitConverter';
   import { Radix } from 'src/classes/RadixConverter';
-
+  import { BigNumber } from 'classes/CalculatorTypes';
   import MyTooltip from 'components/MyTooltip.vue';
   import MenuItem from 'components/MenuItem.vue';
 
@@ -75,7 +75,7 @@
 
     return UnitConverter.convert(
       selectedCategory,
-      calc.getCurrentNumber(),
+      BigNumber(calc.getCurrentNumber()),
       sourceUnits[selectedCategory],
       targetUnits[selectedCategory],
     );
@@ -89,7 +89,7 @@
    * - 현재 숫자를 시작 통화에서 목표 통화로 변환
    */
   const getConvertedCurrencyNumber = () => {
-    const currentNumber = Number(calc.getCurrentNumber());
+    const currentNumber = BigNumber(calc.getCurrentNumber());
     const fromCurrency = store.sourceCurrency;
     const toCurrency = store.targetCurrency;
 
@@ -442,7 +442,7 @@
             </q-list>
           </q-menu>
           <MyTooltip v-if="needFieldTooltip">
-            {{ symbol + result + unit + (currentTab === 'radix' ? '(' + radixSuffix + ')' : '') }}
+            {{ displayedResult }}
           </MyTooltip>
         </div>
       </template>
@@ -452,20 +452,20 @@
 
 <style scoped lang="scss">
   @font-face {
-    font-family: 'digital-7-mono-italic';
+    font-family: 'resultFont';
     src: url('/digital-7.monoitalic.ttf') format('truetype');
   }
 
   #symbol {
-    font-size: 36px;
+    font-size: 34px;
     font-family: 'Courier New', Courier, monospace;
-    padding-right: 0.3rem;
+    // padding-right: 0.3rem;
   }
 
   #result,
   #subResult {
-    font-family: 'digital-7-mono-italic';
-    font-size: 38px;
+    font-family: 'resultFont';
+    font-size: 36px;
   }
 
   #unit {
@@ -473,9 +473,8 @@
   }
 
   #radixPrefix {
-    font-size: 34px;
-    padding-right: 0.3rem;
-    font-style: italic;
+    font-size: 32px;
+    padding-right: 0.1rem;
   }
 
   #radixSuffix {

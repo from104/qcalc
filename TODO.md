@@ -5,6 +5,8 @@
 - [ ] Ads function (monetization)
 - [ ] Theme function
 - [ ] Automatic updates (electron)
+- [ ] Active layout for calculation history panel
+- [ ] Adjust layout scaling for large tablets
 - [ ] Mobile app implementation (capacitor:ios)
 - [ ] Search calculation result history
 - [ ] Add accessibility features

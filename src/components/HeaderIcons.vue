@@ -1,20 +1,26 @@
 <script setup lang="ts">
   import { onMounted } from 'vue';
-  import { useQuasar } from 'quasar';
-  import { useI18n } from 'vue-i18n';
-  import MyTooltip from 'components/MyTooltip.vue';
-  import MenuItem from 'components/MenuItem.vue';
-  import MenuPanel from './MenuPanel.vue';
-  import { useStore } from 'src/stores/store';
+
   import { KeyBinding } from 'classes/KeyBinding';
 
+  import MyTooltip from './MyTooltip.vue';
+  import MenuItem from './MenuItem.vue';
+  import MenuPanel from './MenuPanel.vue';
+
+  // router 인스턴스 가져오기
+  import { useRouter } from 'vue-router'
+  const router = useRouter()
+
   // Quasar 인스턴스 초기화
-  const quasar = useQuasar();
+  import { useQuasar } from 'quasar';
+  const $q = useQuasar();
 
   // i18n 설정
+  import { useI18n } from 'vue-i18n';
   const { t } = useI18n();
 
   // 스토어 인스턴스 초기화
+  import { useStore } from 'src/stores/store';
   const store = useStore();
 
   // 스토어에서 필요한 메서드와 속성 추출
@@ -47,7 +53,7 @@
   const handlePaste = async (target: 'main' | 'sub' = 'main'): Promise<void> => {
     try {
       let clipboardText = '';
-      if (quasar.platform.is.capacitor) {
+      if ($q.platform.is.capacitor) {
         clipboardText = await AndroidInterface.getFromClipboard();
       } else {
         clipboardText = await navigator.clipboard.readText();
@@ -106,7 +112,6 @@
     flat
     icon="content_paste"
     class="q-ma-none q-pa-none q-pl-xs"
-    :disable="store.isSettingDialogOpen"
     @click="handlePaste()"
   >
     <q-menu v-if="store.currentTab !== 'calc'" context-menu auto-close class="z-max shadow-6">
@@ -123,7 +128,7 @@
     icon="history"
     class="q-ma-none q-pa-none q-pl-xs"
     :disable="store.isSettingDialogOpen"
-    @click="store.isHistoryDialogOpen = !store.isHistoryDialogOpen"
+    @click="router.push('/history')"
   >
     <MyTooltip>{{ t('openHistoryDialog') }}</MyTooltip>
   </q-btn>

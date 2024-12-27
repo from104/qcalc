@@ -1,8 +1,9 @@
 <script setup lang="ts">
   // Vue 핵심 기능 및 컴포지션 API 가져오기
-  import { ref, watch, onBeforeMount } from 'vue';
+  import { ref, watch, onBeforeMount, onMounted, onBeforeUnmount } from 'vue';
   import { useI18n } from 'vue-i18n';
   import { useMeta, useQuasar } from 'quasar';
+  import { RouteLocationNormalizedLoaded } from 'vue-router';
 
   // 상태 관리를 위한 스토어 가져오기
   import { useStore } from 'src/stores/store';
@@ -43,6 +44,8 @@
     },
   );
 
+  const isFirstNavigation = ref(true);
+
   // 컴포넌트 마운트 직전 초기화 작업 수행
   onBeforeMount(() => {
     // 저장된 언어 설정 적용
@@ -60,10 +63,6 @@
     // 현재 언어로 앱 제목 설정
     updateTitle();
 
-    // 모든 다이얼로그 초기 상태를 닫힘으로 설정
-    store.isHistoryDialogOpen = false;
-    store.isSettingDialogOpen = false;
-
     // 설정에 따라 계산기 패널 초기화
     if (store.initPanel && store.calc) {
       store.calc.reset();
@@ -73,41 +72,183 @@
     if ($q.platform.is.electron) {
       setAlwaysOnTop(store.alwaysOnTop);
     }
+
+    // 시스템 다크모드 변경 감지
+    const darkModeMediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+    darkModeMediaQuery.addEventListener('change', () => {
+      if (store.darkMode === 'system') {
+        store.updateDarkMode();
+      }
+    });
+
+    // 다크모드 상태 설정
+    store.updateDarkMode();
+
+    // 첫 번째 네비게이션 후에 플래그를 false로 설정
+    setTimeout(() => {
+      isFirstNavigation.value = false;
+    }, 100);
+  });
+
+  // 스토어에서 필요한 함수들을 구조 분해 할당으로 가져옵니다.
+  const { showMessage, toggleAlwaysOnTop } = store;
+
+  // '항상 위에' 설정을 토글하고 알림을 표시하는 함수입니다.
+  const toggleAlwaysOnTopWithNotification = () => {
+    if ($q.platform.is.electron) {
+      toggleAlwaysOnTop();
+
+      if (store.alwaysOnTop) {
+        showMessage(t('alwaysOnTopOn'));
+      } else {
+        showMessage(t('alwaysOnTopOff'));
+      }
+    }
+  };
+
+  // 다크모드 토글 함수
+  const toggleDarkModeWithNotification = () => {
+    store.toggleDarkMode();
+
+    if (store.darkMode == 'system') {
+      showMessage(t('darkMode.message.system'));
+    } else {
+      showMessage(t('darkMode.message.' + store.darkMode));
+    }
+  };
+  import { useRouter } from 'vue-router'
+
+// router 인스턴스 가져오기
+const router = useRouter()
+
+  // 키 바인딩 클래스를 가져옵니다.
+  import { KeyBinding } from 'classes/KeyBinding';
+
+  // 키 바인딩을 설정합니다.
+  const keyBinding = new KeyBinding([
+    [['Alt+t'], toggleAlwaysOnTopWithNotification],
+    [['Alt+i'], store.toggleInitPanel],
+    [['Alt+d'], toggleDarkModeWithNotification],
+    [['Alt+p'], store.toggleHapticsMode],
+    [['F1'], () => router.push('/help')],
+    [['F2'], () => router.push('/about')],
+    [['F3'], () => router.push('/settings')],
+    [['F4'], () => router.push('/history')],
+    [[';'], store.toggleButtonAddedLabel],
+    [[','], store.toggleUseGrouping],
+    [['Alt+,'], () => store.setGroupingUnit(store.groupingUnit === 3 ? 4 : 3)],
+    [['['], store.decrementDecimalPlaces],
+    [[']'], store.incrementDecimalPlaces],
+  ]);
+
+  // 입력 포커스 상태에 따라 키 바인딩을 활성화/비활성화합니다.
+  watch(
+    () => store.inputFocused,
+    () => {
+      if (store.inputFocused) {
+        keyBinding.unsubscribe();
+      } else {
+        keyBinding.subscribe();
+      }
+    },
+    { immediate: true },
+  );
+
+  // 컴포넌트가 마운트된 후 실행되는 훅입니다.
+  onMounted(() => {
+    keyBinding.subscribe();
+  });
+
+  // 컴포넌트가 언마운트되기 전에 실행되는 훅입니다.
+  onBeforeUnmount(() => {
+    keyBinding.unsubscribe();
+  });
+
+  // 로케일을 설정하는 함수입니다.
+  const setLanguage = () => {
+    if (store.useSystemLocale) {
+      locale.value = systemLocale.value;
+    } else {
+      locale.value = store.userLocale;
+    }
+  };
+
+  // 시스템 로케일을 참조로 저장합니다.
+  const systemLocale = ref(navigator.language.substring(0, 2));
+
+  // 컴포넌트가 마운트되기 전에 실행되는 훅입니다.
+  onBeforeMount(() => {
+    setLanguage();
+
+    // 초기 실행 시 로케일 설정
+    if (store.locale === '') {
+      store.locale = systemLocale.value;
+    }
+    if (store.userLocale === '') {
+      store.userLocale = systemLocale.value;
+    }
+  });
+  import { computed } from 'vue';
+  import { useRoute } from 'vue-router';
+
+  interface RouteMeta {
+    getTransition?: (navigationMethod: string) => string;
+    navigationMethod?: string;
+  }
+
+  const route = useRoute() as RouteLocationNormalizedLoaded & { meta: RouteMeta };
+
+  const transitionName = computed(() => {
+    return route.meta.getTransition?.(route.meta.navigationMethod) || 'move-forward';
   });
 </script>
 
 <template>
-  <router-view v-slot="{ Component, route }">
-    <transition :name="(route.meta?.transition as string) || ''" mode="default">
-      <component :is="Component" :key="route.path" />
+  <router-view v-slot="{ Component, route: routeProps }">
+    <transition 
+      :name="isFirstNavigation ? '' : transitionName || ''" 
+      mode="default"
+    >
+      <component :is="Component" :key="routeProps.path" />
     </transition>
   </router-view>
 </template>
 
-<style>
-  .slide-right-enter-active,
-  .slide-right-leave-active {
-    transition: transform 0.3s ease;
+<style scoped lang="scss">
+  .move-back-enter-active,
+  .move-back-leave-active,
+  .move-forward-enter-active,
+  .move-forward-leave-active {
+    transition: transform 0.5s ease;
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    overflow: hidden; /* 스크롤바 숨기기 */
   }
-  .slide-right-enter,
-  .slide-right-leave-to {
-    transform: translateX(100%);
+
+  .move-back-enter-from {
+    transform: translateX(-100%);
   }
-  .slide-right-enter-to,
-  .slide-right-leave {
+
+  .move-back-enter-to,
+  .move-back-leave-from {
     transform: translateX(0);
   }
 
-  .slide-left-enter-active,
-  .slide-left-leave-active {
-    transition: transform 0.3s ease;
+  .move-back-leave-to {
+    transform: translateX(100%);
   }
-  .slide-left-enter,
-  .slide-left-leave-to {
-    transform: translateX(-100%);
+
+  .move-forward-enter-from {
+    transform: translateX(100%);
   }
-  .slide-left-enter-to,
-  .slide-left-leave {
+
+  .move-forward-enter-to,
+  .move-forward-leave-from {
     transform: translateX(0);
+  }
+
+  .move-forward-leave-to {
+    transform: translateX(-100%);
   }
 </style>

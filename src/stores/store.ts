@@ -1,6 +1,7 @@
 import { defineStore } from 'pinia';
 import { Notify, Dark, copyToClipboard } from 'quasar';
 import { match } from 'ts-pattern';
+import { useRoute, useRouter } from 'vue-router';
 
 import { WordSize, Operator, CalculationResult } from 'classes/CalculatorTypes';
 import { Calculator } from 'classes/Calculator';
@@ -9,6 +10,9 @@ import { CurrencyConverter } from 'classes/CurrencyConverter';
 import { RadixConverter, Radix, RadixType } from 'src/classes/RadixConverter';
 
 const radixConverter = new RadixConverter();
+
+// darkMode 타입 정의 추가
+type DarkModeType = 'system' | 'light' | 'dark';
 
 // 기본 스토어 정의
 export const useStore = defineStore('store', {
@@ -21,7 +25,11 @@ export const useStore = defineStore('store', {
     isMemoryVisible: false,
     resultPanelPadding: 0,
     paddingOnResult: 20,
-    
+
+    // // Vue Router 관련
+    // router: useRouter(),
+    // route: useRoute(),
+
     // UI 상태 관련
     isSettingDialogOpen: false,
     isShiftPressed: false,
@@ -30,11 +38,17 @@ export const useStore = defineStore('store', {
     initPanel: false,
     showButtonAddedLabel: true,
     hapticsMode: true,
-    
+
     // 테마/디스플레이 관련
-    darkMode: false,
+    darkMode: 'system' as DarkModeType,
     alwaysOnTop: false,
-    
+
+    // 계산 결과 관련
+    // 전체 계산 결과 삭제 확인 다이얼로그 표시 여부
+    isDeleteHistoryConfirmOpen: false,
+    // 계산 결과 창 스크롤 위치 저장
+    historyLastScrollPosition: 0,
+
     // 숫자 표시 관련
     useGrouping: true,
     groupingUnit: 3 as 3 | 4,
@@ -42,19 +56,19 @@ export const useStore = defineStore('store', {
     useSystemLocale: true,
     locale: '',
     userLocale: '',
-    
+
     // 단위 변환 관련
     selectedCategory: '',
     sourceUnits: {} as { [key: string]: string },
     targetUnits: {} as { [key: string]: string },
     showUnit: true,
     showSymbol: true,
-    
+
     // 통화 변환 관련
     converter: new CurrencyConverter(),
     sourceCurrency: 'USD',
     targetCurrency: 'KRW',
-    
+
     // 진법 변환 관련
     wordSize: 32 as WordSize,
     radixList: Object.values(Radix),
@@ -154,7 +168,7 @@ export const useStore = defineStore('store', {
       return this.useGrouping ? this.numberGrouping(formattedValue) : formattedValue;
     },
 
-    // 진법 변환 관련
+    // 진법 ��환 관련
     convertIfRadix(value: string): string {
       const isRadixMode = this.currentTab === 'radix';
 
@@ -228,7 +242,7 @@ export const useStore = defineStore('store', {
       const argValue = result.argumentNumber ? this.convertIfRadix(result.argumentNumber) : '';
       const formattedPrev = radixPrefix + this.toFormattedNumber(prevValue) + radixSuffix;
       const formattedArg = radixPrefix + this.toFormattedNumber(argValue) + radixSuffix;
-      const operator = result.operator || '';
+      const operator = Array.isArray(result.operator) ? result.operator[0] : result.operator || '';
 
       return match(operator)
         .with(
@@ -344,14 +358,39 @@ export const useStore = defineStore('store', {
       this.targetUnits[this.selectedCategory] = temp;
     },
 
+    // 다크모드 여부 얻기
+    isDarkMode(): boolean {
+      if (this.darkMode === 'system') {
+        // 시스템 다크모드 상태 감지
+        const isDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        return isDark;
+      } else {
+        return this.darkMode === 'dark';
+      }
+    },
+
     // 테마/디스플레이 설정
-    setDarkMode(isDark: boolean) {
-      this.darkMode = isDark;
-      Dark.set(this.darkMode);
+    setDarkMode(mode: DarkModeType) {
+      this.darkMode = mode;
+      this.updateDarkMode();
+    },
+
+    // 다크모드 상태 업데이트 메서드 추가
+    updateDarkMode() {
+      if (this.darkMode === 'system') {
+        // 시스템 다크모드 상태 감지
+        const isDark = this.isDarkMode();
+        Dark.set(isDark);
+      } else {
+        Dark.set(this.darkMode === 'dark');
+      }
     },
 
     toggleDarkMode() {
-      this.setDarkMode(!this.darkMode);
+      const modes: DarkModeType[] = ['light', 'dark', 'system'];
+      const currentIndex = modes.indexOf(this.darkMode);
+      const nextMode = modes[(currentIndex + 1) % modes.length];
+      this.setDarkMode(nextMode);
     },
 
     setAlwaysOnTop(isAlwaysOnTop: boolean) {
@@ -446,7 +485,7 @@ export const useStore = defineStore('store', {
     // 알림 관련
     showMessage(
       message: string, // 표시할 메시지 내용
-      duration = 500, // 알림 표시 시간 (기본값: 500ms)
+      duration = 1000, // 알림 표시 시간 (기본값: 1000ms)
       position:
         | 'top'
         | 'top-left'
@@ -489,8 +528,15 @@ export const useStore = defineStore('store', {
         color: 'negative', // 알림 색상 (부정적인 메시지)
       });
     },
+
+    // 전체 계산 결과 삭제 확인 다이얼로그 표시 여부
+    setDeleteHistoryConfirmOpen(value: boolean) {
+      this.isDeleteHistoryConfirmOpen = value;
+    },
   },
 
   // 상태 지속성 설정
   persist: true,
 });
+
+export default useStore;

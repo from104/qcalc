@@ -36,7 +36,14 @@
     "src-bex/*.d.ts",
     "src-ssr/*.d.ts",
     "src-capacitor/*.d.ts",
-    "src-electron/electron-main.js"
   ],
-  "exclude": ["./dist", "./.quasar", "./node_modules", "./src-capacitor", "./src-cordova", "./quasar.config.*.temporary.compiled*"]
+  "exclude": [
+    "./dist",
+    "./.quasar",
+    "./node_modules",
+    "./src-capacitor",
+    "./src-cordova",
+    "./quasar.config.*.temporary.compiled*"
+  ],
+  "extends": "./.quasar/tsconfig.json"
 }

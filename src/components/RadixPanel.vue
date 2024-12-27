@@ -12,15 +12,9 @@
 
   // 스토어 인스턴스 초기화
   const store = useStore();
-  
+
   // 스토어에서 필요한 메서드 추출
-  const {
-    swapRadixes,
-    initRecentRadix,
-    clickButtonById,
-    setInputBlurred,
-    calc,
-  } = store;
+  const { swapRadixes, initRecentRadix, clickButtonById, setInputBlurred, calc } = store;
 
   // 단위 초기화
   initRecentRadix();
@@ -73,7 +67,7 @@
   const wordSizeOptions = reactive({
     values: [0, 4, 8, 16, 32, 64].map((value) => ({
       value,
-      label: `${value || '∞'} ${t('bit')}`,
+      label: `${value || '∞'}${t('bit')}`,
     })),
   } as { values: WordSizeOption[] });
 
@@ -129,12 +123,12 @@
       map-options
       option-value="value"
       option-label="label"
-      :label="t('radixLabel.wordSize')"
-      :label-color="!store.darkMode ? 'primary' : 'grey-1'"
-      :class="!store.darkMode ? 'bg-blue-grey-2' : 'bg-blue-grey-6'"
-      :popup-content-class="!store.darkMode ? 'bg-blue-grey-2' : 'bg-blue-grey-6'"
       class="col-3 q-pa-none shadow-2"
-      :options-selected-class="!store.darkMode ? 'text-primary' : 'text-grey-1'"
+      :label="t('radixLabel.wordSize')"
+      :label-color="!store.isDarkMode() ? 'primary' : 'grey-1'"
+      :class="!store.isDarkMode() ? 'bg-blue-grey-2' : 'bg-blue-grey-6'"
+      :popup-content-class="!store.isDarkMode() ? 'bg-blue-grey-2' : 'bg-blue-grey-6'"
+      :options-selected-class="!store.isDarkMode() ? 'text-primary' : 'text-grey-1'"
       @update:model-value="store.updateWordSize($event)"
     />
 
@@ -151,12 +145,12 @@
       map-options
       option-value="value"
       option-label="label"
-      :label="t('radixLabel.main')"
-      :label-color="!store.darkMode ? 'primary' : 'grey-1'"
-      :options-selected-class="!store.darkMode ? 'text-primary' : 'text-grey-1'"
       class="col-3 q-pl-xs-sm shadow-2"
-      :popup-content-class="!store.darkMode ? 'bg-blue-grey-2' : 'bg-blue-grey-6'"
-      :class="!store.darkMode ? 'bg-blue-grey-2' : 'bg-blue-grey-6'"
+      :label="t('radixLabel.main')"
+      :label-color="!store.isDarkMode() ? 'primary' : 'grey-1'"
+      :options-selected-class="!store.isDarkMode() ? 'text-primary' : 'text-grey-1'"
+      :popup-content-class="!store.isDarkMode() ? 'bg-blue-grey-2' : 'bg-blue-grey-6'"
+      :class="!store.isDarkMode() ? 'bg-blue-grey-2' : 'bg-blue-grey-6'"
     />
 
     <!-- 원본, 대상 진법 바꾸기 버튼 -->
@@ -183,12 +177,12 @@
       map-options
       option-value="value"
       option-label="label"
-      :label="t('radixLabel.sub')"
-      :label-color="!store.darkMode ? 'primary' : 'grey-1'"
-      :class="!store.darkMode ? 'bg-blue-grey-2' : 'bg-blue-grey-6'"
-      :popup-content-class="!store.darkMode ? 'bg-blue-grey-2' : 'bg-blue-grey-6'"
       class="col-3 q-pl-xs-sm shadow-2"
-      :options-selected-class="!store.darkMode ? 'text-primary' : 'text-grey-1'"
+      :label="t('radixLabel.sub')"
+      :label-color="!store.isDarkMode() ? 'primary' : 'grey-1'"
+      :class="!store.isDarkMode() ? 'bg-blue-grey-2' : 'bg-blue-grey-6'"
+      :popup-content-class="!store.isDarkMode() ? 'bg-blue-grey-2' : 'bg-blue-grey-6'"
+      :options-selected-class="!store.isDarkMode() ? 'text-primary' : 'text-grey-1'"
     />
 
     <!-- 대상 방향 -->
