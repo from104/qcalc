@@ -30,15 +30,15 @@
   const store = useStore();
 
   // 스토어에서 필요한 메서드 추출
-  const { 
-    calc, 
-    disableShift, 
-    disableShiftLock, 
-    enableShift, 
-    enableShiftLock, 
+  const {
+    calc,
+    disableShift,
+    disableShiftLock,
+    enableShift,
+    enableShiftLock,
     toggleShift,
     toggleShiftLock,
-    showMemoryTemporarily, 
+    showMemoryTemporarily,
     showError,
     showMessage,
     convertRadix,
@@ -496,7 +496,7 @@
   const getTooltipsOfKeys = (btnId: ButtonID, isShift: boolean) => {
     const buttonFunctions = isShift ? extendedFunctionSet.value : activeButtonSet.value;
     const shortcutKeys = buttonFunctions[btnId].shortcutKeys;
-    
+
     return shortcutKeys.map((key) => {
       if (key === '+') return '+';
       const parts = key.split('+');
@@ -508,11 +508,15 @@
           return part;
         })
         .join('');
-      
+
       const lastPart = parts[parts.length - 1].replace('Digit', '').replace('Numpad', 'N');
       return modifiers + (modifiers ? '-' : '') + lastPart;
     }).join(', ');
   };
+
+  const baseWidth = computed(() => {
+    return $q.screen.gt.xs ? '50vw' : '100vw';
+  });
 </script>
 
 <template>
@@ -556,9 +560,7 @@
               ? 'disabled-button'
               : '',
         ]"
-        :style="[
-          !store.showButtonAddedLabel || !extendedFunctionSet[id].label ? { paddingTop: '4px' } : {}
-        ]"
+        :style="[!store.showButtonAddedLabel || !extendedFunctionSet[id].label ? { paddingTop: '4px' } : {}]"
         :color="`btn-${button.color}`"
         @click="() => (button.isDisabled ? displayDisabledButtonNotification() : handleShiftFunction(id))"
         @touchstart="() => hapticFeedbackLight()"
@@ -589,41 +591,19 @@
         </q-tooltip>
         <MyTooltip>
           {{
-            store.isShiftPressed ? 
-              extendedFunctionSet[id].isDisabled ? t('disabledButton') : getTooltipsOfKeys(id, true)
-            :
-              activeButtonSet[id].isDisabled ? t('disabledButton') : getTooltipsOfKeys(id, false)
+            store.isShiftPressed
+              ? extendedFunctionSet[id].isDisabled
+                ? t('disabledButton')
+                : getTooltipsOfKeys(id, true)
+              : activeButtonSet[id].isDisabled
+                ? t('disabledButton')
+                : getTooltipsOfKeys(id, false)
           }}
         </MyTooltip>
       </q-btn>
     </div>
   </q-card-section>
 </template>
-
-<i18n>
-ko:
-  cannotDivideByZero: '0으로 나눌 수 없습니다.'
-  squareRootOfANegativeNumberIsNotAllowed: '음수의 제곱근은 허용되지 않습니다.'
-  factorialOfANegativeNumberIsNotAllowed: '음수의 팩토리얼은 허용되지 않습니다.'
-  bitOperationPreprocessingCompleted: '비트 연산을 위해 절대값 정수로 계산을 완료되었습니다.'
-  bitOperationPreprocessingReady: '비트 연산을 위해 절대값 정수로 계산을 준비하였습니다.'
-  memoryCleared: '메모리를 초기화했습니다.'
-  memoryRecalled: '메모리를 불러왔습니다.'
-  memorySaved: '메모리에 저장되었습니다.'
-  noMemoryToRecall: '불러올 메모리가 없습니다.'
-  disabledButton: '비활성화된 버튼'
-en:
-  cannotDivideByZero: 'Cannot divide by zero'
-  squareRootOfANegativeNumberIsNotAllowed: 'The square root of a negative number is not allowed.'
-  factorialOfANegativeNumberIsNotAllowed: 'The factorial of a negative number is not allowed.'
-  bitOperationPreprocessingCompleted: 'Bit operation preprocessing completed.'
-  bitOperationPreprocessingReady: 'Bit operation preprocessing ready.'
-  memoryCleared: 'Memory cleared.'
-  memoryRecalled: 'Memory recalled.'
-  memorySaved: 'Memory saved.'
-  noMemoryToRecall: 'No memory to recall.'
-  disabledButton: 'Disabled button'
-</i18n>
 
 <style scoped lang="scss">
   .button {
@@ -634,13 +614,13 @@ en:
   }
 
   .icon {
-    font-size: calc(min(calc((100vh - v-bind('baseHeight')) / 6 * 0.25), calc((100vw - 40px) / 4 * 0.3)) * 0.8);
+    font-size: calc(min(calc((100vh - v-bind('baseHeight')) / 6 * 0.25), calc((v-bind('baseWidth') - 40px) / 4 * 0.3)) * 0.8);
     padding-top: calc(((100vh - v-bind('baseHeight')) / 6 - 13px) * 0.3); /* Lower the content by 4px */
   }
 
   .char {
-    font-size: calc(min(calc((100vh - v-bind('baseHeight')) / 6 * 0.26), calc((100vw - 40px) / 4 * 0.3)) * 1.2);
-    padding-top: calc(((100vh - v-bind('baseHeight')) / 6 - 29px) * 0.3); /* Lower the content by 4px */      
+    font-size: calc(min(calc((100vh - v-bind('baseHeight')) / 6 * 0.26), calc((v-bind('baseWidth') - 40px) / 4 * 0.2)) * 1.2);
+    padding-top: calc(((100vh - v-bind('baseHeight')) / 6 - 29px) * 0.3); /* Lower the content by 4px */
   }
 
   .top-label {
@@ -688,3 +668,28 @@ en:
     color: rgba(255, 255, 255, 0.85) !important;
   }
 </style>
+
+<i18n>
+ko:
+  cannotDivideByZero: '0으로 나눌 수 없습니다.'
+  squareRootOfANegativeNumberIsNotAllowed: '음수의 제곱근은 허용되지 않습니다.'
+  factorialOfANegativeNumberIsNotAllowed: '음수의 팩토리얼은 허용되지 않습니다.'
+  bitOperationPreprocessingCompleted: '비트 연산을 위해 절대값 정수로 계산을 완료되었습니다.'
+  bitOperationPreprocessingReady: '비트 연산을 위해 절대값 정수로 계산을 준비하였습니다.'
+  memoryCleared: '메모리를 초기화했습니다.'
+  memoryRecalled: '메모리를 불러왔습니다.'
+  memorySaved: '메모리에 저장되었습니다.'
+  noMemoryToRecall: '불러올 메모리가 없습니다.'
+  disabledButton: '비활성화된 버튼'
+en:
+  cannotDivideByZero: 'Cannot divide by zero'
+  squareRootOfANegativeNumberIsNotAllowed: 'The square root of a negative number is not allowed.'
+  factorialOfANegativeNumberIsNotAllowed: 'The factorial of a negative number is not allowed.'
+  bitOperationPreprocessingCompleted: 'Bit operation preprocessing completed.'
+  bitOperationPreprocessingReady: 'Bit operation preprocessing ready.'
+  memoryCleared: 'Memory cleared.'
+  memoryRecalled: 'Memory recalled.'
+  memorySaved: 'Memory saved.'
+  noMemoryToRecall: 'No memory to recall.'
+  disabledButton: 'Disabled button'
+</i18n>
