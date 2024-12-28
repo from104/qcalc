@@ -533,6 +533,15 @@ export const useStore = defineStore('store', {
     setDeleteHistoryConfirmOpen(value: boolean) {
       this.isDeleteHistoryConfirmOpen = value;
     },
+
+    encodeHTML(str: string) {
+      return str
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+    },
   },
 
   // 상태 지속성 설정

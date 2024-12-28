@@ -123,7 +123,7 @@
     <MyTooltip>{{ t('tooltipPaste') }}</MyTooltip>
   </q-btn>
   <q-btn
-    id="btn-history"
+    v-if="!$q.screen.gt.xs"
     flat
     icon="history"
     class="q-ma-none q-pa-none q-pl-xs"
@@ -133,7 +133,7 @@
     <MyTooltip>{{ t('openHistoryDialog') }}</MyTooltip>
   </q-btn>
   <q-btn id="btn-menu" flat icon="more_vert" class="q-ma-none q-pa-none q-pl-xs" :disable="store.isSettingDialogOpen">
-    <q-menu auto-close transition-show="slide-left" transition-hide="slide-right" :offset="[0, 10]" class="shadow-6">
+    <q-menu auto-close transition-show="slide-down" transition-hide="slide-up" :offset="[140, 10]" class="shadow-6">
       <MenuPanel />
     </q-menu>
   </q-btn>

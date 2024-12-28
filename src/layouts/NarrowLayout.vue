@@ -144,7 +144,7 @@
       <!-- 서브 페이지 헤더 -->
       <q-toolbar v-if="isSubPage" v-blur class="q-px-sm">
         <q-btn flat dense round icon="arrow_back" @click="router.back()" />
-        <q-toolbar-title class="text-h6">{{ t(`message.${String(route.name)}`) }}</q-toolbar-title>
+        <q-toolbar-title class="text-subtitle1">{{ t(`message.${String(route.name)}`) }}</q-toolbar-title>
         <q-space />
         <q-btn
           v-for="button in SUB_PAGE_CONFIG[route.name as keyof typeof SUB_PAGE_CONFIG]?.buttons"

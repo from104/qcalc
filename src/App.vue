@@ -116,10 +116,10 @@
       showMessage(t('darkMode.message.' + store.darkMode));
     }
   };
-  import { useRouter } from 'vue-router'
+  import { useRouter } from 'vue-router';
 
-// router 인스턴스 가져오기
-const router = useRouter()
+  // router 인스턴스 가져오기
+  const router = useRouter();
 
   // 키 바인딩 클래스를 가져옵니다.
   import { KeyBinding } from 'classes/KeyBinding';
@@ -198,17 +198,20 @@ const router = useRouter()
 
   const route = useRoute() as RouteLocationNormalizedLoaded & { meta: RouteMeta };
 
-  const transitionName = computed(() => {
-    return route.meta.getTransition?.(route.meta.navigationMethod) || 'move-forward';
+  const getTransition = computed(() => {
+    const navigationMethod = route.meta.navigationMethod as string;
+
+    if ($q.screen.gt.xs) {
+      return 'fade-in';
+    } else {
+      return navigationMethod === 'back' ? 'move-back' : 'move-forward';
+    }
   });
 </script>
 
 <template>
   <router-view v-slot="{ Component, route: routeProps }">
-    <transition 
-      :name="isFirstNavigation ? '' : transitionName || ''" 
-      mode="default"
-    >
+    <transition :name="isFirstNavigation ? '' : getTransition || 'fade-in'" mode="default">
       <component :is="Component" :key="routeProps.path" />
     </transition>
   </router-view>
@@ -250,5 +253,24 @@ const router = useRouter()
 
   .move-forward-leave-to {
     transform: translateX(-100%);
+  }
+
+  .fade-in-enter-active,
+  .fade-in-leave-active {
+    transition: opacity 0.3s ease;
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+  }
+
+  .fade-in-enter-from,
+  .fade-in-leave-to {
+    opacity: 0;
+  }
+
+  .fade-in-enter-to,
+  .fade-in-leave-from {
+    opacity: 1;
   }
 </style>

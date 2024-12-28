@@ -94,6 +94,13 @@
     previousSubPage.value = currentSubPage.value;
     currentSubPage.value = pageName;
 
+    // 라우터 히스토리에 페이지 추가
+    if (pageName !== 'history') {
+      router.push({ name: pageName });
+    } else {
+      router.back();
+    }
+
     // 트랜지션이 끝나면 상태 초기화
     setTimeout(() => {
       isPageTransitioning.value = false;
@@ -122,7 +129,8 @@
 
   onMounted(() => {
     keyBinding.subscribe();
-    currentSubPage.value = route.name as string;
+    const validPages = ['help', 'about', 'settings'];
+    currentSubPage.value = validPages.includes(route.name as string) ? (route.name as string) : 'history';
   });
 
   onBeforeUnmount(() => {
@@ -134,7 +142,7 @@
   <q-layout view="hHh LpR fFf">
     <q-header class="z-top noselect row" elevated>
       <!-- 계산기 영역 헤더 -->
-      <q-toolbar v-blur class="col-6">
+      <q-toolbar v-blur class="col-6 calc-header">
         <q-tabs
           v-model="store.currentTab"
           align="left"
@@ -156,19 +164,13 @@
             dense
           />
         </q-tabs>
+        <q-space />
+        <HeaderIcons />
       </q-toolbar>
 
       <!-- 서브페이지 영역 헤더 -->
-      <q-toolbar v-blur class="col-6 q-px-sm">
-        <q-btn
-          v-if="SUB_PAGE_CONFIG[currentSubPage]?.showBackArrow"
-          flat
-          dense
-          round
-          icon="arrow_forward"
-          @click="switchSubPage('history')"
-        />
-        <q-toolbar-title class="text-h6">
+      <q-toolbar v-blur class="col-6 q-px-md sub-header">
+        <q-toolbar-title class="text-subtitle1">
           {{ SUB_PAGE_CONFIG[currentSubPage]?.title }}
         </q-toolbar-title>
         <q-space />
@@ -182,12 +184,21 @@
           :disable="button.disabled.value"
           @click="button.action"
         />
+        <q-btn
+          v-if="SUB_PAGE_CONFIG[currentSubPage]?.showBackArrow"
+          class="q-ma-none q-pa-none"
+          flat
+          dense
+          round
+          icon="arrow_forward"
+          @click="switchSubPage('history')"
+        />
       </q-toolbar>
     </q-header>
 
     <q-page-container class="row" style="padding-bottom: 0px">
       <!-- 계산기 영역 -->
-      <div class="col-6">
+      <div class="col-6 calc-content">
         <q-tab-panels v-model="store.currentTab" animated infinite :swipeable="false">
           <q-tab-panel v-for="(tab, index) in tabs" :key="index" :name="tab.name">
             <component :is="tab.component" />
@@ -196,14 +207,16 @@
       </div>
 
       <!-- 서브페이지 영역 -->
-      <div class="col-6 relative-position">
+      <div class="col-6 relative-position sub-content">
         <transition
           enter-active-class="animate-sub-page-enter"
           leave-active-class="animate-sub-page-leave"
           @enter="isPageTransitioning = true"
           @after-enter="isPageTransitioning = false"
         >
-          <component :is="SUB_PAGE_CONFIG[currentSubPage]?.component" :key="currentSubPage" class="sub-page" />
+          <q-scroll-area class="sub-scroll-area" :class="{ 'hide-scrollbar': currentSubPage === 'history' }">
+            <component :is="SUB_PAGE_CONFIG[currentSubPage]?.component" :key="currentSubPage" class="sub-page" />
+          </q-scroll-area>
         </transition>
       </div>
     </q-page-container>
@@ -222,9 +235,9 @@
   }
 
   .sub-page {
-    position: absolute;
     width: 100%;
-    height: 100%;
+    min-height: 100%;
+    position: relative;
   }
 
   .animate-sub-page-enter {
@@ -250,6 +263,30 @@
     }
     to {
       transform: translateX(100%);
+    }
+  }
+
+  .calc-header {
+    border-right: 3px solid rgba(255, 255, 255, 0.2);
+  }
+
+  .calc-content {
+    border-right: 3px solid rgba(0, 0, 0, 0.2);
+  }
+
+  .body--dark {
+    .calc-content {
+      border-right: 3px solid rgba(255, 255, 255, 0.2);
+    }
+  }
+
+  .sub-scroll-area {
+    height: calc(100vh - 50px);
+  }
+
+  .hide-scrollbar {
+    :deep(.q-scrollarea__thumb) {
+      display: none !important;
     }
   }
 </style>

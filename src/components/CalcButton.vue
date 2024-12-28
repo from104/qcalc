@@ -167,9 +167,9 @@
     radix: {
       a1: ['x<<y', 'function', ['Control+q'], () => bitOperationPreprocessing(() => calc.bitSftL()), false],
       b1: ['x>>y', 'function', ['Control+w'], () => bitOperationPreprocessing(() => calc.bitSftR()), false],
-      a2: ['x&y', 'function', ['Control+a'], () => bitOperationPreprocessing(() => calc.bitAnd()), false],
-      b2: ['x|y', 'function', ['Control+s'], () => bitOperationPreprocessing(() => calc.bitOr()), false],
-      c2: ['x^y', 'function', ['Control+d'], () => bitOperationPreprocessing(() => calc.bitXor()), false],
+      a2: ['AND', 'function', ['Control+a'], () => bitOperationPreprocessing(() => calc.bitAnd()), false],
+      b2: ['OR', 'function', ['Control+s'], () => bitOperationPreprocessing(() => calc.bitOr()), false],
+      c2: ['XOR', 'function', ['Control+d'], () => bitOperationPreprocessing(() => calc.bitXor()), false],
     },
   };
 
@@ -286,10 +286,10 @@
       b1: ['x>>1', ['Shift+Control+w'], () => bitOperationPreprocessing(() => calc.bitSftRNumber(1), false), false],
       a2: ['x<<4', ['Shift+Control+a'], () => bitOperationPreprocessing(() => calc.bitSftLNumber(4), false), false],
       b2: ['x>>4', ['Shift+Control+s'], () => bitOperationPreprocessing(() => calc.bitSftRNumber(4), false), false],
-      c2: ['!x', ['Shift+Control+d'], () => bitOperationPreprocessing(() => calc.bitNot(), false), false],
-      a3: ['!(x&y)', ['Shift+Digit7', 'Shift+Numpad7'], () => bitOperationPreprocessing(() => calc.bitNand()), false],
-      b3: ['!(x|y)', ['Shift+Digit8', 'Shift+Numpad8'], () => bitOperationPreprocessing(() => calc.bitNor()), false],
-      c3: ['!(x^y)', ['Shift+Digit9', 'Shift+Numpad9'], () => bitOperationPreprocessing(() => calc.bitXnor()), false],
+      c2: ['NOT', ['Shift+Control+d'], () => bitOperationPreprocessing(() => calc.bitNot(), false), false],
+      a3: ['NAND', ['Shift+Digit7', 'Shift+Numpad7'], () => bitOperationPreprocessing(() => calc.bitNand()), false],
+      b3: ['NOR', ['Shift+Digit8', 'Shift+Numpad8'], () => bitOperationPreprocessing(() => calc.bitNor()), false],
+      c3: ['XNOR', ['Shift+Digit9', 'Shift+Numpad9'], () => bitOperationPreprocessing(() => calc.bitXnor()), false],
       a4: ['D', ['Shift+Digit4', 'Shift+Numpad4'], () => calc.addDigit('D'), false],
       b4: ['E', ['Shift+Digit5', 'Shift+Numpad5'], () => calc.addDigit('E'), false],
       c4: ['F', ['Shift+Digit6', 'Shift+Numpad6'], () => calc.addDigit('F'), false],
@@ -556,7 +556,9 @@
               ? 'disabled-button'
               : '',
         ]"
-        :style="[!store.showButtonAddedLabel || !extendedFunctionSet[id].label ? { paddingTop: '4px' } : {}]"
+        :style="[
+          !store.showButtonAddedLabel || !extendedFunctionSet[id].label ? { paddingTop: '4px' } : {}
+        ]"
         :color="`btn-${button.color}`"
         @click="() => (button.isDisabled ? displayDisabledButtonNotification() : handleShiftFunction(id))"
         @touchstart="() => hapticFeedbackLight()"
@@ -638,7 +640,7 @@ en:
 
   .char {
     font-size: calc(min(calc((100vh - v-bind('baseHeight')) / 6 * 0.26), calc((100vw - 40px) / 4 * 0.3)) * 1.2);
-    padding-top: calc(((100vh - v-bind('baseHeight')) / 6 - 29px) * 0.3); /* Lower the content by 4px */
+    padding-top: calc(((100vh - v-bind('baseHeight')) / 6 - 29px) * 0.3); /* Lower the content by 4px */      
   }
 
   .top-label {
