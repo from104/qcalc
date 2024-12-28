@@ -201,7 +201,7 @@
   const getTransition = computed(() => {
     const navigationMethod = route.meta.navigationMethod as string;
 
-    if ($q.screen.gt.xs) {
+    if (store.isAtLeastDoubleWidth()) {
       return 'fade-in';
     } else {
       return navigationMethod === 'back' ? 'move-back' : 'move-forward';

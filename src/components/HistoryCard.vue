@@ -85,7 +85,6 @@
       targetScroll = Math.max(0, Math.min(currentScroll + offset, recordElement.scrollHeight - recordElement.clientHeight));
     }
 
-    console.log('targetScroll', targetScroll);
     recordElement.scrollTo({
       top: targetScroll,
       behavior: 'smooth'

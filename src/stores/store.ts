@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia';
 import { Notify, Dark, copyToClipboard } from 'quasar';
 import { match } from 'ts-pattern';
-import { useRoute, useRouter } from 'vue-router';
+import { Screen } from 'quasar';
 
 import { WordSize, Operator, CalculationResult } from 'classes/CalculatorTypes';
 import { Calculator } from 'classes/Calculator';
@@ -100,7 +100,6 @@ export const useStore = defineStore('store', {
 
     // Shift 키 관련
     toggleShift(): void {
-      console.log('toggleShift');
       this.isShiftPressed = !this.isShiftPressed;
     },
 
@@ -534,13 +533,9 @@ export const useStore = defineStore('store', {
       this.isDeleteHistoryConfirmOpen = value;
     },
 
-    encodeHTML(str: string) {
-      return str
-        .replace(/&/g, '&amp;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;')
-        .replace(/"/g, '&quot;')
-        .replace(/'/g, '&#39;');
+    isAtLeastDoubleWidth() {
+      console.log(Screen.width);
+      return Screen.width >= 330 * 2;
     },
   },
 

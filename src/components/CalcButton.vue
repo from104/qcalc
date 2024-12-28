@@ -515,7 +515,7 @@
   };
 
   const baseWidth = computed(() => {
-    return $q.screen.gt.xs ? '50vw' : '100vw';
+    return store.isAtLeastDoubleWidth() ? '50vw' : '100vw';
   });
 </script>
 

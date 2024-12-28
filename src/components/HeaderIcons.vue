@@ -123,7 +123,7 @@
     <MyTooltip>{{ t('tooltipPaste') }}</MyTooltip>
   </q-btn>
   <q-btn
-    v-if="!$q.screen.gt.xs"
+    v-if="!store.isAtLeastDoubleWidth()"
     flat
     icon="history"
     class="q-ma-none q-pa-none q-pl-xs"
