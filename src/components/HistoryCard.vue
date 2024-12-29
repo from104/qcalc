@@ -235,20 +235,6 @@
 </script>
 
 <template>
-  <!-- <q-bar v-blur dark class="full-width noselect text-white bg-primary">
-      <q-icon name="history" size="sm" />
-      <div>{{ t('history') }}</div>
-      <q-space />
-      <q-btn
-        id="btn-delete-history"
-        dense
-        flat
-        icon="delete_outline"
-        size="md"
-        :disable="showDeleteConfirm || histories.length == 0"
-        @click="showDeleteConfirm = true"
-      />
-    </q-bar> -->
   <q-card-section
     id="history"
     square
@@ -278,12 +264,12 @@
       <q-list v-else id="history-list" separator class="full-width">
         <transition-group name="history-list">
           <q-slide-item
-            v-for="history in records"
-            :key="history.id"
+            v-for="record in records"
+            :key="record.id"
             left-color="positive"
             right-color="negative"
-            @left="({ reset }) => handleLeftSlide({ reset }, history.id as number)"
-            @right="deleteHistoryItem(history.id as number)"
+            @left="({ reset }) => handleLeftSlide({ reset }, record.id as number)"
+            @right="deleteHistoryItem(record.id as number)"
           >
             <template #left>
               <q-icon name="edit_note" />
@@ -291,21 +277,21 @@
             <template #right>
               <q-icon name="delete_outline" />
             </template>
-            <q-item v-touch-hold.mouse="() => (recordMenu[history.id as number] = true)" class="text-right q-pa-sm">
+            <q-item v-touch-hold.mouse="() => (recordMenu[record.id as number] = true)" class="text-right q-pa-sm">
               <q-item-section class="q-mr-none q-px-none">
-                <q-item-label v-if="history.memo">
-                  <u>{{ history.memo }}</u>
+                <q-item-label v-if="record.memo">
+                  <u>{{ record.memo }}</u>
                 </q-item-label>
                 <q-item-label style="white-space: pre-wrap">
-                  {{ getLeftSideInHistory(history.calculationResult, true) }}
+                  {{ getLeftSideInHistory(record.calculationResult, true) }}
                 </q-item-label>
                 <q-item-label>
-                  {{ ['=', getRightSideInHistory(history.calculationResult)].join(' ') }}
+                  {{ ['=', getRightSideInHistory(record.calculationResult)].join(' ') }}
                 </q-item-label>
               </q-item-section>
             </q-item>
             <q-menu
-              v-model="recordMenu[history.id as number]"
+              v-model="recordMenu[record.id as number]"
               class="shadow-6"
               :context-menu="$q.platform.is.desktop"
               auto-close
@@ -314,45 +300,45 @@
             >
               <q-list dense class="noselect" style="max-width: 200px">
                 <MenuItem
-                  v-if="!history.memo"
+                  v-if="!record.memo"
                   :title="t('addMemo')"
-                  :action="() => openMemoDialog(history.id as number)"
+                  :action="() => openMemoDialog(record.id as number)"
                 />
                 <MenuItem
-                  v-if="history.memo"
+                  v-if="record.memo"
                   :title="t('editMemo')"
-                  :action="() => openMemoDialog(history.id as number)"
+                  :action="() => openMemoDialog(record.id as number)"
                 />
                 <MenuItem
-                  v-if="history.memo"
+                  v-if="record.memo"
                   :title="t('copyMemo')"
-                  :action="() => copyHistoryItem(history.id as number, 'memo')"
+                  :action="() => copyHistoryItem(record.id as number, 'memo')"
                 />
                 <MenuItem
-                  v-if="history.memo"
+                  v-if="record.memo"
                   :title="t('deleteMemo')"
-                  :action="() => deleteMemo(history.id as number)"
+                  :action="() => deleteMemo(record.id as number)"
                 />
                 <MenuItem separator />
                 <MenuItem
                   :title="t('copyDisplayedResult')"
-                  :action="() => copyHistoryItem(history.id as number, 'formattedNumber')"
-                  :caption="getRightSideInHistory(history.calculationResult)"
+                  :action="() => copyHistoryItem(record.id as number, 'formattedNumber')"
+                  :caption="getRightSideInHistory(record.calculationResult)"
                 />
                 <MenuItem
                   :title="t('copyResultNumber')"
-                  :action="() => copyHistoryItem(history.id as number, 'onlyNumber')"
-                  :caption="history.calculationResult.resultNumber"
+                  :action="() => copyHistoryItem(record.id as number, 'onlyNumber')"
+                  :caption="record.calculationResult.resultNumber"
                 />
                 <MenuItem separator />
-                <MenuItem :title="t('loadToMainPanel')" :action="() => loadToMainPanel(history.id as number)" />
+                <MenuItem :title="t('loadToMainPanel')" :action="() => loadToMainPanel(record.id as number)" />
                 <MenuItem
-                  v-if="store.currentTab === 'unit' || store.currentTab === 'currency'"
+                  v-if="!store.isDefaultCalculator()"
                   :title="t('loadToSubPanel')"
-                  :action="() => loadToSubPanel(history.id as number)"
+                  :action="() => loadToSubPanel(record.id as number)"
                 />
                 <MenuItem separator />
-                <MenuItem :title="t('deleteResult')" :action="() => deleteHistoryItem(history.id as number)" />
+                <MenuItem :title="t('deleteResult')" :action="() => deleteHistoryItem(record.id as number)" />
               </q-list>
             </q-menu>
           </q-slide-item>

@@ -21,7 +21,6 @@ export const useStore = defineStore('store', {
     // 계산기 관련
     calc: new Calculator(),
     currentTab: 'calc',
-    isHistoryDialogOpen: false,
     isMemoryVisible: false,
     resultPanelPadding: 0,
     paddingOnResult: 20,
@@ -31,7 +30,6 @@ export const useStore = defineStore('store', {
     // route: useRoute(),
 
     // UI 상태 관련
-    isSettingDialogOpen: false,
     isShiftPressed: false,
     isShiftLocked: false,
     inputFocused: false,
@@ -536,6 +534,11 @@ export const useStore = defineStore('store', {
     isAtLeastDoubleWidth() {
       console.log(Screen.width);
       return Screen.width >= 330 * 2;
+    },
+
+    // 기본 계산기 여부 확인
+    isDefaultCalculator(): boolean {
+      return this.currentTab === 'calc';
     },
   },
 

@@ -1,0 +1,11 @@
+Use TypeScript best practices:
+- Prefer interfaces over type aliases for object types
+- Use const assertions for literal values
+- Utilize strict null checks
+- Implement proper error handling with union types
+- Follow the naming conventions:
+  - UpperCamelCase for types, interfaces, classes
+  - lowerCamelCase for variables, functions, methods
+  - CONSTANT_CASE for global constants and enum values
+- Avoid using 'any' type, prefer 'unknown' for maximum type safety
+- Utilize TypeScript's built-in utility types when appropriate

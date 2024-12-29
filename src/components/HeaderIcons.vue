@@ -32,6 +32,7 @@
     showMessage,
     swapUnits,
     swapCurrencies,
+    swapRadixes,
   } = store;
 
   /**
@@ -73,6 +74,10 @@
           swapCurrencies();
           setTimeout(() => calc.setCurrentNumber(clipboardText), 5);
           setTimeout(swapCurrencies, 10);
+        } else if (store.currentTab === 'radix') {
+          swapRadixes();
+          setTimeout(() => calc.setCurrentNumber(clipboardText), 5);
+          setTimeout(swapRadixes, 10);
         }
         showMessage(t('pastedFromClipboardToSubPanel'));
       } else {
@@ -102,7 +107,6 @@
     flat
     icon="content_copy"
     class="q-ma-none q-pa-none q-pl-xs"
-    :disable="store.isSettingDialogOpen"
     @click="handleCopy"
   >
     <MyTooltip>{{ t('tooltipCopy') }}</MyTooltip>
@@ -114,7 +118,7 @@
     class="q-ma-none q-pa-none q-pl-xs"
     @click="handlePaste()"
   >
-    <q-menu v-if="store.currentTab !== 'calc'" context-menu auto-close class="z-max shadow-6">
+    <q-menu v-if="!store.isDefaultCalculator()" context-menu auto-close class="z-max shadow-6">
       <q-list dense style="max-width: 200px">
         <MenuItem :action="() => handlePaste('main')" :title="t('pasteToMainPanel')" />
         <MenuItem :action="() => handlePaste('sub')" :title="t('pasteToSubPanel')" />
@@ -127,12 +131,11 @@
     flat
     icon="history"
     class="q-ma-none q-pa-none q-pl-xs"
-    :disable="store.isSettingDialogOpen"
     @click="router.push('/history')"
   >
     <MyTooltip>{{ t('openHistoryDialog') }}</MyTooltip>
   </q-btn>
-  <q-btn id="btn-menu" flat icon="more_vert" class="q-ma-none q-pa-none q-pl-xs" :disable="store.isSettingDialogOpen">
+  <q-btn id="btn-menu" flat icon="more_vert" class="q-ma-none q-pa-none q-pl-xs" >
     <q-menu auto-close transition-show="slide-down" transition-hide="slide-up" :offset="[140, 10]" class="shadow-6">
       <MenuPanel />
     </q-menu>

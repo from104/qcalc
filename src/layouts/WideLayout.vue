@@ -159,7 +159,6 @@
             :key="tab.name"
             :label="tab.title"
             :name="tab.name"
-            :disable="store.isSettingDialogOpen"
             class="q-px-xs"
             dense
           />
