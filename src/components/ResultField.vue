@@ -33,14 +33,14 @@
     showMemoryTemporarily,
     toFormattedNumber,
     convertIfRadix,
-    getLeftSideInHistory,
+    getLeftSideInRecord,
     copyToClipboard,
     initRecentUnits,
     initRecentCurrencies,
     initRecentRadix,
   } = store;
 
-  const calcHistory = calc.history;
+  const calcRecord = calc.record;
   const needFieldTooltip = ref(false);
   // const fieldElement = ref<HTMLElement | null>(null);
   const fieldElement = computed(() => document.getElementById(fieldID));
@@ -195,9 +195,7 @@
 
   const radixSuffix = computed(() => {
     const radix = isMainField ? store.sourceRadix : store.targetRadix;
-    return currentTab === 'radix' && store.showRadix && store.radixType === 'suffix'
-      ? store.getRadixSuffix(radix)
-      : '';
+    return currentTab === 'radix' && store.showRadix && store.radixType === 'suffix' ? store.getRadixSuffix(radix) : '';
   });
 
   const displayedResult = computed(() => {
@@ -224,7 +222,6 @@
    * 필드와 애드온 타입에 따라 적절한 숫자를 반환
    */
   const onlyNumber = computed(() => {
-
     // 메인 필드 처리
     if (props.field === 'main') {
       if (props.addon === 'radix') {
@@ -287,18 +284,18 @@
   // const getPreviousResult = () => {
   const calculationExpression = computed(() => {
     // 마지막 계산 기록 가져오기
-    const lastHistory = calcHistory.getCount() > 0 ? calcHistory.getAllRecords()[0] : null;
+    const lastRecord = calcRecord.getCount() > 0 ? calcRecord.getAllRecords()[0] : null;
 
     // 초기화 필요 여부와 연산자 존재 여부 확인
     const needsReset = calc.getNeedsBufferReset();
     const hasOperator = operator.value !== '';
 
     // 마지막 계산 기록이 있고 초기화가 필요한 경우
-    const isLastHistoryValid =
-      lastHistory !== null && needsReset && calc.getCurrentNumber() === lastHistory.calculationResult.resultNumber;
+    const isLastRecordValid =
+      lastRecord !== null && needsReset && calc.getCurrentNumber() === lastRecord.calculationResult.resultNumber;
 
-    if (isLastHistoryValid) {
-      return `${getLeftSideInHistory(lastHistory.calculationResult)} =`;
+    if (isLastRecordValid) {
+      return `${getLeftSideInRecord(lastRecord.calculationResult)} =`;
     }
 
     // 연산자가 있고 초기화가 필요없는 경우
@@ -421,10 +418,7 @@
             {{ isMainField && store.isMemoryVisible ? memoryValue : result }}
           </span>
           <span v-if="currentTab === 'unit'" id="unit">{{ unit }}</span>
-          <span
-            v-if="currentTab === 'radix' && store.showRadix && store.radixType === 'suffix'"
-            id="radixSuffix"
-          >
+          <span v-if="currentTab === 'radix' && store.showRadix && store.radixType === 'suffix'" id="radixSuffix">
             {{ radixSuffix }}
           </span>
           <q-menu context-menu auto-close touch-position class="shadow-6">

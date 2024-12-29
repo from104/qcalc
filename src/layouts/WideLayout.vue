@@ -16,7 +16,7 @@
   import RadixPage from 'pages/RadixPage.vue';
   import HelpPage from 'src/pages/HelpPage.vue';
   import AboutPage from 'src/pages/AboutPage.vue';
-  import HistoryPage from 'src/pages/HistoryPage.vue';
+  import RecordPage from 'src/pages/RecordPage.vue';
   import SettingPage from 'src/pages/SettingPage.vue';
 
   const router = useRouter();
@@ -35,7 +35,7 @@
 
   // 서브 페이지 설정
   interface PageConfig {
-    component: typeof HelpPage | typeof AboutPage | typeof HistoryPage | typeof SettingPage;
+    component: typeof HelpPage | typeof AboutPage | typeof RecordPage | typeof SettingPage;
     title: string;
     showBackArrow?: boolean;
     buttons?: PageButton[];
@@ -47,8 +47,8 @@
     action: () => void;
   }
 
-  const isHistoryDisabled = computed(() => {
-    return store.calc.history.getAllRecords().length === 0 || store.isDeleteHistoryConfirmOpen;
+  const isRecordDisabled = computed(() => {
+    return store.calc.record.getAllRecords().length === 0 || store.isDeleteRecordConfirmOpen;
   });
 
   const SUB_PAGE_CONFIG: Record<string, PageConfig> = {
@@ -62,15 +62,15 @@
       title: t('message.about'),
       showBackArrow: true,
     },
-    history: {
-      component: HistoryPage,
-      title: t('message.history'),
+    record: {
+      component: RecordPage,
+      title: t('message.record'),
       buttons: [
         {
           icon: 'delete_outline',
-          disabled: isHistoryDisabled,
+          disabled: isRecordDisabled,
           action: () => {
-            store.isDeleteHistoryConfirmOpen = true;
+            store.isDeleteRecordConfirmOpen = true;
           },
         },
       ],
@@ -83,8 +83,8 @@
   };
 
   // 현재 서브 페이지 관련
-  const currentSubPage = ref('history');
-  const previousSubPage = ref('history');
+  const currentSubPage = ref('record');
+  const previousSubPage = ref('record');
   const isPageTransitioning = ref(false);
 
   const switchSubPage = async (pageName: string) => {
@@ -95,7 +95,7 @@
     currentSubPage.value = pageName;
 
     // 라우터 히스토리에 페이지 추가
-    if (pageName !== 'history') {
+    if (pageName !== 'record') {
       router.push({ name: pageName });
     } else {
       router.back();
@@ -130,7 +130,7 @@
   onMounted(() => {
     keyBinding.subscribe();
     const validPages = ['help', 'about', 'settings'];
-    currentSubPage.value = validPages.includes(route.name as string) ? (route.name as string) : 'history';
+    currentSubPage.value = validPages.includes(route.name as string) ? (route.name as string) : 'record';
   });
 
   onBeforeUnmount(() => {
@@ -154,14 +154,7 @@
           inline-label
           @update:model-value="store.setCurrentTab($event)"
         >
-          <q-tab
-            v-for="tab in tabs"
-            :key="tab.name"
-            :label="tab.title"
-            :name="tab.name"
-            class="q-px-xs"
-            dense
-          />
+          <q-tab v-for="tab in tabs" :key="tab.name" :label="tab.title" :name="tab.name" class="q-px-xs" dense />
         </q-tabs>
         <q-space />
         <HeaderIcons />
@@ -190,7 +183,7 @@
           dense
           round
           icon="arrow_forward"
-          @click="switchSubPage('history')"
+          @click="switchSubPage('record')"
         />
       </q-toolbar>
     </q-header>
@@ -213,7 +206,7 @@
           @enter="isPageTransitioning = true"
           @after-enter="isPageTransitioning = false"
         >
-          <q-scroll-area class="sub-scroll-area" :class="{ 'hide-scrollbar': currentSubPage === 'history' }">
+          <q-scroll-area class="sub-scroll-area" :class="{ 'hide-scrollbar': currentSubPage === 'record' }">
             <component :is="SUB_PAGE_CONFIG[currentSubPage]?.component" :key="currentSubPage" class="sub-page" />
           </q-scroll-area>
         </transition>

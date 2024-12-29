@@ -133,7 +133,7 @@
     [['F1'], () => router.push('/help')],
     [['F2'], () => router.push('/about')],
     [['F3'], () => router.push('/settings')],
-    [['F4'], () => router.push('/history')],
+    [['F4'], () => router.push('/record')],
     [[';'], store.toggleButtonAddedLabel],
     [[','], store.toggleUseGrouping],
     [['Alt+,'], () => store.setGroupingUnit(store.groupingUnit === 3 ? 4 : 3)],

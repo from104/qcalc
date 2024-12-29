@@ -1,6 +1,5 @@
 // Vue Router에서 RouteRecordRaw 타입을 가져옵니다.
 import { RouteRecordRaw } from 'vue-router';
-import { useQuasar } from 'quasar';
 
 // meta 타입 정의
 interface RouteMeta {
@@ -38,8 +37,8 @@ const routes: AppRouteRecordRaw[] = [
     }, // 왼쪽으로 슬라이드 전환 효과
   },
   {
-    name: 'history',
-    path: '/history',
+    name: 'record',
+    path: '/record',
     component: () => import('layouts/MainLayout.vue'),
     meta: {
       navigationMethod: '',

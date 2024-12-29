@@ -43,9 +43,9 @@ export const useStore = defineStore('store', {
 
     // 계산 결과 관련
     // 전체 계산 결과 삭제 확인 다이얼로그 표시 여부
-    isDeleteHistoryConfirmOpen: false,
+    isDeleteRecordConfirmOpen: false,
     // 계산 결과 창 스크롤 위치 저장
-    historyLastScrollPosition: 0,
+    recordLastScrollPosition: 0,
 
     // 숫자 표시 관련
     useGrouping: true,
@@ -165,7 +165,7 @@ export const useStore = defineStore('store', {
       return this.useGrouping ? this.numberGrouping(formattedValue) : formattedValue;
     },
 
-    // 진법 ��환 관련
+    // 진법 변환 관련
     convertIfRadix(value: string): string {
       const isRadixMode = this.currentTab === 'radix';
 
@@ -223,7 +223,7 @@ export const useStore = defineStore('store', {
     },
 
     // 계산 기록 관련
-    getLeftSideInHistory(result: CalculationResult, useLineBreak = false): string {
+    getLeftSideInRecord(result: CalculationResult, useLineBreak = false): string {
       const radixPrefix =
         this.currentTab === 'radix' && this.showRadix && this.radixType === 'prefix'
           ? this.getRadixPrefix(this.sourceRadix)
@@ -284,7 +284,7 @@ export const useStore = defineStore('store', {
         .otherwise(() => formattedPrev);
     },
 
-    getRightSideInHistory(result: CalculationResult): string {
+    getRightSideInRecord(result: CalculationResult): string {
       const radixPrefix =
         this.currentTab === 'radix' && this.showRadix && this.radixType === 'prefix'
           ? this.getRadixPrefix(this.sourceRadix)
@@ -527,8 +527,8 @@ export const useStore = defineStore('store', {
     },
 
     // 전체 계산 결과 삭제 확인 다이얼로그 표시 여부
-    setDeleteHistoryConfirmOpen(value: boolean) {
-      this.isDeleteHistoryConfirmOpen = value;
+    setDeleteRecordConfirmOpen(value: boolean) {
+      this.isDeleteRecordConfirmOpen = value;
     },
 
     isAtLeastDoubleWidth() {

@@ -2,7 +2,7 @@ import { match } from 'ts-pattern';
 
 import { BigNumber, Operator, CalculationResult, constants, WordSize } from './CalculatorTypes';
 import { CalculatorMath } from './CalculatorMath';
-import { CalculatorHistory } from './CalculatorHistory';
+import { CalculatorRecord } from './CalculatorRecord';
 import { Radix, RadixConverter } from './RadixConverter';
 
 /**
@@ -18,7 +18,7 @@ export class Calculator {
   private currentOperator!: Operator; // 현재 선택된 연산자
   private calculationSnapshot!: CalculationResult; // 최근 계산 결과 스냅샷
 
-  public readonly history!: CalculatorHistory; // 계산 히스토리 관리자
+  public readonly record!: CalculatorRecord; // 계산 기록 관리자
 
   // 진법 변환기를 초기화합니다.
   private radixConverter: RadixConverter = new RadixConverter();
@@ -168,7 +168,7 @@ export class Calculator {
     this.wordSize = 8;
 
     // 히스토리 관리 객체 생성
-    this.history = new CalculatorHistory();
+    this.record = new CalculatorRecord();
 
     // needsBufferReset 초기화 추가
     this.setDoesNotNeedBufferReset();
@@ -196,19 +196,19 @@ export class Calculator {
 
   /**
    * 계산 결과의 스냅샷을 내부 상태에 저장합니다.
-   * @param history - 저장할 계산 결과 스냅샷 객체
+   * @param record - 저장할 계산 결과 스냅샷 객체
    * @description
    * - 계산기의 현재 상태를 스냅샷 형태로 보관
    * - 이전 계산 결과를 추적하고 복원하는데 사용
    * - ResultSnapshot 타입의 객체를 그대로 저장
    */
-  private saveCalculationResult(history: CalculationResult): void {
-    this.calculationSnapshot = history;
+  private saveCalculationResult(record: CalculationResult): void {
+    this.calculationSnapshot = record;
   }
 
   /**
-   * 계산 결과를 히스토리에 추가하고 결과값을 반환합니다.
-   * @param history - 히스토리에 추가할 계산 결과 스넵샷 객체
+   * 계산 결과를 기록에 추가하고 결과값을 반환합니다.
+   * @param record - 기록에 추가할 계산 결과 스넵샷 객체
    * @returns 계산 결과값을 문자열로 반환
    * @description
    * - 계산 결과를 내부 스냅샷으로 저장
@@ -216,10 +216,10 @@ export class Calculator {
    * - 안전한 null 체크 후 히스토리 추가 수행
    * - 계산된 최종 결과값 반환
    */
-  private addHistory(history: CalculationResult): string {
-    this.saveCalculationResult(history);
-    this.history?.addHistory(history);
-    return history.resultNumber;
+  private addRecord(record: CalculationResult): string {
+    this.saveCalculationResult(record);
+    this.record?.addRecord(record);
+    return record.resultNumber;
   }
 
   /**
@@ -229,7 +229,7 @@ export class Calculator {
    * - 결과 스냅샷을 기본값으로 초기화
    * - 계산기의 메모리 관리를 위해 사용됨
    */
-  private removeFirstHistory(): void {
+  private removeFirstRecord(): void {
     // 결과 스냅샷을 기본 상태로 초기화
     this.calculationSnapshot = {
       previousNumber: '', // 이전 숫자를 0으로 설정
@@ -239,7 +239,7 @@ export class Calculator {
     };
 
     // 히스토리 관리자의 removeFirst 메서드 호출
-    this.history?.removeFirst();
+    this.record?.removeFirst();
   }
 
   /**
@@ -498,7 +498,7 @@ export class Calculator {
 
     // 계산 수행 및 이력 기록
     const result = this.performBinaryOperationCalculation(numberForCalc);
-    this.previousNumber = this.addHistory({
+    this.previousNumber = this.addRecord({
       previousNumber: this.previousNumber.toString(),
       operator: this.currentOperator,
       argumentNumber: numberForCalc.toString(),
@@ -566,7 +566,7 @@ export class Calculator {
    * 단항 연산을 수행하는 공통 메서드
    */
   private performUnaryOperation(operator: Operator, calculation: () => string): void {
-    this.currentNumber = this.calculateAndAddHistory(this.currentNumber, operator, calculation);
+    this.currentNumber = this.calculateAndAddRecord(this.currentNumber, operator, calculation);
     this.resetInputState();
   }
 
@@ -593,7 +593,7 @@ export class Calculator {
       const { previousNumber, argumentNumber } = this.calculationSnapshot;
 
       // 연산 기록 이동
-      this.removeFirstHistory();
+      this.removeFirstRecord();
 
       // 연산자 문자열 생성 (예: ×%, ÷%)
       const operator = [Operator.PCT, this.currentOperator];
@@ -605,7 +605,7 @@ export class Calculator {
           : BigNumber(this.previousNumber).div(100).toString(); // 곱셈: ÷ 100
 
       // 계산 결과를 기록에 추가하고 이전 숫자로 저장
-      this.previousNumber = this.addHistory({ previousNumber, operator, argumentNumber, resultNumber });
+      this.previousNumber = this.addRecord({ previousNumber, operator, argumentNumber, resultNumber });
       this.setCurrentNumberFromPrevious();
     }
 
@@ -731,25 +731,17 @@ export class Calculator {
   }
 
   /**
-   * 계산 결과를 히스토리 추가하고 문자열로 반환하는 헬퍼 함수
-   *
-   * @param number 계산에 사용될 입력 숫자
-   * @param operator 수행할 연산자 (예: 더하기, 빼기 등)
-   * @param calculation 실제 계산을 수행하는 콜백 함수
-   * @returns 계산 결과를 문자열로 변환한 값
-   *
-   * 동작 과정:
-   * 1. calculation() 함수를 호출하여 계산 수행
-   * 2. 계산 결과와 함께 입력 숫자, 연산자를 히스토리에 기록
-   * 3. 결과값을 문자열로 변환하여 반환
-   *
-   * 예시:
-   * calculateAndAddHistory("5", Operator.Add, () => "8")
-   * => 히스토리에 {이전값: "5", 연산자: "+", 결과값: "8"} 추가
-   * => "8" 반환
+   * 계산 결과를 기록에 추가하고 결과값을 반환합니다.
+   * @param record - 기록에 추가할 계산 결과 스넵샷 객체
+   * @returns 계산 결과값을 문자열로 반환
+   * @description
+   * - 계산 결과를 내부 스냅샷으로 저장
+   * - 히스토리 관리자에 결과를 추가하여 기록 유지
+   * - 안전한 null 체크 후 히스토리 추가 수행
+   * - 계산된 최종 결과값 반환
    */
-  private calculateAndAddHistory(number: string, operator: Operator, calculation: () => string): string {
-    return this.addHistory({
+  private calculateAndAddRecord(number: string, operator: Operator, calculation: () => string): string {
+    return this.addRecord({
       previousNumber: number,
       operator: operator,
       resultNumber: calculation(),
@@ -872,7 +864,7 @@ export class Calculator {
    * 2. 초기화 상태면 에러 발생
    * 3. 아니면 메모리의 숫자를 현재 숫자로 설정하고 리셋 플래그 해제
    *
-   * @throws {Error} 메모리가 초기화 상태일 때 ���출하면 'Memory is empty' 에러 발생
+   * @throws {Error} 메모리가 초기화 상태일 때 호출하면 'Memory is empty' 에러 발생
    */
   public memoryRecall(): void {
     // 1. 메모리가 비어있으면 (this.isMemoryEmpty이 true이면)

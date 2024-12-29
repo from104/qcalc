@@ -16,7 +16,7 @@
   import RadixPage from 'pages/RadixPage.vue';
   import HelpPage from 'src/pages/HelpPage.vue';
   import AboutPage from 'src/pages/AboutPage.vue';
-  import HistoryPage from 'src/pages/HistoryPage.vue';
+  import RecordPage from 'src/pages/RecordPage.vue';
   import SettingPage from 'src/pages/SettingPage.vue';
 
   const router = useRouter();
@@ -41,25 +41,25 @@
   }
 
   interface PageConfig {
-    component: typeof HelpPage | typeof AboutPage | typeof HistoryPage | typeof SettingPage;
+    component: typeof HelpPage | typeof AboutPage | typeof RecordPage | typeof SettingPage;
     buttons?: PageButton[];
   }
 
-  const isHistoryDisabled = computed(() => {
-    return store.calc.history.getAllRecords().length === 0 || store.isDeleteHistoryConfirmOpen;
+  const isRecordDisabled = computed(() => {
+    return store.calc.record.getAllRecords().length === 0 || store.isDeleteRecordConfirmOpen;
   });
 
   const SUB_PAGE_CONFIG: Record<string, PageConfig> = {
     help: { component: HelpPage },
     about: { component: AboutPage },
-    history: {
-      component: HistoryPage,
+    record: {
+      component: RecordPage,
       buttons: [
         {
           icon: 'delete_outline',
-          disabled: isHistoryDisabled,
+          disabled: isRecordDisabled,
           action: () => {
-            store.isDeleteHistoryConfirmOpen = true;
+            store.isDeleteRecordConfirmOpen = true;
           },
         },
       ],
@@ -69,7 +69,7 @@
 
   // 현재 페이지가 서브 페이지인지 확인
   const isSubPage = computed(() => {
-    return ['help', 'about', 'history', 'settings'].includes(String(route.name));
+    return ['help', 'about', 'record', 'settings'].includes(String(route.name));
   });
 
   // 현재 서브 페이지 컴포넌트
@@ -174,14 +174,7 @@
           mobile-arrows
           @update:model-value="store.setCurrentTab($event)"
         >
-          <q-tab
-            v-for="tab in tabs"
-            :key="tab.name"
-            :label="tab.title"
-            :name="tab.name"
-            class="q-px-xs"
-            dense
-          />
+          <q-tab v-for="tab in tabs" :key="tab.name" :label="tab.title" :name="tab.name" class="q-px-xs" dense />
         </q-tabs>
         <q-space />
         <HeaderIcons />

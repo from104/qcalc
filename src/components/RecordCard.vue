@@ -18,8 +18,8 @@
   const {
     calc,
     clickButtonById,
-    getRightSideInHistory,
-    getLeftSideInHistory,
+    getRightSideInRecord,
+    getLeftSideInRecord,
     showMessage,
     showError,
     swapUnits,
@@ -27,12 +27,12 @@
   } = store;
 
   // 계산 결과 배열 (반응형)
-  const records = computed(() => calc.history.getAllRecords());
+  const records = computed(() => calc.record.getAllRecords());
 
   // 계산 결과 메뉴의 열림 상태를 관리하는 반응형 객체
   const recordMenu = reactive(Object.fromEntries(records.value.map((h) => [h.id, false])));
 
-  // histories 변경 감시
+  // records 변경 감시
   watch(
     () => records,
     (newRecords) => {
@@ -63,7 +63,7 @@
 
   // 계산 결과 창 스크롤 위치를 최상단으로 이동
   const scrollToTop = () => {
-    document.getElementById('history')?.scrollTo({
+    document.getElementById('record')?.scrollTo({
       top: 0,
       behavior: 'smooth',
     });
@@ -71,7 +71,7 @@
 
   // 히스토리 스크롤 함수
   const scrollToRecord = (offset: number | 'top' | 'bottom') => {
-    const recordElement = document.getElementById('history');
+    const recordElement = document.getElementById('record');
     if (!recordElement) return;
 
     const currentScroll = recordElement.scrollTop;
@@ -82,20 +82,26 @@
     } else if (offset === 'bottom') {
       targetScroll = recordElement.scrollHeight - recordElement.clientHeight;
     } else {
-      targetScroll = Math.max(0, Math.min(currentScroll + offset, recordElement.scrollHeight - recordElement.clientHeight));
+      targetScroll = Math.max(
+        0,
+        Math.min(currentScroll + offset, recordElement.scrollHeight - recordElement.clientHeight),
+      );
     }
 
     recordElement.scrollTo({
       top: targetScroll,
-      behavior: 'smooth'
+      behavior: 'smooth',
     });
   };
-  
+
   // 키 바인딩 설정
   const keyBinding = new KeyBinding([
-    [['d'], () => {
-      if (calc.history.getAllRecords().length > 0) store.isDeleteHistoryConfirmOpen = true;
-    }],
+    [
+      ['d'],
+      () => {
+        if (calc.record.getAllRecords().length > 0) store.isDeleteRecordConfirmOpen = true;
+      },
+    ],
     [['ArrowUp'], () => scrollToRecord(-50)],
     [['ArrowDown'], () => scrollToRecord(50)],
     [['PageUp'], () => scrollToRecord(-400)],
@@ -121,7 +127,7 @@
   onMounted(() => {
     keyBinding.subscribe();
     setTimeout(() => {
-      document.getElementById('history')?.scrollTo({ top: store.historyLastScrollPosition });
+      document.getElementById('record')?.scrollTo({ top: store.recordLastScrollPosition });
     }, 50);
     showScrollToTop.value = false;
   });
@@ -129,9 +135,9 @@
   // 컴포넌트 언마운트 시 키 바인딩 비활성화
   onBeforeUnmount(() => {
     keyBinding.unsubscribe();
-    store.historyLastScrollPosition = document.getElementById('history')?.scrollTop ?? 0;
+    store.recordLastScrollPosition = document.getElementById('record')?.scrollTop ?? 0;
 
-    store.isDeleteHistoryConfirmOpen = false;
+    store.isDeleteRecordConfirmOpen = false;
   });
 
   // 메모 편집 관련 상태 변수
@@ -143,7 +149,7 @@
   // 메모 다이얼로그 열기 함수
   const openMemoDialog = (id: number) => {
     selectedMemoId = id;
-    memoText.value = (calc.history.getMemo(id) as string) || '';
+    memoText.value = (calc.record.getMemo(id) as string) || '';
     showMemoDialog.value = true;
   };
 
@@ -155,7 +161,7 @@
 
   // 메모 편집 확인 함수
   const saveMemo = () => {
-    calc.history.setMemo(selectedMemoId, memoText.value);
+    calc.record.setMemo(selectedMemoId, memoText.value);
     memoSlideDirection.value = 'slide-right';
     showMemoDialog.value = false;
     memoText.value = '';
@@ -172,20 +178,20 @@
 
   // 메모 삭제 함수
   const deleteMemo = (id: number) => {
-    calc.history.deleteMemo(id);
+    calc.record.deleteMemo(id);
     memoText.value = '';
   };
 
   // 히스토리 항목 복사 함수
-  const copyHistoryItem = async (id: number, copyType: 'formattedNumber' | 'onlyNumber' | 'memo'): Promise<void> => {
-    const history = calc.history.getRecordById(id);
+  const copyRecordItem = async (id: number, copyType: 'formattedNumber' | 'onlyNumber' | 'memo'): Promise<void> => {
+    const record = calc.record.getRecordById(id);
     const copyText =
       copyType === 'formattedNumber'
-        ? getRightSideInHistory(history.calculationResult)
+        ? getRightSideInRecord(record.calculationResult)
         : copyType === 'onlyNumber'
-          ? history.calculationResult.resultNumber
+          ? record.calculationResult.resultNumber
           : copyType === 'memo'
-            ? (calc.history.getMemo(id) as string)
+            ? (calc.record.getMemo(id) as string)
             : '';
     try {
       await copyToClipboard(copyText);
@@ -198,36 +204,36 @@
 
   // 메인 결과로 이동 함수
   const loadToMainPanel = (id: number) => {
-    const history = calc.history.getRecordById(id);
-    calc.setCurrentNumber(history.calculationResult.resultNumber);
+    const record = calc.record.getRecordById(id);
+    calc.setCurrentNumber(record.calculationResult.resultNumber);
   };
 
   // 서브 결과로 이동 함수
   const loadToSubPanel = (id: number) => {
-    const history = calc.history.getRecordById(id);
+    const record = calc.record.getRecordById(id);
     if (store.currentTab === 'unit') {
       swapUnits();
       setTimeout(() => {
-        calc.setCurrentNumber(history.calculationResult.resultNumber);
+        calc.setCurrentNumber(record.calculationResult.resultNumber);
       }, 5);
       setTimeout(swapUnits, 10);
     } else if (store.currentTab === 'currency') {
       swapCurrencies();
       setTimeout(() => {
-        calc.setCurrentNumber(history.calculationResult.resultNumber);
+        calc.setCurrentNumber(record.calculationResult.resultNumber);
       }, 5);
       setTimeout(swapCurrencies, 10);
     }
   };
 
   // 히스토리 항목 삭제 함수
-  const deleteHistoryItem = (id: number) => {
-    calc.history.deleteRecord(id);
+  const deleteRecordItem = (id: number) => {
+    calc.record.deleteRecord(id);
   };
 
   const $q = useQuasar();
 
-    // 헤더의 높이를 동적으로 계산하는 computed 속성입니다.
+  // 헤더의 높이를 동적으로 계산하는 computed 속성입니다.
   const calculatedHeaderHeight = computed(() => {
     const headerElement = document.getElementById('header');
     return headerElement ? headerElement.clientHeight + 'px' : '0px';
@@ -236,7 +242,7 @@
 
 <template>
   <q-card-section
-    id="history"
+    id="record"
     square
     class="full-width row justify-center items-start relative-position scrollbar-custom q-py-none q-pt-md"
     @scroll="handleScroll"
@@ -249,7 +255,7 @@
         color="secondary"
         icon="publish"
         class="fixed q-ma-md"
-        style="z-index: 15" 
+        style="z-index: 15"
         @click="scrollToTop"
       />
     </transition>
@@ -257,19 +263,19 @@
       <q-item v-if="records.length == 0" class="text-center">
         <q-item-section>
           <q-item-label>
-            <span>{{ t('noHistory') }}</span>
+            <span>{{ t('noRecord') }}</span>
           </q-item-label>
         </q-item-section>
       </q-item>
-      <q-list v-else id="history-list" separator class="full-width">
-        <transition-group name="history-list">
+      <q-list v-else id="record-list" separator class="full-width">
+        <transition-group name="record-list">
           <q-slide-item
             v-for="record in records"
             :key="record.id"
             left-color="positive"
             right-color="negative"
             @left="({ reset }) => handleLeftSlide({ reset }, record.id as number)"
-            @right="deleteHistoryItem(record.id as number)"
+            @right="deleteRecordItem(record.id as number)"
           >
             <template #left>
               <q-icon name="edit_note" />
@@ -283,10 +289,10 @@
                   <u>{{ record.memo }}</u>
                 </q-item-label>
                 <q-item-label style="white-space: pre-wrap">
-                  {{ getLeftSideInHistory(record.calculationResult, true) }}
+                  {{ getLeftSideInRecord(record.calculationResult, true) }}
                 </q-item-label>
                 <q-item-label>
-                  {{ ['=', getRightSideInHistory(record.calculationResult)].join(' ') }}
+                  {{ ['=', getRightSideInRecord(record.calculationResult)].join(' ') }}
                 </q-item-label>
               </q-item-section>
             </q-item>
@@ -312,22 +318,18 @@
                 <MenuItem
                   v-if="record.memo"
                   :title="t('copyMemo')"
-                  :action="() => copyHistoryItem(record.id as number, 'memo')"
+                  :action="() => copyRecordItem(record.id as number, 'memo')"
                 />
-                <MenuItem
-                  v-if="record.memo"
-                  :title="t('deleteMemo')"
-                  :action="() => deleteMemo(record.id as number)"
-                />
+                <MenuItem v-if="record.memo" :title="t('deleteMemo')" :action="() => deleteMemo(record.id as number)" />
                 <MenuItem separator />
                 <MenuItem
                   :title="t('copyDisplayedResult')"
-                  :action="() => copyHistoryItem(record.id as number, 'formattedNumber')"
-                  :caption="getRightSideInHistory(record.calculationResult)"
+                  :action="() => copyRecordItem(record.id as number, 'formattedNumber')"
+                  :caption="getRightSideInRecord(record.calculationResult)"
                 />
                 <MenuItem
                   :title="t('copyResultNumber')"
-                  :action="() => copyHistoryItem(record.id as number, 'onlyNumber')"
+                  :action="() => copyRecordItem(record.id as number, 'onlyNumber')"
                   :caption="record.calculationResult.resultNumber"
                 />
                 <MenuItem separator />
@@ -338,7 +340,7 @@
                   :action="() => loadToSubPanel(record.id as number)"
                 />
                 <MenuItem separator />
-                <MenuItem :title="t('deleteResult')" :action="() => deleteHistoryItem(record.id as number)" />
+                <MenuItem :title="t('deleteResult')" :action="() => deleteRecordItem(record.id as number)" />
               </q-list>
             </q-menu>
           </q-slide-item>
@@ -348,12 +350,17 @@
   </q-card-section>
 
   <!-- 기록 전체 삭제 다이얼로그 -->
-  <q-dialog v-model="store.isDeleteHistoryConfirmOpen" transition-show="scale" transition-hide="scale" style="z-index: 15">
+  <q-dialog
+    v-model="store.isDeleteRecordConfirmOpen"
+    transition-show="scale"
+    transition-hide="scale"
+    style="z-index: 15"
+  >
     <q-card class="noselect text-center text-white bg-negative" style="width: 240px">
-      <q-card-section>{{ t('doYouDeleteHistory') }} </q-card-section>
+      <q-card-section>{{ t('doYouDeleteRecord') }} </q-card-section>
       <q-card-actions align="center" class="text-negative bg-white">
         <q-btn v-close-popup flat :label="t('message.no')" autofocus />
-        <q-btn v-close-popup flat :label="t('message.yes')" @click="calc.history.clearRecords()" />
+        <q-btn v-close-popup flat :label="t('message.yes')" @click="calc.record.clearRecords()" />
       </q-card-actions>
     </q-card>
   </q-dialog>
@@ -396,7 +403,7 @@
 </template>
 
 <style scoped lang="scss">
-  #history {
+  #record {
     max-height: calc(100vh - v-bind('calculatedHeaderHeight'));
     overflow: auto;
   }
@@ -412,24 +419,24 @@
     transform: translateY(-20px);
   }
 
-  .history-list-move,
-  .history-list-enter-active,
-  .history-list-leave-active {
+  .record-list-move,
+  .record-list-enter-active,
+  .record-list-leave-active {
     transition: all 0.3s ease;
   }
 
-  .history-list-leave-active {
+  .record-list-leave-active {
     position: absolute; // 이 부분이 중요합니다
   }
 
-  .history-list-enter-from,
-  .history-list-leave-to {
+  .record-list-enter-from,
+  .record-list-leave-to {
     opacity: 0;
     transform: translateY(-50%);
     width: 100%;
   }
 
-  #history-list {
+  #record-list {
     -ms-overflow-style: none;
     scrollbar-width: none;
     overflow: hidden;
@@ -439,9 +446,9 @@
 
 <i18n>
 ko:
-  history: '계산 결과'
-  noHistory: '계산 결과가 없습니다.'
-  doYouDeleteHistory: '모든 계산 기록을 지우겠어요?'
+  record: '계산 기록'
+  noRecord: '계산 기록이 없습니다.'
+  doYouDeleteRecord: '모든 계산 기록을 지우겠어요?'
   memo: '메모'
   copySuccess: '클립보드에 복사되었습니다.'
   copyFailure: '클립보드 복사에 실패했습니다.'
@@ -455,9 +462,9 @@ ko:
   loadToSubPanel: '서브 패널에 불러오기'
   deleteResult: '결과 삭제'
 en:
-  history: 'History'
-  noHistory: 'No history.'
-  doYouDeleteHistory: 'Do you want to delete all history?'
+  record: 'record'
+  noRecord: 'No record.'
+  doYouDeleteRecord: 'Do you want to delete all record?'
   memo: 'Memo'
   copySuccess: 'Copied to clipboard.'
   copyFailure: 'Failed to copy to clipboard.'

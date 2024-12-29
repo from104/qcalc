@@ -129,11 +129,11 @@
   <q-btn
     v-if="!store.isAtLeastDoubleWidth()"
     flat
-    icon="history"
+    icon="record"
     class="q-ma-none q-pa-none q-pl-xs"
-    @click="router.push('/history')"
+    @click="router.push('/record')"
   >
-    <MyTooltip>{{ t('openHistoryDialog') }}</MyTooltip>
+    <MyTooltip>{{ t('openRecordPage') }}</MyTooltip>
   </q-btn>
   <q-btn id="btn-menu" flat icon="more_vert" class="q-ma-none q-pa-none q-pl-xs" >
     <q-menu auto-close transition-show="slide-down" transition-hide="slide-up" :offset="[140, 10]" class="shadow-6">
@@ -156,7 +156,7 @@ ko:
   pasteToSubPanel: '보조 패널에 붙여넣기'
   tooltipCopy: '내용을 복사합니다.'
   tooltipPaste: '숫자를 붙혀넣습니다.'
-  openHistoryDialog: '클릭하면 기록을 열거나 닫습니다.'
+  openRecordPage: '클릭하면 기록 페이지를 엽니다.'
 en:
   targetToBeCopiedResult: 'the calculation result'
   targetToBeCopiedSelected: 'the selected content'
@@ -170,5 +170,5 @@ en:
   pasteToSubPanel: 'Paste to the sub panel'
   tooltipCopy: 'Copy the content.'
   tooltipPaste: 'Paste the number.'
-  openHistoryDialog: 'Click to open or close the history.'
+  openRecordPage: 'Click to open the record page.'
 </i18n>
