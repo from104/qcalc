@@ -98,12 +98,7 @@
     [['Control+4'], () => store.setCurrentTab('radix')],
     [['Control+Tab', 'ArrowRight'], moveTabRight],
     [['Control+Shift+Tab', 'ArrowLeft'], moveTabLeft],
-    [
-      ['Escape'],
-      () => {
-        if (isSubPage.value) router.back();
-      },
-    ],
+    [['Escape'], () => { if (isSubPage.value) router.back(); }],
   ]);
 
   // 입력 포커스 상태에 따라 키 바인딩 활성화/비활성화
@@ -141,8 +136,29 @@
 <template>
   <q-layout view="hHh lpR fFf">
     <q-header class="z-top noselect" elevated>
+      <!-- 메인 페이지 헤더 -->
+      <q-toolbar v-if="!isSubPage" v-blur>
+        <q-tabs
+          v-model="store.currentTab"
+          align="left"
+          class="col-8 q-px-none"
+          active-color="text-primary"
+          indicator-color="secondary"
+          dense
+          shrink
+          inline-label
+          outside-arrows
+          mobile-arrows
+          @update:model-value="store.setCurrentTab($event)"
+        >
+          <q-tab v-for="tab in tabs" :key="tab.name" :label="tab.title" :name="tab.name" class="q-px-xs" dense />
+        </q-tabs>
+        <q-space />
+        <HeaderIcons />
+      </q-toolbar>
+
       <!-- 서브 페이지 헤더 -->
-      <q-toolbar v-if="isSubPage" v-blur class="q-px-sm">
+      <q-toolbar v-else v-blur class="q-px-sm">
         <q-btn
           flat
           dense
@@ -169,43 +185,23 @@
         />
       </q-toolbar>
 
-      <!-- 메인 페이지 헤더 -->
-      <q-toolbar v-else v-blur>
-        <q-tabs
-          v-model="store.currentTab"
-          align="left"
-          class="col-8 q-px-none"
-          active-color="text-primary"
-          indicator-color="secondary"
-          dense
-          shrink
-          inline-label
-          outside-arrows
-          mobile-arrows
-          @update:model-value="store.setCurrentTab($event)"
-        >
-          <q-tab v-for="tab in tabs" :key="tab.name" :label="tab.title" :name="tab.name" class="q-px-xs" dense />
-        </q-tabs>
-        <q-space />
-        <HeaderIcons />
-      </q-toolbar>
     </q-header>
 
     <q-page-container style="padding-bottom: 0px">
-      <!-- 서브 페이지 컨텐츠 -->
-      <template v-if="isSubPage">
-        <q-scroll-area style="height: 100vh">
-          <component :is="CurrentSubPageComponent" />
-        </q-scroll-area>
-      </template>
-
       <!-- 메인 페이지 컨텐츠 -->
-      <template v-else>
+      <template v-if="!isSubPage">
         <q-tab-panels v-model="store.currentTab" animated infinite :swipeable="$q.platform.is.mobile">
           <q-tab-panel v-for="(tab, index) in tabs" :key="index" :name="tab.name">
             <component :is="tab.component" />
           </q-tab-panel>
         </q-tab-panels>
+      </template>
+
+      <!-- 서브 페이지 컨텐츠 -->
+      <template v-else>
+        <q-scroll-area style="height: 100vh">
+          <component :is="CurrentSubPageComponent" />
+        </q-scroll-area>
       </template>
     </q-page-container>
   </q-layout>
