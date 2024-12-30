@@ -256,34 +256,40 @@
         icon="publish"
         class="fixed q-ma-md"
         style="z-index: 15"
+        :aria-label="t('ariaLabel.scrollToTop')"
         @click="scrollToTop"
       />
     </transition>
     <transition name="slide-fade" mode="out-in">
       <q-item v-if="records.length == 0" class="text-center">
-        <q-item-section>
+        <q-item-section role="listitem">
           <q-item-label>
             <span>{{ t('noRecord') }}</span>
           </q-item-label>
         </q-item-section>
       </q-item>
-      <q-list v-else id="record-list" separator class="full-width">
+      <q-list v-else id="record-list" separator class="full-width" role="list">
         <transition-group name="record-list">
           <q-slide-item
             v-for="record in records"
             :key="record.id"
             left-color="positive"
             right-color="negative"
+            role="listitem"
             @left="({ reset }) => handleLeftSlide({ reset }, record.id as number)"
             @right="deleteRecordItem(record.id as number)"
           >
             <template #left>
-              <q-icon name="edit_note" />
+              <q-icon name="edit_note" :aria-label="t('ariaLabel.editMemo')" role="button" />
             </template>
             <template #right>
-              <q-icon name="delete_outline" />
+              <q-icon name="delete_outline" :aria-label="t('ariaLabel.deleteRecord')" role="button" />
             </template>
-            <q-item v-touch-hold.mouse="() => (recordMenu[record.id as number] = true)" class="text-right q-pa-sm">
+            <q-item
+              v-touch-hold.mouse="() => (recordMenu[record.id as number] = true)"
+              class="text-right q-pa-sm"
+              role="listitem"
+            >
               <q-item-section class="q-mr-none q-px-none">
                 <q-item-label v-if="record.memo">
                   <u>{{ record.memo }}</u>
@@ -304,7 +310,7 @@
               anchor="center left"
               self="top left"
             >
-              <q-list dense class="noselect" style="max-width: 200px">
+              <q-list dense class="noselect" style="max-width: 200px" role="list">
                 <MenuItem
                   v-if="!record.memo"
                   :title="t('addMemo')"
@@ -461,6 +467,10 @@ ko:
   loadToMainPanel: '메인 패널에 불러오기'
   loadToSubPanel: '서브 패널에 불러오기'
   deleteResult: '결과 삭제'
+  ariaLabel:
+    scrollToTop: '맨 위로 스크롤'
+    editMemo: '메모 편집'
+    deleteRecord: '기록 삭제'
 en:
   record: 'record'
   noRecord: 'No record.'
@@ -477,4 +487,8 @@ en:
   loadToMainPanel: 'Load to main panel'
   loadToSubPanel: 'Load to sub panel'
   deleteResult: 'Delete result'
+  ariaLabel:
+    scrollToTop: 'Scroll to top'
+    editMemo: 'Edit memo'
+    deleteRecord: 'Delete record'
 </i18n>

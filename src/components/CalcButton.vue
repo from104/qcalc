@@ -344,11 +344,7 @@
 
   // 추가 기능 툴팁 표시 함수
   const displayActionTooltip = (id: ButtonID) => {
-    if (
-      tooltipTimers[id] ||
-      id === shiftButtonId.value ||
-      (!store.showButtonAddedLabel && store.isShiftPressed)
-    )
+    if (tooltipTimers[id] || id === shiftButtonId.value || (!store.showButtonAddedLabel && store.isShiftPressed))
       return;
     tooltipTimers[id] = true;
     setTimeout(() => {
@@ -497,30 +493,52 @@
     const buttonFunctions = isShift ? extendedFunctionSet.value : activeButtonSet.value;
     const shortcutKeys = buttonFunctions[btnId].shortcutKeys;
 
-    return shortcutKeys.map((key) => {
-      if (key === '+') return '+';
-      const parts = key.split('+');
-      const modifiers = parts.slice(0, -1)
-        .map(part => {
-          if (part === 'Shift') return 'S';
-          if (part === 'Control') return 'C';
-          if (part === 'Alt') return 'A';
-          return part;
-        })
-        .join('');
+    return shortcutKeys
+      .map((key) => {
+        if (key === '+') return '+';
+        const parts = key.split('+');
+        const modifiers = parts
+          .slice(0, -1)
+          .map((part) => {
+            if (part === 'Shift') return 'S';
+            if (part === 'Control') return 'C';
+            if (part === 'Alt') return 'A';
+            return part;
+          })
+          .join('');
 
-      const lastPart = parts[parts.length - 1].replace('Digit', '').replace('Numpad', 'N');
-      return modifiers + (modifiers ? '-' : '') + lastPart;
-    }).join(', ');
+        const lastPart = parts[parts.length - 1].replace('Digit', '').replace('Numpad', 'N');
+        return modifiers + (modifiers ? '-' : '') + lastPart;
+      })
+      .join(', ');
   };
 
   const baseWidth = computed(() => {
     return store.isAtLeastDoubleWidth() ? '50vw' : '100vw';
   });
+
+  // 버튼의 aria-label 설정
+  const getAriaLabel = (id: ButtonID, button: { label: string }) => {
+    if (button.label.charAt(0) === '@') {
+      // 아이콘 버튼의 경우 아이콘 이름에 따라 적절한 레이블 반환
+      return match(button.label.slice(1))
+        .with('mdi-backspace', () => t('ariaLabel.backspace'))
+        .with('mdi-plus-minus-variant', () => t('ariaLabel.plusMinus'))
+        .with('mdi-division', () => t('ariaLabel.divide'))
+        .with('mdi-close', () => t('ariaLabel.multiply'))
+        .with('mdi-minus', () => t('ariaLabel.subtract'))
+        .with('mdi-plus', () => t('ariaLabel.add'))
+        .with('mdi-equal', () => t('ariaLabel.equals'))
+        .with('mdi-circle-small', () => t('ariaLabel.decimal'))
+        .with('keyboard_capslock', () => t('ariaLabel.shift'))
+        .otherwise(() => button.label.slice(1));
+    }
+    return button.label;
+  };
 </script>
 
 <template>
-  <q-card-section v-blur class="row wrap justify-center q-pt-xs q-pb-none q-px-none" >
+  <q-card-section v-blur class="row wrap justify-center q-pt-xs q-pb-none q-px-none">
     <div v-for="(button, id) in activeButtonSet" :key="id" class="col-3 row wrap justify-center q-pa-sm">
       <q-btn
         :id="'btn-' + id"
@@ -557,6 +575,7 @@
         ]"
         :style="[!store.showButtonAddedLabel || !extendedFunctionSet[id].label ? { paddingTop: '4px' } : {}]"
         :color="`btn-${button.color}`"
+        :aria-label="getAriaLabel(id, button)"
         @click="() => (button.isDisabled ? displayDisabledButtonNotification() : handleShiftFunction(id))"
         @touchstart="() => hapticFeedbackLight()"
       >
@@ -609,12 +628,16 @@
   }
 
   .icon {
-    font-size: calc(min(calc((100vh - v-bind('baseHeight')) / 6 * 0.25), calc((v-bind('baseWidth') - 40px) / 4 * 0.3)) * 0.8);
+    font-size: calc(
+      min(calc((100vh - v-bind('baseHeight')) / 6 * 0.25), calc((v-bind('baseWidth') - 40px) / 4 * 0.3)) * 0.8
+    );
     padding-top: calc(((100vh - v-bind('baseHeight')) / 6 - 13px) * 0.3); /* Lower the content by 4px */
   }
 
   .char {
-    font-size: calc(min(calc((100vh - v-bind('baseHeight')) / 6 * 0.26), calc((v-bind('baseWidth') - 40px) / 4 * 0.2)) * 1.2);
+    font-size: calc(
+      min(calc((100vh - v-bind('baseHeight')) / 6 * 0.26), calc((v-bind('baseWidth') - 40px) / 4 * 0.2)) * 1.2
+    );
     padding-top: calc(((100vh - v-bind('baseHeight')) / 6 - 29px) * 0.3); /* Lower the content by 4px */
   }
 
@@ -676,6 +699,16 @@ ko:
   memorySaved: '메모리에 저장되었습니다.'
   noMemoryToRecall: '불러올 메모리가 없습니다.'
   disabledButton: '비활성화된 버튼'
+  ariaLabel:
+    backspace: '지우기'
+    plusMinus: '부호 바꾸기'
+    divide: '나누기'
+    multiply: '곱하기'
+    subtract: '빼기'
+    add: '더하기'
+    equals: '계산하기'
+    decimal: '소수점'
+    shift: '시프트'
 en:
   cannotDivideByZero: 'Cannot divide by zero'
   squareRootOfANegativeNumberIsNotAllowed: 'The square root of a negative number is not allowed.'
@@ -687,4 +720,14 @@ en:
   memorySaved: 'Memory saved.'
   noMemoryToRecall: 'No memory to recall.'
   disabledButton: 'Disabled button'
+  ariaLabel:
+    backspace: 'Backspace'
+    plusMinus: 'Change sign'
+    divide: 'Divide'
+    multiply: 'Multiply' 
+    subtract: 'Subtract'
+    add: 'Add'
+    equals: 'Calculate'
+    decimal: 'Decimal point'
+    shift: 'Shift'
 </i18n>

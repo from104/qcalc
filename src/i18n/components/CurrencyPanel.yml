@@ -171,6 +171,12 @@ ko:
     ZMW: '잠비아 콰차'
     ZWL: '짐바브웨 달러'
   tooltipSwap: '원본과 대상을 바꿉니다.'
+  ariaLabel:
+    sourceDirection: '원본 통화 방향'
+    targetDirection: '대상 통화 방향'
+    sourceCurrency: '원본 통화 선택'
+    targetCurrency: '대상 통화 선택'
+    swapCurrencies: '원본과 대상 통화 바꾸기'
 en:
   currency: 'Currency'
   currencyDesc:
@@ -345,3 +351,9 @@ en:
     ZMW: 'Zambian Kwacha'
     ZWL: 'Zimbabwean Dollar'
   tooltipSwap: 'Swap source and destination.'
+  ariaLabel:
+    sourceDirection: 'Source currency direction'
+    targetDirection: 'Target currency direction'
+    sourceCurrency: 'Select source currency'
+    targetCurrency: 'Select target currency'
+    swapCurrencies: 'Swap source and target currencies'

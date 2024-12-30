@@ -32,28 +32,36 @@
       caption: t('item.calc.caption'),
       shortcut: 'Ctrl-1',
       icon: 'calculate',
-      action: () => { store.currentTab = 'calc'; },
+      action: () => {
+        store.currentTab = 'calc';
+      },
     },
     unit: {
       title: t('item.unit.title'),
       caption: t('item.unit.caption'),
       shortcut: 'Ctrl-2',
       icon: 'swap_vert',
-      action: () => { store.currentTab = 'unit'; },
+      action: () => {
+        store.currentTab = 'unit';
+      },
     },
     currency: {
       title: t('item.currency.title'),
       caption: t('item.currency.caption'),
       shortcut: 'Ctrl-3',
       icon: 'currency_exchange',
-      action: () => { store.currentTab = 'currency'; },
+      action: () => {
+        store.currentTab = 'currency';
+      },
     },
     radix: {
       title: t('item.radix.title'),
       caption: t('item.radix.caption'),
       shortcut: 'Ctrl-4',
       icon: 'transform',
-      action: () => { store.currentTab = 'radix'; },
+      action: () => {
+        store.currentTab = 'radix';
+      },
     },
     separator1: { separator: true },
     settings: {
@@ -61,7 +69,7 @@
       caption: t('item.settings.caption'),
       shortcut: 'Alt-s',
       icon: 'settings',
-      action:  () => router.push('/settings'),
+      action: () => router.push('/settings'),
     },
     separator2: { separator: true },
     help: {
@@ -103,7 +111,7 @@
 </script>
 
 <template>
-  <q-list v-blur>
+  <q-list v-blur role="menu" :aria-label="t('ariaLabel.menu')">
     <MenuItem v-for="item in items" :key="item.title" v-bind="item" />
   </q-list>
 </template>
@@ -132,6 +140,8 @@ ko:
     about:
       title: '소개'
       caption: '앱에 대한 소개'
+  ariaLabel:
+    menu: '메인 메뉴'
 en:
   item:
     calc:
@@ -155,4 +165,6 @@ en:
     about:
       title: 'About'
       caption: 'About the app'
+  ariaLabel:
+    menu: 'Main menu'
 </i18n>

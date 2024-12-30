@@ -143,7 +143,15 @@
     <q-header class="z-top noselect" elevated>
       <!-- 서브 페이지 헤더 -->
       <q-toolbar v-if="isSubPage" v-blur class="q-px-sm">
-        <q-btn flat dense round icon="arrow_back" @click="router.back()" />
+        <q-btn
+          flat
+          dense
+          round
+          icon="arrow_back"
+          role="button"
+          :aria-label="t('ariaLabel.back')"
+          @click="router.back()"
+        />
         <q-toolbar-title class="text-subtitle1">{{ t(`message.${String(route.name)}`) }}</q-toolbar-title>
         <q-space />
         <q-btn
@@ -154,6 +162,8 @@
           size="md"
           style="z-index: 1000"
           :icon="button.icon"
+          role="button"
+          :aria-label="t(`ariaLabel.${button.icon}`)"
           :disable="button.disabled.value"
           @click="button.action"
         />
@@ -218,9 +228,15 @@ ko:
   unit: 단위
   currency: 환율
   radix: 진법
+  ariaLabel:
+    back: '이전 페이지로 돌아가기'
+    delete_outline: '모든 기록 삭제'
 en:
   calc: Basic
   unit: Unit
   currency: Currency
   radix: Radix
+  ariaLabel:
+    back: 'Go back to previous page'
+    delete_outline: 'Delete all records'
 </i18n>

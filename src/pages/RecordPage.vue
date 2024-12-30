@@ -1,7 +1,5 @@
 <script setup lang="ts">
-  import { useI18n } from 'vue-i18n';
   import RecordCard from 'components/RecordCard.vue';
-  const { locale } = useI18n({ useScope: 'global' });
 </script>
 
 <template>

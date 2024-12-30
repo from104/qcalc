@@ -174,13 +174,15 @@
 <template>
   <q-card-section class="row q-px-sm q-pt-none q-pb-sm">
     <!-- 원본 방향 -->
-    <q-icon name="keyboard_double_arrow_up" class="col-1" />
+    <q-icon name="keyboard_double_arrow_up" class="col-1" role="img" :aria-label="t('ariaLabel.sourceDirection')" />
 
     <!-- 원본 통화 -->
     <q-select
       v-model="store.sourceCurrency"
       :options="filteredSourceCurrencyOptions"
       :label="currencyDescriptions[store.sourceCurrency]"
+      role="combobox"
+      :aria-label="t('ariaLabel.sourceCurrency')"
       stack-label
       dense
       options-dense
@@ -225,6 +227,8 @@
       icon="swap_horiz"
       size="md"
       class="col-2 q-mx-none q-px-sm"
+      role="button"
+      :aria-label="t('ariaLabel.swapCurrencies')"
       @click="handleCurrencySwap()"
     >
       <MyTooltip>{{ t('tooltipSwap') }}</MyTooltip>
@@ -235,6 +239,8 @@
       v-model="store.targetCurrency"
       :options="filteredTargetCurrencyOptions"
       :label="currencyDescriptions[store.targetCurrency]"
+      role="combobox"
+      :aria-label="t('ariaLabel.targetCurrency')"
       stack-label
       dense
       options-dense
@@ -275,7 +281,13 @@
     </q-select>
 
     <!-- 대상 방향 -->
-    <q-icon name="keyboard_double_arrow_down" size="xs" class="col-1 q-px-none" />
+    <q-icon
+      name="keyboard_double_arrow_down"
+      size="xs"
+      class="col-1 q-px-none"
+      role="img"
+      :aria-label="t('ariaLabel.targetDirection')"
+    />
   </q-card-section>
 </template>
 

@@ -55,27 +55,48 @@
 
 <template>
   <q-card-section class="full-height column no-wrap">
-    <q-list v-blur dense class="full-width">
+    <q-list v-blur dense class="full-width" role="list" :aria-label="t('ariaLabel.settingsList')">
       <q-item v-if="$q.platform.is.electron" class="q-mb-sm">
-        <q-item-label class="self-center">{{ t('alwaysOnTop') }} (Alt-T)</q-item-label>
+        <q-item-label class="self-center" role="text">{{ t('alwaysOnTop') }} (Alt-T)</q-item-label>
         <q-space />
-        <q-toggle v-model="store.alwaysOnTop" keep-color dense @click="setAlwaysOnTop(store.alwaysOnTop)" />
+        <q-toggle
+          v-model="store.alwaysOnTop"
+          keep-color
+          dense
+          role="switch"
+          :aria-label="t('ariaLabel.alwaysOnTop')"
+          @click="setAlwaysOnTop(store.alwaysOnTop)"
+        />
       </q-item>
 
       <q-item class="q-mb-sm">
-        <q-item-label class="self-center">{{ t('initPanel') }} (Alt-I)</q-item-label>
+        <q-item-label class="self-center" role="text">{{ t('initPanel') }} (Alt-I)</q-item-label>
         <q-space />
-        <q-toggle v-model="store.initPanel" keep-color dense @click="setInitPanel(store.initPanel)" />
+        <q-toggle
+          v-model="store.initPanel"
+          keep-color
+          dense
+          role="switch"
+          :aria-label="t('ariaLabel.initPanel')"
+          @click="setInitPanel(store.initPanel)"
+        />
       </q-item>
 
       <q-item v-if="$q.platform.is.capacitor" class="q-mb-sm">
-        <q-item-label class="self-center">{{ t('hapticsMode') }} (Alt-P)</q-item-label>
+        <q-item-label class="self-center" role="text">{{ t('hapticsMode') }} (Alt-P)</q-item-label>
         <q-space />
-        <q-toggle v-model="store.hapticsMode" keep-color dense @click="setHapticsMode(store.hapticsMode)" />
+        <q-toggle
+          v-model="store.hapticsMode"
+          keep-color
+          dense
+          role="switch"
+          :aria-label="t('ariaLabel.hapticsMode')"
+          @click="setHapticsMode(store.hapticsMode)"
+        />
       </q-item>
 
       <q-item class="q-mb-md">
-        <q-item-label class="self-center">{{ t('darkMode.title') }} (Alt-D)</q-item-label>
+        <q-item-label class="self-center" role="text">{{ t('darkMode.title') }} (Alt-D)</q-item-label>
         <q-space />
         <q-select
           v-model="store.darkMode"
@@ -84,6 +105,8 @@
             { label: t('darkMode.dark'), value: 'dark' },
             { label: t('darkMode.system'), value: 'system' },
           ]"
+          role="combobox"
+          :aria-label="t('ariaLabel.darkMode')"
           dense
           options-dense
           emit-value
@@ -96,22 +119,28 @@
         />
       </q-item>
 
-      <q-separator spaced="md" />
+      <q-separator spaced="md" role="separator" />
 
       <q-item class="q-mb-sm">
-        <q-item-label class="self-center">{{ t('showButtonAddedLabel') }} (;)</q-item-label>
+        <q-item-label class="self-center" role="text">{{ t('showButtonAddedLabel') }} (;)</q-item-label>
         <q-space />
-        <q-toggle v-model="store.showButtonAddedLabel" keep-color dense />
+        <q-toggle
+          v-model="store.showButtonAddedLabel"
+          keep-color
+          dense
+          role="switch"
+          :aria-label="t('ariaLabel.showButtonAddedLabel')"
+        />
       </q-item>
 
       <q-item class="q-mb-xs">
-        <q-item-label class="self-center">{{ t('useGrouping') }} (,)</q-item-label>
+        <q-item-label class="self-center" role="text">{{ t('useGrouping') }} (,)</q-item-label>
         <q-space />
         <q-toggle v-model="store.useGrouping" keep-color dense />
       </q-item>
 
       <q-item class="q-mb-sm">
-        <q-item-label class="self-center">{{ t('groupingUnit') }} (Alt-,)</q-item-label>
+        <q-item-label class="self-center" role="text">{{ t('groupingUnit') }} (Alt-,)</q-item-label>
         <q-space />
         <q-slider
           v-model="store.groupingUnit"
@@ -169,7 +198,7 @@
         <q-separator spaced="md" />
 
         <q-item class="q-mb-sm">
-          <q-item-label class="self-center"> {{ t('showUnit') }} (Alt-Y) </q-item-label>
+          <q-item-label class="self-center" role="text"> {{ t('showUnit') }} (Alt-Y) </q-item-label>
           <q-space />
           <q-toggle v-model="store.showUnit" keep-color dense />
         </q-item>
@@ -179,7 +208,7 @@
         <q-separator spaced="md" />
 
         <q-item class="q-mb-sm">
-          <q-item-label class="self-center"> {{ t('showSymbol') }} (Alt-Y) </q-item-label>
+          <q-item-label class="self-center" role="text"> {{ t('showSymbol') }} (Alt-Y) </q-item-label>
           <q-space />
           <q-toggle v-model="store.showSymbol" keep-color dense />
         </q-item>
@@ -189,13 +218,13 @@
         <q-separator spaced="md" />
 
         <q-item class="q-mb-sm">
-          <q-item-label class="self-center"> {{ t('showRadix') }} (Alt-Y) </q-item-label>
+          <q-item-label class="self-center" role="text"> {{ t('showRadix') }} (Alt-Y) </q-item-label>
           <q-space />
           <q-toggle v-model="store.showRadix" keep-color dense />
         </q-item>
 
         <q-item class="q-mb-md">
-          <q-item-label class="self-center"> {{ t('radixType') }} (Alt-U) </q-item-label>
+          <q-item-label class="self-center" role="text"> {{ t('radixType') }} (Alt-U) </q-item-label>
           <q-space />
           <q-select
             v-model="store.radixType"
@@ -219,13 +248,13 @@
       <q-separator spaced="md" />
 
       <q-item class="q-mb-sm">
-        <q-item-label class="self-center">{{ t('useSystemLocale') }}</q-item-label>
+        <q-item-label class="self-center" role="text">{{ t('useSystemLocale') }}</q-item-label>
         <q-space />
         <q-toggle v-model="store.useSystemLocale" keep-color dense @click="setLanguage()" />
       </q-item>
 
       <q-item class="q-mb-md">
-        <q-item-label class="self-center">
+        <q-item-label class="self-center" role="text">
           {{ t('language') }}
         </q-item-label>
         <q-space />
@@ -233,6 +262,8 @@
           v-model="store.userLocale"
           :disable="store.useSystemLocale"
           :options="languageOptions"
+          role="combobox"
+          :aria-label="t('ariaLabel.language')"
           dense
           emit-value
           map-options
@@ -309,6 +340,22 @@ ko:
   suffix: '뒤에'
   useSystemLocale: '시스템 언어 사용'
   language: '언어'
+  ariaLabel:
+    settingsList: '설정 목록'
+    alwaysOnTop: '항상 위에 표시 설정'
+    initPanel: '시작 시 패널 초기화 설정'
+    hapticsMode: '진동 모드 설정'
+    darkMode: '다크 모드 설정'
+    showButtonAddedLabel: '버튼 추가 라벨 표시 설정'
+    useGrouping: '숫자 묶음 표시 설정'
+    groupingUnit: '숫자 묶음 단위 설정'
+    decimalPlaces: '소수점 자리수 설정'
+    showUnit: '단위 표시 설정'
+    showSymbol: '기호 표시 설정'
+    showRadix: '진법 표시 설정'
+    radixType: '진법 형식 설정'
+    useSystemLocale: '시스템 언어 사용 설정'
+    language: '언어 설정'
 en:
   alwaysOnTop: 'Always on top'
   alwaysOnTopOn: 'Always on top ON'
@@ -339,4 +386,20 @@ en:
   suffix: 'Suffix'
   useSystemLocale: 'Use system locale'
   language: 'Language'
+  ariaLabel:
+    settingsList: 'Settings list'
+    alwaysOnTop: 'Always on top setting'
+    initPanel: 'Initialize panel at startup setting'
+    hapticsMode: 'Haptics mode setting'
+    darkMode: 'Dark mode setting'
+    showButtonAddedLabel: 'Show button added label setting'
+    useGrouping: 'Use grouping setting'
+    groupingUnit: 'Grouping unit setting'
+    decimalPlaces: 'Decimal places setting'
+    showUnit: 'Show unit setting'
+    showSymbol: 'Show symbol setting'
+    showRadix: 'Show radix setting'
+    radixType: 'Radix type setting'
+    useSystemLocale: 'Use system locale setting'
+    language: 'Language setting'
 </i18n>

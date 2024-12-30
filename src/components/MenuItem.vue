@@ -1,53 +1,65 @@
 <script setup lang="ts">
+  import { useI18n } from 'vue-i18n';
+
+  // i18n 설정
+  const { t } = useI18n();
+
   // MenuItem 컴포넌트의 props 정의
   defineProps({
     // 메뉴 아이템의 제목
     title: {
       type: String,
-      default: ''
+      default: '',
     },
-    // 메뉴 아이템의 부가 설명 
+    // 메뉴 아이템의 부가 설명
     caption: {
       type: String,
-      default: ''
+      default: '',
     },
     // 메뉴 아이템의 단축키
     shortcut: {
       type: String,
-      default: ''
+      default: '',
     },
     // 메뉴 아이템의 아이콘
     icon: {
       type: String,
-      default: ''
+      default: '',
     },
     // 메뉴 아이템 클릭 시 실행할 함수
     action: {
       type: Function,
-      default: () => {}
+      default: () => {},
     },
     // 구분선 여부
     separator: {
       type: Boolean,
-      default: false
+      default: false,
     },
   });
 </script>
 
 <template>
-  <q-item v-if="!separator" clickable @click="action()">
-    <q-item-section v-if="icon" class="col-3" avatar>
-      <q-icon :name="icon" />
+  <q-separator v-if="separator" />
+  <q-item v-else v-close-popup clickable role="menuitem" :aria-label="title" @click="(evt: Event) => action(evt)">
+    <q-item-section v-if="icon" avatar>
+      <q-icon :name="icon" role="img" :aria-label="t('ariaLabel.icon', { name: title })" />
     </q-item-section>
-
     <q-item-section>
-      <q-item-label v-if="title">
-        {{ title }}
-      </q-item-label>
-      <q-item-label v-if="caption" caption class="ellipsis">
-        {{ caption }} {{ shortcut ? '('+shortcut+')' : '' }}
-      </q-item-label>
+      <q-item-label>{{ title }}</q-item-label>
+      <q-item-label caption>{{ caption }}</q-item-label>
+    </q-item-section>
+    <q-item-section v-if="shortcut" side>
+      <q-item-label caption>{{ shortcut }}</q-item-label>
     </q-item-section>
   </q-item>
-  <q-separator v-else class="q-my-xs" />
 </template>
+
+<i18n>
+ko:
+  ariaLabel:
+    icon: '{name} 메뉴 아이콘'
+en:
+  ariaLabel:
+    icon: '{name} menu icon'
+</i18n>

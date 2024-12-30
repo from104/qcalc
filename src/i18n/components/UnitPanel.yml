@@ -212,6 +212,13 @@ ko:
       mAh: '밀리암페어시'
       e: '원자 전하'
   tooltipSwap: '원본과 대상을 바꿉니다.'
+  ariaLabel:
+    selectCategory: '단위 카테고리 선택'
+    sourceDirection: '원본 단위 방향'
+    targetDirection: '대상 단위 방향'
+    sourceUnit: '원본 단위 선택'
+    targetUnit: '대상 단위 선택'
+    swapUnits: '원본과 대상 단위 바꾸기'
 en:
   category: 'Category'
   categories:
@@ -426,3 +433,10 @@ en:
       mAh: 'Milliampere-hour'
       e: 'Elementary charge'
   tooltipSwap: 'Swap source and destination.'
+  ariaLabel:
+    selectCategory: 'Select unit category'
+    sourceDirection: 'Source unit direction'
+    targetDirection: 'Target unit direction'
+    sourceUnit: 'Select source unit'
+    targetUnit: 'Select target unit'
+    swapUnits: 'Swap source and target units'

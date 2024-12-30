@@ -118,6 +118,8 @@
       v-model="store.selectedCategory"
       :options="categoryList"
       :label="t('category')"
+      role="combobox"
+      :aria-label="t('ariaLabel.selectCategory')"
       stack-label
       dense
       options-dense
@@ -131,13 +133,15 @@
     />
 
     <!-- 원본 방향 -->
-    <q-icon name="keyboard_double_arrow_up" class="col-1" />
+    <q-icon name="keyboard_double_arrow_up" class="col-1" role="img" :aria-label="t('ariaLabel.sourceDirection')" />
 
     <!-- 원본 단위 -->
     <q-select
       v-model="store.sourceUnits[store.selectedCategory]"
       :options="sourceUnitOptions.values"
       :label="t(`unitDesc.${store.selectedCategory}.${store.sourceUnits[store.selectedCategory]}`)"
+      role="combobox"
+      :aria-label="t('ariaLabel.sourceUnit')"
       stack-label
       dense
       options-dense
@@ -173,6 +177,8 @@
       icon="swap_horiz"
       size="md"
       class="col-1 q-mx-none q-px-sm"
+      role="button"
+      :aria-label="t('ariaLabel.swapUnits')"
       @click="handleUnitSwap()"
     >
       <MyTooltip>{{ t('tooltipSwap') }}</MyTooltip>
@@ -183,6 +189,8 @@
       v-model="store.targetUnits[store.selectedCategory]"
       :options="targetUnitOptions.values"
       :label="t(`unitDesc.${store.selectedCategory}.${store.targetUnits[store.selectedCategory]}`)"
+      role="combobox"
+      :aria-label="t('ariaLabel.targetUnit')"
       stack-label
       dense
       options-dense
@@ -210,7 +218,13 @@
     </q-select>
 
     <!-- 대상 방향 -->
-    <q-icon name="keyboard_double_arrow_down" size="xs" class="col-1 q-px-none" />
+    <q-icon
+      name="keyboard_double_arrow_down"
+      size="xs"
+      class="col-1 q-px-none"
+      role="img"
+      :aria-label="t('ariaLabel.targetDirection')"
+    />
   </q-card-section>
 </template>
 

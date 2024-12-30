@@ -173,6 +173,8 @@
           flat
           size="md"
           :icon="button.icon"
+          role="button"
+          :aria-label="t(`ariaLabel.${button.icon}`)"
           :disable="button.disabled.value"
           @click="button.action"
         />
@@ -183,6 +185,8 @@
           dense
           round
           icon="arrow_forward"
+          role="button"
+          :aria-label="t('ariaLabel.backToRecord')"
           @click="switchSubPage('record')"
         />
       </q-toolbar>
@@ -289,9 +293,15 @@ ko:
   unit: 단위
   currency: 환율
   radix: 진법
+  ariaLabel:
+    delete_outline: '모든 기록 삭제'
+    backToRecord: '기록 페이지로 돌아가기'
 en:
   calc: Basic
   unit: Unit
   currency: Currency
   radix: Radix
+  ariaLabel:
+    delete_outline: 'Delete all records'
+    backToRecord: 'Return to record page'
 </i18n>

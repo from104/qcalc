@@ -29,7 +29,6 @@
   const {
     calc,
     currentTab,
-    hideMemory,
     showMemoryTemporarily,
     toFormattedNumber,
     convertIfRadix,
@@ -375,12 +374,14 @@
       dense
       readonly
       :dark="false"
+      role="textbox"
+      :aria-label="t('ariaLabel.resultField', { type: isMainField ? t('ariaLabel.main') : t('ariaLabel.sub') })"
       :bg-color="!needFieldTooltip ? resultBackgroundColors.normal : resultBackgroundColors.warning"
       :label-slot="isMainField"
       :stack-label="isMainField"
     >
       <template v-if="isMainField" #label>
-        <div v-blur class="noselect" :class="getResultColor()">
+        <div v-blur class="noselect" :class="getResultColor()" role="text" :aria-label="t('ariaLabel.expression')">
           {{ calculationExpression }}
         </div>
       </template>
@@ -390,12 +391,21 @@
           v-blur
           class="noselect full-height q-mt-xs q-pt-sm"
           :class="getResultColor()"
+          role="button"
+          :aria-label="t('ariaLabel.memory')"
           @click="showMemoryTemporarily()"
         >
-          <q-icon name="mdi-chip" />
+          <q-icon name="mdi-chip" role="img" :aria-label="t('ariaLabel.memoryIcon')" />
         </div>
-        <div v-if="operator != ''" v-blur class="noselect full-height q-mt-xs q-pt-sm" :class="getResultColor()">
-          <q-icon :name="operatorIcons[operator]" />
+        <div
+          v-if="operator != ''"
+          v-blur
+          class="noselect full-height q-mt-xs q-pt-sm"
+          :class="getResultColor()"
+          role="text"
+          :aria-label="t('ariaLabel.operator', { operator })"
+        >
+          <q-icon :name="operatorIcons[operator]" role="img" :aria-label="t('ariaLabel.operatorIcon', { operator })" />
         </div>
       </template>
       <template #control>
@@ -411,17 +421,40 @@
           class="self-center no-outline full-width full-height ellipsis text-right q-pt-xs noselect"
           :class="[isMainField ? 'text-h5' : '', getResultColor()]"
           :style="`padding-top: ${store.resultPanelPadding}px;`"
+          role="text"
+          :aria-label="t('ariaLabel.result', { type: isMainField ? t('ariaLabel.main') : t('ariaLabel.sub') })"
         >
-          <span v-if="currentTab === 'radix'" id="radixPrefix">{{ radixPrefix }}</span>
-          <span v-if="currentTab === 'currency'" id="symbol">{{ symbol }}</span>
-          <span :id="isMainField ? 'result' : 'subResult'" :class="getResultColor()">
+          <span v-if="currentTab === 'radix'" id="radixPrefix" role="text" :aria-label="t('ariaLabel.radixPrefix')">{{
+            radixPrefix
+          }}</span>
+          <span v-if="currentTab === 'currency'" id="symbol" role="text" :aria-label="t('ariaLabel.currencySymbol')">{{
+            symbol
+          }}</span>
+          <span
+            :id="isMainField ? 'result' : 'subResult'"
+            :class="getResultColor()"
+            role="text"
+            :aria-label="t('ariaLabel.value')"
+          >
             {{ isMainField && store.isMemoryVisible ? memoryValue : result }}
           </span>
-          <span v-if="currentTab === 'unit'" id="unit">{{ unit }}</span>
-          <span v-if="currentTab === 'radix' && store.showRadix && store.radixType === 'suffix'" id="radixSuffix">
+          <span v-if="currentTab === 'unit'" id="unit" role="text" :aria-label="t('ariaLabel.unit')">{{ unit }}</span>
+          <span
+            v-if="currentTab === 'radix' && store.showRadix && store.radixType === 'suffix'"
+            id="radixSuffix"
+            role="text"
+            :aria-label="t('ariaLabel.radixSuffix')"
+          >
             {{ radixSuffix }}
           </span>
-          <q-menu context-menu auto-close touch-position class="shadow-6">
+          <q-menu
+            context-menu
+            auto-close
+            touch-position
+            class="shadow-6"
+            role="menu"
+            :aria-label="t('ariaLabel.contextMenu')"
+          >
             <q-list class="noselect" dense style="min-width: 150px">
               <MenuItem
                 :action="() => copyToClipboard(displayedResult, t('copiedDisplayedResult'))"
@@ -493,13 +526,45 @@
 
 <i18n>
   ko:
-    copiedDisplayedResult: '표시된 결과가 복사되습니다.'
+    copiedDisplayedResult: '표시된 결과가 복사되었습니다.'
     copyDisplayedResult: '표시된 결과 복사'
     copiedOnlyNumber: '결과 숫자가 복사되었습니다.'
-    copyOnlyNumber: '결과 숫자 복사'    
+    copyOnlyNumber: '결과 숫자 복사'
+    ariaLabel:
+      resultField: '{type} 결과 필드'
+      main: '주'
+      sub: '보조'
+      expression: '계산식'
+      memory: '메모리 값 표시'
+      memoryIcon: '메모리 아이콘'
+      operator: '현재 연산자: {operator}'
+      operatorIcon: '{operator} 연산자 아이콘'
+      result: '{type} 결과 값'
+      value: '계산 결과'
+      radixPrefix: '진법 접두사'
+      radixSuffix: '진법 접미사'
+      currencySymbol: '통화 기호'
+      unit: '단위'
+      contextMenu: '결과 복사 메뉴'
   en:
     copiedDisplayedResult: 'The displayed result has been copied.'
     copyDisplayedResult: 'Copy displayed result'
     copiedOnlyNumber: 'The result number has been copied.'
     copyOnlyNumber: 'Copy result number'
+    ariaLabel:
+      resultField: '{type} result field'
+      main: 'main'
+      sub: 'sub'
+      expression: 'Calculation expression'
+      memory: 'Show memory value'
+      memoryIcon: 'Memory icon'
+      operator: 'Current operator: {operator}'
+      operatorIcon: '{operator} operator icon'
+      result: '{type} result value'
+      value: 'Calculation result'
+      radixPrefix: 'Radix prefix'
+      radixSuffix: 'Radix suffix'
+      currencySymbol: 'Currency symbol'
+      unit: 'Unit'
+      contextMenu: 'Result copy menu'
 </i18n>

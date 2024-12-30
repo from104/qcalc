@@ -8,8 +8,8 @@
   import MenuPanel from './MenuPanel.vue';
 
   // router 인스턴스 가져오기
-  import { useRouter } from 'vue-router'
-  const router = useRouter()
+  import { useRouter } from 'vue-router';
+  const router = useRouter();
 
   // Quasar 인스턴스 초기화
   import { useQuasar } from 'quasar';
@@ -24,16 +24,8 @@
   const store = useStore();
 
   // 스토어에서 필요한 메서드와 속성 추출
-  const {
-    calc,
-    copyToClipboard,
-    clickButtonById,
-    showError,
-    showMessage,
-    swapUnits,
-    swapCurrencies,
-    swapRadixes,
-  } = store;
+  const { calc, copyToClipboard, clickButtonById, showError, showMessage, swapUnits, swapCurrencies, swapRadixes } =
+    store;
 
   /**
    * 선택된 텍스트 또는 계산 결과를 클립보드에 복사하는 함수
@@ -107,6 +99,7 @@
     flat
     icon="content_copy"
     class="q-ma-none q-pa-none q-pl-xs"
+    :aria-label="t('ariaLabel.copy')"
     @click="handleCopy"
   >
     <MyTooltip>{{ t('tooltipCopy') }}</MyTooltip>
@@ -116,6 +109,7 @@
     flat
     icon="content_paste"
     class="q-ma-none q-pa-none q-pl-xs"
+    :aria-label="t('ariaLabel.paste')"
     @click="handlePaste()"
   >
     <q-menu v-if="!store.isDefaultCalculator()" context-menu auto-close class="z-max shadow-6">
@@ -129,13 +123,14 @@
   <q-btn
     v-if="!store.isAtLeastDoubleWidth()"
     flat
-    icon="record"
+    icon="mdi-history"
     class="q-ma-none q-pa-none q-pl-xs"
+    :aria-label="t('ariaLabel.record')"
     @click="router.push('/record')"
   >
     <MyTooltip>{{ t('openRecordPage') }}</MyTooltip>
   </q-btn>
-  <q-btn id="btn-menu" flat icon="more_vert" class="q-ma-none q-pa-none q-pl-xs" >
+  <q-btn id="btn-menu" flat icon="more_vert" class="q-ma-none q-pa-none q-pl-xs" :aria-label="t('ariaLabel.menu')">
     <q-menu auto-close transition-show="slide-down" transition-hide="slide-up" :offset="[140, 10]" class="shadow-6">
       <MenuPanel />
     </q-menu>
@@ -157,6 +152,11 @@ ko:
   tooltipCopy: '내용을 복사합니다.'
   tooltipPaste: '숫자를 붙혀넣습니다.'
   openRecordPage: '클릭하면 기록 페이지를 엽니다.'
+  ariaLabel:
+    copy: '클립보드에 복사'
+    paste: '클립보드에서 붙여넣기'
+    record: '기록 페이지 열기'
+    menu: '메뉴 열기'
 en:
   targetToBeCopiedResult: 'the calculation result'
   targetToBeCopiedSelected: 'the selected content'
@@ -171,4 +171,9 @@ en:
   tooltipCopy: 'Copy the content.'
   tooltipPaste: 'Paste the number.'
   openRecordPage: 'Click to open the record page.'
+  ariaLabel:
+    copy: 'Copy to clipboard'
+    paste: 'Paste from clipboard'
+    record: 'Open record page'
+    menu: 'Open menu'
 </i18n>
