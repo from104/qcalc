@@ -1,9 +1,13 @@
 <script setup lang="ts">
   // Vue 핵심 기능 및 컴포지션 API 가져오기
-  import { ref, watch, onBeforeMount, onMounted, onBeforeUnmount } from 'vue';
+  import { ref, watch, computed, onBeforeMount, onMounted, onBeforeUnmount } from 'vue';
   import { useI18n } from 'vue-i18n';
   import { useMeta, useQuasar } from 'quasar';
-  import { RouteLocationNormalizedLoaded } from 'vue-router';
+  import { useRouter, useRoute, RouteLocationNormalizedLoaded, RouteLocationRaw } from 'vue-router';
+
+  // router 인스턴스 가져오기
+  const router = useRouter();
+  const route = useRoute() as RouteLocationNormalizedLoaded & { meta: RouteMeta };
 
   // 상태 관리를 위한 스토어 가져오기
   import { useStore } from 'src/stores/store';
@@ -116,11 +120,17 @@
       showMessage(t('darkMode.message.' + store.darkMode));
     }
   };
-  import { useRouter } from 'vue-router';
 
-  // router 인스턴스 가져오기
-  const router = useRouter();
-
+  //
+  const pushOrBackAndPush = (path: string) => {
+    if (route.path === path) {
+      return;
+    } else if (/help|about|settings|record/.test(route.path)) {
+      router.replace(path);
+    } else {
+      router.push(path);
+    }
+  };
   // 키 바인딩 클래스를 가져옵니다.
   import { KeyBinding } from 'classes/KeyBinding';
 
@@ -130,10 +140,10 @@
     [['Alt+i'], store.toggleInitPanel],
     [['Alt+d'], toggleDarkModeWithNotification],
     [['Alt+p'], store.toggleHapticsMode],
-    [['F1'], () => router.push('/help')],
-    [['F2'], () => router.push('/about')],
-    [['F3'], () => router.push('/settings')],
-    [['F4'], () => router.push('/record')],
+    [['F1'], () => pushOrBackAndPush('/help')],
+    [['F2'], () => pushOrBackAndPush('/about')],
+    [['F3'], () => pushOrBackAndPush('/settings')],
+    [['F4'], () => pushOrBackAndPush('/record')],
     [[';'], store.toggleButtonAddedLabel],
     [[','], store.toggleUseGrouping],
     [['Alt+,'], () => store.setGroupingUnit(store.groupingUnit === 3 ? 4 : 3)],
@@ -188,15 +198,11 @@
       store.userLocale = systemLocale.value;
     }
   });
-  import { computed } from 'vue';
-  import { useRoute } from 'vue-router';
 
   interface RouteMeta {
     getTransition?: (navigationMethod: string) => string;
     navigationMethod?: string;
   }
-
-  const route = useRoute() as RouteLocationNormalizedLoaded & { meta: RouteMeta };
 
   const getTransition = computed(() => {
     const navigationMethod = route.meta.navigationMethod as string;

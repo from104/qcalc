@@ -532,7 +532,6 @@ export const useStore = defineStore('store', {
     },
 
     isAtLeastDoubleWidth() {
-      console.log(Screen.width);
       return Screen.width >= 330 * 2;
     },
 

@@ -42,15 +42,16 @@
 <template>
   <q-separator v-if="separator" />
   <q-item v-else v-close-popup clickable role="menuitem" :aria-label="title" @click="(evt: Event) => action(evt)">
-    <q-item-section v-if="icon" avatar>
+    <q-item-section v-if="icon" avatar class="col-3">
       <q-icon :name="icon" role="img" :aria-label="t('ariaLabel.icon', { name: title })" />
     </q-item-section>
     <q-item-section>
-      <q-item-label>{{ title }}</q-item-label>
-      <q-item-label caption>{{ caption }}</q-item-label>
-    </q-item-section>
-    <q-item-section v-if="shortcut" side>
-      <q-item-label caption>{{ shortcut }}</q-item-label>
+      <q-item-label v-if="title" role="text">
+        {{ title }}
+      </q-item-label>
+      <q-item-label v-if="caption" caption role="text" class="ellipsis">
+        {{ caption }} {{ shortcut ? '('+shortcut+')' : '' }}
+      </q-item-label>
     </q-item-section>
   </q-item>
 </template>

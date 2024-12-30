@@ -38,46 +38,34 @@ export default route(function (/* { store, ssrContext } */) {
   });
 
   // 전역 배열(또는 Vuex/Pinia/기타 스토어)에 경로 스택을 하나 관리
-  const routeStack = [];
 
   // 네비게이션 가드 설정
   Router.beforeEach((to, from, next) => {
-    // 만약 최초 방문이라면(from이 존재하지 않는다면) 그냥 스택에 추가
-    if (!from.name) {
-      routeStack.push(to.fullPath);
-      return next();
-    }
+    // 경로 깊이 계산 함수
 
-    // 네비게이션 메서드 초기화
-    let navigationMethod = 'unknown';
-    
-    // 스택에서 현재 경로의 위치 확인
-    const currentIndex = routeStack.lastIndexOf(to.fullPath);
-
-    // 1. 스택에서 현재 경로의 위치 확인
-    if (currentIndex !== -1) {
-      // 이미 방문한 경로인 경우
-      if (currentIndex === routeStack.length - 2) {
-        // 바로 이전 페이지로 돌아가는 경우
-        routeStack.pop();
-        navigationMethod = 'back';
-      } else if (currentIndex < routeStack.length - 2) {
-        // 히스토리에서 더 이전 페이지로 돌아가는 경우
-        routeStack.splice(currentIndex + 1);
-        navigationMethod = 'back_multiple';
-      } else {
-        // 현재 페이지 재방문 (새로고침 등)
-        navigationMethod = 'refresh';
+    // '/' == 0, '/a' == 1, '/a/b' == 2, '/a/b/c' == 3
+    const getPathDepth = (path: string): number => {
+      // 시작과 끝의 '/'를 제거하고 남은 '/'의 수를 계산
+      const trimmedPath = path.replace(/^\/+|\/+$/g, '');
+      if (trimmedPath === '') {
+        return 0;
       }
+      return trimmedPath.split('/').length;
+    };
+
+    const fromDepth = getPathDepth(from.path);
+    const toDepth = getPathDepth(to.path);
+
+    // 깊이 비교하여 네비게이션 방향 결정
+    if (toDepth > fromDepth) {
+      to.meta.navigationMethod = 'forward';
+    } else if (toDepth < fromDepth) {
+      to.meta.navigationMethod = 'back';
     } else {
-      // 새로운 경로 방문
-      routeStack.push(to.fullPath);
-      navigationMethod = 'forward';
+      // 같은 깊이일 경우 이전 경로로 판단
+      to.meta.navigationMethod = 'forward';
     }
 
-    // 2. 라우트 메타에 네비게이션 메서드 추가
-    to.meta.navigationMethod = navigationMethod;
-    // 3. 다음 네비게이션 함수 호출
     next();
   });
 
