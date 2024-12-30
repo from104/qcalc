@@ -37,8 +37,6 @@ export default route(function (/* { store, ssrContext } */) {
     history: createHistory(process.env.VUE_ROUTER_BASE),
   });
 
-  // 전역 배열(또는 Vuex/Pinia/기타 스토어)에 경로 스택을 하나 관리
-
   // 네비게이션 가드 설정
   Router.beforeEach((to, from, next) => {
     // 경로 깊이 계산 함수
