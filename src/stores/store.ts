@@ -1,8 +1,16 @@
+// Pinia 관련
 import { defineStore } from 'pinia';
-import { Notify, Dark, copyToClipboard } from 'quasar';
-import { match } from 'ts-pattern';
-import { Screen } from 'quasar';
 
+// Quasar 관련
+import { Notify, Dark, copyToClipboard, Screen } from 'quasar';
+
+// 패턴 매칭 유틸리티
+import { match } from 'ts-pattern';
+
+// Vue Router 관련
+import { useRouter, useRoute } from 'vue-router';
+
+// 계산기 관련 타입과 클래스 가져오기
 import { WordSize, Operator, CalculationResult } from 'classes/CalculatorTypes';
 import { Calculator } from 'classes/Calculator';
 import { UnitConverter } from 'classes/UnitConverter';
@@ -24,10 +32,6 @@ export const useStore = defineStore('store', {
     isMemoryVisible: false,
     resultPanelPadding: 0,
     paddingOnResult: 20,
-
-    // // Vue Router 관련
-    // router: useRouter(),
-    // route: useRoute(),
 
     // UI 상태 관련
     isShiftPressed: false,
@@ -538,6 +542,20 @@ export const useStore = defineStore('store', {
     // 기본 계산기 여부 확인
     isDefaultCalculator(): boolean {
       return this.currentTab === 'calc';
+    },
+
+    // 특정 경로로 이동하는 함수
+    navigateToPath(path: string): void {
+      const router = useRouter();
+      const route = useRoute();
+
+      if (route.path === path) {
+        return;
+      } else if (/help|about|settings|record/.test(route.path)) {
+        router.replace(path);
+      } else {
+        router.push(path);
+      }
     },
   },
 
