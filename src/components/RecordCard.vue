@@ -15,16 +15,7 @@
   const store = useStore();
 
   // 스토어에서 필요한 메서드와 속성 추출
-  const {
-    calc,
-    clickButtonById,
-    getRightSideInRecord,
-    getLeftSideInRecord,
-    showMessage,
-    showError,
-    swapUnits,
-    swapCurrencies,
-  } = store;
+  const { calc, getRightSideInRecord, getLeftSideInRecord, showMessage, showError, swapUnits, swapCurrencies } = store;
 
   // 계산 결과 배열 (반응형)
   const records = computed(() => calc.record.getAllRecords());
@@ -154,7 +145,7 @@
   };
 
   // 슬라이드 왼쪽 동작 핸들러
-  const handleLeftSlide = ({ reset }: { reset: () => void }, id: number) => {
+  const handleRightSlide = ({ reset }: { reset: () => void }, id: number) => {
     openMemoDialog(id);
     setTimeout(reset, 500);
   };
@@ -276,8 +267,8 @@
             left-color="positive"
             right-color="negative"
             role="listitem"
-            @left="({ reset }) => handleLeftSlide({ reset }, record.id as number)"
-            @right="deleteRecordItem(record.id as number)"
+            @right="({ reset }) => handleRightSlide({ reset }, record.id as number)"
+            @left="deleteRecordItem(record.id as number)"
           >
             <template #left>
               <q-icon name="edit_note" :aria-label="t('ariaLabel.editMemo')" role="button" />
