@@ -131,6 +131,10 @@
   onBeforeUnmount(() => {
     keyBinding.unsubscribe();
   });
+
+  const currentPage = computed(() => {
+    return route.name;
+  });
 </script>
 
 <template>
@@ -199,7 +203,7 @@
 
       <!-- 서브 페이지 컨텐츠 -->
       <template v-else>
-        <q-scroll-area style="height: 100vh">
+        <q-scroll-area class="sub-scroll-area" :class="{ 'hide-scrollbar': currentPage === 'record' }">
           <component :is="CurrentSubPageComponent" />
         </q-scroll-area>
       </template>
@@ -215,6 +219,16 @@
   }
   .q-tab-panel {
     padding: 0px;
+  }
+
+  .sub-scroll-area {
+    height: calc(100vh - 50px);
+  }
+
+  .hide-scrollbar {
+    :deep(.q-scrollarea__thumb) {
+      display: none !important;
+    }
   }
 </style>
 
