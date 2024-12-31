@@ -18,15 +18,15 @@
   // 햅틱 피드백 관련
   import { Haptics, ImpactStyle } from 'capacitor/@capacitor/haptics';
 
-  // 스토어 관련
-  import { useStore } from 'src/stores/store';
-  // 스토어 인스턴스 초기화
-  const store = useStore();
-
   // 계산기 관련 타입과 클래스
   import { KeyBinding, KeyBindings } from 'classes/KeyBinding';
   import { Radix } from 'classes/RadixConverter';
   import { BigNumber, Operator } from 'src/classes/CalculatorTypes';
+
+  // 스토어 관련
+  import { useStore } from 'src/stores/store';
+  // 스토어 인스턴스 초기화
+  const store = useStore();
 
   // 컴포넌트 import
   import MyTooltip from 'components/MyTooltip.vue';
