@@ -656,11 +656,11 @@
   }
 
   .top-label-icon {
-    top: calc(((100vh - v-bind('baseHeight')) / 6) * 0.15 - 11px);
+    top: 4%;
   }
 
   .top-label-char {
-    top: calc(((100vh - v-bind('baseHeight')) / 6) * 0.15 - 17px);
+    top: calc(4% - 3px);
   }
 
   .bg-btn-important {
