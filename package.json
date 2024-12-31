@@ -41,7 +41,7 @@
     "@capacitor/core": "^6.2.0",
     "@everapi/freecurrencyapi-js": "^1.0.1",
     "@quasar/cli": "^2.4.1",
-    "@quasar/extras": "1.16.13",
+    "@quasar/extras": "1.16.15",
     "axios": "^1.7.7",
     "dmg-builder": "25.1.8",
     "dotenv": "^16.4.5",
