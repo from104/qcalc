@@ -1,7 +1,6 @@
 <script setup lang="ts">
-  import { useI18n } from 'vue-i18n';
-
   // i18n 설정
+  import { useI18n } from 'vue-i18n';
   const { t } = useI18n();
 
   // MenuItem 컴포넌트의 props 정의
@@ -50,7 +49,7 @@
         {{ title }}
       </q-item-label>
       <q-item-label v-if="caption" caption role="text" class="ellipsis">
-        {{ caption }} {{ shortcut ? '('+shortcut+')' : '' }}
+        {{ caption }} {{ shortcut ? '(' + shortcut + ')' : '' }}
       </q-item-label>
     </q-item-section>
   </q-item>

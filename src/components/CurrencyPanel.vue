@@ -1,14 +1,17 @@
 <script setup lang="ts">
+  // Vue 핵심 기능 및 컴포지션 API 가져오기
   import { ref, onMounted, onBeforeUnmount, reactive, watch, Ref } from 'vue';
-  import { BigNumber } from 'classes/CalculatorTypes';
-  import MyTooltip from 'components/MyTooltip.vue';
-  import { useI18n } from 'vue-i18n';
-  import { useStore } from 'src/stores/store';
-  import { KeyBinding } from 'classes/KeyBinding';
 
   // i18n 설정
+  import { useI18n } from 'vue-i18n';
   const { t } = useI18n();
 
+  // 계산기 관련 타입과 클래스
+  import { BigNumber } from 'classes/CalculatorTypes';
+  import { KeyBinding } from 'classes/KeyBinding';
+
+  // 스토어 관련
+  import { useStore } from 'src/stores/store';
   // 스토어 인스턴스 초기화
   const store = useStore();
   // 스토어에서 필요한 메서드 추출
@@ -22,6 +25,15 @@
     setInputFocused,
     blurElement,
   } = store;
+
+  // 컴포넌트 import
+  import MyTooltip from 'components/MyTooltip.vue';
+
+  // 키 바인딩 설정
+  const keyBinding = new KeyBinding([
+    [['Alt+w'], () => clickButtonById('btn-swap-currency')],
+    [['Alt+y'], () => store.toggleShowSymbol()],
+  ]);
 
   // 단위 초기화
   initRecentCurrencies();
@@ -45,12 +57,6 @@
       currencyDescriptions[currency] = t(`currencyDesc.${currency}`);
     });
   });
-
-  // 키 바인딩 설정
-  const keyBinding = new KeyBinding([
-    [['Alt+w'], () => clickButtonById('btn-swap-currency')],
-    [['Alt+y'], () => store.toggleShowSymbol()],
-  ]);
 
   // 입력 포커스에 따른 키 바인딩 활성화/비활성화
   watch(

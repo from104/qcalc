@@ -1,23 +1,25 @@
 <script setup lang="ts">
+  // Vue 핵심 기능 및 컴포지션 API 가져오기
   import { onMounted, onBeforeUnmount, reactive, watch } from 'vue';
-  import { useI18n } from 'vue-i18n';
 
+  // i18n 설정
+  import { useI18n } from 'vue-i18n';
+  const { t } = useI18n();
+
+  // 계산기 관련 타입과 클래스
   import { KeyBinding } from 'classes/KeyBinding';
   import { UnitConverter } from 'classes/UnitConverter';
   import { BigNumber } from 'classes/CalculatorTypes';
 
+  // 스토어 관련
   import { useStore } from 'src/stores/store';
-
-  import MyTooltip from 'components/MyTooltip.vue';
-
-  // i18n 설정
-  const { t } = useI18n();
-
   // 스토어 인스턴스 생성
   const store = useStore();
-
   // 스토어에서 필요한 메서드 추출
   const { calc, clickButtonById, swapUnits, initRecentUnits } = store;
+
+  // 컴포넌트 import
+  import MyTooltip from 'components/MyTooltip.vue';
 
   // 단위 초기화
   initRecentUnits();

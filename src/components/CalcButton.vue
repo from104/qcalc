@@ -1,33 +1,40 @@
 <script setup lang="ts">
+  // Vue 핵심 기능 및 컴포지션 API 가져오기
   import { onMounted, onBeforeUnmount, ref, watch, reactive, computed } from 'vue';
-  import { useQuasar, colors } from 'quasar';
+
+  // i18n 설정
   import { useI18n } from 'vue-i18n';
-  import { match } from 'ts-pattern';
+  const { t } = useI18n();
 
-  import { Haptics, ImpactStyle } from 'capacitor/@capacitor/haptics';
-
-  import { KeyBinding, KeyBindings } from 'classes/KeyBinding';
-  import { Radix } from 'classes/RadixConverter';
-  import { BigNumber, Operator } from 'src/classes/CalculatorTypes';
-
-  import { useStore } from 'src/stores/store';
-
-  import MyTooltip from 'components/MyTooltip.vue';
-
+  // Quasar 관련 설정
+  import { useQuasar, colors } from 'quasar';
   // Quasar 인스턴스 및 색상 유틸리티 초기화
   const $q = useQuasar();
   const { lighten } = colors;
 
-  // i18n 설정
-  const { t } = useI18n();
+  // 패턴 매칭 유틸리티
+  import { match } from 'ts-pattern';
+
+  // 햅틱 피드백 관련
+  import { Haptics, ImpactStyle } from 'capacitor/@capacitor/haptics';
+
+  // 스토어 관련
+  import { useStore } from 'src/stores/store';
+  // 스토어 인스턴스 초기화
+  const store = useStore();
+
+  // 계산기 관련 타입과 클래스
+  import { KeyBinding, KeyBindings } from 'classes/KeyBinding';
+  import { Radix } from 'classes/RadixConverter';
+  import { BigNumber, Operator } from 'src/classes/CalculatorTypes';
+
+  // 컴포넌트 import
+  import MyTooltip from 'components/MyTooltip.vue';
 
   // props 기본값 설정
   const props = withDefaults(defineProps<{ type?: string }>(), {
     type: 'calc',
   });
-
-  // 스토어 인스턴스 초기화
-  const store = useStore();
 
   // 스토어에서 필요한 메서드 추출
   const {

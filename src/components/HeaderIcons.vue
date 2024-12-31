@@ -1,31 +1,34 @@
 <script setup lang="ts">
+  // Vue 핵심 기능 및 컴포지션 API 가져오기
   import { onMounted } from 'vue';
-
-  import { KeyBinding } from 'classes/KeyBinding';
-
-  import MyTooltip from './MyTooltip.vue';
-  import MenuItem from './MenuItem.vue';
-  import MenuPanel from './MenuPanel.vue';
-
-  // router 인스턴스 가져오기
-  import { useRouter } from 'vue-router';
-  const router = useRouter();
-
-  // Quasar 인스턴스 초기화
-  import { useQuasar } from 'quasar';
-  const $q = useQuasar();
 
   // i18n 설정
   import { useI18n } from 'vue-i18n';
   const { t } = useI18n();
 
-  // 스토어 인스턴스 초기화
-  import { useStore } from 'src/stores/store';
-  const store = useStore();
+  // router 관련
+  import { useRouter } from 'vue-router';
+  const router = useRouter();
 
+  // Quasar 관련 설정
+  import { useQuasar } from 'quasar';
+  const $q = useQuasar();
+
+  // 계산기 관련 타입과 클래스
+  import { KeyBinding } from 'classes/KeyBinding';
+
+  // 스토어 관련
+  import { useStore } from 'src/stores/store';
+  // 스토어 인스턴스 초기화
+  const store = useStore();
   // 스토어에서 필요한 메서드와 속성 추출
   const { calc, copyToClipboard, clickButtonById, showError, showMessage, swapUnits, swapCurrencies, swapRadixes } =
     store;
+
+  // 컴포넌트 import
+  import MyTooltip from './MyTooltip.vue';
+  import MenuItem from './MenuItem.vue';
+  import MenuPanel from './MenuPanel.vue';
 
   /**
    * 선택된 텍스트 또는 계산 결과를 클립보드에 복사하는 함수

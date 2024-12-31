@@ -1,32 +1,28 @@
 <script lang="ts" setup>
-  // Vue 3의 Composition API에서 필요한 함수들을 가져옵니다.
+  // Vue 핵심 기능 및 컴포지션 API 가져오기
   import { reactive, watch, ref } from 'vue';
 
-  // 패키지 버전 정보를 가져옵니다.
-  import { version } from '../../package.json';
-
-  // 사용자 정의 툴팁 컴포넌트를 가져옵니다.
-  import MyTooltip from 'components/MyTooltip.vue';
-
-  // Quasar 프레임워크의 useQuasar 훅을 가져옵니다.
+  // Quasar 프레임워크 관련
   import { useQuasar } from 'quasar';
   const $q = useQuasar();
 
-  // 애플리케이션의 여러 스토어들을 가져옵니다.
-  import { useStore } from 'src/stores/store';
-
-  // 스토어 인스턴스들을 생성합니다.
-  const store = useStore();
-
-  // 스토어에서 필요한 함수들을 구조 분해 할당으로 가져옵니다.
-  const { setInitPanel, setDarkMode, setAlwaysOnTop, setHapticsMode, setDecimalPlaces } = store;
-
-  // i18n 설정을 위한 훅을 가져옵니다.
+  // i18n 설정
   import { useI18n } from 'vue-i18n';
   const { locale } = useI18n({ useScope: 'global' });
   const { t } = useI18n();
 
-  // 언어 옵션을 반응형 배열로 정의합니다.
+  // 스토어 관련
+  import { useStore } from 'src/stores/store';
+  const store = useStore();
+  const { setInitPanel, setDarkMode, setAlwaysOnTop, setHapticsMode, setDecimalPlaces } = store;
+
+  // 컴포넌트 import
+  import MyTooltip from 'components/MyTooltip.vue';
+
+  // 패키지 버전 정보
+  import { version } from '../../package.json';
+
+  // 언어 옵션 정의
   const languageOptions = reactive([
     { value: 'ko', label: t('message.ko') },
     { value: 'en', label: t('message.en') },

@@ -1,21 +1,27 @@
 <script setup lang="ts">
+  // Vue 핵심 기능 및 컴포지션 API 가져오기
   import { onMounted, onBeforeUnmount, ref, computed, watch, reactive } from 'vue';
-  import { useI18n } from 'vue-i18n';
-  import { useQuasar, copyToClipboard } from 'quasar';
-
-  import { useStore } from 'src/stores/store';
-  import { KeyBinding } from 'classes/KeyBinding';
-
-  import MenuItem from 'components/MenuItem.vue';
 
   // i18n 설정
+  import { useI18n } from 'vue-i18n';
   const { t } = useI18n();
 
+  // Quasar 관련 설정
+  import { useQuasar, copyToClipboard } from 'quasar';
+  const $q = useQuasar();
+
+  // 계산기 관련 타입과 클래스
+  import { KeyBinding } from 'classes/KeyBinding';
+
+  // 스토어 관련
+  import { useStore } from 'src/stores/store';
   // 스토어 인스턴스 초기화
   const store = useStore();
-
   // 스토어에서 필요한 메서드와 속성 추출
   const { calc, getRightSideInRecord, getLeftSideInRecord, showMessage, showError, swapUnits, swapCurrencies } = store;
+
+  // 컴포넌트 import
+  import MenuItem from 'components/MenuItem.vue';
 
   // 계산 결과 배열 (반응형)
   const records = computed(() => calc.record.getAllRecords());
@@ -221,8 +227,6 @@
   const deleteRecordItem = (id: number) => {
     calc.record.deleteRecord(id);
   };
-
-  const $q = useQuasar();
 
   // 헤더의 높이를 동적으로 계산하는 computed 속성입니다.
   const calculatedHeaderHeight = computed(() => {

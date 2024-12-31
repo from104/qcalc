@@ -1,19 +1,23 @@
 <script setup lang="ts">
+  // Vue 핵심 기능 및 컴포지션 API 가져오기
   import { onMounted, reactive, watch } from 'vue';
-  import { useRouter } from 'vue-router';
-  import { useStore } from 'src/stores/store';
+
+  // i18n 설정
   import { useI18n } from 'vue-i18n';
+  const { t } = useI18n();
 
-  import MenuItem from 'components/MenuItem.vue';
-
+  // router 관련
+  import { useRouter } from 'vue-router';
   // 라우터 인스턴스 초기화
   const router = useRouter();
 
+  // 스토어 관련
+  import { useStore } from 'src/stores/store';
   // 스토어 인스턴스 초기화
   const store = useStore();
 
-  // i18n 설정
-  const { t } = useI18n();
+  // 컴포넌트 import
+  import MenuItem from 'components/MenuItem.vue';
 
   // 메뉴 아이템 인터페이스 정의
   interface MenuItem {
@@ -67,7 +71,7 @@
     settings: {
       title: t('item.settings.title'),
       caption: t('item.settings.caption'),
-      shortcut: 'Alt-s',
+      shortcut: 'F3',
       icon: 'settings',
       action: () => router.push('/settings'),
     },
@@ -75,12 +79,14 @@
     help: {
       title: t('item.help.title'),
       caption: t('item.help.caption'),
+      shortcut: 'F1',
       icon: 'help',
       action: () => router.push('/help'),
     },
     about: {
       title: t('item.about.title'),
-      caption: t('item.about.caption'),
+      caption: t('iem.about.caption'),
+      shortcut: 'F2',
       icon: 'info',
       action: () => router.push('/about'),
     },
