@@ -8,7 +8,9 @@ import { Notify, Dark, copyToClipboard, Screen } from 'quasar';
 import { match } from 'ts-pattern';
 
 // Vue Router 관련
-import { useRouter, useRoute } from 'vue-router';
+import { type Router, type RouteLocationNormalizedLoaded, useRouter, useRoute } from 'vue-router';
+// const router = useRouter();
+// const route = useRoute();
 
 // 계산기 관련 타입과 클래스 가져오기
 import { WordSize, Operator, CalculationResult } from 'classes/CalculatorTypes';
@@ -78,6 +80,9 @@ export const useStore = defineStore('store', {
     targetRadix: Radix.Hexadecimal as RadixType,
     showRadix: true,
     radixType: 'suffix' as 'prefix' | 'suffix',
+
+    // 서브페이지 애니메이션 관련
+    isSubPageAnimating: false,
   }),
 
   // 액션 정의
@@ -545,10 +550,12 @@ export const useStore = defineStore('store', {
     },
 
     // 특정 경로로 이동하는 함수
-    navigateToPath(path: string): void {
-      const router = useRouter();
-      const route = useRoute();
+    navigateToPath(path: string, route: RouteLocationNormalizedLoaded, router: Router): void {
+      // const router = useRouter();
+      // const route = useRoute();
 
+      this.setSubPageAnimating(true);
+      console.log('navigateToPath', path);
       if (route.path === path) {
         return;
       } else if (/help|about|settings|record/.test(route.path)) {
@@ -556,6 +563,16 @@ export const useStore = defineStore('store', {
       } else {
         router.push(path);
       }
+      // 트랜지션이 끝나면 상태 초기화
+      setTimeout(() => {
+        this.setSubPageAnimating(false);
+        console.log('setSubPageAnimating', false);
+      }, 300);
+    },
+
+    // 서브페이지 애니메이션 관련
+    setSubPageAnimating(value: boolean) {
+      this.isSubPageAnimating = value;
     },
   },
 

@@ -128,10 +128,10 @@
     [['Alt+i'], store.toggleInitPanel],
     [['Alt+d'], toggleDarkModeWithNotification],
     [['Alt+p'], store.toggleHapticsMode],
-    [['F1'], () => store.navigateToPath('/help')],
-    [['F2'], () => store.navigateToPath('/about')],
-    [['F3'], () => store.navigateToPath('/settings')],
-    [['F4'], () => store.navigateToPath('/record')],
+    [['F1'], () => store.navigateToPath('/help', route, router)],
+    [['F2'], () => store.navigateToPath('/about', route, router)],
+    [['F3'], () => store.navigateToPath('/settings', route, router)],
+    [['F4'], () => store.navigateToPath('/record', route, router)],
     [[';'], store.toggleButtonAddedLabel],
     [[','], store.toggleUseGrouping],
     [['Alt+,'], () => store.setGroupingUnit(store.groupingUnit === 3 ? 4 : 3)],
@@ -187,11 +187,6 @@
     }
   });
 
-  interface RouteTransitionMeta {
-    getTransition?: (navigationMethod: string) => string;
-    navigationMethod?: string;
-  }
-
   // Track navigation state
   const previousPath = ref(route.path);
   const isWideLayout = ref(store.isAtLeastDoubleWidth());
@@ -211,11 +206,13 @@
   watch(
     () => route.path,
     (newPath) => {
-      if (!store.isAtLeastDoubleWidth() && previousPath.value !== newPath) {
+      if (!isWideLayout.value && previousPath.value !== newPath) {
         const { navigationMethod } = route.meta as RouteTransitionMeta;
         currentTransition.value =
           navigationMethod === 'back' ? 'slide-back' : navigationMethod === 'forward' ? 'slide-forward' : 'fade';
         previousPath.value = newPath;
+      } else {
+        currentTransition.value = '';
       }
     },
   );
@@ -226,7 +223,7 @@
 
 <template>
   <router-view v-slot="{ Component, route: routeProps }">
-    <transition :name="isFirstNavigation ? '' : computeTransition || 'fade'" mode="default">
+    <transition :name="isFirstNavigation ? '' : computeTransition || ''" mode="default">
       <component :is="Component" :key="routeProps.path" />
     </transition>
   </router-view>

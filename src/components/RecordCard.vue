@@ -268,17 +268,17 @@
           <q-slide-item
             v-for="record in records"
             :key="record.id"
-            left-color="positive"
-            right-color="negative"
+            left-color="negative"
+            right-color="positive"
             role="listitem"
-            @right="({ reset }) => handleRightSlide({ reset }, record.id as number)"
             @left="deleteRecordItem(record.id as number)"
+            @right="({ reset }) => handleRightSlide({ reset }, record.id as number)"
           >
             <template #left>
-              <q-icon name="edit_note" :aria-label="t('ariaLabel.editMemo')" role="button" />
+              <q-icon name="delete_outline" :aria-label="t('ariaLabel.deleteRecord')" role="button" />
             </template>
             <template #right>
-              <q-icon name="delete_outline" :aria-label="t('ariaLabel.deleteRecord')" role="button" />
+              <q-icon name="edit_note" :aria-label="t('ariaLabel.editMemo')" role="button" />
             </template>
             <q-item
               v-touch-hold.mouse="() => (recordMenu[record.id as number] = true)"

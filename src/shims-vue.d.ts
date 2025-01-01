@@ -23,3 +23,8 @@ declare module '*.vue' {
 
   export default component;
 }
+
+interface RouteTransitionMeta {
+  getTransition?: (navigationMethod: string) => string;
+  navigationMethod?: string;
+}

@@ -6,10 +6,11 @@
   import { useI18n } from 'vue-i18n';
   const { t } = useI18n();
 
-  // router 관련
-  import { useRouter } from 'vue-router';
-  // 라우터 인스턴스 초기화
+  import { useRouter, useRoute, RouteLocationNormalizedLoaded } from 'vue-router';
+
+  // router 인스턴스 가져오기
   const router = useRouter();
+  const route = useRoute() as RouteLocationNormalizedLoaded & { meta: RouteTransitionMeta };
 
   // 스토어 관련
   import { useStore } from 'src/stores/store';
@@ -73,7 +74,9 @@
       caption: t('item.settings.caption'),
       shortcut: 'F3',
       icon: 'settings',
-      action: () => router.push('/settings'),
+      action: () => {
+        store.navigateToPath('/settings', route, router);
+      },
     },
     separator2: { separator: true },
     help: {
@@ -81,14 +84,14 @@
       caption: t('item.help.caption'),
       shortcut: 'F1',
       icon: 'help',
-      action: () => router.push('/help'),
+      action: () => store.navigateToPath('/help', route, router),
     },
     about: {
       title: t('item.about.title'),
       caption: t('iem.about.caption'),
       shortcut: 'F2',
       icon: 'info',
-      action: () => router.push('/about'),
+      action: () => store.navigateToPath('/about', route, router),
     },
   });
 

@@ -1,7 +1,6 @@
 <script setup lang="ts">
   import { onBeforeUnmount, onMounted, reactive, shallowRef, watch, computed, ref, ComputedRef } from 'vue';
   import { useRouter, useRoute } from 'vue-router';
-  import { useQuasar } from 'quasar';
   import { useStore } from 'src/stores/store';
   import { useI18n } from 'vue-i18n';
   import { KeyBinding } from 'classes/KeyBinding';
@@ -21,7 +20,6 @@
 
   const router = useRouter();
   const route = useRoute();
-  const $q = useQuasar();
   const store = useStore();
   const { t } = useI18n();
 
@@ -37,7 +35,7 @@
   interface PageConfig {
     component: typeof HelpPage | typeof AboutPage | typeof RecordPage | typeof SettingPage;
     title: string;
-    showBackArrow?: boolean;
+    showClose?: boolean;
     buttons?: PageButton[];
   }
 
@@ -55,12 +53,12 @@
     help: {
       component: HelpPage,
       title: t('message.help'),
-      showBackArrow: true,
+      showClose: true,
     },
     about: {
       component: AboutPage,
       title: t('message.about'),
-      showBackArrow: true,
+      showClose: true,
     },
     record: {
       component: RecordPage,
@@ -78,19 +76,18 @@
     settings: {
       component: SettingPage,
       title: t('message.settings'),
-      showBackArrow: true,
+      showClose: true,
     },
   };
 
   // 현재 서브 페이지 관련
   const currentSubPage = ref('record');
   const previousSubPage = ref('record');
-  const isPageTransitioning = ref(false);
 
   const switchSubPage = async (pageName: string) => {
     if (currentSubPage.value === pageName) return;
 
-    isPageTransitioning.value = true;
+    store.setSubPageAnimating(true);
     previousSubPage.value = currentSubPage.value;
     currentSubPage.value = pageName;
 
@@ -103,7 +100,7 @@
 
     // 트랜지션이 끝나면 상태 초기화
     setTimeout(() => {
-      isPageTransitioning.value = false;
+      store.setSubPageAnimating(false);
     }, 300);
   };
 
@@ -136,6 +133,12 @@
   onBeforeUnmount(() => {
     keyBinding.unsubscribe();
   });
+
+  const SUB_PAGE_BUTTONS = [
+    { label: 'help', icon: 'help_outline', path: '/help' },
+    { label: 'about', icon: 'info_outline', path: '/about' },
+    { label: 'settings', icon: 'settings', path: '/settings' },
+  ];
 </script>
 
 <template>
@@ -161,34 +164,50 @@
       </q-toolbar>
 
       <!-- 서브페이지 영역 헤더 -->
-      <q-toolbar v-blur class="col-6 q-px-md sub-header">
-        <q-toolbar-title class="text-subtitle1">
-          {{ SUB_PAGE_CONFIG[currentSubPage]?.title }}
-        </q-toolbar-title>
-        <q-space />
-        <q-btn
-          v-for="button in SUB_PAGE_CONFIG[currentSubPage]?.buttons"
-          :key="button.icon"
-          dense
-          flat
-          size="md"
-          :icon="button.icon"
-          role="button"
-          :aria-label="t(`ariaLabel.${button.icon}`)"
-          :disable="button.disabled.value"
-          @click="button.action"
-        />
-        <q-btn
-          v-if="SUB_PAGE_CONFIG[currentSubPage]?.showBackArrow"
-          class="q-ma-none q-pa-none"
-          flat
-          dense
-          round
-          icon="arrow_forward"
-          role="button"
-          :aria-label="t('ariaLabel.backToRecord')"
-          @click="switchSubPage('record')"
-        />
+      <q-toolbar v-blur class="col-6 q-px-none sub-header">
+        <transition name="animate-sub-page">
+          <div :key="currentSubPage" :data-page="currentSubPage" class="header-content row full-width items-center">
+            <q-toolbar-title class="text-subtitle1 q-ml-md">
+              {{ SUB_PAGE_CONFIG[currentSubPage]?.title }}
+            </q-toolbar-title>
+            <q-space />
+            <q-btn
+              v-for="button in SUB_PAGE_BUTTONS"
+              :key="button.label"
+              class="q-mx-xs q-px-none"
+              dense
+              flat
+              size="md"
+              :icon="button.icon"
+              @click="store.navigateToPath(button.path, route, router)"
+            />
+            <q-separator vertical class="sub-header-separator q-mx-xs q-pl-xs" />
+            <q-btn
+              v-for="button in SUB_PAGE_CONFIG[currentSubPage]?.buttons"
+              :key="button.icon"
+              class="q-mr-md"
+              dense
+              flat
+              size="md"
+              :icon="button.icon"
+              role="button"
+              :aria-label="t(`ariaLabel.${button.icon}`)"
+              :disable="button.disabled.value"
+              @click="button.action"
+            />
+            <q-btn
+              v-if="SUB_PAGE_CONFIG[currentSubPage]?.showClose"
+              class="q-mr-md"
+              flat
+              dense
+              round
+              icon="close"
+              role="button"
+              :aria-label="t('ariaLabel.backToRecord')"
+              @click="switchSubPage('record')"
+            />
+          </div>
+        </transition>
       </q-toolbar>
     </q-header>
 
@@ -204,16 +223,16 @@
 
       <!-- 서브페이지 영역 -->
       <div class="col-6 relative-position sub-content">
-        <transition
-          enter-active-class="animate-sub-page-enter"
-          leave-active-class="animate-sub-page-leave"
-          @enter="isPageTransitioning = true"
-          @after-enter="isPageTransitioning = false"
-        >
-          <q-scroll-area class="sub-scroll-area" :class="{ 'hide-scrollbar': currentSubPage === 'record' }">
-            <component :is="SUB_PAGE_CONFIG[currentSubPage]?.component" :key="currentSubPage" class="sub-page" />
-          </q-scroll-area>
-        </transition>
+        <q-scroll-area class="sub-scroll-area" :class="{ 'hide-scrollbar': currentSubPage === 'record' }">
+          <transition name="animate-sub-page">
+            <component
+              :is="SUB_PAGE_CONFIG[currentSubPage]?.component"
+              :key="currentSubPage"
+              :data-page="currentSubPage"
+              class="sub-page"
+            />
+          </transition>
+        </q-scroll-area>
       </div>
     </q-page-container>
   </q-layout>
@@ -232,15 +251,27 @@
 
   .sub-page {
     width: 100%;
-    min-height: 100%;
-    position: relative;
+    height: 100%;
+    position: absolute;
+    left: 0;
+    top: 0;
   }
 
-  .animate-sub-page-enter {
+  .animate-sub-page-enter-from[data-page='record'],
+  .animate-sub-page-leave-to[data-page='record'] {
+    opacity: 0;
+  }
+
+  .animate-sub-page-enter-active[data-page='record'],
+  .animate-sub-page-leave-active[data-page='record'] {
+    transition: opacity 0.3s ease;
+  }
+
+  .animate-sub-page-enter-active:not([data-page='record']) {
     animation: slideFromRight 0.3s ease-out;
   }
 
-  .animate-sub-page-leave {
+  .animate-sub-page-leave-active:not([data-page='record']) {
     animation: slideToRight 0.3s ease-out;
   }
 
@@ -274,6 +305,14 @@
     .calc-content {
       border-right: 3px solid rgba(255, 255, 255, 0.2);
     }
+
+    .sub-header-separator {
+      border-right: 3px solid rgba(255, 255, 255, 0.05);
+    }
+  }
+
+  .sub-header-separator {
+    border-right: 3px solid rgba(255, 255, 255, 0.4);
   }
 
   .sub-scroll-area {
@@ -284,6 +323,28 @@
     :deep(.q-scrollarea__thumb) {
       display: none !important;
     }
+  }
+
+  .header-content {
+    position: absolute;
+  }
+
+  .animate-sub-page-enter-from[data-page='record'],
+  .animate-sub-page-leave-to[data-page='record'] {
+    opacity: 0;
+  }
+
+  .animate-sub-page-enter-active[data-page='record'],
+  .animate-sub-page-leave-active[data-page='record'] {
+    transition: opacity 0.3s ease;
+  }
+
+  .animate-sub-page-enter-active:not([data-page='record']) {
+    animation: slideFromRight 0.3s ease-out;
+  }
+
+  .animate-sub-page-leave-active:not([data-page='record']) {
+    animation: slideToRight 0.3s ease-out;
   }
 </style>
 
