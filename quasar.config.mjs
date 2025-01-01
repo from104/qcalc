@@ -46,6 +46,7 @@ export default configure(function (/* ctx */) {
       // 폴더 별칭 설정
       alias: {
         classes: path.join(__dirname, 'src/classes'),
+        types: path.join(__dirname, 'src/types'),
         capacitor: path.join(__dirname, 'src-capacitor/node_modules'),
       },
 

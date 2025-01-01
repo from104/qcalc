@@ -16,7 +16,8 @@
       "boot/*": ["src/boot/*"],
       "stores/*": ["src/stores/*"],
       "classes/*": ["src/classes/*"],
-      "capacitor/*": ["src-capacitor/node_modules/*"]
+      "capacitor/*": ["src-capacitor/node_modules/*"],
+      "types/*": ["src/types/*"]
     },
     "preserveValueImports": false,
     "allowSyntheticDefaultImports": true,
@@ -35,15 +36,8 @@
     "src-pwa/*.d.ts",
     "src-bex/*.d.ts",
     "src-ssr/*.d.ts",
-    "src-capacitor/*.d.ts",
+    "src-capacitor/*.d.ts"
   ],
-  "exclude": [
-    "./dist",
-    "./.quasar",
-    "./node_modules",
-    "./src-capacitor",
-    "./src-cordova",
-    "./quasar.config.*.temporary.compiled*"
-  ],
+  "exclude": ["./dist", "./.quasar", "./node_modules", "./src-capacitor", "./src-cordova", "./quasar.config.*.temporary.compiled*"],
   "extends": "./.quasar/tsconfig.json"
 }

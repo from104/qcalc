@@ -9,7 +9,7 @@
   // 계산기 관련 타입과 클래스
   import { KeyBinding } from 'classes/KeyBinding';
   import { UnitConverter } from 'classes/UnitConverter';
-  import { BigNumber } from 'classes/CalculatorTypes';
+  import { BigNumber } from 'classes/CalculatorMath';
 
   // 스토어 관련
   import { useStore } from 'src/stores/store';

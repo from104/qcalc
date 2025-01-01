@@ -1,9 +1,44 @@
-import { match } from 'ts-pattern';
-
-import { BigNumber, Operator, CalculationResult, constants, WordSize } from './CalculatorTypes';
+import { RadixConverter } from './RadixConverter';
 import { CalculatorMath } from './CalculatorMath';
+import { CalculationResult, WordSize } from 'src/types/calculator';
+import { BigNumber, CONSTANTS } from './CalculatorMath';
+import { Radix } from './RadixConverter';
+import { match } from 'ts-pattern';
 import { CalculatorRecord } from './CalculatorRecord';
-import { Radix, RadixConverter } from './RadixConverter';
+
+/**
+ * 계산기에서 사용되는 연산자 열거형
+ */
+export enum Operator {
+  NONE = '',
+  ADD = '+',
+  SUB = '-',
+  MUL = '×',
+  DIV = '÷',
+  PCT = '%',
+  POW = 'pow',
+  ROOT = 'root',
+  MOD = 'mod',
+  BIT_SFT_R = 'bitSftR',
+  BIT_SFT_L = 'bitSftL',
+  BIT_AND = 'bitAnd',
+  BIT_OR = 'bitOr',
+  BIT_XOR = 'bitXor',
+  BIT_NOT = 'bitNot',
+  BIT_NAND = 'bitNand',
+  BIT_NOR = 'bitNor',
+  BIT_XNOR = 'bitXnor',
+  REC = 'rec',
+  SQRT = 'sqrt',
+  POW2 = 'pow2',
+  SIN = 'sin',
+  COS = 'cos',
+  TAN = 'tan',
+  FCT = 'fct',
+  EXP10 = 'exp10',
+  INT = 'int',
+  FRAC = 'frac',
+}
 
 /**
  * 계산기 클래스
@@ -823,8 +858,8 @@ export class Calculator {
    * 3. 상수가 존재하지 않으면 에러 발생
    */
   public getConstant(constant: string): string {
-    if (constants[constant]) {
-      return constants[constant];
+    if (CONSTANTS[constant]) {
+      return CONSTANTS[constant];
     }
     throw new Error('The requested mathematical constant was not found');
   }
@@ -840,7 +875,7 @@ export class Calculator {
    * 2. 현재 계산기의 값(currentValue)을 해당 상수 값으로 업데이트
    */
   public setConstant(constant: string): void {
-    this.setCurrentNumber(this.getConstant(constant));
+    this.setCurrentNumber(CONSTANTS[constant]);
   }
 
   // 메모리 관련 메서드들

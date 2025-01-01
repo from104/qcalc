@@ -1,28 +1,4 @@
-import { CalculationResult } from './CalculatorTypes';
-
-/**
- * 계산기 히스토리 항목을 위한 인터페이스
- * 각 히스토리 항목은 계산 결과와 관련 메타데이터를 포함합니다.
- */
-export interface Record {
-  /**
-   * 히스토리 항목의 고유 식별자
-   * 선택적 필드이며, 새로운 히스토리 생성 시 자동으로 할당됩니다.
-   */
-  id?: number;
-
-  /**
-   * 계산 결과의 스냅샷
-   * 계산식, 결과값 등 계산과 관련된 모든 정보를 포함합니다.
-   */
-  calculationResult: CalculationResult;
-
-  /**
-   * 히스토리 항목에 대한 사용자 메모
-   * 선택적 필드이며, 사용자가 특정 계산에 대한 참고사항을 기록할 수 있습니다.
-   */
-  memo?: string;
-}
+import type { Record, CalculationResult } from 'src/types/calculator';
 
 /**
  * 계산기의 기록을 관리하는 클래스입니다.

@@ -20,8 +20,9 @@
 
   // 계산기 관련 타입과 클래스
   import { KeyBinding, KeyBindings } from 'classes/KeyBinding';
+  import { BigNumber } from 'classes/CalculatorMath';
+  import { Operator } from 'classes/Calculator';
   import { Radix } from 'classes/RadixConverter';
-  import { BigNumber, Operator } from 'src/classes/CalculatorTypes';
 
   // 스토어 관련
   import { useStore } from 'src/stores/store';

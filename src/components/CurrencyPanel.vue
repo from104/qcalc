@@ -7,7 +7,7 @@
   const { t } = useI18n();
 
   // 계산기 관련 타입과 클래스
-  import { BigNumber } from 'classes/CalculatorTypes';
+  import { BigNumber } from 'classes/CalculatorMath';
   import { KeyBinding } from 'classes/KeyBinding';
 
   // 스토어 관련

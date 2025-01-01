@@ -8,26 +8,24 @@ import { Notify, Dark, copyToClipboard, Screen } from 'quasar';
 import { match } from 'ts-pattern';
 
 // Vue Router 관련
-import { type Router, type RouteLocationNormalizedLoaded, useRouter, useRoute } from 'vue-router';
-// const router = useRouter();
-// const route = useRoute();
-
+import { type Router, type RouteLocationNormalizedLoaded } from 'vue-router';
 // 계산기 관련 타입과 클래스 가져오기
-import { WordSize, Operator, CalculationResult } from 'classes/CalculatorTypes';
+import type { WordSize, CalculationResult } from 'types/calculator';
+import { Operator } from 'classes/Calculator';
+import { Radix } from 'classes/RadixConverter';
 import { Calculator } from 'classes/Calculator';
 import { UnitConverter } from 'classes/UnitConverter';
 import { CurrencyConverter } from 'classes/CurrencyConverter';
-import { RadixConverter, Radix, RadixType } from 'src/classes/RadixConverter';
+import { RadixConverter } from 'classes/RadixConverter';
+
+import type { StoreState, DarkModeType } from 'types/store';
 
 const radixConverter = new RadixConverter();
-
-// darkMode 타입 정의 추가
-type DarkModeType = 'system' | 'light' | 'dark';
 
 // 기본 스토어 정의
 export const useStore = defineStore('store', {
   // 상태 정의
-  state: () => ({
+  state: (): StoreState => ({
     // 계산기 관련
     calc: new Calculator(),
     currentTab: 'calc',
@@ -44,18 +42,16 @@ export const useStore = defineStore('store', {
     hapticsMode: true,
 
     // 테마/디스플레이 관련
-    darkMode: 'system' as DarkModeType,
+    darkMode: 'system',
     alwaysOnTop: false,
 
     // 계산 결과 관련
-    // 전체 계산 결과 삭제 확인 다이얼로그 표시 여부
     isDeleteRecordConfirmOpen: false,
-    // 계산 결과 창 스크롤 위치 저장
     recordLastScrollPosition: 0,
 
     // 숫자 표시 관련
     useGrouping: true,
-    groupingUnit: 3 as 3 | 4,
+    groupingUnit: 3,
     decimalPlaces: -2,
     useSystemLocale: true,
     locale: '',
@@ -63,8 +59,8 @@ export const useStore = defineStore('store', {
 
     // 단위 변환 관련
     selectedCategory: '',
-    sourceUnits: {} as { [key: string]: string },
-    targetUnits: {} as { [key: string]: string },
+    sourceUnits: {},
+    targetUnits: {},
     showUnit: true,
     showSymbol: true,
 
@@ -74,15 +70,12 @@ export const useStore = defineStore('store', {
     targetCurrency: 'KRW',
 
     // 진법 변환 관련
-    wordSize: 32 as WordSize,
+    wordSize: 32,
     radixList: Object.values(Radix),
-    sourceRadix: Radix.Decimal as RadixType,
-    targetRadix: Radix.Hexadecimal as RadixType,
+    sourceRadix: Radix.Decimal,
+    targetRadix: Radix.Hexadecimal,
     showRadix: true,
-    radixType: 'suffix' as 'prefix' | 'suffix',
-
-    // 서브페이지 애니메이션 관련
-    isSubPageAnimating: false,
+    radixType: 'suffix',
   }),
 
   // 액션 정의
@@ -181,15 +174,15 @@ export const useStore = defineStore('store', {
       return isRadixMode ? this.convertRadix(value, Radix.Decimal, this.sourceRadix) : value;
     },
 
-    convertRadix(value: string, fromRadix: RadixType, toRadix: RadixType): string {
+    convertRadix(value: string, fromRadix: Radix, toRadix: Radix): string {
       return radixConverter.convertRadix(value, fromRadix, toRadix);
     },
 
-    validateRadixNumber(value: string, radix: RadixType): boolean {
+    validateRadixNumber(value: string, radix: Radix): boolean {
       return radixConverter.isValidRadixNumber(value, radix);
     },
 
-    getRadixPrefix(radix: RadixType) {
+    getRadixPrefix(radix: Radix) {
       return {
         [Radix.Binary]: '0b',
         [Radix.Octal]: '0o',
@@ -198,7 +191,7 @@ export const useStore = defineStore('store', {
       }[radix];
     },
 
-    getRadixSuffix(radix: RadixType) {
+    getRadixSuffix(radix: Radix) {
       return {
         [Radix.Binary]: '2',
         [Radix.Octal]: '8',
@@ -209,7 +202,7 @@ export const useStore = defineStore('store', {
 
     initRecentRadix() {
       const availableRadixes = Object.values(Radix);
-      const isValidRadixType = (radix: RadixType) => availableRadixes.includes(radix);
+      const isValidRadixType = (radix: Radix) => availableRadixes.includes(radix);
 
       if (!isValidRadixType(this.sourceRadix)) {
         this.sourceRadix = Radix.Decimal;
@@ -551,11 +544,6 @@ export const useStore = defineStore('store', {
 
     // 특정 경로로 이동하는 함수
     navigateToPath(path: string, route: RouteLocationNormalizedLoaded, router: Router): void {
-      // const router = useRouter();
-      // const route = useRoute();
-
-      this.setSubPageAnimating(true);
-      console.log('navigateToPath', path);
       if (route.path === path) {
         return;
       } else if (/help|about|settings|record/.test(route.path)) {
@@ -563,16 +551,6 @@ export const useStore = defineStore('store', {
       } else {
         router.push(path);
       }
-      // 트랜지션이 끝나면 상태 초기화
-      setTimeout(() => {
-        this.setSubPageAnimating(false);
-        console.log('setSubPageAnimating', false);
-      }, 300);
-    },
-
-    // 서브페이지 애니메이션 관련
-    setSubPageAnimating(value: boolean) {
-      this.isSubPageAnimating = value;
     },
   },
 

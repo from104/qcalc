@@ -1,5 +1,6 @@
-import { BigNumberType, BigNumber } from './CalculatorTypes';
+import { BigNumberType } from 'src/types/calculator';
 import { unitBaseData, UnitBaseData } from './UnitBaseData';
+import { BigNumber } from './CalculatorMath';
 
 /**
  * UnitConverter 클래스

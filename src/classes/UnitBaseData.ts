@@ -1,5 +1,6 @@
 // mathjs 라이브러리에서 필요한 함수와 타입을 가져옵니다.
-import { BigNumber, BigNumberType as BigNumberType } from './CalculatorTypes';
+import { BigNumberType } from 'src/types/calculator';
+import { BigNumber } from './CalculatorMath';
 
 // Unit 인터페이스는 각 단위에 대한 정보를 정의합니다.
 interface Unit {

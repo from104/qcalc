@@ -1,6 +1,29 @@
 import { match } from 'ts-pattern';
-import { convertRadix, Radix } from './RadixConverter';
-import { BigNumber, MathB, BigNumberType } from './CalculatorTypes';
+import { convertRadix } from './RadixConverter';
+import { BigNumberType } from 'src/types/calculator';
+import { Radix } from './RadixConverter';
+import { all, create } from 'mathjs';
+
+// MathJS 라이브러리 설정
+export const MathB = create(all, {
+  number: 'BigNumber',
+  precision: 128,
+});
+
+// BigNumber 타입 정의
+export const BigNumber = MathB.bignumber;
+
+/**
+ * 수학 상수 정의 객체
+ */
+export const CONSTANTS: { [key: string]: string } = {
+  pi: MathB.pi.toString(), // 원주율
+  pi2: MathB.bignumber(MathB.pi).div(2).toString(), // 원주율의 절반
+  e: MathB.e.toString(), // 자연로그의 밑
+  ln2: MathB.log(2).toString(), // 자연로그 2
+  ln10: MathB.log(10).toString(), // 자연로그 10
+  phi: MathB.phi.toString(), // 황금비
+};
 
 /**
  * 계산기 수학 연산 클래스

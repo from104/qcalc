@@ -1,15 +1,6 @@
-import { create, all, bignumber } from 'mathjs';
-import { BigNumber, BigNumberType } from './CalculatorTypes';
+import { BigNumberType } from 'src/types/calculator';
+import { MathB, BigNumber } from './CalculatorMath';
 import { match } from 'ts-pattern';
-
-/**
- * BigNumber 설정으로 MathJS 인스턴스 생성
- * - precision: 64비트 정밀도 설정
- */
-const MathB = create(all, {
-  number: 'BigNumber',
-  precision: 128,
-});
 
 export enum Radix {
   Binary = 'bin',

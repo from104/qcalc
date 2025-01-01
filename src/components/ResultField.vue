@@ -8,8 +8,8 @@
 
   // 계산기 관련 타입과 클래스
   import { UnitConverter } from 'src/classes/UnitConverter';
-  import { Radix } from 'src/classes/RadixConverter';
-  import { BigNumber } from 'classes/CalculatorTypes';
+  import { BigNumber } from 'classes/CalculatorMath';
+  import { Radix } from 'classes/RadixConverter';
 
   // 스토어 관련
   import { useStore } from 'src/stores/store';

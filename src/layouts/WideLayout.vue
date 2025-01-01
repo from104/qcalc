@@ -87,7 +87,6 @@
   const switchSubPage = async (pageName: string) => {
     if (currentSubPage.value === pageName) return;
 
-    store.setSubPageAnimating(true);
     previousSubPage.value = currentSubPage.value;
     currentSubPage.value = pageName;
 
@@ -97,11 +96,6 @@
     } else {
       router.back();
     }
-
-    // 트랜지션이 끝나면 상태 초기화
-    setTimeout(() => {
-      store.setSubPageAnimating(false);
-    }, 300);
   };
 
   // 키 바인딩 설정
@@ -155,9 +149,22 @@
           dense
           shrink
           inline-label
+          role="tablist"
+          :aria-label="t('ariaLabel.mainTabs')"
           @update:model-value="store.setCurrentTab($event)"
         >
-          <q-tab v-for="tab in tabs" :key="tab.name" :label="tab.title" :name="tab.name" class="q-px-xs" dense />
+          <q-tab
+            v-for="tab in tabs"
+            :key="tab.name"
+            :label="tab.title"
+            :name="tab.name"
+            class="q-px-xs"
+            dense
+            role="tab"
+            :aria-label="t('ariaLabel.tab', { name: tab.title })"
+            :aria-selected="store.currentTab === tab.name"
+            :aria-controls="`panel-${tab.name}`"
+          />
         </q-tabs>
         <q-space />
         <HeaderIcons />
@@ -167,7 +174,11 @@
       <q-toolbar v-blur class="col-6 q-px-none sub-header">
         <transition name="animate-sub-page">
           <div :key="currentSubPage" :data-page="currentSubPage" class="header-content row full-width items-center">
-            <q-toolbar-title class="text-subtitle1 q-ml-md">
+            <q-toolbar-title
+              class="text-subtitle1 q-ml-md"
+              role="heading"
+              :aria-label="t('ariaLabel.subPageTitle', { title: SUB_PAGE_CONFIG[currentSubPage]?.title })"
+            >
               {{ SUB_PAGE_CONFIG[currentSubPage]?.title }}
             </q-toolbar-title>
             <q-space />
@@ -179,6 +190,8 @@
               flat
               size="md"
               :icon="button.icon"
+              role="button"
+              :aria-label="t('ariaLabel.subPageButton', { label: t(`message.${button.label}`) })"
               @click="store.navigateToPath(button.path, route, router)"
             />
             <q-separator vertical class="sub-header-separator q-mx-xs q-pl-xs" />
@@ -203,7 +216,7 @@
               round
               icon="close"
               role="button"
-              :aria-label="t('ariaLabel.backToRecord')"
+              :aria-label="t('ariaLabel.closeSubPage')"
               @click="switchSubPage('record')"
             />
           </div>
@@ -213,17 +226,37 @@
 
     <q-page-container class="row" style="padding-bottom: 0px">
       <!-- 계산기 영역 -->
-      <div class="col-6 calc-content">
-        <q-tab-panels v-model="store.currentTab" animated infinite :swipeable="false">
-          <q-tab-panel v-for="(tab, index) in tabs" :key="index" :name="tab.name">
+      <div class="col-6 calc-content" role="region" :aria-label="t('ariaLabel.calculatorSection')">
+        <q-tab-panels
+          v-model="store.currentTab"
+          animated
+          infinite
+          :swipeable="false"
+          role="tabpanel"
+          :aria-label="t('ariaLabel.calculatorContent')"
+        >
+          <q-tab-panel
+            v-for="(tab, index) in tabs"
+            :id="`panel-${tab.name}`"
+            :key="index"
+            :name="tab.name"
+            role="tabpanel"
+            :aria-label="t('ariaLabel.tabPanel', { name: tab.title })"
+            :aria-labelledby="`tab-${tab.name}`"
+          >
             <component :is="tab.component" />
           </q-tab-panel>
         </q-tab-panels>
       </div>
 
       <!-- 서브페이지 영역 -->
-      <div class="col-6 relative-position sub-content">
-        <q-scroll-area class="sub-scroll-area" :class="{ 'hide-scrollbar': currentSubPage === 'record' }">
+      <div class="col-6 relative-position sub-content" role="complementary" :aria-label="t('ariaLabel.subPageSection')">
+        <q-scroll-area
+          class="sub-scroll-area"
+          :class="{ 'hide-scrollbar': currentSubPage === 'record' }"
+          role="region"
+          :aria-label="t('ariaLabel.subPageContent')"
+        >
           <transition name="animate-sub-page">
             <component
               :is="SUB_PAGE_CONFIG[currentSubPage]?.component"
@@ -357,6 +390,18 @@ ko:
   ariaLabel:
     delete_outline: '모든 기록 삭제'
     backToRecord: '기록 페이지로 돌아가기'
+    mainTabs: '메인 탭 목록'
+    tab: '{name} 탭'
+    subPageTitle: '{title} 페이지'
+    subPageButton: '{label} 버튼'
+    closeSubPage: '서브페이지 닫기'
+    calculatorSection: '계산기 영역'
+    calculatorContent: '계산기 컨텐츠'
+    tabPanel: '{name} 탭 패널'
+    subPageSection: '서브페이지 영역'
+    subPageContent: '서브페이지 컨텐츠'
+    tabSelected: '{name} 탭 선택됨'
+    tabUnselected: '{name} 탭 선택되지 않음'
 en:
   calc: Basic
   unit: Unit
@@ -365,4 +410,16 @@ en:
   ariaLabel:
     delete_outline: 'Delete all records'
     backToRecord: 'Return to record page'
+    mainTabs: 'Main tab list'
+    tab: '{name} tab'
+    subPageTitle: '{title} page'
+    subPageButton: '{label} button'
+    closeSubPage: 'Close sub page'
+    calculatorSection: 'Calculator section'
+    calculatorContent: 'Calculator content'
+    tabPanel: '{name} tab panel'
+    subPageSection: 'Sub page section'
+    subPageContent: 'Sub page content'
+    tabSelected: '{name} tab selected'
+    tabUnselected: '{name} tab unselected'
 </i18n>
