@@ -10,7 +10,7 @@ import { match } from 'ts-pattern';
 // Vue Router 관련
 import { type Router, type RouteLocationNormalizedLoaded } from 'vue-router';
 // 계산기 관련 타입과 클래스 가져오기
-import type { WordSize, CalculationResult } from 'types/calculator';
+// import type { WordSize, CalculationResult } from 'src/types/calculator';
 import { Operator } from 'classes/Calculator';
 import { Radix } from 'classes/RadixConverter';
 import { Calculator } from 'classes/Calculator';
@@ -18,7 +18,7 @@ import { UnitConverter } from 'classes/UnitConverter';
 import { CurrencyConverter } from 'classes/CurrencyConverter';
 import { RadixConverter } from 'classes/RadixConverter';
 
-import type { StoreState, DarkModeType } from 'types/store';
+// import type { StoreState, DarkModeType } from 'src/types/store';
 
 const radixConverter = new RadixConverter();
 

@@ -316,7 +316,7 @@
   }
 
   .collapse-layout-enter-from {
-    transform: scaleX(0.7);
+    transform: scaleX(0.5);
     transform-origin: left;
   }
   .collapse-layout-enter-to,

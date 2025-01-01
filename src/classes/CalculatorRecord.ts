@@ -1,4 +1,4 @@
-import type { Record, CalculationResult } from 'src/types/calculator';
+// import type { ResultRecord, CalculationResult } from 'src/types/calculator';
 
 /**
  * 계산기의 기록을 관리하는 클래스입니다.
@@ -26,7 +26,7 @@ export class CalculatorRecord {
    * 계산기의 모든 기록 항목들을 저장하는 배열
    * 가장 최근 항목이 배열의 앞쪽에 위치합니다.
    */
-  private records: Record[] = [];
+  private records: ResultRecord[] = [];
 
   /**
    * 기록의 최대 저장 개수
@@ -51,7 +51,7 @@ export class CalculatorRecord {
       // - id: 고유한 식별자
       // - resultSnapshot: 계산 결과 데이터
       // - memo: 사용자 메모 (초기값: 빈 문자열)
-      const newRecord: Record = {
+      const newRecord: ResultRecord = {
         id: newId,
         calculationResult: record,
         memo: '',
@@ -95,9 +95,9 @@ export class CalculatorRecord {
    * 저장된 모든 기록 항목을 배열 형태로 반환합니다.
    * 배열은 최신 항목부터 오래된 항목 순으로 정렬되어 있습니다.
    *
-   * @returns {Record[]} 전체 기록 항목 배열
+   * @returns {ResultRecord[]} 전체 기록 항목 배열
    */
-  public getAllRecords(): Record[] {
+  public getAllRecords(): ResultRecord[] {
     return this.records;
   }
 
@@ -118,10 +118,10 @@ export class CalculatorRecord {
    * 주어진 인덱스에 해당하는 기록 항목을 반환합니다.
    *
    * @param {number} index - 찾고자 하는 기록 항목의 인덱스
-   * @returns {Record} 해당 인덱스의 기록 항목
+   * @returns {ResultRecord} 해당 인덱스의 기록 항목
    * @throws {Error} 유효하지 않은 인덱스가 전달된 경우
    */
-  public getRecordByIndex(index: number): Record {
+  public getRecordByIndex(index: number): ResultRecord {
     if (index < 0 || index >= this.records.length) {
       throw new Error('Invalid record index');
     }
@@ -132,10 +132,10 @@ export class CalculatorRecord {
    * 주어진 ID에 해당하는 기록 항목을 반환합니다.
    *
    * @param {number} id - 찾고자 하는 기록 항목의 고유 ID
-   * @returns {Record} 해당 ID의 기록 항목
+   * @returns {ResultRecord} 해당 ID의 기록 항목
    * @throws {Error} 해당 ID의 기록을 찾을 수 없는 경우
    */
-  public getRecordById(id: number): Record {
+  public getRecordById(id: number): ResultRecord {
     return this.getRecordByIndex(this.findIndexById(id));
   }
 
