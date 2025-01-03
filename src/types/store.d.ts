@@ -37,7 +37,9 @@ declare global {
     // 계산 결과 관련
     isDeleteRecordConfirmOpen: boolean;
     recordLastScrollPosition: number;
-
+    isSearchOpen: boolean;
+    searchKeyword: string;
+    
     // 숫자 표시 관련
     useGrouping: boolean;
     groupingUnit: 3 | 4;
@@ -65,6 +67,9 @@ declare global {
     targetRadix: RadixType;
     showRadix: boolean;
     radixType: 'prefix' | 'suffix';
+
+    // 플로팅 창 위치 관련
+    floatingPosition: FloatingPosition;
   }
 
   /**

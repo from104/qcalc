@@ -22,6 +22,12 @@ import { RadixConverter } from 'classes/RadixConverter';
 
 const radixConverter = new RadixConverter();
 
+// 플로팅 창 위치 관련 상태 추가
+interface FloatingPosition {
+  x: number;
+  y: number;
+}
+
 // 기본 스토어 정의
 export const useStore = defineStore('store', {
   // 상태 정의
@@ -48,6 +54,8 @@ export const useStore = defineStore('store', {
     // 계산 결과 관련
     isDeleteRecordConfirmOpen: false,
     recordLastScrollPosition: 0,
+    isSearchOpen: false,
+    searchKeyword: '',
 
     // 숫자 표시 관련
     useGrouping: true,
@@ -76,6 +84,9 @@ export const useStore = defineStore('store', {
     targetRadix: Radix.Hexadecimal,
     showRadix: true,
     radixType: 'suffix',
+
+    // 플로팅 창 위치 관련 상태 추가
+    floatingPosition: { x: 16, y: 16 } as FloatingPosition,
   }),
 
   // 액션 정의
@@ -551,6 +562,43 @@ export const useStore = defineStore('store', {
       } else {
         router.push(path);
       }
+    },
+
+    // 플로팅 창 위치 계산 메서드
+    calculateFloatingBounds() {
+      const header = document.getElementById('header');
+      const recordPage = document.getElementById('record-page');
+      const floatingElement = document.querySelector('.search-input-floating') as HTMLElement;
+
+      if (!header || !recordPage || !floatingElement) return null;
+
+      const headerHeight = header.clientHeight;
+      const pageRect = recordPage.getBoundingClientRect();
+      const floatingRect = floatingElement.getBoundingClientRect();
+      const innerPadding = 16;
+      const horizontalOffset = this.isAtLeastDoubleWidth() ? window.innerWidth / 2 : 0;
+
+      return {
+        minX: pageRect.left + innerPadding,
+        maxX: pageRect.right - floatingRect.width - innerPadding,
+        minY: pageRect.top + innerPadding,
+        maxY: pageRect.bottom - floatingRect.height - innerPadding,
+        headerHeight,
+        horizontalOffset,
+      };
+    },
+
+    // 플로팅 창 위치 업데이트
+    updateFloatingPosition(x: number, y: number) {
+      const bounds = this.calculateFloatingBounds();
+      if (!bounds) return;
+
+      const { minX, maxX, minY, maxY, headerHeight, horizontalOffset } = bounds;
+
+      this.floatingPosition = {
+        x: Math.max(minX, Math.min(maxX, x)) - horizontalOffset,
+        y: Math.max(minY, Math.min(maxY, y)) - headerHeight,
+      };
     },
   },
 

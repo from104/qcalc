@@ -65,6 +65,13 @@
       title: t('message.record'),
       buttons: [
         {
+          icon: 'search',
+          disabled: computed(() => false),
+          action: () => {
+            store.isSearchOpen = !store.isSearchOpen;
+          },
+        },
+        {
           icon: 'delete_outline',
           disabled: isRecordDisabled,
           action: () => {
@@ -137,7 +144,7 @@
 
 <template>
   <q-layout view="hHh LpR fFf">
-    <q-header class="z-top noselect row" elevated>
+    <q-header id="header" class="z-top noselect row" elevated>
       <!-- 계산기 영역 헤더 -->
       <q-toolbar v-blur class="col-6 calc-header">
         <q-tabs
@@ -171,54 +178,53 @@
       </q-toolbar>
 
       <!-- 서브페이지 영역 헤더 -->
-      <q-toolbar v-blur class="col-6 q-px-none sub-header">
+      <q-toolbar v-blur class="col-6 sub-header">
         <transition name="animate-sub-page">
-          <div :key="currentSubPage" :data-page="currentSubPage" class="header-content row full-width items-center">
+          <div :key="currentSubPage" :data-page="currentSubPage" class="header-content full-width row items-center">
             <q-toolbar-title
-              class="text-subtitle1 q-ml-md"
+              class="text-subtitle1 col-4"
               role="heading"
               :aria-label="t('ariaLabel.subPageTitle', { title: SUB_PAGE_CONFIG[currentSubPage]?.title })"
             >
               {{ SUB_PAGE_CONFIG[currentSubPage]?.title }}
             </q-toolbar-title>
-            <q-space />
-            <q-btn
-              v-for="button in SUB_PAGE_BUTTONS"
-              :key="button.label"
-              class="q-mx-xs q-px-none"
-              dense
-              flat
-              size="md"
-              :icon="button.icon"
-              role="button"
-              :aria-label="t('ariaLabel.subPageButton', { label: t(`message.${button.label}`) })"
-              @click="store.navigateToPath(button.path, route, router)"
-            />
-            <q-separator vertical class="sub-header-separator q-mx-xs q-pl-xs" />
-            <q-btn
-              v-for="button in SUB_PAGE_CONFIG[currentSubPage]?.buttons"
-              :key="button.icon"
-              class="q-mr-md"
-              dense
-              flat
-              size="md"
-              :icon="button.icon"
-              role="button"
-              :aria-label="t(`ariaLabel.${button.icon}`)"
-              :disable="button.disabled.value"
-              @click="button.action"
-            />
-            <q-btn
-              v-if="SUB_PAGE_CONFIG[currentSubPage]?.showClose"
-              class="q-mr-md"
-              flat
-              dense
-              round
-              icon="close"
-              role="button"
-              :aria-label="t('ariaLabel.closeSubPage')"
-              @click="switchSubPage('record')"
-            />
+            <div class="col-8 row justify-end q-pr-lg">
+              <q-btn
+                v-for="button in SUB_PAGE_BUTTONS"
+                :key="button.label"
+                dense
+                flat
+                size="md"
+                :icon="button.icon"
+                role="button"
+                :aria-label="t('ariaLabel.subPageButton', { label: t(`message.${button.label}`) })"
+                @click="store.navigateToPath(button.path, route, router)"
+              />
+              <q-separator vertical class="sub-header-separator q-mx-sm" />
+              <q-btn
+                v-for="button in SUB_PAGE_CONFIG[currentSubPage]?.buttons"
+                :key="button.icon"
+                dense
+                flat
+                size="md"
+                :icon="button.icon"
+                role="button"
+                :aria-label="t(`ariaLabel.${button.icon}`)"
+                :disable="button.disabled.value"
+                @click="button.action"
+              />
+              <q-btn
+                v-if="SUB_PAGE_CONFIG[currentSubPage]?.showClose"
+                class="q-mx-none q-px-none"
+                flat
+                dense
+                round
+                icon="close"
+                role="button"
+                :aria-label="t('ariaLabel.closeSubPage')"
+                @click="switchSubPage('record')"
+              />
+            </div>
           </div>
         </transition>
       </q-toolbar>

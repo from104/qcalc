@@ -56,6 +56,13 @@
       component: RecordPage,
       buttons: [
         {
+          icon: 'search',
+          disabled: computed(() => false),
+          action: () => {
+            store.isSearchOpen = !store.isSearchOpen;
+          },
+        },
+        {
           icon: 'delete_outline',
           disabled: isRecordDisabled,
           action: () => {
@@ -98,7 +105,12 @@
     [['Control+4'], () => store.setCurrentTab('radix')],
     [['Control+Tab', 'ArrowRight'], moveTabRight],
     [['Control+Shift+Tab', 'ArrowLeft'], moveTabLeft],
-    [['Escape'], () => { if (isSubPage.value) router.back(); }],
+    [
+      ['Escape'],
+      () => {
+        if (isSubPage.value) router.back();
+      },
+    ],
   ]);
 
   // 입력 포커스 상태에 따라 키 바인딩 활성화/비활성화
@@ -139,7 +151,7 @@
 
 <template>
   <q-layout view="hHh lpR fFf">
-    <q-header class="z-top noselect" elevated>
+    <q-header id="header" class="z-top noselect" elevated>
       <!-- 메인 페이지 헤더 -->
       <q-toolbar v-if="!isSubPage" v-blur>
         <q-tabs
@@ -188,7 +200,6 @@
           @click="button.action"
         />
       </q-toolbar>
-
     </q-header>
 
     <q-page-container style="padding-bottom: 0px">

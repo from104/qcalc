@@ -1,6 +1,6 @@
 <script setup lang="ts">
   // Vue 핵심 기능 및 컴포지션 API 가져오기
-  import { onMounted, onBeforeUnmount, ref, computed, watch, reactive } from 'vue';
+  import { onMounted, onBeforeUnmount, ref, computed, watch, reactive, defineComponent, h } from 'vue';
 
   // i18n 설정
   import { useI18n } from 'vue-i18n';
@@ -127,6 +127,7 @@
       document.getElementById('record')?.scrollTo({ top: store.recordLastScrollPosition });
     }, 50);
     showScrollToTop.value = false;
+    window.addEventListener('resize', adjustFloatingPosition);
   });
 
   // 컴포넌트 언마운트 시 키 바인딩 비활성화
@@ -135,6 +136,7 @@
     store.recordLastScrollPosition = document.getElementById('record')?.scrollTop ?? 0;
 
     store.isDeleteRecordConfirmOpen = false;
+    window.removeEventListener('resize', adjustFloatingPosition);
   });
 
   // 메모 편집 관련 상태 변수
@@ -233,6 +235,130 @@
     const headerElement = document.getElementById('header');
     return headerElement ? headerElement.clientHeight + 'px' : '0px';
   });
+
+  // 계산 결과를 문자열로 변환하고 필터링하는 computed 속성
+  const recordStrings = computed<RecordString[]>(() => {
+    // 기본 레코드 문자열 생성
+    const strings = records.value.map((record) => {
+      const displayText = [
+        getLeftSideInRecord(record.calculationResult, true),
+        '\n= ',
+        getRightSideInRecord(record.calculationResult),
+      ].join('');
+
+      return {
+        id: record.id as number,
+        memo: record.memo,
+        displayText,
+        origResult: record.calculationResult,
+      };
+    });
+
+    // 검색이 활성화되지 않은 경우 전체 결과 반환
+    if (!store.isSearchOpen) return strings;
+
+    // 검색어가 없는 경우 전체 결과 반환
+    const searchTerm = store.searchKeyword.trim().toLowerCase();
+    if (!searchTerm) return strings;
+
+    // 검색어로 필터링
+    return strings.filter((record) => {
+      const memoMatch = record.memo?.toLowerCase().includes(searchTerm);
+      const displayTextMatch = record.displayText.toLowerCase().includes(searchTerm);
+      return memoMatch || displayTextMatch;
+    });
+  });
+
+  // 새로운 컴포넌트 추가
+  const HighlightText = defineComponent({
+    props: {
+      text: { type: String, required: true },
+      searchTerm: { type: String, required: true },
+    },
+    setup(props) {
+      return () => {
+        if (!store.isSearchOpen || !props.searchTerm.trim()) return props.text;
+
+        const escapedSearchTerm = props.searchTerm.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+        const regex = new RegExp(`(${escapedSearchTerm})`, 'gi');
+        const parts = props.text.split(regex);
+
+        return h(
+          'span',
+          parts.map((part, i) => (i % 2 === 1 ? h('span', { class: 'search-highlight' }, part) : part)),
+        );
+      };
+    },
+  });
+
+  // 드래그 관련 상태 수정
+  const isDragging = ref(false);
+  const dragOffset = reactive({ x: 0, y: 0 });
+
+  // 스타일 계산 수정
+  const floatingStyle = computed(() => ({
+    position: 'fixed',
+    left: `${store.floatingPosition.x}px`,
+    top: `${store.floatingPosition.y}px`,
+    opacity: isDragging.value ? 0.3 : store.inputFocused ? 1 : undefined,
+    transition: isDragging.value ? 'none' : 'all 0.2s',
+    zIndex: 1500,
+  }));
+
+  // 드래그 시작
+  const startDrag = (e: MouseEvent) => {
+    const floatingElement = document.querySelector('.search-input-floating') as HTMLElement;
+    if (!floatingElement) return;
+
+    isDragging.value = true;
+    const rect = floatingElement.getBoundingClientRect();
+    dragOffset.x = e.clientX - rect.left;
+    dragOffset.y = e.clientY - rect.top;
+
+    document.addEventListener('mousemove', onDrag);
+    document.addEventListener('mouseup', stopDrag);
+  };
+
+  // 드래그 중 수정
+  const onDrag = (e: MouseEvent) => {
+    if (isDragging.value) {
+      store.updateFloatingPosition(e.clientX - dragOffset.x, e.clientY - dragOffset.y);
+    }
+  };
+
+  // 드래그 종료
+  const stopDrag = () => {
+    isDragging.value = false;
+    document.removeEventListener('mousemove', onDrag);
+    document.removeEventListener('mouseup', stopDrag);
+  };
+
+  // 컴포넌트 언마운트 시 이벤트 리스너 제거
+  onBeforeUnmount(() => {
+    document.removeEventListener('mousemove', onDrag);
+    document.removeEventListener('mouseup', stopDrag);
+  });
+
+  // 플로팅창 위치 조정 함수 수정
+  const adjustFloatingPosition = () => {
+    const bounds = store.calculateFloatingBounds();
+    if (!bounds) return;
+
+    store.updateFloatingPosition(
+      store.floatingPosition.x + bounds.horizontalOffset,
+      store.floatingPosition.y + bounds.headerHeight,
+    );
+  };
+
+  // store.isAtLeastDoubleWidth 변경 감시
+  watch(
+    () => store.isAtLeastDoubleWidth(),
+    () => {
+      setTimeout(() => {
+        adjustFloatingPosition();
+      }, 200);
+    },
+  );
 </script>
 
 <template>
@@ -255,18 +381,60 @@
         @click="scrollToTop"
       />
     </transition>
+    <transition name="slide-fade">
+      <q-item
+        v-if="store.isSearchOpen"
+        class="search-input-floating"
+        :class="{ 'input-focused': store.inputFocused }"
+        :style="floatingStyle"
+      >
+        <q-input
+          v-model="store.searchKeyword"
+          :placeholder="t('search')"
+          filled
+          dense
+          autofocus
+          class="search-input"
+          :aria-label="t('ariaLabel.searchInput')"
+          role="searchbox"
+          @focus="store.setInputFocused"
+          @blur="store.setInputBlurred"
+          @keyup.enter="$event.target.blur()"
+        >
+          <template #prepend>
+            <div
+              class="drag-handle"
+              role="button"
+              :aria-label="t('ariaLabel.dragHandle')"
+              tabindex="0"
+              @mousedown="startDrag"
+            />
+          </template>
+          <template #append>
+            <q-btn
+              round
+              flat
+              dense
+              icon="close"
+              :aria-label="t('ariaLabel.closeSearch')"
+              @click="store.isSearchOpen = false"
+            />
+          </template>
+        </q-input>
+      </q-item>
+    </transition>
     <transition name="slide-fade" mode="out-in">
-      <q-item v-if="records.length == 0" class="text-center">
+      <q-item v-if="recordStrings.length == 0" class="text-center">
         <q-item-section role="listitem">
           <q-item-label>
-            <span>{{ t('noRecord') }}</span>
+            <span>{{ store.searchKeyword.trim() === '' ? t('noRecord') : t('noSearchResult') }}</span>
           </q-item-label>
         </q-item-section>
       </q-item>
       <q-list v-else id="record-list" separator class="full-width" role="list">
         <transition-group name="record-list">
           <q-slide-item
-            v-for="record in records"
+            v-for="record in recordStrings"
             :key="record.id"
             left-color="negative"
             right-color="positive"
@@ -287,13 +455,10 @@
             >
               <q-item-section class="q-mr-none q-px-none">
                 <q-item-label v-if="record.memo">
-                  <u>{{ record.memo }}</u>
+                  <u><HighlightText :text="record.memo" :search-term="store.searchKeyword" /></u>
                 </q-item-label>
                 <q-item-label style="white-space: pre-wrap">
-                  {{ getLeftSideInRecord(record.calculationResult, true) }}
-                </q-item-label>
-                <q-item-label>
-                  {{ ['=', getRightSideInRecord(record.calculationResult)].join(' ') }}
+                  <HighlightText :text="record.displayText" :search-term="store.searchKeyword" />
                 </q-item-label>
               </q-item-section>
             </q-item>
@@ -326,12 +491,12 @@
                 <MenuItem
                   :title="t('copyDisplayedResult')"
                   :action="() => copyRecordItem(record.id as number, 'formattedNumber')"
-                  :caption="getRightSideInRecord(record.calculationResult)"
+                  :caption="getRightSideInRecord(record.origResult)"
                 />
                 <MenuItem
                   :title="t('copyResultNumber')"
                   :action="() => copyRecordItem(record.id as number, 'onlyNumber')"
-                  :caption="record.calculationResult.resultNumber"
+                  :caption="record.origResult.resultNumber"
                 />
                 <MenuItem separator />
                 <MenuItem :title="t('loadToMainPanel')" :action="() => loadToMainPanel(record.id as number)" />
@@ -443,12 +608,110 @@
     overflow: hidden;
     position: relative;
   }
+
+  .hidden {
+    display: none;
+  }
+
+  :deep(.search-highlight) {
+    background-color: rgba(255, 255, 0, 0.3);
+    border-radius: 2px;
+    padding: 0 2px;
+    margin: 0 -2px;
+  }
+
+  /* 다크 모드에서의 하이라이트 스타일 */
+  :deep(.body--dark .search-highlight) {
+    background-color: rgba(255, 255, 0, 0.2);
+  }
+
+  .search-input-floating {
+    z-index: 2000;
+    padding: 0;
+    width: 50%;
+    max-width: 600px;
+    transition: opacity 0.2s;
+
+    &:hover:not(.input-focused) {
+      opacity: 0.5;
+    }
+
+    .drag-handle {
+      width: 16px;
+      height: 24px;
+      cursor: move;
+      background: rgba(255, 255, 255, 0.2);
+      border-radius: 4px;
+      margin: 8px 0 8px 8px;
+      position: relative;
+
+      &::before {
+        content: '';
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 4px;
+        height: 12px;
+        background: repeating-linear-gradient(
+          to bottom,
+          rgba(255, 255, 255, 0.7) 0px,
+          rgba(255, 255, 255, 0.7) 1px,
+          transparent 1px,
+          transparent 3px
+        );
+      }
+
+      &:hover {
+        background: rgba(255, 255, 255, 0.3);
+      }
+    }
+
+    .search-input {
+      :deep(.q-field__control) {
+        background: var(--q-primary);
+        border-radius: 8px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        padding-left: 0;
+      }
+
+      :deep(.q-field__before) {
+        padding-right: 0;
+        min-width: auto;
+      }
+
+      :deep(.q-field__native) {
+        color: white;
+      }
+
+      :deep(.q-field__marginal) {
+        color: white;
+      }
+    }
+
+    &.dragging {
+      cursor: move;
+    }
+  }
+
+  /* 다크 모드 */
+  :deep(.body--dark) .search-input-floating {
+    .drag-handle {
+      background: rgba(255, 255, 255, 0.15);
+
+      &:hover {
+        background: rgba(255, 255, 255, 0.25);
+      }
+    }
+  }
 </style>
 
 <i18n>
 ko:
   record: '계산 기록'
   noRecord: '계산 기록이 없습니다.'
+  noSearchResult: '검색 결과가 없습니다.'
+  search: '검색어를 입력하세요'
   doYouDeleteRecord: '모든 계산 기록을 지우겠어요?'
   memo: '메모'
   copySuccess: '클립보드에 복사되었습니다.'
@@ -466,9 +729,14 @@ ko:
     scrollToTop: '맨 위로 스크롤'
     editMemo: '메모 편집'
     deleteRecord: '기록 삭제'
+    searchInput: '검색어 입력'
+    dragHandle: '검색창 이동'
+    closeSearch: '검색창 닫기'
 en:
   record: 'record'
   noRecord: 'No record.'
+  noSearchResult: 'No search results.'
+  search: 'Enter search term'
   doYouDeleteRecord: 'Do you want to delete all record?'
   memo: 'Memo'
   copySuccess: 'Copied to clipboard.'
@@ -486,4 +754,7 @@ en:
     scrollToTop: 'Scroll to top'
     editMemo: 'Edit memo'
     deleteRecord: 'Delete record'
+    searchInput: 'Enter search term'
+    dragHandle: 'Move search window'
+    closeSearch: 'Close search window'
 </i18n>

@@ -16,9 +16,16 @@ declare global {
 
   type ResultRecord = {
     id?: number;
-    calculationResult: CalculationResult;
     memo?: string;
+    calculationResult: CalculationResult;
   };
+
+  interface RecordString {
+    id: number;
+    memo?: string;
+    displayText: string;
+    origResult: CalculationResult;
+  }
 }
 
 export {}; // 파일을 모듈로 만들기 위한 빈 export
