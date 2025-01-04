@@ -279,7 +279,7 @@
       return () => {
         if (!store.isSearchOpen || !props.searchTerm.trim()) return props.text;
 
-        const escapedSearchTerm = props.searchTerm.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+        const escapedSearchTerm = props.searchTerm.trim().replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
         const regex = new RegExp(`(${escapedSearchTerm})`, 'gi');
         const parts = props.text.split(regex);
 
@@ -298,8 +298,8 @@
   // 스타일 계산 수정
   const floatingStyle = computed(() => ({
     position: 'fixed',
-    left: `${store.floatingPosition.x}px`,
-    top: `${store.floatingPosition.y}px`,
+    left: `${store.isAtLeastDoubleWidth() ? store.doubleFloatingPosition.x : store.singleFloatingPosition.x}px`,
+    top: `${store.isAtLeastDoubleWidth() ? store.doubleFloatingPosition.y : store.singleFloatingPosition.y}px`,
     opacity: isDragging.value ? 0.3 : store.inputFocused ? 1 : undefined,
     transition: isDragging.value ? 'none' : 'all 0.2s',
     zIndex: 1500,
@@ -344,10 +344,16 @@
     const bounds = store.calculateFloatingBounds();
     if (!bounds) return;
 
-    store.updateFloatingPosition(
-      store.floatingPosition.x + bounds.horizontalOffset,
-      store.floatingPosition.y + bounds.headerHeight,
-    );
+    const { minX, maxX, minY, maxY, headerHeight } = bounds;
+    const currentPosition = store.isAtLeastDoubleWidth() 
+      ? store.doubleFloatingPosition 
+      : store.singleFloatingPosition;
+
+    const x = store.isAtLeastDoubleWidth()
+      ? currentPosition.x + window.innerWidth / 2
+      : currentPosition.x;
+
+    store.updateFloatingPosition(x, currentPosition.y + headerHeight);
   };
 
   // store.isAtLeastDoubleWidth 변경 감시
@@ -391,6 +397,7 @@
         <q-input
           v-model="store.searchKeyword"
           :placeholder="t('search')"
+          borderless
           filled
           dense
           autofocus

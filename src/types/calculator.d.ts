@@ -28,4 +28,9 @@ declare global {
   }
 }
 
-export {}; // 파일을 모듈로 만들기 위한 빈 export
+export {
+  WordSize,
+  CalculationResult,
+  ResultRecord,
+  RecordString,
+}; // 파일을 모듈로 만들기 위한 빈 export

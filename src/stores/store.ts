@@ -18,7 +18,7 @@ import { UnitConverter } from 'classes/UnitConverter';
 import { CurrencyConverter } from 'classes/CurrencyConverter';
 import { RadixConverter } from 'classes/RadixConverter';
 
-// import type { StoreState, DarkModeType } from 'src/types/store';
+import type { StoreState, DarkModeType } from '../types/store';
 
 const radixConverter = new RadixConverter();
 
@@ -86,7 +86,8 @@ export const useStore = defineStore('store', {
     radixType: 'suffix',
 
     // 플로팅 창 위치 관련 상태 추가
-    floatingPosition: { x: 16, y: 16 } as FloatingPosition,
+    singleFloatingPosition: { x: 16, y: 16 } as FloatingPosition,
+    doubleFloatingPosition: { x: 16, y: 16 } as FloatingPosition,
   }),
 
   // 액션 정의
@@ -593,12 +594,34 @@ export const useStore = defineStore('store', {
       const bounds = this.calculateFloatingBounds();
       if (!bounds) return;
 
-      const { minX, maxX, minY, maxY, headerHeight, horizontalOffset } = bounds;
-
-      this.floatingPosition = {
-        x: Math.max(minX, Math.min(maxX, x)) - horizontalOffset,
+      const { minX, maxX, minY, maxY, headerHeight } = bounds;
+      const position = {
+        x: Math.max(minX, Math.min(maxX, x)),
         y: Math.max(minY, Math.min(maxY, y)) - headerHeight,
       };
+
+      if (this.isAtLeastDoubleWidth()) {
+        this.doubleFloatingPosition = {
+          x: position.x - window.innerWidth / 2,
+          y: position.y,
+        };
+      } else {
+        this.singleFloatingPosition = position;
+      }
+    },
+
+    // 현재 레이아웃에 맞는 위치 반환
+    get floatingPosition(): FloatingPosition {
+      const defaultPosition = { x: 16, y: 16 };
+
+      if (this.isAtLeastDoubleWidth()) {
+        if (!this.doubleFloatingPosition) return defaultPosition;
+        return {
+          x: this.doubleFloatingPosition.x + window.innerWidth / 2,
+          y: this.doubleFloatingPosition.y,
+        };
+      }
+      return this.singleFloatingPosition || defaultPosition;
     },
   },
 
