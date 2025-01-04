@@ -91,14 +91,24 @@
     });
   };
 
+  const openDeleteRecordConfirmDialog = () => {
+    if (calc.record.getAllRecords().length > 0) store.isDeleteRecordConfirmOpen = true;
+  };
+
+  const openSearchDialogByKey = () => {
+    store.isSearchOpen = !store.isSearchOpen;
+    if (store.isSearchOpen) {
+      setTimeout(() => {
+        // 끝의 s 삭제
+        store.searchKeyword = store.searchKeyword.slice(0, -1);
+      }, 100);
+    }
+  };
+
   // 키 바인딩 설정
   const keyBinding = new KeyBinding([
-    [
-      ['d'],
-      () => {
-        if (calc.record.getAllRecords().length > 0) store.isDeleteRecordConfirmOpen = true;
-      },
-    ],
+    [['d'], () => openDeleteRecordConfirmDialog()],
+    [['s'], () => openSearchDialogByKey()],
     [['ArrowUp'], () => scrollToRecord(-50)],
     [['ArrowDown'], () => scrollToRecord(50)],
     [['PageUp'], () => scrollToRecord(-400)],
@@ -677,6 +687,7 @@
     .search-input {
       :deep(.q-field__control) {
         background: var(--q-primary);
+        color: white;
         border-radius: 8px;
         box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
         padding-left: 0;
@@ -688,11 +699,15 @@
       }
 
       :deep(.q-field__native) {
-        color: white;
+        color: var(--q-dark-text);
+        &::placeholder {
+          color: var(--q-dark-text);
+          opacity: 0.7;
+        }
       }
 
       :deep(.q-field__marginal) {
-        color: white;
+        color: var(--q-dark-text);
       }
     }
 
@@ -703,6 +718,25 @@
 
   /* 다크 모드 */
   :deep(.body--dark) .search-input-floating {
+    .search-input {
+      :deep(.q-field__control) {
+        background: var(--q-light);
+        color: var(--q-light-text);
+      }
+
+      :deep(.q-field__native) {
+        color: var(--q-light-text);
+        &::placeholder {
+          color: var(--q-light-text);
+          opacity: 0.7;
+        }
+      }
+
+      :deep(.q-field__marginal) {
+        color: var(--q-light-text);
+      }
+    }
+
     .drag-handle {
       background: rgba(255, 255, 255, 0.15);
 
@@ -718,7 +752,7 @@ ko:
   record: '계산 기록'
   noRecord: '계산 기록이 없습니다.'
   noSearchResult: '검색 결과가 없습니다.'
-  search: '검색어를 입력하세요'
+  search: '검색'
   doYouDeleteRecord: '모든 계산 기록을 지우겠어요?'
   memo: '메모'
   copySuccess: '클립보드에 복사되었습니다.'
@@ -736,14 +770,14 @@ ko:
     scrollToTop: '맨 위로 스크롤'
     editMemo: '메모 편집'
     deleteRecord: '기록 삭제'
-    searchInput: '검색어 입력'
+    searchInput: '검색'
     dragHandle: '검색창 이동'
     closeSearch: '검색창 닫기'
 en:
   record: 'record'
   noRecord: 'No record.'
   noSearchResult: 'No search results.'
-  search: 'Enter search term'
+  search: 'Search'
   doYouDeleteRecord: 'Do you want to delete all record?'
   memo: 'Memo'
   copySuccess: 'Copied to clipboard.'
@@ -761,7 +795,8 @@ en:
     scrollToTop: 'Scroll to top'
     editMemo: 'Edit memo'
     deleteRecord: 'Delete record'
-    searchInput: 'Enter search term'
+    searchInput: 'Search'
     dragHandle: 'Move search window'
     closeSearch: 'Close search window'
 </i18n>
+

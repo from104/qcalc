@@ -44,7 +44,11 @@ This is a simple calculator made using the source code of an Android calculator 
 - S-{+,-,\*,/}: Add, subtract, multiply, divide in memory
 - A-w: Reverse unit or currency symbols, radix
 - A-y: Toggle display of units or currency symbols, radix
-- d: Clear calculation result history
+
+#### Calculation Result Record
+
+- d: Clear calculation result records
+- s: Toggle the search window
 
 #### Common for Unit and Currency Mode
 

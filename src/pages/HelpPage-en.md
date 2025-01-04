@@ -37,7 +37,11 @@
 - A-w: Reverse unit or currency symbols, radix
 - A-y: Toggle display of units or currency symbols, radix
 - A-h: Open the history of calculation results (up to 100)
-- d: Clear calculation result history
+
+#### Calculation Result Record
+
+- d: Clear calculation result records
+- s: Toggle the search window
 
 #### Common for Unit and Currency Mode
 
