@@ -153,7 +153,7 @@
   <q-layout view="hHh lpR fFf">
     <q-header id="header" class="z-top noselect" elevated>
       <!-- 메인 페이지 헤더 -->
-      <q-toolbar v-if="!isSubPage" v-blur>
+      <q-toolbar v-if="!isSubPage" v-auto-blur>
         <q-tabs
           v-model="store.currentTab"
           align="left"
@@ -174,7 +174,7 @@
       </q-toolbar>
 
       <!-- 서브 페이지 헤더 -->
-      <q-toolbar v-else v-blur class="q-px-sm">
+      <q-toolbar v-else v-auto-blur class="q-px-sm">
         <q-btn
           flat
           dense

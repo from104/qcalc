@@ -114,7 +114,7 @@
 </script>
 
 <template>
-  <q-card-section v-blur class="row q-px-sm q-pt-none q-pb-sm">
+  <q-card-section v-auto-blur class="row q-px-sm q-pt-none q-pb-sm">
     <!-- 카테고리 -->
     <q-select
       v-model="store.selectedCategory"

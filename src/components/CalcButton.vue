@@ -546,7 +546,7 @@
 </script>
 
 <template>
-  <q-card-section v-blur class="row wrap justify-center q-pt-xs q-pb-none q-px-none">
+  <q-card-section v-auto-blur class="row wrap justify-center q-pt-xs q-pb-none q-px-none">
     <div v-for="(button, id) in activeButtonSet" :key="id" class="col-3 row wrap justify-center q-pa-sm">
       <q-btn
         :id="'btn-' + id"

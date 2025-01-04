@@ -547,7 +547,7 @@
     style="z-index: 15"
   >
     <q-card class="noselect text-center" style="width: 250px">
-      <q-bar v-blur dark class="full-width justify-between nnoselect text-body1 text-white bg-primary">
+      <q-bar v-auto-blur dark class="full-width justify-between nnoselect text-body1 text-white bg-primary">
         <q-btn dense flat icon="replay" size="sm" @click="cancelMemo" />
         <div>{{ t('memo') }}</div>
         <q-btn dense flat icon="check" size="sm" @click="saveMemo" />

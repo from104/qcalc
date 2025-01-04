@@ -385,14 +385,14 @@
       :stack-label="isMainField"
     >
       <template v-if="isMainField" #label>
-        <div v-blur class="noselect" :class="getResultColor()" role="text" :aria-label="t('ariaLabel.expression')">
+        <div v-auto-blur class="noselect" :class="getResultColor()" role="text" :aria-label="t('ariaLabel.expression')">
           {{ calculationExpression }}
         </div>
       </template>
       <template v-if="isMainField" #prepend>
         <div
           v-if="!isMemoryEmpty"
-          v-blur
+          v-auto-blur
           class="noselect full-height q-mt-xs q-pt-sm"
           :class="getResultColor()"
           role="button"
@@ -403,7 +403,7 @@
         </div>
         <div
           v-if="operator != ''"
-          v-blur
+          v-auto-blur
           class="noselect full-height q-mt-xs q-pt-sm"
           :class="getResultColor()"
           role="text"

@@ -117,7 +117,7 @@
 </script>
 
 <template>
-  <q-card-section v-blur class="row q-px-sm q-pt-none q-pb-sm">
+  <q-card-section v-auto-blur class="row q-px-sm q-pt-none q-pb-sm">
     <!-- 워드사이즈 선택 -->
     <q-select
       v-model="store.wordSize"

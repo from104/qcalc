@@ -51,7 +51,7 @@
 
 <template>
   <q-card-section class="full-height column no-wrap">
-    <q-list v-blur dense class="full-width" role="list" :aria-label="t('ariaLabel.settingsList')">
+    <q-list v-auto-blur dense class="full-width" role="list" :aria-label="t('ariaLabel.settingsList')">
       <q-item v-if="$q.platform.is.electron" class="q-mb-sm">
         <q-item-label class="self-center" role="text">{{ t('alwaysOnTop') }} (Alt-T)</q-item-label>
         <q-space />

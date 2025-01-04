@@ -120,7 +120,7 @@
 </script>
 
 <template>
-  <q-list v-blur role="menu" :aria-label="t('ariaLabel.menu')">
+  <q-list v-auto-blur role="menu" :aria-label="t('ariaLabel.menu')">
     <MenuItem v-for="item in items" :key="item.title" v-bind="item" />
   </q-list>
 </template>

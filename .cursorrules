@@ -1,3 +1,12 @@
+**Extremely Important!!**
+When generating or modifying code, *never* omit any part of the code, no matter how long it is. Omissions can lead to the code failing to function as intended or cause critical errors. **Do not omit anything under any circumstances.**
+---
+**Top Priorities for Code Generation**
+1. Ensure a linear dependency structure whenever possible.
+2. Build a structure that facilitates seamless maintenance.
+3. Write the code, including comments, in a way that makes its intent and logic **easily understandable** and interpretable by anyone.
+4. Design the code with a **clear and simple structure**, prioritizing reusability for future purposes.
+--- 
 Use TypeScript best practices:
 - Prefer interfaces over type aliases for object types
 - Use const assertions for literal values

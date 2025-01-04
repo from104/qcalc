@@ -146,7 +146,7 @@
   <q-layout view="hHh LpR fFf">
     <q-header id="header" class="z-top noselect row" elevated>
       <!-- 계산기 영역 헤더 -->
-      <q-toolbar v-blur class="col-6 calc-header">
+      <q-toolbar v-auto-blur class="col-6 calc-header">
         <q-tabs
           v-model="store.currentTab"
           align="left"
@@ -178,7 +178,7 @@
       </q-toolbar>
 
       <!-- 서브페이지 영역 헤더 -->
-      <q-toolbar v-blur class="col-6 sub-header">
+      <q-toolbar v-auto-blur class="col-6 sub-header">
         <transition name="animate-sub-page">
           <div :key="currentSubPage" :data-page="currentSubPage" class="header-content full-width row items-center">
             <q-toolbar-title
