@@ -434,7 +434,10 @@
               dense
               icon="close"
               :aria-label="t('ariaLabel.closeSearch')"
-              @click="store.isSearchOpen = false"
+              @click="() => {
+                store.isSearchOpen = false;
+                store.setInputBlurred();
+              }"
             />
           </template>
         </q-input>
@@ -444,7 +447,7 @@
       <q-item v-if="recordStrings.length == 0" class="text-center">
         <q-item-section role="listitem">
           <q-item-label>
-            <span>{{ store.searchKeyword.trim() === '' ? t('noRecord') : t('noSearchResult') }}</span>
+            <span>{{ store.isSearchOpen && store.searchKeyword.trim() !== '' ? t('noSearchResult') : t('noRecord') }}</span>
           </q-item-label>
         </q-item-section>
       </q-item>

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-  import { onBeforeUnmount, onMounted, reactive, shallowRef, watch, computed, ref, ComputedRef } from 'vue';
+  import { onBeforeUnmount, onMounted, reactive, shallowRef, watch, computed, ref, ComputedRef, ShallowRef } from 'vue';
   import { useRouter, useRoute } from 'vue-router';
   import { useStore } from 'src/stores/store';
   import { useI18n } from 'vue-i18n';
@@ -33,7 +33,7 @@
 
   // 서브 페이지 설정
   interface PageConfig {
-    component: typeof HelpPage | typeof AboutPage | typeof RecordPage | typeof SettingPage;
+    component: ShallowRef<typeof HelpPage | typeof AboutPage | typeof RecordPage | typeof SettingPage>;
     title: string;
     showClose?: boolean;
     buttons?: PageButton[];
@@ -49,19 +49,19 @@
     return store.calc.record.getAllRecords().length === 0 || store.isDeleteRecordConfirmOpen;
   });
 
-  const SUB_PAGE_CONFIG: Record<string, PageConfig> = {
+  const SUB_PAGE_CONFIG = reactive<Record<string, PageConfig>>({
     help: {
-      component: HelpPage,
+      component: shallowRef(HelpPage),
       title: t('message.help'),
       showClose: true,
     },
     about: {
-      component: AboutPage,
+      component: shallowRef(AboutPage),
       title: t('message.about'),
       showClose: true,
     },
     record: {
-      component: RecordPage,
+      component: shallowRef(RecordPage),
       title: t('message.record'),
       buttons: [
         {
@@ -81,11 +81,11 @@
       ],
     },
     settings: {
-      component: SettingPage,
+      component: shallowRef(SettingPage),
       title: t('message.settings'),
       showClose: true,
     },
-  };
+  });
 
   // 현재 서브 페이지 관련
   const currentSubPage = ref('record');
@@ -123,6 +123,19 @@
       }
     },
     { immediate: true },
+  );
+
+  // 언어 변경 시 탭 이름 업데이트
+  watch(
+    () => store.locale,
+    () => {
+      tabs.forEach((tab) => {
+        tab.title = t(tab.name);
+      });
+      Object.keys(SUB_PAGE_CONFIG).forEach((page) => {
+        SUB_PAGE_CONFIG[page].title = t(`message.${page}`);
+      });
+    },
   );
 
   onMounted(() => {

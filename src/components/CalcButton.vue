@@ -144,7 +144,7 @@
   const standardButtons: CalculatorButtonDefinition = {
     a1: ['x²', 'function', ['Control+q'], () => calc.pow2(), false],
     b1: ['√x', 'function', ['Control+w'], () => calc.sqrt(), false],
-    c1: ['Ｃ', 'important', ['Control+e', 'Delete', 'Escape'], () => calc.reset(), false],
+    c1: ['Ｃ', 'important', ['Control+e', 'Delete'], () => calc.reset(), false],
     d1: ['@mdi-backspace', 'important', ['Backspace', 'Control+r'], () => calc.deleteDigitOrDot(), false],
     a2: ['@mdi-plus-minus-variant', 'function', ['Control+a'], () => calc.changeSign(), false],
     b2: ['%', 'function', ['Control+s'], () => calc.percent(), false],
