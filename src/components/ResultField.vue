@@ -16,8 +16,8 @@
   const store = useStore();
 
   // 컴포넌트 import
-  import MyTooltip from 'components/MyTooltip.vue';
-  import MenuItem from 'components/MenuItem.vue';
+  import MyTooltip from 'src/components/snippets/MyTooltip.vue';
+  import MenuItem from 'src/components/snippets/MenuItem.vue';
 
   // props 정의
   const props = withDefaults(defineProps<{ field?: string; addon?: string }>(), {

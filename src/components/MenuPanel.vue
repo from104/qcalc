@@ -13,12 +13,12 @@
   const route = useRoute() as RouteLocationNormalizedLoaded & { meta: RouteTransitionMeta };
 
   // 스토어 관련
-  import { useStore } from 'src/stores/store';
+  import { useStore } from 'stores/store';
   // 스토어 인스턴스 초기화
   const store = useStore();
 
   // 컴포넌트 import
-  import MenuItem from 'components/MenuItem.vue';
+  import MenuItem from 'components/snippets/MenuItem.vue';
 
   // 메뉴 아이템 인터페이스 정의
   interface MenuItem {

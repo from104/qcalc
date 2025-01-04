@@ -26,8 +26,8 @@
     store;
 
   // 컴포넌트 import
-  import MyTooltip from './MyTooltip.vue';
-  import MenuItem from './MenuItem.vue';
+  import MyTooltip from './snippets/MyTooltip.vue';
+  import MenuItem from './snippets/MenuItem.vue';
   import MenuPanel from './MenuPanel.vue';
 
   /**

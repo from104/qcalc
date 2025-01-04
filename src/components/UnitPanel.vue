@@ -19,7 +19,7 @@
   const { calc, clickButtonById, swapUnits, initRecentUnits } = store;
 
   // 컴포넌트 import
-  import MyTooltip from 'components/MyTooltip.vue';
+  import MyTooltip from 'src/components/snippets/MyTooltip.vue';
 
   // 단위 초기화
   initRecentUnits();

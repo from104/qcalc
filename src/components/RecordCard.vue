@@ -21,7 +21,7 @@
   const { calc, getRightSideInRecord, getLeftSideInRecord, showMessage, showError, swapUnits, swapCurrencies } = store;
 
   // 컴포넌트 import
-  import MenuItem from 'components/MenuItem.vue';
+  import MenuItem from 'src/components/snippets/MenuItem.vue';
 
   // 계산 결과 배열 (반응형)
   const records = computed(() => calc.record.getAllRecords());

@@ -30,7 +30,7 @@
   const store = useStore();
 
   // 컴포넌트 import
-  import MyTooltip from 'components/MyTooltip.vue';
+  import MyTooltip from 'src/components/snippets/MyTooltip.vue';
 
   // props 기본값 설정
   const props = withDefaults(defineProps<{ type?: string }>(), {

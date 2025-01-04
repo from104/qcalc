@@ -27,7 +27,7 @@
   } = store;
 
   // 컴포넌트 import
-  import MyTooltip from 'components/MyTooltip.vue';
+  import MyTooltip from 'src/components/snippets/MyTooltip.vue';
 
   // 키 바인딩 설정
   const keyBinding = new KeyBinding([

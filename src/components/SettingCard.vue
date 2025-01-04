@@ -17,7 +17,7 @@
   const { setInitPanel, setDarkMode, setAlwaysOnTop, setHapticsMode, setDecimalPlaces } = store;
 
   // 컴포넌트 import
-  import MyTooltip from 'components/MyTooltip.vue';
+  import MyTooltip from 'src/components/snippets/MyTooltip.vue';
 
   // 패키지 버전 정보
   import { version } from '../../package.json';
