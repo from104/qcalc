@@ -488,11 +488,11 @@
   }
 
   .top-label-icon {
-    top: 6%; /* 버튼 높이의 15% 위치에 배치 */
+    top: 6%; 
   }
 
   .top-label-char {
-    top: -7%; /* 버튼 높이의 15% 위치에 배치 */
+    top: -7%;
   }
 
   .bg-btn-important {
