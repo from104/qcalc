@@ -97,6 +97,13 @@
     store.setCurrentTab(prevTab);
   };
 
+  // 서브 페이지 닫기
+  const closeSubPage = () => {
+    if (isSubPage.value) {
+      router.back();
+    }
+  };
+
   // 키 바인딩 설정
   const keyBinding = new KeyBinding([
     [['Control+1'], () => store.setCurrentTab('calc')],
@@ -105,12 +112,7 @@
     [['Control+4'], () => store.setCurrentTab('radix')],
     [['Control+Tab', 'ArrowRight'], moveTabRight],
     [['Control+Shift+Tab', 'ArrowLeft'], moveTabLeft],
-    [
-      ['Escape'],
-      () => {
-        if (isSubPage.value) router.back();
-      },
-    ],
+    [['Escape'], closeSubPage],
   ]);
 
   // 입력 포커스 상태에 따라 키 바인딩 활성화/비활성화

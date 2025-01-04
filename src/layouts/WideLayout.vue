@@ -105,12 +105,25 @@
     }
   };
 
+  // 현재 페이지가 서브 페이지인지 확인
+  const isSubPage = computed(() => {
+    return ['help', 'about', 'settings'].includes(String(route.name));
+  });
+
+  // 서브 페이지 닫기
+  const closeSubPage = () => {
+    if (isSubPage.value) {
+      switchSubPage('record');
+    }
+  };
+
   // 키 바인딩 설정
   const keyBinding = new KeyBinding([
     [['Control+1'], () => store.setCurrentTab('calc')],
     [['Control+2'], () => store.setCurrentTab('unit')],
     [['Control+3'], () => store.setCurrentTab('currency')],
     [['Control+4'], () => store.setCurrentTab('radix')],
+    [['Escape'], closeSubPage],
   ]);
 
   watch(

@@ -21,7 +21,8 @@
   const { calc, getRightSideInRecord, getLeftSideInRecord, showMessage, showError, swapUnits, swapCurrencies } = store;
 
   // 컴포넌트 import
-  import MenuItem from 'src/components/snippets/MenuItem.vue';
+  import MenuItem from 'components/snippets/MenuItem.vue';
+  import HighlightText from 'components/snippets/HighlightText.vue';
 
   // 계산 결과 배열 (반응형)
   const records = computed(() => calc.record.getAllRecords());
@@ -163,7 +164,7 @@
   };
 
   // 슬라이드 왼쪽 동작 핸들러
-  const handleRightSlide = ({ reset }: { reset: () => void }, id: number) => {
+  const slideToOpenMemoDialog = ({ reset }: { reset: () => void }, id: number) => {
     openMemoDialog(id);
     setTimeout(reset, 500);
   };
@@ -279,28 +280,6 @@
     });
   });
 
-  // 새로운 컴포넌트 추가
-  const HighlightText = defineComponent({
-    props: {
-      text: { type: String, required: true },
-      searchTerm: { type: String, required: true },
-    },
-    setup(props) {
-      return () => {
-        if (!store.isSearchOpen || !props.searchTerm.trim()) return props.text;
-
-        const escapedSearchTerm = props.searchTerm.trim().replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-        const regex = new RegExp(`(${escapedSearchTerm})`, 'gi');
-        const parts = props.text.split(regex);
-
-        return h(
-          'span',
-          parts.map((part, i) => (i % 2 === 1 ? h('span', { class: 'search-highlight' }, part) : part)),
-        );
-      };
-    },
-  });
-
   // 드래그 관련 상태 수정
   const isDragging = ref(false);
   const dragOffset = reactive({ x: 0, y: 0 });
@@ -401,7 +380,9 @@
       <q-item
         v-if="store.isSearchOpen"
         class="search-input-floating"
-        :class="{ 'input-focused': store.inputFocused }"
+        :class="{
+          'input-focused': store.inputFocused
+        }"
         :style="floatingStyle"
       >
         <q-input
@@ -417,6 +398,10 @@
           @focus="store.setInputFocused"
           @blur="store.setInputBlurred"
           @keyup.enter="$event.target.blur()"
+          @keyup.escape="() => {
+            store.isSearchOpen = false;
+            store.setInputBlurred();
+          }"
         >
           <template #prepend>
             <div
@@ -460,7 +445,7 @@
             right-color="positive"
             role="listitem"
             @left="deleteRecordItem(record.id as number)"
-            @right="({ reset }) => handleRightSlide({ reset }, record.id as number)"
+            @right="({ reset }) => slideToOpenMemoDialog({ reset }, record.id as number)"
           >
             <template #left>
               <q-icon name="delete_outline" :aria-label="t('ariaLabel.deleteRecord')" role="button" />
@@ -576,12 +561,10 @@
           color="primary"
           @focus="store.setInputFocused"
           @blur="store.setInputBlurred"
-          @keyup.enter="
-            {
-              store.setInputBlurred;
-              saveMemo();
-            }
-          "
+          @keyup.enter="() => {
+            store.setInputBlurred;
+            saveMemo();
+          }"
         />
       </q-card-section>
     </q-card>
@@ -631,18 +614,6 @@
 
   .hidden {
     display: none;
-  }
-
-  :deep(.search-highlight) {
-    background-color: rgba(255, 255, 0, 0.3);
-    border-radius: 2px;
-    padding: 0 2px;
-    margin: 0 -2px;
-  }
-
-  /* 다크 모드에서의 하이라이트 스타일 */
-  :deep(.body--dark .search-highlight) {
-    background-color: rgba(255, 255, 0, 0.2);
   }
 
   .search-input-floating {
