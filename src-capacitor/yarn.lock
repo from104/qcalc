@@ -5,31 +5,30 @@ __metadata:
   version: 8
   cacheKey: 10
 
-"@capacitor/android@npm:^6.0.0":
-  version: 6.0.0
-  resolution: "@capacitor/android@npm:6.0.0"
+"@capacitor/android@npm:6.2.0":
+  version: 6.2.0
+  resolution: "@capacitor/android@npm:6.2.0"
   peerDependencies:
-    "@capacitor/core": ^6.0.0
-  checksum: 10/568046fd0f006b5c62e1b525cc8589407a65daa5178c421cbc13fec2a080abb25e502206c8eacfda2362b89371b1157e6f87f0eace11dae7adc845435ab0de75
+    "@capacitor/core": ^6.2.0
+  checksum: 10/ec1c6030433a46880ce0e284d0a4108a2a5cab43b9cf813911ff9d666a172591c9eb856ed85dac0ef0fb01e52c9348cd4bb4b144fe9c81147f6dc0d73e6cfe11
   languageName: node
   linkType: hard
 
-"@capacitor/app@npm:^6.0.0":
-  version: 6.0.0
-  resolution: "@capacitor/app@npm:6.0.0"
+"@capacitor/app@npm:6.0.2":
+  version: 6.0.2
+  resolution: "@capacitor/app@npm:6.0.2"
   peerDependencies:
     "@capacitor/core": ^6.0.0
-  checksum: 10/a1e09bb017a5cb1e30705c4d39613949174b9ae801518d03766feaaadeaf751988132717af9f74f463b2f8f4a2b7591dfa8e3b9a7bd2cf9636653152bb07b871
+  checksum: 10/8376124224d96cfe88656894e90a2b0b0edd2d16d68a3ee945882c607ac8c649beead7ccc82cd7a3c77d45c1c18ca460fb436cb10e3597f9359d4e93646ab35c
   languageName: node
   linkType: hard
 
-"@capacitor/cli@npm:^6.0.0":
-  version: 6.0.0
-  resolution: "@capacitor/cli@npm:6.0.0"
+"@capacitor/cli@npm:6.2.0":
+  version: 6.2.0
+  resolution: "@capacitor/cli@npm:6.2.0"
   dependencies:
     "@ionic/cli-framework-output": "npm:^2.2.5"
     "@ionic/utils-fs": "npm:^3.1.6"
-    "@ionic/utils-process": "npm:^2.1.11"
     "@ionic/utils-subprocess": "npm:2.1.11"
     "@ionic/utils-terminal": "npm:^2.3.3"
     commander: "npm:^9.3.0"
@@ -48,34 +47,34 @@ __metadata:
   bin:
     cap: bin/capacitor
     capacitor: bin/capacitor
-  checksum: 10/bfc3083b47736928ce832e414d9ef4d19478ad05cadb31650f4cdf40879cc4e59f11dbab83dd648c712bfed7de555cf5de6bfffca9eb477de32b244540897739
+  checksum: 10/0c8199b3ba15756d4ce72fc5e64431f7b56bab18ca63e48853ef0a506d6265f052704f50451aa54f2e6a3ec85fca23be2c9275b25dfd45df721d277f5146dbbf
   languageName: node
   linkType: hard
 
-"@capacitor/core@npm:^6.0.0":
-  version: 6.0.0
-  resolution: "@capacitor/core@npm:6.0.0"
+"@capacitor/core@npm:6.2.0":
+  version: 6.2.0
+  resolution: "@capacitor/core@npm:6.2.0"
   dependencies:
     tslib: "npm:^2.1.0"
-  checksum: 10/1abadb14429eaf8591f4a18b607481b8a3c5a221e7fe3033149079b5c0a5ce1759c9f42af82be8041ffaa47c2ecebacd6b883ce992772afc9a944fdd734ce06f
+  checksum: 10/d153121cb9164e69bf6367e47b87d11483682dc0e58e44ec0e86f95e30f818b9f076eb3cf0bd4d4550dd91f073eff7d23b966f044afaa75378e611bad6cad01c
   languageName: node
   linkType: hard
 
-"@capacitor/haptics@npm:^6.0.0":
-  version: 6.0.0
-  resolution: "@capacitor/haptics@npm:6.0.0"
+"@capacitor/haptics@npm:6.0.2":
+  version: 6.0.2
+  resolution: "@capacitor/haptics@npm:6.0.2"
   peerDependencies:
     "@capacitor/core": ^6.0.0
-  checksum: 10/7eb3983d294ecfa7cbd0f9f748dd765f54c948b227f22412dca71af233e4088d931c7107312473c54125683921c203fafdd0fea9a737fde273c601479dc81688
+  checksum: 10/986003d8327d914762f5c0a4f4b6e494654fa0c27344c2a1764f06d08895bce035d8105c0f2a571b8b8bd3bd2f72b08bdc2ad4e1167aa186632a7a16bb6118a2
   languageName: node
   linkType: hard
 
-"@capacitor/splash-screen@npm:^6.0.0":
-  version: 6.0.0
-  resolution: "@capacitor/splash-screen@npm:6.0.0"
+"@capacitor/splash-screen@npm:6.0.3":
+  version: 6.0.3
+  resolution: "@capacitor/splash-screen@npm:6.0.3"
   peerDependencies:
     "@capacitor/core": ^6.0.0
-  checksum: 10/813f430731b1d8f44c8b0f02cbd6fb965379f88b03e6ff974e9af1c487a97db00ca5bb1065bac41f22ab20f9c1eeefcb7fae37adc9abee25c375c883ff884866
+  checksum: 10/cee2cf95565cdb4cacd9f3c5f7bb40afefaca30882203112e6aaa6e3d8f86bb3bb1c1bd3e9f216bc8c5c15dc30c7a670e7b55a0e7f3fdbe8bde2f1464c6a5e96
   languageName: node
   linkType: hard
 
@@ -134,16 +133,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@ionic/utils-object@npm:2.1.6":
-  version: 2.1.6
-  resolution: "@ionic/utils-object@npm:2.1.6"
-  dependencies:
-    debug: "npm:^4.0.0"
-    tslib: "npm:^2.0.1"
-  checksum: 10/c545f09ede118a801c7eb4c794d4b479c574a98023b752421c0b18e340cb0f509aa7d7e92ef9b1048361e194a0b6f80df8922cd56bae8201d2fb796b71d87e60
-  languageName: node
-  linkType: hard
-
 "@ionic/utils-process@npm:2.1.10":
   version: 2.1.10
   resolution: "@ionic/utils-process@npm:2.1.10"
@@ -155,20 +144,6 @@ __metadata:
     tree-kill: "npm:^1.2.2"
     tslib: "npm:^2.0.1"
   checksum: 10/afe835f0e8beedec53f6fbd0f2fa4f9eb38e59d96c03cecd44b33ffa18b04f9a318bf4e71c7315c9e729bbf942f8e74033b08373058ded2e04ed107956f7eee8
-  languageName: node
-  linkType: hard
-
-"@ionic/utils-process@npm:^2.1.11":
-  version: 2.1.12
-  resolution: "@ionic/utils-process@npm:2.1.12"
-  dependencies:
-    "@ionic/utils-object": "npm:2.1.6"
-    "@ionic/utils-terminal": "npm:2.3.5"
-    debug: "npm:^4.0.0"
-    signal-exit: "npm:^3.0.3"
-    tree-kill: "npm:^1.2.2"
-    tslib: "npm:^2.0.1"
-  checksum: 10/3a94eeb4cc7c05a2d3058e997a2ca05c50bf1a9d76e39b91659d0cbb402adbe2b24b8bc08d8b95bbab1703328dcc50c2e333b345700709ed2ec94e8d844d20c1
   languageName: node
   linkType: hard
 
@@ -705,12 +680,12 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "qcalc@workspace:."
   dependencies:
-    "@capacitor/android": "npm:^6.0.0"
-    "@capacitor/app": "npm:^6.0.0"
-    "@capacitor/cli": "npm:^6.0.0"
-    "@capacitor/core": "npm:^6.0.0"
-    "@capacitor/haptics": "npm:^6.0.0"
-    "@capacitor/splash-screen": "npm:^6.0.0"
+    "@capacitor/android": "npm:6.2.0"
+    "@capacitor/app": "npm:6.0.2"
+    "@capacitor/cli": "npm:6.2.0"
+    "@capacitor/core": "npm:6.2.0"
+    "@capacitor/haptics": "npm:6.0.2"
+    "@capacitor/splash-screen": "npm:6.0.3"
   languageName: unknown
   linkType: soft
 

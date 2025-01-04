@@ -16,7 +16,7 @@
   import { match } from 'ts-pattern';
 
   // 햅틱 피드백 관련
-  import { Haptics, ImpactStyle } from 'capacitor/@capacitor/haptics';
+  import { Haptics, ImpactStyle } from 'capacitor/haptics';
 
   // 계산기 관련 타입과 클래스
   import { KeyBinding, KeyBindings } from 'classes/KeyBinding';
@@ -30,7 +30,7 @@
   const store = useStore();
 
   // 컴포넌트 import
-  import MyTooltip from 'src/components/snippets/MyTooltip.vue';
+  import ToolTip from 'src/components/snippets/ToolTip.vue';
 
   // props 기본값 설정
   const props = withDefaults(defineProps<{ type?: string }>(), {
@@ -611,7 +611,7 @@
         >
           {{ extendedFunctionSet[id].label }}
         </q-tooltip>
-        <MyTooltip>
+        <ToolTip>
           {{
             store.isShiftPressed
               ? extendedFunctionSet[id].isDisabled
@@ -621,7 +621,7 @@
                 ? t('disabledButton')
                 : getTooltipsOfKeys(id, false)
           }}
-        </MyTooltip>
+        </ToolTip>
       </q-btn>
     </div>
   </q-card-section>

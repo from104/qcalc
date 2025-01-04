@@ -13,12 +13,13 @@
       "components/*": ["src/components/*"],
       "layouts/*": ["src/layouts/*"],
       "pages/*": ["src/pages/*"],
-      "assets/*": ["src/assets/*"],
+      "assets/*": ["assets/*"],
       "boot/*": ["src/boot/*"],
       "stores/*": ["src/stores/*"],
       "classes/*": ["src/classes/*"],
       "types/*": ["src/types/*"],
-      "constants/*": ["src/constants/*"]
+      "constants/*": ["src/constants/*"],
+      "capacitor/*": ["src-capacitor/node_modules/@capacitor/*"]
     },
     "preserveValueImports": false,
     "allowSyntheticDefaultImports": true,

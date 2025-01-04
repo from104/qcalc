@@ -26,7 +26,7 @@
     store;
 
   // 컴포넌트 import
-  import MyTooltip from './snippets/MyTooltip.vue';
+  import ToolTip from './snippets/ToolTip.vue';
   import MenuItem from './snippets/MenuItem.vue';
   import MenuPanel from './MenuPanel.vue';
 
@@ -105,7 +105,7 @@
     :aria-label="t('ariaLabel.copy')"
     @click="handleCopy"
   >
-    <MyTooltip>{{ t('tooltipCopy') }}</MyTooltip>
+    <ToolTip>{{ t('tooltipCopy') }}</ToolTip>
   </q-btn>
   <q-btn
     id="btn-paste"
@@ -121,7 +121,7 @@
         <MenuItem :action="() => handlePaste('sub')" :title="t('pasteToSubPanel')" />
       </q-list>
     </q-menu>
-    <MyTooltip>{{ t('tooltipPaste') }}</MyTooltip>
+    <ToolTip>{{ t('tooltipPaste') }}</ToolTip>
   </q-btn>
   <q-btn
     v-if="!store.isAtLeastDoubleWidth()"
@@ -131,7 +131,7 @@
     :aria-label="t('ariaLabel.record')"
     @click="router.push('/record')"
   >
-    <MyTooltip>{{ t('openRecordPage') }}</MyTooltip>
+    <ToolTip>{{ t('openRecordPage') }}</ToolTip>
   </q-btn>
   <q-btn id="btn-menu" flat icon="more_vert" class="q-ma-none q-pa-none q-pl-xs" :aria-label="t('ariaLabel.menu')">
     <q-menu auto-close transition-show="slide-down" transition-hide="slide-up" :offset="[140, 10]" class="shadow-6">

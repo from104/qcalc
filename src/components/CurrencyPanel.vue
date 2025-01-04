@@ -27,7 +27,7 @@
   } = store;
 
   // 컴포넌트 import
-  import MyTooltip from 'src/components/snippets/MyTooltip.vue';
+  import ToolTip from 'src/components/snippets/ToolTip.vue';
 
   // 키 바인딩 설정
   const keyBinding = new KeyBinding([
@@ -217,11 +217,11 @@
           </q-item-section>
         </q-item>
       </template>
-      <MyTooltip>
+      <ToolTip>
         <div class="text-left" style="white-space: pre-wrap">
           {{ `${currencyDescriptions[store.sourceCurrency]}\n${store.sourceCurrency}` }}
         </div>
-      </MyTooltip>
+      </ToolTip>
     </q-select>
 
     <!-- 원본, 대상 통화 바꾸기 버튼 -->
@@ -237,7 +237,7 @@
       :aria-label="t('ariaLabel.swapCurrencies')"
       @click="handleCurrencySwap()"
     >
-      <MyTooltip>{{ t('tooltipSwap') }}</MyTooltip>
+      <ToolTip>{{ t('tooltipSwap') }}</ToolTip>
     </q-btn>
 
     <!-- 대상 통화 -->
@@ -277,13 +277,13 @@
           </q-item-section>
         </q-item>
       </template>
-      <MyTooltip>
+      <ToolTip>
         <div class="text-left" style="white-space: pre-wrap">
           {{
             `${currencyDescriptions[store.targetCurrency]}\n${store.targetCurrency}, ${converter.getRate(store.targetCurrency).toFixed(4)}`
           }}
         </div>
-      </MyTooltip>
+      </ToolTip>
     </q-select>
 
     <!-- 대상 방향 -->

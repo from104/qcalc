@@ -16,7 +16,7 @@
   const store = useStore();
 
   // 컴포넌트 import
-  import MyTooltip from 'src/components/snippets/MyTooltip.vue';
+  import ToolTip from 'src/components/snippets/ToolTip.vue';
   import MenuItem from 'src/components/snippets/MenuItem.vue';
 
   // props 정의
@@ -472,9 +472,9 @@
               />
             </q-list>
           </q-menu>
-          <MyTooltip v-if="needFieldTooltip">
+          <ToolTip v-if="needFieldTooltip">
             {{ displayedResult }}
-          </MyTooltip>
+          </ToolTip>
         </div>
       </template>
     </q-field>

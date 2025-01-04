@@ -53,12 +53,12 @@
     "tinykeys": "^3.0.0",
     "ts-pattern": "^5.5.0",
     "vue": "3.5.13",
-    "vue-i18n": "10.0.5",
+    "vue-i18n": "11.0.1",
     "vue-router": "4.5.0"
   },
   "devDependencies": {
     "@capacitor/cli": "^6.2.0",
-    "@intlify/vite-plugin-vue-i18n": "7.0.0",
+    "@intlify/vite-plugin-vue-i18n": "6.0.3",
     "@jest/globals": "^29.7.0",
     "@modyfi/vite-plugin-yaml": "^1.1.0",
     "@quasar/app-vite": "2.0.0-rc.4",

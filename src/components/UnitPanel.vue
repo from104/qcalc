@@ -19,7 +19,7 @@
   const { calc, clickButtonById, swapUnits, initRecentUnits } = store;
 
   // 컴포넌트 import
-  import MyTooltip from 'src/components/snippets/MyTooltip.vue';
+  import ToolTip from 'src/components/snippets/ToolTip.vue';
 
   // 단위 초기화
   initRecentUnits();
@@ -165,9 +165,9 @@
           </q-item-section>
         </q-item>
       </template>
-      <MyTooltip>
+      <ToolTip>
         {{ t(`unitDesc.${store.selectedCategory}.${store.sourceUnits[store.selectedCategory]}`) }}
-      </MyTooltip>
+      </ToolTip>
     </q-select>
 
     <!-- 원본, 대상 단위 바꾸기 버튼 -->
@@ -183,7 +183,7 @@
       :aria-label="t('ariaLabel.swapUnits')"
       @click="handleUnitSwap()"
     >
-      <MyTooltip>{{ t('tooltipSwap') }}</MyTooltip>
+      <ToolTip>{{ t('tooltipSwap') }}</ToolTip>
     </q-btn>
 
     <!-- 대상 단위 -->
@@ -214,9 +214,9 @@
           </q-item-section>
         </q-item>
       </template>
-      <MyTooltip>
+      <ToolTip>
         {{ t(`unitDesc.${store.selectedCategory}.${store.targetUnits[store.selectedCategory]}`) }}
-      </MyTooltip>
+      </ToolTip>
     </q-select>
 
     <!-- 대상 방향 -->

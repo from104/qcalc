@@ -17,7 +17,7 @@
   const { setInitPanel, setDarkMode, setAlwaysOnTop, setHapticsMode, setDecimalPlaces } = store;
 
   // 컴포넌트 import
-  import MyTooltip from 'src/components/snippets/MyTooltip.vue';
+  import Tooltip from 'components/snippets/ToolTip.vue';
 
   // 패키지 버전 정보
   import { version } from '../../package.json';
@@ -151,10 +151,10 @@
       </q-item>
 
       <q-item class="q-mb-xs">
-        <MyTooltip>
+        <Tooltip>
           {{ t('decimalPlacesStat') }}:
           {{ store.decimalPlaces == -2 ? t('noLimit') : `${store.decimalPlaces} ${t('toNDecimalPlaces')}` }}
-        </MyTooltip>
+        </Tooltip>
         <q-item-label class="q-pt-xs self-start">{{ t('decimalPlaces') }} ([,])</q-item-label>
         <q-space />
         <q-slider

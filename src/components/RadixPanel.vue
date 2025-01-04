@@ -19,7 +19,7 @@
   const { swapRadixes, initRecentRadix, clickButtonById, setInputBlurred, calc } = store;
 
   // 컴포넌트 import
-  import MyTooltip from 'src/components/snippets/MyTooltip.vue';
+  import ToolTip from 'src/components/snippets/ToolTip.vue';
 
   // 단위 초기화
   initRecentRadix();
@@ -175,7 +175,7 @@
       :aria-label="t('ariaLabel.swapRadix')"
       @click="swapRadixes()"
     >
-      <MyTooltip>{{ t('tooltipSwap') }}</MyTooltip>
+      <ToolTip>{{ t('tooltipSwap') }}</ToolTip>
     </q-btn>
 
     <!-- 대상 진법 -->

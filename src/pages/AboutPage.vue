@@ -2,8 +2,8 @@
   import { useI18n } from 'vue-i18n';
   const { locale } = useI18n({ useScope: 'global' });
 
-  import AboutPageMD_en from './AboutPage-en.md';
   import AboutPageMD_ko from './AboutPage-ko.md';
+  import AboutPageMD_en from './AboutPage-en.md';
 </script>
 
 <template>
