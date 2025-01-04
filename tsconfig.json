@@ -17,8 +17,8 @@
       "boot/*": ["src/boot/*"],
       "stores/*": ["src/stores/*"],
       "classes/*": ["src/classes/*"],
-      "capacitor/*": ["src-capacitor/node_modules/*"],
-      "types/*": ["src/types/*"]
+      "types/*": ["src/types/*"],
+      "constants/*": ["src/constants/*"]
     },
     "preserveValueImports": false,
     "allowSyntheticDefaultImports": true,

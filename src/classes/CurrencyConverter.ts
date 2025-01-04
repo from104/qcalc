@@ -1,7 +1,7 @@
 import Freecurrencyapi from '@everapi/freecurrencyapi-js';
 
 // import { BigNumberType } from 'src/types/calculator';
-import { CurrencyExchangeRates, CurrencyData, currencyBaseData } from './CurrencyBaseData';
+import { CurrencyExchangeRates, CurrencyData, currencyBaseData } from '../constants/CurrencyBaseData';
 
 /**
  * CurrencyConverter 클래스

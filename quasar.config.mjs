@@ -47,7 +47,7 @@ export default configure(function (/* ctx */) {
       alias: {
         classes: path.join(__dirname, 'src/classes'),
         types: path.join(__dirname, 'src/types'),
-        capacitor: path.join(__dirname, 'src-capacitor/node_modules'),
+        constants: path.join(__dirname, 'src/constants'),
       },
 
       // 대상 브라우저 및 Node 버전
