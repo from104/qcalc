@@ -295,7 +295,7 @@
   }));
 
   // 드래그 시작
-  const startDrag = (e: MouseEvent) => {
+  const startDrag = (e: MouseEvent | Touch) => {
     const floatingElement = document.querySelector('.search-input-floating') as HTMLElement;
     if (!floatingElement) return;
 
@@ -306,6 +306,8 @@
 
     document.addEventListener('mousemove', onDrag);
     document.addEventListener('mouseup', stopDrag);
+    document.addEventListener('touchmove', onDrag);
+    document.addEventListener('touchend', stopDrag);
   };
 
   // 드래그 중 수정
@@ -320,12 +322,16 @@
     isDragging.value = false;
     document.removeEventListener('mousemove', onDrag);
     document.removeEventListener('mouseup', stopDrag);
+    document.removeEventListener('touchmove', onDrag);
+    document.removeEventListener('touchend', stopDrag);
   };
 
   // 컴포넌트 언마운트 시 이벤트 리스너 제거
   onBeforeUnmount(() => {
     document.removeEventListener('mousemove', onDrag);
     document.removeEventListener('mouseup', stopDrag);
+    document.removeEventListener('touchmove', onDrag);
+    document.removeEventListener('touchend', stopDrag);
   });
 
   // 플로팅창 위치 조정 함수 수정
@@ -409,6 +415,7 @@
               role="button"
               :aria-label="t('ariaLabel.dragHandle')"
               tabindex="0"
+              @touchstart="(e: TouchEvent) => startDrag(e.touches[0])"
               @mousedown="startDrag"
             />
           </template>

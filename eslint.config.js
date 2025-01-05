@@ -1,0 +1,206 @@
+// /* eslint-disable @typescript-eslint/no-require-imports */
+// require('@rushstack/eslint-patch/modern-module-resolution');
+
+// module.exports = {
+//   // https://eslint.org/docs/user-guide/configuring#configuration-cascading-and-hierarchy
+//   // This option interrupts the configuration hierarchy at this file
+//   // Remove this if you have an higher level ESLint config file (it usually happens into a monorepos)
+//   root: true,
+
+//   parser: 'vue-eslint-parser',
+//   // https://eslint.vuejs.org/user-guide/#how-to-use-a-custom-parser
+//   // Must use parserOptions instead of "parser" to allow vue-eslint-parser to keep working
+//   // `parser: 'vue-eslint-parser'` is already included with any 'plugin:vue/**' config and should be omitted
+//   parserOptions: {
+//     parser: '@typescript-eslint/parser',
+//     extraFileExtensions: ['.vue'],
+//   },
+
+//   env: {
+//     browser: true,
+//     es2021: true,
+//     node: true,
+//     'vue/setup-compiler-macros': true,
+//   },
+
+//   // Rules order is important, please avoid shuffling them
+//   extends: [
+//     // Base ESLint recommended rules
+//     // 'eslint:recommended',
+
+//     // https://github.com/typescript-eslint/typescript-eslint/tree/master/packages/eslint-plugin#usage
+//     // ESLint typescript rules
+//     'plugin:@typescript-eslint/recommended',
+//     // "@vue/typescript/recommended",
+
+//     // Uncomment any of the lines below to choose desired strictness,
+//     // but leave only one uncommented!
+//     // See https://eslint.vuejs.org/rules/#available-rules
+//     // 'plugin:vue/vue3-essential', // Priority A: Essential (Error Prevention)
+//     // 'plugin:vue/vue3-strongly-recommended', // Priority B: Strongly Recommended (Improving Readability)
+//     'plugin:vue/vue3-recommended', // Priority C: Recommended (Minimizing Arbitrary Choices and Cognitive Overhead)
+
+//     // https://github.com/prettier/eslint-config-prettier#installation
+//     // usage with Prettier, provided by 'eslint-config-prettier'.
+//     'prettier',
+//     // '@vue/eslint-config-airbnb'
+//   ],
+
+//   plugins: [
+//     // required to apply rules which need type information
+//     '@typescript-eslint',
+
+//     // https://eslint.vuejs.org/user-guide/#why-doesn-t-it-work-on-vue-files
+//     // required to lint *.vue files
+//     'vue',
+
+//     // https://github.com/typescript-eslint/typescript-eslint/issues/389#issuecomment-509292674
+//     // Prettier has not been included as plugin to avoid performance impact
+//     // add it as an extension for your IDE
+//   ],
+
+//   globals: {
+//     ga: 'readonly', // Google Analytics
+//     cordova: 'readonly',
+//     __statics: 'readonly',
+//     __QUASAR_SSR__: 'readonly',
+//     __QUASAR_SSR_SERVER__: 'readonly',
+//     __QUASAR_SSR_CLIENT__: 'readonly',
+//     __QUASAR_SSR_PWA__: 'readonly',
+//     process: 'readonly',
+//     Capacitor: 'readonly',
+//     chrome: 'readonly',
+//   },
+
+//   // add your custom rules here
+//   rules: {
+//     'prefer-promise-reject-errors': 'off',
+
+//     quotes: ['warn', 'single', {avoidEscape: true}],
+
+//     // this rule, if on, would require explicit return type on the `render` function
+//     '@typescript-eslint/explicit-function-return-type': 'off',
+
+//     // in plain CommonJS modules, you can't use `import foo = require('foo')` to pass this rule, so it has to be disabled
+//     '@typescript-eslint/no-var-requires': 'off',
+
+//     '@typescript-eslint/no-unused-vars': 'off',
+
+//     // The core 'no-unused-vars' rules (in the eslint:recommended ruleset)
+//     // does not work with type definitions
+//     'no-unused-vars': 'off',
+
+//     // allow debugger during development only
+//     'no-debugger': process.env.NODE_ENV === 'production' ? 'error' : 'off',
+//   },
+//   settings: {
+//     'import/resolver': {
+//       node: {
+//         extensions: ['.js', '.jsx', 'e.ts', '.tsx'],
+//       },
+//     },
+//   },
+// };
+
+import js from '@eslint/js'
+import globals from 'globals'
+import pluginVue from 'eslint-plugin-vue'
+import pluginQuasar from '@quasar/app-vite/eslint'
+import vueTsEslintConfig from '@vue/eslint-config-typescript'
+
+// the following is optional, if you want prettier too:
+import prettierSkipFormatting from '@vue/eslint-config-prettier/skip-formatting'
+
+export default [
+  {
+    /**
+     * Ignore the following files.
+     * Please note that pluginQuasar.configs.recommended() already ignores
+     * the "node_modules" folder for you (and all other Quasar project
+     * relevant folders and files).
+     *
+     * ESLint requires "ignores" key to be the only one in this object
+     */
+    ignores: [
+      'dist',
+      '.quasar',
+      'node_modules',
+      'src-capacitor',
+      'quasar.config.*.temporary.compiled*'
+    ]
+  },
+
+  ...pluginQuasar.configs.recommended(),
+  js.configs.recommended,
+
+  /**
+   * https://eslint.vuejs.org
+   *
+   * pluginVue.configs.base
+   *   -> Settings and rules to enable correct ESLint parsing.
+   * pluginVue.configs[ 'flat/essential']
+   *   -> base, plus rules to prevent errors or unintended behavior.
+   * pluginVue.configs["flat/strongly-recommended"]
+   *   -> Above, plus rules to considerably improve code readability and/or dev experience.
+   * pluginVue.configs["flat/recommended"]
+   *   -> Above, plus rules to enforce subjective community defaults to ensure consistency.
+   */
+  ...pluginVue.configs[ 'flat/essential' ],
+
+  // https://github.com/vuejs/eslint-config-typescript
+  ...vueTsEslintConfig({
+    // Optional: extend additional configurations from typescript-eslint'.
+    // Supports all the configurations in
+    // https://typescript-eslint.io/users/configs#recommended-configurations
+    extends: [
+      // By default, only the recommended rules are enabled.
+      'recommended'
+      // You can also manually enable the stylistic rules.
+      // "stylistic",
+
+      // Other utility configurations, such as 'eslintRecommended', (note that it's in camelCase)
+      // are also extendable here. But we don't recommend using them directly.
+    ]
+  }),
+
+  {
+    languageOptions: {
+      ecmaVersion: 'latest',
+      sourceType: 'module',
+
+      globals: {
+        ...globals.browser,
+        ...globals.node, // SSR, Electron, config files
+        process: 'readonly', // process.env.*
+        ga: 'readonly', // Google Analytics
+        cordova: 'readonly',
+        Capacitor: 'readonly',
+        chrome: 'readonly', // BEX related
+        browser: 'readonly' // BEX related
+      }
+    },
+
+    // add your custom rules here
+    rules: {
+      'prefer-promise-reject-errors': 'off',
+      '@typescript-eslint/consistent-type-imports': [
+        'error',
+        { prefer: 'type-imports' }
+      ],
+
+      // allow debugger during development only
+      'no-debugger': process.env.NODE_ENV === 'production' ? 'error' : 'off'
+    }
+  },
+
+  {
+    files: [ 'src-pwa/custom-service-worker.ts' ],
+    languageOptions: {
+      globals: {
+        ...globals.serviceworker
+      }
+    }
+  },
+
+  prettierSkipFormatting // optional, if you want prettier
+]

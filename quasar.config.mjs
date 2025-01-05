@@ -9,11 +9,11 @@
 // Quasar 앱 구성
 // 자세한 내용: https://v2.quasar.dev/quasar-cli-vite/quasar-config-js
 
-import { configure } from 'quasar/wrappers';
+import { defineConfig } from '#q-app/wrapper';
 import path from 'path';
-import dotenv from 'dotenv';
+// import dotenv from 'dotenv';
 
-export default configure(function (/* ctx */) {
+export default defineConfig(function (/* ctx */) {
   return {
     // ESLint 설정
     eslint: {
@@ -41,7 +41,7 @@ export default configure(function (/* ctx */) {
     // 빌드 설정
     build: {
       // .env 파일 사용
-      env: dotenv.config().parsed,
+      // env: dotenv.config().parsed,
 
       // 폴더 별칭 설정
       alias: {
@@ -74,11 +74,10 @@ export default configure(function (/* ctx */) {
         [
           'vite-plugin-checker',
           {
-            vueTsc: {
-              tsconfigPath: 'tsconfig.vue-tsc.json',
-            },
+            vueTsc: true,
             eslint: {
-              lintCommand: 'eslint "./**/*.{js,ts,mjs,cjs,vue}"',
+              lintCommand: 'eslint -c ./eslint.config.js "./src*/**/*.{ts,js,mjs,cjs,vue}"',
+              useFlatConfig: true,
             },
           },
           { server: false },
@@ -88,7 +87,7 @@ export default configure(function (/* ctx */) {
 
     // 개발 서버 설정
     devServer: {
-      open: true, // 브라우저 자동 실���
+      open: true,
     },
 
     // Quasar 프레임워크 설정
