@@ -64,6 +64,7 @@ export class CalculatorRecord {
       // 오래된 항목을 제거하여 크기 조정
       this.trimRecordsIfNeeded();
     } catch (error) {
+      console.error('Failed to add record item:', error);
       throw new Error('Failed to add record item');
     }
   }
@@ -125,7 +126,9 @@ export class CalculatorRecord {
     if (index < 0 || index >= this.records.length) {
       throw new Error('Invalid record index');
     }
-    return this.records[index];
+    const record = this.records[index];
+    if (!record) throw new Error('Record not found');
+    return record;
   }
 
   /**
@@ -167,7 +170,7 @@ export class CalculatorRecord {
    */
   public setMemo(id: number, memo: string): void {
     const index = this.findIndexById(id);
-    this.records[index].memo = memo;
+    this.records[index]!.memo = memo;
   }
 
   /**
@@ -179,7 +182,7 @@ export class CalculatorRecord {
    */
   public getMemo(id: number): string | null {
     const index = this.findIndexById(id);
-    return this.records[index].memo || null;
+    return this.records[index]!.memo || null;
   }
 
   /**
@@ -190,7 +193,7 @@ export class CalculatorRecord {
    */
   public deleteMemo(id: number): void {
     const index = this.findIndexById(id);
-    delete this.records[index].memo;
+    delete this.records[index]!.memo;
   }
 
   /**

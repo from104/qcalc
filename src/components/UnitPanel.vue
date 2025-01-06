@@ -105,8 +105,8 @@
       UnitConverter.convert(
         store.selectedCategory,
         BigNumber(calc.currentNumber),
-        store.sourceUnits[store.selectedCategory],
-        store.targetUnits[store.selectedCategory],
+        store.sourceUnits[store.selectedCategory] ?? '',
+        store.targetUnits[store.selectedCategory] ?? '',
       ),
     );
     swapUnits();

@@ -1,5 +1,6 @@
 <script setup lang="ts">
-  import { onBeforeUnmount, onMounted, reactive, shallowRef, watch, computed, ref, ComputedRef, ShallowRef } from 'vue';
+  import { onBeforeUnmount, onMounted, reactive, shallowRef, watch, computed, ref } from 'vue';
+  import type { ComputedRef, ShallowRef } from 'vue';
   import { useRouter, useRoute } from 'vue-router';
   import { useStore } from 'src/stores/store';
   import { useI18n } from 'vue-i18n';
@@ -146,7 +147,7 @@
         tab.title = t(tab.name);
       });
       Object.keys(SUB_PAGE_CONFIG).forEach((page) => {
-        SUB_PAGE_CONFIG[page].title = t(`message.${page}`);
+        SUB_PAGE_CONFIG[page]!.title = t(`message.${page}`);
       });
     },
   );

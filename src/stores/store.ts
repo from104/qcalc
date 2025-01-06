@@ -151,13 +151,13 @@ export const useStore = defineStore('store', {
     numberGrouping(value: string): string {
       const [integerPart, decimalPart] = value.split('.');
       const groupingPattern = new RegExp(`\\B(?=([\\da-fA-F]{${this.groupingUnit}})+(?![\\da-fA-F]))`, 'g');
-      return integerPart.replace(groupingPattern, ',') + (decimalPart ? `.${decimalPart}` : '');
+      return integerPart?.replace(groupingPattern, ',') + (decimalPart ? `.${decimalPart}` : '');
     },
 
     formatDecimalPlaces(value: string, decimalPlaces: number): string {
       if (!value) return '';
       if (decimalPlaces < 0) return value;
-      if (decimalPlaces === 0) return value.split('.')[0];
+      if (decimalPlaces === 0) return value.split('.')[0] ?? '';
 
       // 소수점이 없는 경우 처리
       if (!value.includes('.')) {
@@ -166,7 +166,7 @@ export const useStore = defineStore('store', {
 
       // 소수점이 있는 경우 처리
       const [integerPart, decimalPart] = value.split('.');
-      const formattedDecimal = decimalPart.slice(0, decimalPlaces).padEnd(decimalPlaces, '0');
+      const formattedDecimal = decimalPart?.slice(0, decimalPlaces).padEnd(decimalPlaces, '0') ?? '';
 
       return `${integerPart}.${formattedDecimal}`;
     },
@@ -223,7 +223,7 @@ export const useStore = defineStore('store', {
         this.targetRadix = Radix.Hexadecimal;
       }
       if (this.sourceRadix === this.targetRadix) {
-        this.targetRadix = this.radixList[(this.radixList.indexOf(this.sourceRadix) + 1) % this.radixList.length];
+        this.targetRadix = this.radixList[(this.radixList.indexOf(this.sourceRadix) + 1) % this.radixList.length] as Radix;
       }
     },
 
@@ -343,14 +343,14 @@ export const useStore = defineStore('store', {
     initRecentUnits(): void {
       // 최근 카테고리가 설정되지 않은 경우, 첫 번째 카테고리로 설정
       if (this.selectedCategory === '') {
-        this.selectedCategory = UnitConverter.categories[0];
+        this.selectedCategory = UnitConverter.categories[0] ?? '';
       }
 
       // 변환 출발 단위가 설정되지 않은 경우, 각 카테고리의 첫 번째 단위로 설정
       if (Object.keys(this.sourceUnits).length === 0) {
         UnitConverter.categories.forEach((category) => {
           const units = UnitConverter.getUnitLists(category);
-          this.sourceUnits[category] = units[0];
+          this.sourceUnits[category] = units[0] ?? '';
         });
       }
 
@@ -358,15 +358,15 @@ export const useStore = defineStore('store', {
       if (Object.keys(this.targetUnits).length === 0) {
         UnitConverter.categories.forEach((category) => {
           const units = UnitConverter.getUnitLists(category);
-          this.targetUnits[category] = units[1] || units[0];
+          this.targetUnits[category] = units[1] || units[0] || '';
         });
       }
     },
 
     swapUnits(): void {
       const temp = this.sourceUnits[this.selectedCategory];
-      this.sourceUnits[this.selectedCategory] = this.targetUnits[this.selectedCategory];
-      this.targetUnits[this.selectedCategory] = temp;
+      this.sourceUnits[this.selectedCategory] = this.targetUnits[this.selectedCategory] || '';
+      this.targetUnits[this.selectedCategory] = temp || '';
     },
 
     // 다크모드 여부 얻기
@@ -401,7 +401,7 @@ export const useStore = defineStore('store', {
       const modes: DarkModeType[] = ['light', 'dark', 'system'];
       const currentIndex = modes.indexOf(this.darkMode);
       const nextMode = modes[(currentIndex + 1) % modes.length];
-      this.setDarkMode(nextMode);
+      this.setDarkMode(nextMode as DarkModeType);
     },
 
     setAlwaysOnTop(isAlwaysOnTop: boolean) {

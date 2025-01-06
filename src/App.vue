@@ -8,7 +8,8 @@
   const { locale, t } = useI18n({ useScope: 'global' });
 
   // 라우터 관련 설정
-  import { useRouter, useRoute, RouteLocationNormalizedLoaded } from 'vue-router';
+  import { useRouter, useRoute } from 'vue-router';
+  import type { RouteLocationNormalizedLoaded } from 'vue-router';
 
   // router 인스턴스 가져오기
   const router = useRouter();

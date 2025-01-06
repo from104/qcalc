@@ -1,10 +1,10 @@
-import { Calculator } from '../classes/Calculator';
-import { CurrencyConverter } from '../classes/CurrencyConverter';
-import { RadixType } from '../classes/RadixConverter';
-import { Router, RouteLocationNormalizedLoaded } from 'vue-router';
-import { StoreDefinition } from 'pinia';
-import { WordSize } from './calculator';
-import { CalculationResult } from './calculator';
+import type { Calculator } from '../classes/Calculator';
+import type { CurrencyConverter } from '../classes/CurrencyConverter';
+import type { RadixType } from '../classes/RadixConverter';
+import type { Router, RouteLocationNormalizedLoaded } from 'vue-router';
+import type { StoreDefinition } from 'pinia';
+import type { WordSize } from './calculator';
+import type { CalculationResult } from './calculator';
 
 /**
  * 다크모드 설정 타입

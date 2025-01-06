@@ -134,6 +134,16 @@ export class Calculator {
     this._wordSize = value;
   }
 
+  private _radix: Radix = Radix.Decimal;
+
+  get radix(): Radix {
+    return this._radix;
+  }
+
+  set radix(value: Radix) {
+    this._radix = value;
+  }
+
   /**
    * 연산자를 문자열 형태로 변환하여 반환하는 메서드
    *
@@ -291,13 +301,13 @@ export class Calculator {
     let onlyNumber = (() => {
       switch (radix) {
         case 'hex':
-          return originalString.replace(/[^0-9a-fA-F.\-]/gm, '').toUpperCase();
+          return originalString.replace(/[^0-9a-fA-F.-]/gm, '').toUpperCase();
         case 'oct':
-          return originalString.replace(/[^0-7.\-]/gm, '');
+          return originalString.replace(/[^0-7.-]/gm, '');
         case 'bin':
-          return originalString.replace(/[^0-1.\-]/gm, '');
+          return originalString.replace(/[^0-1.-]/gm, '');
         default:
-          return originalString.replace(/[^0-9.\-]/gm, '');
+          return originalString.replace(/[^0-9.-]/gm, '');
       }
     })();
 
@@ -640,12 +650,15 @@ export class Calculator {
           : BigNumber(this.previousNumber).div(100).toString(); // 곱셈: ÷ 100
 
       // 계산 결과를 기록에 추가하고 이전 숫자로 저장
-      this.previousNumber = this.addRecord({ previousNumber, operator, argumentNumber, resultNumber });
+      this.previousNumber = this.addRecord({
+        previousNumber,
+        operator,
+        argumentNumber: argumentNumber ?? '',
+        resultNumber,
+      });
       this.setCurrentNumberFromPrevious();
+      this.resetOperatorState();
     }
-
-    // 연산자 상태 초기화
-    this.resetOperatorState();
   }
 
   // 단항 연산자 메서드들
@@ -875,7 +888,7 @@ export class Calculator {
    * 2. 현재 계산기의 값(currentValue)을 해당 상수 값으로 업데이트
    */
   public setConstant(constant: string): void {
-    this.setCurrentNumber(CONSTANTS[constant]);
+    this.setCurrentNumber(CONSTANTS[constant] as string);
   }
 
   // 메모리 관련 메서드들

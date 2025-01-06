@@ -1,4 +1,4 @@
-import { BigNumber as tBigNumber } from 'mathjs';
+import type { BigNumber as tBigNumber } from 'mathjs';
 import { Radix } from 'classes/RadixConverter';
 import { BigNumber } from 'classes/CalculatorMath';
 

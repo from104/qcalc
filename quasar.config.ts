@@ -9,12 +9,15 @@
 // Quasar 앱 구성
 // 자세한 내용: https://v2.quasar.dev/quasar-cli-vite/quasar-config-js
 
-import { defineConfig } from '#q-app/wrapper';
-import path from 'path';
+import { defineConfig } from '#q-app/wrappers';
+import { join } from 'node:path';
 // import dotenv from 'dotenv';
 
-export default defineConfig(function (/* ctx */) {
+export default defineConfig((/* ctx */) => {
   return {
+    sourceFiles: {
+      // bexManifestFile: '',
+    },
     // ESLint 설정
     eslint: {
       // fix: true, // 자동 수정 활성화 (주석 처리됨)
@@ -43,12 +46,33 @@ export default defineConfig(function (/* ctx */) {
       // .env 파일 사용
       // env: dotenv.config().parsed,
 
+      /**
+       * Automatically open remote Vue Devtools when running in development mode.
+       */
+      vueDevtools: true,
+
+      /**
+       * Folder where Quasar CLI should look for .env* files.
+       * Can be an absolute path or a relative path to project root directory.
+       *
+       * @default project root directory
+       */
+      envFolder: '',
+
+      /**
+       * Additional .env* files to be loaded.
+       * Each entry can be an absolute path or a relative path to quasar.config > build > envFolder.
+       *
+       * @example ['.env.somefile', '../.env.someotherfile']
+       */
+      envFiles: [],
+          
       // 폴더 별칭 설정
       alias: {
-        classes: path.join(__dirname, 'src/classes'),
-        types: path.join(__dirname, 'src/types'),
-        constants: path.join(__dirname, 'src/constants'),
-        capacitor: path.join(__dirname, 'src-capacitor/node_modules/@capacitor'),
+        classes: join(__dirname, 'src/classes'),
+        types: join(__dirname, 'src/types'),
+        constants: join(__dirname, 'src/constants'),
+        capacitor: join(__dirname, 'src-capacitor/node_modules/@capacitor'),
       },
 
       // 대상 브라우저 및 Node 버전
@@ -66,7 +90,7 @@ export default defineConfig(function (/* ctx */) {
           '@intlify/vite-plugin-vue-i18n',
           {
             compositionOnly: true,
-            include: path.resolve(__dirname, './src/i18n/**'),
+            include: join(__dirname, './src/i18n/**'),
             defaultSFCLang: 'yml',
           },
         ],
@@ -83,6 +107,14 @@ export default defineConfig(function (/* ctx */) {
           { server: false },
         ],
       ],
+      typescript: {
+        strict: true, // (recommended) enables strict settings for TypeScript
+        vueShim: true, // required when using ESLint with type-checked rules, will generate a shim file for `*.vue` files
+        extendTsConfig (tsConfig) {
+          // You can use this hook to extend tsConfig dynamically
+          // For basic use cases, you can still update the usual tsconfig.json file to override some settings
+        },
+      },
     },
 
     // 개발 서버 설정
@@ -94,6 +126,30 @@ export default defineConfig(function (/* ctx */) {
     framework: {
       config: {},
       plugins: ['Notify', 'Meta'],
+
+      /**
+       * Auto import - how to detect components in your vue files
+       *   "kebab": q-carousel q-page
+       *   "pascal": QCarousel QPage
+       *   "combined": q-carousel QPage
+       * @default 'kebab'
+       */
+      autoImportComponentCase: 'kebab',
+
+      /**
+       * Auto import - which file extensions should be interpreted as referring to Vue SFC?
+       * @default [ 'vue' ]
+       */
+      autoImportVueExtensions: ['vue'],
+
+      /**
+       * Auto import - which file extensions should be interpreted as referring to script files?
+       * Treeshake Quasar's UI on dev too?
+       * Recommended to leave this as false for performance reasons.
+       * @default false
+       */
+      devTreeshaking: false,
+      // was previously under /quasar.conf > build
     },
 
     // 애니메이션 설정
@@ -121,6 +177,9 @@ export default defineConfig(function (/* ctx */) {
 
     // Electron 설정
     electron: {
+      // Electron preload scripts (if any) from /src-electron, WITHOUT file extension
+      preloadScripts: ['electron-preload'],
+
       inspectPort: 5858,
       bundler: 'builder', // 'packager' 또는 'builder'
 
@@ -137,7 +196,7 @@ export default defineConfig(function (/* ctx */) {
           signAndEditExecutable: false,
           signtoolOptions: {
             publisherName: 'ATIT',
-            sign: false,
+            sign: '',
           },
         },
         snap: {

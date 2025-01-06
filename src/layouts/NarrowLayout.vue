@@ -87,14 +87,18 @@
   // 탭 이동 함수들
   const moveTabRight = () => {
     const currentIndex = tabs.findIndex((tab) => tab.name === store.currentTab);
-    const nextTab = tabs[(currentIndex + 1) % tabs.length].name;
-    store.setCurrentTab(nextTab);
+    const nextTab = tabs[(currentIndex + 1) % tabs.length]?.name;
+    if (nextTab) {
+      store.setCurrentTab(nextTab);
+    }
   };
 
   const moveTabLeft = () => {
     const currentIndex = tabs.findIndex((tab) => tab.name === store.currentTab);
-    const prevTab = tabs[(currentIndex - 1 + tabs.length) % tabs.length].name;
-    store.setCurrentTab(prevTab);
+    const prevTab = tabs[(currentIndex - 1 + tabs.length) % tabs.length]?.name;
+    if (prevTab) {
+      store.setCurrentTab(prevTab);
+    }
   };
 
   // 서브 페이지 닫기

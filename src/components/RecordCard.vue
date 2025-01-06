@@ -1,6 +1,6 @@
 <script setup lang="ts">
   // Vue 핵심 기능 및 컴포지션 API 가져오기
-  import { onMounted, onBeforeUnmount, ref, computed, watch, reactive, defineComponent, h } from 'vue';
+  import { onMounted, onBeforeUnmount, ref, computed, watch, reactive } from 'vue';
 
   // i18n 설정
   import { useI18n } from 'vue-i18n';
@@ -247,7 +247,6 @@
     return headerElement ? headerElement.clientHeight + 'px' : '0px';
   });
 
-  // 계산 결과를 문자열로 변환하고 필터링하는 computed 속성
   const recordStrings = computed<RecordString[]>(() => {
     // 기본 레코드 문자열 생성
     const strings = records.value.map((record) => {
@@ -311,9 +310,12 @@
   };
 
   // 드래그 중 수정
-  const onDrag = (e: MouseEvent) => {
-    if (isDragging.value) {
-      store.updateFloatingPosition(e.clientX - dragOffset.x, e.clientY - dragOffset.y);
+  const onDrag = (e: MouseEvent | TouchEvent) => {
+    if (!isDragging.value) return;
+    const clientX = e instanceof MouseEvent ? e.clientX : e.touches[0]?.clientX;
+    const clientY = e instanceof MouseEvent ? e.clientY : e.touches[0]?.clientY;
+    if (clientX !== undefined && clientY !== undefined) {
+      store.updateFloatingPosition(clientX - dragOffset.x, clientY - dragOffset.y);
     }
   };
 
@@ -415,7 +417,7 @@
               role="button"
               :aria-label="t('ariaLabel.dragHandle')"
               tabindex="0"
-              @touchstart="(e: TouchEvent) => startDrag(e.touches[0])"
+              @touchstart="(e: TouchEvent) => startDrag(e.touches[0] as Touch)"
               @mousedown="startDrag"
             />
           </template>

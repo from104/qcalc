@@ -86,7 +86,7 @@ export function createCalcButtonSet(t: ComposerTranslation) {
     b5: ['2', 'normal', ['2'], () => calc.addDigit(2), false],
     c5: ['3', 'normal', ['3'], () => calc.addDigit(3), false],
     d5: ['@mdi-plus', 'function', ['+'], () => calc.add(), false],
-    a6: ['@keyboard_capslock', 'important', ["'"], null, false],
+    a6: ['@keyboard_capslock', 'important', ["'"], () => null, false],
     b6: ['0', 'normal', ['0'], () => calc.addDigit(0), false],
     c6: ['@mdi-circle-small', 'normal', ['.'], () => calc.addDot(), false],
     d6: ['@mdi-equal', 'important', ['=', 'Enter'], () => equalForBitOperation(), false],

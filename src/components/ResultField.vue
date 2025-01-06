@@ -79,8 +79,8 @@
     return UnitConverter.convert(
       selectedCategory,
       BigNumber(calc.getCurrentNumber()),
-      sourceUnits[selectedCategory],
-      targetUnits[selectedCategory],
+      sourceUnits[selectedCategory] ?? '',
+      targetUnits[selectedCategory] ?? '',
     );
   };
 
@@ -295,7 +295,7 @@
 
     // 마지막 계산 기록이 있고 초기화가 필요한 경우
     const isLastRecordValid =
-      lastRecord !== null && needsReset && calc.getCurrentNumber() === lastRecord.calculationResult.resultNumber;
+      lastRecord !== null && needsReset && calc.getCurrentNumber() === lastRecord?.calculationResult.resultNumber;
 
     if (isLastRecordValid) {
       return `${getLeftSideInRecord(lastRecord.calculationResult)} =`;

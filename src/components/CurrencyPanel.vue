@@ -1,6 +1,7 @@
 <script setup lang="ts">
   // Vue 핵심 기능 및 컴포지션 API 가져오기
-  import { ref, onMounted, onBeforeUnmount, reactive, watch, Ref } from 'vue';
+  import { ref, onMounted, onBeforeUnmount, reactive, watch } from 'vue';
+  import type { Ref } from 'vue';
 
   // i18n 설정
   import { useI18n } from 'vue-i18n';
@@ -122,7 +123,7 @@
       sourceCurrencyOptions.values = currencyList.map((currency) => ({
         value: currency,
         label: currency,
-        desc: currencyDescriptions[currency],
+        desc: currencyDescriptions[currency] ?? '',
         disable: store.targetCurrency === currency,
       }));
 
@@ -130,7 +131,7 @@
       targetCurrencyOptions.values = currencyList.map((currency) => ({
         value: currency,
         label: currency,
-        desc: currencyDescriptions[currency],
+        desc: currencyDescriptions[currency] ?? '',
         disable: store.sourceCurrency === currency,
       }));
 

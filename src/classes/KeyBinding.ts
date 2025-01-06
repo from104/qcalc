@@ -1,4 +1,7 @@
-import { tinykeys, KeyBindingMap } from 'tinykeys';
+// @ts-ignore
+import type { KeyBindingMap } from 'tinykeys';
+// @ts-ignore
+import { tinykeys } from 'tinykeys';
 
 // 키 바인딩과 해당 콜백 함수를 정의하는 타입
 export type KeyBindings = [string[], () => void][]; // [키바인딩 배열, 콜백 함수][]

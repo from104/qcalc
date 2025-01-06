@@ -80,6 +80,7 @@
         showMessage(t('pastedFromClipboard'));
       }
     } catch (error) {
+      console.error('Failed to paste from clipboard:', error);
       showError(t('failedToPasteFromClipboard'));
     }
   };

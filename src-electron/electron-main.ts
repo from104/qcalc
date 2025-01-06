@@ -18,8 +18,9 @@ try {
     const path = await import('path');
     fs.unlinkSync(path.join(app.getPath('userData'), 'DevTools Extensions'));
   }
-} catch (_) {
+} catch (error) {
   // 오류 발생 시 무시
+  console.error('Failed to remove DevTools Extensions:', error);
 }
 
 // 메인 윈도우 변수 선언

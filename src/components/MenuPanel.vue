@@ -6,7 +6,8 @@
   import { useI18n } from 'vue-i18n';
   const { t } = useI18n();
 
-  import { useRouter, useRoute, RouteLocationNormalizedLoaded } from 'vue-router';
+  import { useRouter, useRoute } from 'vue-router';
+  import type { RouteLocationNormalizedLoaded } from 'vue-router';
 
   // router 인스턴스 가져오기
   const router = useRouter();
@@ -22,17 +23,19 @@
 
   // 메뉴 아이템 인터페이스 정의
   interface MenuItem {
-    title?: string;
-    caption?: string;
-    shortcut?: string;
-    icon?: string;
-    action?: () => void;
-    separator?: boolean;
+    id: string;
+    title?: string | undefined;
+    caption?: string | undefined;
+    shortcut?: string | undefined;
+    icon?: string | undefined;
+    action?: (() => void) | undefined;
+    separator?: boolean | undefined;
   }
 
   // 메뉴 아이템 정의
-  const items: { [key: string]: MenuItem } = reactive({
-    calc: {
+  const items = reactive([
+    {
+      id: 'calc',
       title: t('item.calc.title'),
       caption: t('item.calc.caption'),
       shortcut: 'Ctrl-1',
@@ -41,7 +44,8 @@
         store.currentTab = 'calc';
       },
     },
-    unit: {
+    {
+      id: 'unit',
       title: t('item.unit.title'),
       caption: t('item.unit.caption'),
       shortcut: 'Ctrl-2',
@@ -50,7 +54,8 @@
         store.currentTab = 'unit';
       },
     },
-    currency: {
+    {
+      id: 'currency',
       title: t('item.currency.title'),
       caption: t('item.currency.caption'),
       shortcut: 'Ctrl-3',
@@ -59,7 +64,8 @@
         store.currentTab = 'currency';
       },
     },
-    radix: {
+    {
+      id: 'radix',
       title: t('item.radix.title'),
       caption: t('item.radix.caption'),
       shortcut: 'Ctrl-4',
@@ -68,8 +74,9 @@
         store.currentTab = 'radix';
       },
     },
-    separator1: { separator: true },
-    settings: {
+    { id: 'separator1', separator: true },
+    {
+      id: 'settings',
       title: t('item.settings.title'),
       caption: t('item.settings.caption'),
       shortcut: 'F3',
@@ -78,29 +85,31 @@
         store.navigateToPath('/settings', route, router);
       },
     },
-    separator2: { separator: true },
-    help: {
+    { id: 'separator2', separator: true },
+    {
+      id: 'help',
       title: t('item.help.title'),
       caption: t('item.help.caption'),
       shortcut: 'F1',
       icon: 'help',
       action: () => store.navigateToPath('/help', route, router),
     },
-    about: {
+    {
+      id: 'about',
       title: t('item.about.title'),
       caption: t('iem.about.caption'),
       shortcut: 'F2',
       icon: 'info',
       action: () => store.navigateToPath('/about', route, router),
     },
-  });
+  ]);
 
   // 언어 변경 시 메뉴 아이템 텍스트 업데이트 함수
   const updateLocale = () => {
-    Object.keys(items).forEach((item) => {
-      if (!items[item].separator) {
-        items[item].title = t(`item.${item}.title`);
-        items[item].caption = t(`item.${item}.caption`);
+    items.forEach((item) => {
+      if (!item.separator) {
+        item.title = t(`item.${item.id}.title`);
+        item.caption = t(`item.${item.id}.caption`);
       }
     });
   };
@@ -121,7 +130,11 @@
 
 <template>
   <q-list v-auto-blur role="menu" :aria-label="t('ariaLabel.menu')">
-    <MenuItem v-for="item in items" :key="item.title" v-bind="item" />
+    <MenuItem 
+      v-for="item in items" 
+      :key="item.id" 
+      v-bind="item" 
+    />
   </q-list>
 </template>
 

@@ -1,5 +1,5 @@
 // Vue Router에서 RouteRecordRaw 타입을 가져옵니다.
-import { RouteRecordRaw } from 'vue-router';
+import type { RouteRecordRaw } from 'vue-router';
 
 // meta 타입 정의
 interface RouteMeta {

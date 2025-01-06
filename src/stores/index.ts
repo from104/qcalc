@@ -1,5 +1,5 @@
 // Quasar의 store 래퍼 함수 가져오기
-import { store } from 'quasar/wrappers';
+import { defineStore } from '#q-app/wrappers';
 
 // Pinia 상태 관리 라이브러리에서 createPinia 함수 가져오기
 import { createPinia } from 'pinia';
@@ -14,7 +14,7 @@ import piniaPluginPersistedstate from 'pinia-plugin-persistedstate';
  * 이 함수는 비동기일 수 있으며, async/await를 사용하거나
  * Store 인스턴스로 해결되는 Promise를 반환할 수 있습니다.
  */
-export default store((/* { ssrContext } */) => {
+export default defineStore((/* { ssrContext } */) => {
   // Pinia 인스턴스 생성
   const pinia = createPinia();
 
@@ -27,3 +27,14 @@ export default store((/* { ssrContext } */) => {
   // 구성된 Pinia 인스턴스 반환
   return pinia;
 });
+
+/*
+ * When adding new properties to stores, you should also
+ * extend the `PiniaCustomProperties` interface.
+ * @see https://pinia.vuejs.org/core-concepts/plugins.html#Typing-new-store-properties
+ */
+declare module 'pinia' {
+  export interface PiniaCustomProperties {
+    // add your custom properties here, if any
+  }
+}

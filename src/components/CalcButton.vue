@@ -71,16 +71,15 @@
       'The square root of a negative number is not allowed.': 'squareRootOfANegativeNumberIsNotAllowed',
       'The factorial of a negative number is not allowed.': 'factorialOfANegativeNumberIsNotAllowed',
       'No memory to recall.': 'noMemoryToRecall',
-    };
+    } as const;
     try {
       action();
     } catch (e: unknown) {
-      if (e instanceof Error) {
-        if (errorMessages[e.message]) {
-          showError(t(errorMessages[e.message]));
-        } else {
-          showError(e.message);
-        }
+      const message = e instanceof Error ? e.message : 'Unknown error';
+      if (errorMessages[message]) {
+        showError(t(errorMessages[message]));
+      } else {
+        showError(message);
       }
     }
   };
@@ -92,7 +91,7 @@
     normal: '#5e9e7d',
   };
 
-  const shiftButtonPressedColor = lighten(calculatorButtonColors.important, -30);
+  const shiftButtonPressedColor = lighten(calculatorButtonColors.important ?? '', -30);
 
   import { createCalcButtonSet } from 'src/constants/CalcButtonSet';
 
@@ -172,16 +171,16 @@
   // 버튼 클릭 시 알림 표시 함수
   const displayButtonNotification = (id: ButtonID) => {
     const buttonFunc = extendedFunctionSet.value[id];
-    if (buttonFunc.label === 'MC') {
+    if (buttonFunc?.label === 'MC') {
       showMessage(t('memoryCleared'));
-    } else if (buttonFunc.label === 'MR' && !calc.isMemoryEmpty) {
+    } else if (buttonFunc?.label === 'MR' && !calc.isMemoryEmpty) {
       showMessage(t('memoryRecalled'));
     }
   };
 
   // 시프트 버튼의 ID 찾기
   const shiftButtonId = computed(() =>
-    Object.keys(extendedFunctionSet.value).find((key) => extendedFunctionSet.value[key].label === ''),
+    Object.keys(extendedFunctionSet.value).find((key) => extendedFunctionSet.value[key]?.label === ''),
   );
 
   // 추가 기능 툴팁 표시를 위한 타이머 상태 객체
@@ -203,9 +202,9 @@
   const handleShiftFunction = (id: ButtonID) => {
     const isShiftButton = id === shiftButtonId.value;
     const isDisabled = store.isShiftPressed
-      ? extendedFunctionSet.value[id].isDisabled
-      : activeButtonSet.value[id].isDisabled;
-    const action = store.isShiftPressed ? extendedFunctionSet.value[id].action : activeButtonSet.value[id].action;
+      ? extendedFunctionSet.value[id]?.isDisabled ?? false
+      : activeButtonSet.value[id]?.isDisabled ?? false;
+    const action = store.isShiftPressed ? extendedFunctionSet.value[id]?.action : activeButtonSet.value[id]?.action;
 
     if (isShiftButton) {
       toggleShift();
@@ -218,7 +217,7 @@
       return;
     }
 
-    executeActionWithErrorHandling(action);
+    executeActionWithErrorHandling(action as () => void);
 
     if (store.isShiftPressed) {
       displayActionTooltip(id);
@@ -248,15 +247,15 @@
     }
 
     const buttonFunctions = isShiftActive ? activeButtonSet.value : extendedFunctionSet.value;
-    const buttonAction = buttonFunctions[id].action;
-    const isDisabled = buttonFunctions[id].isDisabled;
+    const buttonAction = buttonFunctions[id]?.action;
+    const isDisabled = buttonFunctions[id]?.isDisabled ?? false;
 
     if (isDisabled) {
       displayDisabledButtonNotification();
       return;
     }
 
-    executeActionWithErrorHandling(buttonAction);
+    executeActionWithErrorHandling(buttonAction as () => void);
 
     if (isShiftActive) {
       if (!isShiftLocked) disableShift();
@@ -329,7 +328,7 @@
 
   const getTooltipsOfKeys = (btnId: ButtonID, isShift: boolean) => {
     const buttonFunctions = isShift ? extendedFunctionSet.value : activeButtonSet.value;
-    const shortcutKeys = buttonFunctions[btnId].shortcutKeys;
+    const shortcutKeys = buttonFunctions[btnId]?.shortcutKeys ?? [];
 
     return shortcutKeys
       .map((key) => {
@@ -345,7 +344,7 @@
           })
           .join('');
 
-        const lastPart = parts[parts.length - 1].replace('Digit', '').replace('Numpad', 'N');
+        const lastPart = parts[parts.length - 1]?.replace('Digit', '').replace('Numpad', 'N') ?? '';
         return modifiers + (modifiers ? '-' : '') + lastPart;
       })
       .join(', ');
@@ -386,7 +385,7 @@
         push
         :label="
           store.isShiftPressed && !store.showButtonAddedLabel && id !== shiftButtonId
-            ? extendedFunctionSet[id].label
+            ? extendedFunctionSet[id]?.label ?? ''
             : button.label.charAt(0) === '@'
               ? undefined
               : button.label
@@ -405,13 +404,13 @@
               ? 'icon'
               : 'char',
           id === shiftButtonId && store.isShiftPressed ? 'button-shift' : '',
-          store.isShiftPressed && !store.showButtonAddedLabel && !extendedFunctionSet[id].isDisabled
+          store.isShiftPressed && !store.showButtonAddedLabel && !(extendedFunctionSet[id]?.isDisabled ?? false)
             ? ''
-            : button.isDisabled || store.isShiftPressed
+            : (button.isDisabled ?? false) || store.isShiftPressed
               ? 'disabled-button'
               : '',
         ]"
-        :style="[!store.showButtonAddedLabel || !extendedFunctionSet[id].label ? { paddingTop: '4px' } : {}]"
+        :style="[!store.showButtonAddedLabel || !(extendedFunctionSet[id]?.label ?? '') ? { paddingTop: '4px' } : {}]"
         :color="`btn-${button.color}`"
         :aria-label="getAriaLabel(id, button)"
         @click="() => (button.isDisabled ? displayDisabledButtonNotification() : handleShiftFunction(id))"
@@ -429,7 +428,7 @@
           {{ extendedFunctionSet[id].label }}
         </span>
         <q-tooltip
-          :model-value="tooltipTimers[id]"
+          :model-value="tooltipTimers[id] ?? false"
           no-parent-event
           class="noselect"
           :style="`background: ${calculatorButtonColors[button.color]}; border: 2px outset ${calculatorButtonColors[button.color]}; border-radius: 10px;`"
@@ -439,15 +438,15 @@
           transition-hide="jump-down"
           transition-duration="200"
         >
-          {{ extendedFunctionSet[id].label }}
+          {{ extendedFunctionSet[id]?.label ?? '' }}
         </q-tooltip>
         <ToolTip>
           {{
             store.isShiftPressed
-              ? extendedFunctionSet[id].isDisabled
+              ? (extendedFunctionSet[id]?.isDisabled ?? false)
                 ? t('disabledButton')
                 : getTooltipsOfKeys(id, true)
-              : activeButtonSet[id].isDisabled
+              : (activeButtonSet[id]?.isDisabled ?? false)
                 ? t('disabledButton')
                 : getTooltipsOfKeys(id, false)
           }}
