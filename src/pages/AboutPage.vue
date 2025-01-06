@@ -32,7 +32,7 @@
 
 <template>
   <q-page>
-    <q-card flat class="q-pa-md">
+    <q-card flat class="q-pa-lg">
       <!-- eslint-disable-next-line vue/no-v-html -->
       <div class="markdown-content" v-html="markdownContent" />
     </q-card>
@@ -52,6 +52,11 @@
   .markdown-content h5,
   .markdown-content h6 {
     font-weight: var(--heading-font-weight);
+    margin-top: 0.7em;
+    margin-bottom: 0.5em;
+    padding-top: 0;
+    padding-bottom: 0;
+    line-height: 1.2;
   }
 
   .markdown-content h1 {
