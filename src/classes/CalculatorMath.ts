@@ -2,7 +2,8 @@ import { match } from 'ts-pattern';
 import { convertRadix } from './RadixConverter';
 // import { BigNumberType } from 'src/types/calculator';
 import { Radix } from './RadixConverter';
-import { all, create, FactoryFunctionMap } from 'mathjs';
+import type { FactoryFunctionMap } from 'mathjs';
+import { all, create } from 'mathjs';
 
 // MathJS 라이브러리 설정
 export const MathB = create(all as FactoryFunctionMap, {

@@ -112,7 +112,7 @@ export class CurrencyConverter {
       return this.baseExchangeRates;
     }
 
-    if (!this.baseExchangeRates.hasOwnProperty(baseCurrency)) {
+    if (!Object.prototype.hasOwnProperty.call(this.baseExchangeRates, baseCurrency)) {
       throw new Error('Invalid base currency');
     }
 

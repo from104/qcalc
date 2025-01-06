@@ -66,7 +66,7 @@ export default defineConfig((/* ctx */) => {
        * @example ['.env.somefile', '../.env.someotherfile']
        */
       envFiles: [],
-          
+
       // 폴더 별칭 설정
       alias: {
         classes: join(__dirname, 'src/classes'),
@@ -110,7 +110,7 @@ export default defineConfig((/* ctx */) => {
       typescript: {
         strict: true, // (recommended) enables strict settings for TypeScript
         vueShim: true, // required when using ESLint with type-checked rules, will generate a shim file for `*.vue` files
-        extendTsConfig (tsConfig) {
+        extendTsConfig() {
           // You can use this hook to extend tsConfig dynamically
           // For basic use cases, you can still update the usual tsconfig.json file to override some settings
         },

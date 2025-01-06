@@ -18,8 +18,11 @@
   // 햅틱 피드백 관련
   import { Haptics, ImpactStyle } from 'capacitor/haptics';
 
-  // 계산기 관련 타입과 클래스
-  import { KeyBinding, KeyBindings } from 'classes/KeyBinding';
+  // 키 바인딩 관련
+  import { KeyBinding } from 'classes/KeyBinding';
+  import type { KeyBindings } from 'classes/KeyBinding';
+
+  // 진법 관련
   import { Radix } from 'classes/RadixConverter';
 
   // 스토어 관련
@@ -44,7 +47,6 @@
     enableShiftLock,
     toggleShift,
     toggleShiftLock,
-    showMemoryTemporarily,
     showError,
     showMessage,
     convertRadix,
@@ -96,12 +98,8 @@
   import { createCalcButtonSet } from 'src/constants/CalcButtonSet';
 
   // const i18n = useI18n();
-  const {
-    standardButtons,
-    modeSpecificButtons,
-    standardExtendedFunctions,
-    modeSpecificExtendedFunctions,
-  } = createCalcButtonSet(t);
+  const { standardButtons, modeSpecificButtons, standardExtendedFunctions, modeSpecificExtendedFunctions } =
+    createCalcButtonSet(t);
 
   // mainRadix의 변경을 감지하는 computed 속성 추가
   const currentRadixBase = computed(() => {
@@ -202,8 +200,8 @@
   const handleShiftFunction = (id: ButtonID) => {
     const isShiftButton = id === shiftButtonId.value;
     const isDisabled = store.isShiftPressed
-      ? extendedFunctionSet.value[id]?.isDisabled ?? false
-      : activeButtonSet.value[id]?.isDisabled ?? false;
+      ? (extendedFunctionSet.value[id]?.isDisabled ?? false)
+      : (activeButtonSet.value[id]?.isDisabled ?? false);
     const action = store.isShiftPressed ? extendedFunctionSet.value[id]?.action : activeButtonSet.value[id]?.action;
 
     if (isShiftButton) {
@@ -385,7 +383,7 @@
         push
         :label="
           store.isShiftPressed && !store.showButtonAddedLabel && id !== shiftButtonId
-            ? extendedFunctionSet[id]?.label ?? ''
+            ? (extendedFunctionSet[id]?.label ?? '')
             : button.label.charAt(0) === '@'
               ? undefined
               : button.label
@@ -487,7 +485,7 @@
   }
 
   .top-label-icon {
-    top: 6%; 
+    top: 6%;
   }
 
   .top-label-char {

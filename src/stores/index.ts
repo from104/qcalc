@@ -35,6 +35,8 @@ export default defineStore((/* { ssrContext } */) => {
  */
 declare module 'pinia' {
   export interface PiniaCustomProperties {
-    // add your custom properties here, if any
+    // 사용자 정의 속성을 여기에 추가하세요.
+    // 예: myCustomProperty: string;
+    myCustomProperty?: unknown; // 예시로 추가된 사용자 정의 속성
   }
 }

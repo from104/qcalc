@@ -1,5 +1,4 @@
-// import { BigNumberType } from 'src/types/calculator';
-import { MathB, BigNumber } from './CalculatorMath';
+import { BigNumber, MathB } from './CalculatorMath';
 import { match } from 'ts-pattern';
 
 export enum Radix {
@@ -261,7 +260,7 @@ export class RadixConverter {
       .with(Radix.Hexadecimal, () => '0x')
       .exhaustive();
     // 정수부 변환 (빈 문자열이면 0으로 처리)
-    let result = MathB.bignumber(integerPart ? BigInt(radixPrefix + integerPart).toString() : '0');
+    let result = BigNumber(integerPart ? BigInt(radixPrefix + integerPart).toString() : '0');
 
     // 소수부가 존재하면 변환하여 더하기
     if (fractionPart) {

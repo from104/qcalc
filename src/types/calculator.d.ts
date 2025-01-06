@@ -1,10 +1,8 @@
 import type { BigNumber as tBigNumber } from 'mathjs';
-import { Radix } from 'classes/RadixConverter';
-import { BigNumber } from 'classes/CalculatorMath';
+import type { Radix } from 'classes/RadixConverter';
 
 declare global {
   type BigNumberType = tBigNumber;
-  const BigNumber;
 
   type RadixType = Radix;
 

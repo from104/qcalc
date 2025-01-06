@@ -341,7 +341,7 @@
     const bounds = store.calculateFloatingBounds();
     if (!bounds) return;
 
-    const { minX, maxX, minY, maxY, headerHeight } = bounds;
+    const { headerHeight } = bounds;
     const currentPosition = store.isAtLeastDoubleWidth() 
       ? store.doubleFloatingPosition 
       : store.singleFloatingPosition;

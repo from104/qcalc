@@ -1,6 +1,7 @@
+import { match } from 'ts-pattern';
+import { BigNumber } from 'classes/CalculatorMath';
 import { Operator } from 'src/classes/Calculator';
 import { useStore } from 'stores/store';
-import { match } from 'ts-pattern';
 import type { ComposerTranslation } from 'vue-i18n';
 
 // ComposerTranslation 타입 사용

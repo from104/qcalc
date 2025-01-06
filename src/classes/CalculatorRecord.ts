@@ -76,10 +76,8 @@ export class CalculatorRecord {
    * @throws {Error} 기록 항목 제거 중 오류가 발생한 경우
    */
   public removeFirst(): void {
-    try {
+    if (this.records.length > 0) {
       this.records.shift();
-    } catch (error) {
-      throw new Error('Failed to remove record item');
     }
   }
 
