@@ -52,6 +52,11 @@ export default defineConfig((/* ctx */) => {
       vueDevtools: true,
 
       /**
+       * Include markdown files as raw text
+       */
+      assetsInclude: ['**/*.md'],
+
+      /**
        * Folder where Quasar CLI should look for .env* files.
        * Can be an absolute path or a relative path to project root directory.
        *
@@ -105,6 +110,23 @@ export default defineConfig((/* ctx */) => {
             },
           },
           { server: false },
+        ],
+        // 환경 변수 및 타입 정의를 위한 플러그인
+        [
+          'vite-plugin-env-types',
+          {
+            dts: 'src/types/env.d.ts',
+          },
+        ],
+        // 번들 분석을 위한 플러그인
+        [
+          'rollup-plugin-visualizer',
+          {
+            open: true,
+            filename: 'dist/stats.html',
+            gzipSize: true,
+            brotliSize: true,
+          },
         ],
       ],
       typescript: {

@@ -95,7 +95,7 @@
 - ,: Display number grouping (,)
 - A-,: Change number grouping unit (3 or 4)
 - [, ]: Adjust decimal point fixation (no limit to 6 digits)
-- "'": Activate additional functions of the button
+- ': Activate additional functions of the button
 
 ### Clipboard
 
