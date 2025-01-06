@@ -164,7 +164,7 @@
   };
 
   // 슬라이드 왼쪽 동작 핸들러
-  const slideToOpenMemoDialog = ({ reset }: { reset: () => void }, id: number) => {
+  const slideToOpenMemoDialog = (reset: QSlideEvent['reset'], id: number) => {
     openMemoDialog(id);
     setTimeout(reset, 500);
   };
@@ -342,13 +342,9 @@
     if (!bounds) return;
 
     const { headerHeight } = bounds;
-    const currentPosition = store.isAtLeastDoubleWidth() 
-      ? store.doubleFloatingPosition 
-      : store.singleFloatingPosition;
+    const currentPosition = store.isAtLeastDoubleWidth() ? store.doubleFloatingPosition : store.singleFloatingPosition;
 
-    const x = store.isAtLeastDoubleWidth()
-      ? currentPosition.x + window.innerWidth / 2
-      : currentPosition.x;
+    const x = store.isAtLeastDoubleWidth() ? currentPosition.x + window.innerWidth / 2 : currentPosition.x;
 
     store.updateFloatingPosition(x, currentPosition.y + headerHeight);
   };
@@ -362,6 +358,10 @@
       }, 200);
     },
   );
+
+  interface QSlideEvent {
+    reset: () => void;
+  }
 </script>
 
 <template>
@@ -389,7 +389,7 @@
         v-if="store.isSearchOpen"
         class="search-input-floating"
         :class="{
-          'input-focused': store.inputFocused
+          'input-focused': store.inputFocused,
         }"
         :style="floatingStyle"
       >
@@ -406,10 +406,12 @@
           @focus="store.setInputFocused"
           @blur="store.setInputBlurred"
           @keyup.enter="$event.target.blur()"
-          @keyup.escape="() => {
-            store.isSearchOpen = false;
-            store.setInputBlurred();
-          }"
+          @keyup.escape="
+            () => {
+              store.isSearchOpen = false;
+              store.setInputBlurred();
+            }
+          "
         >
           <template #prepend>
             <div
@@ -428,10 +430,12 @@
               dense
               icon="close"
               :aria-label="t('ariaLabel.closeSearch')"
-              @click="() => {
-                store.isSearchOpen = false;
-                store.setInputBlurred();
-              }"
+              @click="
+                () => {
+                  store.isSearchOpen = false;
+                  store.setInputBlurred();
+                }
+              "
             />
           </template>
         </q-input>
@@ -441,7 +445,9 @@
       <q-item v-if="recordStrings.length == 0" class="text-center">
         <q-item-section role="listitem">
           <q-item-label>
-            <span>{{ store.isSearchOpen && store.searchKeyword.trim() !== '' ? t('noSearchResult') : t('noRecord') }}</span>
+            <span>{{
+              store.isSearchOpen && store.searchKeyword.trim() !== '' ? t('noSearchResult') : t('noRecord')
+            }}</span>
           </q-item-label>
         </q-item-section>
       </q-item>
@@ -454,7 +460,7 @@
             right-color="positive"
             role="listitem"
             @left="deleteRecordItem(record.id as number)"
-            @right="({ reset }) => slideToOpenMemoDialog({ reset }, record.id as number)"
+            @right="(event: QSlideEvent) => slideToOpenMemoDialog(event.reset, record.id)"
           >
             <template #left>
               <q-icon name="delete_outline" :aria-label="t('ariaLabel.deleteRecord')" role="button" />
@@ -570,10 +576,12 @@
           color="primary"
           @focus="store.setInputFocused"
           @blur="store.setInputBlurred"
-          @keyup.enter="() => {
-            store.setInputBlurred;
-            saveMemo();
-          }"
+          @keyup.enter="
+            () => {
+              store.setInputBlurred;
+              saveMemo();
+            }
+          "
         />
       </q-card-section>
     </q-card>
@@ -782,4 +790,3 @@ en:
     dragHandle: 'Move search window'
     closeSearch: 'Close search window'
 </i18n>
-
