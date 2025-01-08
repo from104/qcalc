@@ -1021,7 +1021,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@intlify/bundle-utils@npm:^3.1.2":
+"@intlify/bundle-utils@npm:^3.2.1":
   version: 3.4.0
   resolution: "@intlify/bundle-utils@npm:3.4.0"
   dependencies:
@@ -1083,11 +1083,11 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@intlify/vite-plugin-vue-i18n@npm:^7.0.0":
-  version: 7.0.0
-  resolution: "@intlify/vite-plugin-vue-i18n@npm:7.0.0"
+"@intlify/vite-plugin-vue-i18n@npm:6.0.3":
+  version: 6.0.3
+  resolution: "@intlify/vite-plugin-vue-i18n@npm:6.0.3"
   dependencies:
-    "@intlify/bundle-utils": "npm:^3.1.2"
+    "@intlify/bundle-utils": "npm:^3.2.1"
     "@intlify/shared": "npm:next"
     "@rollup/pluginutils": "npm:^4.2.0"
     debug: "npm:^4.3.1"
@@ -1104,7 +1104,7 @@ __metadata:
       optional: true
     vue-i18n:
       optional: true
-  checksum: 10/33983cc24cd8f0bb45046cc6b320296053c9763db1c0b8d6de779bd791abeb709e89cd49d2238e96e9f94831759bcd1b7c5f528415c29bee8d63753d773c380d
+  checksum: 10/86270e739d21392378e5ba84fbbebf54fedf49c4fadc6a40c15f867f550777d69b1c148c956034c2568cbc862e4b7074e8cee859131ae0cf04da5d87db7609b8
   languageName: node
   linkType: hard
 
@@ -10135,7 +10135,7 @@ __metadata:
     "@capacitor/core": "npm:^6.2.0"
     "@eslint/js": "npm:^9.17.0"
     "@everapi/freecurrencyapi-js": "npm:^1.0.1"
-    "@intlify/vite-plugin-vue-i18n": "npm:^7.0.0"
+    "@intlify/vite-plugin-vue-i18n": "npm:6.0.3"
     "@jest/globals": "npm:^29.7.0"
     "@modyfi/vite-plugin-yaml": "npm:^1.1.0"
     "@quasar/app-vite": "npm:2.0.5"
