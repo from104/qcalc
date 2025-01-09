@@ -191,7 +191,10 @@
   };
 
   // 히스토리 항목 복사 함수
-  const copyRecordItem = async (id: number, copyType: 'formattedNumber' | 'onlyNumber' | 'memo'): Promise<void> => {
+  const copyRecordItem = async (
+    id: number,
+    copyType: 'formattedNumber' | 'onlyNumber' | 'memo' | 'time',
+  ): Promise<void> => {
     const record = calc.record.getRecordById(id);
     const copyText =
       copyType === 'formattedNumber'
@@ -200,7 +203,9 @@
           ? record.calculationResult.resultNumber
           : copyType === 'memo'
             ? (calc.record.getMemo(id) as string)
-            : '';
+            : copyType === 'time'
+              ? formatDateTime(record.timestamp)
+              : '';
     try {
       await copyToClipboard(copyText);
       showMessage(t('copySuccess'));
@@ -245,6 +250,20 @@
     return headerElement ? headerElement.clientHeight + 'px' : '0px';
   });
 
+  // 날짜/시간 포맷 함수
+  const formatDateTime = (timestamp: number): string => {
+    const date = new Date(timestamp);
+    return date.toLocaleString('ko-KR', {
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit',
+      hour12: false,
+    });
+  };
+
   const recordStrings = computed<RecordString[]>(() => {
     // 기본 레코드 문자열 생성
     const strings = records.value.map((record) => {
@@ -257,6 +276,7 @@
       return {
         id: record.id as number,
         memo: record.memo,
+        timestamp: record.timestamp,
         displayText,
         origResult: record.calculationResult,
       };
@@ -273,7 +293,8 @@
     return strings.filter((record) => {
       const memoMatch = record.memo?.toLowerCase().includes(searchTerm);
       const displayTextMatch = record.displayText.toLowerCase().includes(searchTerm);
-      return memoMatch || displayTextMatch;
+      const timeMatch = formatDateTime(record.timestamp).toLowerCase().includes(searchTerm);
+      return memoMatch || displayTextMatch || timeMatch;
     });
   });
 
@@ -387,6 +408,9 @@
               role="listitem"
             >
               <q-item-section class="q-mr-none q-px-none">
+                <q-item-label class="text-caption text-grey-7">
+                  <HighlightText :text="formatDateTime(record.timestamp)" :search-term="store.searchKeyword" />
+                </q-item-label>
                 <q-item-label v-if="record.memo">
                   <u><HighlightText :text="record.memo" :search-term="store.searchKeyword" /></u>
                 </q-item-label>
@@ -420,6 +444,12 @@
                   :action="() => copyRecordItem(record.id as number, 'memo')"
                 />
                 <MenuItem v-if="record.memo" :title="t('deleteMemo')" :action="() => deleteMemo(record.id as number)" />
+                <MenuItem separator />
+                <MenuItem
+                  :title="t('copyTime')"
+                  :action="() => copyRecordItem(record.id as number, 'time')"
+                  :caption="formatDateTime(record.timestamp)"
+                />
                 <MenuItem separator />
                 <MenuItem
                   :title="t('copyDisplayedResult')"
@@ -615,6 +645,7 @@ ko:
   loadToMainPanel: '메인 패널에 불러오기'
   loadToSubPanel: '서브 패널에 불러오기'
   deleteResult: '결과 삭제'
+  copyTime: '시간 복사'
   ariaLabel:
     scrollToTop: '맨 위로 스크롤'
     editMemo: '메모 편집'
@@ -640,6 +671,7 @@ en:
   loadToMainPanel: 'Load to main panel'
   loadToSubPanel: 'Load to sub panel'
   deleteResult: 'Delete result'
+  copyTime: 'Copy time'
   ariaLabel:
     scrollToTop: 'Scroll to top'
     editMemo: 'Edit memo'

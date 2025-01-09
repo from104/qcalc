@@ -18,12 +18,14 @@ declare global {
   type ResultRecord = {
     id?: number;
     memo?: string;
+    timestamp: number;
     calculationResult: CalculationResult;
   };
 
   interface RecordString {
     id: number;
     memo?: string;
+    timestamp: number;
     displayText: string;
     origResult: CalculationResult;
   }
