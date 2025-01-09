@@ -339,7 +339,7 @@
           filled
           dense
           autofocus
-          class="search-input"
+          class="search-input "
           :aria-label="t('ariaLabel.searchInput')"
           role="searchbox"
           @focus="store.setInputFocused"
@@ -358,7 +358,7 @@
               flat
               dense
               size="sm"
-              icon="mdi-arrow-collapse-up"
+              icon="close"
               style="top: -3px"
               :aria-label="t('ariaLabel.closeSearch')"
               @click="
@@ -373,7 +373,7 @@
       </q-bar>
     </transition>
 
-    <div v-if="store.isSearchOpen" class="q-ma-md q-pa-xs" />
+    <div v-if="store.isSearchOpen" class="q-ma-md q-pa-sm" />
 
     <transition name="slide-fade" mode="out-in">
       <q-item v-if="recordStrings.length == 0" class="text-center">
@@ -585,6 +585,7 @@
     width: 100%;
     height: 50px;
     top: 0;
+    left: 0;
     z-index: 2000;
     background: var(--q-primary);
     transition: all 0.3s ease-out;
