@@ -1,37 +1,45 @@
+// Pinia 관련
 import { defineStore } from 'pinia';
-import { Notify, Dark, copyToClipboard } from 'quasar';
-import { match } from 'ts-pattern';
-import { useRoute, useRouter } from 'vue-router';
 
-import { WordSize, Operator, CalculationResult } from 'classes/CalculatorTypes';
+// Quasar 관련
+import { Notify, Dark, copyToClipboard, Screen } from 'quasar';
+
+// 패턴 매칭 유틸리티
+import { match } from 'ts-pattern';
+
+// Vue Router 관련
+import { type Router, type RouteLocationNormalizedLoaded } from 'vue-router';
+// 계산기 관련 타입과 클래스 가져오기
+// import type { WordSize, CalculationResult } from 'src/types/calculator';
+import { Operator } from 'classes/Calculator';
+import { Radix } from 'classes/RadixConverter';
 import { Calculator } from 'classes/Calculator';
 import { UnitConverter } from 'classes/UnitConverter';
 import { CurrencyConverter } from 'classes/CurrencyConverter';
-import { RadixConverter, Radix, RadixType } from 'src/classes/RadixConverter';
+import { RadixConverter } from 'classes/RadixConverter';
+
+import type { StoreState, DarkModeType } from '../types/store';
 
 const radixConverter = new RadixConverter();
 
-// darkMode 타입 정의 추가
-type DarkModeType = 'system' | 'light' | 'dark';
+// 플로팅 창 위치 관련 상태 추가
+interface FloatingPosition {
+  x: number;
+  y: number;
+}
 
 // 기본 스토어 정의
 export const useStore = defineStore('store', {
   // 상태 정의
-  state: () => ({
+  state: (): StoreState => ({
     // 계산기 관련
     calc: new Calculator(),
     currentTab: 'calc',
-    isHistoryDialogOpen: false,
     isMemoryVisible: false,
     resultPanelPadding: 0,
     paddingOnResult: 20,
 
-    // // Vue Router 관련
-    // router: useRouter(),
-    // route: useRoute(),
-
     // UI 상태 관련
-    isSettingDialogOpen: false,
     isShiftPressed: false,
     isShiftLocked: false,
     inputFocused: false,
@@ -40,18 +48,18 @@ export const useStore = defineStore('store', {
     hapticsMode: true,
 
     // 테마/디스플레이 관련
-    darkMode: 'system' as DarkModeType,
+    darkMode: 'system',
     alwaysOnTop: false,
 
     // 계산 결과 관련
-    // 전체 계산 결과 삭제 확인 다이얼로그 표시 여부
-    isDeleteHistoryConfirmOpen: false,
-    // 계산 결과 창 스크롤 위치 저장
-    historyLastScrollPosition: 0,
+    isDeleteRecordConfirmOpen: false,
+    recordLastScrollPosition: 0,
+    isSearchOpen: false,
+    searchKeyword: '',
 
     // 숫자 표시 관련
     useGrouping: true,
-    groupingUnit: 3 as 3 | 4,
+    groupingUnit: 3,
     decimalPlaces: -2,
     useSystemLocale: true,
     locale: '',
@@ -59,8 +67,8 @@ export const useStore = defineStore('store', {
 
     // 단위 변환 관련
     selectedCategory: '',
-    sourceUnits: {} as { [key: string]: string },
-    targetUnits: {} as { [key: string]: string },
+    sourceUnits: {},
+    targetUnits: {},
     showUnit: true,
     showSymbol: true,
 
@@ -70,12 +78,16 @@ export const useStore = defineStore('store', {
     targetCurrency: 'KRW',
 
     // 진법 변환 관련
-    wordSize: 32 as WordSize,
+    wordSize: 32,
     radixList: Object.values(Radix),
-    sourceRadix: Radix.Decimal as RadixType,
-    targetRadix: Radix.Hexadecimal as RadixType,
+    sourceRadix: Radix.Decimal,
+    targetRadix: Radix.Hexadecimal,
     showRadix: true,
-    radixType: 'suffix' as 'prefix' | 'suffix',
+    radixType: 'suffix',
+
+    // 플로팅 창 위치 관련 상태 추가
+    singleFloatingPosition: { x: 16, y: 16 } as FloatingPosition,
+    doubleFloatingPosition: { x: 16, y: 16 } as FloatingPosition,
   }),
 
   // 액션 정의
@@ -100,7 +112,6 @@ export const useStore = defineStore('store', {
 
     // Shift 키 관련
     toggleShift(): void {
-      console.log('toggleShift');
       this.isShiftPressed = !this.isShiftPressed;
     },
 
@@ -140,13 +151,13 @@ export const useStore = defineStore('store', {
     numberGrouping(value: string): string {
       const [integerPart, decimalPart] = value.split('.');
       const groupingPattern = new RegExp(`\\B(?=([\\da-fA-F]{${this.groupingUnit}})+(?![\\da-fA-F]))`, 'g');
-      return integerPart.replace(groupingPattern, ',') + (decimalPart ? `.${decimalPart}` : '');
+      return integerPart?.replace(groupingPattern, ',') + (decimalPart ? `.${decimalPart}` : '');
     },
 
     formatDecimalPlaces(value: string, decimalPlaces: number): string {
       if (!value) return '';
       if (decimalPlaces < 0) return value;
-      if (decimalPlaces === 0) return value.split('.')[0];
+      if (decimalPlaces === 0) return value.split('.')[0] ?? '';
 
       // 소수점이 없는 경우 처리
       if (!value.includes('.')) {
@@ -155,7 +166,7 @@ export const useStore = defineStore('store', {
 
       // 소수점이 있는 경우 처리
       const [integerPart, decimalPart] = value.split('.');
-      const formattedDecimal = decimalPart.slice(0, decimalPlaces).padEnd(decimalPlaces, '0');
+      const formattedDecimal = decimalPart?.slice(0, decimalPlaces).padEnd(decimalPlaces, '0') ?? '';
 
       return `${integerPart}.${formattedDecimal}`;
     },
@@ -168,22 +179,22 @@ export const useStore = defineStore('store', {
       return this.useGrouping ? this.numberGrouping(formattedValue) : formattedValue;
     },
 
-    // 진법 ��환 관련
+    // 진법 변환 관련
     convertIfRadix(value: string): string {
       const isRadixMode = this.currentTab === 'radix';
 
       return isRadixMode ? this.convertRadix(value, Radix.Decimal, this.sourceRadix) : value;
     },
 
-    convertRadix(value: string, fromRadix: RadixType, toRadix: RadixType): string {
+    convertRadix(value: string, fromRadix: Radix, toRadix: Radix): string {
       return radixConverter.convertRadix(value, fromRadix, toRadix);
     },
 
-    validateRadixNumber(value: string, radix: RadixType): boolean {
+    validateRadixNumber(value: string, radix: Radix): boolean {
       return radixConverter.isValidRadixNumber(value, radix);
     },
 
-    getRadixPrefix(radix: RadixType) {
+    getRadixPrefix(radix: Radix) {
       return {
         [Radix.Binary]: '0b',
         [Radix.Octal]: '0o',
@@ -192,7 +203,7 @@ export const useStore = defineStore('store', {
       }[radix];
     },
 
-    getRadixSuffix(radix: RadixType) {
+    getRadixSuffix(radix: Radix) {
       return {
         [Radix.Binary]: '2',
         [Radix.Octal]: '8',
@@ -203,7 +214,7 @@ export const useStore = defineStore('store', {
 
     initRecentRadix() {
       const availableRadixes = Object.values(Radix);
-      const isValidRadixType = (radix: RadixType) => availableRadixes.includes(radix);
+      const isValidRadixType = (radix: Radix) => availableRadixes.includes(radix);
 
       if (!isValidRadixType(this.sourceRadix)) {
         this.sourceRadix = Radix.Decimal;
@@ -212,7 +223,7 @@ export const useStore = defineStore('store', {
         this.targetRadix = Radix.Hexadecimal;
       }
       if (this.sourceRadix === this.targetRadix) {
-        this.targetRadix = this.radixList[(this.radixList.indexOf(this.sourceRadix) + 1) % this.radixList.length];
+        this.targetRadix = this.radixList[(this.radixList.indexOf(this.sourceRadix) + 1) % this.radixList.length] as Radix;
       }
     },
 
@@ -226,7 +237,7 @@ export const useStore = defineStore('store', {
     },
 
     // 계산 기록 관련
-    getLeftSideInHistory(result: CalculationResult, useLineBreak = false): string {
+    getLeftSideInRecord(result: CalculationResult, useLineBreak = false): string {
       const radixPrefix =
         this.currentTab === 'radix' && this.showRadix && this.radixType === 'prefix'
           ? this.getRadixPrefix(this.sourceRadix)
@@ -287,7 +298,7 @@ export const useStore = defineStore('store', {
         .otherwise(() => formattedPrev);
     },
 
-    getRightSideInHistory(result: CalculationResult): string {
+    getRightSideInRecord(result: CalculationResult): string {
       const radixPrefix =
         this.currentTab === 'radix' && this.showRadix && this.radixType === 'prefix'
           ? this.getRadixPrefix(this.sourceRadix)
@@ -332,14 +343,14 @@ export const useStore = defineStore('store', {
     initRecentUnits(): void {
       // 최근 카테고리가 설정되지 않은 경우, 첫 번째 카테고리로 설정
       if (this.selectedCategory === '') {
-        this.selectedCategory = UnitConverter.categories[0];
+        this.selectedCategory = UnitConverter.categories[0] ?? '';
       }
 
       // 변환 출발 단위가 설정되지 않은 경우, 각 카테고리의 첫 번째 단위로 설정
       if (Object.keys(this.sourceUnits).length === 0) {
         UnitConverter.categories.forEach((category) => {
           const units = UnitConverter.getUnitLists(category);
-          this.sourceUnits[category] = units[0];
+          this.sourceUnits[category] = units[0] ?? '';
         });
       }
 
@@ -347,15 +358,15 @@ export const useStore = defineStore('store', {
       if (Object.keys(this.targetUnits).length === 0) {
         UnitConverter.categories.forEach((category) => {
           const units = UnitConverter.getUnitLists(category);
-          this.targetUnits[category] = units[1] || units[0];
+          this.targetUnits[category] = units[1] || units[0] || '';
         });
       }
     },
 
     swapUnits(): void {
       const temp = this.sourceUnits[this.selectedCategory];
-      this.sourceUnits[this.selectedCategory] = this.targetUnits[this.selectedCategory];
-      this.targetUnits[this.selectedCategory] = temp;
+      this.sourceUnits[this.selectedCategory] = this.targetUnits[this.selectedCategory] || '';
+      this.targetUnits[this.selectedCategory] = temp || '';
     },
 
     // 다크모드 여부 얻기
@@ -390,7 +401,7 @@ export const useStore = defineStore('store', {
       const modes: DarkModeType[] = ['light', 'dark', 'system'];
       const currentIndex = modes.indexOf(this.darkMode);
       const nextMode = modes[(currentIndex + 1) % modes.length];
-      this.setDarkMode(nextMode);
+      this.setDarkMode(nextMode as DarkModeType);
     },
 
     setAlwaysOnTop(isAlwaysOnTop: boolean) {
@@ -530,8 +541,87 @@ export const useStore = defineStore('store', {
     },
 
     // 전체 계산 결과 삭제 확인 다이얼로그 표시 여부
-    setDeleteHistoryConfirmOpen(value: boolean) {
-      this.isDeleteHistoryConfirmOpen = value;
+    setDeleteRecordConfirmOpen(value: boolean) {
+      this.isDeleteRecordConfirmOpen = value;
+    },
+
+    isAtLeastDoubleWidth() {
+      return Screen.width >= 330 * 2;
+    },
+
+    // 기본 계산기 여부 확인
+    isDefaultCalculator(): boolean {
+      return this.currentTab === 'calc';
+    },
+
+    // 특정 경로로 이동하는 함수
+    navigateToPath(path: string, route: RouteLocationNormalizedLoaded, router: Router): void {
+      if (route.path === path) {
+        return;
+      } else if (/help|about|settings|record/.test(route.path)) {
+        router.replace(path);
+      } else {
+        router.push(path);
+      }
+    },
+
+    // 플로팅 창 위치 계산 메서드
+    calculateFloatingBounds() {
+      const header = document.getElementById('header');
+      const recordPage = document.getElementById('record-page');
+      const floatingElement = document.querySelector('.search-input-floating') as HTMLElement;
+
+      if (!header || !recordPage || !floatingElement) return null;
+
+      const headerHeight = header.clientHeight;
+      const pageRect = recordPage.getBoundingClientRect();
+      const floatingRect = floatingElement.getBoundingClientRect();
+      const innerPadding = 16;
+      const horizontalOffset = this.isAtLeastDoubleWidth() ? window.innerWidth / 2 : 0;
+
+      return {
+        minX: pageRect.left + innerPadding,
+        maxX: pageRect.right - floatingRect.width - innerPadding,
+        minY: pageRect.top + innerPadding,
+        maxY: pageRect.bottom - floatingRect.height - innerPadding,
+        headerHeight,
+        horizontalOffset,
+      };
+    },
+
+    // 플로팅 창 위치 업데이트
+    updateFloatingPosition(x: number, y: number) {
+      const bounds = this.calculateFloatingBounds();
+      if (!bounds) return;
+
+      const { minX, maxX, minY, maxY, headerHeight } = bounds;
+      const position = {
+        x: Math.max(minX, Math.min(maxX, x)),
+        y: Math.max(minY, Math.min(maxY, y)) - headerHeight,
+      };
+
+      if (this.isAtLeastDoubleWidth()) {
+        this.doubleFloatingPosition = {
+          x: position.x - window.innerWidth / 2,
+          y: position.y,
+        };
+      } else {
+        this.singleFloatingPosition = position;
+      }
+    },
+
+    // 현재 레이아웃에 맞는 위치 반환
+    get floatingPosition(): FloatingPosition {
+      const defaultPosition = { x: 16, y: 16 };
+
+      if (this.isAtLeastDoubleWidth()) {
+        if (!this.doubleFloatingPosition) return defaultPosition;
+        return {
+          x: this.doubleFloatingPosition.x + window.innerWidth / 2,
+          y: this.doubleFloatingPosition.y,
+        };
+      }
+      return this.singleFloatingPosition || defaultPosition;
     },
   },
 

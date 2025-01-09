@@ -1,6 +1,30 @@
 import { match } from 'ts-pattern';
-import { convertRadix, Radix } from './RadixConverter';
-import { BigNumber, MathB, BigNumberType } from './CalculatorTypes';
+import { convertRadix } from './RadixConverter';
+// import { BigNumberType } from 'src/types/calculator';
+import { Radix } from './RadixConverter';
+import type { FactoryFunctionMap } from 'mathjs';
+import { all, create } from 'mathjs';
+
+// MathJS 라이브러리 설정
+export const MathB = create(all as FactoryFunctionMap, {
+  number: 'BigNumber',
+  precision: 128,
+});
+
+// BigNumber 타입 정의
+export const BigNumber = MathB.bignumber;
+
+/**
+ * 수학 상수 정의 객체
+ */
+export const CONSTANTS: { [key: string]: string } = {
+  pi: MathB.pi.toString(), // 원주율
+  pi2: MathB.bignumber(MathB.pi).div(2).toString(), // 원주율의 절반
+  e: MathB.e.toString(), // 자연로그의 밑
+  ln2: MathB.log(2).toString(), // 자연로그 2
+  ln10: MathB.log(10).toString(), // 자연로그 10
+  phi: MathB.phi.toString(), // 황금비
+};
 
 /**
  * 계산기 수학 연산 클래스
@@ -270,7 +294,7 @@ export class CalculatorMath {
    * AND, OR, XOR 비트 연산을 수행하는 내부 메서드
    * @param firstValue 첫 번째 숫자 (문자열)
    * @param secondValue 두 번째 숫자 (문자열)
-   * @param operation 수행할 연���자 ('and' | 'or' | 'xor')
+   * @param operation 수행할 연산자 ('and' | 'or' | 'xor')
    * @param wordSize 비트 크기 (기본값: 8)
    * @returns 비트 연산 결과 (문자열)
    */
@@ -284,14 +308,14 @@ export class CalculatorMath {
     const [firstBinary, secondBinary] = [firstValue, secondValue].map((n) =>
       convertRadix(this.int(this.abs(n)), Radix.Decimal, Radix.Binary),
     ) as string[];
-    const maxLength = Math.max(firstBinary.length, secondBinary.length);
+    const maxLength = Math.max(firstBinary?.length ?? 0, secondBinary?.length ?? 0);
     const [firstPadded, secondPadded] = [firstBinary, secondBinary].map((binary) =>
       (binary as string).padStart(maxLength, '0'),
     );
 
-    const resultBinary = [...firstPadded]
+    const resultBinary = [...(firstPadded ?? '')]
       .map((_, index) => {
-        const [firstBit, secondBit] = [firstPadded[index] === '1', secondPadded[index] === '1'];
+        const [firstBit, secondBit] = [firstPadded?.[index] === '1', secondPadded?.[index] === '1'];
         return match(operation)
           .with('and', () => firstBit && secondBit)
           .with('or', () => firstBit || secondBit)

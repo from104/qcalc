@@ -1,5 +1,3 @@
-/* eslint-disable */
-
 /**
  * Node.js 환경 변수에 대한 타입 선언
  */

@@ -1,20 +1,25 @@
 <script setup lang="ts">
+  // Vue 핵심 기능 및 컴포지션 API 가져오기
   import { onMounted, onBeforeUnmount, reactive, watch } from 'vue';
-  import { useI18n } from 'vue-i18n';
-  import { KeyBinding } from 'classes/KeyBinding';
-  import { Radix } from 'classes/RadixConverter';
-  import { useStore } from 'src/stores/store';
-
-  import MyTooltip from 'components/MyTooltip.vue';
 
   // i18n 설정
+  import { useI18n } from 'vue-i18n';
   const { t } = useI18n();
 
+  // 계산기 관련 타입과 클래스
+  import { KeyBinding } from 'classes/KeyBinding';
+  import { Radix } from 'classes/RadixConverter';
+
+  // 스토어 관련
+  // 스토어 관련
+  import { useStore } from 'src/stores/store';
   // 스토어 인스턴스 초기화
   const store = useStore();
-
   // 스토어에서 필요한 메서드 추출
   const { swapRadixes, initRecentRadix, clickButtonById, setInputBlurred, calc } = store;
+
+  // 컴포넌트 import
+  import ToolTip from 'src/components/snippets/ToolTip.vue';
 
   // 단위 초기화
   initRecentRadix();
@@ -112,11 +117,13 @@
 </script>
 
 <template>
-  <q-card-section v-blur class="row q-px-sm q-pt-none q-pb-sm">
+  <q-card-section v-auto-blur class="row q-px-sm q-pt-none q-pb-sm">
     <!-- 워드사이즈 선택 -->
     <q-select
       v-model="store.wordSize"
       :options="wordSizeOptions.values"
+      role="combobox"
+      :aria-label="t('ariaLabel.wordSize')"
       dense
       options-dense
       emit-value
@@ -133,12 +140,14 @@
     />
 
     <!-- 원본 방향 -->
-    <q-icon name="keyboard_double_arrow_up" class="col-1" />
+    <q-icon name="keyboard_double_arrow_up" class="col-1" role="img" :aria-label="t('ariaLabel.sourceDirection')" />
 
     <!-- 원본 진법 -->
     <q-select
       v-model="store.sourceRadix"
       :options="sourceRadixOptions.values"
+      role="combobox"
+      :aria-label="t('ariaLabel.sourceRadix')"
       dense
       options-dense
       emit-value
@@ -162,15 +171,19 @@
       icon="swap_horiz"
       size="md"
       class="col-1 q-mx-none q-px-sm blur"
+      role="button"
+      :aria-label="t('ariaLabel.swapRadix')"
       @click="swapRadixes()"
     >
-      <MyTooltip>{{ t('tooltipSwap') }}</MyTooltip>
+      <ToolTip>{{ t('tooltipSwap') }}</ToolTip>
     </q-btn>
 
     <!-- 대상 진법 -->
     <q-select
       v-model="store.targetRadix"
       :options="targetRadixOptions.values"
+      role="combobox"
+      :aria-label="t('ariaLabel.targetRadix')"
       dense
       options-dense
       emit-value
@@ -186,7 +199,13 @@
     />
 
     <!-- 대상 방향 -->
-    <q-icon name="keyboard_double_arrow_down" size="xs" class="col-1 q-px-none" />
+    <q-icon
+      name="keyboard_double_arrow_down"
+      size="xs"
+      class="col-1 q-px-none"
+      role="img"
+      :aria-label="t('ariaLabel.targetDirection')"
+    />
   </q-card-section>
 </template>
 
@@ -215,6 +234,13 @@
       sub: 변환 후
       wordSize: 워드크기
     bit: 비트
+    ariaLabel:
+      wordSize: '워드 크기 선택'
+      sourceDirection: '원본 진법 방향'
+      targetDirection: '대상 진법 방향'
+      sourceRadix: '원본 진법 선택'
+      targetRadix: '대상 진법 선택'
+      swapRadix: '원본과 대상 진법 바꾸기'
   en:
     tooltipSwap: Swap Radix
     radixLabel:
@@ -226,4 +252,11 @@
       sub: After
       wordSize: Word Size
     bit: Bit
+    ariaLabel:
+      wordSize: 'Select word size'
+      sourceDirection: 'Source radix direction'
+      targetDirection: 'Target radix direction'
+      sourceRadix: 'Select source radix'
+      targetRadix: 'Select target radix'
+      swapRadix: 'Swap source and target radix'
 </i18n>

@@ -1,14 +1,18 @@
 <script setup lang="ts">
-  import { ref, onMounted, onBeforeUnmount, reactive, watch, Ref } from 'vue';
-  import { BigNumber } from 'classes/CalculatorTypes';
-  import MyTooltip from 'components/MyTooltip.vue';
-  import { useI18n } from 'vue-i18n';
-  import { useStore } from 'src/stores/store';
-  import { KeyBinding } from 'classes/KeyBinding';
+  // Vue 핵심 기능 및 컴포지션 API 가져오기
+  import { ref, onMounted, onBeforeUnmount, reactive, watch } from 'vue';
+  import type { Ref } from 'vue';
 
   // i18n 설정
+  import { useI18n } from 'vue-i18n';
   const { t } = useI18n();
 
+  // 계산기 관련 타입과 클래스
+  import { BigNumber } from 'classes/CalculatorMath';
+  import { KeyBinding } from 'classes/KeyBinding';
+
+  // 스토어 관련
+  import { useStore } from 'src/stores/store';
   // 스토어 인스턴스 초기화
   const store = useStore();
   // 스토어에서 필요한 메서드 추출
@@ -22,6 +26,15 @@
     setInputFocused,
     blurElement,
   } = store;
+
+  // 컴포넌트 import
+  import ToolTip from 'src/components/snippets/ToolTip.vue';
+
+  // 키 바인딩 설정
+  const keyBinding = new KeyBinding([
+    [['Alt+w'], () => clickButtonById('btn-swap-currency')],
+    [['Alt+y'], () => store.toggleShowSymbol()],
+  ]);
 
   // 단위 초기화
   initRecentCurrencies();
@@ -45,12 +58,6 @@
       currencyDescriptions[currency] = t(`currencyDesc.${currency}`);
     });
   });
-
-  // 키 바인딩 설정
-  const keyBinding = new KeyBinding([
-    [['Alt+w'], () => clickButtonById('btn-swap-currency')],
-    [['Alt+y'], () => store.toggleShowSymbol()],
-  ]);
 
   // 입력 포커스에 따른 키 바인딩 활성화/비활성화
   watch(
@@ -116,7 +123,7 @@
       sourceCurrencyOptions.values = currencyList.map((currency) => ({
         value: currency,
         label: currency,
-        desc: currencyDescriptions[currency],
+        desc: currencyDescriptions[currency] ?? '',
         disable: store.targetCurrency === currency,
       }));
 
@@ -124,7 +131,7 @@
       targetCurrencyOptions.values = currencyList.map((currency) => ({
         value: currency,
         label: currency,
-        desc: currencyDescriptions[currency],
+        desc: currencyDescriptions[currency] ?? '',
         disable: store.sourceCurrency === currency,
       }));
 
@@ -174,13 +181,15 @@
 <template>
   <q-card-section class="row q-px-sm q-pt-none q-pb-sm">
     <!-- 원본 방향 -->
-    <q-icon name="keyboard_double_arrow_up" class="col-1" />
+    <q-icon name="keyboard_double_arrow_up" class="col-1" role="img" :aria-label="t('ariaLabel.sourceDirection')" />
 
     <!-- 원본 통화 -->
     <q-select
       v-model="store.sourceCurrency"
       :options="filteredSourceCurrencyOptions"
       :label="currencyDescriptions[store.sourceCurrency]"
+      role="combobox"
+      :aria-label="t('ariaLabel.sourceCurrency')"
       stack-label
       dense
       options-dense
@@ -209,11 +218,11 @@
           </q-item-section>
         </q-item>
       </template>
-      <MyTooltip>
+      <ToolTip>
         <div class="text-left" style="white-space: pre-wrap">
           {{ `${currencyDescriptions[store.sourceCurrency]}\n${store.sourceCurrency}` }}
         </div>
-      </MyTooltip>
+      </ToolTip>
     </q-select>
 
     <!-- 원본, 대상 통화 바꾸기 버튼 -->
@@ -225,9 +234,11 @@
       icon="swap_horiz"
       size="md"
       class="col-2 q-mx-none q-px-sm"
+      role="button"
+      :aria-label="t('ariaLabel.swapCurrencies')"
       @click="handleCurrencySwap()"
     >
-      <MyTooltip>{{ t('tooltipSwap') }}</MyTooltip>
+      <ToolTip>{{ t('tooltipSwap') }}</ToolTip>
     </q-btn>
 
     <!-- 대상 통화 -->
@@ -235,6 +246,8 @@
       v-model="store.targetCurrency"
       :options="filteredTargetCurrencyOptions"
       :label="currencyDescriptions[store.targetCurrency]"
+      role="combobox"
+      :aria-label="t('ariaLabel.targetCurrency')"
       stack-label
       dense
       options-dense
@@ -265,17 +278,23 @@
           </q-item-section>
         </q-item>
       </template>
-      <MyTooltip>
+      <ToolTip>
         <div class="text-left" style="white-space: pre-wrap">
           {{
             `${currencyDescriptions[store.targetCurrency]}\n${store.targetCurrency}, ${converter.getRate(store.targetCurrency).toFixed(4)}`
           }}
         </div>
-      </MyTooltip>
+      </ToolTip>
     </q-select>
 
     <!-- 대상 방향 -->
-    <q-icon name="keyboard_double_arrow_down" size="xs" class="col-1 q-px-none" />
+    <q-icon
+      name="keyboard_double_arrow_down"
+      size="xs"
+      class="col-1 q-px-none"
+      role="img"
+      :aria-label="t('ariaLabel.targetDirection')"
+    />
   </q-card-section>
 </template>
 

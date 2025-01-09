@@ -1,38 +1,34 @@
 <script setup lang="ts">
+  // Vue 핵심 기능 및 컴포지션 API 가져오기
   import { onMounted } from 'vue';
-
-  import { KeyBinding } from 'classes/KeyBinding';
-
-  import MyTooltip from './MyTooltip.vue';
-  import MenuItem from './MenuItem.vue';
-  import MenuPanel from './MenuPanel.vue';
-
-  // router 인스턴스 가져오기
-  import { useRouter } from 'vue-router'
-  const router = useRouter()
-
-  // Quasar 인스턴스 초기화
-  import { useQuasar } from 'quasar';
-  const $q = useQuasar();
 
   // i18n 설정
   import { useI18n } from 'vue-i18n';
   const { t } = useI18n();
 
-  // 스토어 인스턴스 초기화
-  import { useStore } from 'src/stores/store';
-  const store = useStore();
+  // router 관련
+  import { useRouter } from 'vue-router';
+  const router = useRouter();
 
+  // Quasar 관련 설정
+  import { useQuasar } from 'quasar';
+  const $q = useQuasar();
+
+  // 계산기 관련 타입과 클래스
+  import { KeyBinding } from 'classes/KeyBinding';
+
+  // 스토어 관련
+  import { useStore } from 'src/stores/store';
+  // 스토어 인스턴스 초기화
+  const store = useStore();
   // 스토어에서 필요한 메서드와 속성 추출
-  const {
-    calc,
-    copyToClipboard,
-    clickButtonById,
-    showError,
-    showMessage,
-    swapUnits,
-    swapCurrencies,
-  } = store;
+  const { calc, copyToClipboard, clickButtonById, showError, showMessage, swapUnits, swapCurrencies, swapRadixes } =
+    store;
+
+  // 컴포넌트 import
+  import ToolTip from './snippets/ToolTip.vue';
+  import MenuItem from './snippets/MenuItem.vue';
+  import MenuPanel from './MenuPanel.vue';
 
   /**
    * 선택된 텍스트 또는 계산 결과를 클립보드에 복사하는 함수
@@ -73,6 +69,10 @@
           swapCurrencies();
           setTimeout(() => calc.setCurrentNumber(clipboardText), 5);
           setTimeout(swapCurrencies, 10);
+        } else if (store.currentTab === 'radix') {
+          swapRadixes();
+          setTimeout(() => calc.setCurrentNumber(clipboardText), 5);
+          setTimeout(swapRadixes, 10);
         }
         showMessage(t('pastedFromClipboardToSubPanel'));
       } else {
@@ -80,6 +80,7 @@
         showMessage(t('pastedFromClipboard'));
       }
     } catch (error) {
+      console.error('Failed to paste from clipboard:', error);
       showError(t('failedToPasteFromClipboard'));
     }
   };
@@ -102,38 +103,39 @@
     flat
     icon="content_copy"
     class="q-ma-none q-pa-none q-pl-xs"
-    :disable="store.isSettingDialogOpen"
+    :aria-label="t('ariaLabel.copy')"
     @click="handleCopy"
   >
-    <MyTooltip>{{ t('tooltipCopy') }}</MyTooltip>
+    <ToolTip>{{ t('tooltipCopy') }}</ToolTip>
   </q-btn>
   <q-btn
     id="btn-paste"
     flat
     icon="content_paste"
     class="q-ma-none q-pa-none q-pl-xs"
+    :aria-label="t('ariaLabel.paste')"
     @click="handlePaste()"
   >
-    <q-menu v-if="store.currentTab !== 'calc'" context-menu auto-close class="z-max shadow-6">
+    <q-menu v-if="!store.isDefaultCalculator()" context-menu auto-close class="z-max shadow-6">
       <q-list dense style="max-width: 200px">
         <MenuItem :action="() => handlePaste('main')" :title="t('pasteToMainPanel')" />
         <MenuItem :action="() => handlePaste('sub')" :title="t('pasteToSubPanel')" />
       </q-list>
     </q-menu>
-    <MyTooltip>{{ t('tooltipPaste') }}</MyTooltip>
+    <ToolTip>{{ t('tooltipPaste') }}</ToolTip>
   </q-btn>
   <q-btn
-    id="btn-history"
+    v-if="!store.isAtLeastDoubleWidth()"
     flat
-    icon="history"
+    icon="mdi-history"
     class="q-ma-none q-pa-none q-pl-xs"
-    :disable="store.isSettingDialogOpen"
-    @click="router.push('/history')"
+    :aria-label="t('ariaLabel.record')"
+    @click="router.push('/record')"
   >
-    <MyTooltip>{{ t('openHistoryDialog') }}</MyTooltip>
+    <ToolTip>{{ t('openRecordPage') }}</ToolTip>
   </q-btn>
-  <q-btn id="btn-menu" flat icon="more_vert" class="q-ma-none q-pa-none q-pl-xs" :disable="store.isSettingDialogOpen">
-    <q-menu auto-close transition-show="slide-left" transition-hide="slide-right" :offset="[0, 10]" class="shadow-6">
+  <q-btn id="btn-menu" flat icon="more_vert" class="q-ma-none q-pa-none q-pl-xs" :aria-label="t('ariaLabel.menu')">
+    <q-menu auto-close transition-show="slide-down" transition-hide="slide-up" :offset="[140, 10]" class="shadow-6">
       <MenuPanel />
     </q-menu>
   </q-btn>
@@ -153,7 +155,12 @@ ko:
   pasteToSubPanel: '보조 패널에 붙여넣기'
   tooltipCopy: '내용을 복사합니다.'
   tooltipPaste: '숫자를 붙혀넣습니다.'
-  openHistoryDialog: '클릭하면 기록을 열거나 닫습니다.'
+  openRecordPage: '클릭하면 기록 페이지를 엽니다.'
+  ariaLabel:
+    copy: '클립보드에 복사'
+    paste: '클립보드에서 붙여넣기'
+    record: '기록 페이지 열기'
+    menu: '메뉴 열기'
 en:
   targetToBeCopiedResult: 'the calculation result'
   targetToBeCopiedSelected: 'the selected content'
@@ -167,5 +174,10 @@ en:
   pasteToSubPanel: 'Paste to the sub panel'
   tooltipCopy: 'Copy the content.'
   tooltipPaste: 'Paste the number.'
-  openHistoryDialog: 'Click to open or close the history.'
+  openRecordPage: 'Click to open the record page.'
+  ariaLabel:
+    copy: 'Copy to clipboard'
+    paste: 'Paste from clipboard'
+    record: 'Open record page'
+    menu: 'Open menu'
 </i18n>

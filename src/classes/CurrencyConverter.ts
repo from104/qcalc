@@ -1,7 +1,9 @@
 import Freecurrencyapi from '@everapi/freecurrencyapi-js';
 
-import { BigNumberType, BigNumber } from './CalculatorTypes';
-import { CurrencyExchangeRates, CurrencyData, currencyBaseData } from './CurrencyBaseData';
+// import { BigNumberType } from 'src/types/calculator';
+ // Start of Selection
+import type { CurrencyExchangeRates, CurrencyData } from '../constants/CurrencyBaseData';
+import { currencyBaseData } from '../constants/CurrencyBaseData';
 
 /**
  * CurrencyConverter 클래스
@@ -110,13 +112,13 @@ export class CurrencyConverter {
       return this.baseExchangeRates;
     }
 
-    if (!this.baseExchangeRates.hasOwnProperty(baseCurrency)) {
+    if (!Object.prototype.hasOwnProperty.call(this.baseExchangeRates, baseCurrency)) {
       throw new Error('Invalid base currency');
     }
 
     const baseRate = this.baseExchangeRates[baseCurrency];
     return Object.fromEntries(
-      Object.entries(this.baseExchangeRates).map(([currency, rate]) => [currency, rate / baseRate]),
+      Object.entries(this.baseExchangeRates).map(([currency, rate]) => [currency, rate / (baseRate ?? 1)]),
     );
   }
 
@@ -159,7 +161,7 @@ export class CurrencyConverter {
    * @returns {string} 포맷팅된 금액 문자열
    */
   format(amount: BigNumberType, currency: string): string {
-    return `${this.currencyData[currency].symbol}${amount.toFixed(2)}`;
+    return `${this.currencyData[currency]?.symbol ?? ''}${amount.toFixed(2)}`;
   }
 
   /**
@@ -172,8 +174,9 @@ export class CurrencyConverter {
     }
 
     return Object.keys(this.currentRates).reduce((currencies, currency) => {
-      if (this.currencyData.hasOwnProperty(currency)) {
-        currencies[currency] = this.currencyData[currency];
+      const currencyInfo = this.currencyData[currency];
+      if (currencyInfo) {
+        currencies[currency] = currencyInfo;
       }
       return currencies;
     }, {} as CurrencyData);

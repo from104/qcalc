@@ -1,23 +1,25 @@
 <script setup lang="ts">
+  // Vue 핵심 기능 및 컴포지션 API 가져오기
   import { onMounted, onBeforeUnmount, reactive, watch } from 'vue';
-  import { useI18n } from 'vue-i18n';
-
-  import { KeyBinding } from 'classes/KeyBinding';
-  import { UnitConverter } from 'classes/UnitConverter';
-  import { BigNumber } from 'classes/CalculatorTypes';
-
-  import { useStore } from 'src/stores/store';
-
-  import MyTooltip from 'components/MyTooltip.vue';
 
   // i18n 설정
+  import { useI18n } from 'vue-i18n';
   const { t } = useI18n();
 
+  // 계산기 관련 타입과 클래스
+  import { KeyBinding } from 'classes/KeyBinding';
+  import { UnitConverter } from 'classes/UnitConverter';
+  import { BigNumber } from 'classes/CalculatorMath';
+
+  // 스토어 관련
+  import { useStore } from 'src/stores/store';
   // 스토어 인스턴스 생성
   const store = useStore();
-
   // 스토어에서 필요한 메서드 추출
   const { calc, clickButtonById, swapUnits, initRecentUnits } = store;
+
+  // 컴포넌트 import
+  import ToolTip from 'src/components/snippets/ToolTip.vue';
 
   // 단위 초기화
   initRecentUnits();
@@ -103,8 +105,8 @@
       UnitConverter.convert(
         store.selectedCategory,
         BigNumber(calc.currentNumber),
-        store.sourceUnits[store.selectedCategory],
-        store.targetUnits[store.selectedCategory],
+        store.sourceUnits[store.selectedCategory] ?? '',
+        store.targetUnits[store.selectedCategory] ?? '',
       ),
     );
     swapUnits();
@@ -112,12 +114,14 @@
 </script>
 
 <template>
-  <q-card-section v-blur class="row q-px-sm q-pt-none q-pb-sm">
+  <q-card-section v-auto-blur class="row q-px-sm q-pt-none q-pb-sm">
     <!-- 카테고리 -->
     <q-select
       v-model="store.selectedCategory"
       :options="categoryList"
       :label="t('category')"
+      role="combobox"
+      :aria-label="t('ariaLabel.selectCategory')"
       stack-label
       dense
       options-dense
@@ -131,13 +135,15 @@
     />
 
     <!-- 원본 방향 -->
-    <q-icon name="keyboard_double_arrow_up" class="col-1" />
+    <q-icon name="keyboard_double_arrow_up" class="col-1" role="img" :aria-label="t('ariaLabel.sourceDirection')" />
 
     <!-- 원본 단위 -->
     <q-select
       v-model="store.sourceUnits[store.selectedCategory]"
       :options="sourceUnitOptions.values"
       :label="t(`unitDesc.${store.selectedCategory}.${store.sourceUnits[store.selectedCategory]}`)"
+      role="combobox"
+      :aria-label="t('ariaLabel.sourceUnit')"
       stack-label
       dense
       options-dense
@@ -159,9 +165,9 @@
           </q-item-section>
         </q-item>
       </template>
-      <MyTooltip>
+      <ToolTip>
         {{ t(`unitDesc.${store.selectedCategory}.${store.sourceUnits[store.selectedCategory]}`) }}
-      </MyTooltip>
+      </ToolTip>
     </q-select>
 
     <!-- 원본, 대상 단위 바꾸기 버튼 -->
@@ -173,9 +179,11 @@
       icon="swap_horiz"
       size="md"
       class="col-1 q-mx-none q-px-sm"
+      role="button"
+      :aria-label="t('ariaLabel.swapUnits')"
       @click="handleUnitSwap()"
     >
-      <MyTooltip>{{ t('tooltipSwap') }}</MyTooltip>
+      <ToolTip>{{ t('tooltipSwap') }}</ToolTip>
     </q-btn>
 
     <!-- 대상 단위 -->
@@ -183,6 +191,8 @@
       v-model="store.targetUnits[store.selectedCategory]"
       :options="targetUnitOptions.values"
       :label="t(`unitDesc.${store.selectedCategory}.${store.targetUnits[store.selectedCategory]}`)"
+      role="combobox"
+      :aria-label="t('ariaLabel.targetUnit')"
       stack-label
       dense
       options-dense
@@ -204,13 +214,19 @@
           </q-item-section>
         </q-item>
       </template>
-      <MyTooltip>
+      <ToolTip>
         {{ t(`unitDesc.${store.selectedCategory}.${store.targetUnits[store.selectedCategory]}`) }}
-      </MyTooltip>
+      </ToolTip>
     </q-select>
 
     <!-- 대상 방향 -->
-    <q-icon name="keyboard_double_arrow_down" size="xs" class="col-1 q-px-none" />
+    <q-icon
+      name="keyboard_double_arrow_down"
+      size="xs"
+      class="col-1 q-px-none"
+      role="img"
+      :aria-label="t('ariaLabel.targetDirection')"
+    />
   </q-card-section>
 </template>
 

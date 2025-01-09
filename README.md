@@ -18,15 +18,18 @@ This is a simple calculator made using the source code of an Android calculator 
 - English, Korean language support
 - Desktop, mobile compatible (electron, capacitor, etc...)
 - Support swipe function on mobile. (Switch calculator, open and close settings and history)
+- Adaptive layout applied. (When the window width increases, sub-panels such as calculation history are displayed on the right)
 
 ## Shortcut keys (S: Shift, C: Control, A: Alt)
 
 ### Calculator (\*: binomial operator)
 
+#### Basic Mode and Common
+
 - [0-9\.]: numbers and dots
 - +, -, \*, / (\*): Add, subtract, multiply, divide, respectively
 - Enter, =: Output the result of the last calculation
-- Backspace: Clear each character
+- Backspace, C-r: Clear each character
 - C-e, Escape, Delete: Reset calculator
 - C-a: Replace sign
 - C-s: Calculate percent (enter a number, followed by a / (or \*), followed by a number, followed by the corresponding key)
@@ -36,13 +39,16 @@ This is a simple calculator made using the source code of an Android calculator 
 - S-[123456]: Enter Pi, phi (golden mean), e (base of log), Pi/2, log 10, log 2 constants
 - S-[0\.]: Integer, extract decimal part
 - S-=, S-Enter: save to memory
-- CS-r: call memory
-- CS-e, S-Delete, S-Escape: clear memory
-- S-{+,-,*,/}: Add, subtract, multiply, divide in memory
-- A-w: Reverse unit or currency symbols. radix
+- SC-r: call memory
+- SC-e, S-Delete, S-Escape: clear memory
+- S-{+,-,\*,/}: Add, subtract, multiply, divide in memory
+- A-w: Reverse unit or currency symbols, radix
 - A-y: Toggle display of units or currency symbols, radix
-- A-h: Open the history of calculation results (up to 20)
-- d: Clear calculation result history
+
+#### Calculation Result Record
+
+- d: Clear calculation result records
+- s: Toggle the search window
 
 #### Common for Unit and Currency Mode
 
@@ -78,11 +84,15 @@ This is a simple calculator made using the source code of an Android calculator 
 
 ### Other functions
 
+- F1: Go to Help
+- F2: Go to About
+- F3: Go to Settings
+- F4: Go to History
 - C-1: Go to Basic calculator
 - C-2: Go to Unit converter
 - C-3: Go to Currency converter
 - C-4: Go to Radix converter
-- C-Tab,  ->: Go to the right calculator tab.
+- C-Tab, ->: Go to the right calculator tab.
 - CS-Tab, <-: Go to the left calculator tab.
 - A-t: Always toggle the above functions
 - A-i: Toggle panel initialization on startup
@@ -99,6 +109,15 @@ This is a simple calculator made using the source code of an Android calculator 
 - C-c, C-Insert: Copy calculation result or selection to clipboard
 - C-v, S-Insert: Paste from the clipboard into the app
 
+### History Navigation
+
+- ArrowUp: Scroll up 50px
+- ArrowDown: Scroll down 50px
+- PageUp: Scroll up 400px
+- PageDown: Scroll down 400px
+- Home: Scroll to top
+- End: Scroll to bottom
+
 ## Techniques and information
 
 ### Technologies, frameworks, and programs used
@@ -108,7 +127,7 @@ This is a simple calculator made using the source code of an Android calculator 
 - electron
 - vue 3
 - quasar 2
-- q-markdown
+- markdown-it
 - tinykeys
 - MathJS
 - freecurrencyapi-js
@@ -222,7 +241,7 @@ chmod +x build.sh
 ./build.sh
 ```
 
-##### Windows Users (build.bat)
+##### Windows Users (build.bat, Incomplete)
 
 ```batch
 # Run in command prompt

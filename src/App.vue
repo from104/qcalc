@@ -1,31 +1,40 @@
 <script setup lang="ts">
   // Vue 핵심 기능 및 컴포지션 API 가져오기
-  import { ref, watch, onBeforeMount, onMounted, onBeforeUnmount } from 'vue';
+  import { ref, watch, computed, onBeforeMount, onMounted, onBeforeUnmount } from 'vue';
+
+  // i18n 설정
   import { useI18n } from 'vue-i18n';
-  import { useMeta, useQuasar } from 'quasar';
-  import { RouteLocationNormalizedLoaded } from 'vue-router';
-
-  // 상태 관리를 위한 스토어 가져오기
-  import { useStore } from 'src/stores/store';
-
-  // 스토어 인스턴스 생성 및 필요한 메서드 추출
-  const store = useStore();
-  const { setDarkMode, setAlwaysOnTop } = store;
-
-  // 다국어 지원을 위한 i18n 설정
   // useScope: 'global'로 설정하여 전역 범위에서 사용
   const { locale, t } = useI18n({ useScope: 'global' });
+
+  // 라우터 관련 설정
+  import { useRouter, useRoute } from 'vue-router';
+  import type { RouteLocationNormalizedLoaded } from 'vue-router';
+
+  // router 인스턴스 가져오기
+  const router = useRouter();
+  const route = useRoute() as RouteLocationNormalizedLoaded & { meta: RouteTransitionMeta };
+
+  // 계산기 관련 타입과 클래스
+  import { KeyBinding } from 'classes/KeyBinding';
+
+  // 스토어 관련
+  import { useStore } from 'src/stores/store';
+  // 스토어 인스턴스 생성 및 필요한 메서드 추출
+  const store = useStore();
+  const { setDarkMode, setAlwaysOnTop, showMessage, toggleAlwaysOnTop } = store;
 
   // 앱 제목을 반응형 변수로 선언
   const title = ref(t('message.appTitle'));
 
+  // HTML 메타 데이터 및 Quasar 프레임워크 설정
+  import { useMeta, useQuasar } from 'quasar';
+  // Quasar 프레임워크 인스턴스 초기화
+  const $q = useQuasar();
   // HTML 메타 데이터 설정 (페이지 제목)
   useMeta(() => ({
     title: title.value,
   }));
-
-  // Quasar 프레임워크 인스턴스 초기화
-  const $q = useQuasar();
 
   // 사용자 설정에 따른 다크 모드 적용
   setDarkMode(store.darkMode);
@@ -90,9 +99,6 @@
     }, 100);
   });
 
-  // 스토어에서 필요한 함수들을 구조 분해 할당으로 가져옵니다.
-  const { showMessage, toggleAlwaysOnTop } = store;
-
   // '항상 위에' 설정을 토글하고 알림을 표시하는 함수입니다.
   const toggleAlwaysOnTopWithNotification = () => {
     if ($q.platform.is.electron) {
@@ -116,13 +122,6 @@
       showMessage(t('darkMode.message.' + store.darkMode));
     }
   };
-  import { useRouter } from 'vue-router'
-
-// router 인스턴스 가져오기
-const router = useRouter()
-
-  // 키 바인딩 클래스를 가져옵니다.
-  import { KeyBinding } from 'classes/KeyBinding';
 
   // 키 바인딩을 설정합니다.
   const keyBinding = new KeyBinding([
@@ -130,10 +129,10 @@ const router = useRouter()
     [['Alt+i'], store.toggleInitPanel],
     [['Alt+d'], toggleDarkModeWithNotification],
     [['Alt+p'], store.toggleHapticsMode],
-    [['F1'], () => router.push('/help')],
-    [['F2'], () => router.push('/about')],
-    [['F3'], () => router.push('/settings')],
-    [['F4'], () => router.push('/history')],
+    [['F1'], () => store.navigateToPath('/help', route, router)],
+    [['F2'], () => store.navigateToPath('/about', route, router)],
+    [['F3'], () => store.navigateToPath('/settings', route, router)],
+    [['F4'], () => store.navigateToPath('/record', route, router)],
     [[';'], store.toggleButtonAddedLabel],
     [[','], store.toggleUseGrouping],
     [['Alt+,'], () => store.setGroupingUnit(store.groupingUnit === 3 ? 4 : 3)],
@@ -188,67 +187,145 @@ const router = useRouter()
       store.userLocale = systemLocale.value;
     }
   });
-  import { computed } from 'vue';
-  import { useRoute } from 'vue-router';
 
-  interface RouteMeta {
-    getTransition?: (navigationMethod: string) => string;
-    navigationMethod?: string;
-  }
+  // Track navigation state
+  const previousPath = ref(route.path);
+  const isWideLayout = ref(store.isAtLeastDoubleWidth());
+  const currentTransition = ref('');
 
-  const route = useRoute() as RouteLocationNormalizedLoaded & { meta: RouteMeta };
+  // Watch for layout and route changes
+  watch(
+    () => store.isAtLeastDoubleWidth(),
+    (newValue) => {
+      if (isWideLayout.value !== newValue) {
+        currentTransition.value = newValue ? 'expand-layout' : 'collapse-layout';
+        isWideLayout.value = newValue;
+      }
+    },
+  );
 
-  const transitionName = computed(() => {
-    return route.meta.getTransition?.(route.meta.navigationMethod) || 'move-forward';
-  });
+  watch(
+    () => route.path,
+    (newPath) => {
+      if (!isWideLayout.value && previousPath.value !== newPath) {
+        const { navigationMethod } = route.meta as RouteTransitionMeta;
+        currentTransition.value =
+          navigationMethod === 'back' ? 'slide-back' : navigationMethod === 'forward' ? 'slide-forward' : 'fade';
+        previousPath.value = newPath;
+      } else {
+        currentTransition.value = '';
+      }
+    },
+  );
+
+  // Pure computed for transition name
+  const computeTransition = computed(() => currentTransition.value);
 </script>
 
 <template>
   <router-view v-slot="{ Component, route: routeProps }">
-    <transition 
-      :name="isFirstNavigation ? '' : transitionName || ''" 
-      mode="default"
-    >
+    <transition :name="isFirstNavigation ? '' : computeTransition || ''" mode="default">
       <component :is="Component" :key="routeProps.path" />
     </transition>
   </router-view>
 </template>
 
 <style scoped lang="scss">
-  .move-back-enter-active,
-  .move-back-leave-active,
-  .move-forward-enter-active,
-  .move-forward-leave-active {
-    transition: transform 0.5s ease;
+  // Common transition properties
+  %transition-base {
     position: absolute;
     width: 100%;
     height: 100%;
-    overflow: hidden; /* 스크롤바 숨기기 */
+    overflow: hidden;
   }
 
-  .move-back-enter-from {
+  // Slide transitions
+  .slide-back-enter-active,
+  .slide-back-leave-active,
+  .slide-forward-enter-active,
+  .slide-forward-leave-active {
+    @extend %transition-base;
+    transition: transform 0.2s ease;
+  }
+
+  // Slide back animation
+  .slide-back-enter-from {
     transform: translateX(-100%);
   }
-
-  .move-back-enter-to,
-  .move-back-leave-from {
+  .slide-back-enter-to,
+  .slide-back-leave-from {
     transform: translateX(0);
   }
-
-  .move-back-leave-to {
+  .slide-back-leave-to {
     transform: translateX(100%);
   }
 
-  .move-forward-enter-from {
+  // Slide forward animation
+  .slide-forward-enter-from {
     transform: translateX(100%);
   }
-
-  .move-forward-enter-to,
-  .move-forward-leave-from {
+  .slide-forward-enter-to,
+  .slide-forward-leave-from {
     transform: translateX(0);
   }
-
-  .move-forward-leave-to {
+  .slide-forward-leave-to {
     transform: translateX(-100%);
+  }
+
+  // Fade transition
+  .fade-enter-active,
+  .fade-leave-active {
+    @extend %transition-base;
+    transition: opacity 0.2s ease;
+  }
+
+  .fade-enter-from,
+  .fade-leave-to {
+    opacity: 0;
+  }
+  .fade-enter-to,
+  .fade-leave-from {
+    opacity: 1;
+  }
+
+  // Layout expansion animation
+  .expand-layout-enter-active,
+  .expand-layout-leave-active {
+    @extend %transition-base;
+    transition: transform 0.2s ease;
+  }
+
+  .expand-layout-enter-from {
+    transform: scaleX(2);
+    transform-origin: left;
+  }
+  .expand-layout-enter-to,
+  .expand-layout-leave-from {
+    transform: scaleX(1);
+    transform-origin: left;
+  }
+  .expand-layout-leave-to {
+    transform: scaleX(0.5);
+    transform-origin: left;
+  }
+
+  // Layout collapse animation
+  .collapse-layout-enter-active,
+  .collapse-layout-leave-active {
+    @extend %transition-base;
+    transition: transform 0.2s ease;
+  }
+
+  .collapse-layout-enter-from {
+    transform: scaleX(0.5);
+    transform-origin: left;
+  }
+  .collapse-layout-enter-to,
+  .collapse-layout-leave-from {
+    transform: scaleX(1);
+    transform-origin: left;
+  }
+  .collapse-layout-leave-to {
+    transform: translateX(100%);
   }
 </style>

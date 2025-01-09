@@ -1,16 +1,23 @@
 <script setup lang="ts">
+  // Vue 핵심 기능 및 컴포지션 API 가져오기
   import { ref, computed, onBeforeMount, onMounted, watch, onUnmounted } from 'vue';
-  import { useI18n } from 'vue-i18n';
-
-  import { useStore } from 'src/stores/store';
-  import { UnitConverter } from 'src/classes/UnitConverter';
-  import { Radix } from 'src/classes/RadixConverter';
-  import { BigNumber } from 'classes/CalculatorTypes';
-  import MyTooltip from 'components/MyTooltip.vue';
-  import MenuItem from 'components/MenuItem.vue';
 
   // i18n 설정
+  import { useI18n } from 'vue-i18n';
   const { t } = useI18n();
+
+  // 계산기 관련 타입과 클래스
+  import { UnitConverter } from 'src/classes/UnitConverter';
+  import { BigNumber } from 'classes/CalculatorMath';
+  import { Radix } from 'classes/RadixConverter';
+
+  // 스토어 관련
+  import { useStore } from 'src/stores/store';
+  const store = useStore();
+
+  // 컴포넌트 import
+  import ToolTip from 'src/components/snippets/ToolTip.vue';
+  import MenuItem from 'src/components/snippets/MenuItem.vue';
 
   // props 정의
   const props = withDefaults(defineProps<{ field?: string; addon?: string }>(), {
@@ -22,25 +29,21 @@
   const isMainField = props.field === 'main';
   const fieldID = `${props.field}Field`;
 
-  // 스토어 인스턴스 생성
-  const store = useStore();
-
   // 스토어에서 필요한 메서드와 속성 추출
   const {
     calc,
     currentTab,
-    hideMemory,
     showMemoryTemporarily,
     toFormattedNumber,
     convertIfRadix,
-    getLeftSideInHistory,
+    getLeftSideInRecord,
     copyToClipboard,
     initRecentUnits,
     initRecentCurrencies,
     initRecentRadix,
   } = store;
 
-  const calcHistory = calc.history;
+  const calcRecord = calc.record;
   const needFieldTooltip = ref(false);
   // const fieldElement = ref<HTMLElement | null>(null);
   const fieldElement = computed(() => document.getElementById(fieldID));
@@ -76,8 +79,8 @@
     return UnitConverter.convert(
       selectedCategory,
       BigNumber(calc.getCurrentNumber()),
-      sourceUnits[selectedCategory],
-      targetUnits[selectedCategory],
+      sourceUnits[selectedCategory] ?? '',
+      targetUnits[selectedCategory] ?? '',
     );
   };
 
@@ -195,9 +198,7 @@
 
   const radixSuffix = computed(() => {
     const radix = isMainField ? store.sourceRadix : store.targetRadix;
-    return currentTab === 'radix' && store.showRadix && store.radixType === 'suffix'
-      ? store.getRadixSuffix(radix)
-      : '';
+    return currentTab === 'radix' && store.showRadix && store.radixType === 'suffix' ? store.getRadixSuffix(radix) : '';
   });
 
   const displayedResult = computed(() => {
@@ -224,7 +225,6 @@
    * 필드와 애드온 타입에 따라 적절한 숫자를 반환
    */
   const onlyNumber = computed(() => {
-
     // 메인 필드 처리
     if (props.field === 'main') {
       if (props.addon === 'radix') {
@@ -287,18 +287,18 @@
   // const getPreviousResult = () => {
   const calculationExpression = computed(() => {
     // 마지막 계산 기록 가져오기
-    const lastHistory = calcHistory.getCount() > 0 ? calcHistory.getAllRecords()[0] : null;
+    const lastRecord = calcRecord.getCount() > 0 ? calcRecord.getAllRecords()[0] : null;
 
     // 초기화 필요 여부와 연산자 존재 여부 확인
     const needsReset = calc.getNeedsBufferReset();
     const hasOperator = operator.value !== '';
 
     // 마지막 계산 기록이 있고 초기화가 필요한 경우
-    const isLastHistoryValid =
-      lastHistory !== null && needsReset && calc.getCurrentNumber() === lastHistory.calculationResult.resultNumber;
+    const isLastRecordValid =
+      lastRecord !== null && needsReset && calc.getCurrentNumber() === lastRecord?.calculationResult.resultNumber;
 
-    if (isLastHistoryValid) {
-      return `${getLeftSideInHistory(lastHistory.calculationResult)} =`;
+    if (isLastRecordValid) {
+      return `${getLeftSideInRecord(lastRecord.calculationResult)} =`;
     }
 
     // 연산자가 있고 초기화가 필요없는 경우
@@ -378,27 +378,38 @@
       dense
       readonly
       :dark="false"
+      role="textbox"
+      :aria-label="t('ariaLabel.resultField', { type: isMainField ? t('ariaLabel.main') : t('ariaLabel.sub') })"
       :bg-color="!needFieldTooltip ? resultBackgroundColors.normal : resultBackgroundColors.warning"
       :label-slot="isMainField"
       :stack-label="isMainField"
     >
       <template v-if="isMainField" #label>
-        <div v-blur class="noselect" :class="getResultColor()">
+        <div v-auto-blur class="noselect" :class="getResultColor()" role="text" :aria-label="t('ariaLabel.expression')">
           {{ calculationExpression }}
         </div>
       </template>
       <template v-if="isMainField" #prepend>
         <div
           v-if="!isMemoryEmpty"
-          v-blur
+          v-auto-blur
           class="noselect full-height q-mt-xs q-pt-sm"
           :class="getResultColor()"
+          role="button"
+          :aria-label="t('ariaLabel.memory')"
           @click="showMemoryTemporarily()"
         >
-          <q-icon name="mdi-chip" />
+          <q-icon name="mdi-chip" role="img" :aria-label="t('ariaLabel.memoryIcon')" />
         </div>
-        <div v-if="operator != ''" v-blur class="noselect full-height q-mt-xs q-pt-sm" :class="getResultColor()">
-          <q-icon :name="operatorIcons[operator]" />
+        <div
+          v-if="operator != ''"
+          v-auto-blur
+          class="noselect full-height q-mt-xs q-pt-sm"
+          :class="getResultColor()"
+          role="text"
+          :aria-label="t('ariaLabel.operator', { operator })"
+        >
+          <q-icon :name="operatorIcons[operator]" role="img" :aria-label="t('ariaLabel.operatorIcon', { operator })" />
         </div>
       </template>
       <template #control>
@@ -414,20 +425,40 @@
           class="self-center no-outline full-width full-height ellipsis text-right q-pt-xs noselect"
           :class="[isMainField ? 'text-h5' : '', getResultColor()]"
           :style="`padding-top: ${store.resultPanelPadding}px;`"
+          role="text"
+          :aria-label="t('ariaLabel.result', { type: isMainField ? t('ariaLabel.main') : t('ariaLabel.sub') })"
         >
-          <span v-if="currentTab === 'radix'" id="radixPrefix">{{ radixPrefix }}</span>
-          <span v-if="currentTab === 'currency'" id="symbol">{{ symbol }}</span>
-          <span :id="isMainField ? 'result' : 'subResult'" :class="getResultColor()">
+          <span v-if="currentTab === 'radix'" id="radixPrefix" role="text" :aria-label="t('ariaLabel.radixPrefix')">{{
+            radixPrefix
+          }}</span>
+          <span v-if="currentTab === 'currency'" id="symbol" role="text" :aria-label="t('ariaLabel.currencySymbol')">{{
+            symbol
+          }}</span>
+          <span
+            :id="isMainField ? 'result' : 'subResult'"
+            :class="getResultColor()"
+            role="text"
+            :aria-label="t('ariaLabel.value')"
+          >
             {{ isMainField && store.isMemoryVisible ? memoryValue : result }}
           </span>
-          <span v-if="currentTab === 'unit'" id="unit">{{ unit }}</span>
+          <span v-if="currentTab === 'unit'" id="unit" role="text" :aria-label="t('ariaLabel.unit')">{{ unit }}</span>
           <span
             v-if="currentTab === 'radix' && store.showRadix && store.radixType === 'suffix'"
             id="radixSuffix"
+            role="text"
+            :aria-label="t('ariaLabel.radixSuffix')"
           >
             {{ radixSuffix }}
           </span>
-          <q-menu context-menu auto-close touch-position class="shadow-6">
+          <q-menu
+            context-menu
+            auto-close
+            touch-position
+            class="shadow-6"
+            role="menu"
+            :aria-label="t('ariaLabel.contextMenu')"
+          >
             <q-list class="noselect" dense style="min-width: 150px">
               <MenuItem
                 :action="() => copyToClipboard(displayedResult, t('copiedDisplayedResult'))"
@@ -441,9 +472,9 @@
               />
             </q-list>
           </q-menu>
-          <MyTooltip v-if="needFieldTooltip">
+          <ToolTip v-if="needFieldTooltip">
             {{ displayedResult }}
-          </MyTooltip>
+          </ToolTip>
         </div>
       </template>
     </q-field>
@@ -499,13 +530,45 @@
 
 <i18n>
   ko:
-    copiedDisplayedResult: '표시된 결과가 복사되습니다.'
+    copiedDisplayedResult: '표시된 결과가 복사되었습니다.'
     copyDisplayedResult: '표시된 결과 복사'
     copiedOnlyNumber: '결과 숫자가 복사되었습니다.'
-    copyOnlyNumber: '결과 숫자 복사'    
+    copyOnlyNumber: '결과 숫자 복사'
+    ariaLabel:
+      resultField: '{type} 결과 필드'
+      main: '주'
+      sub: '보조'
+      expression: '계산식'
+      memory: '메모리 값 표시'
+      memoryIcon: '메모리 아이콘'
+      operator: '현재 연산자: {operator}'
+      operatorIcon: '{operator} 연산자 아이콘'
+      result: '{type} 결과 값'
+      value: '계산 결과'
+      radixPrefix: '진법 접두사'
+      radixSuffix: '진법 접미사'
+      currencySymbol: '통화 기호'
+      unit: '단위'
+      contextMenu: '결과 복사 메뉴'
   en:
     copiedDisplayedResult: 'The displayed result has been copied.'
     copyDisplayedResult: 'Copy displayed result'
     copiedOnlyNumber: 'The result number has been copied.'
     copyOnlyNumber: 'Copy result number'
+    ariaLabel:
+      resultField: '{type} result field'
+      main: 'main'
+      sub: 'sub'
+      expression: 'Calculation expression'
+      memory: 'Show memory value'
+      memoryIcon: 'Memory icon'
+      operator: 'Current operator: {operator}'
+      operatorIcon: '{operator} operator icon'
+      result: '{type} result value'
+      value: 'Calculation result'
+      radixPrefix: 'Radix prefix'
+      radixSuffix: 'Radix suffix'
+      currencySymbol: 'Currency symbol'
+      unit: 'Unit'
+      contextMenu: 'Result copy menu'
 </i18n>

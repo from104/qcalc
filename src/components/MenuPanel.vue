@@ -1,89 +1,115 @@
 <script setup lang="ts">
+  // Vue 핵심 기능 및 컴포지션 API 가져오기
   import { onMounted, reactive, watch } from 'vue';
-  import { useRouter } from 'vue-router';
-  import { useStore } from 'src/stores/store';
+
+  // i18n 설정
   import { useI18n } from 'vue-i18n';
+  const { t } = useI18n();
 
-  import MenuItem from 'components/MenuItem.vue';
+  import { useRouter, useRoute } from 'vue-router';
+  import type { RouteLocationNormalizedLoaded } from 'vue-router';
 
-  // 라우터 인스턴스 초기화
+  // router 인스턴스 가져오기
   const router = useRouter();
+  const route = useRoute() as RouteLocationNormalizedLoaded & { meta: RouteTransitionMeta };
 
+  // 스토어 관련
+  import { useStore } from 'stores/store';
   // 스토어 인스턴스 초기화
   const store = useStore();
 
-  // i18n 설정
-  const { t } = useI18n();
+  // 컴포넌트 import
+  import MenuItem from 'components/snippets/MenuItem.vue';
 
   // 메뉴 아이템 인터페이스 정의
   interface MenuItem {
-    title?: string;
-    caption?: string;
-    shortcut?: string;
-    icon?: string;
-    action?: () => void;
-    separator?: boolean;
+    id: string;
+    title?: string | undefined;
+    caption?: string | undefined;
+    shortcut?: string | undefined;
+    icon?: string | undefined;
+    action?: (() => void) | undefined;
+    separator?: boolean | undefined;
   }
 
   // 메뉴 아이템 정의
-  const items: { [key: string]: MenuItem } = reactive({
-    calc: {
+  const items = reactive([
+    {
+      id: 'calc',
       title: t('item.calc.title'),
       caption: t('item.calc.caption'),
       shortcut: 'Ctrl-1',
       icon: 'calculate',
-      action: () => { store.currentTab = 'calc'; },
+      action: () => {
+        store.currentTab = 'calc';
+      },
     },
-    unit: {
+    {
+      id: 'unit',
       title: t('item.unit.title'),
       caption: t('item.unit.caption'),
       shortcut: 'Ctrl-2',
       icon: 'swap_vert',
-      action: () => { store.currentTab = 'unit'; },
+      action: () => {
+        store.currentTab = 'unit';
+      },
     },
-    currency: {
+    {
+      id: 'currency',
       title: t('item.currency.title'),
       caption: t('item.currency.caption'),
       shortcut: 'Ctrl-3',
       icon: 'currency_exchange',
-      action: () => { store.currentTab = 'currency'; },
+      action: () => {
+        store.currentTab = 'currency';
+      },
     },
-    radix: {
+    {
+      id: 'radix',
       title: t('item.radix.title'),
       caption: t('item.radix.caption'),
       shortcut: 'Ctrl-4',
       icon: 'transform',
-      action: () => { store.currentTab = 'radix'; },
+      action: () => {
+        store.currentTab = 'radix';
+      },
     },
-    separator1: { separator: true },
-    settings: {
+    { id: 'separator1', separator: true },
+    {
+      id: 'settings',
       title: t('item.settings.title'),
       caption: t('item.settings.caption'),
-      shortcut: 'Alt-s',
+      shortcut: 'F3',
       icon: 'settings',
-      action:  () => router.push('/settings'),
+      action: () => {
+        store.navigateToPath('/settings', route, router);
+      },
     },
-    separator2: { separator: true },
-    help: {
+    { id: 'separator2', separator: true },
+    {
+      id: 'help',
       title: t('item.help.title'),
       caption: t('item.help.caption'),
+      shortcut: 'F1',
       icon: 'help',
-      action: () => router.push('/help'),
+      action: () => store.navigateToPath('/help', route, router),
     },
-    about: {
+    {
+      id: 'about',
       title: t('item.about.title'),
-      caption: t('item.about.caption'),
+      caption: t('iem.about.caption'),
+      shortcut: 'F2',
       icon: 'info',
-      action: () => router.push('/about'),
+      action: () => store.navigateToPath('/about', route, router),
     },
-  });
+  ]);
 
   // 언어 변경 시 메뉴 아이템 텍스트 업데이트 함수
   const updateLocale = () => {
-    Object.keys(items).forEach((item) => {
-      if (!items[item].separator) {
-        items[item].title = t(`item.${item}.title`);
-        items[item].caption = t(`item.${item}.caption`);
+    items.forEach((item) => {
+      if (!item.separator) {
+        item.title = t(`item.${item.id}.title`);
+        item.caption = t(`item.${item.id}.caption`);
       }
     });
   };
@@ -103,8 +129,12 @@
 </script>
 
 <template>
-  <q-list v-blur>
-    <MenuItem v-for="item in items" :key="item.title" v-bind="item" />
+  <q-list v-auto-blur role="menu" :aria-label="t('ariaLabel.menu')">
+    <MenuItem 
+      v-for="item in items" 
+      :key="item.id" 
+      v-bind="item" 
+    />
   </q-list>
 </template>
 
@@ -132,6 +162,8 @@ ko:
     about:
       title: '소개'
       caption: '앱에 대한 소개'
+  ariaLabel:
+    menu: '메인 메뉴'
 en:
   item:
     calc:
@@ -155,4 +187,6 @@ en:
     about:
       title: 'About'
       caption: 'About the app'
+  ariaLabel:
+    menu: 'Main menu'
 </i18n>

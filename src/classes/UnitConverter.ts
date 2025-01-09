@@ -1,5 +1,7 @@
-import { BigNumberType, BigNumber } from './CalculatorTypes';
-import { unitBaseData, UnitBaseData } from './UnitBaseData';
+// import { BigNumberType } from 'src/types/calculator';
+import type { UnitBaseData } from 'constants/UnitBaseData';
+import { unitBaseData } from 'constants/UnitBaseData';
+import { BigNumber } from 'classes/CalculatorMath';
 
 /**
  * UnitConverter 클래스
@@ -32,7 +34,11 @@ export class UnitConverter {
     if (!this.categories.includes(category)) {
       throw new Error(`Invalid category: ${category}`);
     }
-    return Object.keys(this.units[category]);
+    const categoryUnits = this.units[category];
+    if (!categoryUnits) {
+      throw new Error(`No units found for category: ${category}`);
+    }
+    return Object.keys(categoryUnits);
   }
 
   /**
@@ -94,9 +100,18 @@ export class UnitConverter {
     const baseValue =
       typeof fromUnitValue === 'function'
         ? fromUnitValue(originalValue, true)
-        : BigNumber(originalValue).mul(fromUnitValue);
+        : BigNumber(originalValue).mul(BigNumber(fromUnitValue));
 
-    const convertedValue = typeof toUnitValue === 'function' ? toUnitValue(baseValue) : baseValue.div(toUnitValue);
+    if (!baseValue) {
+      throw new Error('Failed to calculate base value');
+    }
+
+    const convertedValue =
+      typeof toUnitValue === 'function' ? toUnitValue(baseValue) : baseValue.div(BigNumber(toUnitValue));
+
+    if (!convertedValue) {
+      throw new Error('Failed to convert value');
+    }
 
     return convertedValue.toString();
   }

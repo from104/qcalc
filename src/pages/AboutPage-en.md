@@ -2,11 +2,9 @@
 
 This app was created using vue+quasar+electron.
 
-   <p align="center">
-     <img src="./icons/icon.png" align=center height="128" alt="Icon" title="Icon" />
-   </p>
+   ![Icon](./icons/icon.png){height=128}
 
-Contact: Seo Kihyun &lt;<from104@gmail.com>&gt;,
+Contact: Seo Kihyun <from104@gmail.com>,
 
 Copyright © 2022 Seo Kihyun. MIT License.
 

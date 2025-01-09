@@ -18,8 +18,9 @@ try {
     const path = await import('path');
     fs.unlinkSync(path.join(app.getPath('userData'), 'DevTools Extensions'));
   }
-} catch (_) {
+} catch (error) {
   // 오류 발생 시 무시
+  console.error('Failed to remove DevTools Extensions:', error);
 }
 
 // 메인 윈도우 변수 선언
@@ -49,7 +50,7 @@ async function createWindow() {
 
     // 최대 윈도우 크기 설정
     const maxWindowHeight = isLandscape ? Math.floor((height / 3) * 2) : Math.floor(height / 3);
-    const maxWindowWidth = isLandscape ? Math.floor(width / 4) : Math.floor(width / 3);
+    const maxWindowWidth = isLandscape ? Math.floor(width / 2) : Math.floor(width / 3 * 2);
 
     // 윈도우 상태 관리 설정
     const mainWindowState = windowState({
