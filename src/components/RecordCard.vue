@@ -138,7 +138,6 @@
       document.getElementById('record')?.scrollTo({ top: store.recordLastScrollPosition });
     }, 50);
     showScrollToTop.value = false;
-    window.addEventListener('resize', adjustFloatingPosition);
   });
 
   // 컴포넌트 언마운트 시 키 바인딩 비활성화
@@ -147,7 +146,6 @@
     store.recordLastScrollPosition = document.getElementById('record')?.scrollTop ?? 0;
 
     store.isDeleteRecordConfirmOpen = false;
-    window.removeEventListener('resize', adjustFloatingPosition);
   });
 
   // 메모 편집 관련 상태 변수
@@ -279,86 +277,6 @@
     });
   });
 
-  // 드래그 관련 상태 수정
-  const isDragging = ref(false);
-  const dragOffset = reactive({ x: 0, y: 0 });
-
-  // 스타일 계산 수정
-  const floatingStyle = computed(() => ({
-    position: 'fixed',
-    left: `${store.isAtLeastDoubleWidth() ? store.doubleFloatingPosition.x : store.singleFloatingPosition.x}px`,
-    top: `${store.isAtLeastDoubleWidth() ? store.doubleFloatingPosition.y : store.singleFloatingPosition.y}px`,
-    opacity: isDragging.value ? 0.3 : store.inputFocused ? 1 : undefined,
-    transition: isDragging.value ? 'none' : 'all 0.2s',
-    zIndex: 1500,
-  }));
-
-  // 드래그 시작
-  const startDrag = (e: MouseEvent | Touch) => {
-    const floatingElement = document.querySelector('.search-input-floating') as HTMLElement;
-    if (!floatingElement) return;
-
-    isDragging.value = true;
-    const rect = floatingElement.getBoundingClientRect();
-    dragOffset.x = e.clientX - rect.left;
-    dragOffset.y = e.clientY - rect.top;
-
-    document.addEventListener('mousemove', onDrag);
-    document.addEventListener('mouseup', stopDrag);
-    document.addEventListener('touchmove', onDrag);
-    document.addEventListener('touchend', stopDrag);
-  };
-
-  // 드래그 중 수정
-  const onDrag = (e: MouseEvent | TouchEvent) => {
-    if (!isDragging.value) return;
-    const clientX = e instanceof MouseEvent ? e.clientX : e.touches[0]?.clientX;
-    const clientY = e instanceof MouseEvent ? e.clientY : e.touches[0]?.clientY;
-    if (clientX !== undefined && clientY !== undefined) {
-      store.updateFloatingPosition(clientX - dragOffset.x, clientY - dragOffset.y);
-    }
-  };
-
-  // 드래그 종료
-  const stopDrag = () => {
-    isDragging.value = false;
-    document.removeEventListener('mousemove', onDrag);
-    document.removeEventListener('mouseup', stopDrag);
-    document.removeEventListener('touchmove', onDrag);
-    document.removeEventListener('touchend', stopDrag);
-  };
-
-  // 컴포넌트 언마운트 시 이벤트 리스너 제거
-  onBeforeUnmount(() => {
-    document.removeEventListener('mousemove', onDrag);
-    document.removeEventListener('mouseup', stopDrag);
-    document.removeEventListener('touchmove', onDrag);
-    document.removeEventListener('touchend', stopDrag);
-  });
-
-  // 플로팅창 위치 조정 함수 수정
-  const adjustFloatingPosition = () => {
-    const bounds = store.calculateFloatingBounds();
-    if (!bounds) return;
-
-    const { headerHeight } = bounds;
-    const currentPosition = store.isAtLeastDoubleWidth() ? store.doubleFloatingPosition : store.singleFloatingPosition;
-
-    const x = store.isAtLeastDoubleWidth() ? currentPosition.x + window.innerWidth / 2 : currentPosition.x;
-
-    store.updateFloatingPosition(x, currentPosition.y + headerHeight);
-  };
-
-  // store.isAtLeastDoubleWidth 변경 감시
-  watch(
-    () => store.isAtLeastDoubleWidth(),
-    () => {
-      setTimeout(() => {
-        adjustFloatingPosition();
-      }, 200);
-    },
-  );
-
   interface QSlideEvent {
     reset: () => void;
   }
@@ -378,20 +296,20 @@
         glossy
         color="secondary"
         icon="publish"
-        class="fixed q-ma-md"
+        class="fixed"
+        :class="store.isSearchOpen ? 'q-ma-xl' : 'q-ma-md'"
         style="z-index: 15"
         :aria-label="t('ariaLabel.scrollToTop')"
         @click="scrollToTop"
       />
     </transition>
     <transition name="slide-fade">
-      <q-item
+      <q-bar
         v-if="store.isSearchOpen"
-        class="search-input-floating"
+        class="search-bar"
         :class="{
           'input-focused': store.inputFocused,
         }"
-        :style="floatingStyle"
       >
         <q-input
           v-model="store.searchKeyword"
@@ -413,22 +331,14 @@
             }
           "
         >
-          <template #prepend>
-            <div
-              class="drag-handle"
-              role="button"
-              :aria-label="t('ariaLabel.dragHandle')"
-              tabindex="0"
-              @touchstart="(e: TouchEvent) => startDrag(e.touches[0] as Touch)"
-              @mousedown="startDrag"
-            />
-          </template>
           <template #append>
             <q-btn
               round
               flat
               dense
-              icon="close"
+              size="sm"
+              icon="mdi-arrow-collapse-up"
+              style="top: -3px"
               :aria-label="t('ariaLabel.closeSearch')"
               @click="
                 () => {
@@ -439,8 +349,11 @@
             />
           </template>
         </q-input>
-      </q-item>
+      </q-bar>
     </transition>
+
+    <div v-if="store.isSearchOpen" class="q-ma-md q-pa-xs" />
+
     <transition name="slide-fade" mode="out-in">
       <q-item v-if="recordStrings.length == 0" class="text-center">
         <q-item-section role="listitem">
@@ -596,13 +509,17 @@
 
   .slide-fade-enter-active,
   .slide-fade-leave-active {
-    transition: all 0.2s ease-out;
+    transition: all 0.3s ease-out;
   }
 
-  .slide-fade-enter-from,
+  .slide-fade-enter-from {
+    opacity: 0;
+    transform: translateY(-100%);
+  }
+
   .slide-fade-leave-to {
     opacity: 0;
-    transform: translateY(-20px);
+    transform: translateY(-100%);
   }
 
   .record-list-move,
@@ -612,7 +529,7 @@
   }
 
   .record-list-leave-active {
-    position: absolute; // 이 부분이 중요합니다
+    position: absolute;
   }
 
   .record-list-enter-from,
@@ -633,55 +550,30 @@
     display: none;
   }
 
-  .search-input-floating {
+  .search-bar {
+    position: fixed;
+    width: 100%;
+    height: 50px;
+    top: 0;
     z-index: 2000;
-    padding: 0;
-    width: 50%;
-    max-width: 600px;
-    transition: opacity 0.2s;
-
-    &:hover:not(.input-focused) {
-      opacity: 0.5;
-    }
-
-    .drag-handle {
-      width: 16px;
-      height: 24px;
-      cursor: move;
-      background: rgba(255, 255, 255, 0.2);
-      border-radius: 4px;
-      margin: 8px 0 8px 8px;
-      position: relative;
-
-      &::before {
-        content: '';
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        width: 4px;
-        height: 12px;
-        background: repeating-linear-gradient(
-          to bottom,
-          rgba(255, 255, 255, 0.7) 0px,
-          rgba(255, 255, 255, 0.7) 1px,
-          transparent 1px,
-          transparent 3px
-        );
-      }
-
-      &:hover {
-        background: rgba(255, 255, 255, 0.3);
-      }
-    }
+    background: var(--q-primary);
+    transition: all 0.3s ease-out;
 
     .search-input {
+      position: absolute;
+      padding: 8px;
+      padding-left: 8px;
+      top: 0;
+      left: 0;
+      width: 100%;
+      color: var(--q-light-text);
+
       :deep(.q-field__control) {
-        background: var(--q-primary);
-        color: white;
+        background: white;
+        color: black;
         border-radius: 8px;
         box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-        padding-left: 0;
+        height: 34px;
       }
 
       :deep(.q-field__before) {
@@ -690,49 +582,15 @@
       }
 
       :deep(.q-field__native) {
-        color: var(--q-dark-text);
+        color: black;
         &::placeholder {
-          color: var(--q-dark-text);
+          color: rgba(0, 0, 0, 0.7);
           opacity: 0.7;
         }
       }
 
       :deep(.q-field__marginal) {
-        color: var(--q-dark-text);
-      }
-    }
-
-    &.dragging {
-      cursor: move;
-    }
-  }
-
-  /* 다크 모드 */
-  :deep(.body--dark) .search-input-floating {
-    .search-input {
-      :deep(.q-field__control) {
-        background: var(--q-light);
-        color: var(--q-light-text);
-      }
-
-      :deep(.q-field__native) {
-        color: var(--q-light-text);
-        &::placeholder {
-          color: var(--q-light-text);
-          opacity: 0.7;
-        }
-      }
-
-      :deep(.q-field__marginal) {
-        color: var(--q-light-text);
-      }
-    }
-
-    .drag-handle {
-      background: rgba(255, 255, 255, 0.15);
-
-      &:hover {
-        background: rgba(255, 255, 255, 0.25);
+        color: black;
       }
     }
   }

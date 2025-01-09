@@ -564,65 +564,6 @@ export const useStore = defineStore('store', {
         router.push(path);
       }
     },
-
-    // 플로팅 창 위치 계산 메서드
-    calculateFloatingBounds() {
-      const header = document.getElementById('header');
-      const recordPage = document.getElementById('record-page');
-      const floatingElement = document.querySelector('.search-input-floating') as HTMLElement;
-
-      if (!header || !recordPage || !floatingElement) return null;
-
-      const headerHeight = header.clientHeight;
-      const pageRect = recordPage.getBoundingClientRect();
-      const floatingRect = floatingElement.getBoundingClientRect();
-      const innerPadding = 16;
-      const horizontalOffset = this.isAtLeastDoubleWidth() ? window.innerWidth / 2 : 0;
-
-      return {
-        minX: pageRect.left + innerPadding,
-        maxX: pageRect.right - floatingRect.width - innerPadding,
-        minY: pageRect.top + innerPadding,
-        maxY: pageRect.bottom - floatingRect.height - innerPadding,
-        headerHeight,
-        horizontalOffset,
-      };
-    },
-
-    // 플로팅 창 위치 업데이트
-    updateFloatingPosition(x: number, y: number) {
-      const bounds = this.calculateFloatingBounds();
-      if (!bounds) return;
-
-      const { minX, maxX, minY, maxY, headerHeight } = bounds;
-      const position = {
-        x: Math.max(minX, Math.min(maxX, x)),
-        y: Math.max(minY, Math.min(maxY, y)) - headerHeight,
-      };
-
-      if (this.isAtLeastDoubleWidth()) {
-        this.doubleFloatingPosition = {
-          x: position.x - window.innerWidth / 2,
-          y: position.y,
-        };
-      } else {
-        this.singleFloatingPosition = position;
-      }
-    },
-
-    // 현재 레이아웃에 맞는 위치 반환
-    get floatingPosition(): FloatingPosition {
-      const defaultPosition = { x: 16, y: 16 };
-
-      if (this.isAtLeastDoubleWidth()) {
-        if (!this.doubleFloatingPosition) return defaultPosition;
-        return {
-          x: this.doubleFloatingPosition.x + window.innerWidth / 2,
-          y: this.doubleFloatingPosition.y,
-        };
-      }
-      return this.singleFloatingPosition || defaultPosition;
-    },
   },
 
   // 상태 지속성 설정
