@@ -127,7 +127,7 @@ This is a simple calculator made using the source code of an Android calculator 
 - electron
 - vue 3
 - quasar 2
-- q-markdown
+- markdown-it
 - tinykeys
 - MathJS
 - freecurrencyapi-js
@@ -241,7 +241,7 @@ chmod +x build.sh
 ./build.sh
 ```
 
-##### Windows Users (build.bat)
+##### Windows Users (build.bat, Incomplete)
 
 ```batch
 # Run in command prompt

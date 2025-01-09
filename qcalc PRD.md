@@ -1,250 +1,250 @@
-# QCalc 프로젝트 PRD (제품 요구사항 문서)
+# QCalc Project PRD (Product Requirements Document)
 
-## 1. 제품 개요
+## 1. Product Overview
 
-### 1.1 제품 설명
+### 1.1 Product Description
 
-QCalc은 최신 웹 기술을 활용한 크로스 플랫폼 계산기 애플리케이션입니다. 예전 안드로이드용 계산기의 소스를 활용하여 현대적인 웹 기술로 재구현한 프로젝트입니다.
+QCalc is a cross-platform calculator application utilizing modern web technologies. This project reimplements a previous Android calculator's source code using contemporary web technologies.
 
-### 1.2 기술 스택
+### 1.2 Technology Stack
 
 - Frontend: Vue 3, Quasar 2
-- 언어: TypeScript
-- 데스크톱: Electron
-- 모바일: Capacitor
-- 상태 관리: Vue Store
-- 국제화: vue-i18n
-- 수학 연산: MathJS
-- 통화 API: freecurrencyapi-js
-- 키보드 이벤트: tinykeys
-- 마크다운 렌더링: q-markdown
+- Language: TypeScript
+- Desktop: Electron
+- Mobile: Capacitor
+- State Management: Vue Store
+- Internationalization: vue-i18n
+- Math Operations: MathJS
+- Currency API: freecurrencyapi-js
+- Keyboard Events: tinykeys
+- Markdown Rendering: markdown-it
 
-### 1.3 지원 플랫폼
+### 1.3 Supported Platforms
 
-- 데스크톱
+- Desktop
   - Windows
-  - Linux (AppImage, Snap 패키지 지원)
-- 모바일
-  - Android (Play Store 배포 예정)
-- 향후 계획
+  - Linux (AppImage, Snap package support)
+- Mobile
+  - Android (Play Store release planned)
+- Future Plans
   - macOS
   - iOS
 
-### 1.4 주요 기능
+### 1.4 Key Features
 
-- 기본 계산기 기능
-- 단위 변환기
-- 통화 환전기
-- 진법 변환기
-- 계산 기록 관리
-- 다국어 지원 (한국어, 영어)
-- 다크 모드
-- 햅틱 피드백 (모바일)
-- 스와이프 제스처 (모바일)
+- Basic Calculator Functions
+- Unit Converter
+- Currency Exchanger
+- Base Number Converter
+- Calculation History Management
+- Multi-language Support (Korean, English)
+- Dark Mode
+- Haptic Feedback (Mobile)
+- Swipe Gestures (Mobile)
 
-## 2. 상세 기능 요구사항
+## 2. Detailed Feature Requirements
 
-### 2.1 계산기 기본 기능
+### 2.1 Basic Calculator Functions
 
-#### 2.1.1 기본 연산
+#### 2.1.1 Basic Operations
 
-- 사칙연산
-  - 덧셈 (+)
-  - 뺄셈 (-)
-  - 곱셈 (×)
-  - 나눗셈 (÷)
-- 정밀도
-  - 최대 64자리까지 정확한 계산
-  - 0으로 나누기 등 예외 처리
-  - 음수의 제곱근 계산 방지
+- Arithmetic Operations
+  - Addition (+)
+  - Subtraction (-)
+  - Multiplication (×)
+  - Division (÷)
+- Precision
+  - Accurate calculations up to 64 digits
+  - Exception handling for division by zero
+  - Prevention of negative square root calculations
 
-#### 2.1.2 고급 연산
+#### 2.1.2 Advanced Operations
 
-- 수학 함수
-  - 제곱
-  - 제곱근
-  - N제곱
-  - N제곱근
-  - 팩토리얼
-  - 삼각함수 (sin, cos, tan)
-  - 로그 함수
-  - 10의 N제곱
-  - 정수부 추출
-  - 소수부 추출
-- 상수 입력
-  - π (파이)
-  - e (자연상수)
-  - φ (황금비)
+- Mathematical Functions
+  - Square
+  - Square Root
+  - N-th Power
+  - N-th Root
+  - Factorial
+  - Trigonometric Functions (sin, cos, tan)
+  - Logarithmic Functions
+  - Powers of 10
+  - Integer Part Extraction
+  - Decimal Part Extraction
+- Constants Input
+  - π (Pi)
+  - e (Euler's number)
+  - φ (Golden Ratio)
   - π/2
   - log 10
   - log 2
 
-#### 2.1.3 메모리 기능
+#### 2.1.3 Memory Functions
 
-- 저장 (MS)
-- 불러오기 (MR)
-- 초기화 (MC)
-- 메모리 연산
-  - 더하기 (M+)
-  - 빼기 (M-)
-  - 곱하기 (M×)
-  - 나누기 (M÷)
-- 메모리 작업 알림 기능
+- Store (MS)
+- Recall (MR)
+- Clear (MC)
+- Memory Operations
+  - Add (M+)
+  - Subtract (M-)
+  - Multiply (M×)
+  - Divide (M÷)
+- Memory Operation Notifications
 
-### 2.2 진법 변환 및 비트 연산
+### 2.2 Base Number Conversion and Bit Operations
 
-#### 2.2.1 지원 진법
+#### 2.2.1 Supported Number Systems
 
-- 2진수 (Binary)
-- 8진수 (Octal)
-- 10진수 (Decimal)
-- 16진수 (Hexadecimal)
-- 진법 표시 형식 전환 (접두사/접미사)
+- Binary (Base-2)
+- Octal (Base-8)
+- Decimal (Base-10)
+- Hexadecimal (Base-16)
+- Number System Display Format Toggle (Prefix/Suffix)
 
-#### 2.2.2 비트 연산
+#### 2.2.2 Bit Operations
 
-- 기본 연산
+- Basic Operations
   - AND
   - OR
   - XOR
   - NOT
-- 확장 연산
+- Extended Operations
   - NAND
   - NOR
   - XNOR
-- 시프트 연산
-  - 왼쪽 시프트 (<<)
-  - 오른쪽 시프트 (>>)
-  - 4비트 시프트
-  - 1비트 시프트
+- Shift Operations
+  - Left Shift (<<)
+  - Right Shift (>>)
+  - 4-bit Shift
+  - 1-bit Shift
 
-### 2.3 단위 변환기
+### 2.3 Unit Converter
 
-#### 2.3.1 지원 단위 카테고리
+#### 2.3.1 Supported Unit Categories
 
-- 길이/거리 (length)
-- 면적 (area)
-- 부피 (volume)
-- 무게 (weight)
-- 각도 (angle)
-- 온도 (temp)
-- 에너지 (energy)
-- 힘 (force)
-- 시간 (time)
-- 속도 (speed)
-- 압력 (pressure)
-- 데이터 용량 (data)
-- 주파수 (frequency)
-- 휘도 (luminance)
-- 조도 (illuminance)
-- 전하량 (electricCharge)
+- Length/Distance (length)
+- Area (area)
+- Volume (volume)
+- Weight (weight)
+- Angle (angle)
+- Temperature (temp)
+- Energy (energy)
+- Force (force)
+- Time (time)
+- Speed (speed)
+- Pressure (pressure)
+- Data Size (data)
+- Frequency (frequency)
+- Luminance (luminance)
+- Illuminance (illuminance)
+- Electric Charge (electricCharge)
 
-#### 2.3.2 변환 기능
+#### 2.3.2 Conversion Features
 
-- 단위 간 실시간 변환
-- 단위 기호 표시/숨김
-- 단위 설명 툴팁 제공
-- 빠른 계산 기능
-  - 곱셈: ×2, ×3, ×5, ×10, ×100, ×1000
-  - 나눗셈: ÷2, ÷3, ÷5, ÷10, ÷100, ÷1000
-  - 덧셈: +5, +10, +100
-  - 뺄셈: -5, -10, -100
+- Real-time Unit Conversion
+- Unit Symbol Display/Hide
+- Unit Description Tooltips
+- Quick Calculation Features
+  - Multiplication: ×2, ×3, ×5, ×10, ×100, ×1000
+  - Division: ÷2, ÷3, ÷5, ÷10, ÷100, ÷1000
+  - Addition: +5, +10, +100
+  - Subtraction: -5, -10, -100
 
-### 2.4 계산 기록 관리
+### 2.4 Calculation History Management
 
-#### 2.4.1 기록 기능
+#### 2.4.1 History Features
 
-- 최대 100개 계산 기록 저장
-- 기록별 메모 추가/편집
-- 스와이프로 개별 기록 삭제/편집
-- 계산 결과 복사
-- 이전 계산 결과 재사용
-- 향후 계획
-  - 계산 기록 검색 기능
+- Store up to 100 calculation records
+- Add/Edit memos for each record
+- Swipe to delete/edit individual records
+- Copy calculation results
+- Reuse previous calculation results
+- Future Plans
+  - Calculation history search function
 
-### 2.5 사용자 인터페이스
+### 2.5 User Interface
 
-#### 2.5.1 UI/UX 기능
+#### 2.5.1 UI/UX Features
 
-- 다크 모드 지원
-- 반응형 레이아웃
-- 햅틱 피드백 (모바일)
-- 키보드 단축키 지원
-- 버튼 누름 효과
-- 화면 전환 효과
-- 계산기 모드 탭 전환
-- 모바일 스와이프 제스처
-  - 계산기 전환
-  - 설정 열기/닫기
-  - 기록 패널 열기/닫기
+- Dark Mode Support
+- Responsive Layout
+- Haptic Feedback (Mobile)
+- Keyboard Shortcut Support
+- Button Press Effects
+- Screen Transition Effects
+- Calculator Mode Tab Switching
+- Mobile Swipe Gestures
+  - Calculator Switching
+  - Settings Open/Close
+  - History Panel Open/Close
 
-#### 2.5.2 표시 설정
+#### 2.5.2 Display Settings
 
-- 숫자 그룹화
-  - 3자리 또는 4자리 선택 가능
-  - 구분자 표시/숨김
-- 소수점 자릿수 제한 설정
-  - 제한 없음 ~ 6자리
-- 단위/통화 기호 표시
-- 버튼 추가 기능 표시
-- 버튼 단축키 툴팁
+- Number Grouping
+  - 3 or 4 digit grouping options
+  - Separator Display/Hide
+- Decimal Place Limit Settings
+  - No limit ~ 6 digits
+- Unit/Currency Symbol Display
+- Button Additional Function Display
+- Button Shortcut Tooltips
 
-#### 2.5.3 접근성 (향후 계획)
+#### 2.5.3 Accessibility
 
-- ARIA 레이블 적용
-- 결과 음성 출력
-- 계산기 음성 조작
-- 고대비 모드
+- ✅ ARIA Labels Implementation (Completed)
+- Result Voice Output
+- Calculator Voice Control
+- High Contrast Mode
 
-### 2.6 설정 및 상태 관리
+### 2.6 Settings and State Management
 
-- 마지막 사용 계산기 모드 기억
-- 창 크기 및 위치 기억
-- 소수점 자릿수 설정 유지
-- 천단위 구분 상태 유지
-- 시작 시 패널 초기화 옵션
+- Remember Last Used Calculator Mode
+- Remember Window Size and Position
+- Maintain Decimal Place Settings
+- Maintain Thousand Separator Status
+- Panel Reset Option on Startup
 
-## 3. 개발 환경
+## 3. Development Environment
 
-### 3.1 필수 요구사항
+### 3.1 Requirements
 
-- Node.js 20.0 이상
-- Yarn 패키지 매니저
-- VSCode(Feat. Copilot) 또는 Cursor AI
-- Android Studio (안드로이드 빌드 시)
+- Node.js 20.0 or higher
+- Yarn Package Manager
+- VSCode(Feat. Copilot) or Cursor AI
+- Android Studio (for Android builds)
 
-### 3.2 빌드 환경
+### 3.2 Build Environment
 
-- 데스크톱 빌드
-  - Electron 빌더
-  - Linux: AppImage, Snap 패키지
-  - Windows: 설치 프로그램
-- 모바일 빌드
+- Desktop Build
+  - Electron Builder
+  - Linux: AppImage, Snap Package
+  - Windows: Installer
+- Mobile Build
   - Capacitor
   - Android Studio
-  - 키스토어 설정
-  - 환경 변수 구성
+  - Keystore Configuration
+  - Environment Variable Setup
 
-## 4. 보안 요구사항
+## 4. Security Requirements
 
-- Content Security Policy 적용
-- API 키 보안 관리
-  - 통화 환율 API 키
-  - 환경 변수 사용
-- 키스토어 파일 보안
-  - 안드로이드 앱 서명
-  - 키스토어 비밀번호 관리
+- Content Security Policy Implementation
+- API Key Security Management
+  - Currency Exchange Rate API Key
+  - Environment Variable Usage
+- Keystore File Security
+  - Android App Signing
+  - Keystore Password Management
 
-## 5. 향후 개발 계획
+## 5. Future Development Plans
 
-- 광고 기능 (수익화)
-- 테마 기능
-- 큰 태블릿 대응 레이아웃 배율 조정
-- 자동 업데이트 (electron)
-- iOS 앱 개발
-- 계산 기록 검색 기능
-- 접근성 기능 강화
+- Advertising Features (Monetization)
+- Theme Functionality
+- Large Tablet Layout Scale Adjustment
+- Automatic Updates (electron)
+- iOS App Development
+- Calculation History Search Function
+- Enhanced Accessibility Features
 
-## 6. 라이선스
+## 6. License
 
-MIT 라이선스 하에 배포되며, 오픈 소스로 유지됩니다.
+Distributed under the MIT License and maintained as open source.

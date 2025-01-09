@@ -127,7 +127,7 @@ MIT License
 - electron
 - vue 3
 - quasar 2
-- q-markdown
+- markdown-it
 - tinykeys
 - MathJS
 - freecurrencyapi-js
@@ -241,7 +241,7 @@ chmod +x build.sh
 ./build.sh
 ```
 
-##### Windows 사용자 (build.bat)
+##### Windows 사용자 (build.bat, 미완성)
 
 ```batch
 # 명령 프롬프트에서 실행

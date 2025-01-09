@@ -17,13 +17,7 @@
     "url": "https://github.com/from104/qcalc/issues"
   },
   "homepage": "https://github.com/from104/qcalc#readme",
-  "keywords": [
-    "calculator",
-    "quasar",
-    "vue",
-    "electron",
-    "typescript"
-  ],
+  "keywords": ["calculator", "quasar", "vue", "electron", "typescript"],
   "type": "module",
   "scripts": {
     "postinstall": "quasar prepare",
@@ -47,7 +41,7 @@
     "@quasar/cli": "^2.4.1",
     "@quasar/extras": "1.16.15",
     "@quasar/vite-plugin": "^1.8.1",
-    "@types/dompurify": "^3.2.0",
+    "@types/dompurify": "3.0.5",
     "axios": "^1.7.9",
     "dompurify": "^3.2.3",
     "dotenv": "^16.4.7",

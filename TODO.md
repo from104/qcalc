@@ -9,7 +9,7 @@
 - [ ] Mobile app implementation (capacitor:ios)
 - [ ] Search calculation result history
 - [ ] Add accessibility features
-  - [ ] Apply aria-label
+  - [x] Apply aria-label
   - [ ] Voice output of results
   - [ ] Voice control of calculator
   - [ ] High contrast mode
