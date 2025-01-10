@@ -253,15 +253,15 @@
   // 날짜/시간 포맷 함수
   const formatDateTime = (timestamp: number): string => {
     const date = new Date(timestamp);
-    return date.toLocaleString('ko-KR', {
-      year: 'numeric',
-      month: '2-digit',
-      day: '2-digit',
-      hour: '2-digit',
-      minute: '2-digit',
-      second: '2-digit',
-      hour12: false,
-    });
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    const hours = String(date.getHours()).padStart(2, '0');
+    const minutes = String(date.getMinutes()).padStart(2, '0');
+    const seconds = String(date.getSeconds()).padStart(2, '0');
+    const milliseconds = String(date.getMilliseconds()).padStart(3, '0');
+
+    return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}.${milliseconds}`;
   };
 
   const recordStrings = computed<RecordString[]>(() => {
@@ -298,6 +298,14 @@
     });
   });
 
+  // 검색바 높이를 저장하는 ref 추가
+  const searchBarHeight = ref(50); // 기본 높이 50px
+
+  // 계산된 상단 여백 추가
+  const calculatedTopMargin = computed(() => {
+    return store.isSearchOpen ? `${searchBarHeight.value}px` : '0px';
+  });
+
   interface QSlideEvent {
     reset: () => void;
   }
@@ -307,7 +315,10 @@
   <q-card-section
     id="record"
     square
-    class="full-width row justify-center items-start relative-position scrollbar-custom q-py-none q-pt-md"
+    class="full-width row justify-center items-start relative-position scrollbar-custom"
+    :style="{
+      paddingTop: calculatedTopMargin,
+    }"
     @scroll="handleScroll"
   >
     <transition name="slide-fade">
@@ -324,7 +335,7 @@
         @click="scrollToTop"
       />
     </transition>
-    <transition name="slide-fade">
+    <transition name="search-bar">
       <q-bar
         v-if="store.isSearchOpen"
         class="search-bar"
@@ -339,7 +350,7 @@
           filled
           dense
           autofocus
-          class="search-input "
+          class="search-input"
           :aria-label="t('ariaLabel.searchInput')"
           role="searchbox"
           @focus="store.setInputFocused"
@@ -373,19 +384,17 @@
       </q-bar>
     </transition>
 
-    <div v-if="store.isSearchOpen" class="q-ma-md q-pa-sm" />
-
     <transition name="slide-fade" mode="out-in">
-      <q-item v-if="recordStrings.length == 0" class="text-center">
+      <q-item v-if="recordStrings.length == 0" class="text-center q-pt-xl">
         <q-item-section role="listitem">
           <q-item-label>
-            <span>{{
+            <span class="text-h6">{{
               store.isSearchOpen && store.searchKeyword.trim() !== '' ? t('noSearchResult') : t('noRecord')
             }}</span>
           </q-item-label>
         </q-item-section>
       </q-item>
-      <q-list v-else id="record-list" separator class="full-width" role="list">
+      <q-list v-else id="record-list" separator class="full-width q-pt-md" role="list">
         <transition-group name="record-list">
           <q-slide-item
             v-for="record in recordStrings"
@@ -408,14 +417,14 @@
               role="listitem"
             >
               <q-item-section class="q-mr-none q-px-none">
-                <q-item-label class="text-caption text-grey-7">
-                  <HighlightText :text="formatDateTime(record.timestamp)" :search-term="store.searchKeyword" />
-                </q-item-label>
                 <q-item-label v-if="record.memo">
                   <u><HighlightText :text="record.memo" :search-term="store.searchKeyword" /></u>
                 </q-item-label>
                 <q-item-label style="white-space: pre-wrap">
                   <HighlightText :text="record.displayText" :search-term="store.searchKeyword" />
+                </q-item-label>
+                <q-item-label class="text-caption text-grey-7">
+                  <HighlightText :text="formatDateTime(record.timestamp)" :search-term="store.searchKeyword" />
                 </q-item-label>
               </q-item-section>
             </q-item>
@@ -446,12 +455,6 @@
                 <MenuItem v-if="record.memo" :title="t('deleteMemo')" :action="() => deleteMemo(record.id as number)" />
                 <MenuItem separator />
                 <MenuItem
-                  :title="t('copyTime')"
-                  :action="() => copyRecordItem(record.id as number, 'time')"
-                  :caption="formatDateTime(record.timestamp)"
-                />
-                <MenuItem separator />
-                <MenuItem
                   :title="t('copyDisplayedResult')"
                   :action="() => copyRecordItem(record.id as number, 'formattedNumber')"
                   :caption="getRightSideInRecord(record.origResult)"
@@ -460,6 +463,12 @@
                   :title="t('copyResultNumber')"
                   :action="() => copyRecordItem(record.id as number, 'onlyNumber')"
                   :caption="record.origResult.resultNumber"
+                />
+                <MenuItem separator />
+                <MenuItem
+                  :title="t('copyTime')"
+                  :action="() => copyRecordItem(record.id as number, 'time')"
+                  :caption="formatDateTime(record.timestamp)"
                 />
                 <MenuItem separator />
                 <MenuItem :title="t('loadToMainPanel')" :action="() => loadToMainPanel(record.id as number)" />
@@ -535,6 +544,7 @@
   #record {
     max-height: calc(100vh - v-bind('calculatedHeaderHeight'));
     overflow: auto;
+    transition: padding-top 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   }
 
   .slide-fade-enter-active,
@@ -583,12 +593,12 @@
   .search-bar {
     position: fixed;
     width: 100%;
-    height: 50px;
+    height: v-bind('searchBarHeight + "px"');
     top: 0;
     left: 0;
     z-index: 2000;
     background: var(--q-primary);
-    transition: all 0.3s ease-out;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 
     .search-input {
       position: absolute;
@@ -624,6 +634,23 @@
         color: black;
       }
     }
+  }
+
+  .search-bar-enter-active,
+  .search-bar-leave-active {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .search-bar-enter-from,
+  .search-bar-leave-to {
+    opacity: 0;
+    transform: translateY(-100%);
+  }
+
+  .search-bar-enter-to,
+  .search-bar-leave-from {
+    opacity: 1;
+    transform: translateY(0);
   }
 </style>
 

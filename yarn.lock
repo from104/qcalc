@@ -2150,12 +2150,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/dompurify@npm:^3.2.0":
-  version: 3.2.0
-  resolution: "@types/dompurify@npm:3.2.0"
+"@types/dompurify@npm:3.0.5":
+  version: 3.0.5
+  resolution: "@types/dompurify@npm:3.0.5"
   dependencies:
-    dompurify: "npm:*"
-  checksum: 10/0194dd9024e76e856f3373e8b080c7a5ac9910543ac1ee85db45277efbbea820b2f27fe22c8a6f02bb51833e0a8540d732be0d11d156efd16cb0b97f88e41ebf
+    "@types/trusted-types": "npm:*"
+  checksum: 10/e544b3ce53c41215cabff3d89256ff707c7ee8e0c9a1b5034b22014725d288b16e6942cdcdeeb4221c578c3421a6a4721aa0676431f55d7abd18c07368855c5e
   languageName: node
   linkType: hard
 
@@ -2462,7 +2462,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/trusted-types@npm:^2.0.7":
+"@types/trusted-types@npm:*, @types/trusted-types@npm:^2.0.7":
   version: 2.0.7
   resolution: "@types/trusted-types@npm:2.0.7"
   checksum: 10/8e4202766a65877efcf5d5a41b7dd458480b36195e580a3b1085ad21e948bc417d55d6f8af1fd2a7ad008015d4117d5fdfe432731157da3c68678487174e4ba3
@@ -2613,7 +2613,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@vitejs/plugin-vue@npm:^5.1.4":
+"@vitejs/plugin-vue@npm:^5.1.4, @vitejs/plugin-vue@npm:^5.2.1":
   version: 5.2.1
   resolution: "@vitejs/plugin-vue@npm:5.2.1"
   peerDependencies:
@@ -4884,7 +4884,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"dompurify@npm:*, dompurify@npm:^3.2.3":
+"dompurify@npm:^3.2.3":
   version: 3.2.3
   resolution: "dompurify@npm:3.2.3"
   dependencies:
@@ -6022,7 +6022,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"fast-glob@npm:^3.2.5, fast-glob@npm:^3.2.7, fast-glob@npm:^3.3.2":
+"fast-glob@npm:^3.2.12, fast-glob@npm:^3.2.5, fast-glob@npm:^3.2.7, fast-glob@npm:^3.3.2":
   version: 3.3.3
   resolution: "fast-glob@npm:3.3.3"
   dependencies:
@@ -10143,12 +10143,13 @@ __metadata:
     "@quasar/extras": "npm:1.16.15"
     "@quasar/vite-plugin": "npm:^1.8.1"
     "@rushstack/eslint-patch": "npm:^1.10.4"
-    "@types/dompurify": "npm:^3.2.0"
+    "@types/dompurify": "npm:3.0.5"
     "@types/jest": "npm:^29.5.14"
     "@types/markdown-it": "npm:^14.1.2"
     "@types/node": "npm:22.10.5"
     "@typescript-eslint/eslint-plugin": "npm:^8.19.1"
     "@typescript-eslint/parser": "npm:8.19.1"
+    "@vitejs/plugin-vue": "npm:^5.2.1"
     "@vue/devtools": "npm:7.6.8"
     "@vue/eslint-config-prettier": "npm:^10.1.0"
     "@vue/eslint-config-typescript": "npm:^14.2.0"
@@ -10180,6 +10181,7 @@ __metadata:
     typescript: "npm:<5.7"
     vite: "npm:6.0.7"
     vite-plugin-checker: "npm:^0.8.0"
+    vite-plugin-env-types: "npm:^0.1.4"
     vue: "npm:3.5.13"
     vue-eslint-parser: "npm:^9.4.3"
     vue-i18n: "npm:^11.0.1"
@@ -12651,6 +12653,17 @@ __metadata:
     vue-tsc:
       optional: true
   checksum: 10/a38a90ac706b4fdd21db52caca7e380118ae1e8cd520184b000481cf40baac491723c71e90b6d36197051131f0e20509d2e297e199831bf3428cf4b1c50114ef
+  languageName: node
+  linkType: hard
+
+"vite-plugin-env-types@npm:^0.1.4":
+  version: 0.1.4
+  resolution: "vite-plugin-env-types@npm:0.1.4"
+  dependencies:
+    fast-glob: "npm:^3.2.12"
+  peerDependencies:
+    vite: ">=2.0.0"
+  checksum: 10/dc67bf632b0a905c22f8b1463f1187383c9a580548eb3f5f386fc05a2104b1ce49830cfe61cffc89207a86a80d8ed979b6aab789d09b7376019d807cf529910b
   languageName: node
   linkType: hard
 

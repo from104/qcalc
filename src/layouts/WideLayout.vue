@@ -1,6 +1,6 @@
 <script setup lang="ts">
   import { onBeforeUnmount, onMounted, reactive, shallowRef, watch, computed, ref } from 'vue';
-  import type { ComputedRef, ShallowRef } from 'vue';
+  import type { ComputedRef } from 'vue';
   import { useRouter, useRoute } from 'vue-router';
   import { useStore } from 'src/stores/store';
   import { useI18n } from 'vue-i18n';
@@ -34,7 +34,7 @@
 
   // 서브 페이지 설정
   interface PageConfig {
-    component: ShallowRef<typeof HelpPage | typeof AboutPage | typeof RecordPage | typeof SettingPage>;
+    component: typeof HelpPage | typeof AboutPage | typeof RecordPage | typeof SettingPage;
     title: string;
     showClose?: boolean;
     buttons?: PageButton[];
@@ -50,19 +50,19 @@
     return store.calc.record.getAllRecords().length === 0 || store.isDeleteRecordConfirmOpen;
   });
 
-  const SUB_PAGE_CONFIG = reactive<Record<string, PageConfig>>({
+  const SUB_PAGE_CONFIG: Record<string, PageConfig> = {
     help: {
-      component: shallowRef(HelpPage),
+      component: HelpPage,
       title: t('message.help'),
       showClose: true,
     },
     about: {
-      component: shallowRef(AboutPage),
+      component: AboutPage,
       title: t('message.about'),
       showClose: true,
     },
     record: {
-      component: shallowRef(RecordPage),
+      component: RecordPage,
       title: t('message.record'),
       buttons: [
         {
@@ -82,11 +82,11 @@
       ],
     },
     settings: {
-      component: shallowRef(SettingPage),
+      component: SettingPage,
       title: t('message.settings'),
       showClose: true,
     },
-  });
+  };
 
   // 현재 서브 페이지 관련
   const currentSubPage = ref('record');
