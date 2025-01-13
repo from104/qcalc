@@ -272,19 +272,27 @@
     window.electronUpdater.installUpdate();
   };
 
-  // 컴포넌트 마운트 시 업데이트 리스너 등록
-  onMounted(() => {
-    window.electronUpdater.onUpdateStatus(handleUpdateStatus);
+  // Electron 환경인지 확인하는 computed 속성 추가
+  const isElectron = computed(() => $q.platform.is.electron);
 
-    // 개발 모드가 아닐 때만 업데이트 확인
-    if (!import.meta.env.DEV) {
-      window.electronUpdater.checkForUpdates();
+  // 업데이트 관련 코드를 Electron 환경에서만 실행하도록 수정
+  onMounted(() => {
+    // Electron 환경에서만 업데이트 리스너 등록
+    if (isElectron.value) {
+      window.electronUpdater.onUpdateStatus(handleUpdateStatus);
+
+      // 개발 모드가 아닐 때만 업데이트 확인
+      if (!import.meta.env.DEV) {
+        window.electronUpdater.checkForUpdates();
+      }
     }
   });
 
-  // 컴포넌트 언마운트 시 리스너 제거
   onUnmounted(() => {
-    window.electronUpdater.removeUpdateStatusListener();
+    // Electron 환경에서만 리스너 제거
+    if (isElectron.value) {
+      window.electronUpdater.removeUpdateStatusListener();
+    }
   });
 
   const isDev = import.meta.env.DEV;
@@ -300,49 +308,51 @@
       <component :is="Component" :key="routeProps.path" />
     </transition>
   </router-view>
-  <!-- 업데이트 알림 -->
-  <q-dialog v-model="updateDialog" persistent>
-    <q-card style="min-width: 350px">
-      <q-card-section>
-        <div class="text-h6">업데이트 알림</div>
-      </q-card-section>
+  <!-- Electron 환경에서만 업데이트 관련 UI 표시 -->
+  <template v-if="isElectron">
+    <q-dialog v-model="updateDialog" persistent>
+      <q-card style="min-width: 350px">
+        <q-card-section>
+          <div class="text-h6">업데이트 알림</div>
+        </q-card-section>
 
-      <q-card-section class="q-pt-none">
-        <template v-if="updateStatus === 'available'">
-          <p>새로운 버전이 있습니다: {{ updateInfo?.version }}</p>
-          <p v-if="updateInfo?.releaseNotes">{{ updateInfo.releaseNotes }}</p>
-          <p>업데이트를 진행하시겠습니까?</p>
-        </template>
-        <template v-else-if="updateStatus === 'progress'">
-          <p>다운로드 중... {{ Math.round(updateProgress?.percent || 0) }}%</p>
-          <q-linear-progress :value="(updateProgress?.percent || 0) / 100" />
-        </template>
-        <template v-else-if="updateStatus === 'downloaded'">
-          <p>업데이트가 다운로드되었습니다. 지금 설치하시겠습니까?</p>
-        </template>
-        <template v-else-if="updateStatus === 'error'">
-          <p>업데이트 중 오류가 발생했습니다:</p>
-          <p>{{ updateError?.message }}</p>
-        </template>
-      </q-card-section>
+        <q-card-section class="q-pt-none">
+          <template v-if="updateStatus === 'available'">
+            <p>새로운 버전이 있습니다: {{ updateInfo?.version }}</p>
+            <p v-if="updateInfo?.releaseNotes">{{ updateInfo.releaseNotes }}</p>
+            <p>업데이트를 진행하시겠습니까?</p>
+          </template>
+          <template v-else-if="updateStatus === 'progress'">
+            <p>다운로드 중... {{ Math.round(updateProgress?.percent || 0) }}%</p>
+            <q-linear-progress :value="(updateProgress?.percent || 0) / 100" />
+          </template>
+          <template v-else-if="updateStatus === 'downloaded'">
+            <p>업데이트가 다운로드되었습니다. 지금 설치하시겠습니까?</p>
+          </template>
+          <template v-else-if="updateStatus === 'error'">
+            <p>업데이트 중 오류가 발생했습니다:</p>
+            <p>{{ updateError?.message }}</p>
+          </template>
+        </q-card-section>
 
-      <q-card-actions align="right">
-        <template v-if="updateStatus === 'available'">
-          <q-btn v-close-popup flat label="나중에" color="primary" />
-          <q-btn flat label="업데이트" color="primary" @click="startUpdate" />
-        </template>
-        <template v-else-if="updateStatus === 'downloaded'">
-          <q-btn v-close-popup flat label="나중에" color="primary" />
-          <q-btn flat label="지금 설치" color="primary" @click="installUpdate" />
-        </template>
-        <template v-else-if="updateStatus === 'error'">
-          <q-btn v-close-popup flat label="닫기" color="primary" />
-        </template>
-      </q-card-actions>
-    </q-card>
-  </q-dialog>
-  <!-- 개발 환경에서만 표시되는 테스트 버튼 -->
-  <q-btn v-if="isDev" class="fixed-bottom-right q-ma-md" color="primary" icon="refresh" @click="testUpdate" />
+        <q-card-actions align="right">
+          <template v-if="updateStatus === 'available'">
+            <q-btn v-close-popup flat label="나중에" color="primary" />
+            <q-btn flat label="업데이트" color="primary" @click="startUpdate" />
+          </template>
+          <template v-else-if="updateStatus === 'downloaded'">
+            <q-btn v-close-popup flat label="나중에" color="primary" />
+            <q-btn flat label="지금 설치" color="primary" @click="installUpdate" />
+          </template>
+          <template v-else-if="updateStatus === 'error'">
+            <q-btn v-close-popup flat label="닫기" color="primary" />
+          </template>
+        </q-card-actions>
+      </q-card>
+    </q-dialog>
+    <!-- 개발 환경에서만 표시되는 테스트 버튼 -->
+    <q-btn v-if="isDev" class="fixed-bottom-right q-ma-md" color="primary" icon="refresh" @click="testUpdate" />
+  </template>
 </template>
 
 <style scoped lang="scss">
