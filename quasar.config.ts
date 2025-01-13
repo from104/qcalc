@@ -193,7 +193,14 @@ export default defineConfig((/* ctx */) => {
         productName: 'QCalc',
         artifactName: '${productName}-${version}-${os}.${ext}',
         linux: {
-          target: ['AppImage', 'snap'],
+          target: [
+            'AppImage',
+            {
+              target: 'snap',
+              // snap 패키지에서는 자동 업데이트 비활성화
+              publish: null,
+            },
+          ],
           category: 'Utility',
         },
         win: {
@@ -208,6 +215,16 @@ export default defineConfig((/* ctx */) => {
           confinement: 'strict',
           grade: 'devel',
         },
+        publish: [
+          {
+            provider: 'github',
+            owner: 'from104',
+            repo: 'qcalc',
+            // snap 패키지 제외
+            publishAutoUpdate: false,
+            releaseType: 'release',
+          },
+        ],
       },
     },
 

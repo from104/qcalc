@@ -17,8 +17,7 @@
  */
 
 // Electron의 contextBridge와 ipcRenderer 모듈 가져오기
-import { contextBridge } from 'electron';
-import { ipcRenderer } from 'electron/renderer';
+import { contextBridge, ipcRenderer } from 'electron';
 
 // 메인 월드에 myAPI 객체 노출
 contextBridge.exposeInMainWorld('myAPI', {
@@ -30,4 +29,19 @@ contextBridge.exposeInMainWorld('myAPI', {
     // 메인 프로세스에 'toggle-always-on-top' 이벤트 전송
     ipcRenderer.send('toggle-always-on-top', alwaysOnTop);
   },
+});
+
+contextBridge.exposeInMainWorld('electronUpdater', {
+  checkForUpdates: () => ipcRenderer.send('check-for-updates'),
+  startUpdate: () => ipcRenderer.send('start-update'),
+  installUpdate: () => ipcRenderer.send('install-update'),
+  onUpdateStatus: (
+    callback: (status: UpdateStatusInfo['status'], info?: UpdateInfo | UpdateProgressInfo | UpdateError) => void,
+  ) => {
+    ipcRenderer.on('update-status', (_event, status, info) => callback(status, info));
+  },
+  removeUpdateStatusListener: () => {
+    ipcRenderer.removeAllListeners('update-status');
+  },
+  testUpdate: () => ipcRenderer.send('test-update'),
 });
