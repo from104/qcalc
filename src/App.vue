@@ -255,7 +255,7 @@
         updateDialog.value = true;
         $q.notify({
           type: 'negative',
-          message: '업데이트 중 오류가 발생했습니다',
+          message: t('update.error'),
           caption: (info as UpdateError).message,
         });
         break;
@@ -311,47 +311,54 @@
   <!-- Electron 환경에서만 업데이트 관련 UI 표시 -->
   <template v-if="isElectron">
     <q-dialog v-model="updateDialog" persistent>
-      <q-card style="min-width: 350px">
+      <q-card style="min-width: 350px; margin-top: 25px">
         <q-card-section>
-          <div class="text-h6">업데이트 알림</div>
+          <div class="text-h6">{{ t('update.title') }}</div>
         </q-card-section>
 
         <q-card-section class="q-pt-none">
           <template v-if="updateStatus === 'available'">
-            <p>새로운 버전이 있습니다: {{ updateInfo?.version }}</p>
+            <p>{{ t('update.newVersion', { version: updateInfo?.version }) }}</p>
             <p v-if="updateInfo?.releaseNotes">{{ updateInfo.releaseNotes }}</p>
-            <p>업데이트를 진행하시겠습니까?</p>
+            <p>{{ t('update.confirmUpdate') }}</p>
           </template>
           <template v-else-if="updateStatus === 'progress'">
-            <p>다운로드 중... {{ Math.round(updateProgress?.percent || 0) }}%</p>
+            <p>{{ t('update.downloading', { percent: Math.round(updateProgress?.percent || 0) }) }}</p>
             <q-linear-progress :value="(updateProgress?.percent || 0) / 100" />
           </template>
           <template v-else-if="updateStatus === 'downloaded'">
-            <p>업데이트가 다운로드되었습니다. 지금 설치하시겠습니까?</p>
+            <p>{{ t('update.downloadComplete') }}</p>
           </template>
           <template v-else-if="updateStatus === 'error'">
-            <p>업데이트 중 오류가 발생했습니다:</p>
+            <p>{{ t('update.error') }}</p>
             <p>{{ updateError?.message }}</p>
           </template>
         </q-card-section>
 
         <q-card-actions align="right">
           <template v-if="updateStatus === 'available'">
-            <q-btn v-close-popup flat label="나중에" color="primary" />
-            <q-btn flat label="업데이트" color="primary" @click="startUpdate" />
+            <q-btn v-close-popup flat :label="t('update.later')" color="primary" />
+            <q-btn flat :label="t('update.update')" color="primary" @click="startUpdate" />
           </template>
           <template v-else-if="updateStatus === 'downloaded'">
-            <q-btn v-close-popup flat label="나중에" color="primary" />
-            <q-btn flat label="지금 설치" color="primary" @click="installUpdate" />
+            <q-btn v-close-popup flat :label="t('update.later')" color="primary" />
+            <q-btn flat :label="t('update.installNow')" color="primary" @click="installUpdate" />
           </template>
           <template v-else-if="updateStatus === 'error'">
-            <q-btn v-close-popup flat label="닫기" color="primary" />
+            <q-btn v-close-popup flat :label="t('update.close')" color="primary" />
           </template>
         </q-card-actions>
       </q-card>
     </q-dialog>
     <!-- 개발 환경에서만 표시되는 테스트 버튼 -->
-    <q-btn v-if="isDev" class="fixed-bottom-right q-ma-md" color="primary" icon="refresh" @click="testUpdate" />
+    <q-btn
+      v-if="isDev"
+      class="fixed-bottom-right q-ma-md"
+      color="primary"
+      icon="refresh"
+      :aria-label="t('update.testUpdate')"
+      @click="testUpdate"
+    />
   </template>
 </template>
 
@@ -454,3 +461,32 @@
     transform: translateX(100%);
   }
 </style>
+
+<i18n lang="yaml5">
+ko:
+  update:
+    title: 업데이트 알림
+    newVersion: '새로운 버전이 있습니다: {version}'
+    confirmUpdate: 업데이트를 진행하시겠습니까?
+    downloading: '다운로드 중... {percent}%'
+    downloadComplete: 업데이트가 다운로드되었습니다. 지금 설치하시겠습니까?
+    error: '업데이트 중 오류가 발생했습니다:'
+    later: 나중에
+    update: 업데이트
+    installNow: 지금 설치
+    close: 닫기
+    testUpdate: 업데이트 테스트
+en:
+  update:
+    title: Update Notification
+    newVersion: 'New version available: {version}'
+    confirmUpdate: Would you like to proceed with the update?
+    downloading: 'Downloading... {percent}%'
+    downloadComplete: Update has been downloaded. Would you like to install it now?
+    error: 'An error occurred during update:'
+    later: Later
+    update: Update
+    installNow: Install Now
+    close: Close
+    testUpdate: Test Update
+</i18n>

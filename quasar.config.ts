@@ -193,14 +193,7 @@ export default defineConfig((/* ctx */) => {
         productName: 'QCalc',
         artifactName: '${productName}-${version}-${os}.${ext}',
         linux: {
-          target: [
-            'AppImage',
-            {
-              target: 'snap',
-              // snap 패키지에서는 자동 업데이트 비활성화
-              publish: null,
-            },
-          ],
+          target: ['AppImage', 'snap'],
           category: 'Utility',
         },
         win: {
