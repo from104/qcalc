@@ -1,6 +1,5 @@
 import { match } from 'ts-pattern';
 import { convertRadix } from './RadixConverter';
-// import { BigNumberType } from 'src/types/calculator';
 import { Radix } from './RadixConverter';
 import type { FactoryFunctionMap } from 'mathjs';
 import { all, create } from 'mathjs';
@@ -8,7 +7,7 @@ import { all, create } from 'mathjs';
 // MathJS 라이브러리 설정
 export const MathB = create(all as FactoryFunctionMap, {
   number: 'BigNumber',
-  precision: 128,
+  precision: 1025,
 });
 
 // BigNumber 타입 정의
@@ -58,7 +57,7 @@ export class CalculatorMath {
    * @returns 절대값 결과 (문자열)
    */
   public abs(value: string): string {
-    return BigNumber(value).abs().toString();
+    return BigNumber(value).abs().toFixed();
   }
 
   /**
@@ -67,7 +66,7 @@ export class CalculatorMath {
    * @returns 정수 부분 (문자열)
    */
   public int(value: string): string {
-    return BigNumber(value).floor().toString();
+    return BigNumber(value).floor().toFixed();
   }
 
   /**
@@ -76,7 +75,7 @@ export class CalculatorMath {
    * @returns 소수 부분 (문자열)
    */
   public frac(value: string): string {
-    return BigNumber(value).mod(1).toString();
+    return BigNumber(value).mod(1).toFixed();
   }
 
   /**
@@ -85,7 +84,7 @@ export class CalculatorMath {
    * @returns 팩토리얼 결과 (문자열)
    */
   public fact(value: string): string {
-    return MathB.factorial(BigNumber(value)).toString();
+    return MathB.factorial(BigNumber(value)).toFixed();
   }
 
   /**
@@ -94,7 +93,7 @@ export class CalculatorMath {
    * @returns 10^exponent 결과 (문자열)
    */
   public exp10(exponent: string): string {
-    return BigNumber(10).pow(BigNumber(exponent)).toString();
+    return BigNumber(10).pow(BigNumber(exponent)).toFixed();
   }
 
   /**
@@ -116,7 +115,7 @@ export class CalculatorMath {
    * @returns sin(angle) 결과 (문자열)
    */
   public sin(angle: string): string {
-    return this.convertDegreesToRadians(angle).sin().toString();
+    return this.convertDegreesToRadians(angle).sin().toFixed();
   }
 
   /**
@@ -125,7 +124,7 @@ export class CalculatorMath {
    * @returns cos(angle) 결과 (문자열)
    */
   public cos(angle: string): string {
-    return this.convertDegreesToRadians(angle).cos().toString();
+    return this.convertDegreesToRadians(angle).cos().toFixed();
   }
 
   /**
@@ -134,7 +133,7 @@ export class CalculatorMath {
    * @returns tan(angle) 결과 (문자열)
    */
   public tan(angle: string): string {
-    return this.convertDegreesToRadians(angle).tan().toString();
+    return this.convertDegreesToRadians(angle).tan().toFixed();
   }
 
   /**
@@ -148,7 +147,7 @@ export class CalculatorMath {
    * @returns augend + addend 결과 (문자열)
    */
   public add(augend: string, addend: string): string {
-    return BigNumber(augend).add(BigNumber(addend)).toString();
+    return BigNumber(augend).add(BigNumber(addend)).toFixed();
   }
 
   /**
@@ -158,7 +157,7 @@ export class CalculatorMath {
    * @returns minuend - subtrahend 결과 (문자열)
    */
   public sub(minuend: string, subtrahend: string): string {
-    return BigNumber(minuend).sub(BigNumber(subtrahend)).toString();
+    return BigNumber(minuend).sub(BigNumber(subtrahend)).toFixed();
   }
 
   /**
@@ -168,7 +167,7 @@ export class CalculatorMath {
    * @returns multiplicand × multiplier 결과 (문자열)
    */
   public mul(multiplicand: string, multiplier: string): string {
-    return BigNumber(multiplicand).mul(BigNumber(multiplier)).toString();
+    return BigNumber(multiplicand).mul(BigNumber(multiplier)).toFixed();
   }
 
   /**
@@ -180,7 +179,7 @@ export class CalculatorMath {
    */
   public div(dividend: string, divisor: string): string {
     if (divisor === '0') throw new Error('Division by zero');
-    return BigNumber(dividend).div(BigNumber(divisor)).toString();
+    return BigNumber(dividend).div(BigNumber(divisor)).toFixed();
   }
 
   /**
@@ -192,7 +191,7 @@ export class CalculatorMath {
    */
   public mod(dividend: string, divisor: string): string {
     if (divisor === '0') throw new Error('Division by zero');
-    return BigNumber(dividend).mod(BigNumber(divisor)).toString();
+    return BigNumber(dividend).mod(BigNumber(divisor)).toFixed();
   }
 
   /**
@@ -202,7 +201,7 @@ export class CalculatorMath {
    * @returns base^exponent 결과 (문자열)
    */
   public pow(base: string, exponent: string): string {
-    return BigNumber(base).pow(BigNumber(exponent)).toString();
+    return BigNumber(base).pow(BigNumber(exponent)).toFixed();
   }
 
   /**
@@ -215,7 +214,7 @@ export class CalculatorMath {
   public root(radicand: string, index: string): string {
     if (BigNumber(index).lt(0) && this.mod(this.int(radicand), '2') === '0')
       throw new Error('The root of a negative number is not allowed.');
-    return BigNumber(radicand).pow(BigNumber(1).div(index)).toString();
+    return BigNumber(radicand).pow(BigNumber(1).div(index)).toFixed();
   }
 
   /**
@@ -248,8 +247,8 @@ export class CalculatorMath {
   public truncateToBitSize(value: string, wordSize: number = 8): string {
     this.validateNonNegativeNumbers(value);
     return wordSize === 0
-      ? BigNumber(value).floor().toString()
-      : BigNumber(value).mod(BigNumber(2).pow(wordSize)).floor().toString();
+      ? BigNumber(value).floor().toFixed()
+      : BigNumber(value).mod(BigNumber(2).pow(wordSize)).floor().toFixed();
   }
 
   /**
@@ -266,7 +265,7 @@ export class CalculatorMath {
         .abs()
         .floor()
         .mul(BigNumber(2).pow(BigNumber(shiftAmount).abs().floor()))
-        .toString(),
+        .toFixed(),
       wordSize,
     );
   }
@@ -285,7 +284,7 @@ export class CalculatorMath {
         .abs()
         .floor()
         .div(BigNumber(2).pow(BigNumber(shiftAmount).abs().floor()))
-        .toString(),
+        .toFixed(),
       wordSize,
     );
   }

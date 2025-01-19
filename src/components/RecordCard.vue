@@ -309,6 +309,16 @@
   interface QSlideEvent {
     reset: () => void;
   }
+
+  // 툴팁 상태를 위한 인터페이스 정의
+  interface TooltipState {
+    [key: number]: boolean;
+  }
+
+  const isTooltipOpen = reactive<TooltipState>({});
+  const handleTooltip = (id: number, isShow: boolean) => {
+    isTooltipOpen[id] = isShow;
+  };
 </script>
 
 <template>
@@ -421,7 +431,15 @@
                   <u><HighlightText :text="record.memo" :search-term="store.searchKeyword" /></u>
                 </q-item-label>
                 <q-item-label style="white-space: pre-wrap">
-                  <HighlightText :text="record.displayText" :search-term="store.searchKeyword" />
+                  <HighlightText
+                    :text="record.displayText"
+                    :search-term="store.searchKeyword"
+                    allow-line-break
+                    @show-tooltip="(isShow) => handleTooltip(record.id, isShow)"
+                  />
+                  <q-tooltip v-if="isTooltipOpen[record.id]" :delay="1000">
+                    {{ record.displayText }}
+                  </q-tooltip>
                 </q-item-label>
                 <q-item-label class="text-caption text-grey-7">
                   <HighlightText :text="formatDateTime(record.timestamp)" :search-term="store.searchKeyword" />

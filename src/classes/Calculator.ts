@@ -680,7 +680,7 @@ export class Calculator {
   }
 
   public pow2(): void {
-    this.performUnaryOperation(Operator.POW2, () => BigNumber(this.currentNumber).pow(2).toString());
+    this.performUnaryOperation(Operator.POW2, () => this.math.pow(this.currentNumber, '2'));
   }
 
   public fct(): void {

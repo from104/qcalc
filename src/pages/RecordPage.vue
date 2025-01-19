@@ -3,7 +3,7 @@
 </script>
 
 <template>
-  <q-page id="record-page" class="q-mt-none q-pa-none">
+  <q-page id="record-page" class="full-width q-mt-none q-pa-none">
     <q-card flat square>
       <RecordCard />
     </q-card>

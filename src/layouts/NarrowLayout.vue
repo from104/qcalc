@@ -208,7 +208,7 @@
       </q-toolbar>
     </q-header>
 
-    <q-page-container style="padding-bottom: 0px">
+    <q-page-container class="row" style="padding-bottom: 0px">
       <!-- 메인 페이지 컨텐츠 -->
       <template v-if="!isSubPage">
         <q-tab-panels v-model="store.currentTab" animated infinite :swipeable="$q.platform.is.mobile">
@@ -220,9 +220,11 @@
 
       <!-- 서브 페이지 컨텐츠 -->
       <template v-else>
-        <q-scroll-area class="sub-scroll-area" :class="{ 'hide-scrollbar': currentPage === 'record' }">
-          <component :is="CurrentSubPageComponent" />
-        </q-scroll-area>
+        <div class="col-12">
+          <q-scroll-area class="sub-scroll-area" :class="{ 'hide-scrollbar': currentPage === 'record' }">
+            <component :is="CurrentSubPageComponent" class="sub-page" />
+          </q-scroll-area>
+        </div>
       </template>
     </q-page-container>
   </q-layout>
@@ -246,6 +248,10 @@
     :deep(.q-scrollarea__thumb) {
       display: none !important;
     }
+  }
+
+  .sub-page {
+    max-width: 100vw;
   }
 </style>
 
