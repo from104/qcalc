@@ -7,7 +7,7 @@ import { all, create } from 'mathjs';
 // MathJS 라이브러리 설정
 export const MathB = create(all as FactoryFunctionMap, {
   number: 'BigNumber',
-  precision: 1025,
+  precision: 64,
 });
 
 // BigNumber 타입 정의

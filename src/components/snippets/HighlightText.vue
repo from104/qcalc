@@ -1,5 +1,5 @@
 <script setup lang="ts">
-  import { h, ref, onMounted } from 'vue';
+  import { h, ref, onMounted, watch } from 'vue';
   import { useStore } from 'stores/store';
 
   const store = useStore();
@@ -20,16 +20,23 @@
   }>();
 
   // 텍스트 요소에 대한 참조 생성
-  const textElement = ref<HTMLElement | null>(null);
+  const textIDs = ref<string[]>([]);
 
-  /**
-   * 텍스트가 줄임표로 표시되는지 확인하고 tooltip을 표시합니다.
-   */
+  // 텍스트가 줄임표로 표시되는지 확인
   const checkTextOverflow = () => {
-    if (textElement.value) {
-      const isOverflowing = textElement.value.scrollWidth > textElement.value.clientWidth;
-      emit('show-tooltip', isOverflowing);
+    for (const id of textIDs.value) {
+      console.log('checkTextOverflow id', id);
+      const textElement = document.getElementById(id);
+      if (textElement) {
+        if (textElement.scrollWidth > textElement.clientWidth) {
+          console.log('checkTextOverflow', true);
+          emit('show-tooltip', true);
+          return;
+        }
+      }
     }
+    console.log('checkTextOverflow', false);
+    emit('show-tooltip', false);
   };
 
   // 컴포넌트가 마운트된 후 overflow 체크
@@ -38,12 +45,16 @@
   });
 
   const renderLine = (text: string, searchTerm: string) => {
+    // now()기반의 고유 ID 생성
+    const id = Date.now() + '-for-check-overflow';
+    textIDs.value.push(id);
+
     if (!store.isSearchOpen || !searchTerm.trim()) {
       return h(
         'span',
         {
           class: 'single-line',
-          ref: textElement,
+          id: id,
         },
         text,
       );
@@ -57,7 +68,7 @@
       'span',
       {
         class: 'single-line',
-        ref: textElement,
+        id: id,
       },
       parts.map((part, i) => (i % 2 === 1 ? h('span', { class: 'search-highlight' }, part) : h('span', part))),
     );
@@ -73,21 +84,20 @@
 
     return h(
       'span',
-      {
-        class: 'multiline',
-        ref: textElement,
-      },
+      { class: 'multiline' },
       lines.map((line, index) => [renderLine(line, props.searchTerm), index < lines.length - 1 ? h('br') : null]),
     );
   };
+
+  
+  watch(() => props.text, () => {
+    setTimeout(checkTextOverflow, 10);
+  });
+
 </script>
 
 <template>
-  <component :is="render()">
-    <q-tooltip v-if="props.text" anchor="top middle" self="bottom middle">
-      {{ props.text }}
-    </q-tooltip>
-  </component>
+  <component :is="render()" />
 </template>
 
 <style scoped>

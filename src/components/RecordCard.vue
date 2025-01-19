@@ -22,6 +22,7 @@
 
   // 컴포넌트 import
   import MenuItem from 'components/snippets/MenuItem.vue';
+  import ToolTip from 'components/snippets/ToolTip.vue';
   import HighlightText from 'components/snippets/HighlightText.vue';
 
   // 계산 결과 배열 (반응형)
@@ -315,9 +316,16 @@
     [key: number]: boolean;
   }
 
-  const isTooltipOpen = reactive<TooltipState>({});
-  const handleTooltip = (id: number, isShow: boolean) => {
-    isTooltipOpen[id] = isShow;
+  const isShowResultTooltip = reactive<TooltipState>({});
+  const handleResultTooltip = (id: number, isShow: boolean) => {
+    console.log('handleResultTooltip', id, isShow);
+    isShowResultTooltip[id] = isShow;
+  };
+
+  const isShowMemoTooltip = reactive<TooltipState>({});
+  const handleMemoTooltip = (id: number, isShow: boolean) => {
+    console.log('handleMemoTooltip', id, isShow);
+    isShowMemoTooltip[id] = isShow;
   };
 </script>
 
@@ -427,19 +435,26 @@
               role="listitem"
             >
               <q-item-section class="q-mr-none q-px-none">
-                <q-item-label v-if="record.memo">
-                  <u><HighlightText :text="record.memo" :search-term="store.searchKeyword" /></u>
+                <q-item-label v-if="record.memo" class="memo-text">
+                  <HighlightText
+                    :text="record.memo"
+                    :search-term="store.searchKeyword"
+                    @show-tooltip="(isShow) => handleMemoTooltip(record.id, isShow)"
+                  />
+                  <ToolTip v-if="isShowMemoTooltip[record.id]" :delay="1000">
+                    {{ record.memo }}
+                  </ToolTip>
                 </q-item-label>
-                <q-item-label style="white-space: pre-wrap">
+                <q-item-label class="record-text">
                   <HighlightText
                     :text="record.displayText"
                     :search-term="store.searchKeyword"
                     allow-line-break
-                    @show-tooltip="(isShow) => handleTooltip(record.id, isShow)"
+                    @show-tooltip="(isShow) => handleResultTooltip(record.id, isShow)"
                   />
-                  <q-tooltip v-if="isTooltipOpen[record.id]" :delay="1000">
+                  <ToolTip v-if="isShowResultTooltip[record.id]" :delay="1000" line-break>
                     {{ record.displayText }}
-                  </q-tooltip>
+                  </ToolTip>
                 </q-item-label>
                 <q-item-label class="text-caption text-grey-7">
                   <HighlightText :text="formatDateTime(record.timestamp)" :search-term="store.searchKeyword" />
@@ -563,6 +578,20 @@
     max-height: calc(100vh - v-bind('calculatedHeaderHeight'));
     overflow: auto;
     transition: padding-top 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .record-text {
+    white-space: pre-wrap;
+    font-size: 0.8rem;
+  }
+
+  .memo-text {
+    font-size: 0.9rem;
+    text-decoration: underline;
+
+    :deep(span) {
+      text-decoration: underline;
+    }
   }
 
   .slide-fade-enter-active,
