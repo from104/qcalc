@@ -8,6 +8,7 @@
 
   // 컴포넌트 가져오기
   import HeaderIcons from 'components/HeaderIcons.vue';
+  import ToolTip from 'components/snippets/ToolTip.vue';
 
   // 페이지 컴포넌트 가져오기
   import CalcPage from 'pages/CalcPage.vue';
@@ -26,44 +27,50 @@
 
   // 메인 탭 정보 설정
   const tabs = reactive([
-    { name: 'calc', title: t('calc'), component: shallowRef(CalcPage) },
-    { name: 'unit', title: t('unit'), component: shallowRef(UnitPage) },
-    { name: 'currency', title: t('currency'), component: shallowRef(CurrencyPage) },
-    { name: 'radix', title: t('radix'), component: shallowRef(RadixPage) },
+    { name: 'calc', title: computed(() => t('calc')), component: shallowRef(CalcPage) },
+    { name: 'unit', title: computed(() => t('unit')), component: shallowRef(UnitPage) },
+    { name: 'currency', title: computed(() => t('currency')), component: shallowRef(CurrencyPage) },
+    { name: 'radix', title: computed(() => t('radix')), component: shallowRef(RadixPage) },
   ]);
 
-  // 서브 페이지 설정
-  interface PageConfig {
-    component: typeof HelpPage | typeof AboutPage | typeof RecordPage | typeof SettingPage;
-    title: string;
-    showClose?: boolean;
-    buttons?: PageButton[];
-  }
-
-  interface PageButton {
-    icon: string;
-    disabled: ComputedRef<boolean>;
-    action: () => void;
-  }
+  //     action: () => void;
+  //     tooltip: () => ComputedRef<string>;
+  //   }[];
+  // }
 
   const isRecordDisabled = computed(() => {
     return store.calc.record.getAllRecords().length === 0 || store.isDeleteRecordConfirmOpen;
   });
 
-  const SUB_PAGE_CONFIG: Record<string, PageConfig> = {
+  // 서브 페이지 설정
+  interface SubPageConfig {
+    [key: string]: {
+      component: ReturnType<typeof shallowRef>;
+      title: ComputedRef<string>;
+      showClose?: boolean;
+      buttons?: {
+        icon: string;
+        disabled: ComputedRef<boolean>;
+        action: () => void;
+        tooltip: ComputedRef<string>;
+      }[];
+    };
+  }
+  
+  const SUB_PAGE_CONFIG = reactive<SubPageConfig>({
     help: {
-      component: HelpPage,
-      title: t('message.help'),
+      component: shallowRef(HelpPage),
+      title: computed(() => t('message.help')),
       showClose: true,
     },
     about: {
-      component: AboutPage,
-      title: t('message.about'),
+      component: shallowRef(AboutPage),
+      title: computed(() => t('message.about')),
       showClose: true,
     },
     record: {
-      component: RecordPage,
-      title: t('message.record'),
+      component: shallowRef(RecordPage),
+      title: computed(() => t('message.record')),
       buttons: [
         {
           icon: 'search',
@@ -71,6 +78,7 @@
           action: () => {
             store.isSearchOpen = !store.isSearchOpen;
           },
+          tooltip: computed(() => t('tooltip.search')),
         },
         {
           icon: 'delete_outline',
@@ -78,15 +86,16 @@
           action: () => {
             store.isDeleteRecordConfirmOpen = true;
           },
+          tooltip: computed(() => t('tooltip.deleteRecord')),
         },
       ],
     },
     settings: {
-      component: SettingPage,
-      title: t('message.settings'),
+      component: shallowRef(SettingPage),
+      title: computed(() => t('message.settings')),
       showClose: true,
     },
-  };
+  });
 
   // 현재 서브 페이지 관련
   const currentSubPage = ref('record');
@@ -139,19 +148,6 @@
     { immediate: true },
   );
 
-  // 언어 변경 시 탭 이름 업데이트
-  watch(
-    () => store.locale,
-    () => {
-      tabs.forEach((tab) => {
-        tab.title = t(tab.name);
-      });
-      Object.keys(SUB_PAGE_CONFIG).forEach((page) => {
-        SUB_PAGE_CONFIG[page]!.title = t(`message.${page}`);
-      });
-    },
-  );
-
   onMounted(() => {
     keyBinding.subscribe();
     const validPages = ['help', 'about', 'settings'];
@@ -162,11 +158,11 @@
     keyBinding.unsubscribe();
   });
 
-  const SUB_PAGE_BUTTONS = [
-    { label: 'help', icon: 'help_outline', path: '/help' },
-    { label: 'about', icon: 'info_outline', path: '/about' },
-    { label: 'settings', icon: 'settings', path: '/settings' },
-  ];
+  const SUB_PAGE_BUTTONS = reactive([
+    { label: 'help', icon: 'help_outline', path: '/help', tooltip: computed(() => t('tooltip.help')) },
+    { label: 'about', icon: 'info_outline', path: '/about', tooltip: computed(() => t('tooltip.about')) },
+    { label: 'settings', icon: 'settings', path: '/settings', tooltip: computed(() => t('tooltip.settings')) },
+  ]);
 </script>
 
 <template>
@@ -226,7 +222,9 @@
                 role="button"
                 :aria-label="t('ariaLabel.subPageButton', { label: t(`message.${button.label}`) })"
                 @click="store.navigateToPath(button.path, route, router)"
-              />
+              >
+                <ToolTip :text="button.tooltip" />
+              </q-btn>
               <q-separator vertical class="sub-header-separator q-mx-sm" />
               <q-btn
                 v-for="button in SUB_PAGE_CONFIG[currentSubPage]?.buttons"
@@ -237,9 +235,11 @@
                 :icon="button.icon"
                 role="button"
                 :aria-label="t(`ariaLabel.${button.icon}`)"
-                :disable="button.disabled.value"
+                :disable="button.disabled as unknown as boolean"
                 @click="button.action"
-              />
+              >
+                <ToolTip :text="button.tooltip as unknown as string" />
+              </q-btn>
               <q-btn
                 v-if="SUB_PAGE_CONFIG[currentSubPage]?.showClose"
                 class="q-mx-none q-px-none"
@@ -437,6 +437,12 @@ ko:
     subPageContent: '서브페이지 컨텐츠'
     tabSelected: '{name} 탭 선택됨'
     tabUnselected: '{name} 탭 선택되지 않음'
+  tooltip:
+    help: '도움말'
+    about: '정보'
+    settings: '설정'
+    deleteRecord: '모든 기록 삭제'
+    search: '검색'
 en:
   calc: Basic
   unit: Unit
@@ -457,4 +463,10 @@ en:
     subPageContent: 'Sub page content'
     tabSelected: '{name} tab selected'
     tabUnselected: '{name} tab unselected'
+  tooltip:
+    help: 'Help'
+    about: 'About'
+    settings: 'Settings'
+    deleteRecord: 'Delete all records'
+    search: 'Search'
 </i18n>
