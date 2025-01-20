@@ -36,15 +36,15 @@
     () => records,
     (newRecords) => {
       // 새로운 히스토리 항목에 대한 메뉴 상태 초기화
-      newRecords.value.forEach((h) => {
-        if (h.id && recordMenu[h.id] === undefined) {
-          recordMenu[h.id] = false;
+      newRecords.value.forEach((record) => {
+        if (record.id && recordMenu[record.id] === undefined) {
+          recordMenu[record.id] = false;
         }
       });
 
       // 삭제된 히스토리 항목의 메뉴 상태 제거
       for (const id in recordMenu) {
-        if (!newRecords.value.some((h) => h.id === parseInt(id))) {
+        if (!newRecords.value.some((record) => record.id === parseInt(id))) {
           delete recordMenu[id];
         }
       }
@@ -543,6 +543,8 @@
     transition-show="slide-right"
     :transition-hide="memoSlideDirection"
     style="z-index: 15"
+    @show="store.setInputFocused"
+    @hide="store.setInputBlurred"
   >
     <q-card class="noselect text-center" style="width: 250px">
       <q-bar v-auto-blur dark class="full-width justify-between nnoselect text-body1 text-white bg-primary">

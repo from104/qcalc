@@ -1,5 +1,5 @@
 <script setup lang="ts">
-  import { h, ref, onMounted, watch } from 'vue';
+  import { h, ref, onMounted, watch, onUnmounted } from 'vue';
   import { useStore } from 'stores/store';
 
   const store = useStore();
@@ -25,28 +25,48 @@
   // 텍스트가 줄임표로 표시되는지 확인
   const checkTextOverflow = () => {
     for (const id of textIDs.value) {
-      console.log('checkTextOverflow id', id);
       const textElement = document.getElementById(id);
       if (textElement) {
         if (textElement.scrollWidth > textElement.clientWidth) {
-          console.log('checkTextOverflow', true);
           emit('show-tooltip', true);
           return;
         }
       }
     }
-    console.log('checkTextOverflow', false);
     emit('show-tooltip', false);
   };
 
-  // 컴포넌트가 마운트된 후 overflow 체크
+  // 컴포넌트가 마운트된 후 overflow 체크 및 리사이즈 이벤트 리스너 등록
   onMounted(() => {
-    checkTextOverflow();
+    setTimeout(checkTextOverflow, 350);
+    window.addEventListener('resize', checkTextOverflow);
   });
 
+  // 컴포넌트가 언마운트될 때 리사이즈 이벤트 리스너 제거
+  onUnmounted(() => {
+    window.removeEventListener('resize', checkTextOverflow);
+  });
+
+  // 텍스트가 변경될 때 체크
+  watch(
+    () => props.text,
+    () => {
+      setTimeout(checkTextOverflow, 10);
+    },
+  );
+
+  // UUID v4 생성 함수
+  const generateUUID = () => {
+    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
+      const r = (Math.random() * 16) | 0;
+      const v = c === 'x' ? r : (r & 0x3) | 0x8;
+      return v.toString(16);
+    });
+  };
+
   const renderLine = (text: string, searchTerm: string) => {
-    // now()기반의 고유 ID 생성
-    const id = Date.now() + '-for-check-overflow';
+    // UUID 기반의 고유 ID 생성
+    const id = `highlight-${generateUUID()}`;
     textIDs.value.push(id);
 
     if (!store.isSearchOpen || !searchTerm.trim()) {
@@ -88,12 +108,6 @@
       lines.map((line, index) => [renderLine(line, props.searchTerm), index < lines.length - 1 ? h('br') : null]),
     );
   };
-
-  
-  watch(() => props.text, () => {
-    setTimeout(checkTextOverflow, 10);
-  });
-
 </script>
 
 <template>

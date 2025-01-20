@@ -22,12 +22,6 @@ import type { StoreState, DarkModeType } from '../types/store';
 
 const radixConverter = new RadixConverter();
 
-// 플로팅 창 위치 관련 상태 추가
-interface FloatingPosition {
-  x: number;
-  y: number;
-}
-
 // 기본 스토어 정의
 export const useStore = defineStore('store', {
   // 상태 정의
@@ -84,10 +78,6 @@ export const useStore = defineStore('store', {
     targetRadix: Radix.Hexadecimal,
     showRadix: true,
     radixType: 'suffix',
-
-    // 플로팅 창 위치 관련 상태 추가
-    singleFloatingPosition: { x: 16, y: 16 } as FloatingPosition,
-    doubleFloatingPosition: { x: 16, y: 16 } as FloatingPosition,
   }),
 
   // 액션 정의

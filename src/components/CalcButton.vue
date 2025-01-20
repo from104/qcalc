@@ -306,8 +306,10 @@
     () => store.inputFocused,
     (focused) => {
       if (focused) {
+        console.log('button unsubscribe');
         keyBinding.unsubscribe();
       } else {
+        console.log('button subscribe');
         keyBinding.subscribe();
       }
     },

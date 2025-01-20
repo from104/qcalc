@@ -72,10 +72,6 @@ export interface StoreState {
   targetRadix: RadixType;
   showRadix: boolean;
   radixType: 'prefix' | 'suffix';
-
-  // 플로팅 창 위치 관련
-  singleFloatingPosition: FloatingPosition;
-  doubleFloatingPosition: FloatingPosition;
 }
 
 /**
