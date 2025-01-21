@@ -11,10 +11,16 @@ import type { CalculationResult } from './calculator';
  */
 export type DarkModeType = 'system' | 'light' | 'dark';
 
-export interface FloatingPosition {
-  x: number;
-  y: number;
-}
+/**
+ * 그룹핑 단위 설정 타입
+ */
+export type GroupingUnitType = 3 | 4;
+
+// 소수점 자릿수를 위한 상수 배열 정의
+export const DECIMAL_PLACES = [-1, 0, 2, 4, 8, 16, 32] as const;
+
+// DecimalPlacesType을 배열로부터 생성
+export type DecimalPlacesType = (typeof DECIMAL_PLACES)[number];
 
 /**
  * 스토어의 상태 인터페이스
@@ -47,8 +53,10 @@ export interface StoreState {
 
   // 숫자 표시 관련
   useGrouping: boolean;
-  groupingUnit: 3 | 4;
-  decimalPlaces: number;
+  groupingUnit: GroupingUnitType;
+  decimalPlaces: DecimalPlacesType;
+
+  // 언어 관련
   useSystemLocale: boolean;
   locale: string;
   userLocale: string;

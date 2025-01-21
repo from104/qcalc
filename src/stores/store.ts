@@ -18,7 +18,8 @@ import { UnitConverter } from 'classes/UnitConverter';
 import { CurrencyConverter } from 'classes/CurrencyConverter';
 import { RadixConverter } from 'classes/RadixConverter';
 
-import type { StoreState, DarkModeType } from '../types/store';
+import type { StoreState, DarkModeType, DecimalPlacesType, GroupingUnitType } from '../types/store';
+import { DECIMAL_PLACES } from '../types/store';
 
 const radixConverter = new RadixConverter();
 
@@ -54,7 +55,9 @@ export const useStore = defineStore('store', {
     // 숫자 표시 관련
     useGrouping: true,
     groupingUnit: 3,
-    decimalPlaces: -2,
+    decimalPlaces: -1,
+
+    // 언어 관련
     useSystemLocale: true,
     locale: '',
     userLocale: '',
@@ -213,7 +216,9 @@ export const useStore = defineStore('store', {
         this.targetRadix = Radix.Hexadecimal;
       }
       if (this.sourceRadix === this.targetRadix) {
-        this.targetRadix = this.radixList[(this.radixList.indexOf(this.sourceRadix) + 1) % this.radixList.length] as Radix;
+        this.targetRadix = this.radixList[
+          (this.radixList.indexOf(this.sourceRadix) + 1) % this.radixList.length
+        ] as Radix;
       }
     },
 
@@ -416,22 +421,28 @@ export const useStore = defineStore('store', {
       this.useGrouping = !this.useGrouping;
     },
 
-    setGroupingUnit(digitCount: 3 | 4) {
+    setGroupingUnit(digitCount: GroupingUnitType) {
       this.groupingUnit = digitCount;
     },
 
-    setDecimalPlaces(places: number) {
-      if ([-2, 0, 2, 4, 6].includes(places)) {
-        this.decimalPlaces = places;
-      }
+    setDecimalPlaces(places: DecimalPlacesType) {
+      this.decimalPlaces = places;
     },
 
     incrementDecimalPlaces() {
-      this.setDecimalPlaces(this.decimalPlaces + 2);
+      const currentIndex = DECIMAL_PLACES.indexOf(this.decimalPlaces);
+      const nextValue = DECIMAL_PLACES[currentIndex + 1];
+      if (nextValue !== undefined) {
+        this.setDecimalPlaces(nextValue);
+      }
     },
 
     decrementDecimalPlaces() {
-      this.setDecimalPlaces(this.decimalPlaces - 2);
+      const currentIndex = DECIMAL_PLACES.indexOf(this.decimalPlaces);
+      const prevValue = DECIMAL_PLACES[currentIndex - 1];
+      if (prevValue !== undefined) {
+        this.setDecimalPlaces(prevValue);
+      }
     },
 
     // UI 표시 설정
