@@ -8,7 +8,7 @@
 
   // 컴포넌트 가져오기
   import HeaderIcons from 'components/HeaderIcons.vue';
-
+  import ToolTip from 'components/snippets/ToolTip.vue';
   // 페이지 컴포넌트 가져오기
   import CalcPage from 'pages/CalcPage.vue';
   import UnitPage from 'pages/UnitPage.vue';
@@ -27,33 +27,43 @@
 
   // 메인 탭 정보 설정
   const tabs = reactive([
-    { name: 'calc', title: t('calc'), component: shallowRef(CalcPage) },
-    { name: 'unit', title: t('unit'), component: shallowRef(UnitPage) },
-    { name: 'currency', title: t('currency'), component: shallowRef(CurrencyPage) },
-    { name: 'radix', title: t('radix'), component: shallowRef(RadixPage) },
+    { name: 'calc', title: computed(() => t('calc')), component: shallowRef(CalcPage) },
+    { name: 'unit', title: computed(() => t('unit')), component: shallowRef(UnitPage) },
+    { name: 'currency', title: computed(() => t('currency')), component: shallowRef(CurrencyPage) },
+    { name: 'radix', title: computed(() => t('radix')), component: shallowRef(RadixPage) },
   ]);
 
   // 서브 페이지 설정
-  interface PageButton {
-    icon: string;
-    disabled: ComputedRef<boolean>;
-    action: () => void;
-  }
 
-  interface PageConfig {
-    component: typeof HelpPage | typeof AboutPage | typeof RecordPage | typeof SettingPage;
-    buttons?: PageButton[];
+  interface SubPageConfig {
+    [key: string]: {
+      component: ReturnType<typeof shallowRef>;
+      title: ComputedRef<string>;
+      buttons?: {
+        icon: string;
+        disabled: ComputedRef<boolean>;
+        action: () => void;
+        tooltip: ComputedRef<string>;
+      }[];
+    };
   }
 
   const isRecordDisabled = computed(() => {
     return store.calc.record.getAllRecords().length === 0 || store.isDeleteRecordConfirmOpen;
   });
 
-  const SUB_PAGE_CONFIG: Record<string, PageConfig> = {
-    help: { component: HelpPage },
-    about: { component: AboutPage },
+  const SUB_PAGE_CONFIG = reactive<SubPageConfig>({
+    help: {
+      component: shallowRef(HelpPage),
+      title: computed(() => t('message.help')),
+    },
+    about: {
+      component: shallowRef(AboutPage),
+      title: computed(() => t('message.about')),
+    },
     record: {
-      component: RecordPage,
+      component: shallowRef(RecordPage),
+      title: computed(() => t('message.record')),
       buttons: [
         {
           icon: 'search',
@@ -61,6 +71,7 @@
           action: () => {
             store.isSearchOpen = !store.isSearchOpen;
           },
+          tooltip: computed(() => t('tooltip.search')),
         },
         {
           icon: 'delete_outline',
@@ -68,20 +79,24 @@
           action: () => {
             store.isDeleteRecordConfirmOpen = true;
           },
+          tooltip: computed(() => t('tooltip.deleteRecord')),
         },
       ],
     },
-    settings: { component: SettingPage },
-  };
+    settings: {
+      component: shallowRef(SettingPage),
+      title: computed(() => t('message.settings')),
+    },
+  });
 
   // 현재 페이지가 서브 페이지인지 확인
   const isSubPage = computed(() => {
-    return ['help', 'about', 'record', 'settings'].includes(String(route.name));
+    return Object.keys(SUB_PAGE_CONFIG).includes(String(route.name));
   });
 
   // 현재 서브 페이지 컴포넌트
   const CurrentSubPageComponent = computed(() => {
-    return SUB_PAGE_CONFIG[route.name as keyof typeof SUB_PAGE_CONFIG]?.component ?? null;
+    return SUB_PAGE_CONFIG[currentSubPage.value as keyof typeof SUB_PAGE_CONFIG]?.component ?? null;
   });
 
   // 탭 이동 함수들
@@ -132,16 +147,6 @@
     { immediate: true },
   );
 
-  // 언어 변경 시 탭 이름 업데이트
-  watch(
-    () => store.locale,
-    () => {
-      tabs.forEach((tab) => {
-        tab.title = t(tab.name);
-      });
-    },
-  );
-
   onMounted(() => {
     keyBinding.subscribe();
   });
@@ -150,7 +155,7 @@
     keyBinding.unsubscribe();
   });
 
-  const currentPage = computed(() => {
+  const currentSubPage = computed(() => {
     return route.name;
   });
 </script>
@@ -190,10 +195,10 @@
           :aria-label="t('ariaLabel.back')"
           @click="router.back()"
         />
-        <q-toolbar-title class="text-subtitle1">{{ t(`message.${String(route.name)}`) }}</q-toolbar-title>
+        <q-toolbar-title class="text-subtitle1">{{ SUB_PAGE_CONFIG[currentSubPage as keyof typeof SUB_PAGE_CONFIG]?.title }}</q-toolbar-title>
         <q-space />
         <q-btn
-          v-for="button in SUB_PAGE_CONFIG[route.name as keyof typeof SUB_PAGE_CONFIG]?.buttons"
+          v-for="button in SUB_PAGE_CONFIG[currentSubPage as keyof typeof SUB_PAGE_CONFIG]?.buttons"
           :key="button.icon"
           dense
           flat
@@ -202,9 +207,11 @@
           :icon="button.icon"
           role="button"
           :aria-label="t(`ariaLabel.${button.icon}`)"
-          :disable="button.disabled.value"
+          :disable="button.disabled as unknown as boolean"
           @click="button.action"
-        />
+        >
+          <ToolTip :text="button.tooltip as unknown as string" />
+        </q-btn>
       </q-toolbar>
     </q-header>
 
@@ -221,7 +228,7 @@
       <!-- 서브 페이지 컨텐츠 -->
       <template v-else>
         <div class="col-12">
-          <q-scroll-area class="sub-scroll-area" :class="{ 'hide-scrollbar': currentPage === 'record' }">
+          <q-scroll-area class="sub-scroll-area" :class="{ 'hide-scrollbar': currentSubPage === 'record' }">
             <component :is="CurrentSubPageComponent" class="sub-page" />
           </q-scroll-area>
         </div>
@@ -264,6 +271,9 @@ ko:
   ariaLabel:
     back: '이전 페이지로 돌아가기'
     delete_outline: '모든 기록 삭제'
+  tooltip:
+    search: '검색'
+    deleteRecord: '모든 기록 삭제'
 en:
   calc: Basic
   unit: Unit
@@ -272,4 +282,7 @@ en:
   ariaLabel:
     back: 'Go back to previous page'
     delete_outline: 'Delete all records'
+  tooltip:
+    search: 'Search'
+    deleteRecord: 'Delete all records'
 </i18n>

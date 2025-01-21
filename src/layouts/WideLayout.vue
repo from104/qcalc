@@ -117,7 +117,9 @@
 
   // 현재 페이지가 서브 페이지인지 확인
   const isSubPage = computed(() => {
-    return ['help', 'about', 'settings'].includes(String(route.name));
+    return Object.keys(SUB_PAGE_CONFIG).filter(
+      key => key !== 'record'
+    ).includes(String(route.name));
   });
 
   // 서브 페이지 닫기
