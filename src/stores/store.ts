@@ -83,6 +83,9 @@ export const useStore = defineStore('store', {
     radixType: 'suffix',
   }),
 
+  getters: {
+    getDecimalPlaces: (state) => DECIMAL_PLACES[state.decimalPlaces ?? -1] ?? -1,
+  },
   // 액션 정의
   actions: {
     // 탭 관리
@@ -167,7 +170,7 @@ export const useStore = defineStore('store', {
     toFormattedNumber(value: string): string {
       if (!value) return '';
 
-      const formattedValue = this.formatDecimalPlaces(value, this.decimalPlaces);
+      const formattedValue = this.formatDecimalPlaces(value, this.getDecimalPlaces);
 
       return this.useGrouping ? this.numberGrouping(formattedValue) : formattedValue;
     },
@@ -430,19 +433,19 @@ export const useStore = defineStore('store', {
     },
 
     incrementDecimalPlaces() {
-      const currentIndex = DECIMAL_PLACES.indexOf(this.decimalPlaces);
-      const nextValue = DECIMAL_PLACES[currentIndex + 1];
-      if (nextValue !== undefined) {
-        this.setDecimalPlaces(nextValue);
-      }
+      this.decimalPlaces = Math.min(
+        this.decimalPlaces + 1,
+        Math.max(...Object.keys(DECIMAL_PLACES).map(Number)),
+      );
+      console.log(this.decimalPlaces);
     },
 
     decrementDecimalPlaces() {
-      const currentIndex = DECIMAL_PLACES.indexOf(this.decimalPlaces);
-      const prevValue = DECIMAL_PLACES[currentIndex - 1];
-      if (prevValue !== undefined) {
-        this.setDecimalPlaces(prevValue);
-      }
+      this.decimalPlaces = Math.max(
+        this.decimalPlaces - 1,
+        Math.min(...Object.keys(DECIMAL_PLACES).map(Number)),
+      );
+      console.log(this.decimalPlaces);
     },
 
     // UI 표시 설정

@@ -17,9 +17,27 @@ export type DarkModeType = 'system' | 'light' | 'dark';
 export type GroupingUnitType = 3 | 4;
 
 // 소수점 자릿수를 위한 상수 배열 정의
-export const DECIMAL_PLACES = [-1, 0, 2, 4, 8, 16, 32] as const;
+// export const DECIMAL_PLACES = [-1, 0, 2, 4, 6, 8, 16] as const;
+// -1 => -1
+// 0 => 0
+// 1 => 2
+// 2 => 4
+// 3 => 6
+// 4 => 8
+// 5 => 16
+export const DECIMAL_PLACES: { [key: number]: number } = {
+  '-1': -1,
+  '0': 0,
+  '1': 2,
+  '2': 4,
+  '3': 6,
+  '4': 8,
+  5: 16,
+} as const;
 
 // DecimalPlacesType을 배열로부터 생성
+// -1 | 0 | 1 | 2 | 3 | 4 | 5
+
 export type DecimalPlacesType = (typeof DECIMAL_PLACES)[number];
 
 /**

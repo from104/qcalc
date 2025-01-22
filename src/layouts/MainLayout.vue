@@ -139,7 +139,11 @@
   // 서브 페이지 닫기
   const closeSubPage = () => {
     if (isSubPage.value) {
-      switchSubPage('record');
+      if (store.isAtLeastDoubleWidth()) {
+        switchSubPage('record');
+      } else {
+        router.back();
+      }
     }
   };
 

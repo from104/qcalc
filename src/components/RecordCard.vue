@@ -318,13 +318,11 @@
 
   const isShowResultTooltip = reactive<TooltipState>({});
   const handleResultTooltip = (id: number, isShow: boolean) => {
-    console.log('handleResultTooltip', id, isShow);
     isShowResultTooltip[id] = isShow;
   };
 
   const isShowMemoTooltip = reactive<TooltipState>({});
   const handleMemoTooltip = (id: number, isShow: boolean) => {
-    console.log('handleMemoTooltip', id, isShow);
     isShowMemoTooltip[id] = isShow;
   };
 </script>

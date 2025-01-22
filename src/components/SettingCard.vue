@@ -1,6 +1,6 @@
 <script lang="ts" setup>
   // Vue 핵심 기능 및 컴포지션 API 가져오기
-  import { reactive, watch, ref } from 'vue';
+  import { reactive, watch, ref, computed } from 'vue';
 
   // Quasar 프레임워크 관련
   import { useQuasar } from 'quasar';
@@ -22,17 +22,20 @@
   // 패키지 버전 정보
   import { version } from '../../package.json';
 
+  // 소수점 자리수 설정 값
+  // const DECIMAL_PLACES = [-1, 0, 2, 4, 8, 16, 32] as const;
+  // type DecimalPlacesType = (typeof DECIMAL_PLACES)[number];
+
+  import { DECIMAL_PLACES } from 'src/types/store';
+
   // 언어 옵션 정의
   const languageOptions = reactive([
-    { value: 'ko', label: t('message.ko') },
-    { value: 'en', label: t('message.en') },
+    { value: 'ko', label: computed(() => t('message.ko')) },
+    { value: 'en', label: computed(() => t('message.en')) },
   ]);
 
   // 시스템 로케일 사용 여부와 사용자 로케일이 변경될 때마다 언어 옵션 라벨을 업데이트합니다.
   watch([() => store.useSystemLocale, () => store.userLocale], () => {
-    languageOptions.forEach((option) => {
-      option.label = t('message.' + option.value);
-    });
     store.locale = locale.value as string;
   });
 
@@ -153,38 +156,34 @@
       <q-item class="q-mb-xs">
         <Tooltip>
           {{ t('decimalPlacesStat') }}:
-          {{ store.decimalPlaces == -2 ? t('noLimit') : `${store.decimalPlaces} ${t('toNDecimalPlaces')}` }}
+          {{
+            store.decimalPlaces == -1
+              ? t('noLimit')
+              : `${DECIMAL_PLACES[store.decimalPlaces as keyof typeof DECIMAL_PLACES]} ${t('toNDecimalPlaces')}`
+          }}
         </Tooltip>
         <q-item-label class="q-pt-xs self-start">{{ t('decimalPlaces') }} ([,])</q-item-label>
         <q-space />
         <q-slider
-          v-model="store.decimalPlaces"
-          :min="-2"
-          :step="2"
-          :max="6"
-          marker-labels
+          :model-value="Number(store.decimalPlaces)"
+          :min="-1"
+          :max="5"
+          :step="1"
+          :marker-labels="Object.keys(DECIMAL_PLACES)"
           class="col-5 q-pr-sm"
           dense
-          @change="setDecimalPlaces(store.decimalPlaces)"
+          @update:model-value="(value) => setDecimalPlaces(Number(value))"
         >
           <template #marker-label-group="{ markerList }">
             <div
+              v-for="(marker, index) in markerList"
+              :key="index"
               class="cursor-pointer"
-              :class="(markerList[0] as any).classes"
-              :style="(markerList[0] as any).style"
-              @click="setDecimalPlaces((markerList[0] as any).value)"
+              :class="marker.classes"
+              :style="marker.style as any"
+              @click="setDecimalPlaces(Number(marker.value))"
             >
-              x
-            </div>
-            <div
-              v-for="val in [1, 2, 3, 4]"
-              :key="val"
-              class="cursor-pointer"
-              :class="(markerList[val] as any).classes"
-              :style="(markerList[val] as any).style"
-              @click="setDecimalPlaces((markerList[val] as any).value)"
-            >
-              {{ (markerList[val] as any).value }}
+              {{ marker.value.toString() == '-1' ? '∞' : DECIMAL_PLACES[marker.value] }}
             </div>
           </template>
         </q-slider>
