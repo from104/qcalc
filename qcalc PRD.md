@@ -12,7 +12,7 @@ QCalc is a cross-platform calculator application utilizing modern web technologi
 - Language: TypeScript
 - Desktop: Electron
 - Mobile: Capacitor
-- State Management: Vue Store
+- State Management: Pinia
 - Internationalization: vue-i18n
 - Math Operations: MathJS
 - Currency API: freecurrencyapi-js

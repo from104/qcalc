@@ -12,7 +12,7 @@ QCalc은 최신 웹 기술을 활용한 크로스 플랫폼 계산기 애플리�
 - 언어: TypeScript
 - 데스크톱: Electron
 - 모바일: Capacitor
-- 상태 관리: Vue Store
+- 상태 관리: Pinia
 - 국제화: vue-i18n
 - 수학 연산: MathJS
 - 통화 API: freecurrencyapi-js
