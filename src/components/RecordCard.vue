@@ -454,7 +454,7 @@
                     {{ record.displayText }}
                   </ToolTip>
                 </q-item-label>
-                <q-item-label class="text-caption text-grey-7">
+                <q-item-label class="text-caption" :class="store.isDarkMode() ? 'text-grey-5' : 'text-grey-7'">
                   <HighlightText :text="formatDateTime(record.timestamp)" :search-term="store.searchKeyword" />
                 </q-item-label>
               </q-item-section>
