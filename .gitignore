@@ -54,3 +54,4 @@ yarn-error.log*
 !.yarn/releases
 !.yarn/sdks
 !.yarn/versions
+src-capacitor/capacitor.config.json
