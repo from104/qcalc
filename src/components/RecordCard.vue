@@ -137,6 +137,9 @@
     keyBinding.subscribe();
     setTimeout(() => {
       document.getElementById('record')?.scrollTo({ top: store.recordLastScrollPosition });
+      if (store.isSearchOpen) {
+        store.setInputFocused();
+      }
     }, 50);
     showScrollToTop.value = false;
   });
