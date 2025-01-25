@@ -4,7 +4,7 @@ All notable changes to this project are recorded in this file.
 
 The format is based on [Keep a Changelog] and this project follows [Semantic Versioning].
 
-## [0.10.1] 2024-12-15
+## [0.10.1] 2025-01-10
 
 ### Added
 
@@ -15,6 +15,7 @@ The format is based on [Keep a Changelog] and this project follows [Semantic Ver
 ### Changed
 
 - Increased currency conversion precision from Number to BigNumber.
+- Expanded decimal point display limit up to 16 digits
 
 ### Fixed
 
