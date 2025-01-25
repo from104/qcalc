@@ -437,7 +437,6 @@ export const useStore = defineStore('store', {
         this.decimalPlaces + 1,
         Math.max(...Object.keys(DECIMAL_PLACES).map(Number)),
       );
-      console.log(this.decimalPlaces);
     },
 
     decrementDecimalPlaces() {
@@ -445,7 +444,6 @@ export const useStore = defineStore('store', {
         this.decimalPlaces - 1,
         Math.min(...Object.keys(DECIMAL_PLACES).map(Number)),
       );
-      console.log(this.decimalPlaces);
     },
 
     // UI 표시 설정
