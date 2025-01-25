@@ -23,6 +23,8 @@
 // $info      : #31CCEC;
 // $warning   : #F2C037;
 
+@use 'sass:color';
+
 // Light theme colors
 $primary-light: #16743f;
 $secondary-light: #4abf89;
@@ -47,11 +49,11 @@ $warning: #d1a527;
 
 // Dark theme color adjustments
 body.body--dark {
-  --q-primary: #{darken($primary, 10%)};
-  --q-secondary: #{darken($secondary, 10%)};
-  --q-accent: #{darken($accent, 10%)};
-  --q-positive: #{darken($positive, 10%)};
-  --q-negative: #{darken($negative, 10%)};
-  --q-info: #{darken($info, 10%)};
-  --q-warning: #{darken($warning, 10%)};
+  --q-primary: #{color.adjust($primary, $lightness: -10%)};
+  --q-secondary: #{color.adjust($secondary, $lightness: -10%)};
+  --q-accent: #{color.adjust($accent, $lightness: -10%)};
+  --q-positive: #{color.adjust($positive, $lightness: -10%)};
+  --q-negative: #{color.adjust($negative, $lightness: -10%)};
+  --q-info: #{color.adjust($info, $lightness: -10%)};
+  --q-warning: #{color.adjust($warning, $lightness: -10%)};
 }
