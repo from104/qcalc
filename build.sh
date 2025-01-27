@@ -94,6 +94,8 @@ build_linux() {
         echo "Linux build completed successfully"
         mv dist/electron/Packaged/*.AppImage "$BUILD_DIR/QCalc-$VERSION-linux.AppImage"
         mv dist/electron/Packaged/*.snap "$BUILD_DIR/QCalc-$VERSION-linux.snap"
+        # latest-linux.yml 파일 복사
+        cp dist/electron/Packaged/latest-linux.yml "$BUILD_DIR/latest-linux.yml"
     else
         echo "Linux build failed"
         exit 1
@@ -111,6 +113,8 @@ build_windows() {
     if [ $? -eq 0 ]; then
         echo "Windows build completed successfully"
         mv dist/electron/Packaged/*.exe "$BUILD_DIR/QCalc-$VERSION-win.exe"
+        # latest.yml 파일 복사
+        cp dist/electron/Packaged/latest.yml "$BUILD_DIR/latest.yml"
     else
         echo "Windows build failed"
         exit 1

@@ -11,6 +11,7 @@ The format is based on [Keep a Changelog] and this project follows [Semantic Ver
 - Added temperature units: Delisle (°De), Newton (°N), Romer (°Rø), Réaumur (°Ré).
 - Added support for adaptive layout: displays calculation history and sub-panel when the window width increases.
 - Added search to calculation history
+- Added automatic updates in electron package format
 
 ### Changed
 

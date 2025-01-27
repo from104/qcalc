@@ -1,9 +1,9 @@
+import { match } from 'ts-pattern';
+
 import { RadixConverter } from './RadixConverter';
 import { CalculatorMath } from './CalculatorMath';
-// import { CalculationResult, WordSize } from 'src/types/calculator';
 import { BigNumber, CONSTANTS } from './CalculatorMath';
 import { Radix } from './RadixConverter';
-import { match } from 'ts-pattern';
 import { CalculatorRecord } from './CalculatorRecord';
 
 /**

@@ -1,5 +1,3 @@
-// import type { ResultRecord, CalculationResult } from 'src/types/calculator';
-
 /**
  * 계산기의 기록을 관리하는 클래스입니다.
  *

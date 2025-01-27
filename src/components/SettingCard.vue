@@ -17,15 +17,12 @@
   const { setInitPanel, setDarkMode, setAlwaysOnTop, setHapticsMode, setDecimalPlaces } = store;
 
   // 컴포넌트 import
-  import Tooltip from 'components/snippets/ToolTip.vue';
+  import ToolTip from 'components/snippets/ToolTip.vue';
 
   // 패키지 버전 정보
   import { version } from '../../package.json';
 
   // 소수점 자리수 설정 값
-  // const DECIMAL_PLACES = [-1, 0, 2, 4, 8, 16, 32] as const;
-  // type DecimalPlacesType = (typeof DECIMAL_PLACES)[number];
-
   import { DECIMAL_PLACES } from 'src/types/store';
 
   // 언어 옵션 정의
@@ -53,8 +50,9 @@
 </script>
 
 <template>
-  <q-card-section class="full-height column no-wrap">
+  <q-card-section class="full-height noselect column no-wrap">
     <q-list v-auto-blur dense class="full-width" role="list" :aria-label="t('ariaLabel.settingsList')">
+      <!-- 항상 위에 표시 -->
       <q-item v-if="$q.platform.is.electron" class="q-mb-sm">
         <q-item-label class="self-center" role="text">{{ t('alwaysOnTop') }} (Alt-T)</q-item-label>
         <q-space />
@@ -68,6 +66,7 @@
         />
       </q-item>
 
+      <!-- 시작 시 패널 초기화 -->
       <q-item class="q-mb-sm">
         <q-item-label class="self-center" role="text">{{ t('initPanel') }} (Alt-I)</q-item-label>
         <q-space />
@@ -81,6 +80,7 @@
         />
       </q-item>
 
+      <!-- 진동 모드 -->
       <q-item v-if="$q.platform.is.capacitor" class="q-mb-sm">
         <q-item-label class="self-center" role="text">{{ t('hapticsMode') }} (Alt-P)</q-item-label>
         <q-space />
@@ -94,6 +94,7 @@
         />
       </q-item>
 
+      <!-- 다크 모드 -->
       <q-item class="q-mb-md">
         <q-item-label class="self-center" role="text">{{ t('darkMode.title') }} (Alt-D)</q-item-label>
         <q-space />
@@ -120,6 +121,7 @@
 
       <q-separator spaced="md" role="separator" />
 
+      <!-- 버튼 추가 라벨 표시 -->
       <q-item class="q-mb-sm">
         <q-item-label class="self-center" role="text">{{ t('showButtonAddedLabel') }} (;)</q-item-label>
         <q-space />
@@ -132,12 +134,14 @@
         />
       </q-item>
 
+      <!-- 숫자 묶음 표시 -->
       <q-item class="q-mb-xs">
         <q-item-label class="self-center" role="text">{{ t('useGrouping') }} (,)</q-item-label>
         <q-space />
         <q-toggle v-model="store.useGrouping" keep-color dense />
       </q-item>
 
+      <!-- 숫자 묶음 단위 -->
       <q-item class="q-mb-sm">
         <q-item-label class="self-center" role="text">{{ t('groupingUnit') }} (Alt-,)</q-item-label>
         <q-space />
@@ -153,15 +157,16 @@
         />
       </q-item>
 
+      <!-- 소수점 자리수 -->
       <q-item class="q-mb-xs">
-        <Tooltip>
+        <ToolTip>
           {{ t('decimalPlacesStat') }}:
           {{
             store.decimalPlaces == -1
               ? t('noLimit')
               : `${DECIMAL_PLACES[store.decimalPlaces as keyof typeof DECIMAL_PLACES]} ${t('toNDecimalPlaces')}`
           }}
-        </Tooltip>
+        </ToolTip>
         <q-item-label class="q-pt-xs self-start">{{ t('decimalPlaces') }} ([,])</q-item-label>
         <q-space />
         <q-slider
@@ -189,6 +194,7 @@
         </q-slider>
       </q-item>
 
+      <!-- 단위 표시 -->
       <template v-if="store.currentTab == 'unit'">
         <q-separator spaced="md" />
 
@@ -199,6 +205,7 @@
         </q-item>
       </template>
 
+      <!-- 기호 표시 -->
       <template v-else-if="store.currentTab == 'currency'">
         <q-separator spaced="md" />
 
@@ -209,6 +216,7 @@
         </q-item>
       </template>
 
+      <!-- 진법 표시 -->
       <template v-else-if="store.currentTab == 'radix'">
         <q-separator spaced="md" />
 
@@ -218,6 +226,7 @@
           <q-toggle v-model="store.showRadix" keep-color dense />
         </q-item>
 
+        <!-- 진법 형식 -->
         <q-item class="q-mb-md">
           <q-item-label class="self-center" role="text"> {{ t('radixType') }} (Alt-U) </q-item-label>
           <q-space />
@@ -242,12 +251,14 @@
 
       <q-separator spaced="md" />
 
+      <!-- 시스템 언어 사용 -->
       <q-item class="q-mb-sm">
         <q-item-label class="self-center" role="text">{{ t('useSystemLocale') }}</q-item-label>
         <q-space />
         <q-toggle v-model="store.useSystemLocale" keep-color dense @click="setLanguage()" />
       </q-item>
 
+      <!-- 언어 -->
       <q-item class="q-mb-md">
         <q-item-label class="self-center" role="text">
           {{ t('language') }}
@@ -273,6 +284,7 @@
 
       <q-separator spaced="md" />
 
+      <!-- 버전 -->
       <q-item>
         <q-item-label class="self-center">
           {{ t('message.version') }}

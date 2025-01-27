@@ -1,8 +1,10 @@
 import { match } from 'ts-pattern';
+import { all, create } from 'mathjs';
+
+import type { FactoryFunctionMap } from 'mathjs';
+
 import { convertRadix } from './RadixConverter';
 import { Radix } from './RadixConverter';
-import type { FactoryFunctionMap } from 'mathjs';
-import { all, create } from 'mathjs';
 
 // MathJS 라이브러리 설정
 export const MathB = create(all as FactoryFunctionMap, {
@@ -17,12 +19,12 @@ export const BigNumber = MathB.bignumber;
  * 수학 상수 정의 객체
  */
 export const CONSTANTS: { [key: string]: string } = {
-  pi: MathB.pi.toString(), // 원주율
-  pi2: MathB.bignumber(MathB.pi).div(2).toString(), // 원주율의 절반
-  e: MathB.e.toString(), // 자연로그의 밑
-  ln2: MathB.log(2).toString(), // 자연로그 2
-  ln10: MathB.log(10).toString(), // 자연로그 10
-  phi: MathB.phi.toString(), // 황금비
+  pi: MathB.pi.toFixed(), // 원주율
+  pi2: MathB.bignumber(MathB.pi).div(2).toFixed(), // 원주율의 절반
+  e: MathB.e.toFixed(), // 자연로그의 밑
+  ln2: MathB.log(2).toFixed(), // 자연로그 2
+  ln10: MathB.log(10).toFixed(), // 자연로그 10
+  phi: MathB.phi.toFixed(), // 황금비
 };
 
 /**

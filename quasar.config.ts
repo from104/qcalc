@@ -195,6 +195,8 @@ export default defineConfig((/* ctx */) => {
         linux: {
           target: ['AppImage', 'snap'],
           category: 'Utility',
+          // latest-linux.yml 생성을 위한 설정
+          generateUpdatesFilesForAllChannels: true,
         },
         win: {
           target: ['nsis'],
@@ -213,9 +215,9 @@ export default defineConfig((/* ctx */) => {
             provider: 'github',
             owner: 'from104',
             repo: 'qcalc',
-            // snap 패키지 제외
-            publishAutoUpdate: false,
+            private: false,
             releaseType: 'release',
+            publishAutoUpdate: true,
           },
         ],
       },

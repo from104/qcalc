@@ -1,6 +1,7 @@
 <script setup lang="ts">
   // Vue 핵심 기능 및 컴포지션 API 가져오기
   import { ref, onMounted, onBeforeUnmount, reactive, watch } from 'vue';
+  
   import type { Ref } from 'vue';
 
   // i18n 설정

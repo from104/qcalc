@@ -1,5 +1,6 @@
-import { BigNumber, MathB } from './CalculatorMath';
 import { match } from 'ts-pattern';
+
+import { BigNumber, MathB } from './CalculatorMath';
 
 export enum Radix {
   Binary = 'bin',

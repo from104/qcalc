@@ -5,7 +5,9 @@
   // i18n 설정
   import { useI18n } from 'vue-i18n';
   // useScope: 'global'로 설정하여 전역 범위에서 사용
-  const { locale, t } = useI18n({ useScope: 'global' });
+  const { locale } = useI18n({ useScope: 'global' });
+  const { t } = useI18n();
+
 
   // 라우터 관련 설정
   import { useRouter, useRoute } from 'vue-router';
@@ -256,8 +258,9 @@
         $q.notify({
           type: 'negative',
           message: t('update.error'),
-          caption: (info as UpdateError).message,
+          caption: t('update.errorMessage'),
         });
+        console.error((info as UpdateError).message);
         break;
     }
   };
@@ -331,7 +334,7 @@
           </template>
           <template v-else-if="updateStatus === 'error'">
             <p>{{ t('update.error') }}</p>
-            <p>{{ updateError?.message }}</p>
+            <p>{{ t('update.errorMessage') }}</p>
           </template>
         </q-card-section>
 
@@ -471,6 +474,7 @@ ko:
     downloading: '다운로드 중... {percent}%'
     downloadComplete: 업데이트가 다운로드되었습니다. 지금 설치하시겠습니까?
     error: '업데이트 중 오류가 발생했습니다:'
+    errorMessage: '업데이트 중 오류가 발생했습니다: 콘솔을 확인해주세요.'
     later: 나중에
     update: 업데이트
     installNow: 지금 설치
@@ -484,6 +488,7 @@ en:
     downloading: 'Downloading... {percent}%'
     downloadComplete: Update has been downloaded. Would you like to install it now?
     error: 'An error occurred during update:'
+    errorMessage: 'An error occurred during update: Check the console.'
     later: Later
     update: Update
     installNow: Install Now
