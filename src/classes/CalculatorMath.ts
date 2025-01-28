@@ -49,6 +49,13 @@ export const CONSTANTS: { [key: string]: string } = {
  * - 문자열 기반 입/출력으로 정확한 값 처리
  */
 export class CalculatorMath {
+  // 에러 검사를 위한 헬퍼 메서드
+  private checkError(condition: boolean, message: string): void {
+    if (condition) {
+      throw new Error(message);
+    }
+  }
+
   /**
    * ===== 기본 수학 함수 =====
    */
@@ -180,8 +187,12 @@ export class CalculatorMath {
    * @throws 0으로 나누려고 할 때 에러 발생
    */
   public div(dividend: string, divisor: string): string {
-    if (divisor === '0') throw new Error('Division by zero');
-    return BigNumber(dividend).div(BigNumber(divisor)).toFixed();
+    this.checkError(BigNumber(divisor).eq(0), 'Division by zero');
+
+    const result = BigNumber(dividend).div(divisor);
+    this.checkError(!result.isFinite(), 'Numerical error in division');
+
+    return result.toFixed();
   }
 
   /**
@@ -192,7 +203,7 @@ export class CalculatorMath {
    * @throws 0으로 나누려고 할 때 에러 발생
    */
   public mod(dividend: string, divisor: string): string {
-    if (divisor === '0') throw new Error('Division by zero');
+    this.checkError(BigNumber(divisor).eq(0), 'Division by zero');
     return BigNumber(dividend).mod(BigNumber(divisor)).toFixed();
   }
 
@@ -214,9 +225,19 @@ export class CalculatorMath {
    * @throws 음수의 제곱근을 계산하려 할 때 에러 발생
    */
   public root(radicand: string, index: string): string {
-    if (BigNumber(index).lt(0) && this.mod(this.int(radicand), '2') === '0')
-      throw new Error('The root of a negative number is not allowed.');
-    return BigNumber(radicand).pow(BigNumber(1).div(index)).toFixed();
+    const bnRadicand = BigNumber(radicand);
+    const bnIndex = BigNumber(index);
+
+    this.checkError(bnIndex.lt(0), 'Negative roots are not supported');
+
+    const isEvenRoot = this.mod(this.int(index), '2') === '0';
+    this.checkError(
+      bnRadicand.isNegative() && isEvenRoot,
+      'Even root of negative number is not allowed',
+    );
+
+    const result = bnRadicand.pow(MathB.bignumber(1).div(bnIndex));
+    return result.toFixed();
   }
 
   /**
@@ -228,16 +249,11 @@ export class CalculatorMath {
    * @param values 검사할 숫자들 (문자열 배열)
    * @throws 음수가 입력되면 에러 발생
    */
-  private validatePositiveNumbers(...values: string[]): void {
-    if (values.some((value) => BigNumber(value).isNegative())) {
-      throw new Error('Negative numbers are not allowed in bit operations');
-    }
-  }
-
   private validateNonNegativeNumbers(...values: string[]): void {
-    if (values.some((value) => BigNumber(value).isNegative())) {
-      throw new Error('Negative numbers are not allowed in bit operations');
-    }
+    this.checkError(
+      values.some((value) => BigNumber(value).isNegative()),
+      'Negative numbers are not allowed in bit operations',
+    );
   }
 
   /**
@@ -280,7 +296,7 @@ export class CalculatorMath {
    * @returns 시프트 연산 결과 (문자열)
    */
   public bitwiseRightShift(value: string, shiftAmount: string, wordSize: number = 8): string {
-    this.validatePositiveNumbers(value, shiftAmount);
+    this.validateNonNegativeNumbers(value, shiftAmount);
     return this.truncateToBitSize(
       BigNumber(value)
         .abs()
@@ -305,7 +321,7 @@ export class CalculatorMath {
     operation: 'and' | 'or' | 'xor',
     wordSize: number = 8,
   ): string {
-    this.validatePositiveNumbers(firstValue, secondValue);
+    this.validateNonNegativeNumbers(firstValue, secondValue);
     const [firstBinary, secondBinary] = [firstValue, secondValue].map((n) =>
       convertRadix(this.int(this.abs(n)), Radix.Decimal, Radix.Binary),
     ) as string[];
@@ -370,7 +386,7 @@ export class CalculatorMath {
    * @returns NOT 연산 결과 (문자열)
    */
   public bitwiseNot(value: string, wordSize: number = 8): string {
-    this.validatePositiveNumbers(value);
+    this.validateNonNegativeNumbers(value);
     const binary = convertRadix(this.int(this.abs(value)), Radix.Decimal, Radix.Binary);
     const paddedBinary = binary.padStart(Math.max(binary.length, wordSize), '0');
 
