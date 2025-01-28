@@ -193,6 +193,10 @@ async function createWindow() {
           });
         }
       });
+
+      ipcMain.on('is-snap', () => {
+        return isSnap();
+      });
     }
 
     // 개발 환경에서 자세한 로그 출력

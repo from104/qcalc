@@ -71,5 +71,6 @@ interface Window {
      * @param alwaysOnTop - true이면 창을 항상 위에 표시하고, false이면 일반 창으로 표시합니다.
      */
     setAlwaysOnTop: (alwaysOnTop: boolean) => void;
+    isSnap: () => boolean;
   };
 }

@@ -14,7 +14,14 @@
   // 스토어 관련
   import { useStore } from 'src/stores/store';
   const store = useStore();
-  const { setInitPanel, setDarkMode, setAlwaysOnTop, setHapticsMode, setDecimalPlaces } = store;
+  const {
+    setInitPanel,
+    setDarkMode,
+    setAlwaysOnTop,
+    setHapticsMode,
+    setDecimalPlaces,
+    setAutoUpdate,
+  } = store;
 
   // 컴포넌트 import
   import ToolTip from 'components/snippets/ToolTip.vue';
@@ -24,6 +31,8 @@
 
   // 소수점 자리수 설정 값
   import { DECIMAL_PLACES } from 'src/types/store';
+
+  const isDev = import.meta.env.DEV;
 
   // 언어 옵션 정의
   const languageOptions = reactive([
@@ -47,6 +56,11 @@
       locale.value = store.userLocale;
     }
   };
+
+  // electron과 snap 여부 확인
+  const isElectronAndNotSnap = computed(() => {
+    return $q.platform.is.electron && !window.myAPI?.isSnap();
+  });
 </script>
 
 <template>
@@ -284,6 +298,20 @@
 
       <q-separator spaced="md" />
 
+      <!-- 자동 업데이트 설정 -->
+      <q-item v-if="!isDev && isElectronAndNotSnap" class="q-mb-sm">
+        <q-item-label class="self-center" role="text">{{ t('autoUpdate') }}</q-item-label>
+        <q-space />
+        <q-toggle
+          v-model="store.autoUpdate"
+          keep-color
+          dense
+          role="switch"
+          :aria-label="t('ariaLabel.autoUpdate')"
+          @click="setAutoUpdate(store.autoUpdate)"
+        />
+      </q-item>
+
       <!-- 버전 -->
       <q-item>
         <q-item-label class="self-center">
@@ -347,6 +375,7 @@ ko:
   suffix: '뒤에'
   useSystemLocale: '시스템 언어 사용'
   language: '언어'
+  autoUpdate: '자동 업데이트'
   ariaLabel:
     settingsList: '설정 목록'
     alwaysOnTop: '항상 위에 표시 설정'
@@ -363,6 +392,7 @@ ko:
     radixType: '진법 형식 설정'
     useSystemLocale: '시스템 언어 사용 설정'
     language: '언어 설정'
+    autoUpdate: '자동 업데이트 설정'
 en:
   alwaysOnTop: 'Always on top'
   alwaysOnTopOn: 'Always on top ON'
@@ -393,6 +423,7 @@ en:
   suffix: 'Suffix'
   useSystemLocale: 'Use system locale'
   language: 'Language'
+  autoUpdate: 'Auto update'
   ariaLabel:
     settingsList: 'Settings list'
     alwaysOnTop: 'Always on top setting'
@@ -409,4 +440,5 @@ en:
     radixType: 'Radix type setting'
     useSystemLocale: 'Use system locale setting'
     language: 'Language setting'
+    autoUpdate: 'Auto update setting'
 </i18n>

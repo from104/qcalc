@@ -81,6 +81,9 @@ export const useStore = defineStore('store', {
     targetRadix: Radix.Hexadecimal,
     showRadix: true,
     radixType: 'suffix',
+
+    // 자동 업데이트 관련
+    autoUpdate: true, 
   }),
 
   getters: {
@@ -100,9 +103,9 @@ export const useStore = defineStore('store', {
 
     updateCalculatorRadix(): void {
       if (this.currentTab === 'radix') {
-        this.calc.radix = this.sourceRadix;
+        this.calc.currentRadix = this.sourceRadix;
       } else {
-        this.calc.radix = Radix.Decimal;
+        this.calc.currentRadix = Radix.Decimal;
       }
     },
 
@@ -433,17 +436,11 @@ export const useStore = defineStore('store', {
     },
 
     incrementDecimalPlaces() {
-      this.decimalPlaces = Math.min(
-        this.decimalPlaces + 1,
-        Math.max(...Object.keys(DECIMAL_PLACES).map(Number)),
-      );
+      this.decimalPlaces = Math.min(this.decimalPlaces + 1, Math.max(...Object.keys(DECIMAL_PLACES).map(Number)));
     },
 
     decrementDecimalPlaces() {
-      this.decimalPlaces = Math.max(
-        this.decimalPlaces - 1,
-        Math.min(...Object.keys(DECIMAL_PLACES).map(Number)),
-      );
+      this.decimalPlaces = Math.max(this.decimalPlaces - 1, Math.min(...Object.keys(DECIMAL_PLACES).map(Number)));
     },
 
     // UI 표시 설정
@@ -565,6 +562,15 @@ export const useStore = defineStore('store', {
       } else {
         router.push(path);
       }
+    },
+
+    // 자동 업데이트 관련
+    setAutoUpdate(value: boolean) {
+      this.autoUpdate = value;
+    },
+
+    toggleAutoUpdate() {
+      this.setAutoUpdate(!this.autoUpdate);
     },
   },
 

@@ -98,6 +98,9 @@ export interface StoreState {
   targetRadix: RadixType;
   showRadix: boolean;
   radixType: 'prefix' | 'suffix';
+
+  // 자동 업데이트 관련
+  autoUpdate: boolean;
 }
 
 /**
@@ -222,6 +225,10 @@ export interface StoreActions {
   isDefaultCalculator(): boolean;
   navigateToPath(path: string, route: RouteLocationNormalizedLoaded, router: Router): void;
   setSubPageAnimating(value: boolean): void;
+
+  // 자동 업데이트 관련
+  setAutoUpdate(value: boolean): void;
+  toggleAutoUpdate(): void;
 }
 
 /**

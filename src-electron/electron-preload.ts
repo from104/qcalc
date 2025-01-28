@@ -29,6 +29,9 @@ contextBridge.exposeInMainWorld('myAPI', {
     // 메인 프로세스에 'toggle-always-on-top' 이벤트 전송
     ipcRenderer.send('toggle-always-on-top', alwaysOnTop);
   },
+  isSnap: () => {
+    return ipcRenderer.send('is-snap');
+  },
 });
 
 contextBridge.exposeInMainWorld('electronUpdater', {

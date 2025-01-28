@@ -8,7 +8,6 @@
   const { locale } = useI18n({ useScope: 'global' });
   const { t } = useI18n();
 
-
   // 라우터 관련 설정
   import { useRouter, useRoute } from 'vue-router';
   import type { RouteLocationNormalizedLoaded } from 'vue-router';
@@ -235,6 +234,11 @@
     status: UpdateStatusInfo['status'],
     info?: UpdateInfo | UpdateProgressInfo | UpdateError,
   ) => {
+    // 자동 업데이트가 비활성화되어 있으면 available 상태에서만 다이얼로그 표시
+    if (!store.autoUpdate && status !== 'available') {
+      return;
+    }
+
     updateStatus.value = status;
 
     switch (status) {
@@ -281,11 +285,11 @@
   // 업데이트 관련 코드를 Electron 환경에서만 실행하도록 수정
   onMounted(() => {
     // Electron 환경에서만 업데이트 리스너 등록
-    if (isElectron.value) {
+    if (isElectron.value && !window.myAPI?.isSnap()) {
       window.electronUpdater.onUpdateStatus(handleUpdateStatus);
 
       // 개발 모드가 아닐 때만 업데이트 확인
-      if (!import.meta.env.DEV) {
+      if (!isDev) {
         window.electronUpdater.checkForUpdates();
       }
     }
@@ -293,7 +297,7 @@
 
   onUnmounted(() => {
     // Electron 환경에서만 리스너 제거
-    if (isElectron.value) {
+    if (isElectron.value && !window.myAPI?.isSnap()) {
       window.electronUpdater.removeUpdateStatusListener();
     }
   });
