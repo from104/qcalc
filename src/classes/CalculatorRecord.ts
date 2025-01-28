@@ -1,5 +1,3 @@
-// import type { ResultRecord, CalculationResult } from 'src/types/calculator';
-
 /**
  * 계산기의 기록을 관리하는 클래스입니다.
  *
@@ -55,6 +53,7 @@ export class CalculatorRecord {
         id: newId,
         calculationResult: record,
         memo: '',
+        timestamp: Date.now(),
       };
 
       // 새로운 기록을 배열의 맨 앞에 추가 (LIFO 구조)

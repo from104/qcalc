@@ -1,6 +1,6 @@
 <script lang="ts" setup>
   // Vue 핵심 기능 및 컴포지션 API 가져오기
-  import { reactive, watch, ref } from 'vue';
+  import { reactive, watch, ref, computed } from 'vue';
 
   // Quasar 프레임워크 관련
   import { useQuasar } from 'quasar';
@@ -14,25 +14,34 @@
   // 스토어 관련
   import { useStore } from 'src/stores/store';
   const store = useStore();
-  const { setInitPanel, setDarkMode, setAlwaysOnTop, setHapticsMode, setDecimalPlaces } = store;
+  const {
+    setInitPanel,
+    setDarkMode,
+    setAlwaysOnTop,
+    setHapticsMode,
+    setDecimalPlaces,
+    setAutoUpdate,
+  } = store;
 
   // 컴포넌트 import
-  import Tooltip from 'components/snippets/ToolTip.vue';
+  import ToolTip from 'components/snippets/ToolTip.vue';
 
   // 패키지 버전 정보
   import { version } from '../../package.json';
 
+  // 소수점 자리수 설정 값
+  import { DECIMAL_PLACES } from 'src/types/store';
+
+  const isDev = import.meta.env.DEV;
+
   // 언어 옵션 정의
   const languageOptions = reactive([
-    { value: 'ko', label: t('message.ko') },
-    { value: 'en', label: t('message.en') },
+    { value: 'ko', label: computed(() => t('message.ko')) },
+    { value: 'en', label: computed(() => t('message.en')) },
   ]);
 
   // 시스템 로케일 사용 여부와 사용자 로케일이 변경될 때마다 언어 옵션 라벨을 업데이트합니다.
   watch([() => store.useSystemLocale, () => store.userLocale], () => {
-    languageOptions.forEach((option) => {
-      option.label = t('message.' + option.value);
-    });
     store.locale = locale.value as string;
   });
 
@@ -47,11 +56,17 @@
       locale.value = store.userLocale;
     }
   };
+
+  // electron과 snap 여부 확인
+  const isElectronAndNotSnap = computed(() => {
+    return $q.platform.is.electron && !window.myAPI?.isSnap();
+  });
 </script>
 
 <template>
-  <q-card-section class="full-height column no-wrap">
+  <q-card-section class="full-height noselect column no-wrap">
     <q-list v-auto-blur dense class="full-width" role="list" :aria-label="t('ariaLabel.settingsList')">
+      <!-- 항상 위에 표시 -->
       <q-item v-if="$q.platform.is.electron" class="q-mb-sm">
         <q-item-label class="self-center" role="text">{{ t('alwaysOnTop') }} (Alt-T)</q-item-label>
         <q-space />
@@ -65,6 +80,7 @@
         />
       </q-item>
 
+      <!-- 시작 시 패널 초기화 -->
       <q-item class="q-mb-sm">
         <q-item-label class="self-center" role="text">{{ t('initPanel') }} (Alt-I)</q-item-label>
         <q-space />
@@ -78,6 +94,7 @@
         />
       </q-item>
 
+      <!-- 진동 모드 -->
       <q-item v-if="$q.platform.is.capacitor" class="q-mb-sm">
         <q-item-label class="self-center" role="text">{{ t('hapticsMode') }} (Alt-P)</q-item-label>
         <q-space />
@@ -91,6 +108,7 @@
         />
       </q-item>
 
+      <!-- 다크 모드 -->
       <q-item class="q-mb-md">
         <q-item-label class="self-center" role="text">{{ t('darkMode.title') }} (Alt-D)</q-item-label>
         <q-space />
@@ -117,6 +135,7 @@
 
       <q-separator spaced="md" role="separator" />
 
+      <!-- 버튼 추가 라벨 표시 -->
       <q-item class="q-mb-sm">
         <q-item-label class="self-center" role="text">{{ t('showButtonAddedLabel') }} (;)</q-item-label>
         <q-space />
@@ -129,12 +148,14 @@
         />
       </q-item>
 
+      <!-- 숫자 묶음 표시 -->
       <q-item class="q-mb-xs">
         <q-item-label class="self-center" role="text">{{ t('useGrouping') }} (,)</q-item-label>
         <q-space />
         <q-toggle v-model="store.useGrouping" keep-color dense />
       </q-item>
 
+      <!-- 숫자 묶음 단위 -->
       <q-item class="q-mb-sm">
         <q-item-label class="self-center" role="text">{{ t('groupingUnit') }} (Alt-,)</q-item-label>
         <q-space />
@@ -150,46 +171,44 @@
         />
       </q-item>
 
+      <!-- 소수점 자리수 -->
       <q-item class="q-mb-xs">
-        <Tooltip>
+        <ToolTip>
           {{ t('decimalPlacesStat') }}:
-          {{ store.decimalPlaces == -2 ? t('noLimit') : `${store.decimalPlaces} ${t('toNDecimalPlaces')}` }}
-        </Tooltip>
+          {{
+            store.decimalPlaces == -1
+              ? t('noLimit')
+              : `${DECIMAL_PLACES[store.decimalPlaces as keyof typeof DECIMAL_PLACES]} ${t('toNDecimalPlaces')}`
+          }}
+        </ToolTip>
         <q-item-label class="q-pt-xs self-start">{{ t('decimalPlaces') }} ([,])</q-item-label>
         <q-space />
         <q-slider
-          v-model="store.decimalPlaces"
-          :min="-2"
-          :step="2"
-          :max="6"
-          marker-labels
+          :model-value="Number(store.decimalPlaces)"
+          :min="-1"
+          :max="5"
+          :step="1"
+          :marker-labels="Object.keys(DECIMAL_PLACES)"
           class="col-5 q-pr-sm"
           dense
-          @change="setDecimalPlaces(store.decimalPlaces)"
+          @update:model-value="(value) => setDecimalPlaces(Number(value))"
         >
           <template #marker-label-group="{ markerList }">
             <div
+              v-for="(marker, index) in markerList"
+              :key="index"
               class="cursor-pointer"
-              :class="(markerList[0] as any).classes"
-              :style="(markerList[0] as any).style"
-              @click="setDecimalPlaces((markerList[0] as any).value)"
+              :class="marker.classes"
+              :style="marker.style as any"
+              @click="setDecimalPlaces(Number(marker.value))"
             >
-              x
-            </div>
-            <div
-              v-for="val in [1, 2, 3, 4]"
-              :key="val"
-              class="cursor-pointer"
-              :class="(markerList[val] as any).classes"
-              :style="(markerList[val] as any).style"
-              @click="setDecimalPlaces((markerList[val] as any).value)"
-            >
-              {{ (markerList[val] as any).value }}
+              {{ marker.value.toString() == '-1' ? '∞' : DECIMAL_PLACES[marker.value] }}
             </div>
           </template>
         </q-slider>
       </q-item>
 
+      <!-- 단위 표시 -->
       <template v-if="store.currentTab == 'unit'">
         <q-separator spaced="md" />
 
@@ -200,6 +219,7 @@
         </q-item>
       </template>
 
+      <!-- 기호 표시 -->
       <template v-else-if="store.currentTab == 'currency'">
         <q-separator spaced="md" />
 
@@ -210,6 +230,7 @@
         </q-item>
       </template>
 
+      <!-- 진법 표시 -->
       <template v-else-if="store.currentTab == 'radix'">
         <q-separator spaced="md" />
 
@@ -219,6 +240,7 @@
           <q-toggle v-model="store.showRadix" keep-color dense />
         </q-item>
 
+        <!-- 진법 형식 -->
         <q-item class="q-mb-md">
           <q-item-label class="self-center" role="text"> {{ t('radixType') }} (Alt-U) </q-item-label>
           <q-space />
@@ -243,12 +265,14 @@
 
       <q-separator spaced="md" />
 
+      <!-- 시스템 언어 사용 -->
       <q-item class="q-mb-sm">
         <q-item-label class="self-center" role="text">{{ t('useSystemLocale') }}</q-item-label>
         <q-space />
         <q-toggle v-model="store.useSystemLocale" keep-color dense @click="setLanguage()" />
       </q-item>
 
+      <!-- 언어 -->
       <q-item class="q-mb-md">
         <q-item-label class="self-center" role="text">
           {{ t('language') }}
@@ -274,6 +298,21 @@
 
       <q-separator spaced="md" />
 
+      <!-- 자동 업데이트 설정 -->
+      <q-item v-if="!isDev && isElectronAndNotSnap" class="q-mb-sm">
+        <q-item-label class="self-center" role="text">{{ t('autoUpdate') }}</q-item-label>
+        <q-space />
+        <q-toggle
+          v-model="store.autoUpdate"
+          keep-color
+          dense
+          role="switch"
+          :aria-label="t('ariaLabel.autoUpdate')"
+          @click="setAutoUpdate(store.autoUpdate)"
+        />
+      </q-item>
+
+      <!-- 버전 -->
       <q-item>
         <q-item-label class="self-center">
           {{ t('message.version') }}
@@ -336,6 +375,7 @@ ko:
   suffix: '뒤에'
   useSystemLocale: '시스템 언어 사용'
   language: '언어'
+  autoUpdate: '자동 업데이트'
   ariaLabel:
     settingsList: '설정 목록'
     alwaysOnTop: '항상 위에 표시 설정'
@@ -352,6 +392,7 @@ ko:
     radixType: '진법 형식 설정'
     useSystemLocale: '시스템 언어 사용 설정'
     language: '언어 설정'
+    autoUpdate: '자동 업데이트 설정'
 en:
   alwaysOnTop: 'Always on top'
   alwaysOnTopOn: 'Always on top ON'
@@ -382,6 +423,7 @@ en:
   suffix: 'Suffix'
   useSystemLocale: 'Use system locale'
   language: 'Language'
+  autoUpdate: 'Auto update'
   ariaLabel:
     settingsList: 'Settings list'
     alwaysOnTop: 'Always on top setting'
@@ -398,4 +440,5 @@ en:
     radixType: 'Radix type setting'
     useSystemLocale: 'Use system locale setting'
     language: 'Language setting'
+    autoUpdate: 'Auto update setting'
 </i18n>

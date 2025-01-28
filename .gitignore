@@ -29,6 +29,7 @@ src-capacitor/node_modules
 src-capacitor/android/app/release
 src-capacitor/android/app/build
 src-capacitor/capacitor.config.json
+/src-capacitor/capacitor.config.json
 
 # BEX related directories and files
 src-bex/www
@@ -53,3 +54,6 @@ yarn-error.log*
 !.yarn/releases
 !.yarn/sdks
 !.yarn/versions
+src-capacitor/capacitor.config.json
+src-capacitor/package.json
+src-capacitor/android/build.gradle

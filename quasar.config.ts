@@ -111,23 +111,6 @@ export default defineConfig((/* ctx */) => {
           },
           { server: false },
         ],
-        // 환경 변수 및 타입 정의를 위한 플러그인
-        [
-          'vite-plugin-env-types',
-          {
-            dts: 'src/types/env.d.ts',
-          },
-        ],
-        // 번들 분석을 위한 플러그인
-        [
-          'rollup-plugin-visualizer',
-          {
-            open: true,
-            filename: 'dist/stats.html',
-            gzipSize: true,
-            brotliSize: true,
-          },
-        ],
       ],
       typescript: {
         strict: true, // (recommended) enables strict settings for TypeScript
@@ -212,19 +195,31 @@ export default defineConfig((/* ctx */) => {
         linux: {
           target: ['AppImage', 'snap'],
           category: 'Utility',
+          // latest-linux.yml 생성을 위한 설정
+          generateUpdatesFilesForAllChannels: true,
         },
         win: {
           target: ['nsis'],
-          signAndEditExecutable: false,
-          signtoolOptions: {
-            publisherName: 'ATIT',
-            sign: '',
-          },
+          // signAndEditExecutable: false,
+          // signtoolOptions: {
+          //   publisherName: 'ATIT',
+          //   sign: '',
+          // },
         },
         snap: {
           confinement: 'strict',
           grade: 'devel',
         },
+        publish: [
+          {
+            provider: 'github',
+            owner: 'from104',
+            repo: 'qcalc',
+            private: false,
+            releaseType: 'release',
+            publishAutoUpdate: true,
+          },
+        ],
       },
     },
 

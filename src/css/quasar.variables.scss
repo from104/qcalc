@@ -23,14 +23,37 @@
 // $info      : #31CCEC;
 // $warning   : #F2C037;
 
-$primary: #16743f; // 아이콘의 주 녹색
-$secondary: #4abf89; // 아이콘의 밝은 녹색
-$accent: #3fce97; // 아이콘의 밝은 민트색
+@use 'sass:color';
 
-$dark: #1d1d1d; // 어두운 색
-$dark-page: #1d1d1d; // 어두운 페이지 배경 색
+// Light theme colors
+$primary-light: #16743f;
+$secondary-light: #4abf89;
+$accent-light: #3fce97;
+$positive-light: #1d8fb6;
+$negative-light: #c71818;
+$info-light: #34a9e0;
+$warning-light: #d1a527;
 
-$positive: #1d8fb6; // 아이콘의 주 녹색과 맞춘 긍정적인 메시지를 나타내는 파란색
-$negative: #c71818; // 조금 더 어둡게 조정된 부정적인 메시지를 나타내는 붉은 색
-$info: #34a9e0; // 아이콘의 어두운 올리브색과 어울리는 정보 메시지 색상
-$warning: #d1a527; // 조금 더 어둡게 조정된 경고 메시지를 나타내는 노란색
+// Dark theme colors (30% darker)
+$primary: #16743f;
+$secondary: #4abf89;
+$accent: #3fce97;
+
+$dark: #1d1d1d;
+$dark-page: #1d1d1d;
+
+$positive: #1d8fb6;
+$negative: #c71818;
+$info: #34a9e0;
+$warning: #d1a527;
+
+// Dark theme color adjustments
+body.body--dark {
+  --q-primary: #{color.adjust($primary, $lightness: -10%)};
+  --q-secondary: #{color.adjust($secondary, $lightness: -10%)};
+  --q-accent: #{color.adjust($accent, $lightness: -10%)};
+  --q-positive: #{color.adjust($positive, $lightness: -10%)};
+  --q-negative: #{color.adjust($negative, $lightness: -10%)};
+  --q-info: #{color.adjust($info, $lightness: -10%)};
+  --q-warning: #{color.adjust($warning, $lightness: -10%)};
+}

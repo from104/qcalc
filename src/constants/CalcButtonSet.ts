@@ -1,8 +1,10 @@
 import { match } from 'ts-pattern';
-import { BigNumber } from 'classes/CalculatorMath';
-import { Operator } from 'src/classes/Calculator';
-import { useStore } from 'stores/store';
+
 import type { ComposerTranslation } from 'vue-i18n';
+
+import { BigNumber } from 'classes/CalculatorMath';
+import { Operator } from 'classes/Calculator';
+import { useStore } from 'stores/store';
 
 // ComposerTranslation 타입 사용
 export function createCalcButtonSet(t: ComposerTranslation) {

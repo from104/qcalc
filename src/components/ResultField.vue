@@ -127,7 +127,7 @@
       const formattedNumber = toFormattedNumber(inputBuffer);
 
       // 소수점 자릿수 설정이 -2이고 소수점이 있는 경우
-      const hasSpecialDecimalPlaces = store.decimalPlaces === -2 && inputBuffer.includes('.');
+      const hasSpecialDecimalPlaces = store.decimalPlaces === -1 && inputBuffer.includes('.');
 
       const result = hasSpecialDecimalPlaces
         ? `${formattedNumber.split('.')[0]}.${inputBuffer.split('.')[1]}`

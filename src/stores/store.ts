@@ -18,15 +18,10 @@ import { UnitConverter } from 'classes/UnitConverter';
 import { CurrencyConverter } from 'classes/CurrencyConverter';
 import { RadixConverter } from 'classes/RadixConverter';
 
-import type { StoreState, DarkModeType } from '../types/store';
+import type { StoreState, DarkModeType, DecimalPlacesType, GroupingUnitType } from '../types/store';
+import { DECIMAL_PLACES } from '../types/store';
 
 const radixConverter = new RadixConverter();
-
-// 플로팅 창 위치 관련 상태 추가
-interface FloatingPosition {
-  x: number;
-  y: number;
-}
 
 // 기본 스토어 정의
 export const useStore = defineStore('store', {
@@ -60,7 +55,9 @@ export const useStore = defineStore('store', {
     // 숫자 표시 관련
     useGrouping: true,
     groupingUnit: 3,
-    decimalPlaces: -2,
+    decimalPlaces: -1,
+
+    // 언어 관련
     useSystemLocale: true,
     locale: '',
     userLocale: '',
@@ -85,11 +82,13 @@ export const useStore = defineStore('store', {
     showRadix: true,
     radixType: 'suffix',
 
-    // 플로팅 창 위치 관련 상태 추가
-    singleFloatingPosition: { x: 16, y: 16 } as FloatingPosition,
-    doubleFloatingPosition: { x: 16, y: 16 } as FloatingPosition,
+    // 자동 업데이트 관련
+    autoUpdate: true, 
   }),
 
+  getters: {
+    getDecimalPlaces: (state) => DECIMAL_PLACES[state.decimalPlaces ?? -1] ?? -1,
+  },
   // 액션 정의
   actions: {
     // 탭 관리
@@ -104,9 +103,9 @@ export const useStore = defineStore('store', {
 
     updateCalculatorRadix(): void {
       if (this.currentTab === 'radix') {
-        this.calc.radix = this.sourceRadix;
+        this.calc.currentRadix = this.sourceRadix;
       } else {
-        this.calc.radix = Radix.Decimal;
+        this.calc.currentRadix = Radix.Decimal;
       }
     },
 
@@ -174,7 +173,7 @@ export const useStore = defineStore('store', {
     toFormattedNumber(value: string): string {
       if (!value) return '';
 
-      const formattedValue = this.formatDecimalPlaces(value, this.decimalPlaces);
+      const formattedValue = this.formatDecimalPlaces(value, this.getDecimalPlaces);
 
       return this.useGrouping ? this.numberGrouping(formattedValue) : formattedValue;
     },
@@ -223,7 +222,9 @@ export const useStore = defineStore('store', {
         this.targetRadix = Radix.Hexadecimal;
       }
       if (this.sourceRadix === this.targetRadix) {
-        this.targetRadix = this.radixList[(this.radixList.indexOf(this.sourceRadix) + 1) % this.radixList.length] as Radix;
+        this.targetRadix = this.radixList[
+          (this.radixList.indexOf(this.sourceRadix) + 1) % this.radixList.length
+        ] as Radix;
       }
     },
 
@@ -426,22 +427,20 @@ export const useStore = defineStore('store', {
       this.useGrouping = !this.useGrouping;
     },
 
-    setGroupingUnit(digitCount: 3 | 4) {
+    setGroupingUnit(digitCount: GroupingUnitType) {
       this.groupingUnit = digitCount;
     },
 
-    setDecimalPlaces(places: number) {
-      if ([-2, 0, 2, 4, 6].includes(places)) {
-        this.decimalPlaces = places;
-      }
+    setDecimalPlaces(places: DecimalPlacesType) {
+      this.decimalPlaces = places;
     },
 
     incrementDecimalPlaces() {
-      this.setDecimalPlaces(this.decimalPlaces + 2);
+      this.decimalPlaces = Math.min(this.decimalPlaces + 1, Math.max(...Object.keys(DECIMAL_PLACES).map(Number)));
     },
 
     decrementDecimalPlaces() {
-      this.setDecimalPlaces(this.decimalPlaces - 2);
+      this.decimalPlaces = Math.max(this.decimalPlaces - 1, Math.min(...Object.keys(DECIMAL_PLACES).map(Number)));
     },
 
     // UI 표시 설정
@@ -565,63 +564,13 @@ export const useStore = defineStore('store', {
       }
     },
 
-    // 플로팅 창 위치 계산 메서드
-    calculateFloatingBounds() {
-      const header = document.getElementById('header');
-      const recordPage = document.getElementById('record-page');
-      const floatingElement = document.querySelector('.search-input-floating') as HTMLElement;
-
-      if (!header || !recordPage || !floatingElement) return null;
-
-      const headerHeight = header.clientHeight;
-      const pageRect = recordPage.getBoundingClientRect();
-      const floatingRect = floatingElement.getBoundingClientRect();
-      const innerPadding = 16;
-      const horizontalOffset = this.isAtLeastDoubleWidth() ? window.innerWidth / 2 : 0;
-
-      return {
-        minX: pageRect.left + innerPadding,
-        maxX: pageRect.right - floatingRect.width - innerPadding,
-        minY: pageRect.top + innerPadding,
-        maxY: pageRect.bottom - floatingRect.height - innerPadding,
-        headerHeight,
-        horizontalOffset,
-      };
+    // 자동 업데이트 관련
+    setAutoUpdate(value: boolean) {
+      this.autoUpdate = value;
     },
 
-    // 플로팅 창 위치 업데이트
-    updateFloatingPosition(x: number, y: number) {
-      const bounds = this.calculateFloatingBounds();
-      if (!bounds) return;
-
-      const { minX, maxX, minY, maxY, headerHeight } = bounds;
-      const position = {
-        x: Math.max(minX, Math.min(maxX, x)),
-        y: Math.max(minY, Math.min(maxY, y)) - headerHeight,
-      };
-
-      if (this.isAtLeastDoubleWidth()) {
-        this.doubleFloatingPosition = {
-          x: position.x - window.innerWidth / 2,
-          y: position.y,
-        };
-      } else {
-        this.singleFloatingPosition = position;
-      }
-    },
-
-    // 현재 레이아웃에 맞는 위치 반환
-    get floatingPosition(): FloatingPosition {
-      const defaultPosition = { x: 16, y: 16 };
-
-      if (this.isAtLeastDoubleWidth()) {
-        if (!this.doubleFloatingPosition) return defaultPosition;
-        return {
-          x: this.doubleFloatingPosition.x + window.innerWidth / 2,
-          y: this.doubleFloatingPosition.y,
-        };
-      }
-      return this.singleFloatingPosition || defaultPosition;
+    toggleAutoUpdate() {
+      this.setAutoUpdate(!this.autoUpdate);
     },
   },
 

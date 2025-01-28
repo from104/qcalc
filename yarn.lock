@@ -2150,12 +2150,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/dompurify@npm:^3.2.0":
-  version: 3.2.0
-  resolution: "@types/dompurify@npm:3.2.0"
+"@types/dompurify@npm:3.0.5":
+  version: 3.0.5
+  resolution: "@types/dompurify@npm:3.0.5"
   dependencies:
-    dompurify: "npm:*"
-  checksum: 10/0194dd9024e76e856f3373e8b080c7a5ac9910543ac1ee85db45277efbbea820b2f27fe22c8a6f02bb51833e0a8540d732be0d11d156efd16cb0b97f88e41ebf
+    "@types/trusted-types": "npm:*"
+  checksum: 10/e544b3ce53c41215cabff3d89256ff707c7ee8e0c9a1b5034b22014725d288b16e6942cdcdeeb4221c578c3421a6a4721aa0676431f55d7abd18c07368855c5e
   languageName: node
   linkType: hard
 
@@ -2462,7 +2462,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/trusted-types@npm:^2.0.7":
+"@types/trusted-types@npm:*, @types/trusted-types@npm:^2.0.7":
   version: 2.0.7
   resolution: "@types/trusted-types@npm:2.0.7"
   checksum: 10/8e4202766a65877efcf5d5a41b7dd458480b36195e580a3b1085ad21e948bc417d55d6f8af1fd2a7ad008015d4117d5fdfe432731157da3c68678487174e4ba3
@@ -2613,7 +2613,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@vitejs/plugin-vue@npm:^5.1.4":
+"@vitejs/plugin-vue@npm:^5.1.4, @vitejs/plugin-vue@npm:^5.2.1":
   version: 5.2.1
   resolution: "@vitejs/plugin-vue@npm:5.2.1"
   peerDependencies:
@@ -4884,7 +4884,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"dompurify@npm:*, dompurify@npm:^3.2.3":
+"dompurify@npm:^3.2.3":
   version: 3.2.3
   resolution: "dompurify@npm:3.2.3"
   dependencies:
@@ -4990,6 +4990,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"electron-log@npm:^5.2.4":
+  version: 5.2.4
+  resolution: "electron-log@npm:5.2.4"
+  checksum: 10/e971f179b58712b3ec3a552a4056a91f81521675eff188cce8a8ec84cbc944877599be8e464e07773a320920714b05100b5ab6f68084a409d9d548cf8a4b1917
+  languageName: node
+  linkType: hard
+
 "electron-publish@npm:25.1.7":
   version: 25.1.7
   resolution: "electron-publish@npm:25.1.7"
@@ -5009,6 +5016,22 @@ __metadata:
   version: 1.5.76
   resolution: "electron-to-chromium@npm:1.5.76"
   checksum: 10/2e8ead6caf746385a8789ced87da8ed98629b3c6bcf19e50e1feb51c2cc5b501fd068c2fa9eefd6c513fb4f07c44d2bd7ead432c083c3798107dc920a3cda1d8
+  languageName: node
+  linkType: hard
+
+"electron-updater@npm:^6.3.9":
+  version: 6.3.9
+  resolution: "electron-updater@npm:6.3.9"
+  dependencies:
+    builder-util-runtime: "npm:9.2.10"
+    fs-extra: "npm:^10.1.0"
+    js-yaml: "npm:^4.1.0"
+    lazy-val: "npm:^1.0.5"
+    lodash.escaperegexp: "npm:^4.1.2"
+    lodash.isequal: "npm:^4.5.0"
+    semver: "npm:^7.6.3"
+    tiny-typed-emitter: "npm:^2.1.0"
+  checksum: 10/98a8a451fde48d6af71ef1e6c09df678feee59444ad296cb6276a01d8a2d0718b6233f884402ba61b736a8d7a16a5df7a86a8cf837ed686f9d3101ab4f34171f
   languageName: node
   linkType: hard
 
@@ -6022,7 +6045,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"fast-glob@npm:^3.2.5, fast-glob@npm:^3.2.7, fast-glob@npm:^3.3.2":
+"fast-glob@npm:^3.2.12, fast-glob@npm:^3.2.5, fast-glob@npm:^3.2.7, fast-glob@npm:^3.3.2":
   version: 3.3.3
   resolution: "fast-glob@npm:3.3.3"
   dependencies:
@@ -8509,6 +8532,20 @@ __metadata:
   languageName: node
   linkType: hard
 
+"lodash.escaperegexp@npm:^4.1.2":
+  version: 4.1.2
+  resolution: "lodash.escaperegexp@npm:4.1.2"
+  checksum: 10/6d99452b1cfd6073175a9b741a9b09ece159eac463f86f02ea3bee2e2092923fce812c8d2bf446309cc52d1d61bf9af51c8118b0d7421388e6cead7bd3798f0f
+  languageName: node
+  linkType: hard
+
+"lodash.isequal@npm:^4.5.0":
+  version: 4.5.0
+  resolution: "lodash.isequal@npm:4.5.0"
+  checksum: 10/82fc58a83a1555f8df34ca9a2cd300995ff94018ac12cc47c349655f0ae1d4d92ba346db4c19bbfc90510764e0c00ddcc985a358bdcd4b3b965abf8f2a48a214
+  languageName: node
+  linkType: hard
+
 "lodash.memoize@npm:^4.1.2":
   version: 4.1.2
   resolution: "lodash.memoize@npm:4.1.2"
@@ -10143,12 +10180,13 @@ __metadata:
     "@quasar/extras": "npm:1.16.15"
     "@quasar/vite-plugin": "npm:^1.8.1"
     "@rushstack/eslint-patch": "npm:^1.10.4"
-    "@types/dompurify": "npm:^3.2.0"
+    "@types/dompurify": "npm:3.0.5"
     "@types/jest": "npm:^29.5.14"
     "@types/markdown-it": "npm:^14.1.2"
     "@types/node": "npm:22.10.5"
     "@typescript-eslint/eslint-plugin": "npm:^8.19.1"
     "@typescript-eslint/parser": "npm:8.19.1"
+    "@vitejs/plugin-vue": "npm:^5.2.1"
     "@vue/devtools": "npm:7.6.8"
     "@vue/eslint-config-prettier": "npm:^10.1.0"
     "@vue/eslint-config-typescript": "npm:^14.2.0"
@@ -10158,6 +10196,8 @@ __metadata:
     dotenv: "npm:^16.4.7"
     electron: "npm:33.3.1"
     electron-builder: "npm:^25.1.8"
+    electron-log: "npm:^5.2.4"
+    electron-updater: "npm:^6.3.9"
     electron-window-state: "npm:^5.0.3"
     eslint: "npm:9.17.0"
     eslint-config-prettier: "npm:^9.1.0"
@@ -10180,6 +10220,7 @@ __metadata:
     typescript: "npm:<5.7"
     vite: "npm:6.0.7"
     vite-plugin-checker: "npm:^0.8.0"
+    vite-plugin-env-types: "npm:^0.1.4"
     vue: "npm:3.5.13"
     vue-eslint-parser: "npm:^9.4.3"
     vue-i18n: "npm:^11.0.1"
@@ -11893,6 +11934,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"tiny-typed-emitter@npm:^2.1.0":
+  version: 2.1.0
+  resolution: "tiny-typed-emitter@npm:2.1.0"
+  checksum: 10/709bca410054e08df4dc29d5ea0916328bb2900d60245c6a743068ea223887d9fd2c945b6070eb20336275a557a36c2808e5c87d2ed4b60633458632be4a3e10
+  languageName: node
+  linkType: hard
+
 "tinyglobby@npm:^0.2.10":
   version: 0.2.10
   resolution: "tinyglobby@npm:0.2.10"
@@ -12651,6 +12699,17 @@ __metadata:
     vue-tsc:
       optional: true
   checksum: 10/a38a90ac706b4fdd21db52caca7e380118ae1e8cd520184b000481cf40baac491723c71e90b6d36197051131f0e20509d2e297e199831bf3428cf4b1c50114ef
+  languageName: node
+  linkType: hard
+
+"vite-plugin-env-types@npm:^0.1.4":
+  version: 0.1.4
+  resolution: "vite-plugin-env-types@npm:0.1.4"
+  dependencies:
+    fast-glob: "npm:^3.2.12"
+  peerDependencies:
+    vite: ">=2.0.0"
+  checksum: 10/dc67bf632b0a905c22f8b1463f1187383c9a580548eb3f5f386fc05a2104b1ce49830cfe61cffc89207a86a80d8ed979b6aab789d09b7376019d807cf529910b
   languageName: node
   linkType: hard
 

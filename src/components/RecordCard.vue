@@ -22,6 +22,7 @@
 
   // 컴포넌트 import
   import MenuItem from 'components/snippets/MenuItem.vue';
+  import ToolTip from 'components/snippets/ToolTip.vue';
   import HighlightText from 'components/snippets/HighlightText.vue';
 
   // 계산 결과 배열 (반응형)
@@ -35,15 +36,15 @@
     () => records,
     (newRecords) => {
       // 새로운 히스토리 항목에 대한 메뉴 상태 초기화
-      newRecords.value.forEach((h) => {
-        if (h.id && recordMenu[h.id] === undefined) {
-          recordMenu[h.id] = false;
+      newRecords.value.forEach((record) => {
+        if (record.id && recordMenu[record.id] === undefined) {
+          recordMenu[record.id] = false;
         }
       });
 
       // 삭제된 히스토리 항목의 메뉴 상태 제거
       for (const id in recordMenu) {
-        if (!newRecords.value.some((h) => h.id === parseInt(id))) {
+        if (!newRecords.value.some((record) => record.id === parseInt(id))) {
           delete recordMenu[id];
         }
       }
@@ -136,9 +137,11 @@
     keyBinding.subscribe();
     setTimeout(() => {
       document.getElementById('record')?.scrollTo({ top: store.recordLastScrollPosition });
+      if (store.isSearchOpen) {
+        store.setInputFocused();
+      }
     }, 50);
     showScrollToTop.value = false;
-    window.addEventListener('resize', adjustFloatingPosition);
   });
 
   // 컴포넌트 언마운트 시 키 바인딩 비활성화
@@ -147,7 +150,6 @@
     store.recordLastScrollPosition = document.getElementById('record')?.scrollTop ?? 0;
 
     store.isDeleteRecordConfirmOpen = false;
-    window.removeEventListener('resize', adjustFloatingPosition);
   });
 
   // 메모 편집 관련 상태 변수
@@ -193,7 +195,10 @@
   };
 
   // 히스토리 항목 복사 함수
-  const copyRecordItem = async (id: number, copyType: 'formattedNumber' | 'onlyNumber' | 'memo'): Promise<void> => {
+  const copyRecordItem = async (
+    id: number,
+    copyType: 'formattedNumber' | 'onlyNumber' | 'memo' | 'time',
+  ): Promise<void> => {
     const record = calc.record.getRecordById(id);
     const copyText =
       copyType === 'formattedNumber'
@@ -202,7 +207,9 @@
           ? record.calculationResult.resultNumber
           : copyType === 'memo'
             ? (calc.record.getMemo(id) as string)
-            : '';
+            : copyType === 'time'
+              ? formatDateTime(record.timestamp)
+              : '';
     try {
       await copyToClipboard(copyText);
       showMessage(t('copySuccess'));
@@ -247,6 +254,20 @@
     return headerElement ? headerElement.clientHeight + 'px' : '0px';
   });
 
+  // 날짜/시간 포맷 함수
+  const formatDateTime = (timestamp: number): string => {
+    const date = new Date(timestamp);
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    const hours = String(date.getHours()).padStart(2, '0');
+    const minutes = String(date.getMinutes()).padStart(2, '0');
+    const seconds = String(date.getSeconds()).padStart(2, '0');
+    const milliseconds = String(date.getMilliseconds()).padStart(3, '0');
+
+    return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}.${milliseconds}`;
+  };
+
   const recordStrings = computed<RecordString[]>(() => {
     // 기본 레코드 문자열 생성
     const strings = records.value.map((record) => {
@@ -259,6 +280,7 @@
       return {
         id: record.id as number,
         memo: record.memo,
+        timestamp: record.timestamp,
         displayText,
         origResult: record.calculationResult,
       };
@@ -275,100 +297,47 @@
     return strings.filter((record) => {
       const memoMatch = record.memo?.toLowerCase().includes(searchTerm);
       const displayTextMatch = record.displayText.toLowerCase().includes(searchTerm);
-      return memoMatch || displayTextMatch;
+      const timeMatch = formatDateTime(record.timestamp).toLowerCase().includes(searchTerm);
+      return memoMatch || displayTextMatch || timeMatch;
     });
   });
 
-  // 드래그 관련 상태 수정
-  const isDragging = ref(false);
-  const dragOffset = reactive({ x: 0, y: 0 });
+  // 검색바 높이를 저장하는 ref 추가
+  const searchBarHeight = ref(50); // 기본 높이 50px
 
-  // 스타일 계산 수정
-  const floatingStyle = computed(() => ({
-    position: 'fixed',
-    left: `${store.isAtLeastDoubleWidth() ? store.doubleFloatingPosition.x : store.singleFloatingPosition.x}px`,
-    top: `${store.isAtLeastDoubleWidth() ? store.doubleFloatingPosition.y : store.singleFloatingPosition.y}px`,
-    opacity: isDragging.value ? 0.3 : store.inputFocused ? 1 : undefined,
-    transition: isDragging.value ? 'none' : 'all 0.2s',
-    zIndex: 1500,
-  }));
-
-  // 드래그 시작
-  const startDrag = (e: MouseEvent | Touch) => {
-    const floatingElement = document.querySelector('.search-input-floating') as HTMLElement;
-    if (!floatingElement) return;
-
-    isDragging.value = true;
-    const rect = floatingElement.getBoundingClientRect();
-    dragOffset.x = e.clientX - rect.left;
-    dragOffset.y = e.clientY - rect.top;
-
-    document.addEventListener('mousemove', onDrag);
-    document.addEventListener('mouseup', stopDrag);
-    document.addEventListener('touchmove', onDrag);
-    document.addEventListener('touchend', stopDrag);
-  };
-
-  // 드래그 중 수정
-  const onDrag = (e: MouseEvent | TouchEvent) => {
-    if (!isDragging.value) return;
-    const clientX = e instanceof MouseEvent ? e.clientX : e.touches[0]?.clientX;
-    const clientY = e instanceof MouseEvent ? e.clientY : e.touches[0]?.clientY;
-    if (clientX !== undefined && clientY !== undefined) {
-      store.updateFloatingPosition(clientX - dragOffset.x, clientY - dragOffset.y);
-    }
-  };
-
-  // 드래그 종료
-  const stopDrag = () => {
-    isDragging.value = false;
-    document.removeEventListener('mousemove', onDrag);
-    document.removeEventListener('mouseup', stopDrag);
-    document.removeEventListener('touchmove', onDrag);
-    document.removeEventListener('touchend', stopDrag);
-  };
-
-  // 컴포넌트 언마운트 시 이벤트 리스너 제거
-  onBeforeUnmount(() => {
-    document.removeEventListener('mousemove', onDrag);
-    document.removeEventListener('mouseup', stopDrag);
-    document.removeEventListener('touchmove', onDrag);
-    document.removeEventListener('touchend', stopDrag);
+  // 계산된 상단 여백 추가
+  const calculatedTopMargin = computed(() => {
+    return store.isSearchOpen ? `${searchBarHeight.value}px` : '0px';
   });
-
-  // 플로팅창 위치 조정 함수 수정
-  const adjustFloatingPosition = () => {
-    const bounds = store.calculateFloatingBounds();
-    if (!bounds) return;
-
-    const { headerHeight } = bounds;
-    const currentPosition = store.isAtLeastDoubleWidth() ? store.doubleFloatingPosition : store.singleFloatingPosition;
-
-    const x = store.isAtLeastDoubleWidth() ? currentPosition.x + window.innerWidth / 2 : currentPosition.x;
-
-    store.updateFloatingPosition(x, currentPosition.y + headerHeight);
-  };
-
-  // store.isAtLeastDoubleWidth 변경 감시
-  watch(
-    () => store.isAtLeastDoubleWidth(),
-    () => {
-      setTimeout(() => {
-        adjustFloatingPosition();
-      }, 200);
-    },
-  );
 
   interface QSlideEvent {
     reset: () => void;
   }
+
+  // 툴팁 상태를 위한 인터페이스 정의
+  interface TooltipState {
+    [key: number]: boolean;
+  }
+
+  const isShowResultTooltip = reactive<TooltipState>({});
+  const handleResultTooltip = (id: number, isShow: boolean) => {
+    isShowResultTooltip[id] = isShow;
+  };
+
+  const isShowMemoTooltip = reactive<TooltipState>({});
+  const handleMemoTooltip = (id: number, isShow: boolean) => {
+    isShowMemoTooltip[id] = isShow;
+  };
 </script>
 
 <template>
   <q-card-section
     id="record"
     square
-    class="full-width row justify-center items-start relative-position scrollbar-custom q-py-none q-pt-md"
+    class="full-width row justify-center items-start relative-position scrollbar-custom"
+    :style="{
+      paddingTop: calculatedTopMargin,
+    }"
     @scroll="handleScroll"
   >
     <transition name="slide-fade">
@@ -378,20 +347,20 @@
         glossy
         color="secondary"
         icon="publish"
-        class="fixed q-ma-md"
+        class="fixed"
+        :class="store.isSearchOpen ? 'q-ma-xl' : 'q-ma-md'"
         style="z-index: 15"
         :aria-label="t('ariaLabel.scrollToTop')"
         @click="scrollToTop"
       />
     </transition>
-    <transition name="slide-fade">
-      <q-item
+    <transition name="search-bar">
+      <q-bar
         v-if="store.isSearchOpen"
-        class="search-input-floating"
+        class="search-bar"
         :class="{
           'input-focused': store.inputFocused,
         }"
-        :style="floatingStyle"
       >
         <q-input
           v-model="store.searchKeyword"
@@ -413,22 +382,14 @@
             }
           "
         >
-          <template #prepend>
-            <div
-              class="drag-handle"
-              role="button"
-              :aria-label="t('ariaLabel.dragHandle')"
-              tabindex="0"
-              @touchstart="(e: TouchEvent) => startDrag(e.touches[0] as Touch)"
-              @mousedown="startDrag"
-            />
-          </template>
           <template #append>
             <q-btn
               round
               flat
               dense
+              size="sm"
               icon="close"
+              style="top: -3px"
               :aria-label="t('ariaLabel.closeSearch')"
               @click="
                 () => {
@@ -439,19 +400,20 @@
             />
           </template>
         </q-input>
-      </q-item>
+      </q-bar>
     </transition>
+
     <transition name="slide-fade" mode="out-in">
-      <q-item v-if="recordStrings.length == 0" class="text-center">
+      <q-item v-if="recordStrings.length == 0" class="text-center q-pt-xl">
         <q-item-section role="listitem">
           <q-item-label>
-            <span>{{
+            <span class="text-h6">{{
               store.isSearchOpen && store.searchKeyword.trim() !== '' ? t('noSearchResult') : t('noRecord')
             }}</span>
           </q-item-label>
         </q-item-section>
       </q-item>
-      <q-list v-else id="record-list" separator class="full-width" role="list">
+      <q-list v-else id="record-list" separator class="full-width q-pt-md" role="list">
         <transition-group name="record-list">
           <q-slide-item
             v-for="record in recordStrings"
@@ -474,11 +436,29 @@
               role="listitem"
             >
               <q-item-section class="q-mr-none q-px-none">
-                <q-item-label v-if="record.memo">
-                  <u><HighlightText :text="record.memo" :search-term="store.searchKeyword" /></u>
+                <q-item-label v-if="record.memo" class="memo-text">
+                  <HighlightText
+                    :text="record.memo"
+                    :search-term="store.searchKeyword"
+                    @show-tooltip="(isShow) => handleMemoTooltip(record.id, isShow)"
+                  />
+                  <ToolTip v-if="isShowMemoTooltip[record.id]" :delay="1000">
+                    {{ record.memo }}
+                  </ToolTip>
                 </q-item-label>
-                <q-item-label style="white-space: pre-wrap">
-                  <HighlightText :text="record.displayText" :search-term="store.searchKeyword" />
+                <q-item-label class="record-text">
+                  <HighlightText
+                    :text="record.displayText"
+                    :search-term="store.searchKeyword"
+                    allow-line-break
+                    @show-tooltip="(isShow) => handleResultTooltip(record.id, isShow)"
+                  />
+                  <ToolTip v-if="isShowResultTooltip[record.id]" :delay="1000" line-break>
+                    {{ record.displayText }}
+                  </ToolTip>
+                </q-item-label>
+                <q-item-label class="text-caption" :class="store.isDarkMode() ? 'text-grey-5' : 'text-grey-7'">
+                  <HighlightText :text="formatDateTime(record.timestamp)" :search-term="store.searchKeyword" />
                 </q-item-label>
               </q-item-section>
             </q-item>
@@ -517,6 +497,12 @@
                   :title="t('copyResultNumber')"
                   :action="() => copyRecordItem(record.id as number, 'onlyNumber')"
                   :caption="record.origResult.resultNumber"
+                />
+                <MenuItem separator />
+                <MenuItem
+                  :title="t('copyTime')"
+                  :action="() => copyRecordItem(record.id as number, 'time')"
+                  :caption="formatDateTime(record.timestamp)"
                 />
                 <MenuItem separator />
                 <MenuItem :title="t('loadToMainPanel')" :action="() => loadToMainPanel(record.id as number)" />
@@ -558,6 +544,8 @@
     transition-show="slide-right"
     :transition-hide="memoSlideDirection"
     style="z-index: 15"
+    @show="store.setInputFocused"
+    @hide="store.setInputBlurred"
   >
     <q-card class="noselect text-center" style="width: 250px">
       <q-bar v-auto-blur dark class="full-width justify-between nnoselect text-body1 text-white bg-primary">
@@ -592,17 +580,36 @@
   #record {
     max-height: calc(100vh - v-bind('calculatedHeaderHeight'));
     overflow: auto;
+    transition: padding-top 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .record-text {
+    white-space: pre-wrap;
+    font-size: 0.8rem;
+  }
+
+  .memo-text {
+    font-size: 0.9rem;
+    text-decoration: underline;
+
+    :deep(span) {
+      text-decoration: underline;
+    }
   }
 
   .slide-fade-enter-active,
   .slide-fade-leave-active {
-    transition: all 0.2s ease-out;
+    transition: all 0.3s ease-out;
   }
 
-  .slide-fade-enter-from,
+  .slide-fade-enter-from {
+    opacity: 0;
+    transform: translateY(-100%);
+  }
+
   .slide-fade-leave-to {
     opacity: 0;
-    transform: translateY(-20px);
+    transform: translateY(-100%);
   }
 
   .record-list-move,
@@ -612,7 +619,7 @@
   }
 
   .record-list-leave-active {
-    position: absolute; // 이 부분이 중요합니다
+    position: absolute;
   }
 
   .record-list-enter-from,
@@ -633,55 +640,31 @@
     display: none;
   }
 
-  .search-input-floating {
+  .search-bar {
+    position: fixed;
+    width: 100%;
+    height: v-bind('searchBarHeight + "px"');
+    top: 0;
+    left: 0;
     z-index: 2000;
-    padding: 0;
-    width: 50%;
-    max-width: 600px;
-    transition: opacity 0.2s;
-
-    &:hover:not(.input-focused) {
-      opacity: 0.5;
-    }
-
-    .drag-handle {
-      width: 16px;
-      height: 24px;
-      cursor: move;
-      background: rgba(255, 255, 255, 0.2);
-      border-radius: 4px;
-      margin: 8px 0 8px 8px;
-      position: relative;
-
-      &::before {
-        content: '';
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        width: 4px;
-        height: 12px;
-        background: repeating-linear-gradient(
-          to bottom,
-          rgba(255, 255, 255, 0.7) 0px,
-          rgba(255, 255, 255, 0.7) 1px,
-          transparent 1px,
-          transparent 3px
-        );
-      }
-
-      &:hover {
-        background: rgba(255, 255, 255, 0.3);
-      }
-    }
+    background: var(--q-primary);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 
     .search-input {
+      position: absolute;
+      padding: 8px;
+      padding-left: 8px;
+      top: 0;
+      left: 0;
+      width: 100%;
+      color: var(--q-light-text);
+
       :deep(.q-field__control) {
-        background: var(--q-primary);
-        color: white;
+        background: white;
+        color: black;
         border-radius: 8px;
         box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-        padding-left: 0;
+        height: 34px;
       }
 
       :deep(.q-field__before) {
@@ -690,51 +673,34 @@
       }
 
       :deep(.q-field__native) {
-        color: var(--q-dark-text);
+        color: black;
         &::placeholder {
-          color: var(--q-dark-text);
+          color: rgba(0, 0, 0, 0.7);
           opacity: 0.7;
         }
       }
 
       :deep(.q-field__marginal) {
-        color: var(--q-dark-text);
+        color: black;
       }
-    }
-
-    &.dragging {
-      cursor: move;
     }
   }
 
-  /* 다크 모드 */
-  :deep(.body--dark) .search-input-floating {
-    .search-input {
-      :deep(.q-field__control) {
-        background: var(--q-light);
-        color: var(--q-light-text);
-      }
+  .search-bar-enter-active,
+  .search-bar-leave-active {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
 
-      :deep(.q-field__native) {
-        color: var(--q-light-text);
-        &::placeholder {
-          color: var(--q-light-text);
-          opacity: 0.7;
-        }
-      }
+  .search-bar-enter-from,
+  .search-bar-leave-to {
+    opacity: 0;
+    transform: translateY(-100%);
+  }
 
-      :deep(.q-field__marginal) {
-        color: var(--q-light-text);
-      }
-    }
-
-    .drag-handle {
-      background: rgba(255, 255, 255, 0.15);
-
-      &:hover {
-        background: rgba(255, 255, 255, 0.25);
-      }
-    }
+  .search-bar-enter-to,
+  .search-bar-leave-from {
+    opacity: 1;
+    transform: translateY(0);
   }
 </style>
 
@@ -757,6 +723,7 @@ ko:
   loadToMainPanel: '메인 패널에 불러오기'
   loadToSubPanel: '서브 패널에 불러오기'
   deleteResult: '결과 삭제'
+  copyTime: '시간 복사'
   ariaLabel:
     scrollToTop: '맨 위로 스크롤'
     editMemo: '메모 편집'
@@ -782,6 +749,7 @@ en:
   loadToMainPanel: 'Load to main panel'
   loadToSubPanel: 'Load to sub panel'
   deleteResult: 'Delete result'
+  copyTime: 'Copy time'
   ariaLabel:
     scrollToTop: 'Scroll to top'
     editMemo: 'Edit memo'

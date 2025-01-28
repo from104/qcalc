@@ -1,7 +1,7 @@
-// import { BigNumberType } from 'src/types/calculator';
-import type { UnitBaseData } from 'constants/UnitBaseData';
-import { unitBaseData } from 'constants/UnitBaseData';
-import { BigNumber } from 'classes/CalculatorMath';
+import { unitBaseData } from '../constants/UnitBaseData';
+import { BigNumber } from './CalculatorMath';
+
+import type { UnitBaseData } from '../constants/UnitBaseData';
 
 /**
  * UnitConverter 클래스

@@ -1,9 +1,9 @@
+import { match } from 'ts-pattern';
+
 import { RadixConverter } from './RadixConverter';
 import { CalculatorMath } from './CalculatorMath';
-// import { CalculationResult, WordSize } from 'src/types/calculator';
 import { BigNumber, CONSTANTS } from './CalculatorMath';
 import { Radix } from './RadixConverter';
-import { match } from 'ts-pattern';
 import { CalculatorRecord } from './CalculatorRecord';
 
 /**
@@ -124,7 +124,7 @@ export class Calculator {
     this.setCurrentNumberToBuffer();
   }
 
-  private _wordSize!: WordSize; // 비트 단위 연산 시 사용할 비트 수
+  private _wordSize: WordSize = 8; // 비트 단위 연산 시 사용할 비트 수
 
   get wordSize(): WordSize {
     return this._wordSize;
@@ -132,16 +132,6 @@ export class Calculator {
 
   set wordSize(value: WordSize) {
     this._wordSize = value;
-  }
-
-  private _radix: Radix = Radix.Decimal;
-
-  get radix(): Radix {
-    return this._radix;
-  }
-
-  set radix(value: Radix) {
-    this._radix = value;
   }
 
   /**
@@ -208,9 +198,6 @@ export class Calculator {
     this.reset();
     // 메모리 초기화
     this.memoryClear();
-
-    // 비트 단위 연산 시 사용할 비트 수 초기화
-    this.wordSize = 8;
 
     // 히스토리 관리 객체 생성
     this.record = new CalculatorRecord();
@@ -418,9 +405,10 @@ export class Calculator {
     const digitString = typeof digit === 'string' ? digit.charAt(0) : Math.floor(digit).toString();
 
     // 유효하지 않은 숫자인 경우 에러 발생
-    if (!this.radixConverter.isValidRadixNumber(digitString, this.currentRadix)) {
-      throw new Error('Invalid digit for current radix');
-    }
+    this.checkError(
+      !this.radixConverter.isValidRadixNumber(digitString, this.currentRadix),
+      'Invalid digit for current radix',
+    );
 
     // 현재 숫자 업데이트
     if (this.inputBuffer === '0' || this.needsBufferReset) {
@@ -467,20 +455,6 @@ export class Calculator {
       this.inputBuffer = this.inputBuffer.slice(0, -1);
     }
   }
-
-  /**
-   * 부동소수점 숫자를 문자열로 변환하는 private 메서드
-   * @param numberForCalc - 변환할 숫자 문자열
-   * @returns 정수부와 소수부가 포함된 문자열
-   * @description
-   * - 입력된 숫자를 소수점을 기준으로 정수부와 소수부로 분리
-   * - 소수부가 있는 경우: 정수부와 소수부를 소수점으로 연결
-   * - 소수부가 없는 경우: 정수부만 반환
-   */
-  // private numberToString(numberForCalc: string): string {
-  //   const [integer, decimal] = numberForCalc.split('.');
-  //   return decimal ? `${integer}.${decimal}` : integer;
-  // }
 
   /**
    * 현재 숫자의 부호를 변환하는 public 메서드
@@ -661,7 +635,6 @@ export class Calculator {
     }
   }
 
-  // 단항 연산자 메서드들
   // 에러 검사를 위한 헬퍼 메서드
   private checkError(condition: boolean, message: string): void {
     if (condition) {
@@ -669,22 +642,32 @@ export class Calculator {
     }
   }
 
+  // 단항 연산자 메서드들
   public rec(): void {
-    this.checkError(BigNumber(this.currentNumber).eq(0), 'Cannot divide by zero');
+    this.checkError(
+      BigNumber(this.currentNumber).eq(0),
+      'Cannot divide by zero',
+    );
     this.performUnaryOperation(Operator.REC, () => this.math.div('1', this.currentNumber));
   }
 
   public sqrt(): void {
-    this.checkError(BigNumber(this.currentNumber).lt(0), 'The square root of a negative number is not allowed');
+    this.checkError(
+      BigNumber(this.currentNumber).lt(0),
+      'The square root of a negative number is not allowed',
+    );
     this.performUnaryOperation(Operator.SQRT, () => this.math.root(this.currentNumber, '2'));
   }
 
   public pow2(): void {
-    this.performUnaryOperation(Operator.POW2, () => BigNumber(this.currentNumber).pow(2).toString());
+    this.performUnaryOperation(Operator.POW2, () => this.math.pow(this.currentNumber, '2'));
   }
 
   public fct(): void {
-    this.checkError(BigNumber(this.currentNumber).lt(0), 'The factorial of a negative number is not allowed');
+    this.checkError(
+      BigNumber(this.currentNumber).lt(0),
+      'The factorial of a negative number is not allowed',
+    );
     this.performUnaryOperation(Operator.FCT, () => this.math.fact(this.currentNumber));
   }
 
@@ -843,19 +826,9 @@ export class Calculator {
     this.executeWithNumber(Operator.BIT_XNOR, n);
   }
   private executeWithNumber(operator: Operator, n: number): void {
-    console.log('operator:', operator);
-    console.log('n:', n);
-    console.log('currentNumber:', this.currentNumber);
-    console.log('previousNumber:', this.previousNumber);
-    console.log('currentOperator:', this.currentOperator);
     this.performBinaryOperation(operator);
-    console.log('After performBinaryOperation - currentNumber:', this.currentNumber);
-    console.log('After performBinaryOperation - previousNumber:', this.previousNumber);
-    console.log('After performBinaryOperation - currentOperator:', this.currentOperator);
     this.setCurrentNumber(n.toString());
-    console.log('After setCurrentNumber - currentNumber:', this.currentNumber);
     this.equal();
-    console.log('Final result:', this.currentNumber);
   }
 
   /**
@@ -870,11 +843,10 @@ export class Calculator {
    * 2. 상수가 존재하면 해당 값을 반환
    * 3. 상수가 존재하지 않으면 에러 발생
    */
-  public getConstant(constant: string): string {
-    if (CONSTANTS[constant]) {
-      return CONSTANTS[constant];
-    }
-    throw new Error('The requested mathematical constant was not found');
+  public getConstant(constant: keyof typeof CONSTANTS): string {
+    const value = CONSTANTS[constant];
+    this.checkError(!value, 'The requested mathematical constant was not found');
+    return value as string;
   }
 
   /**
@@ -887,7 +859,7 @@ export class Calculator {
    * 1. getConstant()를 호출하여 상수 값을 가져옴
    * 2. 현재 계산기의 값(currentValue)을 해당 상수 값으로 업데이트
    */
-  public setConstant(constant: string): void {
+  public setConstant(constant: keyof typeof CONSTANTS): void {
     this.setCurrentNumber(CONSTANTS[constant] as string);
   }
 

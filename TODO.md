@@ -7,16 +7,15 @@
 - [ ] Automatic updates (electron)
 - [ ] Adjust layout scaling for large tablets
 - [ ] Mobile app implementation (capacitor:ios)
-- [ ] Search calculation result history
+
+## In Progress
+
 - [ ] Add accessibility features
   - [x] Apply aria-label
   - [ ] Voice output of results
   - [ ] Voice control of calculator
   - [ ] High contrast mode
   - [x] Haptic mode
-
-
-## In Progress
 
 ## Done
 
@@ -34,3 +33,4 @@
 - [x] Ability to edit and note calculation history individually
 - [x] Programmer's calculator
 - [x] Active layout for calculation history panel
+- [x] Search calculation result history

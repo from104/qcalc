@@ -1,7 +1,5 @@
 import Freecurrencyapi from '@everapi/freecurrencyapi-js';
 
-// import { BigNumberType } from 'src/types/calculator';
- // Start of Selection
 import type { CurrencyExchangeRates, CurrencyData } from '../constants/CurrencyBaseData';
 import { currencyBaseData } from '../constants/CurrencyBaseData';
 
