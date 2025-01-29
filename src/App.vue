@@ -1,6 +1,6 @@
 <script setup lang="ts">
   // Vue 핵심 기능 및 컴포지션 API 가져오기
-  import { ref, watch, computed, onBeforeMount, onMounted, onBeforeUnmount, onUnmounted } from 'vue';
+  import { ref, watch, computed, onBeforeMount } from 'vue';
 
   // i18n 설정
   import { useI18n } from 'vue-i18n';
@@ -23,7 +23,7 @@
   import { useStore } from 'src/stores/store';
   // 스토어 인스턴스 생성 및 필요한 메서드 추출
   const store = useStore();
-  const { setDarkMode, setAlwaysOnTop, showMessage, toggleAlwaysOnTop } = store;
+  const { setDarkMode, setAlwaysOnTop } = store;
 
   // 앱 제목을 반응형 변수로 선언
   const title = ref(t('message.appTitle'));
@@ -36,6 +36,9 @@
   useMeta(() => ({
     title: title.value,
   }));
+
+  // 자동 업데이트 컴포넌트 가져오기
+  import AutoUpdate from 'components/AutoUpdate.vue';
 
   // 사용자 설정에 따른 다크 모드 적용
   setDarkMode(store.darkMode);
@@ -103,12 +106,12 @@
   // '항상 위에' 설정을 토글하고 알림을 표시하는 함수입니다.
   const toggleAlwaysOnTopWithNotification = () => {
     if ($q.platform.is.electron) {
-      toggleAlwaysOnTop();
+      store.toggleAlwaysOnTop();
 
       if (store.alwaysOnTop) {
-        showMessage(t('alwaysOnTopOn'));
+        store.showMessage(t('alwaysOnTopOn'));
       } else {
-        showMessage(t('alwaysOnTopOff'));
+        store.showMessage(t('alwaysOnTopOff'));
       }
     }
   };
@@ -118,9 +121,9 @@
     store.toggleDarkMode();
 
     if (store.darkMode == 'system') {
-      showMessage(t('darkMode.message.system'));
+      store.showMessage(t('darkMode.message.system'));
     } else {
-      showMessage(t('darkMode.message.' + store.darkMode));
+      store.showMessage(t('darkMode.message.' + store.darkMode));
     }
   };
 
@@ -154,41 +157,6 @@
     { immediate: true },
   );
 
-  // 컴포넌트가 마운트된 후 실행되는 훅입니다.
-  onMounted(() => {
-    keyBinding.subscribe();
-  });
-
-  // 컴포넌트가 언마운트되기 전에 실행되는 훅입니다.
-  onBeforeUnmount(() => {
-    keyBinding.unsubscribe();
-  });
-
-  // 로케일을 설정하는 함수입니다.
-  const setLanguage = () => {
-    if (store.useSystemLocale) {
-      locale.value = systemLocale.value;
-    } else {
-      locale.value = store.userLocale;
-    }
-  };
-
-  // 시스템 로케일을 참조로 저장합니다.
-  const systemLocale = ref(navigator.language.substring(0, 2));
-
-  // 컴포넌트가 마운트되기 전에 실행되는 훅입니다.
-  onBeforeMount(() => {
-    setLanguage();
-
-    // 초기 실행 시 로케일 설정
-    if (store.locale === '') {
-      store.locale = systemLocale.value;
-    }
-    if (store.userLocale === '') {
-      store.userLocale = systemLocale.value;
-    }
-  });
-
   // Track navigation state
   const previousPath = ref(route.path);
   const isWideLayout = ref(store.isAtLeastDoubleWidth());
@@ -221,92 +189,6 @@
 
   // Pure computed for transition name
   const computeTransition = computed(() => currentTransition.value);
-
-  // 상태 관리
-  const updateDialog = ref(false);
-  const updateStatus = ref<UpdateStatusInfo['status']>('checking');
-  const updateInfo = ref<UpdateInfo | null>(null);
-  const updateProgress = ref<UpdateProgressInfo | null>(null);
-  const updateError = ref<UpdateError | null>(null);
-
-  // 업데이트 상태 처리 함수
-  const handleUpdateStatus = (
-    status: UpdateStatusInfo['status'],
-    info?: UpdateInfo | UpdateProgressInfo | UpdateError,
-  ) => {
-    // 자동 업데이트가 비활성화되어 있으면 available 상태에서만 다이얼로그 표시
-    if (!store.autoUpdate && status !== 'available') {
-      return;
-    }
-
-    updateStatus.value = status;
-
-    switch (status) {
-      case 'available':
-        updateInfo.value = info as UpdateInfo;
-        updateDialog.value = true;
-        break;
-
-      case 'progress':
-        updateProgress.value = info as UpdateProgressInfo;
-        break;
-
-      case 'downloaded':
-        updateInfo.value = info as UpdateInfo;
-        updateDialog.value = true;
-        break;
-
-      case 'error':
-        updateError.value = info as UpdateError;
-        updateDialog.value = true;
-        $q.notify({
-          type: 'negative',
-          message: t('update.error'),
-          caption: t('update.errorMessage'),
-        });
-        console.error((info as UpdateError).message);
-        break;
-    }
-  };
-
-  // 업데이트 시작
-  const startUpdate = () => {
-    window.electronUpdater.startUpdate();
-  };
-
-  // 업데이트 설치
-  const installUpdate = () => {
-    window.electronUpdater.installUpdate();
-  };
-
-  // Electron 환경인지 확인하는 computed 속성 추가
-  const isElectron = computed(() => $q.platform.is.electron);
-
-  // 업데이트 관련 코드를 Electron 환경에서만 실행하도록 수정
-  onMounted(() => {
-    // Electron 환경에서만 업데이트 리스너 등록
-    if (isElectron.value && !window.myAPI?.isSnap()) {
-      window.electronUpdater.onUpdateStatus(handleUpdateStatus);
-
-      // 개발 모드가 아닐 때만 업데이트 확인
-      if (!isDev) {
-        window.electronUpdater.checkForUpdates();
-      }
-    }
-  });
-
-  onUnmounted(() => {
-    // Electron 환경에서만 리스너 제거
-    if (isElectron.value && !window.myAPI?.isSnap()) {
-      window.electronUpdater.removeUpdateStatusListener();
-    }
-  });
-
-  const isDev = import.meta.env.DEV;
-
-  const testUpdate = () => {
-    window.electronUpdater.testUpdate();
-  };
 </script>
 
 <template>
@@ -315,58 +197,7 @@
       <component :is="Component" :key="routeProps.path" />
     </transition>
   </router-view>
-  <!-- Electron 환경에서만 업데이트 관련 UI 표시 -->
-  <template v-if="isElectron">
-    <q-dialog v-model="updateDialog" persistent>
-      <q-card style="min-width: 350px; margin-top: 25px">
-        <q-card-section>
-          <div class="text-h6">{{ t('update.title') }}</div>
-        </q-card-section>
-
-        <q-card-section class="q-pt-none">
-          <template v-if="updateStatus === 'available'">
-            <p>{{ t('update.newVersion', { version: updateInfo?.version }) }}</p>
-            <p v-if="updateInfo?.releaseNotes">{{ updateInfo.releaseNotes }}</p>
-            <p>{{ t('update.confirmUpdate') }}</p>
-          </template>
-          <template v-else-if="updateStatus === 'progress'">
-            <p>{{ t('update.downloading', { percent: Math.round(updateProgress?.percent || 0) }) }}</p>
-            <q-linear-progress :value="(updateProgress?.percent || 0) / 100" />
-          </template>
-          <template v-else-if="updateStatus === 'downloaded'">
-            <p>{{ t('update.downloadComplete') }}</p>
-          </template>
-          <template v-else-if="updateStatus === 'error'">
-            <p>{{ t('update.error') }}</p>
-            <p>{{ t('update.errorMessage') }}</p>
-          </template>
-        </q-card-section>
-
-        <q-card-actions align="right">
-          <template v-if="updateStatus === 'available'">
-            <q-btn v-close-popup flat :label="t('update.later')" color="primary" />
-            <q-btn flat :label="t('update.update')" color="primary" @click="startUpdate" />
-          </template>
-          <template v-else-if="updateStatus === 'downloaded'">
-            <q-btn v-close-popup flat :label="t('update.later')" color="primary" />
-            <q-btn flat :label="t('update.installNow')" color="primary" @click="installUpdate" />
-          </template>
-          <template v-else-if="updateStatus === 'error'">
-            <q-btn v-close-popup flat :label="t('update.close')" color="primary" />
-          </template>
-        </q-card-actions>
-      </q-card>
-    </q-dialog>
-    <!-- 개발 환경에서만 표시되는 테스트 버튼 -->
-    <q-btn
-      v-if="isDev"
-      class="fixed-bottom-right q-ma-md"
-      color="primary"
-      icon="refresh"
-      :aria-label="t('update.testUpdate')"
-      @click="testUpdate"
-    />
-  </template>
+  <AutoUpdate />
 </template>
 
 <style scoped lang="scss">
@@ -468,34 +299,3 @@
     transform: translateX(100%);
   }
 </style>
-
-<i18n lang="yaml5">
-ko:
-  update:
-    title: 업데이트 알림
-    newVersion: '새로운 버전이 있습니다: {version}'
-    confirmUpdate: 업데이트를 진행하시겠습니까?
-    downloading: '다운로드 중... {percent}%'
-    downloadComplete: 업데이트가 다운로드되었습니다. 지금 설치하시겠습니까?
-    error: '업데이트 중 오류가 발생했습니다:'
-    errorMessage: '업데이트 중 오류가 발생했습니다: 콘솔을 확인해주세요.'
-    later: 나중에
-    update: 업데이트
-    installNow: 지금 설치
-    close: 닫기
-    testUpdate: 업데이트 테스트
-en:
-  update:
-    title: Update Notification
-    newVersion: 'New version available: {version}'
-    confirmUpdate: Would you like to proceed with the update?
-    downloading: 'Downloading... {percent}%'
-    downloadComplete: Update has been downloaded. Would you like to install it now?
-    error: 'An error occurred during update:'
-    errorMessage: 'An error occurred during update: Check the console.'
-    later: Later
-    update: Update
-    installNow: Install Now
-    close: Close
-    testUpdate: Test Update
-</i18n>
