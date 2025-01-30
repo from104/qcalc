@@ -1,24 +1,55 @@
-# 퀘이사를 이용해 만든 간단한 계산기 (v0.10.0)
+# QCalc - 현대적 생산성을 위한 고급 계산기
 
 MIT License
 
-예전에 졸업과제로 만들었던 안드로이드용 계산기의 소스를 활용해 만든 간단한 계산기입니다. Vue3(Quasar v2), TypeScript, Electron 등 최신 웹 기술을 이용해 데스크톱과 모바일 환경에서 모두 사용 가능하도록 만들었습니다.
+졸업과제로 만들었던 안드로이드용 계산기를 Vue3(Quasar v2), TypeScript, Electron 등 최신 웹 기술로 재구성한 다목적 계산기입니다. 정밀한 계산 기능과 깔끔한 인터페이스를 결합하여 데스크톱과 모바일 환경에서 모두 사용할 수 있습니다.
 
 ## 스크린샷
 
-![Screenshot](https://github.com/from104/qcalc/raw/main/assets/screenshot_v0.9.0-ko.png)
+창의 폭을 줄이면 계산기만 나타납니다.
 
-## 특징
+![Screenshot](https://github.com/from104/qcalc/raw/main/assets/screenshot_v0.11.1-ko.png)
 
-- 간단한 산술 연산, 비트 연산 (AND, OR, XOR, NOT 등), 메모리 기능 (MS, MR, MC, M+ ...등)
-- 단위 변환 기능, 통화 변환 기능, 진법(2진수, 8진수, 10진수, 16진수) 변환 기능
-- 계산 결과 등 복사와 붙혀넣기
-- 계산 결과 기록 (최대 100개) 및 편집, 계산기로 불러오기, 메모 추가 등
-- 다크 모드
-- 영어, 한국어 지원
-- 데스크탑, 모바일 대응 (electron, capacitor, etc...)
-- 모바일에서 스와이프 기능 지원. (계산기 전환, 설정 및 기록 열고 닫기)
-- 적응형 레이아웃 적용. (창 폭이 늘어나면 오른쪽에 계산 기록 등 서브 패널 표시)
+## 주요 기능
+
+- **4가지 전문 계산기를 하나로:**
+
+  - 고급 수학 함수를 갖춘 표준 계산기
+  - 15개 이상의 카테고리를 지원하는 종합 단위 변환기
+  - 실시간 환율을 반영하는 통화 변환기
+  - 이진 연산이 가능한 프로그래머용 계산기
+
+- **생산성 향상 기능:**
+
+  - 검색과 주석이 가능한 계산 기록
+  - 사용자 지정 숫자 서식(3자리 또는 4자리 구분)
+  - 최대 64자리 정밀도의 복잡한 계산
+  - 빠른 데이터 입력을 위한 다양한 키보드 단축키
+
+- **전문가용 도구:**
+
+  - 고급 수학 연산(삼각함수, 로그)
+  - 메모리 연산(MS, MR, M+, M-, M×, M÷)
+  - 비트 연산(AND, OR, XOR, NOT, 시프트)
+  - 포괄적인 단위 변환 시스템
+
+- **현대적인 사용자 경험:**
+  - 큰 화면에서 사이드 패널을 활용하는 적응형 레이아웃
+  - 눈의 피로를 줄이는 다크 모드 지원
+  - 제스처를 지원하는 깔끔하고 직관적인 인터페이스
+  - 정확한 입력을 위한 햅틱 피드백
+
+## 전문가를 위한 최적의 도구
+
+- **엔지니어:** 고정밀 복잡 계산
+- **개발자:** 2진수, 8진수, 16진수 변환
+- **재무 분석가:** 통화 변환 및 백분율 계산
+- **과학자:** 고급 수학 함수와 단위 변환
+- **학생:** 학습을 위한 포괄적인 계산 기록
+
+## 기술적 특징
+
+Vue 3, Quasar, Electron으로 제작된 QCalc은 현대적 웹 기술의 안정성과 함께 네이티브 수준의 성능을 제공합니다. 효율적인 작업을 위한 광범위한 키보드 단축키를 지원하며, 멀티태스킹을 위한 항상 위 모드와 같은 기능을 포함합니다.
 
 ## 바로가기 키 (S: Shift, C: Control, A: Alt)
 
@@ -118,153 +149,14 @@ MIT License
 - Home: 맨 위로 스크롤
 - End: 맨 아래로 스크롤
 
-## 기술과 정보
-
-### 사용된 기술, 프래임워크, 프로그램
-
-- typescript
-- nodeJS
-- electron
-- vue 3
-- quasar 2
-- markdown-it
-- tinykeys
-- MathJS
-- freecurrencyapi-js
-
-### 패키지 설치 방법
+## 설치 방법
 
 - 릴리즈 페이지에서 해당 플랫폼에 맞는 파일을 받아서 설치하면 됩니다.
-- 리눅스는 appimage파일을 단독으로 쓰거나 snap파일을 --dangerous 옵션을 사용하여 설치하세요.
+- 윈도우 설치 파일과 리눅스 AppImage 파일은 자동 업데이트가 지원됩니다.
+- 리눅스는 AppImage 파일을 단독으로 쓰거나 `sudo snap install --beta qcalc` 명령어로 설치하세요.
 - 안드로이드는 해당 apk를 받아 설치하세요. 곧 플레이스토어에 올라갑니다.
 - 맥OS, IOS는 사용하지 않고 테스트할 방법이 없어서 패키지가 없습니다.
 
-### 앱 테스트 및 빌드 방법
+## 개발자를 위한 정보
 
-기본적으로 nodeJS, vscode 환경에서 yarn을 아래와 같이 설치해줍니다.
-
-```bash
-npm install -g yarn
-```
-
-#### 필요한 모듈 설치
-
-```bash
-yarn install
-```
-
-#### 개발 모드로 실행하기 (실시간 리로딩, 에러 체크 등)
-
-```bash
-quasar dev -m electron
-```
-
-또는
-
-```bash
-quasar dev -m capacitor -T android
-```
-
-#### 설치 패키지 빌드 {리눅스,윈도우,안드로이드}
-
-```bash
-quasar build -m electron -T {linux|win32}
-```
-
-또는
-
-```bash
-quasar build -m capacitor -T android
-```
-
-#### 빌드 시 유의사항
-
-릴리즈 페이지의 설치파일을 사용할 때 통화환전기능은 잘 작동할 것입니다. 하지만 직접 빌드할 경우에는 그 기능이 동작하지 않을 수 있습니다. 이는 통화환전 데이터를 [외부 사이트(https://freecurrencyapi.com/)](https://freecurrencyapi.com/)에서 가져오기 때문입니다. 이 사이트에서 무료 API key를 발급받아 프로젝트 폴더의 '.env' 파일에 다음과 같이 넣고 빌드하세요. 월 5000회 데이터를 무료로 갱신할 수 있습니다.
-
-```plaintext
-FREECURRENCY_API_KEY=<당신의_키>
-```
-
-### Android Studio에서의 추가적인 개발, 빌드 절차
-
-#### Android Studio 설치 및 설정
-
-1. [Android Studio](https://developer.android.com/studio) 최신 버전을 설치합니다.
-2. Android Studio를 열고, 기본적인 설정을 완료합니다 (SDK 설정 등).
-
-#### Quasar 프로젝트 Android Studio로 가져오기
-
-1. Quasar 프로젝트 디렉토리에서 `quasar build -m capacitor -T android` 명령어를 실행하여 안드로이드 빌드를 생성합니다.
-2. `src-capacitor` 디렉토리 안에 `capacitor.config.json` 파일이 생성됩니다.
-3. Android Studio에서 `Open an existing Android Studio project`를 선택하고, `src-capacitor` 디렉토리를 엽니다.
-
-#### Android 프로젝트 설정
-
-1. Android Studio에서 프로젝트가 열리면, `Sync Project with Gradle Files`를 클릭하여 프로젝트를 동기화합니다.
-2. `MainActivity.java` 또는 `MainActivity.kt` 파일을 열고, 필요한 패키지 및 설정을 확인합니다.
-
-#### Android 키스토어 설정
-
-릴리스 빌드를 위해서는 키스토어 설정이 필요합니다. 프로젝트 루트에 `.env` 파일을 생성하고 다음 변수들을 추가하세요:
-
-```plaintext
-MY_JKS_KEY_FILE=/path/to/your/keystore.jks
-MY_JKS_STORE_PASSWORD=your_store_password
-MY_JKS_KEY_ALIAS=your_key_alias
-MY_JKS_KEY_PASSWORD=your_key_password
-```
-
-이러한 환경 변수들은 릴리스 APK에 서명하는 빌드 과정에서 사용됩니다. 다음 사항들을 반드시 지켜주세요:
-
-- `.env` 파일을 버전 관리에 절대 커밋하지 마세요
-- 키스토어 파일을 안전하게 보관하세요
-- 키스토어 비밀번호를 잘 기억해두세요
-
-#### 빌드 및 실행
-
-1. Android 기기를 USB 디버깅 모드로 연결하거나 Android 에뮬레이터를 실행합니다.
-2. Android Studio에서 `Run` 버튼을 클릭하여 앱을 빌드하고 실행합니다.
-
-이 과정을 통해 Android Studio에서 추가적인 개발 및 빌드를 수행할 수 있습니다.
-
-#### 빌드 스크립트 사용하기
-
-프로젝트 루트에는 빌드 자동화를 위한 스크립트가 포함되어 있습니다:
-
-##### Linux 사용자 (build.sh)
-
-```bash
-# 스크립트에 실행 권한 부여
-chmod +x build.sh
-
-# 스크립트 실행
-./build.sh
-```
-
-##### Windows 사용자 (build.bat, 미완성)
-
-```batch
-# 명령 프롬프트에서 실행
-build.bat
-```
-
-빌드 스크립트는 다음과 같은 작업을 자동으로 수행합니다:
-
-- 프로젝트 버전 확인
-- 필요한 의존성 설치
-- Android 개발 환경 확인 (안드로이드 빌드 시)
-- 빌드 디렉토리 생성 및 정리
-- 플랫폼별 빌드 수행
-
-주의사항:
-
-- Android 빌드를 위해서는 ANDROID_HOME 환경변수가 올바르게 설정되어 있어야 합니다.
-- 키스토어 설정이 필요한 경우 .env 파일이 올바르게 구성되어 있어야 합니다.
-- 빌드 스크립트는 현재 설치된 Node.js 버전과 호환되는지 자동으로 확인합니다.
-
-### 개발 환경 요구사항
-
-- Node.js 20.0 이상
-- Yarn 패키지 매니저
-- VSCode(Feat. Copilot) 또는 Cursor AI (권장)
-- Android Studio (안드로이드 빌드 시)
+개발 및 빌드 방법에 대한 자세한 내용은 [DEVELOP-ko.md](DEVELOP-ko.md)를 참조하세요.
