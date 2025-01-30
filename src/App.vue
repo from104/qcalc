@@ -55,6 +55,7 @@
     () => {
       updateTitle();
     },
+    { immediate: true },
   );
 
   const isFirstNavigation = ref(true);

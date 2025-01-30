@@ -6,8 +6,10 @@
   import { ref, computed, onMounted, onUnmounted } from 'vue';
   import { useI18n } from 'vue-i18n';
   import { useQuasar } from 'quasar';
-  import { useStore } from 'src/stores/store';
   import DOMPurify from 'dompurify';
+
+    // 전역 window 객체에 접근하기 위한 상수 선언
+  const window = globalThis.window;
 
   // i18n 설정
   const { t } = useI18n();
@@ -16,7 +18,7 @@
   const $q = useQuasar();
 
   // 스토어 인스턴스 생성
-  const store = useStore();
+  const store = window.store;
 
   // 상태 관리
   const updateDialog = ref(false);
@@ -24,15 +26,6 @@
   const updateInfo = ref<UpdateInfo | null>(null);
   const updateProgress = ref<UpdateProgressInfo | null>(null);
   const updateError = ref<UpdateError | null>(null);
-
-  // 개발 모드 여부 확인
-  const isDev = import.meta.env.DEV;
-
-  // Electron 환경인지 확인하는 computed 속성
-  const isElectron = $q.platform.is.electron;
-
-  // snap 환경인지 확인하는 computed 속성
-  const isSnap = window.myAPI?.isSnap();
 
   // 릴리스 노트 sanitize
   const sanitizedReleaseNotes = computed(() =>
@@ -94,7 +87,7 @@
    * 업데이트를 시작하는 함수입니다.
    */
   const startUpdate = () => {
-    if (isDev) {
+    if (window.isDev) {
       // 개발 모드에서는 진행 상태를 시뮬레이션
       let progress = 0;
       const interval = setInterval(() => {
@@ -120,17 +113,11 @@
    * 업데이트를 설치하는 함수입니다.
    */
   const installUpdate = () => {
-    if (isDev) {
+    if (window.isDev) {
       // 개발 모드에서는 재시작 확인 다이얼로그 표시
-      $q.dialog({
-        title: t('restartTitle'),
-        message: t('restartMessage'),
-        ok: t('restart'),
-        cancel: t('later'),
-        persistent: true,
-      }).onOk(() => {
-        console.log('개발 모드: 앱 재시작 시뮬레이션');
-      });
+      console.log('개발 모드: 앱 재시작 시뮬레이션');
+      updateDialog.value = false;
+      store.showMessage(t('updateSimulationComplete'), 3000);
     } else {
       window.electronUpdater.installUpdate();
     }
@@ -175,7 +162,7 @@
    * 테스트 업데이트를 시작하는 함수입니다.
    */
   const testUpdate = () => {
-    if (isDev) {
+    if (window.isDev) {
       handleUpdateStatus('available', testUpdateInfo);
     } else {
       window.electronUpdater.testUpdate();
@@ -185,11 +172,11 @@
   // 컴포넌트가 마운트될 때 실행
   onMounted(() => {
     // Electron 환경에서만 업데이트 리스너 등록
-    if (isElectron && !isSnap) {
+    if (window.isElectron && !window.isSnap) {
       window.electronUpdater.onUpdateStatus(handleUpdateStatus);
 
       // 개발 모드가 아닐 때만 업데이트 확인
-      if (!isDev) {
+      if (!window.isDev) {
         window.electronUpdater.checkForUpdates();
       }
     }
@@ -198,7 +185,7 @@
   // 컴포넌트가 언마운트될 때 실행
   onUnmounted(() => {
     // Electron 환경에서만 리스너 제거
-    if (isElectron && !isSnap) {
+    if (window.isElectron && !window.isSnap) {
       window.electronUpdater.removeUpdateStatusListener();
     }
   });
@@ -206,7 +193,7 @@
 
 <template>
   <!-- Electron 환경에서만 업데이트 관련 UI 표시 -->
-  <template v-if="isElectron && !isSnap">
+  <template v-if="window.isElectron && !window.isSnap">
     <q-dialog v-model="updateDialog" persistent>
       <q-card style="min-width: 350px; margin-top: 25px">
         <q-card-section>
@@ -282,7 +269,7 @@
     </q-dialog>
     <!-- 개발 환경에서만 표시되는 테스트 버튼 -->
     <q-btn
-      v-if="isDev"
+      v-if="window.isDev"
       class="fixed-bottom-right q-ma-md"
       color="primary"
       icon="refresh"
@@ -332,6 +319,7 @@
     restartTitle: 재시작 필요
     restartMessage: 업데이트를 적용하려면 앱을 재시작해야 합니다.
     restart: 재시작
+    updateSimulationComplete: 업데이트 시뮬레이션이 완료되었습니다.
   en:
     title: Update Notification
     newVersionMessage: 'New version available: v{version}.'
@@ -349,4 +337,5 @@
     restartTitle: Restart Required
     restartMessage: The application needs to restart to apply the update.
     restart: Restart
+    updateSimulationComplete: Update simulation complete.
 </i18n>

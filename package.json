@@ -47,7 +47,7 @@
     "@quasar/cli": "^2.4.1",
     "@quasar/extras": "1.16.15",
     "@quasar/vite-plugin": "^1.8.1",
-    "@types/dompurify": "3.0.5",
+    "@types/dompurify": "^3.0.0",
     "@vitejs/plugin-vue": "^5.2.1",
     "axios": "^1.7.9",
     "dompurify": "^3.2.3",

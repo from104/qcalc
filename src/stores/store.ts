@@ -19,7 +19,7 @@ import { CurrencyConverter } from 'classes/CurrencyConverter';
 import { RadixConverter } from 'classes/RadixConverter';
 
 import type { StoreState, DarkModeType, DecimalPlacesType, GroupingUnitType } from '../types/store';
-import { DECIMAL_PLACES } from '../types/store';
+import { DECIMAL_PLACES } from '../types/store.d';
 
 const radixConverter = new RadixConverter();
 
