@@ -52,6 +52,7 @@
     "axios": "^1.7.9",
     "dompurify": "^3.2.3",
     "dotenv": "^16.4.7",
+    "electron-is-snap": "^1.0.5",
     "electron-log": "^5.2.4",
     "electron-updater": "^6.3.9",
     "electron-window-state": "^5.0.3",

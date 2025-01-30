@@ -1,5 +1,6 @@
 import { defineBoot } from '#q-app/wrappers';
 import { Platform } from 'quasar';
+import { version } from '../../package.json';
 
 // 전역 변수 정의
 import { useStore } from './../stores/store';
@@ -26,7 +27,10 @@ export default defineBoot(() => {
   defineImmutableProperty(window, 'isAndroid', Platform.is.android);
   defineImmutableProperty(window, 'isElectron', Platform.is.electron);
   defineImmutableProperty(window, 'isCapacitor', Platform.is.capacitor);
-  defineImmutableProperty(window, 'isSnap', !!process.env.SNAP);
+
+  defineImmutableProperty(window, 'isSnap', window.electron.isSnap);
+
+  defineImmutableProperty(window, 'version', version);
 
   // 스토어 인스턴스 (수정 가능)
   window.store = useStore();

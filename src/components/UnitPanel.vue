@@ -1,6 +1,6 @@
 <script setup lang="ts">
   // Vue 핵심 기능 및 컴포지션 API 가져오기
-  import { onMounted, onBeforeUnmount, reactive, watch } from 'vue';
+  import { onMounted, onBeforeUnmount, reactive, watch, computed } from 'vue';
 
   // i18n 설정
   import { useI18n } from 'vue-i18n';
@@ -11,10 +11,12 @@
   import { UnitConverter } from 'classes/UnitConverter';
   import { BigNumber } from 'classes/CalculatorMath';
 
-  // 스토어 관련
-  import { useStore } from 'src/stores/store';
+  // 전역 window 객체에 접근하기 위한 상수 선언
+  const window = globalThis.window;
+
   // 스토어 인스턴스 생성
-  const store = useStore();
+  const store = window.store;
+
   // 스토어에서 필요한 메서드 추출
   const { calc, clickButtonById, swapUnits, initRecentUnits } = store;
 
@@ -63,42 +65,34 @@
   type UnitOption = {
     value: string;
     label: string;
+    desc: string;
     disable?: boolean;
   };
 
-  type ReactiveUnitOptionList = {
-    values: UnitOption[];
-  };
+  // 사용 가능한 단위 목록을 computed로 관리
+  const availableUnits = computed(() => UnitConverter.getUnitLists(store.selectedCategory));
 
   // 단위 옵션 초기화
-  const sourceUnitOptions = reactive({ values: [] } as ReactiveUnitOptionList);
-  const targetUnitOptions = reactive({ values: [] } as ReactiveUnitOptionList);
+  /**
+   * 단위 옵션을 생성하는 유틸리티 함수
+   * @param unit - 단위 문자열
+   * @param isSource - 출발 단위 여부
+   * @returns 단위 옵션 객체
+   */
+  const createUnitOption = (unit: string, isSource: boolean): UnitOption => ({
+    value: unit,
+    label: unit,
+    desc: UnitConverter.getUnitDesc(store.selectedCategory, unit),
+    disable: isSource
+      ? store.targetUnits[store.selectedCategory] === unit
+      : store.sourceUnits[store.selectedCategory] === unit,
+  });
 
-  // 단위 변경 시 옵션 업데이트
-  watch(
-    [() => store.sourceUnits[store.selectedCategory], () => store.targetUnits[store.selectedCategory]],
-    () => {
-      const currentCategory = store.selectedCategory;
-      const availableUnits = UnitConverter.getUnitLists(currentCategory);
+  // 출발 단위 옵션 목록을 computed로 관리
+  const sourceUnitOptions = computed(() => availableUnits.value.map((unit) => createUnitOption(unit, true)));
 
-      // 'From' 단위 옵션 설정
-      sourceUnitOptions.values = availableUnits.map((unit) => ({
-        value: unit,
-        label: unit,
-        desc: UnitConverter.getUnitDesc(currentCategory, unit),
-        disable: store.targetUnits[currentCategory] === unit,
-      }));
-
-      // 'To' 단위 옵션 설정
-      targetUnitOptions.values = availableUnits.map((unit) => ({
-        value: unit,
-        label: unit,
-        desc: UnitConverter.getUnitDesc(currentCategory, unit),
-        disable: store.sourceUnits[currentCategory] === unit,
-      }));
-    },
-    { immediate: true },
-  );
+  // 도착 단위 옵션 목록을 computed로 관리
+  const targetUnitOptions = computed(() => availableUnits.value.map((unit) => createUnitOption(unit, false)));
 
   const handleUnitSwap = () => {
     calc.setCurrentNumber(
@@ -140,7 +134,7 @@
     <!-- 원본 단위 -->
     <q-select
       v-model="store.sourceUnits[store.selectedCategory]"
-      :options="sourceUnitOptions.values"
+      :options="sourceUnitOptions"
       :label="t(`unitDesc.${store.selectedCategory}.${store.sourceUnits[store.selectedCategory]}`)"
       role="combobox"
       :aria-label="t('ariaLabel.sourceUnit')"
@@ -183,13 +177,13 @@
       :aria-label="t('ariaLabel.swapUnits')"
       @click="handleUnitSwap()"
     >
-      <ToolTip>{{ t('tooltipSwap') }}</ToolTip>
+      <ToolTip :auto-hide="3000" :text="t('tooltipSwap')" />
     </q-btn>
 
     <!-- 대상 단위 -->
     <q-select
       v-model="store.targetUnits[store.selectedCategory]"
-      :options="targetUnitOptions.values"
+      :options="targetUnitOptions"
       :label="t(`unitDesc.${store.selectedCategory}.${store.targetUnits[store.selectedCategory]}`)"
       role="combobox"
       :aria-label="t('ariaLabel.targetUnit')"

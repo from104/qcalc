@@ -19,19 +19,20 @@
   // 계산기 관련 타입과 클래스
   import { KeyBinding } from 'classes/KeyBinding';
 
-  // 스토어 관련
-  import { useStore } from 'src/stores/store';
-  // 스토어 인스턴스 생성 및 필요한 메서드 추출
-  const store = useStore();
+  // 전역 window 객체에 접근하기 위한 상수 선언
+  const window = globalThis.window;
+
+  // 스토어 인스턴스 가져오기
+  const store = window.store;
+
+  // 스토어 메서드 가져오기
   const { setDarkMode, setAlwaysOnTop } = store;
 
   // 앱 제목을 반응형 변수로 선언
-  const title = ref(t('message.appTitle'));
+  const title = computed(() => t('message.appTitle'));
 
   // HTML 메타 데이터 및 Quasar 프레임워크 설정
-  import { useMeta, useQuasar } from 'quasar';
-  // Quasar 프레임워크 인스턴스 초기화
-  const $q = useQuasar();
+  import { useMeta } from 'quasar';
   // HTML 메타 데이터 설정 (페이지 제목)
   useMeta(() => ({
     title: title.value,
@@ -45,37 +46,47 @@
 
   // 앱 제목 업데이트 함수
   // 현재 설정된 언어로 제목을 변경
-  const updateTitle = () => {
-    title.value = t('message.appTitle');
-  };
+  // const updateTitle = () => {
+  //   title.value = t('message.appTitle');
+  // };
 
   // 언어 설정 변경 감지 및 제목 자동 업데이트
-  watch(
-    () => store.locale,
-    () => {
-      updateTitle();
-    },
-    { immediate: true },
-  );
+  // watch(
+  //   () => store.locale,
+  //   () => {
+  //     updateTitle();
+  //   },
+  //   { immediate: true },
+  // );
 
   const isFirstNavigation = ref(true);
 
   // 컴포넌트 마운트 직전 초기화 작업 수행
   onBeforeMount(() => {
+    // 스토어의 언어 설정이 비었을 경우 시스템 로케일 사용
+    if (!store.locale) {
+      store.useSystemLocale = true;
+      store.locale = navigator.language.substring(0, 2);
+    }
+
+    if (!store.userLocale) {
+      store.userLocale = store.locale;
+    }
+
     // 저장된 언어 설정 적용
     locale.value = store.locale;
 
     // 운영체제별 결과창 패딩 최적화
-    if ($q.platform.is.win) {
+    if (window.isWindows) {
       store.resultPanelPadding = 8;
-    } else if ($q.platform.is.linux) {
+    } else if (window.isLinux) {
       store.resultPanelPadding = 3;
     } else {
       store.resultPanelPadding = 0;
     }
 
     // 현재 언어로 앱 제목 설정
-    updateTitle();
+    // updateTitle();
 
     // 설정에 따라 계산기 패널 초기화
     if (store.initPanel && store.calc) {
@@ -83,7 +94,7 @@
     }
 
     // 일렉트론 환경에서만 '항상 위에 표시' 설정 적용
-    if ($q.platform.is.electron) {
+    if (window.isElectron) {
       setAlwaysOnTop(store.alwaysOnTop);
     }
 
@@ -106,7 +117,7 @@
 
   // '항상 위에' 설정을 토글하고 알림을 표시하는 함수입니다.
   const toggleAlwaysOnTopWithNotification = () => {
-    if ($q.platform.is.electron) {
+    if (window.isElectron) {
       store.toggleAlwaysOnTop();
 
       if (store.alwaysOnTop) {

@@ -83,7 +83,7 @@ export const useStore = defineStore('store', {
     radixType: 'suffix',
 
     // 자동 업데이트 관련
-    autoUpdate: true, 
+    autoUpdate: true,
   }),
 
   getters: {
@@ -153,27 +153,115 @@ export const useStore = defineStore('store', {
       return integerPart?.replace(groupingPattern, ',') + (decimalPart ? `.${decimalPart}` : '');
     },
 
-    formatDecimalPlaces(value: string, decimalPlaces: number): string {
+    formatDecimalPlaces(value: string, decimalPlaces: number, isTargetRadix: boolean = false): string {
       if (!value) return '';
       if (decimalPlaces < 0) return value;
-      if (decimalPlaces === 0) return value.split('.')[0] ?? '';
 
-      // 소수점이 없는 경우 처리
+      // 현재 진법 결정 (진법 변환 모드일 경우 소스 진법 사용)
+      const currentRadix =
+        this.currentTab === 'radix' ? (isTargetRadix ? this.targetRadix : this.sourceRadix) : Radix.Decimal;
+      const currentRadixNumber = this.radixEnumToNumber(currentRadix);
+      const [integerPart = '', fractionalPart = ''] = value.split('.');
+
+      // 소수점 이하 처리 필요 없는 경우
+      if (decimalPlaces === 0) {
+        if (!fractionalPart) return integerPart;
+
+        // 첫 번째 소수점 자리에서 반올림
+        const firstDigit = parseInt(fractionalPart[0] ?? '', currentRadixNumber);
+        const shouldRoundUp = firstDigit >= Math.floor(currentRadixNumber / 2);
+        return shouldRoundUp ? this.incrementInteger(integerPart, currentRadixNumber) : integerPart;
+      }
+
+      // 소수점 이하 처리
       if (!value.includes('.')) {
         return decimalPlaces > 0 ? `${value}.${'0'.repeat(decimalPlaces)}` : value;
       }
 
-      // 소수점이 있는 경우 처리
-      const [integerPart, decimalPart] = value.split('.');
-      const formattedDecimal = decimalPart?.slice(0, decimalPlaces).padEnd(decimalPlaces, '0') ?? '';
+      // 반올림 처리
+      const { roundedFraction, carryOver } = this.roundFractionalPart(
+        fractionalPart,
+        decimalPlaces,
+        currentRadixNumber,
+      );
 
-      return `${integerPart}.${formattedDecimal}`;
+      // 정수부 자리 올림 처리
+      let finalInteger = integerPart;
+      if (carryOver > 0) {
+        finalInteger = this.incrementInteger(integerPart, currentRadixNumber);
+      }
+
+      // 최종 결과 조합
+      const formattedDecimal = roundedFraction.padEnd(decimalPlaces, '0');
+      return `${finalInteger}${formattedDecimal ? `.${formattedDecimal}` : ''}`;
     },
 
-    toFormattedNumber(value: string): string {
+    // 정수부 증분 처리 (자리 올림 포함)
+    incrementInteger(integerStr: string, radixNumber: number): string {
+      let result = '';
+      let carry = 1;
+      let i = integerStr.length - 1;
+
+      while (i >= 0 || carry > 0) {
+        const digit = i >= 0 ? parseInt(integerStr[i] ?? '', radixNumber) : 0;
+        const sum = digit + carry;
+        carry = sum >= radixNumber ? 1 : 0;
+        const newDigit = (sum % radixNumber).toString(radixNumber).toUpperCase();
+        result = newDigit + result;
+        i--;
+      }
+
+      return result || '0';
+    },
+
+    // 소수부 반올림 처리
+    roundFractionalPart(
+      fractional: string,
+      decimalPlaces: number,
+      radixNumber: number,
+    ): { roundedFraction: string; carryOver: number } {
+      if (fractional.length <= decimalPlaces) {
+        return {
+          roundedFraction: fractional.padEnd(decimalPlaces, '0'),
+          carryOver: 0,
+        };
+      }
+
+      const retainPart = fractional.substring(0, decimalPlaces);
+      const nextDigit = fractional[decimalPlaces];
+      const nextValue = parseInt(nextDigit ?? '', radixNumber as unknown as number);
+      const halfRadix = Math.floor(radixNumber / 2);
+
+      // 반올림 필요 없는 경우
+      if (nextValue < halfRadix) {
+        return {
+          roundedFraction: retainPart,
+          carryOver: 0,
+        };
+      }
+
+      // 반올림 수행
+      const rounded = retainPart.split('');
+      let carryOver = 1;
+      let i = rounded.length - 1;
+
+      while (i >= 0 && carryOver > 0) {
+        const currentValue = parseInt(rounded[i] ?? '', radixNumber) + carryOver;
+        carryOver = currentValue >= radixNumber ? 1 : 0;
+        rounded[i] = (currentValue % radixNumber).toString(radixNumber).toUpperCase();
+        i--;
+      }
+
+      return {
+        roundedFraction: rounded.join(''),
+        carryOver: carryOver,
+      };
+    },
+
+    toFormattedNumber(value: string, isTargetRadix: boolean = false): string {
       if (!value) return '';
 
-      const formattedValue = this.formatDecimalPlaces(value, this.getDecimalPlaces);
+      const formattedValue = this.formatDecimalPlaces(value, this.getDecimalPlaces, isTargetRadix);
 
       return this.useGrouping ? this.numberGrouping(formattedValue) : formattedValue;
     },
@@ -193,22 +281,25 @@ export const useStore = defineStore('store', {
       return radixConverter.isValidRadixNumber(value, radix);
     },
 
-    getRadixPrefix(radix: Radix) {
+    radixEnumToNumber(radix: Radix): number {
       return {
-        [Radix.Binary]: '0b',
-        [Radix.Octal]: '0o',
-        [Radix.Hexadecimal]: '0x',
-        [Radix.Decimal]: '',
+        [Radix.Binary]: 2,
+        [Radix.Octal]: 8,
+        [Radix.Decimal]: 10,
+        [Radix.Hexadecimal]: 16,
       }[radix];
     },
 
+    getRadixNumberToOrder(number: number): number {
+      return { [2]: 0, [8]: 1, [10]: 2, [16]: 3 }[number] ?? -1;
+    },
+
+    getRadixPrefix(radix: Radix) {
+      return ['0b', '0o', '0x', ''][this.getRadixNumberToOrder(this.radixEnumToNumber(radix))];
+    },
+
     getRadixSuffix(radix: Radix) {
-      return {
-        [Radix.Binary]: '2',
-        [Radix.Octal]: '8',
-        [Radix.Hexadecimal]: '16',
-        [Radix.Decimal]: '10',
-      }[radix];
+      return ['2', '8', '10', '16'][this.getRadixNumberToOrder(this.radixEnumToNumber(radix))];
     },
 
     initRecentRadix() {
@@ -407,7 +498,7 @@ export const useStore = defineStore('store', {
 
     setAlwaysOnTop(isAlwaysOnTop: boolean) {
       this.alwaysOnTop = isAlwaysOnTop;
-      window.myAPI.setAlwaysOnTop(this.alwaysOnTop);
+      window.electron.setAlwaysOnTop(this.alwaysOnTop);
     },
 
     toggleAlwaysOnTop() {

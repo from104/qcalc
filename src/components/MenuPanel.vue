@@ -13,10 +13,11 @@
   const router = useRouter();
   const route = useRoute() as RouteLocationNormalizedLoaded & { meta: RouteTransitionMeta };
 
-  // 스토어 관련
-  import { useStore } from 'stores/store';
-  // 스토어 인스턴스 초기화
-  const store = useStore();
+  // 전역 window 객체에 접근하기 위한 상수 선언
+  const window = globalThis.window;
+
+  // 스토어 인스턴스 생성
+  const store = window.store;
 
   // 컴포넌트 import
   import MenuItem from 'components/snippets/MenuItem.vue';

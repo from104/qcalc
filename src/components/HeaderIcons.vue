@@ -10,17 +10,15 @@
   import { useRouter } from 'vue-router';
   const router = useRouter();
 
-  // Quasar 관련 설정
-  import { useQuasar } from 'quasar';
-  const $q = useQuasar();
-
   // 계산기 관련 타입과 클래스
   import { KeyBinding } from 'classes/KeyBinding';
 
-  // 스토어 관련
-  import { useStore } from 'src/stores/store';
-  // 스토어 인스턴스 초기화
-  const store = useStore();
+  // 전역 window 객체에 접근하기 위한 상수 선언
+  const window = globalThis.window;
+
+  // 스토어 인스턴스 생성
+  const store = window.store;
+
   // 스토어에서 필요한 메서드와 속성 추출
   const { calc, copyToClipboard, clickButtonById, showError, showMessage, swapUnits, swapCurrencies, swapRadixes } =
     store;
@@ -49,7 +47,7 @@
   const handlePaste = async (target: 'main' | 'sub' = 'main'): Promise<void> => {
     try {
       let clipboardText = '';
-      if ($q.platform.is.capacitor) {
+      if (window.isCapacitor) {
         clipboardText = await AndroidInterface.getFromClipboard();
       } else {
         clipboardText = await navigator.clipboard.readText();

@@ -2,9 +2,7 @@
   import { onBeforeUnmount, onMounted, reactive, shallowRef, watch, computed, ref } from 'vue';
   import type { ComputedRef } from 'vue';
   import { useRouter, useRoute } from 'vue-router';
-  import { useStore } from 'src/stores/store';
   import { useI18n } from 'vue-i18n';
-  import { useQuasar } from 'quasar';
   import { KeyBinding } from 'classes/KeyBinding';
 
   // 컴포넌트 가져오기
@@ -23,9 +21,14 @@
 
   const router = useRouter();
   const route = useRoute();
-  const store = useStore();
   const { t } = useI18n();
-  const $q = useQuasar();
+
+    // 전역 window 객체에 접근하기 위한 상수 선언
+  const window = globalThis.window;
+
+  // 스토어 인스턴스 생성
+  const store = window.store;
+
 
   // 메인 탭 정보 설정
   const tabs = reactive([
@@ -251,7 +254,7 @@
     <q-page-container class="row" style="padding-bottom: 0px">
       <!-- 메인 페이지 컨텐츠 -->
       <template v-if="!isSubPage">
-        <q-tab-panels v-model="store.currentTab" animated infinite :swipeable="$q.platform.is.mobile">
+        <q-tab-panels v-model="store.currentTab" animated infinite :swipeable="window.isMobile">
           <q-tab-panel v-for="(tab, index) in tabs" :key="index" :name="tab.name">
             <component :is="tab.component" />
           </q-tab-panel>

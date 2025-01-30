@@ -11,14 +11,14 @@
     // 전역 window 객체에 접근하기 위한 상수 선언
   const window = globalThis.window;
 
+  // 스토어 인스턴스 생성
+  const store = window.store;
+
   // i18n 설정
   const { t } = useI18n();
 
   // Quasar 프레임워크 인스턴스 초기화
   const $q = useQuasar();
-
-  // 스토어 인스턴스 생성
-  const store = window.store;
 
   // 상태 관리
   const updateDialog = ref(false);

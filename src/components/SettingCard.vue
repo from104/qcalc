@@ -2,9 +2,11 @@
   // Vue 핵심 기능 및 컴포지션 API 가져오기
   import { reactive, watch, ref, computed } from 'vue';
 
-  // Quasar 프레임워크 관련
-  import { useQuasar } from 'quasar';
-  const $q = useQuasar();
+      // 전역 window 객체에 접근하기 위한 상수 선언
+  const window = globalThis.window;
+
+  // 스토어 인스턴스 생성
+  const store = window.store;
 
   // i18n 설정
   import { useI18n } from 'vue-i18n';
@@ -12,8 +14,6 @@
   const { t } = useI18n();
 
   // 스토어 관련
-  import { useStore } from 'src/stores/store';
-  const store = useStore();
   const { setInitPanel, setDarkMode, setAlwaysOnTop, setHapticsMode, setDecimalPlaces, setAutoUpdate } = store;
 
   // 컴포넌트 import
@@ -50,22 +50,13 @@
       locale.value = store.userLocale;
     }
   };
-
-  // Capacitor 환경인지 확인하는 속성
-  const isCapacitor = $q.platform.is.capacitor;
-
-  // Electron 환경인지 확인하는 속성
-  const isElectron = $q.platform.is.electron;
-
-  // snap 환경인지 확인하는 속성
-  const isSnap = window.myAPI?.isSnap();
 </script>
 
 <template>
   <q-card-section class="full-height noselect column no-wrap">
     <q-list v-auto-blur dense class="full-width" role="list" :aria-label="t('ariaLabel.settingsList')">
       <!-- 항상 위에 표시 -->
-      <q-item v-if="isElectron" class="q-mb-sm">
+      <q-item v-if="window.isElectron" class="q-mb-sm">
         <q-item-label class="self-center" role="text">{{ t('alwaysOnTop') }} (Alt-T)</q-item-label>
         <q-space />
         <q-toggle
@@ -93,7 +84,7 @@
       </q-item>
 
       <!-- 진동 모드 -->
-      <q-item v-if="isCapacitor" class="q-mb-sm">
+      <q-item v-if="window.isCapacitor" class="q-mb-sm">
         <q-item-label class="self-center" role="text">{{ t('hapticsMode') }} (Alt-P)</q-item-label>
         <q-space />
         <q-toggle
@@ -297,7 +288,7 @@
       <q-separator spaced="md" />
 
       <!-- 자동 업데이트 설정 -->
-      <q-item v-if="isElectron && !isSnap" class="q-mb-sm">
+      <q-item v-if="window.isElectron && !window.isSnap" class="q-mb-sm">
         <q-item-label class="self-center" role="text">
           {{ t('autoUpdate') }}
           <HelpIcon :text="t('autoUpdateHelp')" />

@@ -7,16 +7,17 @@
   const { t } = useI18n();
 
   // Quasar 관련 설정
-  import { useQuasar, copyToClipboard } from 'quasar';
-  const $q = useQuasar();
+  import { copyToClipboard } from 'quasar';
 
   // 계산기 관련 타입과 클래스
   import { KeyBinding } from 'classes/KeyBinding';
 
-  // 스토어 관련
-  import { useStore } from 'src/stores/store';
-  // 스토어 인스턴스 초기화
-  const store = useStore();
+  // 전역 window 객체에 접근하기 위한 상수 선언
+  const window = globalThis.window;
+
+  // 스토어 인스턴스 생성
+  const store = window.store;
+
   // 스토어에서 필요한 메서드와 속성 추출
   const { calc, getRightSideInRecord, getLeftSideInRecord, showMessage, showError, swapUnits, swapCurrencies } = store;
 
@@ -25,18 +26,40 @@
   import ToolTip from 'components/snippets/ToolTip.vue';
   import HighlightText from 'components/snippets/HighlightText.vue';
 
-  // 계산 결과 배열 (반응형)
-  const records = computed(() => calc.record.getAllRecords());
+  // 기존 코드 상단에 인터페이스 추가
+  interface Record {
+    id: number;
+    calculationResult: CalculationResult;
+    timestamp: number;
+    memo?: string;
+  }
+
+  interface CalculationResult {
+    resultNumber: string;
+    previousNumber: string;
+    operator: string;
+  }
+
+  interface RecordString {
+    id: number;
+    memo?: string;
+    timestamp: number;
+    displayText: string;
+    origResult: CalculationResult;
+  }
+
+  // records 계산 속성 수정
+  const records = computed<Record[]>(() => calc.record.getAllRecords());
 
   // 계산 결과 메뉴의 열림 상태를 관리하는 반응형 객체
-  const recordMenu = reactive(Object.fromEntries(records.value.map((h) => [h.id, false])));
+  const recordMenu = reactive(Object.fromEntries(records.value.map((h: Record) => [h.id, false])));
 
   // records 변경 감시
   watch(
     () => records,
     (newRecords) => {
       // 새로운 히스토리 항목에 대한 메뉴 상태 초기화
-      newRecords.value.forEach((record) => {
+      newRecords.value.forEach((record: Record) => {
         if (record.id && recordMenu[record.id] === undefined) {
           recordMenu[record.id] = false;
         }
@@ -44,7 +67,7 @@
 
       // 삭제된 히스토리 항목의 메뉴 상태 제거
       for (const id in recordMenu) {
-        if (!newRecords.value.some((record) => record.id === parseInt(id))) {
+        if (!newRecords.value.some((record: Record) => record.id === parseInt(id))) {
           delete recordMenu[id];
         }
       }
@@ -270,7 +293,7 @@
 
   const recordStrings = computed<RecordString[]>(() => {
     // 기본 레코드 문자열 생성
-    const strings = records.value.map((record) => {
+    const strings = records.value.map((record: Record) => {
       const displayText = [
         getLeftSideInRecord(record.calculationResult, true),
         '\n= ',
@@ -279,7 +302,7 @@
 
       return {
         id: record.id as number,
-        memo: record.memo,
+        memo: record.memo as string,
         timestamp: record.timestamp,
         displayText,
         origResult: record.calculationResult,
@@ -294,7 +317,7 @@
     if (!searchTerm) return strings;
 
     // 검색어로 필터링
-    return strings.filter((record) => {
+    return strings.filter((record: RecordString) => {
       const memoMatch = record.memo?.toLowerCase().includes(searchTerm);
       const displayTextMatch = record.displayText.toLowerCase().includes(searchTerm);
       const timeMatch = formatDateTime(record.timestamp).toLowerCase().includes(searchTerm);
@@ -314,9 +337,9 @@
     reset: () => void;
   }
 
-  // 툴팁 상태를 위한 인터페이스 정의
+  // 툴크 상태를 위한 인터페이스 정의
   interface TooltipState {
-    [key: number]: boolean;
+    [key: number]: boolean | null;
   }
 
   const isShowResultTooltip = reactive<TooltipState>({});
@@ -463,12 +486,13 @@
               </q-item-section>
             </q-item>
             <q-menu
-              v-model="recordMenu[record.id as number]"
+              :model-value="recordMenu[record.id] ?? false"
               class="shadow-6"
-              :context-menu="$q.platform.is.desktop"
+              :context-menu="window.isDesktop"
               auto-close
               anchor="center left"
               self="top left"
+              @update:model-value="(val) => (recordMenu[record.id] = val)"
             >
               <q-list dense class="noselect" style="max-width: 200px" role="list">
                 <MenuItem

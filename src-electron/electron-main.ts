@@ -7,10 +7,9 @@ import windowState from 'electron-window-state';
 import useAutoUpdate from 'electron-updater';
 
 const { autoUpdater } = useAutoUpdate;
-// snap 환경인지 확인하는 함수
-const isSnap = (): boolean => {
-  return process.platform === 'linux' && process.env.SNAP !== undefined;
-};
+
+// Electron의 main 프로세스 또는 preload 스크립트에서
+const isSnap = process.platform === 'linux' && !!process.env.SNAP;
 
 // 현재 디렉토리 경로 설정
 const currentDir = fileURLToPath(new URL('.', import.meta.url));
@@ -65,7 +64,7 @@ const checkForUpdates = async () => {
 async function createWindow() {
   try {
     // snap이 아닐 경우에만 자동 업데이트 설정
-    if (!isSnap()) {
+    if (!isSnap) {
       autoUpdater.autoDownload = false;
       autoUpdater.autoInstallOnAppQuit = true;
 
@@ -169,13 +168,13 @@ async function createWindow() {
     // 윈도우가 준비되면 업데이트 확인 시작
     mainWindow.once('ready-to-show', () => {
       mainWindow?.show();
-      if (!isSnap()) {
+      if (!isSnap) {
         checkForUpdates();
       }
     });
 
     // IPC 이벤트 핸들러 추가
-    if (!isSnap()) {
+    if (!isSnap) {
       ipcMain.on('start-update', () => {
         autoUpdater.downloadUpdate().catch((err) => {
           console.error('Error occurred during update download:', err);
@@ -192,10 +191,6 @@ async function createWindow() {
             console.error('Error occurred during update check:', err);
           });
         }
-      });
-
-      ipcMain.on('is-snap', () => {
-        return isSnap();
       });
     }
 
