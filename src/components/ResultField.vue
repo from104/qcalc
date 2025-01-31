@@ -98,7 +98,7 @@
     const fromCurrency = store.sourceCurrency;
     const toCurrency = store.targetCurrency;
 
-    return store.converter.convert(currentNumber, fromCurrency, toCurrency).toString();
+    return store.currencyConverter.convert(currentNumber, fromCurrency, toCurrency).toString();
   };
 
   // 진법 변환 결과 계산 함수
@@ -171,7 +171,7 @@
 
     const currencyCode = isMainField ? store.sourceCurrency : store.targetCurrency;
 
-    return store.converter.getSymbol(currencyCode);
+    return store.currencyConverter.getSymbol(currencyCode);
   });
 
   /**

@@ -70,7 +70,7 @@ export const useStore = defineStore('store', {
     showSymbol: true,
 
     // 통화 변환 관련
-    converter: new CurrencyConverter(),
+    currencyConverter: new CurrencyConverter(),
     sourceCurrency: 'USD',
     targetCurrency: 'KRW',
 
@@ -566,7 +566,7 @@ export const useStore = defineStore('store', {
 
     // 통화 변환 관련
     initRecentCurrencies(): void {
-      const availableCurrencies = this.converter.getCurrencyLists();
+      const availableCurrencies = this.currencyConverter.getCurrencyLists();
       // 출발 통화 초기화
       this.sourceCurrency =
         this.sourceCurrency !== '' && availableCurrencies.includes(this.sourceCurrency)

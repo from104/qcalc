@@ -21,7 +21,7 @@
   // 스토어에서 필요한 메서드 추출
   const {
     calc,
-    converter,
+    currencyConverter,
     swapCurrencies,
     initRecentCurrencies,
     clickButtonById,
@@ -49,7 +49,7 @@
 
   // 통화 이름을 현재 언어에 맞게 초기화
   const currencyDescriptions = reactive<CurrencyDescription>(
-    converter.getCurrencyLists().reduce((acc: CurrencyDescription, currency: string) => {
+    currencyConverter.getCurrencyLists().reduce((acc: CurrencyDescription, currency: string) => {
       acc[currency] = t(`currencyDesc.${currency}`);
       return acc;
     }, {}),
@@ -57,7 +57,7 @@
 
   // 언어 변경 시 통화 이름 업데이트
   watch([() => store.locale], () => {
-    converter.getCurrencyLists().forEach((currency: string) => {
+    currencyConverter.getCurrencyLists().forEach((currency: string) => {
       currencyDescriptions[currency] = t(`currencyDesc.${currency}`);
     });
   });
@@ -82,13 +82,13 @@
 
     // 초기 환율 정보 업데이트
     (async () => {
-      await converter.updateRates();
+      await currencyConverter.updateRates();
     })();
 
     // 주기적으로 환율 정보 업데이트 (1시간마다)
     rateUpdateTimer = window.setInterval(
       async () => {
-        await converter.updateRates();
+        await currencyConverter.updateRates();
       },
       1000 * 60 * 60 * 1,
     );
@@ -108,7 +108,7 @@
     disable?: boolean;
   };
 
-  const currencyList = converter.getCurrencyLists();
+  const currencyList = currencyConverter.getCurrencyLists();
 
   // 통화 옵션 초기화
   /**
@@ -143,7 +143,7 @@
   // 통화 옵션 업데이트
   watch(
     () => store.sourceCurrency,
-    () => converter.setBase(store.sourceCurrency),
+    () => currencyConverter.setBase(store.sourceCurrency),
   );
 
   // 통화 선택 필터 함수 생성
@@ -177,8 +177,13 @@
   const targetFilterFn = createFilterFn(filteredTargetCurrencyOptions, targetCurrencyOptions);
 
   const handleCurrencySwap = () => {
-    const convertedValue = converter.convert(BigNumber(calc.currentNumber), store.sourceCurrency, store.targetCurrency);
-    calc.setCurrentNumber(convertedValue.toString());
+    calc.setCurrentNumber(
+      currencyConverter.convert(
+        BigNumber(calc.currentNumber),
+        store.sourceCurrency,
+        store.targetCurrency,
+      ),
+    );
     swapCurrencies();
   };
 </script>
@@ -278,7 +283,7 @@
           <q-item-section>
             <q-item-label caption>{{ currencyDescriptions[scope.opt.label] }}</q-item-label>
             <q-item-label>
-              {{ `${scope.opt.label}, ${converter.getRate(scope.opt.label).toFixed(4)}` }}
+              {{ `${scope.opt.label}, ${currencyConverter.getRate(scope.opt.label).toFixed(4)}` }}
             </q-item-label>
           </q-item-section>
         </q-item>
@@ -286,7 +291,7 @@
       <ToolTip>
         <div class="text-left" style="white-space: pre-wrap">
           {{
-            `${currencyDescriptions[store.targetCurrency]}\n${store.targetCurrency}, ${converter.getRate(store.targetCurrency).toFixed(4)}`
+            `${currencyDescriptions[store.targetCurrency]}\n${store.targetCurrency}, ${currencyConverter.getRate(store.targetCurrency).toFixed(4)}`
           }}
         </div>
       </ToolTip>

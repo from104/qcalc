@@ -19,12 +19,14 @@
   const store = window.store;
 
   // 스토어에서 필요한 메서드와 속성 추출
-  const { calc, getRightSideInRecord, getLeftSideInRecord, showMessage, showError, swapUnits, swapCurrencies } = store;
+  const { calc, getRightSideInRecord, getLeftSideInRecord, showMessage, showError, currencyConverter } = store;
 
   // 컴포넌트 import
   import MenuItem from 'components/snippets/MenuItem.vue';
   import ToolTip from 'components/snippets/ToolTip.vue';
   import HighlightText from 'components/snippets/HighlightText.vue';
+  import { UnitConverter } from 'src/classes/UnitConverter';
+  import { BigNumber } from 'src/classes/CalculatorMath';
 
   // 기존 코드 상단에 인터페이스 추가
   interface Record {
@@ -248,21 +250,30 @@
     calc.setCurrentNumber(record.calculationResult.resultNumber);
   };
 
-  // 서브 결과로 이동 함수
   const loadToSubPanel = (id: number) => {
-    const record = calc.record.getRecordById(id);
     if (store.currentTab === 'unit') {
-      swapUnits();
-      setTimeout(() => {
-        calc.setCurrentNumber(record.calculationResult.resultNumber);
-      }, 5);
-      setTimeout(swapUnits, 10);
+      store.swapUnits();
+      loadToMainPanel(id);
+      calc.setCurrentNumber(
+        UnitConverter.convert(
+          store.selectedCategory,
+          BigNumber(calc.currentNumber),
+          store.sourceUnits[store.selectedCategory] ?? '',
+          store.targetUnits[store.selectedCategory] ?? '',
+        ),
+      );
+      store.swapUnits();
     } else if (store.currentTab === 'currency') {
-      swapCurrencies();
-      setTimeout(() => {
-        calc.setCurrentNumber(record.calculationResult.resultNumber);
-      }, 5);
-      setTimeout(swapCurrencies, 10);
+      store.swapCurrencies();
+      loadToMainPanel(id);
+      calc.setCurrentNumber(
+        currencyConverter.convert(
+          BigNumber(calc.currentNumber),
+          store.sourceCurrency,
+          store.targetCurrency,
+        ).toString(),
+      );
+      store.swapCurrencies();
     }
   };
 
@@ -531,7 +542,7 @@
                 <MenuItem separator />
                 <MenuItem :title="t('loadToMainPanel')" :action="() => loadToMainPanel(record.id as number)" />
                 <MenuItem
-                  v-if="!store.isDefaultCalculator()"
+                  v-if="store.currentTab === 'unit' || store.currentTab === 'currency'"
                   :title="t('loadToSubPanel')"
                   :action="() => loadToSubPanel(record.id as number)"
                 />

@@ -24,7 +24,7 @@ The format is based on [Keep a Changelog] and this project follows [Semantic Ver
 ### Changed
 
 - Increased currency conversion precision from Number to BigNumber.
-- Expanded decimal point display limit up to 16 digits
+- Extended decimal point display limit up to 16 digits with rounding applied
 
 ### Fixed
 
