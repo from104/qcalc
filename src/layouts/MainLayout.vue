@@ -1,4 +1,10 @@
 <script setup lang="ts">
+  /**
+   * MainLayout.vue
+   * 애플리케이션의 메인 레이아웃을 담당하는 컴포넌트입니다.
+   * 반응형 레이아웃, 탭 관리, 서브페이지 관리, 키보드 단축키 등을 처리합니다.
+   */
+
   import { onBeforeUnmount, onMounted, reactive, shallowRef, watch, computed, ref } from 'vue';
   import type { ComputedRef } from 'vue';
   import { useRouter, useRoute } from 'vue-router';
@@ -6,11 +12,11 @@
   import { useMeta } from 'quasar';
   import { KeyBinding } from 'classes/KeyBinding';
 
-  // 컴포넌트 가져오기
+  // === 컴포넌트 임포트 ===
   import HeaderIcons from 'components/HeaderIcons.vue';
   import ToolTip from 'components/snippets/ToolTip.vue';
 
-  // 페이지 컴포넌트 가져오기
+  // === 페이지 컴포넌트 임포트 ===
   import CalcPage from 'pages/CalcPage.vue';
   import UnitPage from 'pages/UnitPage.vue';
   import CurrencyPage from 'pages/CurrencyPage.vue';
@@ -22,26 +28,25 @@
 
   const router = useRouter();
   const route = useRoute();
+  const { locale } = useI18n({ useScope: 'global' });
   const { t } = useI18n();
 
-  // 전역 window 객체에 접근하기 위한 상수 선언
+  // === 전역 객체 및 인스턴스 초기화 ===
   const window = globalThis.window;
-
-  // 스토어 인스턴스 생성
   const store = window.store;
 
-  // i18n 설정
-  const { locale } = useI18n({ useScope: 'global' });
-
-  // 앱 제목 설정
+  // === 메타데이터 설정 ===
+  /**
+   * 앱 제목을 동적으로 설정합니다.
+   */
   const title = computed(() => t('message.appTitle'));
+  useMeta(() => ({ title: title.value }));
 
-  // HTML 메타 데이터 설정
-  useMeta(() => ({
-    title: title.value,
-  }));
-
-  // 메인 탭 정보 설정
+  // === 메인 탭 설정 ===
+  /**
+   * 메인 탭의 구성과 속성을 정의합니다.
+   * 각 탭은 이름, 제목, 컴포넌트 참조를 포함합니다.
+   */
   const tabs = reactive([
     { name: 'calc', title: computed(() => t('calc')), component: shallowRef(CalcPage) },
     { name: 'unit', title: computed(() => t('unit')), component: shallowRef(UnitPage) },
@@ -49,11 +54,10 @@
     { name: 'radix', title: computed(() => t('radix')), component: shallowRef(RadixPage) },
   ]);
 
-  const isRecordDisabled = computed(() => {
-    return store.calc.record.getAllRecords().length === 0 || store.isDeleteRecordConfirmOpen;
-  });
-
-  // 서브 페이지 설정
+  // === 서브페이지 설정 ===
+  /**
+   * 서브페이지의 구성을 정의하는 인터페이스입니다.
+   */
   interface SubPageConfig {
     [key: string]: {
       component: ReturnType<typeof shallowRef>;
@@ -68,6 +72,16 @@
     };
   }
 
+  /**
+   * 기록 삭제 버튼의 비활성화 상태를 계산합니다.
+   */
+  const isRecordDisabled = computed(() => {
+    return store.calc.record.getAllRecords().length === 0 || store.isDeleteRecordConfirmOpen;
+  });
+
+  /**
+   * 서브페이지의 상세 설정을 정의합니다.
+   */
   const SUB_PAGE_CONFIG = reactive<SubPageConfig>({
     help: {
       component: shallowRef(HelpPage),
@@ -108,17 +122,21 @@
     },
   });
 
-  // 현재 서브 페이지 관련
+  // === 상태 관리 ===
   const currentSubPage = ref('record');
   const previousSubPage = ref('record');
+  const isWideLayout = computed(() => store.isAtLeastDoubleWidth());
 
+  // === 유틸리티 함수 ===
+  /**
+   * 서브페이지를 전환하는 함수입니다.
+   */
   const switchSubPage = async (pageName: string) => {
     if (currentSubPage.value === pageName) return;
 
     previousSubPage.value = currentSubPage.value;
     currentSubPage.value = pageName;
 
-    // 라우터 히스토리에 페이지 추가
     if (pageName !== 'record') {
       router.push({ name: pageName });
     } else {
@@ -126,31 +144,33 @@
     }
   };
 
-  // 현재 페이지가 서브 페이지인지 확인
+  /**
+   * 현재 페이지가 서브페이지인지 확인합니다.
+   */
   const isSubPage = computed(() => {
     return Object.keys(SUB_PAGE_CONFIG)
       .filter((key) => !store.isAtLeastDoubleWidth() || key !== 'record')
       .includes(String(route.name));
   });
 
-  // 탭 이동 함수들
+  /**
+   * 탭 이동 관련 함수들
+   */
   const moveTabRight = () => {
     const currentIndex = tabs.findIndex((tab) => tab.name === store.currentTab);
     const nextTab = tabs[(currentIndex + 1) % tabs.length]?.name;
-    if (nextTab) {
-      store.setCurrentTab(nextTab);
-    }
+    if (nextTab) store.setCurrentTab(nextTab);
   };
 
   const moveTabLeft = () => {
     const currentIndex = tabs.findIndex((tab) => tab.name === store.currentTab);
     const prevTab = tabs[(currentIndex - 1 + tabs.length) % tabs.length]?.name;
-    if (prevTab) {
-      store.setCurrentTab(prevTab);
-    }
+    if (prevTab) store.setCurrentTab(prevTab);
   };
 
-  // 서브 페이지 닫기
+  /**
+   * 서브페이지를 닫는 함수입니다.
+   */
   const closeSubPage = () => {
     if (isSubPage.value) {
       if (store.isAtLeastDoubleWidth()) {
@@ -161,26 +181,46 @@
     }
   };
 
-  // 컴포넌트 마운트 시 초기화
+  // === 키보드 단축키 설정 ===
+  /**
+   * 전역 키보드 단축키를 설정합니다.
+   */
+  const keyBinding = new KeyBinding([
+    [['Control+1'], () => store.setCurrentTab('calc')],
+    [['Control+2'], () => store.setCurrentTab('unit')],
+    [['Control+3'], () => store.setCurrentTab('currency')],
+    [['Control+4'], () => store.setCurrentTab('radix')],
+    [['Control+Tab', 'ArrowRight'], moveTabRight],
+    [['Control+Shift+Tab', 'ArrowLeft'], moveTabLeft],
+    [['F1'], () => store.navigateToPath('/help', route, router)],
+    [['F2'], () => store.navigateToPath('/about', route, router)],
+    [['F3'], () => store.navigateToPath('/settings', route, router)],
+    [['F4'], () => store.navigateToPath('/record', route, router)],
+    [['Escape'], closeSubPage],
+  ]);
+
+  // === 라이프사이클 훅 및 감시자 ===
+  /**
+   * 컴포넌트 마운트 시 초기화 작업을 수행합니다.
+   */
   onMounted(() => {
     keyBinding.subscribe();
+
+    // 현재 서브페이지 설정
     const validPages = ['help', 'about', 'settings'];
     currentSubPage.value = validPages.includes(route.name as string) ? (route.name as string) : 'record';
 
-    // 스토어의 언어 설정이 비었을 경우 시스템 로케일 사용
+    // 로케일 설정
     if (!store.locale) {
       store.useSystemLocale = true;
       store.locale = navigator.language.substring(0, 2);
     }
-
     if (!store.userLocale) {
       store.userLocale = store.locale;
     }
-
-    // 저장된 언어 설정 적용
     locale.value = store.locale;
 
-    // 운영체제별 결과창 패딩 최적화
+    // OS별 UI 최적화
     if (window.isWindows) {
       store.resultPanelPadding = 8;
     } else if (window.isLinux) {
@@ -189,78 +229,35 @@
       store.resultPanelPadding = 0;
     }
 
-    // 설정에 따라 계산기 패널 초기화
+    // 초기 설정 적용
     if (store.initPanel && store.calc) {
       store.calc.reset();
     }
-
-    // 일렉트론 환경에서만 '항상 위에 표시' 설정 적용
     if (window.isElectron) {
       store.setAlwaysOnTop(store.alwaysOnTop);
     }
 
-    // 시스템 다크모드 변경 감지
+    // 다크모드 설정
     const darkModeMediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
     darkModeMediaQuery.addEventListener('change', () => {
       if (store.darkMode === 'system') {
         store.updateDarkMode();
       }
     });
-
-    // 다크모드 상태 설정
     store.updateDarkMode();
   });
 
+  /**
+   * 컴포넌트 언마운트 시 정리 작업을 수행합니다.
+   */
   onBeforeUnmount(() => {
     keyBinding.unsubscribe();
   });
 
-  const SUB_PAGE_BUTTONS = reactive([
-    { label: 'help', icon: 'help_outline', path: '/help', tooltip: computed(() => t('tooltip.help')) },
-    { label: 'about', icon: 'info_outline', path: '/about', tooltip: computed(() => t('tooltip.about')) },
-    { label: 'settings', icon: 'settings', path: '/settings', tooltip: computed(() => t('tooltip.settings')) },
-  ]);
-
-  // 1024px를 기준으로 레이아웃 선택
-  const isWideLayout = computed(() => store.isAtLeastDoubleWidth());
-
-  // '항상 위에' 설정을 토글하고 알림을 표시하는 함수
-  const toggleAlwaysOnTopWithNotification = () => {
-    if (window.isElectron) {
-      store.toggleAlwaysOnTop();
-
-      if (store.alwaysOnTop) {
-        store.showMessage(t('alwaysOnTopOn'));
-      } else {
-        store.showMessage(t('alwaysOnTopOff'));
-      }
-    }
-  };
-
-  // 다크모드 토글 함수
-  const toggleDarkModeWithNotification = () => {
-    store.toggleDarkMode();
-
-    if (store.darkMode == 'system') {
-      store.showMessage(t('darkMode.message.system'));
-    } else {
-      store.showMessage(t('darkMode.message.' + store.darkMode));
-    }
-  };
-
-  // 키 바인딩에 다크모드와 항상 위에 표시 토글 추가
-  const keyBinding = new KeyBinding([
-    [['Control+1'], () => store.setCurrentTab('calc')],
-    [['Control+2'], () => store.setCurrentTab('unit')],
-    [['Control+3'], () => store.setCurrentTab('currency')],
-    [['Control+4'], () => store.setCurrentTab('radix')],
-    [['Control+Tab', 'ArrowRight'], moveTabRight],
-    [['Control+Shift+Tab', 'ArrowLeft'], moveTabLeft],
-    [['Escape'], closeSubPage],
-    [['Alt+t'], toggleAlwaysOnTopWithNotification],
-    [['Alt+d'], toggleDarkModeWithNotification],
-  ]);
-
+  /**
+   * 입력 필드 포커스 상태에 따라 키 바인딩을 관리합니다.
+   */
+  
   watch(
     () => store.inputFocused,
     () => {
@@ -272,6 +269,16 @@
     },
     { immediate: true },
   );
+
+  // === 서브페이지 버튼 설정 ===
+  /**
+   * 서브페이지 버튼의 구성을 정의합니다.
+   */
+  const SUB_PAGE_BUTTONS = reactive([
+    { label: 'help', icon: 'help_outline', path: '/help', tooltip: computed(() => t('tooltip.help')) },
+    { label: 'about', icon: 'info_outline', path: '/about', tooltip: computed(() => t('tooltip.about')) },
+    { label: 'settings', icon: 'settings', path: '/settings', tooltip: computed(() => t('tooltip.settings')) },
+  ]);
 </script>
 
 <template>

@@ -7,8 +7,7 @@
 
   // === 핵심 Vue 및 라우터 의존성 ===
   import { ref, onBeforeMount, watch, computed } from 'vue';
-  import { useRoute, useRouter } from 'vue-router';
-  import type { RouteLocationNormalizedLoaded } from 'vue-router';
+  import { useRoute } from 'vue-router';
   import { useI18n } from 'vue-i18n';
 
   // === 컴포넌트 임포트 ===
@@ -21,8 +20,7 @@
   // === 전역 객체 및 인스턴스 초기화 ===
   const window = globalThis.window;
   const store = window.store;
-  const router = useRouter();
-  const route = useRoute() as RouteLocationNormalizedLoaded & { meta: RouteTransitionMeta };
+  const route = useRoute();
   const { t } = useI18n();
 
   // === 상태 관리 ===
@@ -66,10 +64,6 @@
     [['Alt+i'], store.toggleInitPanel],
     [['Alt+d'], toggleDarkModeWithNotification],
     [['Alt+p'], store.toggleHapticsMode],
-    [['F1'], () => store.navigateToPath('/help', route, router)],
-    [['F2'], () => store.navigateToPath('/about', route, router)],
-    [['F3'], () => store.navigateToPath('/settings', route, router)],
-    [['F4'], () => store.navigateToPath('/record', route, router)],
     [[';'], store.toggleButtonAddedLabel],
     [[','], store.toggleUseGrouping],
     [['Alt+,'], () => store.setGroupingUnit(store.groupingUnit === 3 ? 4 : 3)],
