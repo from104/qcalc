@@ -84,6 +84,9 @@ export const useStore = defineStore('store', {
 
     // 자동 업데이트 관련
     autoUpdate: true,
+
+    // Snap 관련
+    isSnapFirstRun: true,
   }),
 
   getters: {

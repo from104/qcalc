@@ -101,6 +101,9 @@ export interface StoreState {
 
   // 자동 업데이트 관련
   autoUpdate: boolean;
+
+  // Snap 관련
+  isSnapFirstRun: boolean;
 }
 
 /**

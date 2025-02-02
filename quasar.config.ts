@@ -209,6 +209,17 @@ export default defineConfig((/* ctx */) => {
         snap: {
           confinement: 'strict',
           grade: 'devel',
+          plugs: [
+            'desktop',
+            {
+              'desktop-legacy': {
+                interface: 'desktop-legacy',
+              },
+            },
+            'home',
+            'network',
+            'system-observe',
+          ],
         },
         publish: [
           {
