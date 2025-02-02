@@ -1,34 +1,111 @@
 <script setup lang="ts">
-  import { ref, onBeforeMount, watch, computed } from 'vue';
-  import { useRoute } from 'vue-router';
-  import type { RouteLocationNormalizedLoaded } from 'vue-router';
+  /**
+   * App.vue 
+   * 애플리케이션의 루트 컴포넌트입니다.
+   * 전역 키 바인딩, 라우팅 트랜지션, 레이아웃 관리를 담당합니다.
+   */
 
-  // 컴포넌트 가져오기
+  // === 핵심 Vue 및 라우터 의존성 ===
+  import { ref, onBeforeMount, watch, computed } from 'vue';
+  import { useRoute, useRouter } from 'vue-router';
+  import type { RouteLocationNormalizedLoaded } from 'vue-router';
+  import { useI18n } from 'vue-i18n';
+
+  // === 컴포넌트 임포트 ===
   import AutoUpdate from 'components/AutoUpdate.vue';
   import SnapFirst from 'components/snippets/SnapFirst.vue';
 
-    // 전역 window 객체에 접근하기 위한 상수 선언
+  // === 유틸리티 클래스 임포트 ===
+  import { KeyBinding } from 'classes/KeyBinding';
+
+  // === 전역 객체 및 인스턴스 초기화 ===
   const window = globalThis.window;
-
-  // 스토어 인스턴스 생성
   const store = window.store;
-
+  const router = useRouter();
   const route = useRoute() as RouteLocationNormalizedLoaded & { meta: RouteTransitionMeta };
-  const isFirstNavigation = ref(true);
+  const { t } = useI18n();
 
-  // 첫 번째 네비게이션 플래그 설정
+  // === 상태 관리 ===
+  const isFirstNavigation = ref(true);
+  const previousPath = ref(route.path);
+  const isWideLayout = ref(store.isAtLeastDoubleWidth());
+  const currentTransition = ref('');
+
+  /**
+   * '항상 위에' 기능을 토글하고 사용자에게 알림을 표시합니다.
+   */
+  const toggleAlwaysOnTopWithNotification = () => {
+    if (window.isElectron) {
+      store.toggleAlwaysOnTop();
+      store.showMessage(store.alwaysOnTop ? t('alwaysOnTopOn') : t('alwaysOnTopOff'));
+    }
+  };
+
+  /**
+   * 다크모드를 토글하고 현재 설정 상태를 사용자에게 알립니다.
+   */
+  const toggleDarkModeWithNotification = () => {
+    store.toggleDarkMode();
+    store.showMessage(
+      store.darkMode === 'system' ? t('darkMode.message.system') : t('darkMode.message.' + store.darkMode),
+    );
+  };
+
+  // === 키 바인딩 설정 ===
+  /**
+   * 전역 단축키 설정
+   * Alt+t: 항상 위에 토글
+   * Alt+i: 초기화 패널 토글
+   * Alt+d: 다크모드 토글
+   * Alt+p: 햅틱 모드 토글
+   * F1-F4: 각종 페이지 이동
+   * 기타: 계산기 관련 기능
+   */
+  const keyBinding = new KeyBinding([
+    [['Alt+t'], toggleAlwaysOnTopWithNotification],
+    [['Alt+i'], store.toggleInitPanel],
+    [['Alt+d'], toggleDarkModeWithNotification],
+    [['Alt+p'], store.toggleHapticsMode],
+    [['F1'], () => store.navigateToPath('/help', route, router)],
+    [['F2'], () => store.navigateToPath('/about', route, router)],
+    [['F3'], () => store.navigateToPath('/settings', route, router)],
+    [['F4'], () => store.navigateToPath('/record', route, router)],
+    [[';'], store.toggleButtonAddedLabel],
+    [[','], store.toggleUseGrouping],
+    [['Alt+,'], () => store.setGroupingUnit(store.groupingUnit === 3 ? 4 : 3)],
+    [['['], store.decrementDecimalPlaces],
+    [[']'], store.incrementDecimalPlaces],
+  ]);
+
+  // === 라이프사이클 훅 및 감시자 ===
+  /**
+   * 첫 번째 네비게이션 플래그를 설정합니다.
+   * 초기 트랜지션 애니메이션을 방지하기 위해 사용됩니다.
+   */
   onBeforeMount(() => {
     setTimeout(() => {
       isFirstNavigation.value = false;
     }, 100);
   });
 
-  // 트랜지션 상태 관리
-  const previousPath = ref(route.path);
-  const isWideLayout = ref(store.isAtLeastDoubleWidth());
-  const currentTransition = ref('');
+  /**
+   * 입력 필드 포커스 상태에 따라 키 바인딩을 활성화/비활성화합니다.
+   */
+  watch(
+    () => store.inputFocused,
+    () => {
+      if (store.inputFocused) {
+        keyBinding.unsubscribe();
+      } else {
+        keyBinding.subscribe();
+      }
+    },
+    { immediate: true },
+  );
 
-  // 레이아웃과 라우트 변경 감시
+  /**
+   * 레이아웃 너비 변경을 감시하고 적절한 트랜지션을 설정합니다.
+   */
   watch(
     () => store.isAtLeastDoubleWidth(),
     (newValue) => {
@@ -39,6 +116,9 @@
     },
   );
 
+  /**
+   * 라우트 변경을 감시하고 적절한 트랜지션을 설정합니다.
+   */
   watch(
     () => route.path,
     (newPath) => {
@@ -53,6 +133,10 @@
     },
   );
 
+  // === 계산된 속성 ===
+  /**
+   * 현재 적용할 트랜지션 이름을 반환합니다.
+   */
   const computeTransition = computed(() => currentTransition.value);
 </script>
 
@@ -67,7 +151,7 @@
 </template>
 
 <style scoped lang="scss">
-  // Common transition properties
+  // === 공통 트랜지션 스타일 ===
   %transition-base {
     position: absolute;
     width: 100%;
@@ -75,7 +159,8 @@
     overflow: hidden;
   }
 
-  // Slide transitions
+  // === 슬라이드 트랜지션 ===
+  // 뒤로 가기/앞으로 가기 애니메이션 공통 속성
   .slide-back-enter-active,
   .slide-back-leave-active,
   .slide-forward-enter-active,
@@ -84,7 +169,7 @@
     transition: transform 0.2s ease;
   }
 
-  // Slide back animation
+  // 뒤로 가기 애니메이션
   .slide-back-enter-from {
     transform: translateX(-100%);
   }
@@ -96,7 +181,7 @@
     transform: translateX(100%);
   }
 
-  // Slide forward animation
+  // 앞으로 가기 애니메이션
   .slide-forward-enter-from {
     transform: translateX(100%);
   }
@@ -108,7 +193,7 @@
     transform: translateX(-100%);
   }
 
-  // Fade transition
+  // === 페이드 트랜지션 ===
   .fade-enter-active,
   .fade-leave-active {
     @extend %transition-base;
@@ -124,7 +209,8 @@
     opacity: 1;
   }
 
-  // Layout expansion animation
+  // === 레이아웃 확장/축소 트랜지션 ===
+  // 확장 애니메이션
   .expand-layout-enter-active,
   .expand-layout-leave-active {
     @extend %transition-base;
@@ -145,7 +231,7 @@
     transform-origin: left;
   }
 
-  // Layout collapse animation
+  // 축소 애니메이션
   .collapse-layout-enter-active,
   .collapse-layout-leave-active {
     @extend %transition-base;
