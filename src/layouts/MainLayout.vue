@@ -3,6 +3,7 @@
   import type { ComputedRef } from 'vue';
   import { useRouter, useRoute } from 'vue-router';
   import { useI18n } from 'vue-i18n';
+  import { useMeta } from 'quasar';
   import { KeyBinding } from 'classes/KeyBinding';
 
   // 컴포넌트 가져오기
@@ -23,12 +24,22 @@
   const route = useRoute();
   const { t } = useI18n();
 
-    // 전역 window 객체에 접근하기 위한 상수 선언
+  // 전역 window 객체에 접근하기 위한 상수 선언
   const window = globalThis.window;
 
   // 스토어 인스턴스 생성
   const store = window.store;
 
+  // i18n 설정
+  const { locale } = useI18n({ useScope: 'global' });
+
+  // 앱 제목 설정
+  const title = computed(() => t('message.appTitle'));
+
+  // HTML 메타 데이터 설정
+  useMeta(() => ({
+    title: title.value,
+  }));
 
   // 메인 탭 정보 설정
   const tabs = reactive([
@@ -150,33 +161,54 @@
     }
   };
 
-  // 키 바인딩 설정
-  const keyBinding = new KeyBinding([
-    [['Control+1'], () => store.setCurrentTab('calc')],
-    [['Control+2'], () => store.setCurrentTab('unit')],
-    [['Control+3'], () => store.setCurrentTab('currency')],
-    [['Control+4'], () => store.setCurrentTab('radix')],
-    [['Control+Tab', 'ArrowRight'], moveTabRight],
-    [['Control+Shift+Tab', 'ArrowLeft'], moveTabLeft],
-    [['Escape'], closeSubPage],
-  ]);
-
-  watch(
-    () => store.inputFocused,
-    () => {
-      if (store.inputFocused) {
-        keyBinding.unsubscribe();
-      } else {
-        keyBinding.subscribe();
-      }
-    },
-    { immediate: true },
-  );
-
+  // 컴포넌트 마운트 시 초기화
   onMounted(() => {
     keyBinding.subscribe();
     const validPages = ['help', 'about', 'settings'];
     currentSubPage.value = validPages.includes(route.name as string) ? (route.name as string) : 'record';
+
+    // 스토어의 언어 설정이 비었을 경우 시스템 로케일 사용
+    if (!store.locale) {
+      store.useSystemLocale = true;
+      store.locale = navigator.language.substring(0, 2);
+    }
+
+    if (!store.userLocale) {
+      store.userLocale = store.locale;
+    }
+
+    // 저장된 언어 설정 적용
+    locale.value = store.locale;
+
+    // 운영체제별 결과창 패딩 최적화
+    if (window.isWindows) {
+      store.resultPanelPadding = 8;
+    } else if (window.isLinux) {
+      store.resultPanelPadding = 3;
+    } else {
+      store.resultPanelPadding = 0;
+    }
+
+    // 설정에 따라 계산기 패널 초기화
+    if (store.initPanel && store.calc) {
+      store.calc.reset();
+    }
+
+    // 일렉트론 환경에서만 '항상 위에 표시' 설정 적용
+    if (window.isElectron) {
+      store.setAlwaysOnTop(store.alwaysOnTop);
+    }
+
+    // 시스템 다크모드 변경 감지
+    const darkModeMediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+    darkModeMediaQuery.addEventListener('change', () => {
+      if (store.darkMode === 'system') {
+        store.updateDarkMode();
+      }
+    });
+
+    // 다크모드 상태 설정
+    store.updateDarkMode();
   });
 
   onBeforeUnmount(() => {
@@ -191,6 +223,55 @@
 
   // 1024px를 기준으로 레이아웃 선택
   const isWideLayout = computed(() => store.isAtLeastDoubleWidth());
+
+  // '항상 위에' 설정을 토글하고 알림을 표시하는 함수
+  const toggleAlwaysOnTopWithNotification = () => {
+    if (window.isElectron) {
+      store.toggleAlwaysOnTop();
+
+      if (store.alwaysOnTop) {
+        store.showMessage(t('alwaysOnTopOn'));
+      } else {
+        store.showMessage(t('alwaysOnTopOff'));
+      }
+    }
+  };
+
+  // 다크모드 토글 함수
+  const toggleDarkModeWithNotification = () => {
+    store.toggleDarkMode();
+
+    if (store.darkMode == 'system') {
+      store.showMessage(t('darkMode.message.system'));
+    } else {
+      store.showMessage(t('darkMode.message.' + store.darkMode));
+    }
+  };
+
+  // 키 바인딩에 다크모드와 항상 위에 표시 토글 추가
+  const keyBinding = new KeyBinding([
+    [['Control+1'], () => store.setCurrentTab('calc')],
+    [['Control+2'], () => store.setCurrentTab('unit')],
+    [['Control+3'], () => store.setCurrentTab('currency')],
+    [['Control+4'], () => store.setCurrentTab('radix')],
+    [['Control+Tab', 'ArrowRight'], moveTabRight],
+    [['Control+Shift+Tab', 'ArrowLeft'], moveTabLeft],
+    [['Escape'], closeSubPage],
+    [['Alt+t'], toggleAlwaysOnTopWithNotification],
+    [['Alt+d'], toggleDarkModeWithNotification],
+  ]);
+
+  watch(
+    () => store.inputFocused,
+    () => {
+      if (store.inputFocused) {
+        keyBinding.unsubscribe();
+      } else {
+        keyBinding.subscribe();
+      }
+    },
+    { immediate: true },
+  );
 </script>
 
 <template>
