@@ -12,7 +12,7 @@ All notable changes to this project are recorded in this file.
 
 The format is based on [Keep a Changelog] and this project follows [Semantic Versioning].
 
-## [0.11.2] 2025-01-31
+## [0.11.2] 2025-02-05
 
 ### Added
 
@@ -29,5 +29,6 @@ The format is based on [Keep a Changelog] and this project follows [Semantic Ver
 ### Fixed
 
 - Fixed display error in percentage functionality.
+- Fixed abnormal behavior when loading into sub-panel from calculation history
 
 For information about previous versions, please check [here](https://github.com/from104/qcalc/blob/main/CHANGELOG.md).
