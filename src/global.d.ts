@@ -14,6 +14,6 @@ declare global {
     readonly isSnap: boolean;
 
     // Store는 필요에 따라 수정 가능하게 유지
-    store: ReturnType<typeof useStore>;
+    readonly store: ReturnType<typeof useStore>;
   }
 }

@@ -16,22 +16,27 @@ const defineImmutableProperty = <T>(obj: object, prop: string, value: T) => {
 };
 
 export default defineBoot(() => {
-  // 개발 모드 여부
-  defineImmutableProperty(window, 'isDev', !!import.meta.env.DEV);
+  const globalVariables = {
+    // 개발 모드 여부
+    isDev: !!import.meta.env.DEV,
 
-  // 플랫폼 정보
-  defineImmutableProperty(window, 'isDesktop', Platform.is.desktop);
-  defineImmutableProperty(window, 'isMobile', Platform.is.mobile);
-  defineImmutableProperty(window, 'isWindows', Platform.is.win);
-  defineImmutableProperty(window, 'isLinux', Platform.is.linux);
-  defineImmutableProperty(window, 'isAndroid', Platform.is.android);
-  defineImmutableProperty(window, 'isElectron', Platform.is.electron);
-  defineImmutableProperty(window, 'isCapacitor', Platform.is.capacitor);
+    // 플랫폼 정보
+    isDesktop: Platform.is.desktop,
+    isMobile: Platform.is.mobile,
+    isWindows: Platform.is.win,
+    isLinux: Platform.is.linux,
+    isAndroid: Platform.is.android,
+    isElectron: Platform.is.electron,
+    isCapacitor: Platform.is.capacitor,
 
-  defineImmutableProperty(window, 'isSnap', window.electron.isSnap);
+    isSnap: window.electron?.isSnap ?? false,
 
-  defineImmutableProperty(window, 'version', version);
+    version: version,
+    store: useStore(),
+  };
 
-  // 스토어 인스턴스 (수정 가능)
-  window.store = useStore();
+  // 전역 변수 일괄 정의
+  Object.entries(globalVariables).forEach(([key, value]) => {
+    defineImmutableProperty(window, key, value);
+  });
 });
