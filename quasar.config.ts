@@ -33,7 +33,7 @@ export default defineConfig((/* ctx */) => {
 
     // 앱 부트 파일 (/src/boot)
     // 부트 파일은 "main.js"의 일부입니다
-    boot: ['i18n', 'auto-blur', 'android'],
+    boot: ['i18n', 'auto-blur', 'android', 'global-variables'],
 
     // CSS 파일
     css: ['app.scss'],
@@ -209,6 +209,17 @@ export default defineConfig((/* ctx */) => {
         snap: {
           confinement: 'strict',
           grade: 'devel',
+          plugs: [
+            'desktop',
+            {
+              'desktop-legacy': {
+                interface: 'desktop-legacy',
+              },
+            },
+            'home',
+            'network',
+            'system-observe',
+          ],
         },
         publish: [
           {

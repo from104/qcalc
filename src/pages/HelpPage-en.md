@@ -1,16 +1,49 @@
-# Features and Usage
+# QCalc - Calculator for Productivity
 
-## Features
+MIT License
 
-- Simple arithmetic operations, bitwise operations (AND, OR, XOR, NOT, etc.), memory function (MS, MR, MC, M+ ...etc)
-- Unit conversion function, currency conversion function, numeral system (binary, octal, decimal, hexadecimal) conversion function
-- Copy and paste calculation results, etc.
-- Record calculation results (up to 100) and edit, import into calculator, add notes, etc.
-- Dark mode
-- English, Korean language support
-- Desktop, mobile compatible (electron, capacitor, etc...)
-- Support swipe function on mobile. (Switch calculator, open and close settings and history)
-- Adaptive layout applied. (When the window width increases, sub-panels such as calculation history are displayed on the right)
+A multi-purpose calculator that reimagines my Android graduation project calculator using modern web technologies like Vue3 (Quasar v2), TypeScript, and Electron. It combines precise calculation capabilities with a clean interface, making it suitable for both desktop and mobile environments.
+
+## Key Features
+
+- **Four Professional Calculators in One:**
+
+  - Standard calculator with advanced math functions
+  - Comprehensive unit converter supporting 15+ categories
+  - Currency converter with real-time exchange rates
+  - Programmer's calculator with binary operations
+
+- **Productivity Enhancement Features:**
+
+  - Calculation history with search and annotation capabilities
+  - Customizable number formatting (3 or 4-digit grouping)
+  - Complex calculations with up to 64-digit precision
+  - Various keyboard shortcuts for rapid data entry
+
+- **Professional Tools:**
+
+  - Advanced mathematical operations (trigonometry, logarithms)
+  - Memory operations (MS, MR, M+, M-, M×, M÷)
+  - Bit operations (AND, OR, XOR, NOT, shifts)
+  - Comprehensive unit conversion system
+
+- **Modern User Experience:**
+  - Adaptive layout utilizing side panels on larger screens
+  - Dark mode support to reduce eye strain
+  - Clean, intuitive interface with gesture support
+  - Haptic feedback for precise input
+
+## Optimal Tool for Professionals
+
+- **Engineers:** High-precision complex calculations
+- **Developers:** Binary, octal, hexadecimal conversions
+- **Financial Analysts:** Currency conversion and percentage calculations
+- **Scientists:** Advanced math functions and unit conversions
+- **Students:** Comprehensive calculation history for learning
+
+## Technical Features
+
+Built with Vue 3, Quasar, and Electron, QCalc delivers native-level performance with modern web technology stability. It supports extensive keyboard shortcuts for efficient operation and includes features like always-on-top mode for multitasking.
 
 ## Shortcut keys (S: Shift, C: Control, A: Alt)
 

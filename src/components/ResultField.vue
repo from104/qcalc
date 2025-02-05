@@ -11,9 +11,11 @@
   import { BigNumber } from 'classes/CalculatorMath';
   import { Radix } from 'classes/RadixConverter';
 
-  // 스토어 관련
-  import { useStore } from 'src/stores/store';
-  const store = useStore();
+  // 전역 window 객체에 접근하기 위한 상수 선언
+  const window = globalThis.window;
+
+  // 스토어 인스턴스 생성
+  const store = window.store;
 
   // 컴포넌트 import
   import ToolTip from 'src/components/snippets/ToolTip.vue';
@@ -96,7 +98,7 @@
     const fromCurrency = store.sourceCurrency;
     const toCurrency = store.targetCurrency;
 
-    return store.converter.convert(currentNumber, fromCurrency, toCurrency).toString();
+    return store.currencyConverter.convert(currentNumber, fromCurrency, toCurrency).toString();
   };
 
   // 진법 변환 결과 계산 함수
@@ -147,7 +149,7 @@
 
         case 'radix':
           initRecentRadix();
-          return toFormattedNumber(getConvertedRadixNumber());
+          return toFormattedNumber(getConvertedRadixNumber(), props.field === 'sub');
 
         default:
           return '';
@@ -169,7 +171,7 @@
 
     const currencyCode = isMainField ? store.sourceCurrency : store.targetCurrency;
 
-    return store.converter.getSymbol(currencyCode);
+    return store.currencyConverter.getSymbol(currencyCode);
   });
 
   /**

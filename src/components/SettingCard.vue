@@ -2,9 +2,11 @@
   // Vue 핵심 기능 및 컴포지션 API 가져오기
   import { reactive, watch, ref, computed } from 'vue';
 
-  // Quasar 프레임워크 관련
-  import { useQuasar } from 'quasar';
-  const $q = useQuasar();
+      // 전역 window 객체에 접근하기 위한 상수 선언
+  const window = globalThis.window;
+
+  // 스토어 인스턴스 생성
+  const store = window.store;
 
   // i18n 설정
   import { useI18n } from 'vue-i18n';
@@ -12,27 +14,19 @@
   const { t } = useI18n();
 
   // 스토어 관련
-  import { useStore } from 'src/stores/store';
-  const store = useStore();
-  const {
-    setInitPanel,
-    setDarkMode,
-    setAlwaysOnTop,
-    setHapticsMode,
-    setDecimalPlaces,
-    setAutoUpdate,
-  } = store;
+  const { setInitPanel, setDarkMode, setAlwaysOnTop, setHapticsMode, setDecimalPlaces, setAutoUpdate } = store;
 
   // 컴포넌트 import
   import ToolTip from 'components/snippets/ToolTip.vue';
+  import HelpIcon from 'components/snippets/HelpIcon.vue';
 
   // 패키지 버전 정보
   import { version } from '../../package.json';
 
   // 소수점 자리수 설정 값
-  import { DECIMAL_PLACES } from 'src/types/store';
+  import { DECIMAL_PLACES } from 'src/types/store.d';
 
-  const isDev = import.meta.env.DEV;
+  // const isDev = import.meta.env.DEV;
 
   // 언어 옵션 정의
   const languageOptions = reactive([
@@ -56,18 +50,13 @@
       locale.value = store.userLocale;
     }
   };
-
-  // electron과 snap 여부 확인
-  const isElectronAndNotSnap = computed(() => {
-    return $q.platform.is.electron && !window.myAPI?.isSnap();
-  });
 </script>
 
 <template>
   <q-card-section class="full-height noselect column no-wrap">
     <q-list v-auto-blur dense class="full-width" role="list" :aria-label="t('ariaLabel.settingsList')">
       <!-- 항상 위에 표시 -->
-      <q-item v-if="$q.platform.is.electron" class="q-mb-sm">
+      <q-item v-if="window.isElectron" class="q-mb-sm">
         <q-item-label class="self-center" role="text">{{ t('alwaysOnTop') }} (Alt-T)</q-item-label>
         <q-space />
         <q-toggle
@@ -95,7 +84,7 @@
       </q-item>
 
       <!-- 진동 모드 -->
-      <q-item v-if="$q.platform.is.capacitor" class="q-mb-sm">
+      <q-item v-if="window.isCapacitor" class="q-mb-sm">
         <q-item-label class="self-center" role="text">{{ t('hapticsMode') }} (Alt-P)</q-item-label>
         <q-space />
         <q-toggle
@@ -299,8 +288,11 @@
       <q-separator spaced="md" />
 
       <!-- 자동 업데이트 설정 -->
-      <q-item v-if="!isDev && isElectronAndNotSnap" class="q-mb-sm">
-        <q-item-label class="self-center" role="text">{{ t('autoUpdate') }}</q-item-label>
+      <q-item v-if="window.isElectron && !window.isSnap" class="q-mb-sm">
+        <q-item-label class="self-center" role="text">
+          {{ t('autoUpdate') }}
+          <HelpIcon :text="t('autoUpdateHelp')" />
+        </q-item-label>
         <q-space />
         <q-toggle
           v-model="store.autoUpdate"
@@ -376,6 +368,7 @@ ko:
   useSystemLocale: '시스템 언어 사용'
   language: '언어'
   autoUpdate: '자동 업데이트'
+  autoUpdateHelp: '업데이트를 위해서는 설정에서 자동 업데이트를 활성화하고 앱을 재시작해야 합니다.'
   ariaLabel:
     settingsList: '설정 목록'
     alwaysOnTop: '항상 위에 표시 설정'
@@ -424,6 +417,7 @@ en:
   useSystemLocale: 'Use system locale'
   language: 'Language'
   autoUpdate: 'Auto update'
+  autoUpdateHelp: 'To apply the update, you need to enable automatic updates in the settings and restart the app.'
   ariaLabel:
     settingsList: 'Settings list'
     alwaysOnTop: 'Always on top setting'

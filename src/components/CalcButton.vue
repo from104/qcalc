@@ -2,14 +2,19 @@
   // Vue 핵심 기능 및 컴포지션 API 가져오기
   import { onMounted, onBeforeUnmount, ref, watch, reactive, computed } from 'vue';
 
+  // 전역 window 객체에 접근하기 위한 상수 선언
+  const window = globalThis.window;
+
+  // 스토어 인스턴스 생성
+  const store = window.store;
+
   // i18n 설정
   import { useI18n } from 'vue-i18n';
   const { t } = useI18n();
 
   // Quasar 관련 설정
-  import { useQuasar, colors } from 'quasar';
+  import { colors } from 'quasar';
   // Quasar 인스턴스 및 색상 유틸리티 초기화
-  const $q = useQuasar();
   const { lighten } = colors;
 
   // 패턴 매칭 유틸리티
@@ -24,11 +29,6 @@
 
   // 진법 관련
   import { Radix } from 'classes/RadixConverter';
-
-  // 스토어 관련
-  import { useStore } from 'src/stores/store';
-  // 스토어 인스턴스 초기화
-  const store = useStore();
 
   // 컴포넌트 import
   import ToolTip from 'src/components/snippets/ToolTip.vue';
@@ -55,13 +55,13 @@
 
   // 햅틱 피드백 함수
   const hapticFeedbackLight = async () => {
-    if ($q.platform.is.capacitor && store.hapticsMode) {
+    if (window.isCapacitor && store.hapticsMode) {
       await Haptics.impact({ style: ImpactStyle.Light });
     }
   };
 
   const hapticFeedbackMedium = async () => {
-    if ($q.platform.is.capacitor && store.hapticsMode) {
+    if (window.isCapacitor && store.hapticsMode) {
       await Haptics.impact({ style: ImpactStyle.Medium });
     }
   };
@@ -103,13 +103,16 @@
 
   // mainRadix의 변경을 감지하는 computed 속성 추가
   const currentRadixBase = computed(() => {
+    const radixKey = store.sourceRadix as Radix;
     return (
-      {
-        [Radix.Binary]: 2,
-        [Radix.Octal]: 8,
-        [Radix.Decimal]: 10,
-        [Radix.Hexadecimal]: 16,
-      }[store.sourceRadix] ?? 10
+      (
+        {
+          [Radix.Binary]: 2,
+          [Radix.Octal]: 8,
+          [Radix.Decimal]: 10,
+          [Radix.Hexadecimal]: 16,
+        } as Record<Radix, number>
+      )[radixKey] ?? 10
     );
   });
 

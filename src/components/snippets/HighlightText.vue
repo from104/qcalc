@@ -1,9 +1,11 @@
 <script setup lang="ts">
   import { h, ref, onMounted, watch, onUnmounted } from 'vue';
   
-  import { useStore } from 'stores/store';
+  // 전역 window 객체에 접근하기 위한 상수 선언
+  const window = globalThis.window;
 
-  const store = useStore();
+  // 스토어 인스턴스 생성
+  const store = window.store;
 
   interface Props {
     text: string;

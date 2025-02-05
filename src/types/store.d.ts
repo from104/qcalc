@@ -87,7 +87,7 @@ export interface StoreState {
   showSymbol: boolean;
 
   // 통화 변환 관련
-  converter: CurrencyConverter;
+  currencyConverter: CurrencyConverter;
   sourceCurrency: string;
   targetCurrency: string;
 
@@ -101,6 +101,9 @@ export interface StoreState {
 
   // 자동 업데이트 관련
   autoUpdate: boolean;
+
+  // Snap 관련
+  isSnapFirstRun: boolean;
 }
 
 /**

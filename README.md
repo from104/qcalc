@@ -1,26 +1,57 @@
-# Simple calculator using Quasar
+# QCalc - Advanced Calculator for Modern Productivity
 
 MIT License
 
-This is a simple calculator made using the source code of an Android calculator that I created as a graduation project. It is designed to be usable on both desktop and mobile environments using the latest web technologies such as Vue3 (Quasar v2), TypeScript, and Electron.
+A multi-purpose calculator that reimagines my Android graduation project calculator using modern web technologies like Vue3 (Quasar v2), TypeScript, and Electron. It combines precise calculation capabilities with a clean interface, making it suitable for both desktop and mobile environments.
 
 ## Screenshot
 
-![Screenshot](https://github.com/from104/qcalc/raw/main/assets/screenshot_v0.9.0.png)
+The calculator alone appears when the window width is reduced.
 
-## Features
+![Screenshot](https://github.com/from104/qcalc/raw/main/assets/screenshot_v0.11.1.png)
 
-- Simple arithmetic operations, bitwise operations (AND, OR, XOR, NOT, etc.), memory function (MS, MR, MC, M+ ...etc)
-- Unit conversion function, currency conversion function, numeral system (binary, octal, decimal, hexadecimal) conversion function
-- Copy and paste calculation results, etc.
-- Record calculation results (up to 100) and edit, import into calculator, add notes, etc.
-- Dark mode
-- English, Korean language support
-- Desktop, mobile compatible (electron, capacitor, etc...)
-- Support swipe function on mobile. (Switch calculator, open and close settings and history)
-- Adaptive layout applied. (When the window width increases, sub-panels such as calculation history are displayed on the right)
+## Key Features
 
-## Shortcut keys (S: Shift, C: Control, A: Alt)
+- **Four Professional Calculators in One:**
+
+  - Standard calculator with advanced math functions
+  - Comprehensive unit converter supporting 15+ categories
+  - Currency converter with real-time exchange rates
+  - Programmer's calculator with binary operations
+
+- **Productivity Enhancement Features:**
+
+  - Calculation history with search and annotation capabilities
+  - Customizable number formatting (3 or 4-digit grouping)
+  - Complex calculations with up to 64-digit precision
+  - Various keyboard shortcuts for rapid data entry
+
+- **Professional Tools:**
+
+  - Advanced mathematical operations (trigonometry, logarithms)
+  - Memory operations (MS, MR, M+, M-, M×, M÷)
+  - Bit operations (AND, OR, XOR, NOT, shifts)
+  - Comprehensive unit conversion system
+
+- **Modern User Experience:**
+  - Adaptive layout utilizing side panels on larger screens
+  - Dark mode support to reduce eye strain
+  - Clean, intuitive interface with gesture support
+  - Haptic feedback for precise input
+
+## Optimal Tool for Professionals
+
+- **Engineers:** High-precision complex calculations
+- **Developers:** Binary, octal, hexadecimal conversions
+- **Financial Analysts:** Currency conversion and percentage calculations
+- **Scientists:** Advanced math functions and unit conversions
+- **Students:** Comprehensive calculation history for learning
+
+## Technical Features
+
+Built with Vue 3, Quasar, and Electron, QCalc delivers native-level performance with modern web technology stability. It supports extensive keyboard shortcuts for efficient operation and includes features like always-on-top mode for multitasking.
+
+## Shortcut Keys (S: Shift, C: Control, A: Alt)
 
 ### Calculator (\*: binomial operator)
 
@@ -118,153 +149,14 @@ This is a simple calculator made using the source code of an Android calculator 
 - Home: Scroll to top
 - End: Scroll to bottom
 
-## Techniques and information
+## Installation Guide
 
-### Technologies, frameworks, and programs used
+- Download and install the appropriate file for your platform from the release page.
+- Windows installer and Linux AppImage files support automatic updates.
+- For Linux, use the AppImage file standalone or install with `sudo snap install --beta qcalc`.
+- For Android, install the provided APK. Coming soon to Play Store.
+- MacOS and iOS packages are not available due to lack of testing capabilities.
 
-- typescript
-- nodeJS
-- electron
-- vue 3
-- quasar 2
-- markdown-it
-- tinykeys
-- MathJS
-- freecurrencyapi-js
+## Developer Information
 
-### How to install the package
-
-- Grab the appropriate files for your platform from the release page and install them.
-- For Linux, use the appimage file by itself or install the snap file with the --dangerous option.
-- For Android, get the apk and install it, it should be on the Play Store soon.
-- MacOS, IOS don't have a package because there's no way to test it without using it.
-
-### How to test and build your app
-
-Basically, install yarn like below in nodeJS, vscode environment.
-
-```bash
-npm install -g yarn
-```
-
-#### Install the required modules
-
-```bash
-yarn install
-```
-
-#### Run in development mode (live reloading, error checking, etc.)
-
-```bash
-quasar dev -m electron
-```
-
-or
-
-```bash
-quasar dev -m capacitor -T android
-```
-
-#### build installation package {Linux,Windows,Android}
-
-```bash
-quasar build -m electron -T {linux|win32}
-```
-
-or
-
-```bash
-quasar build -m capacitor -T android
-```
-
-Note when building ####
-
-The currency conversion feature should work fine when using the installer from the release page, but if you build it yourself, it may not work. This is because the currency conversion data is fetched from [external site (https://freecurrencyapi.com/)](https://freecurrencyapi.com/). Get a free API key from this site and put it in the '.env' file of your project folder and build it as follows. You can renew the data 5000 times per month for free.
-
-```plaintext
-FREECURRENCY_API_KEY=<your_key>
-```
-
-### Further development in Android Studio, build procedure
-
-#### Install and set up Android Studio
-
-1. install the latest version of [Android Studio](https://developer.android.com/studio).
-2. open Android Studio, and complete the basic settings (SDK settings, etc.).
-
-#### Importing the Quasar project into Android Studio
-
-1. Create an Android build by executing `quasar build -m capacitor -T android` command in the Quasar project directory.
-2. Inside the `src-capacitor` directory, a `capacitor.config.json` file will be created.
-3. In Android Studio, select `Open an existing Android Studio project` and open the `src-capacitor` directory.
-
-#### Setting up an Android project
-
-1. Once the project is open in Android Studio, click `Sync Project with Gradle Files` to synchronize the project.
-2. Open the `MainActivity.java` or `MainActivity.kt` file, and verify the required packages and settings.
-
-#### Setting up Android Keystore
-
-For release builds, you'll need to set up a keystore. Create a `.env` file in your project root with the following variables:
-
-```plaintext
-MY_JKS_KEY_FILE=/path/to/your/keystore.jks
-MY_JKS_STORE_PASSWORD=your_store_password
-MY_JKS_KEY_ALIAS=your_key_alias
-MY_JKS_KEY_PASSWORD=your_key_password
-```
-
-These environment variables will be used by the build process to sign your release APK. Make sure to:
-
-- Never commit the `.env` file to version control
-- Keep your keystore file secure
-- Remember your keystore passwords
-
-#### Build and run
-
-1. Connect your Android device in USB debugging mode or run an Android emulator.
-2. In Android Studio, click the `Run` button to build and run the app.
-
-This will allow you to perform further development and builds in Android Studio.
-
-#### Using Build Scripts
-
-The project root includes scripts for build automation:
-
-##### Linux/macOS Users (build.sh)
-
-```bash
-# Grant execution permission to the script
-chmod +x build.sh
-
-# Run the script
-./build.sh
-```
-
-##### Windows Users (build.bat, Incomplete)
-
-```batch
-# Run in command prompt
-build.bat
-```
-
-The build script automatically performs the following tasks:
-
-- Checks project version
-- Installs required dependencies
-- Verifies Android development environment (for Android builds)
-- Creates and cleans build directory
-- Performs platform-specific builds
-
-Important notes:
-
-- For Android builds, the ANDROID_HOME environment variable must be properly set
-- If keystore setup is required, the .env file must be properly configured
-- The build script automatically checks compatibility with the installed Node.js version
-
-### Development Environment Requirements
-
-- Node.js 20.0 or higher
-- Yarn package manager
-- VSCode (with Copilot) or Cursor AI (recommended)
-- Android Studio (for Android builds)
+For detailed development and build instructions, please refer to [DEVELOP.md](DEVELOP.md).

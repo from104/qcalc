@@ -1,6 +1,7 @@
 <script setup lang="ts">
   // Vue 핵심 기능 및 컴포지션 API 가져오기
-  import { onMounted, onBeforeUnmount, reactive, watch } from 'vue';
+  import type { ComputedRef } from 'vue';
+  import { onMounted, onBeforeUnmount, reactive, watch, computed } from 'vue';
 
   // i18n 설정
   import { useI18n } from 'vue-i18n';
@@ -76,44 +77,51 @@
     })),
   } as { values: WordSizeOption[] });
 
-  // 진법 옵션 타입 정의
-  type RadixOption = {
+  // RadixOption 인터페이스 수정
+  interface RadixOption {
+    value: Radix;
+    label: ComputedRef<string>;
+    disable: ComputedRef<boolean>;
+  }
+
+  interface ReactiveRadixOptionList {
+    values: RadixOption[];
+  }
+
+  const radixList = Object.values(Radix);
+
+  // 진법 옵션 초기화 시 computed 사용
+  const createRadixOptions = (isSource: boolean) =>
+    radixList.map((radix) => ({
+      value: radix,
+      label: computed(() => t(`radixLabel.${radix}`)),
+      disable: computed(() => (isSource ? store.targetRadix === radix : store.sourceRadix === radix)),
+    }));
+
+  const sourceRadixOptions = reactive<ReactiveRadixOptionList>({
+    values: createRadixOptions(true),
+  });
+
+  const targetRadixOptions = reactive<ReactiveRadixOptionList>({
+    values: createRadixOptions(false),
+  });
+
+  watch(
+    () => store.sourceRadix,
+    () => (calc.currentRadix = store.sourceRadix),
+  );
+
+  // 수정된 SelectOption 인터페이스
+  interface SelectOption {
     value: string;
     label: string;
-    disable?: boolean;
-  };
+    disable: boolean;
+  }
 
-  type ReactiveRadixOptionList = {
-    values: RadixOption[];
-  };
+  // 단순화된 컴퓨티드 속성
+  const sourceSelectOptions = computed<SelectOption[]>(() => sourceRadixOptions.values);
 
-  // 진법 옵션 초기화
-  const sourceRadixOptions = reactive({ values: [] } as ReactiveRadixOptionList);
-  const targetRadixOptions = reactive({ values: [] } as ReactiveRadixOptionList);
-
-  // 진법 옵션 업데이트
-  watch(
-    [() => store.sourceRadix, () => store.targetRadix],
-    () => {
-      const radixList = Object.values(Radix);
-
-      // 'From' 진법 옵션 설정
-      sourceRadixOptions.values = radixList.map((radix) => ({
-        value: radix,
-        label: t(`radixLabel.${radix}`),
-        disable: store.targetRadix === radix,
-      }));
-
-      // 'To' 진법 옵션 설정
-      targetRadixOptions.values = radixList.map((radix) => ({
-        value: radix,
-        label: t(`radixLabel.${radix}`),
-        disable: store.sourceRadix === radix,
-      }));
-      calc.currentRadix = store.sourceRadix;
-    },
-    { immediate: true },
-  );
+  const targetSelectOptions = computed<SelectOption[]>(() => targetRadixOptions.values);
 </script>
 
 <template>
@@ -145,7 +153,7 @@
     <!-- 원본 진법 -->
     <q-select
       v-model="store.sourceRadix"
-      :options="sourceRadixOptions.values"
+      :options="sourceSelectOptions"
       role="combobox"
       :aria-label="t('ariaLabel.sourceRadix')"
       dense
@@ -175,13 +183,13 @@
       :aria-label="t('ariaLabel.swapRadix')"
       @click="swapRadixes()"
     >
-      <ToolTip>{{ t('tooltipSwap') }}</ToolTip>
+      <ToolTip :auto-hide="3000" :text="t('tooltipSwap')" />
     </q-btn>
 
     <!-- 대상 진법 -->
     <q-select
       v-model="store.targetRadix"
-      :options="targetRadixOptions.values"
+      :options="targetSelectOptions"
       role="combobox"
       :aria-label="t('ariaLabel.targetRadix')"
       dense

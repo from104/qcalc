@@ -1,7 +1,7 @@
 <script setup lang="ts">
   // Vue 핵심 기능 및 컴포지션 API 가져오기
   import { ref, onMounted, onBeforeUnmount, reactive, watch } from 'vue';
-  
+
   import type { Ref } from 'vue';
 
   // i18n 설정
@@ -12,14 +12,16 @@
   import { BigNumber } from 'classes/CalculatorMath';
   import { KeyBinding } from 'classes/KeyBinding';
 
-  // 스토어 관련
-  import { useStore } from 'src/stores/store';
-  // 스토어 인스턴스 초기화
-  const store = useStore();
+  // 전역 window 객체에 접근하기 위한 상수 선언
+  const window = globalThis.window;
+
+  // 스토어 인스턴스 생성
+  const store = window.store;
+
   // 스토어에서 필요한 메서드 추출
   const {
     calc,
-    converter,
+    currencyConverter,
     swapCurrencies,
     initRecentCurrencies,
     clickButtonById,
@@ -42,12 +44,12 @@
 
   // 통화 설명을 위한 인터페이스 정의
   interface CurrencyDescription {
-    [key: string]: string;
+    [key: string]: string; // 키 타입을 명시적으로 string으로 지정
   }
 
   // 통화 이름을 현재 언어에 맞게 초기화
   const currencyDescriptions = reactive<CurrencyDescription>(
-    converter.getCurrencyLists().reduce((acc: CurrencyDescription, currency) => {
+    currencyConverter.getCurrencyLists().reduce((acc: CurrencyDescription, currency: string) => {
       acc[currency] = t(`currencyDesc.${currency}`);
       return acc;
     }, {}),
@@ -55,7 +57,7 @@
 
   // 언어 변경 시 통화 이름 업데이트
   watch([() => store.locale], () => {
-    converter.getCurrencyLists().forEach((currency) => {
+    currencyConverter.getCurrencyLists().forEach((currency: string) => {
       currencyDescriptions[currency] = t(`currencyDesc.${currency}`);
     });
   });
@@ -80,13 +82,13 @@
 
     // 초기 환율 정보 업데이트
     (async () => {
-      await converter.updateRates();
+      await currencyConverter.updateRates();
     })();
 
     // 주기적으로 환율 정보 업데이트 (1시간마다)
     rateUpdateTimer = window.setInterval(
       async () => {
-        await converter.updateRates();
+        await currencyConverter.updateRates();
       },
       1000 * 60 * 60 * 1,
     );
@@ -106,48 +108,50 @@
     disable?: boolean;
   };
 
-  type ReactiveCurrencyOptions = {
-    values: CurrencyOptions[];
-  };
+  const currencyList = currencyConverter.getCurrencyLists();
 
   // 통화 옵션 초기화
-  const sourceCurrencyOptions = reactive({ values: [] } as ReactiveCurrencyOptions);
-  const targetCurrencyOptions = reactive({ values: [] } as ReactiveCurrencyOptions);
+  /**
+   * 통화 옵션을 생성하는 유틸리티 함수
+   * @param currency - 통화 코드
+   * @param isSource - 출발 통화 여부
+   * @returns 통화 옵션 객체
+   */
+  const createCurrencyOption = (currency: string, isSource: boolean) => ({
+    value: currency,
+    label: currency,
+    desc: currencyDescriptions[currency] ?? '',
+    disable: isSource 
+      ? store.targetCurrency === currency
+      : store.sourceCurrency === currency,
+  });
+
+  // 출발 통화 옵션 목록
+  const sourceCurrencyOptions = reactive<CurrencyOptions[]>(
+    currencyList.map((currency: string) =>
+      createCurrencyOption(currency, true),
+    ),
+  );
+
+  // 도착 통화 옵션 목록
+  const targetCurrencyOptions = reactive<CurrencyOptions[]>(
+    currencyList.map((currency: string) =>
+      createCurrencyOption(currency, false),
+    ),
+  );
 
   // 통화 옵션 업데이트
   watch(
-    [() => store.sourceCurrency, () => store.targetCurrency],
-    () => {
-      const currencyList = converter.getCurrencyLists();
-
-      // 'From' 통화 옵션 설정
-      sourceCurrencyOptions.values = currencyList.map((currency) => ({
-        value: currency,
-        label: currency,
-        desc: currencyDescriptions[currency] ?? '',
-        disable: store.targetCurrency === currency,
-      }));
-
-      // 'To' 통화 옵션 설정
-      targetCurrencyOptions.values = currencyList.map((currency) => ({
-        value: currency,
-        label: currency,
-        desc: currencyDescriptions[currency] ?? '',
-        disable: store.sourceCurrency === currency,
-      }));
-
-      // 변환기에 기준 통화 설정
-      converter.setBase(store.sourceCurrency);
-    },
-    { immediate: true },
+    () => store.sourceCurrency,
+    () => currencyConverter.setBase(store.sourceCurrency),
   );
 
   // 통화 선택 필터 함수 생성
-  const createFilterFn = (options: Ref<CurrencyOptions[]>, reactiveOptions: ReactiveCurrencyOptions) => {
+  const createFilterFn = (options: Ref<CurrencyOptions[]>, reactiveOptions: CurrencyOptions[]) => {
     return (val: string, update: (fn: () => void) => void, abort: () => void) => {
       if (val.length < 1) {
         update(() => {
-          options.value = reactiveOptions.values;
+          options.value = reactiveOptions;
         });
         abort();
         return;
@@ -155,7 +159,7 @@
 
       const searchTerm = val.toLowerCase();
       update(() => {
-        options.value = reactiveOptions.values.filter((v) => {
+        options.value = reactiveOptions.filter((v) => {
           const labelMatch = v.label.toLowerCase().indexOf(searchTerm) > -1;
           const descMatch = v.desc.toLowerCase().indexOf(searchTerm) > -1;
           return labelMatch || descMatch;
@@ -165,16 +169,21 @@
   };
 
   // 'From' 통화 필터 설정
-  const filteredSourceCurrencyOptions = ref<CurrencyOptions[]>(sourceCurrencyOptions.values);
+  const filteredSourceCurrencyOptions = ref<CurrencyOptions[]>(sourceCurrencyOptions);
   const sourceFilterFn = createFilterFn(filteredSourceCurrencyOptions, sourceCurrencyOptions);
 
   // 'To' 통화 필터 설정
-  const filteredTargetCurrencyOptions = ref<CurrencyOptions[]>(targetCurrencyOptions.values);
+  const filteredTargetCurrencyOptions = ref<CurrencyOptions[]>(targetCurrencyOptions);
   const targetFilterFn = createFilterFn(filteredTargetCurrencyOptions, targetCurrencyOptions);
 
   const handleCurrencySwap = () => {
-    const convertedValue = converter.convert(BigNumber(calc.currentNumber), store.sourceCurrency, store.targetCurrency);
-    calc.setCurrentNumber(convertedValue.toString());
+    calc.setCurrentNumber(
+      currencyConverter.convert(
+        BigNumber(calc.currentNumber),
+        store.sourceCurrency,
+        store.targetCurrency,
+      ),
+    );
     swapCurrencies();
   };
 </script>
@@ -239,7 +248,7 @@
       :aria-label="t('ariaLabel.swapCurrencies')"
       @click="handleCurrencySwap()"
     >
-      <ToolTip>{{ t('tooltipSwap') }}</ToolTip>
+      <ToolTip :auto-hide="3000" :text="t('tooltipSwap')" />
     </q-btn>
 
     <!-- 대상 통화 -->
@@ -274,7 +283,7 @@
           <q-item-section>
             <q-item-label caption>{{ currencyDescriptions[scope.opt.label] }}</q-item-label>
             <q-item-label>
-              {{ `${scope.opt.label}, ${converter.getRate(scope.opt.label).toFixed(4)}` }}
+              {{ `${scope.opt.label}, ${currencyConverter.getRate(scope.opt.label).toFixed(4)}` }}
             </q-item-label>
           </q-item-section>
         </q-item>
@@ -282,7 +291,7 @@
       <ToolTip>
         <div class="text-left" style="white-space: pre-wrap">
           {{
-            `${currencyDescriptions[store.targetCurrency]}\n${store.targetCurrency}, ${converter.getRate(store.targetCurrency).toFixed(4)}`
+            `${currencyDescriptions[store.targetCurrency]}\n${store.targetCurrency}, ${currencyConverter.getRate(store.targetCurrency).toFixed(4)}`
           }}
         </div>
       </ToolTip>
