@@ -1,34 +1,59 @@
 /**
- * Node.js 환경 변수에 대한 타입 선언
+ * freecurrencyapi-js 모듈 선언
  */
-declare namespace NodeJS {
-  interface ProcessEnv {
-    /**
-     * 현재 실행 환경을 나타내는 문자열
-     * (예: 'development', 'production', 'test')
-     */
-    NODE_ENV: string;
+declare module '@everapi/freecurrencyapi-js';
 
-    /**
-     * Vue Router의 작동 모드
-     * - 'hash': URL 해시를 사용하여 라우팅 (예: /#/about)
-     * - 'history': HTML5 History API를 사용 (예: /about)
-     * - 'abstract': 서버 환경이나 브라우저가 지원하지 않을 때 사용
-     * - undefined: 기본값 사용
-     */
-    VUE_ROUTER_MODE: 'hash' | 'history' | 'abstract' | undefined;
+/**
+ * YAML 파일 모듈 선언
+ */
+declare module '*.yml' {
+  /**
+   * YAML 파일의 내용을 나타내는 문자열
+   */
+  const value: string;
 
-    /**
-     * Vue Router의 기본 URL
-     * 애플리케이션이 서브 디렉토리에서 호스팅될 때 사용
-     * (예: '/my-app/')
-     */
-    VUE_ROUTER_BASE: string | undefined;
-  }
+  // YAML 파일의 내용을 기본 내보내기로 설정
+  export default value;
 }
 
 /**
- * freecurrencyapi-js 모듈 선언
- * 이 모듈은 통화 환율 정보를 제공하는 API를 사용하기 위한 것입니다.
+ * 마크다운 파일 모듈 선언
  */
-declare module '@everapi/freecurrencyapi-js';
+declare module '*.md' {
+  /**
+   * 마크다운 파일의 내용을 나타내는 문자열
+   */
+  const content: string;
+
+  // 마크다운 파일의 내용을 기본 내보내기로 설정
+  export default content;
+}
+
+/**
+ * Android 시스템과 상호 작용하기 위한 인터페이스
+ */
+declare class AndroidInterface {
+  /**
+   * Android 기기의 클립보드에서 내용을 가져옵니다.
+   * @returns 클립보드에서 가져온 텍스트 내용
+   */
+  static getFromClipboard(): string;
+}
+
+/**
+ * tinykeys 모듈 선언
+ */
+declare module 'tinykeys' {
+  /**
+   * 키 바인딩 맵 타입
+   */
+  export type KeyBindingMap = Record<string, (event: KeyboardEvent) => void>;
+
+  /**
+   * tinykeys 함수
+   * @param target 대상 요소
+   * @param keyBindingMap 키 바인딩 맵
+   * @returns 해제 함수
+   */
+  export function tinykeys(target: Window | HTMLElement, keyBindingMap: KeyBindingMap): () => void;
+}
