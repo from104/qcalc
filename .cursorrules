@@ -12,3 +12,5 @@ When generating or modifying code, *never* omit any part of the code, no matter 
 8. Make sure the code is scalable.
 9. Make sure the code is easy to maintain.
 10. Make sure the code is easy to debug.
+11. Make sure the code is easy to test.
+12. Make sure the code is easy to deploy.
