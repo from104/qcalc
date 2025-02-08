@@ -1,4 +1,5 @@
 import Freecurrencyapi from '@everapi/freecurrencyapi-js';
+import { BaseConverter } from './BaseConverter';
 
 import type { CurrencyExchangeRates, CurrencyData } from '../constants/CurrencyBaseData';
 import { currencyBaseData } from '../constants/CurrencyBaseData';
@@ -8,7 +9,9 @@ import { currencyBaseData } from '../constants/CurrencyBaseData';
  *
  * 이 클래스는 환율 정보를 관리하고 통화 변환 기능을 제공합니다.
  */
-export class CurrencyConverter {
+export class CurrencyConverter extends BaseConverter {
+  protected readonly converterName = 'CurrencyConverter';
+
   // FreeCurrency API 접근 키
   private accessKey = process.env.FREECURRENCY_API_KEY;
 
@@ -35,6 +38,7 @@ export class CurrencyConverter {
    * 인스턴스 생성 시 환율 정보를 업데이트합니다.
    */
   constructor() {
+    super();
     this.updateRates();
   }
 
@@ -69,7 +73,7 @@ export class CurrencyConverter {
    * 사용 가능한 통화 목록을 반환하는 메소드
    * @returns {string[]} 통화 코드 배열
    */
-  getCurrencyLists(): string[] {
+  getAvailableItems(): string[] {
     return this.isRatesEmpty() ? [] : Object.keys(this.baseExchangeRates);
   }
 
@@ -200,13 +204,20 @@ export class CurrencyConverter {
    * @param {string} currency - 통화 코드
    * @returns {string} 통화 설명
    */
-  getDesc(currency: string): string {
-    if (this.isRatesEmpty()) {
-      throw new Error('Exchange rates are not available');
-    }
-    if (!this.currencyData[currency] || !this.currentRates[currency]) {
-      throw new Error(`Invalid currency: ${currency}`);
+  getItemDescription(currency: string): string {
+    if (!this.currencyData[currency]) {
+      throw new Error(this.formatError(`Invalid currency code: ${currency}`));
     }
     return this.currencyData[currency].desc;
+  }
+
+  /**
+   * 입력값이 유효한 통화인지 검사합니다.
+   * @param {string} value - 검사할 값
+   * @param {string} format - 검사할 통화 코드
+   * @returns {boolean} 유효성 여부
+   */
+  isValid(value: string, format: string): boolean {
+    return !this.isRatesEmpty() && !!this.currentRates[format];
   }
 }

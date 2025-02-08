@@ -1,27 +1,22 @@
 import { unitBaseData } from '../constants/UnitBaseData';
 import { BigNumber } from './CalculatorMath';
+import { BaseConverter } from './BaseConverter';
 
 import type { UnitBaseData } from '../constants/UnitBaseData';
 
 /**
  * UnitConverter 클래스
- * 다양한 단위 간의 변환을 수행하는 정적 메서드를 제공합니다.
+ * 다양한 단위 간의 변환을 수행하는 메서드를 제공합니다.
  */
-export class UnitConverter {
+export class UnitConverter extends BaseConverter {
+  protected readonly converterName = 'UnitConverter';
+
   /**
    * 사용 가능한 단위 변환 범주 목록을 반환합니다.
    * @returns {string[]} 단위 변환 범주 목록
    */
-  static get categories() {
+  static getCategories(): string[] {
     return Object.keys(unitBaseData);
-  }
-
-  /**
-   * 모든 단위 변환 범주와 해당 단위 목록을 반환합니다.
-   * @returns {UnitBaseData} 단위 변환 범주별 단위 목록
-   */
-  static get units() {
-    return unitBaseData;
   }
 
   /**
@@ -30,15 +25,58 @@ export class UnitConverter {
    * @returns {string[]} 해당 범주의 단위 목록
    * @throws {Error} 유효하지 않은 범주일 경우 에러를 발생시킵니다.
    */
-  static getUnitLists(category: string) {
-    if (!this.categories.includes(category)) {
+  static getUnitLists(category: string): string[] {
+    if (!UnitConverter.getCategories().includes(category)) {
       throw new Error(`Invalid category: ${category}`);
     }
-    const categoryUnits = this.units[category];
+    const categoryUnits = unitBaseData[category];
     if (!categoryUnits) {
       throw new Error(`No units found for category: ${category}`);
     }
     return Object.keys(categoryUnits);
+  }
+
+  getAvailableItems(): string[] {
+    return UnitConverter.getCategories();
+  }
+
+  /**
+   * 모든 단위 변환 범주와 해당 단위 목록을 반환합니다.
+   * @returns {UnitBaseData} 단위 변환 범주별 단위 목록
+   */
+  get units(): UnitBaseData {
+    return unitBaseData;
+  }
+
+  /**
+   * 특정 단위의 설명을 반환합니다.
+   * @param {string} item - 설명을 조회할 단위
+   * @returns {string} 단위의 설명
+   */
+  getItemDescription(item: string): string {
+    const [category, unit] = item.split('.');
+    if (!category || !unit) {
+      throw new Error(this.formatError('Invalid item format. Use "category.unit"'));
+    }
+    return UnitConverter.getUnitDesc(category, unit);
+  }
+
+  /**
+   * 입력값이 유효한 단위인지 검사합니다.
+   * @param {string} value - 검사할 값
+   * @param {string} format - 검사할 단위 (형식: "category.unit")
+   * @returns {boolean} 유효성 여부
+   */
+  isValid(value: string, format: string): boolean {
+    const [category, unit] = format.split('.');
+    if (!category || !unit) return false;
+
+    try {
+      const unitValue = UnitConverter.getUnitValue(category, unit);
+      return unitValue !== undefined;
+    } catch {
+      return false;
+    }
   }
 
   /**
@@ -52,10 +90,10 @@ export class UnitConverter {
     category: string,
     unit: string,
   ): BigNumberType | ((value: BigNumberType, toBase?: boolean) => BigNumberType) {
-    if (!this.categories.includes(category) || !this.units[category]?.[unit]) {
+    if (!UnitConverter.getCategories().includes(category) || !unitBaseData[category]?.[unit]) {
       throw new Error(`Invalid category or unit: ${category}, ${unit}`);
     }
-    const unitValue = this.units[category][unit].value;
+    const unitValue = unitBaseData[category][unit].value;
     return typeof unitValue === 'function' ? unitValue : BigNumber(unitValue);
   }
 
@@ -67,11 +105,12 @@ export class UnitConverter {
    * @throws {Error} 유효하지 않은 범주나 단위일 경우 에러를 발생시킵니다.
    */
   static getUnitDesc(category: string, unit: string): string {
-    if (!this.categories.includes(category) || !this.units[category]?.[unit]) {
+    if (!UnitConverter.getCategories().includes(category) || !unitBaseData[category]?.[unit]) {
       throw new Error(`Invalid category or unit: ${category}, ${unit}`);
     }
-    return this.units[category][unit].desc;
+    return unitBaseData[category][unit].desc;
   }
+
   /**
    * 한 단위에서 다른 단위로 값을 변환합니다.
    * @param {T} category - 단위 범주
@@ -89,7 +128,7 @@ export class UnitConverter {
   ): string {
     // Check validity of fromUnit and toUnit at once
     const [fromUnitValue, toUnitValue] = [from, to].map((unit) => {
-      const value = this.getUnitValue(category, unit);
+      const value = UnitConverter.getUnitValue(category, unit);
       if (!value) {
         throw new Error(`Invalid unit: ${unit}`);
       }

@@ -1,5 +1,5 @@
 import { match } from 'ts-pattern';
-
+import { BaseConverter } from './BaseConverter';
 import { BigNumber, MathB } from './CalculatorMath';
 
 export enum Radix {
@@ -32,7 +32,9 @@ export type RadixType = Radix;
  * const converter = new RadixConverter();
  * const binary = converter.convertDecimalToBinary("42");  // "101010"
  */
-export class RadixConverter {
+export class RadixConverter extends BaseConverter {
+  protected readonly converterName = 'RadixConverter';
+
   // 16진수 변환에 사용될 문자 집합
   private readonly hexDigits = '0123456789ABCDEF';
   // 소수점 이하 최대 자릿수
@@ -44,6 +46,44 @@ export class RadixConverter {
     [Radix.Decimal]: 10,
     [Radix.Hexadecimal]: 16,
   } as const;
+
+  /**
+   * 사용 가능한 진법 목록을 반환합니다.
+   * @returns {string[]} 진법 목록
+   */
+  getAvailableItems(): string[] {
+    return Object.values(Radix);
+  }
+
+  /**
+   * 특정 진법의 설명을 반환합니다.
+   * @param {string} item - 설명을 조회할 진법
+   * @returns {string} 진법 설명
+   */
+  getItemDescription(item: string): string {
+    const descriptions = {
+      [Radix.Binary]: '2진수 (Binary)',
+      [Radix.Octal]: '8진수 (Octal)',
+      [Radix.Decimal]: '10진수 (Decimal)',
+      [Radix.Hexadecimal]: '16진수 (Hexadecimal)',
+    };
+
+    if (!descriptions[item as Radix]) {
+      throw new Error(this.formatError(`Invalid radix: ${item}`));
+    }
+
+    return descriptions[item as Radix];
+  }
+
+  /**
+   * 입력값이 유효한 진법인지 검사합니다.
+   * @param {string} value - 검사할 값
+   * @param {string} format - 검사할 진법
+   * @returns {boolean} 유효성 여부
+   */
+  isValid(value: string, format: string): boolean {
+    return this.isValidRadixNumber(value, format as Radix);
+  }
 
   /**
    * 주어진 문자열이 지정된 진법에 유효한지 검사

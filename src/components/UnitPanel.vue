@@ -28,7 +28,7 @@
 
   // 범주 이름을 현재 언어에 맞게 초기화
   const categoryList = reactive(
-    UnitConverter.categories.map((category) => ({
+    UnitConverter.getCategories().map((category) => ({
       value: category,
       label: t(`categories.${category}`),
     })),

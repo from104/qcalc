@@ -49,7 +49,7 @@
 
   // 통화 이름을 현재 언어에 맞게 초기화
   const currencyDescriptions = reactive<CurrencyDescription>(
-    currencyConverter.getCurrencyLists().reduce((acc: CurrencyDescription, currency: string) => {
+    currencyConverter.getAvailableItems().reduce((acc: CurrencyDescription, currency: string) => {
       acc[currency] = t(`currencyDesc.${currency}`);
       return acc;
     }, {}),
@@ -108,7 +108,7 @@
     disable?: boolean;
   };
 
-  const currencyList = currencyConverter.getCurrencyLists();
+  const currencyList = currencyConverter.getAvailableItems();
 
   // 통화 옵션 초기화
   /**

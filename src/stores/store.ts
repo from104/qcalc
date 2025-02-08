@@ -438,12 +438,12 @@ export const useStore = defineStore('store', {
     initRecentUnits(): void {
       // 최근 카테고리가 설정되지 않은 경우, 첫 번째 카테고리로 설정
       if (this.selectedCategory === '') {
-        this.selectedCategory = UnitConverter.categories[0] ?? '';
+        this.selectedCategory = UnitConverter.getCategories()[0] ?? '';
       }
 
       // 변환 출발 단위가 설정되지 않은 경우, 각 카테고리의 첫 번째 단위로 설정
       if (Object.keys(this.sourceUnits).length === 0) {
-        UnitConverter.categories.forEach((category) => {
+        UnitConverter.getCategories().forEach((category) => {
           const units = UnitConverter.getUnitLists(category);
           this.sourceUnits[category] = units[0] ?? '';
         });
@@ -451,7 +451,7 @@ export const useStore = defineStore('store', {
 
       // 변환 도착 단위가 설정되지 않은 경우, 각 카테고리의 두 번째 단위(없으면 첫 번째)로 설정
       if (Object.keys(this.targetUnits).length === 0) {
-        UnitConverter.categories.forEach((category) => {
+        UnitConverter.getCategories().forEach((category) => {
           const units = UnitConverter.getUnitLists(category);
           this.targetUnits[category] = units[1] || units[0] || '';
         });
@@ -569,7 +569,7 @@ export const useStore = defineStore('store', {
 
     // 통화 변환 관련
     initRecentCurrencies(): void {
-      const availableCurrencies = this.currencyConverter.getCurrencyLists();
+      const availableCurrencies = this.currencyConverter.getAvailableItems();
       // 출발 통화 초기화
       this.sourceCurrency =
         this.sourceCurrency !== '' && availableCurrencies.includes(this.sourceCurrency)
