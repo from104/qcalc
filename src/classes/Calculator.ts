@@ -1,10 +1,12 @@
 import { match } from 'ts-pattern';
+import { checkError } from './utils/ErrorUtils';
 
 import { RadixConverter } from './RadixConverter';
 import { CalculatorMath } from './CalculatorMath';
 import { BigNumber, CONSTANTS } from './CalculatorMath';
 import { Radix } from './RadixConverter';
 import { CalculatorRecord } from './CalculatorRecord';
+import { CalculatorMemory } from './CalculatorMemory';
 
 /**
  * 계산기에서 사용되는 연산자 열거형
@@ -54,6 +56,7 @@ export class Calculator {
   private calculationSnapshot!: CalculationResult; // 최근 계산 결과 스냅샷
 
   public readonly record!: CalculatorRecord; // 계산 기록 관리자
+  public readonly memory: CalculatorMemory; // 메모리 관리자
 
   // 진법 변환기를 초기화합니다.
   private radixConverter: RadixConverter = new RadixConverter();
@@ -96,14 +99,6 @@ export class Calculator {
   set currentNumber(value: string) {
     this._currentNumber = value;
     this.setCurrentNumberToBuffer();
-  }
-
-  // 메모리에 저장된 숫자를 나타내는 변수입니다.
-  private memoryNumber!: string; // string -> BigNumber
-
-  // 메모리가 초기화 상태인지 확인하는 getter입니다.
-  get isMemoryEmpty(): boolean {
-    return this.memoryNumber === '';
   }
 
   // 현재 사용 중인 진법을 저장하는 변수입니다.
@@ -197,7 +192,9 @@ export class Calculator {
     // 기본 상태 초기화
     this.reset();
     // 메모리 초기화
-    this.memoryClear();
+    this.memory = new CalculatorMemory();
+    // 메모리 연산 완료 콜백 설정
+    this.memory.setOperationCompleteCallback(() => this.setNeedsBufferReset());
 
     // 히스토리 관리 객체 생성
     this.record = new CalculatorRecord();
@@ -405,7 +402,7 @@ export class Calculator {
     const digitString = typeof digit === 'string' ? digit.charAt(0) : Math.floor(digit).toString();
 
     // 유효하지 않은 숫자인 경우 에러 발생
-    this.checkError(
+    checkError(
       !this.radixConverter.isValidRadixNumber(digitString, this.currentRadix),
       'Invalid digit for current radix',
     );
@@ -635,27 +632,32 @@ export class Calculator {
     }
   }
 
-  // 에러 검사를 위한 헬퍼 메서드
-  private checkError(condition: boolean, message: string): void {
-    if (condition) {
-      throw new Error(message);
-    }
+  /**
+   * 계산 결과를 기록에 추가하고 결과값을 반환합니다.
+   * @param record - 기록에 추가할 계산 결과 스넵샷 객체
+   * @returns 계산 결과값을 문자열로 반환
+   * @description
+   * - 계산 결과를 내부 스냅샷으로 저장
+   * - 히스토리 관리자에 결과를 추가하여 기록 유지
+   * - 안전한 null 체크 후 히스토리 추가 수행
+   * - 계산된 최종 결과값 반환
+   */
+  private calculateAndAddRecord(number: string, operator: Operator, calculation: () => string): string {
+    return this.addRecord({
+      previousNumber: number,
+      operator: operator,
+      resultNumber: calculation(),
+    });
   }
 
   // 단항 연산자 메서드들
   public rec(): void {
-    this.checkError(
-      BigNumber(this.currentNumber).eq(0),
-      'Cannot divide by zero',
-    );
+    checkError(BigNumber(this.currentNumber).eq(0), 'Cannot divide by zero');
     this.performUnaryOperation(Operator.REC, () => this.math.div('1', this.currentNumber));
   }
 
   public sqrt(): void {
-    this.checkError(
-      BigNumber(this.currentNumber).lt(0),
-      'The square root of a negative number is not allowed',
-    );
+    checkError(BigNumber(this.currentNumber).lt(0), 'The square root of a negative number is not allowed');
     this.performUnaryOperation(Operator.SQRT, () => this.math.root(this.currentNumber, '2'));
   }
 
@@ -664,10 +666,7 @@ export class Calculator {
   }
 
   public fct(): void {
-    this.checkError(
-      BigNumber(this.currentNumber).lt(0),
-      'The factorial of a negative number is not allowed',
-    );
+    checkError(BigNumber(this.currentNumber).lt(0), 'The factorial of a negative number is not allowed');
     this.performUnaryOperation(Operator.FCT, () => this.math.fact(this.currentNumber));
   }
 
@@ -761,24 +760,6 @@ export class Calculator {
     this.performBinaryOperation(Operator.BIT_XNOR);
   }
 
-  /**
-   * 계산 결과를 기록에 추가하고 결과값을 반환합니다.
-   * @param record - 기록에 추가할 계산 결과 스넵샷 객체
-   * @returns 계산 결과값을 문자열로 반환
-   * @description
-   * - 계산 결과를 내부 스냅샷으로 저장
-   * - 히스토리 관리자에 결과를 추가하여 기록 유지
-   * - 안전한 null 체크 후 히스토리 추가 수행
-   * - 계산된 최종 결과값 반환
-   */
-  private calculateAndAddRecord(number: string, operator: Operator, calculation: () => string): string {
-    return this.addRecord({
-      previousNumber: number,
-      operator: operator,
-      resultNumber: calculation(),
-    });
-  }
-
   // 숫자를 직접 사용하는 이항 연산 메서드들
   public addNumber(n: number): void {
     this.executeWithNumber(Operator.ADD, n);
@@ -845,7 +826,7 @@ export class Calculator {
    */
   public getConstant(constant: keyof typeof CONSTANTS): string {
     const value = CONSTANTS[constant];
-    this.checkError(!value, 'The requested mathematical constant was not found');
+    checkError(!value, 'The requested mathematical constant was not found');
     return value as string;
   }
 
@@ -861,71 +842,5 @@ export class Calculator {
    */
   public setConstant(constant: keyof typeof CONSTANTS): void {
     this.setCurrentNumber(CONSTANTS[constant] as string);
-  }
-
-  // 메모리 관련 메서드들
-
-  /**
-   * 현재 계산기에 표시된 숫자를 메모리에 저장하는 메서드
-   *
-   * 동작 과정:
-   * 1. 현재 숫자(currentValue)를 메모리(memoryValue)에 저장
-   * 2. 메모리 초기화 상태(isMemoryEmpty)를 false로 설정하여 메모리 사용 가능 상태로 변경
-   */
-  public memorySave(): void {
-    this.memoryNumber = this.currentNumber;
-  }
-
-  /**
-   * 메모리에 저장된 숫자를 현재 계산기에 불러오는 메서드
-   *
-   * 동작 과정:
-   * 1. 메모리가 초기화 상태인지 확인
-   * 2. 초기화 상태면 에러 발생
-   * 3. 아니면 메모리의 숫자를 현재 숫자로 설정하고 리셋 플래그 해제
-   *
-   * @throws {Error} 메모리가 초기화 상태일 때 호출하면 'Memory is empty' 에러 발생
-   */
-  public memoryRecall(): void {
-    // 1. 메모리가 비어있으면 (this.isMemoryEmpty이 true이면)
-    // Error가 throw되고 여기서 함수 실행이 중단됨
-    this.checkError(this.isMemoryEmpty, 'Memory is empty');
-
-    // 2. 에러가 발생하지 않은 경우에만 아래 코드가 실행됨
-    this.currentNumber = this.memoryNumber;
-    this.setDoesNotNeedBufferReset();
-  }
-
-  public memoryClear(): void {
-    this.memoryNumber = '';
-  }
-
-  private performMemoryOperation(operation: (a: string, b: string) => string): void {
-    if (!this.isMemoryEmpty) {
-      this.memoryNumber = operation(this.memoryNumber, this.currentNumber);
-      this.setNeedsBufferReset();
-    }
-  }
-
-  public memoryAdd(): void {
-    this.performMemoryOperation(this.math.add);
-  }
-  public memorySub(): void {
-    this.performMemoryOperation(this.math.sub);
-  }
-  public memoryMul(): void {
-    this.performMemoryOperation(this.math.mul);
-  }
-  public memoryDiv(): void {
-    this.performMemoryOperation(this.math.div);
-  }
-
-  /**
-   * 메모리에 저장된 숫자를 반환하는 메서드
-   *
-   * @returns {string} 메모리에 저장된 숫자를 문자열 형태로 반환
-   */
-  public getMemoryNumber(): string {
-    return this.memoryNumber;
   }
 }

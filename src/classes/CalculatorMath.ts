@@ -1,5 +1,6 @@
 import { match } from 'ts-pattern';
 import { all, create } from 'mathjs';
+import { checkError } from './utils/ErrorUtils';
 
 import type { FactoryFunctionMap } from 'mathjs';
 
@@ -49,13 +50,6 @@ export const CONSTANTS: { [key: string]: string } = {
  * - 문자열 기반 입/출력으로 정확한 값 처리
  */
 export class CalculatorMath {
-  // 에러 검사를 위한 헬퍼 메서드
-  private checkError(condition: boolean, message: string): void {
-    if (condition) {
-      throw new Error(message);
-    }
-  }
-
   /**
    * ===== 기본 수학 함수 =====
    */
@@ -187,10 +181,16 @@ export class CalculatorMath {
    * @throws 0으로 나누려고 할 때 에러 발생
    */
   public div(dividend: string, divisor: string): string {
-    this.checkError(BigNumber(divisor).eq(0), 'Division by zero');
+    console.log('dividend', dividend);
+    console.log('divisor', divisor);
+    console.log('BigNumber(divisor)', BigNumber(divisor));
+    console.log('BigNumber(divisor).eq(0)', BigNumber(divisor).eq(0));
+    checkError(BigNumber(divisor).eq(0), 'Division by zero');
+    console.log('BigNumber(divisor).eq(0)', BigNumber(divisor).eq(0));
 
     const result = BigNumber(dividend).div(divisor);
-    this.checkError(!result.isFinite(), 'Numerical error in division');
+    console.log('result', result);
+    checkError(!result.isFinite(), 'Numerical error in division');
 
     return result.toFixed();
   }
@@ -203,7 +203,7 @@ export class CalculatorMath {
    * @throws 0으로 나누려고 할 때 에러 발생
    */
   public mod(dividend: string, divisor: string): string {
-    this.checkError(BigNumber(divisor).eq(0), 'Division by zero');
+    checkError(BigNumber(divisor).eq(0), 'Division by zero');
     return BigNumber(dividend).mod(BigNumber(divisor)).toFixed();
   }
 
@@ -228,13 +228,10 @@ export class CalculatorMath {
     const bnRadicand = BigNumber(radicand);
     const bnIndex = BigNumber(index);
 
-    this.checkError(bnIndex.lt(0), 'Negative roots are not supported');
+    checkError(bnIndex.lt(0), 'Negative roots are not supported');
 
     const isEvenRoot = this.mod(this.int(index), '2') === '0';
-    this.checkError(
-      bnRadicand.isNegative() && isEvenRoot,
-      'Even root of negative number is not allowed',
-    );
+    checkError(bnRadicand.isNegative() && isEvenRoot, 'Even root of negative number is not allowed');
 
     const result = bnRadicand.pow(MathB.bignumber(1).div(bnIndex));
     return result.toFixed();
@@ -250,7 +247,7 @@ export class CalculatorMath {
    * @throws 음수가 입력되면 에러 발생
    */
   private validateNonNegativeNumbers(...values: string[]): void {
-    this.checkError(
+    checkError(
       values.some((value) => BigNumber(value).isNegative()),
       'Negative numbers are not allowed in bit operations',
     );

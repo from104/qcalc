@@ -273,10 +273,10 @@
   };
 
   // 메모리 초기화 여부 계산된 속성
-  const isMemoryEmpty = computed(() => calc.isMemoryEmpty);
+  const isMemoryEmpty = computed(() => calc.memory.isEmpty);
 
   // 메모리 값 계산된 속성
-  const memoryValue = computed(() => toFormattedNumber(convertIfRadix(calc.getMemoryNumber())));
+  const memoryValue = computed(() => toFormattedNumber(convertIfRadix(calc.memory.getNumber())));
 
   /**
    * 계산 인자나 계산 결과에 대한 식을 문자열로 생성하는 함수
