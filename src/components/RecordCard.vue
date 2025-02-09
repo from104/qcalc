@@ -247,28 +247,26 @@
   // 메인 결과로 이동 함수
   const loadToMainPanel = (id: number) => {
     const record = calc.record.getRecordById(id);
-    calc.setCurrentNumber(record.calculationResult.resultNumber);
+    calc.currentNumber = record.calculationResult.resultNumber;
   };
 
   const loadToSubPanel = (id: number) => {
     if (store.currentTab === 'unit') {
       store.swapUnits();
       loadToMainPanel(id);
-      calc.setCurrentNumber(
-        UnitConverter.convert(
-          store.selectedCategory,
-          BigNumber(calc.currentNumber),
-          store.sourceUnits[store.selectedCategory] ?? '',
-          store.targetUnits[store.selectedCategory] ?? '',
-        ),
+      calc.currentNumber = UnitConverter.convert(
+        store.selectedCategory,
+        BigNumber(calc.currentNumber),
+        store.sourceUnits[store.selectedCategory] ?? '',
+        store.targetUnits[store.selectedCategory] ?? '',
       );
       store.swapUnits();
     } else if (store.currentTab === 'currency') {
       store.swapCurrencies();
       loadToMainPanel(id);
-      calc.setCurrentNumber(
-        currencyConverter.convert(BigNumber(calc.currentNumber), store.sourceCurrency, store.targetCurrency).toString(),
-      );
+      calc.currentNumber = currencyConverter
+        .convert(BigNumber(calc.currentNumber), store.sourceCurrency, store.targetCurrency)
+        .toString();
       store.swapCurrencies();
     }
   };
@@ -358,6 +356,15 @@
   const handleMemoTooltip = (id: number, isShow: boolean) => {
     isShowMemoTooltip[id] = isShow;
   };
+
+  // 다크모드 상태 변경 감시
+  watch(
+    () => store.isDarkMode(),
+    (isDark) => {
+      console.log('다크모드 상태 변경:', isDark);
+    },
+    { immediate: true },
+  );
 </script>
 
 <template>
@@ -454,15 +461,15 @@
             @left="deleteRecordItem(record.id as number)"
             @right="(event: QSlideEvent) => slideToOpenMemoDialog(event.reset, record.id)"
           >
-            <template #left>
+            <template v-if="window.isMobile" #left>
               <q-icon name="delete_outline" :aria-label="t('ariaLabel.deleteRecord')" role="button" />
             </template>
-            <template #right>
+            <template v-if="window.isMobile" #right>
               <q-icon name="edit_note" :aria-label="t('ariaLabel.editMemo')" role="button" />
             </template>
             <q-item
               v-touch-hold.mouse="() => (recordMenu[record.id as number] = true)"
-              class="text-right q-pa-sm"
+              class="text-right q-pa-sm record-item"
               role="listitem"
             >
               <q-item-section class="q-mr-none q-px-none">
@@ -487,65 +494,89 @@
                     {{ record.displayText }}
                   </ToolTip>
                 </q-item-label>
-                <q-item-label class="text-caption" :class="store.isDarkMode() ? 'text-grey-5' : 'text-grey-7'">
-                  <HighlightText :text="formatDateTime(record.timestamp)" :search-term="store.searchKeyword" />
+                <q-item-label class="row justify-between q-pa-none q-ma-none">
+                  <div class="col-6 text-left record-menu-btn">
+                    <q-btn
+                      class="q-px-xs menu-btn"
+                      icon="more_vert"
+                      size="sm"
+                      flat
+                      rounded
+                      @click="() => (recordMenu[record.id as number] = true)"
+                    >
+                      <q-menu
+                        :model-value="recordMenu[record.id] ?? false"
+                        class="shadow-6"
+                        :context-menu="window.isDesktop"
+                        auto-close
+                        anchor="bottom right"
+                        self="top right"
+                        @update:model-value="(val) => (recordMenu[record.id] = val)"
+                      >
+                        <q-list dense class="noselect" style="max-width: 200px" role="list">
+                          <MenuItem
+                            v-if="!record.memo"
+                            :title="t('addMemo')"
+                            :action="() => openMemoDialog(record.id as number)"
+                          />
+                          <MenuItem
+                            v-if="record.memo"
+                            :title="t('editMemo')"
+                            :action="() => openMemoDialog(record.id as number)"
+                          />
+                          <MenuItem
+                            v-if="record.memo"
+                            :title="t('copyMemo')"
+                            :action="() => copyRecordItem(record.id as number, 'memo')"
+                          />
+                          <MenuItem
+                            v-if="record.memo"
+                            :title="t('deleteMemo')"
+                            :action="() => deleteMemo(record.id as number)"
+                          />
+                          <MenuItem separator />
+                          <MenuItem
+                            :title="t('copyDisplayedResult')"
+                            :action="() => copyRecordItem(record.id as number, 'formattedNumber')"
+                            :caption="getRightSideInRecord(record.origResult)"
+                          />
+                          <MenuItem
+                            :title="t('copyResultNumber')"
+                            :action="() => copyRecordItem(record.id as number, 'onlyNumber')"
+                            :caption="record.origResult.resultNumber"
+                          />
+                          <MenuItem separator />
+                          <MenuItem
+                            :title="t('copyTime')"
+                            :action="() => copyRecordItem(record.id as number, 'time')"
+                            :caption="formatDateTime(record.timestamp)"
+                          />
+                          <MenuItem separator />
+                          <MenuItem
+                            :title="t('loadToMainPanel')"
+                            :action="() => loadToMainPanel(record.id as number)"
+                          />
+                          <MenuItem
+                            v-if="store.currentTab === 'unit' || store.currentTab === 'currency'"
+                            :title="t('loadToSubPanel')"
+                            :action="() => loadToSubPanel(record.id as number)"
+                          />
+                          <MenuItem separator />
+                          <MenuItem :title="t('deleteResult')" :action="() => deleteRecordItem(record.id as number)" />
+                        </q-list>
+                      </q-menu>
+                    </q-btn>
+                  </div>
+                  <div class="col-6 text-right text-caption record-timestamp">
+                    <HighlightText
+                      class="self-center"
+                      :text="formatDateTime(record.timestamp)"
+                      :search-term="store.searchKeyword"
+                    />
+                  </div>
                 </q-item-label>
               </q-item-section>
             </q-item>
-            <q-menu
-              :model-value="recordMenu[record.id] ?? false"
-              class="shadow-6"
-              :context-menu="window.isDesktop"
-              auto-close
-              anchor="center left"
-              self="top left"
-              @update:model-value="(val) => (recordMenu[record.id] = val)"
-            >
-              <q-list dense class="noselect" style="max-width: 200px" role="list">
-                <MenuItem
-                  v-if="!record.memo"
-                  :title="t('addMemo')"
-                  :action="() => openMemoDialog(record.id as number)"
-                />
-                <MenuItem
-                  v-if="record.memo"
-                  :title="t('editMemo')"
-                  :action="() => openMemoDialog(record.id as number)"
-                />
-                <MenuItem
-                  v-if="record.memo"
-                  :title="t('copyMemo')"
-                  :action="() => copyRecordItem(record.id as number, 'memo')"
-                />
-                <MenuItem v-if="record.memo" :title="t('deleteMemo')" :action="() => deleteMemo(record.id as number)" />
-                <MenuItem separator />
-                <MenuItem
-                  :title="t('copyDisplayedResult')"
-                  :action="() => copyRecordItem(record.id as number, 'formattedNumber')"
-                  :caption="getRightSideInRecord(record.origResult)"
-                />
-                <MenuItem
-                  :title="t('copyResultNumber')"
-                  :action="() => copyRecordItem(record.id as number, 'onlyNumber')"
-                  :caption="record.origResult.resultNumber"
-                />
-                <MenuItem separator />
-                <MenuItem
-                  :title="t('copyTime')"
-                  :action="() => copyRecordItem(record.id as number, 'time')"
-                  :caption="formatDateTime(record.timestamp)"
-                />
-                <MenuItem separator />
-                <MenuItem :title="t('loadToMainPanel')" :action="() => loadToMainPanel(record.id as number)" />
-                <MenuItem
-                  v-if="store.currentTab === 'unit' || store.currentTab === 'currency'"
-                  :title="t('loadToSubPanel')"
-                  :action="() => loadToSubPanel(record.id as number)"
-                />
-                <MenuItem separator />
-                <MenuItem :title="t('deleteResult')" :action="() => deleteRecordItem(record.id as number)" />
-              </q-list>
-            </q-menu>
           </q-slide-item>
         </transition-group>
       </q-list>
@@ -732,6 +763,41 @@
   .search-bar-leave-from {
     opacity: 1;
     transform: translateY(0);
+  }
+
+  // 다크모드 믹스인 수정
+  @mixin dark-mode-colors {
+    color: var(--q-grey-7); // 라이트 모드 기본 색상
+
+    @media (prefers-color-scheme: dark) {
+      color: var(--q-grey-5);
+    }
+  }
+
+  .record-item {
+    &:hover {
+      .menu-btn {
+        opacity: 1;
+      }
+    }
+  }
+
+  .record-menu-btn {
+    margin-top: -8px;
+    margin-bottom: -7px;
+    margin-left: -5px;
+    @include dark-mode-colors;
+
+    .menu-btn {
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+  }
+
+  .record-timestamp {
+    margin-top: -5px;
+    margin-bottom: -12px;
+    @include dark-mode-colors;
   }
 </style>
 
