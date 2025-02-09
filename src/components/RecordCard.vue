@@ -566,6 +566,14 @@
                         </q-list>
                       </q-menu>
                     </q-btn>
+                    <q-btn 
+                      class="q-px-xs menu-btn" 
+                      icon="edit_note" 
+                      size="sm" 
+                      flat 
+                      rounded 
+                      @click="() => openMemoDialog(record.id as number)"
+                    />
                   </div>
                   <div class="col-6 text-right text-caption record-timestamp">
                     <HighlightText
