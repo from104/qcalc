@@ -1,4 +1,5 @@
 <script setup lang="ts">
+  import { ref } from 'vue';
   import ToolTip from 'components/snippets/ToolTip.vue';
 
   /**
@@ -20,7 +21,7 @@
     lineBreak?: boolean;
   }
 
-  withDefaults(defineProps<Props>(), {
+  const props = withDefaults(defineProps<Props>(), {
     text: '',
     size: 'xs',
     textColor: 'green-10',
@@ -28,11 +29,32 @@
     delay: 500,
     lineBreak: false,
   });
+
+  const window = globalThis.window;
+  const showTooltip = ref(false);
+  let tooltipTimer: ReturnType<typeof setTimeout> | null = null;
+
+  const handleTooltipTrigger = () => {
+    if (window.isMobile) {
+      showTooltip.value = true;
+
+      // 이전 타이머가 있다면 제거
+      if (tooltipTimer) {
+        clearTimeout(tooltipTimer);
+      }
+
+      // 새로운 타이머 설정
+      tooltipTimer = setTimeout(() => {
+        showTooltip.value = false;
+      }, props.delay);
+    }
+  };
 </script>
 
 <template>
-  <q-icon name="help_outline" :size="size" class="cursor-pointer">
+  <q-icon name="help_outline" :size="size" class="cursor-pointer" @click="handleTooltipTrigger">
     <ToolTip
+      v-if="!window.isMobile || (window.isMobile && showTooltip)"
       :text="text ?? ''"
       :text-color="textColor ?? 'green-10'"
       :bg-color="bgColor ?? 'green-2'"
