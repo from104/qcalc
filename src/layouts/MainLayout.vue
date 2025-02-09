@@ -12,6 +12,8 @@
   import { useMeta } from 'quasar';
   import { KeyBinding } from 'classes/KeyBinding';
 
+  import { navigateToPath } from '../classes/utils/NavigationUtils';
+
   // === 컴포넌트 임포트 ===
   import HeaderIcons from 'components/HeaderIcons.vue';
   import ToolTip from 'components/snippets/ToolTip.vue';
@@ -192,10 +194,10 @@
     [['Control+4'], () => store.setCurrentTab('radix')],
     [['Control+Tab', 'ArrowRight'], moveTabRight],
     [['Control+Shift+Tab', 'ArrowLeft'], moveTabLeft],
-    [['F1'], () => store.navigateToPath('/help', route, router)],
-    [['F2'], () => store.navigateToPath('/about', route, router)],
-    [['F3'], () => store.navigateToPath('/settings', route, router)],
-    [['F4'], () => store.navigateToPath('/record', route, router)],
+    [['F1'], () => navigateToPath('/help', route, router)],
+    [['F2'], () => navigateToPath('/about', route, router)],
+    [['F3'], () => navigateToPath('/settings', route, router)],
+    [['F4'], () => navigateToPath('/record', route, router)],
     [['Escape'], closeSubPage],
   ]);
 

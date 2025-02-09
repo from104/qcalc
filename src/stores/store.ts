@@ -2,15 +2,12 @@
 import { defineStore } from 'pinia';
 
 // Quasar 관련
-import { Notify, Dark, copyToClipboard, Screen } from 'quasar';
+import { Dark, copyToClipboard, Screen } from 'quasar';
 
 // 패턴 매칭 유틸리티
 import { match } from 'ts-pattern';
 
-// Vue Router 관련
-import { type Router, type RouteLocationNormalizedLoaded } from 'vue-router';
 // 계산기 관련 타입과 클래스 가져오기
-// import type { WordSize, CalculationResult } from 'src/types/calculator';
 import { Operator } from 'classes/Calculator';
 import { Radix } from 'classes/RadixConverter';
 import { Calculator } from 'classes/Calculator';
@@ -20,6 +17,10 @@ import { RadixConverter } from 'classes/RadixConverter';
 
 import type { StoreState, DarkModeType, DecimalPlacesType, GroupingUnitType } from '../types/store';
 import { DECIMAL_PLACES } from '../types/store.d';
+
+// 유틸리티 함수들 가져오기
+import { numberGrouping, formatDecimalPlaces } from '../classes/utils/NumberUtils';
+import { showMessage, showError } from '../classes/utils/NotificationUtils';
 
 const radixConverter = new RadixConverter();
 
@@ -150,123 +151,18 @@ export const useStore = defineStore('store', {
     },
 
     // 숫자 포맷팅 관련
-    numberGrouping(value: string): string {
-      const [integerPart, decimalPart] = value.split('.');
-      const groupingPattern = new RegExp(`\\B(?=([\\da-fA-F]{${this.groupingUnit}})+(?![\\da-fA-F]))`, 'g');
-      return integerPart?.replace(groupingPattern, ',') + (decimalPart ? `.${decimalPart}` : '');
-    },
-
-    formatDecimalPlaces(value: string, decimalPlaces: number, isTargetRadix: boolean = false): string {
-      if (!value) return '';
-      if (decimalPlaces < 0) return value;
-
-      // 현재 진법 결정 (진법 변환 모드일 경우 소스 진법 사용)
-      const currentRadix =
-        this.currentTab === 'radix' ? (isTargetRadix ? this.targetRadix : this.sourceRadix) : Radix.Decimal;
-      const currentRadixNumber = this.radixEnumToNumber(currentRadix);
-      const [integerPart = '', fractionalPart = ''] = value.split('.');
-
-      // 소수점 이하 처리 필요 없는 경우
-      if (decimalPlaces === 0) {
-        if (!fractionalPart) return integerPart;
-
-        // 첫 번째 소수점 자리에서 반올림
-        const firstDigit = parseInt(fractionalPart[0] ?? '', currentRadixNumber);
-        const shouldRoundUp = firstDigit >= Math.floor(currentRadixNumber / 2);
-        return shouldRoundUp ? this.incrementInteger(integerPart, currentRadixNumber) : integerPart;
-      }
-
-      // 소수점 이하 처리
-      if (!value.includes('.')) {
-        return decimalPlaces > 0 ? `${value}.${'0'.repeat(decimalPlaces)}` : value;
-      }
-
-      // 반올림 처리
-      const { roundedFraction, carryOver } = this.roundFractionalPart(
-        fractionalPart,
-        decimalPlaces,
-        currentRadixNumber,
-      );
-
-      // 정수부 자리 올림 처리
-      let finalInteger = integerPart;
-      if (carryOver > 0) {
-        finalInteger = this.incrementInteger(integerPart, currentRadixNumber);
-      }
-
-      // 최종 결과 조합
-      const formattedDecimal = roundedFraction.padEnd(decimalPlaces, '0');
-      return `${finalInteger}${formattedDecimal ? `.${formattedDecimal}` : ''}`;
-    },
-
-    // 정수부 증분 처리 (자리 올림 포함)
-    incrementInteger(integerStr: string, radixNumber: number): string {
-      let result = '';
-      let carry = 1;
-      let i = integerStr.length - 1;
-
-      while (i >= 0 || carry > 0) {
-        const digit = i >= 0 ? parseInt(integerStr[i] ?? '', radixNumber) : 0;
-        const sum = digit + carry;
-        carry = sum >= radixNumber ? 1 : 0;
-        const newDigit = (sum % radixNumber).toString(radixNumber).toUpperCase();
-        result = newDigit + result;
-        i--;
-      }
-
-      return result || '0';
-    },
-
-    // 소수부 반올림 처리
-    roundFractionalPart(
-      fractional: string,
-      decimalPlaces: number,
-      radixNumber: number,
-    ): { roundedFraction: string; carryOver: number } {
-      if (fractional.length <= decimalPlaces) {
-        return {
-          roundedFraction: fractional.padEnd(decimalPlaces, '0'),
-          carryOver: 0,
-        };
-      }
-
-      const retainPart = fractional.substring(0, decimalPlaces);
-      const nextDigit = fractional[decimalPlaces];
-      const nextValue = parseInt(nextDigit ?? '', radixNumber as unknown as number);
-      const halfRadix = Math.floor(radixNumber / 2);
-
-      // 반올림 필요 없는 경우
-      if (nextValue < halfRadix) {
-        return {
-          roundedFraction: retainPart,
-          carryOver: 0,
-        };
-      }
-
-      // 반올림 수행
-      const rounded = retainPart.split('');
-      let carryOver = 1;
-      let i = rounded.length - 1;
-
-      while (i >= 0 && carryOver > 0) {
-        const currentValue = parseInt(rounded[i] ?? '', radixNumber) + carryOver;
-        carryOver = currentValue >= radixNumber ? 1 : 0;
-        rounded[i] = (currentValue % radixNumber).toString(radixNumber).toUpperCase();
-        i--;
-      }
-
-      return {
-        roundedFraction: rounded.join(''),
-        carryOver: carryOver,
-      };
-    },
-
     toFormattedNumber(value: string, isTargetRadix: boolean = false): string {
       if (!value) return '';
 
-      const formattedValue = this.formatDecimalPlaces(value, this.getDecimalPlaces, isTargetRadix);
+      const formattedValue = formatDecimalPlaces(
+        value,
+        this.getDecimalPlaces,
+        this.radixEnumToNumber(
+          this.currentTab === 'radix' ? (isTargetRadix ? this.targetRadix : this.sourceRadix) : Radix.Decimal,
+        ),
+      );
 
-      return this.useGrouping ? this.numberGrouping(formattedValue) : formattedValue;
+      return this.useGrouping ? numberGrouping(formattedValue, this.groupingUnit) : formattedValue;
     },
 
     // 진법 변환 관련
@@ -431,7 +327,7 @@ export const useStore = defineStore('store', {
     // 클립보드 관련
     copyToClipboard(text: string, message: string): void {
       copyToClipboard(text);
-      this.showMessage(message);
+      showMessage(message);
     },
 
     // 단위 변환 관련
@@ -587,51 +483,8 @@ export const useStore = defineStore('store', {
     },
 
     // 알림 관련
-    showMessage(
-      message: string, // 표시할 메시지 내용
-      duration = 1000, // 알림 표시 시간 (기본값: 1000ms)
-      position:
-        | 'top'
-        | 'top-left'
-        | 'top-right'
-        | 'bottom-left'
-        | 'bottom-right'
-        | 'bottom'
-        | 'left'
-        | 'right'
-        | 'center'
-        | undefined = 'top', // 알림 위치 (기본값: 'top')
-    ): void {
-      Notify.create({
-        message, // 메시지 내용
-        position, // 알림 위치
-        timeout: duration, // 표시 시간
-        color: 'positive', // 알림 색상 (긍정적인 메시지)
-      });
-    },
-
-    showError(
-      message: string, // 표시할 오류 메시지 내용
-      duration = 500, // 알림 표시 시간 (기본값: 500ms)
-      position:
-        | 'top'
-        | 'top-left'
-        | 'top-right'
-        | 'bottom-left'
-        | 'bottom-right'
-        | 'bottom'
-        | 'left'
-        | 'right'
-        | 'center'
-        | undefined = 'top', // 알림 위치 (기본값: 'top')
-    ): void {
-      Notify.create({
-        message, // 오류 메시지 내용
-        position, // 알림 위치
-        timeout: duration, // 표시 시간
-        color: 'negative', // 알림 색상 (부정적인 메시지)
-      });
-    },
+    showMessage,
+    showError,
 
     // 전체 계산 결과 삭제 확인 다이얼로그 표시 여부
     setDeleteRecordConfirmOpen(value: boolean) {
@@ -645,17 +498,6 @@ export const useStore = defineStore('store', {
     // 기본 계산기 여부 확인
     isDefaultCalculator(): boolean {
       return this.currentTab === 'calc';
-    },
-
-    // 특정 경로로 이동하는 함수
-    navigateToPath(path: string, route: RouteLocationNormalizedLoaded, router: Router): void {
-      if (route.path === path) {
-        return;
-      } else if (/help|about|settings|record/.test(route.path)) {
-        router.replace(path);
-      } else {
-        router.push(path);
-      }
     },
 
     // 자동 업데이트 관련
