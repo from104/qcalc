@@ -20,7 +20,7 @@ import { DECIMAL_PLACES } from '../types/store.d';
 
 // 유틸리티 함수들 가져오기
 import { numberGrouping, formatDecimalPlaces } from '../classes/utils/NumberUtils';
-import { showMessage, showError } from '../classes/utils/NotificationUtils';
+import { showMessage } from '../classes/utils/NotificationUtils';
 
 const radixConverter = new RadixConverter();
 
@@ -481,10 +481,6 @@ export const useStore = defineStore('store', {
     swapCurrencies(): void {
       [this.sourceCurrency, this.targetCurrency] = [this.targetCurrency, this.sourceCurrency];
     },
-
-    // 알림 관련
-    showMessage,
-    showError,
 
     // 전체 계산 결과 삭제 확인 다이얼로그 표시 여부
     setDeleteRecordConfirmOpen(value: boolean) {

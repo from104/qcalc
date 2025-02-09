@@ -1,6 +1,6 @@
 <script setup lang="ts">
   /**
-   * App.vue 
+   * App.vue
    * 애플리케이션의 루트 컴포넌트입니다.
    * 전역 키 바인딩, 라우팅 트랜지션, 레이아웃 관리를 담당합니다.
    */
@@ -16,6 +16,7 @@
 
   // === 유틸리티 클래스 임포트 ===
   import { KeyBinding } from 'classes/KeyBinding';
+import { showMessage } from './classes/utils/NotificationUtils';
 
   // === 전역 객체 및 인스턴스 초기화 ===
   const window = globalThis.window;
@@ -35,7 +36,7 @@
   const toggleAlwaysOnTopWithNotification = () => {
     if (window.isElectron) {
       store.toggleAlwaysOnTop();
-      store.showMessage(store.alwaysOnTop ? t('alwaysOnTopOn') : t('alwaysOnTopOff'));
+      showMessage(store.alwaysOnTop ? t('alwaysOnTopOn') : t('alwaysOnTopOff'));
     }
   };
 
@@ -44,9 +45,7 @@
    */
   const toggleDarkModeWithNotification = () => {
     store.toggleDarkMode();
-    store.showMessage(
-      store.darkMode === 'system' ? t('darkMode.message.system') : t('darkMode.message.' + store.darkMode),
-    );
+    showMessage(store.darkMode === 'system' ? t('darkMode.message.system') : t('darkMode.message.' + store.darkMode));
   };
 
   // === 키 바인딩 설정 ===

@@ -21,6 +21,7 @@
 
   // 컴포넌트 import
   import MenuItem from 'components/snippets/MenuItem.vue';
+import { navigateToPath } from 'src/classes/utils/NavigationUtils';
 
   // 메뉴 아이템 인터페이스 정의
   interface MenuItem {
@@ -83,7 +84,7 @@
       shortcut: 'F3',
       icon: 'settings',
       action: () => {
-        store.navigateToPath('/settings', route, router);
+        navigateToPath('/settings', route, router);
       },
     },
     { id: 'separator2', separator: true },
@@ -93,7 +94,7 @@
       caption: t('item.help.caption'),
       shortcut: 'F1',
       icon: 'help',
-      action: () => store.navigateToPath('/help', route, router),
+      action: () => navigateToPath('/help', route, router),
     },
     {
       id: 'about',
@@ -101,7 +102,7 @@
       caption: t('iem.about.caption'),
       shortcut: 'F2',
       icon: 'info',
-      action: () => store.navigateToPath('/about', route, router),
+      action: () => navigateToPath('/about', route, router),
     },
   ]);
 

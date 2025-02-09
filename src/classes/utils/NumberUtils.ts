@@ -16,7 +16,7 @@ export function numberGrouping(value: string, groupingUnit: number): string {
  * @param radixNumber - 진법
  * @returns 증분된 정수 문자열
  */
-export function incrementInteger(integerStr: string, radixNumber: number): string {
+function incrementInteger(integerStr: string, radixNumber: number): string {
   let result = '';
   let carry = 1;
   let i = integerStr.length - 1;
@@ -40,7 +40,7 @@ export function incrementInteger(integerStr: string, radixNumber: number): strin
  * @param radixNumber - 진법
  * @returns 반올림된 소수부와 자리올림 여부
  */
-export function roundFractionalPart(
+function roundFractionalPart(
   fractional: string,
   decimalPlaces: number,
   radixNumber: number,

@@ -1,7 +1,6 @@
 import type { Calculator } from '../classes/Calculator';
 import type { CurrencyConverter } from '../classes/CurrencyConverter';
 import type { RadixType } from '../classes/RadixConverter';
-import type { Router, RouteLocationNormalizedLoaded } from 'vue-router';
 import type { StoreDefinition } from 'pinia';
 import type { WordSize } from './calculator';
 import type { CalculationResult } from './calculator';
@@ -127,8 +126,6 @@ export interface StoreActions {
   showMemoryTemporarily(): void;
 
   // 숫자 포맷팅 관련
-  numberGrouping(value: string): string;
-  formatDecimalPlaces(value: string, decimalPlaces: number): string;
   toFormattedNumber(value: string): string;
 
   // 진법 변환 관련
@@ -192,41 +189,11 @@ export interface StoreActions {
   initRecentCurrencies(): void;
   swapCurrencies(): void;
 
-  // 알림 관련
-  showMessage(
-    message: string,
-    duration?: number,
-    position?:
-      | 'top'
-      | 'top-left'
-      | 'top-right'
-      | 'bottom-left'
-      | 'bottom-right'
-      | 'bottom'
-      | 'left'
-      | 'right'
-      | 'center',
-  ): void;
-  showError(
-    message: string,
-    duration?: number,
-    position?:
-      | 'top'
-      | 'top-left'
-      | 'top-right'
-      | 'bottom-left'
-      | 'bottom-right'
-      | 'bottom'
-      | 'left'
-      | 'right'
-      | 'center',
-  ): void;
 
   // 기타
   setDeleteRecordConfirmOpen(value: boolean): void;
   isAtLeastDoubleWidth(): boolean;
   isDefaultCalculator(): boolean;
-  navigateToPath(path: string, route: RouteLocationNormalizedLoaded, router: Router): void;
   setSubPageAnimating(value: boolean): void;
 
   // 자동 업데이트 관련

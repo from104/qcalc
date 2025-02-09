@@ -8,7 +8,7 @@
   import { useQuasar } from 'quasar';
   import DOMPurify from 'dompurify';
 
-    // 전역 window 객체에 접근하기 위한 상수 선언
+  // 전역 window 객체에 접근하기 위한 상수 선언
   const window = globalThis.window;
 
   // 스토어 인스턴스 생성
@@ -48,7 +48,7 @@
         const newVersion = (info as UpdateInfo).version;
         const newVersionMessage = t('newVersionMessage', { version: newVersion });
         const newVersionAddedMessage = t('newVersionAddedMessage');
-        store.showMessage(`${newVersionMessage} - ${newVersionAddedMessage}`, 3000);
+        showMessage(`${newVersionMessage} - ${newVersionAddedMessage}`, 3000);
       }
       return;
     }
@@ -117,7 +117,7 @@
       // 개발 모드에서는 재시작 확인 다이얼로그 표시
       console.log('개발 모드: 앱 재시작 시뮬레이션');
       updateDialog.value = false;
-      store.showMessage(t('updateSimulationComplete'), 3000);
+      showMessage(t('updateSimulationComplete'), 3000);
     } else {
       window.electronUpdater.installUpdate();
     }

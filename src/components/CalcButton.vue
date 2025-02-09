@@ -47,8 +47,6 @@
     enableShiftLock,
     toggleShift,
     toggleShiftLock,
-    showError,
-    showMessage,
     convertRadix,
     clickButtonById,
   } = store;
@@ -96,6 +94,7 @@
   const shiftButtonPressedColor = lighten(calculatorButtonColors.important ?? '', -30);
 
   import { createCalcButtonSet } from 'src/constants/CalcButtonSet';
+import { showError, showMessage } from 'src/classes/utils/NotificationUtils';
 
   // const i18n = useI18n();
   const { standardButtons, modeSpecificButtons, standardExtendedFunctions, modeSpecificExtendedFunctions } =

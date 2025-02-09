@@ -421,7 +421,7 @@
                 :icon="button.icon"
                 role="button"
                 :aria-label="t('ariaLabel.subPageButton', { label: t(`message.${button.label}`) })"
-                @click="store.navigateToPath(button.path, route, router)"
+                @click="navigateToPath(button.path, route, router)"
               >
                 <ToolTip :text="button.tooltip" />
               </q-btn>
