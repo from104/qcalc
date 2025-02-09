@@ -3,6 +3,7 @@ import { BaseConverter } from './BaseConverter';
 
 import type { CurrencyExchangeRates, CurrencyData } from '../constants/CurrencyBaseData';
 import { currencyBaseData } from '../constants/CurrencyBaseData';
+import { checkError } from './utils/ErrorUtils';
 
 /**
  * CurrencyConverter 클래스
@@ -82,12 +83,9 @@ export class CurrencyConverter extends BaseConverter {
    * @param {string} baseCurrency - 새로운 기준 통화
    */
   setBase(baseCurrency: string) {
-    if (this.isRatesEmpty()) {
-      throw new Error('Exchange rates are not available');
-    }
-    if (!this.baseExchangeRates[baseCurrency]) {
-      throw new Error('Invalid base currency');
-    }
+    checkError(this.isRatesEmpty(), 'error.currency.exchange_rates_not_available');
+    checkError(!this.baseExchangeRates[baseCurrency], 'error.currency.invalid_base_currency');
+    this.currentBaseCurrency = baseCurrency;
     this.currentBaseCurrency = baseCurrency;
     this.currentRates = this.getRates(baseCurrency);
   }
@@ -104,6 +102,7 @@ export class CurrencyConverter extends BaseConverter {
    * 특정 기준 통화에 대한 환율 정보를 계산하는 메소드
    * @param {string} baseCurrency - 기준 통화 (기본값: 'EUR')
    * @returns {CurrencyExchangeRates} 계산된 환율 정보
+   * @throws {Error} 환율 정보가 비어있거나 유효하지 않은 기준 통화인 경우
    */
   getRates(baseCurrency = 'EUR'): CurrencyExchangeRates {
     if (this.isRatesEmpty()) {
@@ -114,9 +113,7 @@ export class CurrencyConverter extends BaseConverter {
       return this.baseExchangeRates;
     }
 
-    if (!Object.prototype.hasOwnProperty.call(this.baseExchangeRates, baseCurrency)) {
-      throw new Error('Invalid base currency');
-    }
+    checkError(!Object.prototype.hasOwnProperty.call(this.baseExchangeRates, baseCurrency), 'error.currency.invalid_base_currency');
 
     const baseRate = this.baseExchangeRates[baseCurrency];
     return Object.fromEntries(
@@ -131,18 +128,14 @@ export class CurrencyConverter extends BaseConverter {
    * @returns {number} 계산된 환율
    */
   getRate(from: string, to?: string): number {
-    if (this.isRatesEmpty()) {
-      throw new Error('Exchange rates are not available');
-    }
+    checkError(this.isRatesEmpty(), 'error.currency.exchange_rates_not_available');
 
     const actualTo = to ?? from;
     const actualFrom = to ? from : this.currentBaseCurrency;
 
-    if (!this.currentRates[actualTo] || !this.currentRates[actualFrom]) {
-      throw new Error('Invalid currency');
-    }
+    checkError(!this.currentRates[actualTo] || !this.currentRates[actualFrom], 'error.currency.invalid_currency');
 
-    return this.currentRates[actualTo] / this.currentRates[actualFrom];
+    return this.currentRates[actualTo]! / this.currentRates[actualFrom]!;
   }
 
   /**
@@ -190,13 +183,9 @@ export class CurrencyConverter extends BaseConverter {
    * @returns {string} 통화 심볼
    */
   getSymbol(currency: string): string {
-    if (this.isRatesEmpty()) {
-      throw new Error('Exchange rates are not available');
-    }
-    if (!this.currencyData[currency] || !this.currentRates[currency]) {
-      throw new Error(`Invalid currency: ${currency}`);
-    }
-    return this.currencyData[currency].symbol;
+    checkError(this.isRatesEmpty(), 'error.currency.exchange_rates_not_available');
+    checkError(!this.currencyData[currency] || !this.currentRates[currency], `error.currency.invalid_currency: ${currency}`);
+    return this.currencyData[currency]!.symbol;
   }
 
   /**
@@ -205,10 +194,8 @@ export class CurrencyConverter extends BaseConverter {
    * @returns {string} 통화 설명
    */
   getItemDescription(currency: string): string {
-    if (!this.currencyData[currency]) {
-      throw new Error(this.formatError(`Invalid currency code: ${currency}`));
-    }
-    return this.currencyData[currency].desc;
+    checkError(!this.currencyData[currency], `error.currency.invalid_currency: ${currency}`);
+    return this.currencyData[currency]!.desc;
   }
 
   /**

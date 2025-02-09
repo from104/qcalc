@@ -1,0 +1,47 @@
+calc:
+  constant_not_found: '요청한 수학 상수를 찾을 수 없습니다.'
+  invalid_radix: '유효하지 않은 진법입니다.'
+  invalid_digit: '현재 진법에서 유효하지 않은 숫자입니다.'
+  no_memory: '메모리에 저장된 값이 없습니다.'
+  failed_to_add_record_item: '기록 항목 추가 중 오류가 발생했습니다.: {error}'
+  failed_to_delete_record_item: '기록 항목 삭제 중 오류가 발생했습니다.: {error}'
+  invalid_record_index: '유효하지 않은 기록 인덱스입니다.'
+  record_not_found: '요청한 기록 항목을 찾을 수 없습니다.'
+  invalid_operation: '유효하지 않은 연산입니다.'
+  memory_operation_failed: '메모리 연산 중 오류가 발생했습니다.'
+radix:
+  invalid_radix: '유효하지 않은 진법입니다.'
+  invalid_number: '{radix}진법에 대해 유효하지 않은 숫자입니다: {number}'
+currency:
+  exchange_rates_not_available: '환율 정보가 비어있습니다.'
+  invalid_currency: '유효하지 않은 통화입니다.'
+  invalid_base_currency: '유효하지 않은 기준 통화입니다.'
+  conversion_failed: '통화 변환 중 오류가 발생했습니다.'
+unit:
+  invalid_category: '유효하지 않은 단위 범주입니다: {category}'
+  invalid_unit: '유효하지 않은 단위입니다: {unit}'
+  invalid_format: '잘못된 단위 형식입니다. "category.unit" 형식을 사용하세요.'
+  no_units_found: '해당 범주에 대한 단위를 찾을 수 없습니다: {category}'
+  conversion_failed: '단위 변환에 실패했습니다.'
+  invalid_base_value: '기준 단위 값 계산에 실패했습니다.'
+component:
+  clipboard:
+    copy_failed: '클립보드에 복사하는데 실패했습니다.'
+    paste_failed: '클립보드에서 붙여넣기에 실패했습니다.'
+  update:
+    check_failed: '업데이트 확인에 실패했습니다.'
+    download_failed: '업데이트 다운로드에 실패했습니다.'
+    install_failed: '업데이트 설치에 실패했습니다.'
+  navigation:
+    route_not_found: '요청한 페이지를 찾을 수 없습니다.'
+    invalid_route: '유효하지 않은 페이지 요청입니다.'
+math:
+  divide_by_zero: '0으로 나눌 수 없습니다.'
+  negative_factorial: '음수의 팩토리얼은 허용되지 않습니다.'
+  division_error: '나눗셈 연산 중 오류가 발생했습니다.'
+  negative_root: '음수의 제곱근은 허용되지 않습니다.'
+  negative_root_index: '음수 차수의 제곱근은 지원되지 않습니다.'
+  negative_bit_operation: '비트 연산에는 음수를 사용할 수 없습니다.'
+  overflow: '연산 결과가 허용된 범위를 초과했습니다.'
+  invalid_operation: '유효하지 않은 수학 연산입니다.'
+unknown: '알 수 없는 오류가 발생했습니다.: {error}'

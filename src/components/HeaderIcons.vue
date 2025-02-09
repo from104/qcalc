@@ -20,14 +20,13 @@
   const store = window.store;
 
   // 스토어에서 필요한 메서드와 속성 추출
-  const { calc, copyToClipboard, clickButtonById, swapUnits, swapCurrencies, swapRadixes } =
-    store;
+  const { calc, copyToClipboard, clickButtonById, swapUnits, swapCurrencies, swapRadixes } = store;
 
   // 컴포넌트 import
   import ToolTip from './snippets/ToolTip.vue';
   import MenuItem from './snippets/MenuItem.vue';
   import MenuPanel from './MenuPanel.vue';
-import { showError, showMessage } from 'src/classes/utils/NotificationUtils';
+  import { showError, showMessage } from 'src/classes/utils/NotificationUtils';
 
   /**
    * 선택된 텍스트 또는 계산 결과를 클립보드에 복사하는 함수

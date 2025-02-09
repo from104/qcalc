@@ -1,6 +1,7 @@
 import { match } from 'ts-pattern';
 import { BaseConverter } from './BaseConverter';
 import { BigNumber, MathB } from './CalculatorMath';
+import { checkError } from './utils/ErrorUtils';
 
 export enum Radix {
   Binary = 'bin',
@@ -68,9 +69,9 @@ export class RadixConverter extends BaseConverter {
       [Radix.Hexadecimal]: '16진수 (Hexadecimal)',
     };
 
-    if (!descriptions[item as Radix]) {
-      throw new Error(this.formatError(`Invalid radix: ${item}`));
-    }
+    checkError(!descriptions[item as Radix], 'error.radix.invalid_radix', {
+      radix: item,
+    });
 
     return descriptions[item as Radix];
   }
@@ -100,7 +101,10 @@ export class RadixConverter extends BaseConverter {
       [Radix.Hexadecimal]: /^-?[0-9A-Fa-f]+(\.[0-9A-Fa-f]*)?$/,
     };
 
-    return patterns[radix].test(number);
+    const result = patterns[radix].test(number);
+
+    checkError(!result, 'error.radix.invalid_radix', { radix: radix, number: number, });
+    return result;
   }
 
   /**
@@ -370,9 +374,7 @@ export class RadixConverter extends BaseConverter {
   private convertFromDecimal(decimal: string, toRadix: Radix): string {
     // 입력된 10진수의 유효성 검사
     // isValidDecimal 메서드를 통해 올바른 10진수 형식인지 확인
-    if (!this.isValidDecimal(decimal)) {
-      throw new Error('Invalid decimal number format');
-    }
+    checkError(!this.isValidDecimal(decimal), 'error.radix.invalid_decimal', { decimal: decimal, });
 
     // 유효성 검사를 통과한 경우 실제 진법 변환을 수행
     // convertDecimalToRadix 메서드에 decimal과 목표 진법을 전달
@@ -389,9 +391,10 @@ export class RadixConverter extends BaseConverter {
    */
   private convertToDecimal(value: string, fromRadix: Radix): string {
     // 입력값이 해당 진법에 유효한지 검사
-    if (!this.isValidRadixNumber(value, fromRadix)) {
-      throw new Error(`Invalid ${fromRadix} number format`);
-    }
+    checkError(!this.isValidRadixNumber(value, fromRadix), 'error.radix.invalid_radix', {
+      radix: fromRadix,
+      value: value,
+    });
 
     // 실제 10진수 변환 수행
     return this.convertRadixToDecimal(value, fromRadix);

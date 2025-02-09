@@ -66,20 +66,15 @@
 
   // 에러 처리 함수
   const executeActionWithErrorHandling = (action: () => void) => {
-    const errorMessages: { [key: string]: string } = {
-      'Cannot divide by zero.': 'cannotDivideByZero',
-      'The square root of a negative number is not allowed.': 'squareRootOfANegativeNumberIsNotAllowed',
-      'The factorial of a negative number is not allowed.': 'factorialOfANegativeNumberIsNotAllowed',
-      'No memory to recall.': 'noMemoryToRecall',
-    } as const;
     try {
       action();
     } catch (e: unknown) {
-      const message = e instanceof Error ? e.message : 'Unknown error';
-      if (errorMessages[message]) {
-        showError(t(errorMessages[message]));
+      if (e instanceof Error) {
+        // 에러 메시지가 이미 i18n 처리된 경우 그대로 표시
+        showError(e.message);
       } else {
-        showError(message);
+        // 알 수 없는 에러의 경우 기본 에러 메시지 표시
+        showError(t('error.unknown'));
       }
     }
   };
@@ -94,7 +89,7 @@
   const shiftButtonPressedColor = lighten(calculatorButtonColors.important ?? '', -30);
 
   import { createCalcButtonSet } from 'src/constants/CalcButtonSet';
-import { showError, showMessage } from 'src/classes/utils/NotificationUtils';
+  import { showError, showMessage } from 'src/classes/utils/NotificationUtils';
 
   // const i18n = useI18n();
   const { standardButtons, modeSpecificButtons, standardExtendedFunctions, modeSpecificExtendedFunctions } =
@@ -171,9 +166,9 @@ import { showError, showMessage } from 'src/classes/utils/NotificationUtils';
   // 버튼 클릭 시 알림 표시 함수
   const displayButtonNotification = (id: ButtonID) => {
     const buttonFunc = extendedFunctionSet.value[id];
-    if (buttonFunc?.label === 'MC') {
+    if (buttonFunc?.label === 'MC' && !calc.memory.isEmpty) {
       showMessage(t('memoryCleared'));
-    } else if (buttonFunc?.label === 'MR' && !calc.isMemoryEmpty) {
+    } else if (buttonFunc?.label === 'MR' && !calc.memory.isEmpty) {
       showMessage(t('memoryRecalled'));
     }
   };

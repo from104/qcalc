@@ -42,7 +42,7 @@ export class CalculatorMemory {
    * @throws {Error} 메모리가 비어있을 경우 에러 발생
    */
   public recall(): string {
-    checkError(this.isEmpty, 'Memory is empty');
+    checkError(this.isEmpty, 'error.calc.no_memory');
     return this.number;
   }
 
@@ -50,6 +50,7 @@ export class CalculatorMemory {
    * 메모리를 초기화하는 메서드
    */
   public clear(): void {
+    checkError(this.isEmpty, 'error.calc.no_memory');
     this.number = '';
   }
 
@@ -67,10 +68,9 @@ export class CalculatorMemory {
    * @param number - 연산에 사용할 숫자
    */
   private performMemoryOperation(operation: (a: string, b: string) => string, number: string): void {
-    if (!this.isEmpty) {
-      this.number = operation(this.number, number);
-      this.onOperationComplete?.();
-    }
+    checkError(this.isEmpty, 'error.calc.no_memory');
+    this.number = operation(this.number, number);
+    this.onOperationComplete?.();
   }
 
   /**

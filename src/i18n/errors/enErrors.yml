@@ -1,0 +1,47 @@
+calc:
+  invalid_digit: 'Invalid digit for current radix'
+  constant_not_found: 'The requested mathematical constant was not found'
+  invalid_radix: 'Invalid radix value'
+  no_memory: 'No value stored in memory'
+  failed_to_add_record_item: 'Failed to add record item: {error}'
+  failed_to_delete_record_item: 'Failed to delete record item: {error}'
+  invalid_record_index: 'Invalid record index'
+  record_not_found: 'The requested record item was not found'
+  invalid_operation: 'Invalid operation'
+  memory_operation_failed: 'Memory operation failed'
+radix:
+  invalid_radix: 'Invalid radix value'
+  invalid_number: 'Invalid number for radix {radix}: {number}'
+currency:
+  exchange_rates_not_available: 'Exchange rates are not available'
+  invalid_currency: 'Invalid currency'
+  invalid_base_currency: 'Invalid base currency'
+  conversion_failed: 'Currency conversion failed'
+unit:
+  invalid_category: 'Invalid unit category: {category}'
+  invalid_unit: 'Invalid unit: {unit}'
+  invalid_format: 'Invalid item format. Use "category.unit"'
+  no_units_found: 'No units found for category: {category}'
+  conversion_failed: 'Unit conversion failed'
+  invalid_base_value: 'Failed to calculate base value'
+component:
+  clipboard:
+    copy_failed: 'Failed to copy to clipboard'
+    paste_failed: 'Failed to paste from clipboard'
+  update:
+    check_failed: 'Failed to check for updates'
+    download_failed: 'Failed to download update'
+    install_failed: 'Failed to install update'
+  navigation:
+    route_not_found: 'Requested page not found'
+    invalid_route: 'Invalid page request'
+math:
+  divide_by_zero: 'Cannot divide by zero'
+  negative_factorial: 'The factorial of a negative number is not allowed'
+  division_error: 'An error occurred during division'
+  negative_root: 'The root of a negative number is not allowed'
+  negative_root_index: 'Negative roots are not supported'
+  negative_bit_operation: 'Negative numbers are not allowed in bit operations'
+  overflow: 'Operation result exceeds allowed range'
+  invalid_operation: 'Invalid mathematical operation'
+unknown: 'An unknown error occurred: {error}'

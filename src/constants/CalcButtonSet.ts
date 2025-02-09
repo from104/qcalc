@@ -5,13 +5,14 @@ import type { ComposerTranslation } from 'vue-i18n';
 import { BigNumber } from 'classes/CalculatorMath';
 import { Operator } from 'classes/Calculator';
 import { useStore } from 'stores/store';
+import { showMessage } from 'src/classes/utils/NotificationUtils';
 
 // ComposerTranslation 타입 사용
 export function createCalcButtonSet(t: ComposerTranslation) {
   const store = useStore();
 
   // 스토어에서 필요한 메서드 추출
-  const { calc, showMemoryTemporarily, showMessage } = store;
+  const { calc, showMemoryTemporarily } = store;
 
   // 비트 연산 사전 처리 메서드
   const bitOperationPreprocessing = (action: () => void, isBinary: boolean = true) => {
@@ -132,13 +133,13 @@ export function createCalcButtonSet(t: ComposerTranslation) {
     b3: ['cos', ['Shift+Digit8', 'Shift+Numpad8'], () => calc.cos(), false],
     c3: ['tan', ['Shift+Digit9', 'Shift+Numpad9'], () => calc.tan(), false],
     d3: [ 'M×', ['Shift+NumpadMultiply'], () => { calc.memory.mul(calc.currentNumber); displayMemoryStatus(); }, false ],
-    a4: ['Pi/2', ['Shift+Digit4', 'Shift+Numpad4'], () => calc.setConstant('pi2'), false],
-    b4: ['ln10', ['Shift+Digit5', 'Shift+Numpad5'], () => calc.setConstant('ln10'), false],
-    c4: ['ln2', ['Shift+Digit6', 'Shift+Numpad6'], () => calc.setConstant('ln2'), false],
+    a4: ['Pi/2', ['Shift+Digit4', 'Shift+Numpad4'], () => calc.currentNumber = calc.math.getConstant('pi2'), false],
+    b4: ['ln10', ['Shift+Digit5', 'Shift+Numpad5'], () => calc.currentNumber = calc.math.getConstant('ln10'), false],
+    c4: ['ln2', ['Shift+Digit6', 'Shift+Numpad6'], () => calc.currentNumber = calc.math.getConstant('ln2'), false],
     d4: [ 'M-', ['Shift+Minus', 'Shift+NumpadSubtract'], () => { calc.memory.sub(calc.currentNumber); displayMemoryStatus(); }, false ],
-    a5: ['Pi', ['Shift+Digit1', 'Shift+Numpad1'], () => calc.setConstant('pi'), false],
-    b5: ['phi', ['Shift+Digit2', 'Shift+Numpad2'], () => calc.setConstant('phi'), false],
-    c5: ['e', ['Shift+Digit3', 'Shift+Numpad3'], () => calc.setConstant('e'), false],
+    a5: ['Pi', ['Shift+Digit1', 'Shift+Numpad1'], () => calc.currentNumber = calc.math.getConstant('pi'), false],
+    b5: ['phi', ['Shift+Digit2', 'Shift+Numpad2'], () => calc.currentNumber = calc.math.getConstant('phi'), false],
+    c5: ['e', ['Shift+Digit3', 'Shift+Numpad3'], () => calc.currentNumber = calc.math.getConstant('e'), false],
     d5: [ 'M+', ['Shift+Plus', 'Shift+NumpadAdd'], () => { calc.memory.add(calc.currentNumber); displayMemoryStatus(); }, false ],
     a6: ['', ['\''], () => null, false],
     b6: ['int', ['Shift+Digit0', 'Shift+Numpad0'], () => calc.int(), false],

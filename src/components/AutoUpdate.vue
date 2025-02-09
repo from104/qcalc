@@ -5,8 +5,9 @@
    */
   import { ref, computed, onMounted, onUnmounted } from 'vue';
   import { useI18n } from 'vue-i18n';
-  import { useQuasar } from 'quasar';
   import DOMPurify from 'dompurify';
+  
+  import { showError, showMessage } from 'src/classes/utils/NotificationUtils';
 
   // 전역 window 객체에 접근하기 위한 상수 선언
   const window = globalThis.window;
@@ -16,9 +17,6 @@
 
   // i18n 설정
   const { t } = useI18n();
-
-  // Quasar 프레임워크 인스턴스 초기화
-  const $q = useQuasar();
 
   // 상태 관리
   const updateDialog = ref(false);
@@ -73,11 +71,7 @@
       case 'error':
         updateError.value = info as UpdateError;
         updateDialog.value = true;
-        $q.notify({
-          type: 'negative',
-          message: t('error'),
-          caption: t('errorMessage'),
-        });
+        showError(`${t('error')}: ${t('errorMessage')}`);
         console.error((info as UpdateError).message);
         break;
     }

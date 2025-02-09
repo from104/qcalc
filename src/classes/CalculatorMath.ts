@@ -181,16 +181,10 @@ export class CalculatorMath {
    * @throws 0으로 나누려고 할 때 에러 발생
    */
   public div(dividend: string, divisor: string): string {
-    console.log('dividend', dividend);
-    console.log('divisor', divisor);
-    console.log('BigNumber(divisor)', BigNumber(divisor));
-    console.log('BigNumber(divisor).eq(0)', BigNumber(divisor).eq(0));
-    checkError(BigNumber(divisor).eq(0), 'Division by zero');
-    console.log('BigNumber(divisor).eq(0)', BigNumber(divisor).eq(0));
+    checkError(BigNumber(divisor).eq(0), 'error.math.divide_by_zero');
 
     const result = BigNumber(dividend).div(divisor);
-    console.log('result', result);
-    checkError(!result.isFinite(), 'Numerical error in division');
+    checkError(!result.isFinite(), 'error.math.division_error');
 
     return result.toFixed();
   }
@@ -203,7 +197,7 @@ export class CalculatorMath {
    * @throws 0으로 나누려고 할 때 에러 발생
    */
   public mod(dividend: string, divisor: string): string {
-    checkError(BigNumber(divisor).eq(0), 'Division by zero');
+    checkError(BigNumber(divisor).eq(0), 'error.math.divide_by_zero');
     return BigNumber(dividend).mod(BigNumber(divisor)).toFixed();
   }
 
@@ -228,10 +222,10 @@ export class CalculatorMath {
     const bnRadicand = BigNumber(radicand);
     const bnIndex = BigNumber(index);
 
-    checkError(bnIndex.lt(0), 'Negative roots are not supported');
+    checkError(bnIndex.lt(0), 'error.math.negative_root_index');
 
     const isEvenRoot = this.mod(this.int(index), '2') === '0';
-    checkError(bnRadicand.isNegative() && isEvenRoot, 'Even root of negative number is not allowed');
+    checkError(bnRadicand.isNegative() && isEvenRoot, 'error.math.negative_root');
 
     const result = bnRadicand.pow(MathB.bignumber(1).div(bnIndex));
     return result.toFixed();
@@ -249,7 +243,7 @@ export class CalculatorMath {
   private validateNonNegativeNumbers(...values: string[]): void {
     checkError(
       values.some((value) => BigNumber(value).isNegative()),
-      'Negative numbers are not allowed in bit operations',
+      'error.math.negative_bit_operation',
     );
   }
 
@@ -410,5 +404,17 @@ export class CalculatorMath {
 
   public bitwiseXnor(firstValue: string, secondValue: string, wordSize: number = 8): string {
     return this.bitwiseNot(this.bitwiseXor(firstValue, secondValue, wordSize), wordSize);
+  }
+
+  /**
+   * 수학 상수 값을 조회하는 메서드
+   * @param constant - 조회 상수의 이름 (예: 'PI', 'E' 등)
+   * @returns 요청한 상수의 문자열 값
+   * @throws {Error} 존재하지 않는 상수를 요청할 경우 에러 발생
+   */
+  public getConstant(constant: keyof typeof CONSTANTS): string {
+    const value = CONSTANTS[constant];
+    checkError(!value, 'error.calc.constant_not_found');
+    return value as string;
   }
 }

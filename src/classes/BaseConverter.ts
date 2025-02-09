@@ -32,21 +32,11 @@ export abstract class BaseConverter {
   abstract isValid(value: string, format: string): boolean;
 
   /**
-   * 에러 메시지 생성
-   * @param {string} message - 에러 메시지
-   * @returns {string} 포맷팅된 에러 메시지
-   * @protected
-   */
-  protected formatError(message: string): string {
-    return `[${this.converterName}] ${message}`;
-  }
-
-  /**
    * 변환기 초기화 시 필요한 작업 수행
    * @protected
    */
   protected initialize(): void {
-    console.log(`${this.converterName} initialized`);
+    // console.log(`${this.converterName} initialized`);
   }
 
   /**

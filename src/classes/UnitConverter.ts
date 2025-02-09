@@ -1,6 +1,7 @@
 import { unitBaseData } from '../constants/UnitBaseData';
 import { BigNumber } from './CalculatorMath';
 import { BaseConverter } from './BaseConverter';
+import { checkError, throwError } from './utils/ErrorUtils';
 
 import type { UnitBaseData } from '../constants/UnitBaseData';
 
@@ -26,14 +27,12 @@ export class UnitConverter extends BaseConverter {
    * @throws {Error} 유효하지 않은 범주일 경우 에러를 발생시킵니다.
    */
   static getUnitLists(category: string): string[] {
-    if (!UnitConverter.getCategories().includes(category)) {
-      throw new Error(`Invalid category: ${category}`);
-    }
+    checkError(!UnitConverter.getCategories().includes(category), 'unit.invalid_category', { category });
     const categoryUnits = unitBaseData[category];
-    if (!categoryUnits) {
-      throw new Error(`No units found for category: ${category}`);
+    if (categoryUnits) {
+      return Object.keys(categoryUnits);
     }
-    return Object.keys(categoryUnits);
+    throwError('unit.no_units_found', { category });
   }
 
   getAvailableItems(): string[] {
@@ -55,10 +54,11 @@ export class UnitConverter extends BaseConverter {
    */
   getItemDescription(item: string): string {
     const [category, unit] = item.split('.');
-    if (!category || !unit) {
-      throw new Error(this.formatError('Invalid item format. Use "category.unit"'));
+    checkError(!category || !unit, 'unit.invalid_format');
+    if (category && unit) {
+      return UnitConverter.getUnitDesc(category, unit);
     }
-    return UnitConverter.getUnitDesc(category, unit);
+    throwError('unit.invalid_format');
   }
 
   /**
@@ -90,11 +90,17 @@ export class UnitConverter extends BaseConverter {
     category: string,
     unit: string,
   ): BigNumberType | ((value: BigNumberType, toBase?: boolean) => BigNumberType) {
-    if (!UnitConverter.getCategories().includes(category) || !unitBaseData[category]?.[unit]) {
-      throw new Error(`Invalid category or unit: ${category}, ${unit}`);
+    const isValidUnit = UnitConverter.getCategories().includes(category) && unitBaseData[category]?.[unit];
+    checkError(!isValidUnit, 'unit.invalid_unit', { unit: `${category}.${unit}` });
+
+    const categoryData = unitBaseData[category];
+    const unitData = categoryData?.[unit];
+    if (categoryData && unitData) {
+      const unitValue = unitData.value;
+      return typeof unitValue === 'function' ? unitValue : BigNumber(unitValue);
     }
-    const unitValue = unitBaseData[category][unit].value;
-    return typeof unitValue === 'function' ? unitValue : BigNumber(unitValue);
+
+    throwError('unit.invalid_unit', { unit: `${category}.${unit}` });
   }
 
   /**
@@ -105,10 +111,16 @@ export class UnitConverter extends BaseConverter {
    * @throws {Error} 유효하지 않은 범주나 단위일 경우 에러를 발생시킵니다.
    */
   static getUnitDesc(category: string, unit: string): string {
-    if (!UnitConverter.getCategories().includes(category) || !unitBaseData[category]?.[unit]) {
-      throw new Error(`Invalid category or unit: ${category}, ${unit}`);
+    const isValidUnit = UnitConverter.getCategories().includes(category) && unitBaseData[category]?.[unit];
+    checkError(!isValidUnit, 'unit.invalid_unit', { unit: `${category}.${unit}` });
+
+    const categoryData = unitBaseData[category];
+    const unitData = categoryData?.[unit];
+    if (categoryData && unitData) {
+      return unitData.desc;
     }
-    return unitBaseData[category][unit].desc;
+
+    throwError('unit.invalid_unit', { unit: `${category}.${unit}` });
   }
 
   /**
@@ -129,9 +141,7 @@ export class UnitConverter extends BaseConverter {
     // Check validity of fromUnit and toUnit at once
     const [fromUnitValue, toUnitValue] = [from, to].map((unit) => {
       const value = UnitConverter.getUnitValue(category, unit);
-      if (!value) {
-        throw new Error(`Invalid unit: ${unit}`);
-      }
+      checkError(!value, 'unit.invalid_unit', { unit: `${category}.${unit}` });
       return value;
     });
 
@@ -141,16 +151,14 @@ export class UnitConverter extends BaseConverter {
         ? fromUnitValue(originalValue, true)
         : BigNumber(originalValue).mul(BigNumber(fromUnitValue));
 
-    if (!baseValue) {
-      throw new Error('Failed to calculate base value');
-    }
+    checkError(!baseValue, 'unit.invalid_base_value');
 
     const convertedValue =
-      typeof toUnitValue === 'function' ? toUnitValue(baseValue) : baseValue.div(BigNumber(toUnitValue));
+      typeof toUnitValue === 'function'
+        ? toUnitValue(baseValue)
+        : baseValue.div(BigNumber(toUnitValue));
 
-    if (!convertedValue) {
-      throw new Error('Failed to convert value');
-    }
+    checkError(!convertedValue, 'unit.conversion_failed');
 
     return convertedValue.toString();
   }

@@ -267,11 +267,7 @@
       store.swapCurrencies();
       loadToMainPanel(id);
       calc.setCurrentNumber(
-        currencyConverter.convert(
-          BigNumber(calc.currentNumber),
-          store.sourceCurrency,
-          store.targetCurrency,
-        ).toString(),
+        currencyConverter.convert(BigNumber(calc.currentNumber), store.sourceCurrency, store.targetCurrency).toString(),
       );
       store.swapCurrencies();
     }

@@ -8,7 +8,7 @@ import { Notify } from 'quasar';
  */
 export function showMessage(
   message: string,
-  duration = 1000,
+  duration = 2000,
   position:
     | 'top'
     | 'top-left'
@@ -37,7 +37,7 @@ export function showMessage(
  */
 export function showError(
   message: string,
-  duration = 500,
+  duration = 2000,
   position:
     | 'top'
     | 'top-left'
