@@ -19,7 +19,7 @@ export const BigNumber = MathB.bignumber;
 /**
  * 수학 상수 정의 객체
  */
-export const CONSTANTS: { [key: string]: string } = {
+const CONSTANTS: { [key: string]: string } = {
   pi: MathB.pi.toFixed(), // 원주율
   pi2: MathB.bignumber(MathB.pi).div(2).toFixed(), // 원주율의 절반
   e: MathB.e.toFixed(), // 자연로그의 밑

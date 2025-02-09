@@ -80,7 +80,7 @@
 
     return UnitConverter.convert(
       selectedCategory,
-      BigNumber(calc.getCurrentNumber()),
+      BigNumber(calc.currentNumber),
       sourceUnits[selectedCategory] ?? '',
       targetUnits[selectedCategory] ?? '',
     );
@@ -94,7 +94,7 @@
    * - 현재 숫자를 시작 통화에서 목표 통화로 변환
    */
   const getConvertedCurrencyNumber = () => {
-    const currentNumber = BigNumber(calc.getCurrentNumber());
+    const currentNumber = BigNumber(calc.currentNumber);
     const fromCurrency = store.sourceCurrency;
     const toCurrency = store.targetCurrency;
 
@@ -110,7 +110,7 @@
    * - 현재 버퍼의 값을 메인 진법에서 서브 진법으로 변환
    */
   const getConvertedRadixNumber = () => {
-    return store.convertRadix(calc.getInputBuffer(), store.sourceRadix, store.targetRadix);
+    return store.convertRadix(calc.inputBuffer, store.sourceRadix, store.targetRadix);
   };
 
   /**
@@ -124,7 +124,7 @@
   const result = computed(() => {
     // 메인 필드인 경우
     if (isMainField) {
-      const inputBuffer = calc.getInputBuffer();
+      const inputBuffer = calc.inputBuffer;
 
       const formattedNumber = toFormattedNumber(inputBuffer);
 
@@ -230,10 +230,10 @@
     // 메인 필드 처리
     if (props.field === 'main') {
       if (props.addon === 'radix') {
-        const convertedNumber = store.convertRadix(calc.getCurrentNumber(), Radix.Decimal, store.sourceRadix);
+        const convertedNumber = store.convertRadix(calc.currentNumber, Radix.Decimal, store.sourceRadix);
         return getRadixResult(convertedNumber);
       }
-      return calc.getCurrentNumber();
+      return calc.currentNumber;
     }
 
     // 서브 필드 처리
@@ -251,7 +251,7 @@
   });
 
   // 연산자 문자열 계산된 속성
-  const operator = computed(() => calc.getOperatorString() as string);
+  const operator = computed(() => calc.operatorString as string);
 
   // 연산자 아이콘 매핑
   const operatorIcons: { [key: string]: string } = {
@@ -292,12 +292,12 @@
     const lastRecord = calcRecord.getCount() > 0 ? calcRecord.getAllRecords()[0] : null;
 
     // 초기화 필요 여부와 연산자 존재 여부 확인
-    const needsReset = calc.getNeedsBufferReset();
+    const needsReset = calc.needsBufferReset;
     const hasOperator = operator.value !== '';
 
     // 마지막 계산 기록이 있고 초기화가 필요한 경우
     const isLastRecordValid =
-      lastRecord !== null && needsReset && calc.getCurrentNumber() === lastRecord?.calculationResult.resultNumber;
+      lastRecord !== null && needsReset && calc.currentNumber === lastRecord?.calculationResult.resultNumber;
 
     if (isLastRecordValid) {
       return `${getLeftSideInRecord(lastRecord.calculationResult)} =`;
@@ -305,7 +305,7 @@
 
     // 연산자가 있고 초기화가 필요없는 경우
     if (hasOperator && !needsReset) {
-      const convrtedPreviousNumber = toFormattedNumber(convertIfRadix(calc.getPreviousNumber()));
+      const convrtedPreviousNumber = toFormattedNumber(convertIfRadix(calc.previousNumber));
       return props.addon === 'radix' ? getRadixResult(convrtedPreviousNumber) : convrtedPreviousNumber;
     }
 

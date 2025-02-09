@@ -8,19 +8,6 @@ import { CalculatorMemory } from './CalculatorMemory';
 
 import { checkError, getErrorMessage } from './utils/ErrorUtils';
 
-// 타입 정의
-type WordSize = 8 | 16 | 32 | 64;
-
-/**
- * 계산 결과를 저장하는 인터페이스
- */
-interface CalculationResult {
-  previousNumber: string;
-  operator: Operator | Operator[];
-  argumentNumber?: string;
-  resultNumber: string;
-}
-
 /**
  * 계산기에서 사용되는 연산자 열거형
  * @enum {string}
@@ -66,7 +53,7 @@ export class Calculator {
   private repeatedNumber!: string;
   private currentOperator!: Operator;
   private calculationSnapshot!: CalculationResult;
-  private needsBufferReset!: boolean;
+  private _needsBufferReset!: boolean;
   private _currentNumber!: string;
   private _inputBuffer!: string;
   private _currentRadix: Radix = Radix.Decimal;
@@ -117,6 +104,14 @@ export class Calculator {
     this._wordSize = value;
   }
 
+  get needsBufferReset(): boolean {
+    return this._needsBufferReset;
+  }
+
+  set needsBufferReset(value: boolean) {
+    this._needsBufferReset = value;
+  }
+
   /**
    * 계산기 객체를 초기화하고 기본 상태를 설정합니다.
    */
@@ -130,11 +125,11 @@ export class Calculator {
 
   // 상태 관리 메서드
   private setNeedsBufferReset(): void {
-    this.needsBufferReset = true;
+    this._needsBufferReset = true;
   }
 
   private setDoesNotNeedBufferReset(): void {
-    this.needsBufferReset = false;
+    this._needsBufferReset = false;
   }
 
   /**
@@ -271,13 +266,13 @@ export class Calculator {
   }
 
   private performPreCalculation(): void {
-    const numberForCalc = this.needsBufferReset ? this.repeatedNumber : this.currentNumber;
+    const numberForCalc = this._needsBufferReset ? this.repeatedNumber : this.currentNumber;
 
-    if (this.needsBufferReset && numberForCalc === '0') {
+    if (this._needsBufferReset && numberForCalc === '0') {
       return;
     }
 
-    if (!this.needsBufferReset) {
+    if (!this._needsBufferReset) {
       this.repeatedNumber = numberForCalc;
     }
 
@@ -303,7 +298,7 @@ export class Calculator {
     const digitString = typeof digit === 'string' ? digit.charAt(0) : Math.floor(digit).toString();
     checkError(!this.radixConverter.isValidRadixNumber(digitString, this.currentRadix), 'error.invalid_digit');
 
-    if (this.inputBuffer === '0' || this.needsBufferReset) {
+    if (this.inputBuffer === '0' || this._needsBufferReset) {
       this.inputBuffer = digitString;
       this.setDoesNotNeedBufferReset();
     } else {
@@ -312,7 +307,7 @@ export class Calculator {
   }
 
   public addDot(): void {
-    if (this.needsBufferReset) {
+    if (this._needsBufferReset) {
       this.inputBuffer = '0.';
       this.setDoesNotNeedBufferReset();
     } else if (!this.inputBuffer.includes('.')) {
@@ -566,5 +561,9 @@ export class Calculator {
       this.setCurrentNumberFromPrevious();
       this.resetOperatorState();
     }
+  }
+
+  public setConstant(constant: string): void {
+    this.currentNumber = this.math.getConstant(constant);
   }
 }
