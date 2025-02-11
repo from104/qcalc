@@ -40,7 +40,7 @@
     "@everapi/freecurrencyapi-js": "^1.0.1",
     "@quasar/cli": "^2.4.1",
     "@quasar/extras": "1.16.15",
-    "@quasar/vite-plugin": "^1.8.1",
+    "@quasar/vite-plugin": "^1.9.0",
     "@types/dompurify": "3.0.5",
     "axios": "^1.7.9",
     "dompurify": "^3.2.3",
