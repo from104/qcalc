@@ -12,6 +12,9 @@
   // 계산기 관련 타입과 클래스
   import { KeyBinding } from 'classes/KeyBinding';
 
+  // 알림 관련 유틸리티 함수
+  import { showMessage, showError } from 'src/classes/utils/NotificationUtils';
+
   // 전역 window 객체에 접근하기 위한 상수 선언
   const window = globalThis.window;
 
@@ -19,7 +22,7 @@
   const store = window.store;
 
   // 스토어에서 필요한 메서드와 속성 추출
-  const { calc, getRightSideInRecord, getLeftSideInRecord, showMessage, showError, currencyConverter } = store;
+  const { calc, getRightSideInRecord, getLeftSideInRecord, currencyConverter } = store;
 
   // 컴포넌트 import
   import MenuItem from 'components/snippets/MenuItem.vue';
@@ -214,10 +217,10 @@
   };
 
   // 메모 삭제 함수
-  const deleteMemo = (id: number) => {
-    calc.record.deleteMemo(id);
-    memoText.value = '';
-  };
+  // const deleteMemo = (id: number) => {
+  //   calc.record.deleteMemo(id);
+  //   memoText.value = '';
+  // };
 
   // 히스토리 항목 복사 함수
   const copyRecordItem = async (
@@ -357,14 +360,10 @@
     isShowMemoTooltip[id] = isShow;
   };
 
-  // 다크모드 상태 변경 감시
-  watch(
-    () => store.isDarkMode(),
-    (isDark) => {
-      console.log('다크모드 상태 변경:', isDark);
-    },
-    { immediate: true },
-  );
+  // 메뉴 상태 관리를 위한 함수 추가
+  const openRecordMenu = (id: number) => {
+    recordMenu[id] = true;
+  };
 </script>
 
 <template>
@@ -497,44 +496,34 @@
                 <q-item-label class="row justify-between q-pa-none q-ma-none">
                   <div class="col-6 text-left record-menu-btn">
                     <q-btn
-                      class="q-px-xs menu-btn"
+                      class="q-px-xs q-py-none menu-btn"
                       icon="more_vert"
                       size="sm"
                       flat
                       rounded
-                      @click="() => (recordMenu[record.id as number] = true)"
+                      @click="() => window.isDesktop && openRecordMenu(record.id as number)"
+                      @touchstart="() => window.isMobile && openRecordMenu(record.id as number)"
                     >
                       <q-menu
                         :model-value="recordMenu[record.id] ?? false"
                         class="shadow-6"
                         :context-menu="window.isDesktop"
                         auto-close
-                        anchor="bottom right"
-                        self="top right"
-                        @update:model-value="(val) => (recordMenu[record.id] = val)"
+                        anchor="bottom left"
+                        self="top left"
+                        @update:model-value="
+                          (val) => {
+                            recordMenu[record.id] = val;
+                          }
+                        "
                       >
                         <q-list dense class="noselect" style="max-width: 200px" role="list">
-                          <MenuItem
-                            v-if="!record.memo"
-                            :title="t('addMemo')"
-                            :action="() => openMemoDialog(record.id as number)"
-                          />
-                          <MenuItem
-                            v-if="record.memo"
-                            :title="t('editMemo')"
-                            :action="() => openMemoDialog(record.id as number)"
-                          />
                           <MenuItem
                             v-if="record.memo"
                             :title="t('copyMemo')"
                             :action="() => copyRecordItem(record.id as number, 'memo')"
                           />
-                          <MenuItem
-                            v-if="record.memo"
-                            :title="t('deleteMemo')"
-                            :action="() => deleteMemo(record.id as number)"
-                          />
-                          <MenuItem separator />
+                          <MenuItem v-if="record.memo" separator />
                           <MenuItem
                             :title="t('copyDisplayedResult')"
                             :action="() => copyRecordItem(record.id as number, 'formattedNumber')"
@@ -566,12 +555,13 @@
                         </q-list>
                       </q-menu>
                     </q-btn>
-                    <q-btn 
-                      class="q-px-xs menu-btn" 
-                      icon="edit_note" 
-                      size="sm" 
-                      flat 
-                      rounded 
+                    <q-btn
+                      v-if="window.isDesktop"
+                      class="q-px-xs menu-btn"
+                      icon="edit_note"
+                      size="sm"
+                      flat
+                      rounded
                       @click="() => openMemoDialog(record.id as number)"
                     />
                   </div>
@@ -773,39 +763,33 @@
     transform: translateY(0);
   }
 
-  // 다크모드 믹스인 수정
-  @mixin dark-mode-colors {
-    color: var(--q-grey-7); // 라이트 모드 기본 색상
-
-    @media (prefers-color-scheme: dark) {
-      color: var(--q-grey-5);
-    }
-  }
 
   .record-item {
     &:hover {
       .menu-btn {
         opacity: 1;
+        visibility: visible;
       }
     }
   }
 
   .record-menu-btn {
     margin-top: -8px;
-    margin-bottom: -7px;
+    margin-bottom: -17px;
     margin-left: -5px;
-    @include dark-mode-colors;
+    color: v-bind('store.isDarkMode ? "$grey-5" : "$grey-8"');
 
     .menu-btn {
-      opacity: 0;
-      transition: opacity 0.3s ease;
+      opacity: v-bind('window.isMobile ? 1 : 0');
+      visibility: v-bind('window.isMobile ? "visible" : "hidden"');
+      transition: all 0.3s ease-in-out;
     }
   }
 
   .record-timestamp {
     margin-top: -5px;
     margin-bottom: -12px;
-    @include dark-mode-colors;
+    color: v-bind('store.isDarkMode ? "$grey-5" : "$grey-8"');
   }
 </style>
 
