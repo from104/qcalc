@@ -376,6 +376,7 @@
     }"
     @scroll="handleScroll"
   >
+    <!-- 맨 위로 스크롤 하는 아이콘 -->
     <transition name="slide-fade">
       <q-btn
         v-if="showScrollToTop"
@@ -390,6 +391,8 @@
         @click="scrollToTop"
       />
     </transition>
+
+    <!---검색 바 -->
     <transition name="search-bar">
       <q-bar
         v-if="store.isSearchOpen"
@@ -439,7 +442,9 @@
       </q-bar>
     </transition>
 
+    <!-- 기록 목록 -->
     <transition name="slide-fade" mode="out-in">
+      <!-- 기록이 없는 경우 -->
       <q-item v-if="recordStrings.length == 0" class="text-center q-pt-xl">
         <q-item-section role="listitem">
           <q-item-label>
@@ -449,6 +454,7 @@
           </q-item-label>
         </q-item-section>
       </q-item>
+      <!-- 기록이 있을 경우 -->
       <q-list v-else id="record-list" separator class="full-width q-pt-md" role="list">
         <transition-group name="record-list">
           <q-slide-item
@@ -497,6 +503,7 @@
                   <div class="col-6 text-left record-menu-btn">
                     <q-btn
                       class="q-px-xs q-py-none menu-btn"
+                      :class="store.isDarkMode() ? 'body--dark' : 'body--light'"
                       icon="more_vert"
                       size="sm"
                       flat
@@ -558,6 +565,7 @@
                     <q-btn
                       v-if="window.isDesktop"
                       class="q-px-xs menu-btn"
+                      :class="store.isDarkMode() ? 'body--dark' : 'body--light'"
                       icon="edit_note"
                       size="sm"
                       flat
@@ -568,6 +576,7 @@
                   <div class="col-6 text-right text-caption record-timestamp">
                     <HighlightText
                       class="self-center"
+                      :class="store.isDarkMode() ? 'body--dark' : 'body--light'"
                       :text="formatDateTime(record.timestamp)"
                       :search-term="store.searchKeyword"
                     />
@@ -624,12 +633,8 @@
           color="primary"
           @focus="store.setInputFocused"
           @blur="store.setInputBlurred"
-          @keyup.enter="
-            () => {
-              store.setInputBlurred;
-              saveMemo();
-            }
-          "
+          @keyup.enter="() => { store.setInputBlurred; saveMemo(); }"
+          @keyup.escape="() => { store.setInputBlurred; cancelMemo(); }"
         />
       </q-card-section>
     </q-card>
@@ -763,7 +768,6 @@
     transform: translateY(0);
   }
 
-
   .record-item {
     &:hover {
       .menu-btn {
@@ -773,11 +777,20 @@
     }
   }
 
+  @mixin dark-mode-fg-colors {
+    .body--dark {
+      color: $grey-6;
+    }
+    .body--light {
+      color: $grey-7;
+    }
+  }
+
   .record-menu-btn {
     margin-top: -8px;
     margin-bottom: -17px;
     margin-left: -5px;
-    color: v-bind('store.isDarkMode ? "$grey-5" : "$grey-8"');
+    @include dark-mode-fg-colors;
 
     .menu-btn {
       opacity: v-bind('window.isMobile ? 1 : 0');
@@ -789,7 +802,7 @@
   .record-timestamp {
     margin-top: -5px;
     margin-bottom: -12px;
-    color: v-bind('store.isDarkMode ? "$grey-5" : "$grey-8"');
+    @include dark-mode-fg-colors;
   }
 </style>
 
