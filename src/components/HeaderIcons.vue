@@ -123,7 +123,7 @@
     <ToolTip :text="t('tooltipPaste')" />
   </q-btn>
   <q-btn
-    v-if="!store.isAtLeastDoubleWidth()"
+    v-if="!store.isWideWidth()"
     flat
     icon="mdi-history"
     class="q-ma-none q-pa-none q-pl-xs"

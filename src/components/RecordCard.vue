@@ -9,6 +9,15 @@
   // Quasar 관련 설정
   import { copyToClipboard } from 'quasar';
 
+  import { useRouter, useRoute } from 'vue-router';
+  import type { RouteLocationNormalizedLoaded } from 'vue-router';
+
+  // router 인스턴스 가져오기
+  const router = useRouter();
+  const route = useRoute() as RouteLocationNormalizedLoaded & { meta: RouteTransitionMeta };
+
+  import { navigateToPath } from 'src/classes/utils/NavigationUtils';
+
   // 계산기 관련 타입과 클래스
   import { KeyBinding } from 'classes/KeyBinding';
 
@@ -251,6 +260,7 @@
   const loadToMainPanel = (id: number) => {
     const record = calc.record.getRecordById(id);
     calc.currentNumber = record.calculationResult.resultNumber;
+    if (!store.isWideWidth()) navigateToPath('/', route, router);
   };
 
   const loadToSubPanel = (id: number) => {
@@ -272,6 +282,7 @@
         .toString();
       store.swapCurrencies();
     }
+    if (!store.isWideWidth()) navigateToPath('/', route, router);
   };
 
   // 히스토리 항목 삭제 함수
@@ -509,7 +520,6 @@
                       flat
                       rounded
                       @click="() => window.isDesktop && openRecordMenu(record.id as number)"
-                      @touchstart="() => window.isMobile && openRecordMenu(record.id as number)"
                     >
                       <q-menu
                         :model-value="recordMenu[record.id] ?? false"
@@ -557,8 +567,8 @@
                             :title="t('loadToSubPanel')"
                             :action="() => loadToSubPanel(record.id as number)"
                           />
-                          <MenuItem separator />
-                          <MenuItem :title="t('deleteResult')" :action="() => deleteRecordItem(record.id as number)" />
+                          <MenuItem v-if="window.isDesktop" separator />
+                          <MenuItem v-if="window.isDesktop" :title="t('deleteResult')" :action="() => deleteRecordItem(record.id as number)" />
                         </q-list>
                       </q-menu>
                     </q-btn>

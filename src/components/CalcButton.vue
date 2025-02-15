@@ -346,7 +346,7 @@
   };
 
   const baseWidth = computed(() => {
-    return store.isAtLeastDoubleWidth() ? '50vw' : '100vw';
+    return store.isWideWidth() ? '50vw' : '100vw';
   });
 
   // 버튼의 aria-label 설정

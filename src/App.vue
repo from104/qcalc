@@ -16,7 +16,7 @@
 
   // === 유틸리티 클래스 임포트 ===
   import { KeyBinding } from 'classes/KeyBinding';
-import { showMessage } from './classes/utils/NotificationUtils';
+  import { showMessage } from './classes/utils/NotificationUtils';
 
   // === 전역 객체 및 인스턴스 초기화 ===
   const window = globalThis.window;
@@ -27,7 +27,7 @@ import { showMessage } from './classes/utils/NotificationUtils';
   // === 상태 관리 ===
   const isFirstNavigation = ref(true);
   const previousPath = ref(route.path);
-  const isWideLayout = ref(store.isAtLeastDoubleWidth());
+  const isWideLayout = ref(store.isWideWidth());
   const currentTransition = ref('');
 
   /**
@@ -100,7 +100,7 @@ import { showMessage } from './classes/utils/NotificationUtils';
    * 레이아웃 너비 변경을 감시하고 적절한 트랜지션을 설정합니다.
    */
   watch(
-    () => store.isAtLeastDoubleWidth(),
+    () => store.isWideWidth(),
     (newValue) => {
       if (isWideLayout.value !== newValue) {
         currentTransition.value = newValue ? 'expand-layout' : 'collapse-layout';

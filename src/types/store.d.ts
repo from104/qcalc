@@ -189,10 +189,9 @@ export interface StoreActions {
   initRecentCurrencies(): void;
   swapCurrencies(): void;
 
-
   // 기타
   setDeleteRecordConfirmOpen(value: boolean): void;
-  isAtLeastDoubleWidth(): boolean;
+  isWideWidth(): boolean;
   isDefaultCalculator(): boolean;
   setSubPageAnimating(value: boolean): void;
 

@@ -251,7 +251,7 @@
   });
 
   // 연산자 문자열 계산된 속성
-  const operator = computed(() => calc.operatorString as string);
+  const operator = computed(() => calc.getOperatorString());
 
   // 연산자 아이콘 매핑
   const operatorIcons: { [key: string]: string } = {

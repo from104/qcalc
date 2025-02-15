@@ -487,7 +487,7 @@ export const useStore = defineStore('store', {
       this.isDeleteRecordConfirmOpen = value;
     },
 
-    isAtLeastDoubleWidth() {
+    isWideWidth() {
       return Screen.width >= 330 * 2;
     },
 

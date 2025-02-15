@@ -21,7 +21,7 @@
 
   // 컴포넌트 import
   import MenuItem from 'components/snippets/MenuItem.vue';
-import { navigateToPath } from 'src/classes/utils/NavigationUtils';
+  import { navigateToPath } from 'src/classes/utils/NavigationUtils';
 
   // 메뉴 아이템 인터페이스 정의
   interface MenuItem {

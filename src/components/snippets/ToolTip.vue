@@ -3,6 +3,7 @@
   import { QTooltip } from 'quasar';
 
   interface Props {
+    modelValue?: boolean | null;
     text?: string;
     textColor?: string;
     bgColor?: string;
@@ -12,6 +13,7 @@
   }
 
   const {
+    modelValue = null,
     text = '',
     textColor = 'green-10',
     bgColor = 'green-2',
@@ -21,6 +23,10 @@
   } = defineProps<Props>();
 
   const tooltipRef = ref<QTooltip>();
+
+  const emit = defineEmits<{
+    'update:modelValue': [value: boolean];
+  }>();
 
   /**
    * 툴팁이 표시될 때 자동 숨김 타이머를 설정합니다.
@@ -38,6 +44,7 @@
 <template>
   <q-tooltip
     ref="tooltipRef"
+    :model-value="modelValue"
     :class="[`text-${textColor}`, `bg-${bgColor}`, 'text-body2 text-center fa-border-all']"
     :style="{
       border: '1px solid black',
@@ -47,6 +54,7 @@
     anchor="top middle"
     self="bottom middle"
     :delay="delay"
+    @update:model-value="(val) => emit('update:modelValue', val)"
     @show="handleAutoHideTooltip"
   >
     <template v-if="text">{{ text }}</template>

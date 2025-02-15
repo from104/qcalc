@@ -27,6 +27,7 @@
   import AboutPage from 'src/pages/AboutPage.vue';
   import RecordPage from 'src/pages/RecordPage.vue';
   import SettingPage from 'src/pages/SettingPage.vue';
+import HelpIcon from 'src/components/snippets/HelpIcon.vue';
 
   const router = useRouter();
   const route = useRoute();
@@ -127,7 +128,7 @@
   // === 상태 관리 ===
   const currentSubPage = ref('record');
   const previousSubPage = ref('record');
-  const isWideLayout = computed(() => store.isAtLeastDoubleWidth());
+  const isWideLayout = computed(() => store.isWideWidth());
 
   // === 유틸리티 함수 ===
   /**
@@ -151,7 +152,7 @@
    */
   const isSubPage = computed(() => {
     return Object.keys(SUB_PAGE_CONFIG)
-      .filter((key) => !store.isAtLeastDoubleWidth() || key !== 'record')
+      .filter((key) => !store.isWideWidth() || key !== 'record')
       .includes(String(route.name));
   });
 
@@ -175,7 +176,7 @@
    */
   const closeSubPage = () => {
     if (isSubPage.value) {
-      if (store.isAtLeastDoubleWidth()) {
+      if (store.isWideWidth()) {
         switchSubPage('record');
       } else {
         router.back();
@@ -259,7 +260,7 @@
   /**
    * 입력 필드 포커스 상태에 따라 키 바인딩을 관리합니다.
    */
-  
+
   watch(
     () => store.inputFocused,
     () => {
@@ -319,9 +320,13 @@
           :aria-label="t('ariaLabel.back')"
           @click="router.back()"
         />
-        <q-toolbar-title class="text-subtitle1">{{
-          SUB_PAGE_CONFIG[currentSubPage as keyof typeof SUB_PAGE_CONFIG]?.title
-        }}</q-toolbar-title>
+        <q-toolbar-title class="text-subtitle1">
+          {{ SUB_PAGE_CONFIG[currentSubPage as keyof typeof SUB_PAGE_CONFIG]?.title }}
+          <HelpIcon 
+            v-if="currentSubPage === 'record' && window.isMobile"
+            :text="t('tooltip.recordSwipeHelp')"
+          />
+        </q-toolbar-title>
         <q-space />
         <q-btn
           v-for="button in SUB_PAGE_CONFIG[currentSubPage as keyof typeof SUB_PAGE_CONFIG]?.buttons"
@@ -425,6 +430,7 @@
               >
                 <ToolTip :text="button.tooltip" />
               </q-btn>
+              <!-- <HelpIcon v-if="currentSubPage === 'record' && window.isMobile" :text="t('tooltip.recordSwipeHelp')" /> -->
               <q-separator vertical class="sub-header-separator q-mx-sm" />
               <q-btn
                 v-for="button in SUB_PAGE_CONFIG[currentSubPage]?.buttons"
@@ -626,6 +632,7 @@ ko:
     settings: '설정'
     deleteRecord: '모든 기록 삭제'
     search: '검색'
+    recordSwipeHelp: '기록 페이지에서 왼쪽으로 스와이프하여 메모를 추가,수정하거나 오른쪽으로 스와이프하여 기록을 삭제할 수 있습니다.'
 en:
   calc: Basic
   unit: Unit
@@ -653,4 +660,5 @@ en:
     settings: 'Settings'
     deleteRecord: 'Delete all records'
     search: 'Search'
+    recordSwipeHelp: 'You can add, modify, or delete records by swiping left on the record page, or by swiping right to delete the record.'
 </i18n>
