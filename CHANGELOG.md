@@ -4,6 +4,20 @@ All notable changes to this project are recorded in this file.
 
 The format is based on [Keep a Changelog] and this project follows [Semantic Versioning].
 
+## [0.11.3] 2025-02-16
+
+### Added
+
+- Mobile optimization tooltip: Added guidance about adding/deleting memos by swiping on the history screen
+
+### Changed
+
+- History management UI: Provides quick menu on desktop mouseover and intuitive icon button placement for mobile
+
+### Fixed
+
+-
+
 ## [0.11.2] 2025-02-05
 
 ### Added
