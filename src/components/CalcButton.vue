@@ -345,9 +345,9 @@
       .join(', ');
   };
 
-  const baseWidth = computed(() => {
-    return store.isWideWidth() ? '50vw' : '100vw';
-  });
+  // const baseWidth = computed(() => {
+  //   return store.isWideWidth() ? '50vw' : '100vw';
+  // });
 
   // 버튼의 aria-label 설정
   const getAriaLabel = (id: ButtonID, button: { label: string }) => {
@@ -460,23 +460,19 @@
   }
 
   .icon {
-    font-size: calc(
-      min(calc((100vh - v-bind('baseHeight')) / 6 * 0.25), calc((v-bind('baseWidth') - 40px) / 4 * 0.3)) * 0.7
-    );
+    font-size: calc(((100vh - v-bind('baseHeight')) / 6 - 20px) * 0.25);
     padding-top: calc(((100vh - v-bind('baseHeight')) / 6 - 13px) * 0.25); /* Lower the content by 4px */
   }
 
   .char {
-    font-size: calc(
-      min(calc((100vh - v-bind('baseHeight')) / 6 * 0.26), calc((v-bind('baseWidth') - 40px) / 4 * 0.3)) * 1.1
-    );
-    padding-top: calc(((100vh - v-bind('baseHeight')) / 6 - 13px) * 0.23); /* Lower the content by 4px */
+    font-size: calc(((100vh - v-bind('baseHeight')) / 6 - 20px) * 0.38);
+    padding-top: calc(((100vh - v-bind('baseHeight')) / 6 - 13px) * 0.27); /* Lower the content by 4px */
   }
 
   .top-label {
     text-align: center;
     position: absolute;
-    font-size: calc(min(calc((100vh - v-bind('baseHeight')) / 6 * 0.26), calc((100vw - 40px) / 4 * 0.3)) * 1.2 * 0.7);
+    font-size: calc(((100vh - v-bind('baseHeight')) / 6 - 20px) * 0.25);
     color: rgba(255, 255, 255, 0.7);
     width: 100%; /* 가로 중앙 정렬을 위해 추가 */
   }
@@ -486,7 +482,7 @@
   }
 
   .top-label-char {
-    top: -7%;
+    top: -6%;
   }
 
   .bg-btn-important {

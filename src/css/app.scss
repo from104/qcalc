@@ -38,3 +38,8 @@ body {
   overflow: hidden; /* 스크롤바 숨기기 */
 }
 
+@media (min-width: 350px) {
+  html {
+    font-size: calc(100% * 350 / env(--device-width));
+  }
+}
