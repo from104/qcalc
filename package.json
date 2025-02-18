@@ -43,7 +43,7 @@
     "@quasar/vite-plugin": "^1.8.1",
     "@types/dompurify": "3.0.5",
     "axios": "^1.7.9",
-    "dompurify": "^3.2.3",
+    "dompurify": "^3.2.4",
     "dotenv": "^16.4.7",
     "electron-window-state": "^5.0.3",
     "markdown-it": "^14.1.0",
