@@ -1,5 +1,6 @@
 package org.capacitor.quasar.app;
 
+import android.annotation.SuppressLint;
 import android.os.Bundle;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
@@ -7,12 +8,12 @@ import com.getcapacitor.BridgeActivity;
 
 /**
  * MainActivity 클래스
- * <p>
  * 이 클래스는 Capacitor 기반 안드로이드 앱의 메인 액티비티입니다.
  * BridgeActivity를 상속받아 Capacitor의 기능을 활용합니다.
  */
 public class MainActivity extends BridgeActivity {
 
+    @SuppressLint("SetJavaScriptEnabled")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -31,7 +32,7 @@ public class MainActivity extends BridgeActivity {
         // 이는 웹 애플리케이션의 로컬 데이터 저장을 가능하게 합니다.
         webSettings.setDomStorageEnabled(true);
 
-      // 네이티브 코드와 JavaScript 간의 인터페이스를 추가합니다.
+        // 네이티브 코드와 JavaScript 간의 인터페이스를 추가합니다.
         // 'AndroidInterface'라는 이름으로 JavaScript에서 접근할 수 있습니다.
         webView.addJavascriptInterface(new WebAppInterface(this), "AndroidInterface");
 
@@ -40,10 +41,20 @@ public class MainActivity extends BridgeActivity {
         webSettings.setCacheMode(WebSettings.LOAD_NO_CACHE);
 
         // 화면의 물리적인 폭(dp)을 가져옵니다.
-      int textZoom = getZoom();
+        int textZoom = getZoom();
 
-      // 계산된 텍스트 줌 값을 적용합니다.
+        // 계산된 텍스트 줌 값을 적용합니다.
         webSettings.setTextZoom(textZoom);
+
+        // JavaScript로 textZoom 값 전달
+        @SuppressLint("DefaultLocale") String script = String.format("window.textZoomLevel = %d;", textZoom);
+        webView.evaluateJavascript(script, null);
+
+        // textZoom 값이 변경될 때마다 이벤트 발생
+        webView.evaluateJavascript(
+            "window.dispatchEvent(new CustomEvent('textZoomChanged', { detail: { zoom: " + textZoom + " } }));",
+            null
+        );
 
         // 초기 화면 배율 설정
         webSettings.setLoadWithOverviewMode(true);

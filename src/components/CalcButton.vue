@@ -367,6 +367,10 @@
     }
     return button.label;
   };
+
+  const textZoomLevel = computed(() => {
+    return window.isCapacitor ? window.textZoomLevel / 100 : 1;
+  });
 </script>
 
 <template>
