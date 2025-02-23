@@ -16,7 +16,7 @@ declare global {
     // Store는 필요에 따라 수정 가능하게 유지
     readonly store: ReturnType<typeof useStore>;
 
-    // textZoomLevel 변수 선언
-    textZoomLevel: number;
+    // textZoomLevel 값을 저장할 변수
+    readonly textZoomLevel: number;
   }
 }

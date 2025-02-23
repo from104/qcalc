@@ -464,19 +464,19 @@
   }
 
   .icon {
-    font-size: calc(((100vh - v-bind('baseHeight')) / 6 - 20px) * 0.25);
+    font-size: calc(((100vh - v-bind('baseHeight')) / 6 - 20px) * 0.25 / v-bind('textZoomLevel'));
     padding-top: calc(((100vh - v-bind('baseHeight')) / 6 - 13px) * 0.25); /* Lower the content by 4px */
   }
 
   .char {
-    font-size: calc(((100vh - v-bind('baseHeight')) / 6 - 20px) * 0.38);
+    font-size: calc(((100vh - v-bind('baseHeight')) / 6 - 20px) * 0.38 / v-bind('textZoomLevel'));
     padding-top: calc(((100vh - v-bind('baseHeight')) / 6 - 13px) * 0.27); /* Lower the content by 4px */
   }
 
   .top-label {
     text-align: center;
     position: absolute;
-    font-size: calc(((100vh - v-bind('baseHeight')) / 6 - 20px) * 0.25);
+    font-size: calc(((100vh - v-bind('baseHeight')) / 6 - 20px) * 0.25 / v-bind('textZoomLevel'));
     color: rgba(255, 255, 255, 0.7);
     width: 100%; /* 가로 중앙 정렬을 위해 추가 */
   }
