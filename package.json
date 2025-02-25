@@ -39,7 +39,7 @@
     "@capacitor/core": "^6.2.0",
     "@everapi/freecurrencyapi-js": "^1.0.1",
     "@quasar/cli": "^2.4.1",
-    "@quasar/extras": "1.16.15",
+    "@quasar/extras": "1.16.16",
     "@quasar/vite-plugin": "^1.8.1",
     "@types/dompurify": "3.0.5",
     "axios": "^1.7.9",
