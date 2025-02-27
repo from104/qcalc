@@ -5,7 +5,7 @@ __metadata:
   version: 8
   cacheKey: 10
 
-"@capacitor/android@npm:7.0.1":
+"@capacitor/android@npm:^7.0.0":
   version: 7.0.1
   resolution: "@capacitor/android@npm:7.0.1"
   peerDependencies:
@@ -750,7 +750,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "qcalc@workspace:."
   dependencies:
-    "@capacitor/android": "npm:7.0.1"
+    "@capacitor/android": "npm:^7.0.0"
     "@capacitor/app": "npm:7.0.0"
     "@capacitor/cli": "npm:7.0.1"
     "@capacitor/core": "npm:7.0.1"

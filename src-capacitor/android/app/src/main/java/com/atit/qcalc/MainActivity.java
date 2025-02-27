@@ -80,16 +80,25 @@ public class MainActivity extends BridgeActivity {
   private int getZoom() {
     float screenWidthDp = getResources().getDisplayMetrics().widthPixels / getResources().getDisplayMetrics().density;
 
-    // 기준 너비(350dp)에 대한 현재 화면 너비의 비율을 계산합니다.
-    float baseWidth = 350f;
-    float scaleFactor = screenWidthDp / baseWidth;
+  private int getZoom() {
+    // Get the screen width in density-independent pixels (dp).
+    float screenWidthDp = getResources().getDisplayMetrics().widthPixels / getResources().getDisplayMetrics().density;
 
-    // 텍스트 줌 값을 계산합니다. (기본값 100을 기준으로 비율 적용)
-    // 화면이 350dp보다 크면 비례하여 텍스트 크기가 커지고, 작으면 작아집니다.
+    // Define the base width (in dp) for scaling.
+    final float BASE_WIDTH_DP = 350f;
+
+    // Calculate the scaling factor based on the current screen width relative to the base width.
+    float scaleFactor = screenWidthDp / BASE_WIDTH_DP;
+
+    // Calculate the text zoom level based on the scaling factor, with a default of 100%.
+    // Larger screens than BASE_WIDTH_DP will have proportionally larger text, and smaller screens will have smaller text.
     int textZoom = (int) (100 * scaleFactor);
 
-    // 최소값과 최대값을 설정하여 텍스트가 너무 작거나 크지 않도록 합니다.
-    textZoom = Math.max(50, Math.min(textZoom, 200));
+    // Clamp the text zoom level within a reasonable range (50% to 200%) to prevent text from being too small or too large.
+    final int MIN_ZOOM = 50;
+    final int MAX_ZOOM = 200;
+    textZoom = Math.max(MIN_ZOOM, Math.min(textZoom, MAX_ZOOM));
+
     return textZoom;
   }
 }
