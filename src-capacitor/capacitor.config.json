@@ -1,10 +1,5 @@
 {
   "appId": "com.atit.qcalc",
   "appName": "Q Calc",
-  "webDir": "www",
-  "server": {
-    "androidScheme": "https",
-    "url": "http://192.168.219.100:9500",
-    "cleartext": true
-  }
+  "webDir": "www"
 }

@@ -111,5 +111,5 @@
     "wrap-ansi": "7.0.0",
     "string-width": "4.1.0"
   },
-  "packageManager": "yarn@4.5.3"
+  "packageManager": "yarn@4.6.0"
 }
