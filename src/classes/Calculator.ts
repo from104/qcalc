@@ -464,8 +464,14 @@ export class Calculator {
 
   // 숫자를 직접 사용하는 이항 연산 메서드
   private executeWithNumber(operator: Operator, n: number): void {
+    // 연산자 설정 및 이전 숫자 설정
     this.performBinaryOperation(operator);
+
+    // 현재 숫자를 n으로 설정하고 반복 숫자로도 설정
     this.currentNumber = n.toString();
+    this.repeatedNumber = n.toString();
+
+    // 계산 수행 및 결과 설정 (equal 메서드 활용)
     this.equal();
   }
 

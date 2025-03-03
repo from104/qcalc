@@ -6,32 +6,33 @@ A multi-purpose calculator that reimagines my Android graduation project calcula
 
 ## Key Features
 
-- **Four Professional Calculators in One:**
+### **Four Professional Calculators in One**
 
-  - Standard calculator with advanced math functions
-  - Comprehensive unit converter supporting 15+ categories
-  - Currency converter with real-time exchange rates
-  - Programmer's calculator with binary operations
+- Standard calculator with advanced math functions
+- Comprehensive unit converter supporting 15+ categories
+- Currency converter with real-time exchange rates
+- Programmer's calculator with binary operations
 
-- **Productivity Enhancement Features:**
+### **Productivity Enhancement Features**
 
-  - Calculation history with search and annotation capabilities
-  - Customizable number formatting (3 or 4-digit grouping)
-  - Complex calculations with up to 64-digit precision
-  - Various keyboard shortcuts for rapid data entry
+- Calculation history with search and annotation capabilities
+- Customizable number formatting (3 or 4-digit grouping)
+- Complex calculations with up to 64-digit precision
+- Various keyboard shortcuts for rapid data entry
 
-- **Professional Tools:**
+### **Professional Tools:**
 
-  - Advanced mathematical operations (trigonometry, logarithms)
-  - Memory operations (MS, MR, M+, M-, M×, M÷)
-  - Bit operations (AND, OR, XOR, NOT, shifts)
-  - Comprehensive unit conversion system
+- Advanced mathematical operations (trigonometry, logarithms)
+- Memory operations (MS, MR, M+, M-, M×, M÷)
+- Bit operations (AND, OR, XOR, NOT, shifts)
+- Comprehensive unit conversion system
 
-- **Modern User Experience:**
-  - Adaptive layout utilizing side panels on larger screens
-  - Dark mode support to reduce eye strain
-  - Clean, intuitive interface with gesture support
-  - Haptic feedback for precise input
+### **Modern User Experience**
+
+- Adaptive layout utilizing side panels on larger screens
+- Dark mode support to reduce eye strain
+- Clean, intuitive interface with gesture support
+- Haptic feedback for precise input
 
 ## Optimal Tool for Professionals
 
@@ -118,7 +119,7 @@ Built with Vue 3, Quasar, and Electron, QCalc delivers native-level performance 
 - C-2: Go to Unit converter
 - C-3: Go to Currency converter
 - C-4: Go to Radix converter
-- C-Tab,  ->: Go to the right calculator tab
+- C-Tab, ->: Go to the right calculator tab
 - CS-Tab, <-: Go to the left calculator tab
 - A-t: Toggle always on top
 - A-i: Toggle panel initialization on startup
