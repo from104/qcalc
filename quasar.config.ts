@@ -104,10 +104,22 @@ export default defineConfig((/* ctx */) => {
           'vite-plugin-checker',
           {
             vueTsc: true,
-            eslint: {
-              lintCommand: 'eslint -c ./eslint.config.js "./src*/**/*.{ts,js,mjs,cjs,vue}"',
-              useFlatConfig: true,
-            },
+            // eslint: {
+            //   lintCommand: 'eslint -c ./eslint.config.js "./src*/**/*.{ts,js,mjs,cjs,vue}"',
+            //   useFlatConfig: true,
+            //   ignore: [
+            //     '**/node_modules/**',
+            //     '**/dist/**',
+            //     '**/build/**',
+            //     '**/public/**',
+            //     '**/.gradle/**', // .gradle 디렉토리 추가
+            //     '**/src-capacitor/**', // src-capacitor 전체를 무시하도록 추가
+            //   ],
+            // },
+            // 문제되는 경로 무시
+            // chokidar: {
+            //   ignored: ['**/android/.gradle/**'],
+            // },
           },
           { server: false },
         ],
@@ -124,7 +136,8 @@ export default defineConfig((/* ctx */) => {
 
     // 개발 서버 설정
     devServer: {
-      open: true,
+      open: false,
+      host: '0.0.0.0',
     },
 
     // Quasar 프레임워크 설정

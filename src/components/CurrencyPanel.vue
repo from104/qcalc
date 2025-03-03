@@ -177,12 +177,10 @@
   const targetFilterFn = createFilterFn(filteredTargetCurrencyOptions, targetCurrencyOptions);
 
   const handleCurrencySwap = () => {
-    calc.setCurrentNumber(
-      currencyConverter.convert(
-        BigNumber(calc.currentNumber),
-        store.sourceCurrency,
-        store.targetCurrency,
-      ),
+    calc.currentNumber = currencyConverter.convert(
+      BigNumber(calc.currentNumber),
+      store.sourceCurrency,
+      store.targetCurrency,
     );
     swapCurrencies();
   };

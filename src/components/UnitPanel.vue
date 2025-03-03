@@ -95,13 +95,11 @@
   const targetUnitOptions = computed(() => availableUnits.value.map((unit) => createUnitOption(unit, false)));
 
   const handleUnitSwap = () => {
-    calc.setCurrentNumber(
-      UnitConverter.convert(
-        store.selectedCategory,
-        BigNumber(calc.currentNumber),
-        store.sourceUnits[store.selectedCategory] ?? '',
-        store.targetUnits[store.selectedCategory] ?? '',
-      ),
+    calc.currentNumber = UnitConverter.convert(
+      store.selectedCategory,
+      BigNumber(calc.currentNumber),
+      store.sourceUnits[store.selectedCategory] ?? '',
+      store.targetUnits[store.selectedCategory] ?? '',
     );
     swapUnits();
   };

@@ -61,20 +61,20 @@
       if (target === 'sub') {
         if (store.currentTab === 'unit') {
           swapUnits();
-          setTimeout(() => calc.setCurrentNumber(clipboardText), 5);
+          setTimeout(() => (calc.currentNumber = clipboardText), 5);
           setTimeout(swapUnits, 10);
         } else if (store.currentTab === 'currency') {
           swapCurrencies();
-          setTimeout(() => calc.setCurrentNumber(clipboardText), 5);
+          setTimeout(() => (calc.currentNumber = clipboardText), 5);
           setTimeout(swapCurrencies, 10);
         } else if (store.currentTab === 'radix') {
           swapRadixes();
-          setTimeout(() => calc.setCurrentNumber(clipboardText), 5);
+          setTimeout(() => (calc.currentNumber = clipboardText), 5);
           setTimeout(swapRadixes, 10);
         }
         showMessage(t('pastedFromClipboardToSubPanel'));
       } else {
-        calc.setCurrentNumber(clipboardText);
+        calc.currentNumber = clipboardText;
         showMessage(t('pastedFromClipboard'));
       }
     } catch (error) {

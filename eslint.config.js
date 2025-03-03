@@ -17,7 +17,13 @@ export default [
      *
      * ESLint requires "ignores" key to be the only one in this object
      */
-    ignores: ['dist', '.quasar', 'node_modules', 'src-capacitor', 'quasar.config.*.temporary.compiled*'],
+    ignores: [
+      'dist',
+      '.quasar',
+      'node_modules',
+      'src-capacitor',
+      'quasar.config.*.temporary.compiled*',
+    ],
   },
 
   ...pluginQuasar.configs.recommended(),

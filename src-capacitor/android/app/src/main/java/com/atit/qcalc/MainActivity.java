@@ -1,4 +1,4 @@
-package org.capacitor.quasar.app;
+package com.atit.qcalc;
 
 import android.annotation.SuppressLint;
 import android.annotation.SuppressLint;
@@ -17,7 +17,6 @@ import com.getcapacitor.BridgeActivity;
  */
 public class MainActivity extends BridgeActivity {
 
-  @SuppressLint("SetJavaScriptEnabled")
   @SuppressLint("SetJavaScriptEnabled")
   @Override
   protected void onCreate(Bundle savedInstanceState) {
@@ -76,9 +75,6 @@ public class MainActivity extends BridgeActivity {
     // 추가적인 웹뷰 설정을 여기에 구성할 수 있습니다.
     // 예: 뷰포트 설정, 줌 컨트롤, 파일 접근 등
   }
-
-  private int getZoom() {
-    float screenWidthDp = getResources().getDisplayMetrics().widthPixels / getResources().getDisplayMetrics().density;
 
   private int getZoom() {
     // Get the screen width in density-independent pixels (dp).
