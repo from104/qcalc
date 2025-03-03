@@ -1,3 +1,12 @@
+ // Start Generation Here
+/**
+ * @file routes.ts
+ * @description 이 파일은 Vue Router의 라우트 설정을 정의합니다.
+ *              각 라우트는 페이지 컴포넌트와 경로를 매핑하며,
+ *              네비게이션 메타 정보를 포함할 수 있습니다.
+ *              이 파일은 애플리케이션의 다양한 페이지 간의 전환을 관리합니다.
+ */
+
 // Vue Router에서 RouteRecordRaw 타입을 가져옵니다.
 import type { RouteRecordRaw } from 'vue-router';
 

@@ -1,3 +1,10 @@
+/**
+ * @file CalcButtonSet.ts
+ * @description 이 파일은 계산기 버튼 세트를 구성하는 상수 파일입니다.
+ *              다양한 계산 기능을 수행하는 버튼을 정의하며,
+ *              각 버튼의 동작 및 속성을 설정합니다.
+ */
+
 import { match } from 'ts-pattern';
 
 import type { ComposerTranslation } from 'vue-i18n';

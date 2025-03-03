@@ -1,6 +1,13 @@
+/**
+ * @file MainActivity.java
+ * @description 이 파일은 Capacitor 기반 안드로이드 애플리케이션의 메인 액티비티를 정의합니다.
+ *              이 클래스는 BridgeActivity를 상속받아 Capacitor의 기능을 활용하며,
+ *              웹뷰 설정, JavaScript 인터페이스 추가, 캐시 관리 및 텍스트 줌 설정과 같은
+ *              다양한 초기화 작업을 수행합니다.
+ */
+
 package com.atit.qcalc;
 
-import android.annotation.SuppressLint;
 import android.annotation.SuppressLint;
 import android.os.Bundle;
 import android.webkit.WebSettings;
@@ -83,14 +90,18 @@ public class MainActivity extends BridgeActivity {
     // Define the base width (in dp) for scaling.
     final float BASE_WIDTH_DP = 350f;
 
-    // Calculate the scaling factor based on the current screen width relative to the base width.
+    // Calculate the scaling factor based on the current screen width relative to
+    // the base width.
     float scaleFactor = screenWidthDp / BASE_WIDTH_DP;
 
-    // Calculate the text zoom level based on the scaling factor, with a default of 100%.
-    // Larger screens than BASE_WIDTH_DP will have proportionally larger text, and smaller screens will have smaller text.
+    // Calculate the text zoom level based on the scaling factor, with a default of
+    // 100%.
+    // Larger screens than BASE_WIDTH_DP will have proportionally larger text, and
+    // smaller screens will have smaller text.
     int textZoom = (int) (100 * scaleFactor);
 
-    // Clamp the text zoom level within a reasonable range (50% to 200%) to prevent text from being too small or too large.
+    // Clamp the text zoom level within a reasonable range (50% to 200%) to prevent
+    // text from being too small or too large.
     final int MIN_ZOOM = 50;
     final int MAX_ZOOM = 200;
     textZoom = Math.max(MIN_ZOOM, Math.min(textZoom, MAX_ZOOM));

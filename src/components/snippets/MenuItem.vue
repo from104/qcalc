@@ -1,4 +1,19 @@
 <script setup lang="ts">
+  /**
+   * @file MenuItem.vue
+   * @description 이 파일은 메뉴 항목을 표시하는 Vue 컴포넌트입니다.
+   *              사용자는 제목, 캡션, 단축키, 아이콘 및 클릭 시 실행할 액션을 정의할 수 있습니다.
+   *              이 컴포넌트는 Quasar 프레임워크의 q-item 및 q-separator를 사용하여
+   *              메뉴 항목을 구성하고, 접근성을 고려한 aria-label 속성을 포함합니다.
+   * 
+   * @props {string} title - 메뉴 항목의 제목
+   * @props {string} caption - 메뉴 항목의 캡션
+   * @props {string} shortcut - 메뉴 항목의 단축키
+   * @props {string} icon - 메뉴 항목의 아이콘 이름
+   * @props {Function} action - 메뉴 항목 클릭 시 실행할 함수
+   * @props {boolean} separator - 메뉴 항목 사이에 구분선을 표시할지 여부
+   */
+
   // i18n 설정
   import { useI18n } from 'vue-i18n';
   const { t } = useI18n();

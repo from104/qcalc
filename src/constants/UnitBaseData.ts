@@ -1,3 +1,10 @@
+/**
+ * @file UnitBaseData.ts
+ * @description 이 파일은 다양한 단위에 대한 정보를 저장하는 상수 파일입니다.
+ *              각 단위는 값과 설명을 포함하며, 단위 변환 기능을 구현하는 데 사용됩니다.
+ *              단위 카테고리(예: 길이, 넓이 등)에 따라 여러 단위를 관리합니다.
+ */
+
 // mathjs 라이브러리에서 필요한 함수와 타입을 가져옵니다.
 import { BigNumber } from 'classes/CalculatorMath';
 

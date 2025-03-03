@@ -1,3 +1,11 @@
+/**
+ * @file index.ts
+ * @description 이 파일은 Vue Router를 설정하고 라우터 인스턴스를 생성하는 기능을 제공합니다.
+ *              Quasar 프레임워크와 통합되어 있으며, 다양한 라우트 설정을 포함합니다.
+ *              이 파일은 서버 사이드 렌더링(SSR) 및 클라이언트 사이드 렌더링(CSR) 모두를 지원합니다.
+ *              또한, 페이지 이동 시 스크롤 동작을 설정하고, 네비게이션 가드를 통해 경로 변경을 관리합니다.
+ */
+
 // Quasar 프레임워크의 route 래퍼 함수 가져오기
 import { defineRouter } from '#q-app/wrappers';
 

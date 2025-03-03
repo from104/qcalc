@@ -1,4 +1,15 @@
 <script setup lang="ts">
+  /**
+   * @file HighlightText.vue
+   * @description 이 파일은 주어진 텍스트에서 특정 검색어를 강조 표시하는 Vue 컴포넌트입니다.
+   *              사용자는 검색어를 입력하고, 해당 검색어가 포함된 텍스트 부분이 강조 표시됩니다.
+   *              이 컴포넌트는 텍스트가 줄임표로 표시되는 경우 툴팁을 통해 전체 텍스트를 보여주는 기능도 포함하고 있습니다.
+   * 
+   * @props {string} text - 강조 표시할 텍스트
+   * @props {string} searchTerm - 강조할 검색어
+   * @props {boolean} allowLineBreak - 줄바꿈 허용 여부
+   */
+
   import { h, ref, onMounted, watch, onUnmounted } from 'vue';
   
   // 전역 window 객체에 접근하기 위한 상수 선언

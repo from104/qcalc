@@ -1,3 +1,11 @@
+/**
+ * @file electron-main.ts
+ * @description 이 파일은 Electron 애플리케이션의 메인 프로세스를 정의합니다.
+ *              애플리케이션의 초기화, 메인 윈도우 생성, 자동 업데이트 설정,
+ *              플랫폼에 따른 다크 모드 처리 및 기타 필수 기능을 포함합니다.
+ *              또한, 애플리케이션의 상태를 관리하고, 사용자 인터페이스와의 상호작용을 처리합니다.
+ */
+
 // 필요한 모듈 가져오기
 import { fileURLToPath } from 'url';
 import path from 'path';

@@ -1,3 +1,10 @@
+/**
+ * @file WebAppInterface.java
+ * @description 이 클래스는 웹 애플리케이션과 안드로이드 네이티브 기능 간의 인터페이스를 제공합니다.
+ *              JavaScript에서 안드로이드의 네이티브 기능을 호출할 수 있도록 하며,
+ *              클립보드와 같은 시스템 기능에 접근할 수 있는 메서드를 포함합니다.
+ */
+
 package com.atit.qcalc;
 
 import android.content.ClipData;

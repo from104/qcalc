@@ -1,3 +1,10 @@
+/**
+ * @file index.ts
+ * @description 이 파일은 Pinia 스토어를 설정하고 관리하는 기능을 제공합니다.
+ *              Quasar 프레임워크와 통합되어 있으며, 다양한 스토어 플러그인을 포함합니다.
+ *              이 파일은 애플리케이션의 상태 관리를 위한 기본 설정을 제공합니다.
+ */
+
 // Quasar의 store 래퍼 함수 가져오기
 import { defineStore } from '#q-app/wrappers';
 

@@ -1,8 +1,13 @@
 <script setup lang="ts">
   /**
-   * MainLayout.vue
-   * 애플리케이션의 메인 레이아웃을 담당하는 컴포넌트입니다.
-   * 반응형 레이아웃, 탭 관리, 서브페이지 관리, 키보드 단축키 등을 처리합니다.
+   * @file MainLayout.vue
+   * @description 이 파일은 Vue.js 애플리케이션의 메인 레이아웃을 정의합니다.
+   *              레이아웃은 헤더, 사이드바, 메인 콘텐츠 영역으로 구성되어 있으며,
+   *              다양한 페이지 컴포넌트를 동적으로 로드하여 사용자에게 보여줍니다.
+   *              또한, 다국어 지원을 위한 i18n 기능을 통합하여
+   *              사용자의 언어 설정에 따라 적절한 메시지를 표시합니다.
+   *              이 레이아웃은 반응형 디자인을 지원하여 다양한 화면 크기에서
+   *              최적의 사용자 경험을 제공합니다.
    */
 
   import { onBeforeUnmount, onMounted, reactive, shallowRef, watch, computed, ref } from 'vue';

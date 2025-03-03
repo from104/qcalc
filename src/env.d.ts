@@ -1,4 +1,12 @@
 /**
+ * @file env.d.ts
+ * @description 이 파일은 TypeScript 환경 설정을 위한 타입 선언을 포함합니다.
+ *              다양한 모듈과 인터페이스를 정의하여 애플리케이션의 타입 안전성을 높이고,
+ *              외부 라이브러리와의 상호작용을 원활하게 합니다.
+ *              또한, Android 시스템과의 상호작용을 위한 인터페이스를 정의합니다.
+ */
+
+/**
  * freecurrencyapi-js 모듈 선언
  */
 declare module '@everapi/freecurrencyapi-js';

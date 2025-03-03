@@ -1,3 +1,11 @@
+/**
+ * @file store.d.ts
+ * @description 이 파일은 Pinia 스토어의 상태 및 타입을 정의합니다.
+ *              계산기, 통화 변환, 단위 변환 등 다양한 기능을 포함하며,
+ *              애플리케이션의 상태를 관리하는 데 필요한 타입 정보를 제공합니다.
+ *              상태 정의, 액션, 변이 등을 포함하여 UI와 비즈니스 로직을 연결합니다.
+ */
+
 import type { Calculator } from '../classes/Calculator';
 import type { CurrencyConverter } from '../classes/CurrencyConverter';
 import type { RadixType } from '../classes/RadixConverter';
