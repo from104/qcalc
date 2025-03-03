@@ -103,7 +103,7 @@ public class MainActivity extends BridgeActivity {
     // Clamp the text zoom level within a reasonable range (50% to 200%) to prevent
     // text from being too small or too large.
     final int MIN_ZOOM = 50;
-    final int MAX_ZOOM = 200;
+    final int MAX_ZOOM = 500;
     textZoom = Math.max(MIN_ZOOM, Math.min(textZoom, MAX_ZOOM));
 
     return textZoom;
