@@ -4,10 +4,9 @@
    * @description 이 파일은 자동 업데이트 기능을 관리하는 Vue 컴포넌트입니다.
    *              업데이트 확인, 다운로드 및 설치와 같은 기능을 처리합니다.
    */
-  import { ref, computed, onMounted, onUnmounted } from 'vue';
+  import { ref, onMounted, onUnmounted } from 'vue';
   import { useI18n } from 'vue-i18n';
-  import DOMPurify from 'dompurify';
-  
+
   import { showError, showMessage } from 'src/classes/utils/NotificationUtils';
 
   // 전역 window 객체에 접근하기 위한 상수 선언
@@ -25,13 +24,6 @@
   const updateInfo = ref<UpdateInfo | null>(null);
   const updateProgress = ref<UpdateProgressInfo | null>(null);
   const updateError = ref<UpdateError | null>(null);
-
-  // 릴리스 노트 sanitize
-  const sanitizedReleaseNotes = computed(() =>
-    updateInfo.value?.releaseNotes
-      ? DOMPurify.sanitize(updateInfo.value.releaseNotes).replace(/h3>/gm, 'h6>').replace(/h2>/gm, 'h5>')
-      : '',
-  );
 
   /**
    * 업데이트 상태를 처리하는 함수입니다.
@@ -133,24 +125,23 @@
     releaseDate: new Date().toISOString(),
     releaseName: 'v0.11.1',
     releaseNotes: `
-    <h2>[0.11.1] 2025-01-29</h2>
-    <h3>Added</h3>
-    <ul>
-      <li>Added temperature units: Delisle (°De), Newton (°N), Romer (°Rø), Réaumur (°Ré).</li>
-      <li>Added support for adaptive layout: displays calculation history and sub-panel when the window width increases.</li>
-      <li>Added search to calculation history</li>
-      <li>Added automatic updates in electron package format</li>
-    </ul>
-    <h3>Changed</h3>
-    <ul>
-      <li>Increased currency conversion precision from Number to BigNumber.</li>
-      <li>Expanded decimal point display limit up to 16 digits</li>
-    </ul>
-    <h3>Fixed</h3>
-    <ul>
-      <li>Fixed display error in percentage functionality.</li>
-    </ul>
-  `,
+## [0.11.1] 2025-01-29
+
+### Added
+
+- Added temperature units: Delisle (°De), Newton (°N), Romer (°Rø), Réaumur (°Ré).
+- Added support for adaptive layout: displays calculation history and sub-panel when the window width increases.
+- Added search to calculation history
+- Added automatic updates in electron package format
+
+### Changed
+
+- Increased currency conversion precision from Number to BigNumber.
+- Expanded decimal point display limit up to 16 digits
+
+### Fixed
+
+- Fixed display error in percentage functionality.`,
   };
 
   /**
@@ -198,8 +189,7 @@
         <q-card-section class="q-pt-none">
           <template v-if="updateStatus === 'available'">
             <p>{{ t('newVersionMessage', { version: updateInfo?.version }) }}</p>
-            <!-- eslint-disable-next-line vue/no-v-html -->
-            <div v-if="updateInfo?.releaseNotes" class="release-notes q-mb-lg" v-html="sanitizedReleaseNotes" />
+            <q-markdown :src="updateInfo?.releaseNotes || ''" class="q-mb-lg" no-linkify />
             <p>{{ t('confirmUpdate') }}</p>
           </template>
           <template v-else-if="updateStatus === 'progress'">
@@ -273,28 +263,6 @@
     />
   </template>
 </template>
-
-<style scoped lang="scss">
-  .release-notes {
-    :deep(h5),
-    :deep(h6) {
-      font-weight: 700;
-      margin-top: 0.5em;
-      margin-bottom: 0.5em;
-      padding: 0;
-      line-height: 1;
-      background: none;
-    }
-
-    :deep(h5) {
-      font-size: 1.6em;
-    }
-
-    :deep(h6) {
-      font-size: 1.4em;
-    }
-  }
-</style>
 
 <i18n lang="yaml5">
   ko:
