@@ -302,6 +302,8 @@
       elevated
       :width="250"
       :dark="store.isDarkMode()"
+      :swipe-only="window.isMobile"
+      behavior="mobile"
       @click="leftDrawerOpen = false"
     >
       <q-card class="full-height menu-card">
@@ -400,6 +402,8 @@
       elevated
       :width="250"
       :dark="store.isDarkMode()"
+      :swipe-only="window.isMobile"
+      behavior="mobile"
       @click="leftDrawerOpen = false"
     >
       <q-card class="full-height menu-card">
