@@ -1,3 +1,11 @@
+/**
+ * @file Calculator.ts
+ * @description 이 파일은 고급 수학 계산 기능을 제공하는 계산기 클래스를 정의합니다.
+ *              다양한 수학 연산자와 기능을 지원하며, 사용자가 입력한 수식을 계산하고
+ *              결과를 반환하는 기능을 포함합니다. 이 계산기는 정수, 소수, 진법 변환 등
+ *              다양한 수학적 작업을 수행할 수 있도록 설계되었습니다.
+ */
+
 import { match } from 'ts-pattern';
 
 import { RadixConverter, Radix } from './RadixConverter';

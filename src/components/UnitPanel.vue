@@ -1,4 +1,12 @@
 <script setup lang="ts">
+  /**
+   * @file UnitPanel.vue
+   * @description 이 파일은 단위 패널 컴포넌트를 구성하는 Vue 컴포넌트입니다.
+   *              사용자가 다양한 단위를 선택하고 변환할 수 있도록 지원하며,
+   *              단위 변환 기능을 통해 계산기와 상호작용합니다.
+   *              이 컴포넌트는 사용자 경험을 향상시키기 위해 단위 목록을 동적으로 관리합니다.
+   */
+
   // Vue 핵심 기능 및 컴포지션 API 가져오기
   import { onMounted, onBeforeUnmount, reactive, watch, computed } from 'vue';
 

@@ -1,4 +1,13 @@
 <script setup lang="ts">
+  /**
+   * @file RadixPanel.vue
+   * @description 이 파일은 진법 변환 패널을 구성하는 Vue 컴포넌트입니다.
+   *              사용자가 다양한 진법(2진수, 8진수, 10진수, 16진수 등) 간의 변환을 수행할 수 있도록
+   *              진법 선택 및 변환 기능을 제공합니다.
+   *              또한, 진법 스왑 및 최근 사용한 진법 초기화 기능을 포함하고 있습니다.
+   */
+
+
   // Vue 핵심 기능 및 컴포지션 API 가져오기
   import type { ComputedRef } from 'vue';
   import { onMounted, onBeforeUnmount, reactive, watch, computed } from 'vue';

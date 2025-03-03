@@ -1,4 +1,12 @@
 <script setup lang="ts">
+  /**
+   * @file RecordCard.vue
+   * @description 이 파일은 기록 결과 컴포넌트를 구성하는 Vue 컴포넌트입니다.
+   *              사용자가 계산 결과를 기록하고, 메모를 추가하거나 삭제할 수 있는 기능을 제공합니다.
+   *              또한, 기록된 항목을 복사하거나 메인 패널로 로드하는 기능도 포함되어 있습니다.
+   *              이 컴포넌트는 계산기와 상호작용을 통해 다양한 기능을 수행합니다.
+   */
+
   // Vue 핵심 기능 및 컴포지션 API 가져오기
   import { onMounted, onBeforeUnmount, ref, computed, watch, reactive } from 'vue';
 

@@ -1,4 +1,11 @@
 <script setup lang="ts">
+  /**
+   * @file MenuPanel.vue
+   * @description 이 파일은 QCalc 애플리케이션의 메뉴 패널을 구성하는 Vue 컴포넌트입니다.
+   *              사용자가 다양한 계산기 기능에 접근할 수 있도록 메뉴 아이템을 정의하고,
+   *              각 메뉴 아이템에 대한 동작을 설정합니다.
+   */
+
   // Vue 핵심 기능 및 컴포지션 API 가져오기
   import { onMounted, reactive, watch } from 'vue';
 

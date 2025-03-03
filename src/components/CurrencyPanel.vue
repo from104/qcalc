@@ -1,4 +1,11 @@
 <script setup lang="ts">
+  /**
+   * @file CurrencyPanel.vue
+   * @description 이 파일은 통화 패널을 구성하는 Vue 컴포넌트입니다.
+   *              사용자가 다양한 통화 간의 변환을 수행할 수 있도록 통화 선택 및 필터링 기능을 제공합니다.
+   *              또한, 통화 스왑 및 최근 통화 초기화 기능을 포함하고 있습니다.
+   */
+
   // Vue 핵심 기능 및 컴포지션 API 가져오기
   import { ref, onMounted, onBeforeUnmount, reactive, watch } from 'vue';
 

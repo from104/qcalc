@@ -1,4 +1,11 @@
 <script setup lang="ts">
+  /**
+   * @file CalcButton.vue
+   * @description 이 파일은 계산기 버튼을 구성하는 Vue 컴포넌트입니다.
+   *              사용자가 다양한 계산 기능을 수행할 수 있도록 버튼을 제공하며,
+   *              각 버튼에 대한 동작을 설정합니다.
+   */
+
   // Vue 핵심 기능 및 컴포지션 API 가져오기
   import { onMounted, onBeforeUnmount, ref, watch, reactive, computed } from 'vue';
 

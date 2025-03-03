@@ -1,4 +1,13 @@
 <script lang="ts" setup>
+  /**
+   * @file SettingCard.vue
+   * @description 이 파일은 설정 카드 컴포넌트를 구성하는 Vue 컴포넌트입니다.
+   *              사용자가 애플리케이션의 다양한 설정을 조정할 수 있도록
+   *              언어, 다크 모드, 항상 위에 표시, 햅틱 모드, 소수점 자리수 및 자동 업데이트와 같은
+   *              설정 옵션을 제공합니다.
+   *              이 컴포넌트는 사용자 경험을 향상시키기 위해 다양한 설정을 관리합니다.
+   */
+
   // Vue 핵심 기능 및 컴포지션 API 가져오기
   import { reactive, watch, ref, computed } from 'vue';
 

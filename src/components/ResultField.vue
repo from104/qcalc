@@ -1,4 +1,12 @@
 <script setup lang="ts">
+  /**
+   * @file ResultField.vue
+   * @description 이 파일은 계산 결과를 표시하는 Vue 컴포넌트입니다.
+   *              사용자가 선택한 필드와 애드온에 따라 결과를 동적으로 렌더링하며,
+   *              진법 변환, 단위 변환 및 통화 변환 기능 패널과 연동됩니다.
+   *              또한, 메모리 기능을 통해 이전 계산 결과를 관리할 수 있습니다.
+   */
+
   // Vue 핵심 기능 및 컴포지션 API 가져오기
   import { ref, computed, onBeforeMount, onMounted, watch, onUnmounted } from 'vue';
 

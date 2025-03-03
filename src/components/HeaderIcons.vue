@@ -1,4 +1,11 @@
 <script setup lang="ts">
+  /**
+   * @file HeaderIcons.vue
+   * @description 이 파일은 QCalc 애플리케이션의 헤더 아이콘을 구성하는 Vue 컴포넌트입니다.
+   *              사용자가 다양한 기능에 빠르게 접근할 수 있도록 아이콘을 제공하며,
+   *              각 아이콘에 대한 동작을 설정합니다.
+   */
+
   // Vue 핵심 기능 및 컴포지션 API 가져오기
   import { onMounted } from 'vue';
 
