@@ -17,6 +17,7 @@
   // === 컴포넌트 임포트 ===
   import HeaderIcons from 'components/HeaderIcons.vue';
   import ToolTip from 'components/snippets/ToolTip.vue';
+  import MenuPanel from 'components/MenuPanel.vue';
 
   // === 페이지 컴포넌트 임포트 ===
   import CalcPage from 'pages/CalcPage.vue';
@@ -27,7 +28,7 @@
   import AboutPage from 'src/pages/AboutPage.vue';
   import RecordPage from 'src/pages/RecordPage.vue';
   import SettingPage from 'src/pages/SettingPage.vue';
-import HelpIcon from 'src/components/snippets/HelpIcon.vue';
+  import HelpIcon from 'src/components/snippets/HelpIcon.vue';
 
   const router = useRouter();
   const route = useRoute();
@@ -129,6 +130,7 @@ import HelpIcon from 'src/components/snippets/HelpIcon.vue';
   const currentSubPage = ref('record');
   const previousSubPage = ref('record');
   const isWideLayout = computed(() => store.isWideWidth());
+  const leftDrawerOpen = ref(false);
 
   // === 유틸리티 함수 ===
   /**
@@ -182,6 +184,13 @@ import HelpIcon from 'src/components/snippets/HelpIcon.vue';
         router.back();
       }
     }
+  };
+
+  /**
+   * 왼쪽 메뉴 서랍을 토글합니다.
+   */
+  const toggleLeftDrawer = () => {
+    leftDrawerOpen.value = !leftDrawerOpen.value;
   };
 
   // === 키보드 단축키 설정 ===
@@ -286,10 +295,26 @@ import HelpIcon from 'src/components/snippets/HelpIcon.vue';
 
 <template>
   <!-- 좁은 화면 레이아웃 -->
-  <q-layout v-if="!isWideLayout">
+  <q-layout v-if="!isWideLayout" view="hHh LpR fFf">
+    <q-drawer
+      v-model="leftDrawerOpen"
+      show-if-above
+      elevated
+      :width="250"
+      :dark="store.isDarkMode()"
+      @click="leftDrawerOpen = false"
+    >
+      <q-card class="full-height menu-card">
+        <MenuPanel />
+      </q-card>
+    </q-drawer>
+
     <q-header id="header" class="z-top noselect" elevated>
       <!-- 메인 페이지 헤더 -->
       <q-toolbar v-if="!isSubPage" v-auto-blur>
+        <q-btn flat dense round icon="menu" aria-label="Menu" @click="toggleLeftDrawer">
+          <ToolTip :text="t('tooltip.menu')" />
+        </q-btn>
         <q-tabs
           v-model="store.currentTab"
           align="left"
@@ -322,10 +347,7 @@ import HelpIcon from 'src/components/snippets/HelpIcon.vue';
         />
         <q-toolbar-title class="text-subtitle1">
           {{ SUB_PAGE_CONFIG[currentSubPage as keyof typeof SUB_PAGE_CONFIG]?.title }}
-          <HelpIcon 
-            v-if="currentSubPage === 'record' && window.isMobile"
-            :text="t('tooltip.recordSwipeHelp')"
-          />
+          <HelpIcon v-if="currentSubPage === 'record' && window.isMobile" :text="t('tooltip.recordSwipeHelp')" />
         </q-toolbar-title>
         <q-space />
         <q-btn
@@ -334,7 +356,7 @@ import HelpIcon from 'src/components/snippets/HelpIcon.vue';
           dense
           flat
           size="md"
-          style="z-index: 1000"
+          class="high-z-index"
           :icon="button.icon"
           role="button"
           :aria-label="t(`ariaLabel.${button.icon}`)"
@@ -346,7 +368,7 @@ import HelpIcon from 'src/components/snippets/HelpIcon.vue';
       </q-toolbar>
     </q-header>
 
-    <q-page-container class="row" style="padding-bottom: 0px">
+    <q-page-container class="row no-padding-bottom">
       <!-- 메인 페이지 컨텐츠 -->
       <template v-if="!isSubPage">
         <q-tab-panels v-model="store.currentTab" animated infinite :swipeable="window.isMobile">
@@ -372,9 +394,25 @@ import HelpIcon from 'src/components/snippets/HelpIcon.vue';
 
   <!-- 넓은 화면 레이아웃 -->
   <q-layout v-else>
+    <q-drawer
+      v-model="leftDrawerOpen"
+      show-if-above
+      elevated
+      :width="250"
+      :dark="store.isDarkMode()"
+      @click="leftDrawerOpen = false"
+    >
+      <q-card class="full-height menu-card">
+        <MenuPanel />
+      </q-card>
+    </q-drawer>
+
     <q-header id="header" class="z-top noselect row" elevated>
       <!-- 계산기 영역 헤더 -->
       <q-toolbar v-auto-blur class="col-6 calc-header">
+        <q-btn flat dense round icon="menu" aria-label="Menu" @click="toggleLeftDrawer">
+          <ToolTip :text="t('tooltip.menu')" />
+        </q-btn>
         <q-tabs
           v-model="store.currentTab"
           align="left"
@@ -416,7 +454,7 @@ import HelpIcon from 'src/components/snippets/HelpIcon.vue';
             >
               {{ SUB_PAGE_CONFIG[currentSubPage]?.title }}
             </q-toolbar-title>
-            <div class="col-8 row justify-end q-pr-lg">
+            <div class="col-8 row justify-end sub-header-buttons">
               <q-btn
                 v-for="button in SUB_PAGE_BUTTONS"
                 :key="button.label"
@@ -602,6 +640,23 @@ import HelpIcon from 'src/components/snippets/HelpIcon.vue';
   .header-content {
     position: absolute;
   }
+
+  // 새로 추가된 클래스
+  .menu-card {
+    padding-top: 55px;
+  }
+
+  .high-z-index {
+    z-index: 1000;
+  }
+
+  .no-padding-bottom {
+    padding-bottom: 0px;
+  }
+
+  .sub-header-buttons {
+    padding-right: 16px; // q-pr-lg와 동일
+  }
 </style>
 
 <i18n lang="yaml5">
@@ -632,6 +687,7 @@ ko:
     settings: '설정'
     deleteRecord: '모든 기록 삭제'
     search: '검색'
+    menu: '메뉴 열기'
     recordSwipeHelp: '기록 페이지에서 왼쪽으로 스와이프하여 메모를 추가,수정하거나 오른쪽으로 스와이프하여 기록을 삭제할 수 있습니다.'
 en:
   calc: Basic
@@ -660,5 +716,6 @@ en:
     settings: 'Settings'
     deleteRecord: 'Delete all records'
     search: 'Search'
+    menu: 'Open menu'
     recordSwipeHelp: 'You can add, modify, or delete records by swiping left on the record page, or by swiping right to delete the record.'
 </i18n>

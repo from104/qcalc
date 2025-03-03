@@ -32,7 +32,6 @@
   // 컴포넌트 import
   import ToolTip from './snippets/ToolTip.vue';
   import MenuItem from './snippets/MenuItem.vue';
-  import MenuPanel from './MenuPanel.vue';
   import { showError, showMessage } from 'src/classes/utils/NotificationUtils';
 
   /**
@@ -138,11 +137,6 @@
     @click="router.push('/record')"
   >
     <ToolTip :text="t('openRecordPage')" />
-  </q-btn>
-  <q-btn id="btn-menu" flat icon="more_vert" class="q-ma-none q-pa-none q-pl-xs" :aria-label="t('ariaLabel.menu')">
-    <q-menu auto-close transition-show="slide-down" transition-hide="slide-up" :offset="[140, 10]" class="shadow-6">
-      <MenuPanel />
-    </q-menu>
   </q-btn>
 </template>
 
