@@ -73,6 +73,7 @@
     "@jest/globals": "^29.7.0",
     "@modyfi/vite-plugin-yaml": "1.1.1",
     "@quasar/app-vite": "2.1.1",
+    "@quasar/quasar-app-extension-qmarkdown": "^2.0.5",
     "@rushstack/eslint-patch": "1.10.5",
     "@types/jest": "^29.5.14",
     "@types/markdown-it": "^14.1.2",
