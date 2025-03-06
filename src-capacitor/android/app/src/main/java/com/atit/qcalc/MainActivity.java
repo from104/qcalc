@@ -14,6 +14,9 @@ import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import java.util.Locale;
+import android.net.http.SslError;
+import android.webkit.SslErrorHandler;
+import android.util.Log;
 
 import com.getcapacitor.BridgeActivity;
 
@@ -23,6 +26,8 @@ import com.getcapacitor.BridgeActivity;
  * BridgeActivity를 상속받아 Capacitor의 기능을 활용합니다.
  */
 public class MainActivity extends BridgeActivity {
+
+  private static final String TAG = "MainActivity";
 
   @SuppressLint("SetJavaScriptEnabled")
   @Override
@@ -47,9 +52,9 @@ public class MainActivity extends BridgeActivity {
     // 'AndroidInterface'라는 이름으로 JavaScript에서 접근할 수 있습니다.
     webView.addJavascriptInterface(new WebAppInterface(this), "AndroidInterface");
 
-    // 캐시 사용을 비활성화합니다.
-    // 이는 항상 최신 콘텐츠를 로드하도록 보장하지만, 네트워크 사용량이 증가할 수 있습니다.
-    webSettings.setCacheMode(WebSettings.LOAD_NO_CACHE);
+    // 캐시 사용을 설정합니다.
+    // 기본 캐시 모드 사용 (필요한 경우 네트워크에서 로드)
+    webSettings.setCacheMode(WebSettings.LOAD_DEFAULT);
 
     // 화면의 물리적인 폭(dp)을 가져옵니다.
     int textZoom = getZoom();
@@ -66,6 +71,14 @@ public class MainActivity extends BridgeActivity {
             "window.textZoomLevel = %d;", textZoom);
         view.evaluateJavascript(script, null);
       }
+
+      @Override
+      public void onReceivedSslError(WebView view, SslErrorHandler handler, SslError error) {
+        Log.d(TAG, "SSL Error: " + error.toString());
+        // 개발 환경에서는 SSL 오류를 무시하고 진행할 수 있습니다.
+        // 프로덕션 환경에서는 보안을 위해 이 부분을 제거하는 것이 좋습니다.
+        handler.proceed();
+      }
     });
 
     // 초기 화면 배율 설정
@@ -79,8 +92,19 @@ public class MainActivity extends BridgeActivity {
     webSettings.setSupportZoom(false);
     webSettings.setBuiltInZoomControls(false);
 
+    // 로컬 파일 접근 허용
+    webSettings.setAllowFileAccess(true);
+    webSettings.setAllowFileAccessFromFileURLs(true);
+    webSettings.setAllowUniversalAccessFromFileURLs(true);
+
+    // 혼합 콘텐츠 로딩 허용 (HTTP와 HTTPS 콘텐츠 혼합)
+    webSettings.setMixedContentMode(WebSettings.MIXED_CONTENT_ALWAYS_ALLOW);
+
     // 추가적인 웹뷰 설정을 여기에 구성할 수 있습니다.
     // 예: 뷰포트 설정, 줌 컨트롤, 파일 접근 등
+
+    // 디버그 로그 추가
+    Log.d(TAG, "WebView initialized with settings: " + webSettings.toString());
   }
 
   private int getZoom() {
@@ -99,12 +123,6 @@ public class MainActivity extends BridgeActivity {
     // Larger screens than BASE_WIDTH_DP will have proportionally larger text, and
     // smaller screens will have smaller text.
     int textZoom = (int) (100 * scaleFactor);
-
-    // Clamp the text zoom level within a reasonable range (50% to 200%) to prevent
-    // text from being too small or too large.
-    final int MIN_ZOOM = 50;
-    final int MAX_ZOOM = 500;
-    textZoom = Math.max(MIN_ZOOM, Math.min(textZoom, MAX_ZOOM));
 
     return textZoom;
   }
