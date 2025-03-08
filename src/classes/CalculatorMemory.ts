@@ -11,6 +11,8 @@ export class CalculatorMemory {
   private math: CalculatorMath = new CalculatorMath();
   private number: string = '';
   private onOperationComplete?: () => void;
+  private getCurrentNumberCallback?: () => string;
+  private setCurrentNumberCallback?: (value: string) => void;
 
   /**
    * 메모리가 비어있는지 확인하는 getter
@@ -29,20 +31,59 @@ export class CalculatorMemory {
   }
 
   /**
-   * 메모리에 숫자를 저장하는 메서드
-   * @param number - 저장할 숫자 (문자열)
+   * 계산기의 현재 숫자를 가져오는 콜백을 설정합니다.
+   * @param callback - 계산기의 현재 숫자를 반환하는 콜백 함수
    */
-  public save(number: string): void {
-    this.number = number;
+  public setGetCurrentNumberCallback(callback: () => string): void {
+    this.getCurrentNumberCallback = callback;
   }
 
   /**
-   * 메모리에서 숫자를 불러오는 메서드
+   * 계산기의 현재 숫자를 설정하는 콜백을 등록합니다.
+   * @param callback - 계산기의 현재 숫자를 설정하는 콜백 함수
+   */
+  public setSetCurrentNumberCallback(callback: (number: string) => void): void {
+    this.setCurrentNumberCallback = callback;
+  }
+
+  /**
+   * 계산기의 현재 숫자를 가져옵니다.
+   * @returns {string} 계산기의 현재 숫자
+   */
+  public getCurrentNumber(): string {
+    if (!this.getCurrentNumberCallback) {
+      return '';
+    }
+    return this.getCurrentNumberCallback();
+  }
+
+  public setCurrentNumber(number: string): void {
+    if (this.setCurrentNumberCallback) {
+      this.setCurrentNumberCallback(number);
+    }
+  }
+
+  /**
+   * 계산기의 현재 숫자를 메모리에 저장합니다.
+   */
+  public save(): void {
+    const currentNumber = this.getCurrentNumber();
+    if (currentNumber) {
+      this.number = currentNumber;
+    }
+  }
+
+  /**
+   * 메모리에서 숫자를 불러와 계산기의 현재 숫자로 설정합니다.
    * @returns {string} 메모리에 저장된 숫자
    * @throws {Error} 메모리가 비어있을 경우 에러 발생
    */
   public recall(): string {
     checkError(this.isEmpty, 'error.calc.no_memory');
+    if (this.setCurrentNumberCallback) {
+      this.setCurrentNumber(this.number);
+      this.onOperationComplete?.();
+    }
     return this.number;
   }
 
@@ -74,34 +115,42 @@ export class CalculatorMemory {
   }
 
   /**
-   * 메모리에 숫자를 더하는 메서드
-   * @param number - 더할 숫자
+   * 계산기의 현재 숫자를 메모리에 더합니다.
    */
-  public add(number: string): void {
-    this.performMemoryOperation(this.math.add, number);
+  public add(): void {
+    const currentNumber = this.getCurrentNumber();
+    if (currentNumber) {
+      this.performMemoryOperation(this.math.add, currentNumber);
+    }
   }
 
   /**
    * 메모리에서 숫자를 빼는 메서드
-   * @param number - 뺄 숫자
    */
-  public sub(number: string): void {
-    this.performMemoryOperation(this.math.sub, number);
+  public sub(): void {
+    const currentNumber = this.getCurrentNumber();
+    if (currentNumber) {
+      this.performMemoryOperation(this.math.sub, currentNumber);
+    }
   }
 
   /**
    * 메모리의 숫자에 곱하는 메서드
-   * @param number - 곱할 숫자
    */
-  public mul(number: string): void {
-    this.performMemoryOperation(this.math.mul, number);
+  public mul(): void {
+    const currentNumber = this.getCurrentNumber();
+    if (currentNumber) {
+      this.performMemoryOperation(this.math.mul, currentNumber);
+    }
   }
 
   /**
    * 메모리의 숫자를 나누는 메서드
-   * @param number - 나눌 숫자
    */
-  public div(number: string): void {
-    this.performMemoryOperation(this.math.div, number);
+  public div(): void {
+    const currentNumber = this.getCurrentNumber();
+    if (currentNumber) {
+      this.performMemoryOperation(this.math.div, currentNumber);
+    }
   }
 }

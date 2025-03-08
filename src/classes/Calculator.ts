@@ -127,6 +127,8 @@ export class Calculator {
     this.reset();
     this.memory = new CalculatorMemory();
     this.memory.setOperationCompleteCallback(() => this.setNeedsBufferReset());
+    this.memory.setGetCurrentNumberCallback(() => this.currentNumber);
+    this.memory.setSetCurrentNumberCallback((number: string) => (this.currentNumber = number));
     this.record = new CalculatorRecord();
     this.setDoesNotNeedBufferReset();
   }
