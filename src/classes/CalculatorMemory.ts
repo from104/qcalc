@@ -82,7 +82,6 @@ export class CalculatorMemory {
     checkError(this.isEmpty, 'error.calc.no_memory');
     if (this.setCurrentNumberCallback) {
       this.setCurrentNumber(this.number);
-      this.onOperationComplete?.();
     }
     return this.number;
   }
