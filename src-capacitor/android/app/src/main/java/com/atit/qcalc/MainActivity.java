@@ -6,7 +6,7 @@
  *              다양한 초기화 작업을 수행합니다.
  */
 
-package org.capacitor.quasar.app;
+package ocom.atit.qcalc;
 
 import android.annotation.SuppressLint;
 import android.os.Bundle;
@@ -19,7 +19,7 @@ import android.webkit.SslErrorHandler;
 import android.util.Log;
 
 import com.getcapacitor.BridgeActivity;
-import org.capacitor.quasar.app.BuildConfig;
+import ocom.atit.qcalc.BuildConfig;
 
 /**
  * MainActivity 클래스

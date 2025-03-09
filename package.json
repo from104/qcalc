@@ -41,8 +41,8 @@
     "./src/boot/*": "./src/boot/*.ts"
   },
   "dependencies": {
-    "@capacitor/android": "6.2.0",
-    "@capacitor/core": "6.2.0",
+    "@capacitor/android": "7.0.1",
+    "@capacitor/core": "7.0.1",
     "@everapi/freecurrencyapi-js": "^1.0.1",
     "@quasar/cli": "^2.4.1",
     "@quasar/extras": "1.16.17",
