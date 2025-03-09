@@ -1,10 +1,15 @@
 apply plugin: 'com.android.application'
 
 android {
-    namespace "com.atit.qcalc"
+    namespace "org.capacitor.quasar.app"
     compileSdk rootProject.ext.compileSdkVersion
+    
+    buildFeatures {
+        buildConfig true
+    }
+    
     defaultConfig {
-        applicationId "com.atit.qcalc"
+        applicationId "org.capacitor.quasar.app"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1

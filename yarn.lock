@@ -414,21 +414,21 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@capacitor/android@npm:7.0.1":
-  version: 7.0.1
-  resolution: "@capacitor/android@npm:7.0.1"
+"@capacitor/android@npm:6.2.0":
+  version: 6.2.0
+  resolution: "@capacitor/android@npm:6.2.0"
   peerDependencies:
-    "@capacitor/core": ^7.0.0
-  checksum: 10/8520fc09dd48bdabc47d86a17970360ef5ea2709c56a75bc8bca188eb7945c64fca86d96eb1a5bb0aa2af7cb77eec8e777a4095933c95ac78daa6842ec2a7e12
+    "@capacitor/core": ^6.2.0
+  checksum: 10/ec1c6030433a46880ce0e284d0a4108a2a5cab43b9cf813911ff9d666a172591c9eb856ed85dac0ef0fb01e52c9348cd4bb4b144fe9c81147f6dc0d73e6cfe11
   languageName: node
   linkType: hard
 
-"@capacitor/core@npm:7.0.1":
-  version: 7.0.1
-  resolution: "@capacitor/core@npm:7.0.1"
+"@capacitor/core@npm:6.2.0":
+  version: 6.2.0
+  resolution: "@capacitor/core@npm:6.2.0"
   dependencies:
     tslib: "npm:^2.1.0"
-  checksum: 10/3442d41e769c719fd9efb16e06454af12c85f7cd25840f7870f5882c3c7f98e7fe836297eac83d1d6d126015f948e6004ad5a5347aea3db8ed14cf4f23268fbd
+  checksum: 10/d153121cb9164e69bf6367e47b87d11483682dc0e58e44ec0e86f95e30f818b9f076eb3cf0bd4d4550dd91f073eff7d23b966f044afaa75378e611bad6cad01c
   languageName: node
   linkType: hard
 
@@ -10013,8 +10013,8 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "qcalc@workspace:."
   dependencies:
-    "@capacitor/android": "npm:7.0.1"
-    "@capacitor/core": "npm:7.0.1"
+    "@capacitor/android": "npm:6.2.0"
+    "@capacitor/core": "npm:6.2.0"
     "@eslint/js": "npm:9.21.0"
     "@everapi/freecurrencyapi-js": "npm:^1.0.1"
     "@intlify/vite-plugin-vue-i18n": "npm:6.0.3"

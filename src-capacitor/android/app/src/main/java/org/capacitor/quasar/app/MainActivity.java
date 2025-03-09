@@ -19,6 +19,7 @@ import android.webkit.SslErrorHandler;
 import android.util.Log;
 
 import com.getcapacitor.BridgeActivity;
+import org.capacitor.quasar.app.BuildConfig;
 
 /**
  * MainActivity 클래스
@@ -32,6 +33,7 @@ public class MainActivity extends BridgeActivity {
   @SuppressLint("SetJavaScriptEnabled")
   @Override
   protected void onCreate(Bundle savedInstanceState) {
+    // Capacitor 초기화를 먼저 수행합니다.
     super.onCreate(savedInstanceState);
     Log.d(TAG, "onCreate: Starting MainActivity initialization");
 
@@ -39,27 +41,36 @@ public class MainActivity extends BridgeActivity {
     WebView webView = this.getBridge().getWebView();
     Log.d(TAG, "onCreate: WebView instance obtained");
 
+    // 빌드 타입에 따라 로드할 URL을 결정합니다
+    if (BuildConfig.BUILD_TYPE.equals("debug")) {
+      Log.d(TAG, "onCreate: Debug mode detected, using development server");
+      // 개발 모드에서는 개발 서버 URL을 사용합니다
+      // webView.loadUrl("http://localhost:9100");
+    } else {
+      Log.d(TAG, "onCreate: Release mode detected, loading local file");
+      // 프로덕션 모드에서는 로컬 파일 URL을 사용합니다
+      // Capacitor의 기본 메커니즘을 사용하면서도 명시적으로 로컬 파일을 로드합니다
+      // this.getBridge().setServerAssetPath("public/index.html");
+      // this.getBridge().setServerAssetPath("file:///android_asset/public/index.html");
+    }
+
     // 웹뷰의 설정을 구성합니다.
     WebSettings webSettings = webView.getSettings();
     Log.d(TAG, "onCreate: WebSettings initialized");
 
     // JavaScript 실행을 활성화합니다.
-    // 주의: 보안상의 이유로 신뢰할 수 있는 콘텐츠에만 사용해야 합니다.
     webSettings.setJavaScriptEnabled(true);
     Log.d(TAG, "onCreate: JavaScript enabled");
 
     // DOM Storage API를 활성화합니다.
-    // 이는 웹 애플리케이션의 로컬 데이터 저장을 가능하게 합니다.
     webSettings.setDomStorageEnabled(true);
     Log.d(TAG, "onCreate: DOM Storage enabled");
 
     // 네이티브 코드와 JavaScript 간의 인터페이스를 추가합니다.
-    // 'AndroidInterface'라는 이름으로 JavaScript에서 접근할 수 있습니다.
     webView.addJavascriptInterface(new WebAppInterface(this), "AndroidInterface");
     Log.d(TAG, "onCreate: JavaScript interface 'AndroidInterface' added");
 
     // 캐시 사용을 설정합니다.
-    // 기본 캐시 모드 사용 (필요한 경우 네트워크에서 로드)
     webSettings.setCacheMode(WebSettings.LOAD_DEFAULT);
     Log.d(TAG, "onCreate: Cache mode set to LOAD_DEFAULT");
 
@@ -87,9 +98,13 @@ public class MainActivity extends BridgeActivity {
       public void onReceivedSslError(WebView view, SslErrorHandler handler, SslError error) {
         Log.e(TAG, String.format("onReceivedSslError: SSL Error occurred - %s", error.toString()));
         // 개발 환경에서는 SSL 오류를 무시하고 진행할 수 있습니다.
-        // 프로덕션 환경에서는 보안을 위해 이 부분을 제거하는 것이 좋습니다.
-        handler.proceed();
-        Log.w(TAG, "onReceivedSslError: Proceeding despite SSL error (Development mode)");
+        if (BuildConfig.BUILD_TYPE.equals("debug")) {
+          handler.proceed();
+          Log.w(TAG, "onReceivedSslError: Proceeding despite SSL error (Development mode)");
+        } else {
+          handler.cancel();
+          Log.e(TAG, "onReceivedSslError: SSL Error occurred - " + error.toString());
+        }
       }
     });
 
