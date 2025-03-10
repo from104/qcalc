@@ -432,6 +432,24 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@capacitor/device@npm:^7.0.0":
+  version: 7.0.0
+  resolution: "@capacitor/device@npm:7.0.0"
+  peerDependencies:
+    "@capacitor/core": ">=7.0.0"
+  checksum: 10/9a4d92616be3b65092dcbbbde25150cbeb022a0dd5bded72c6f9fc0207f7595a824693401459d0c59bab60a50343eb330a52eee4ebc52dfb2ce8a253c45c8813
+  languageName: node
+  linkType: hard
+
+"@capacitor/screen-reader@npm:^7.0.0":
+  version: 7.0.0
+  resolution: "@capacitor/screen-reader@npm:7.0.0"
+  peerDependencies:
+    "@capacitor/core": ">=7.0.0"
+  checksum: 10/9a07f6b763bd7633e3d86724c08e902d1bea5ecaff534fd75f9cb28df45bcf2da85d38d5a5d99f1b981a34f37d34b5793054e322f82d886b7b1f18771cfb20f3
+  languageName: node
+  linkType: hard
+
 "@develar/schema-utils@npm:~2.6.5":
   version: 2.6.5
   resolution: "@develar/schema-utils@npm:2.6.5"
@@ -10116,6 +10134,8 @@ __metadata:
   dependencies:
     "@capacitor/android": "npm:7.0.1"
     "@capacitor/core": "npm:7.0.1"
+    "@capacitor/device": "npm:^7.0.0"
+    "@capacitor/screen-reader": "npm:^7.0.0"
     "@eslint/js": "npm:9.21.0"
     "@everapi/freecurrencyapi-js": "npm:^1.0.1"
     "@intlify/vite-plugin-vue-i18n": "npm:6.0.3"

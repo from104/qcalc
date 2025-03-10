@@ -26,5 +26,24 @@ declare global {
 
     // textZoomLevel 값을 저장할 변수
     readonly textZoomLevel: number;
+
+    // 디바이스 정보 인터페이스
+    readonly deviceInfo?: {
+      // 정적 정보
+      readonly model: string;
+      readonly platform: string;
+      readonly operatingSystem: string;
+      readonly osVersion: string;
+      readonly manufacturer: string;
+      readonly isVirtual: boolean;
+      readonly webViewVersion: string;
+      // 디바이스 타입
+      readonly isTablet: boolean;
+      readonly isPhone: boolean;
+      readonly isFoldable: boolean;
+      // 화면 관련 정보
+      readonly orientation: 'portrait' | 'landscape';
+      readonly isScreenReaderEnabled: boolean;
+    };
   }
 }

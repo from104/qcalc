@@ -43,6 +43,8 @@
   "dependencies": {
     "@capacitor/android": "7.0.1",
     "@capacitor/core": "7.0.1",
+    "@capacitor/device": "^7.0.0",
+    "@capacitor/screen-reader": "^7.0.0",
     "@everapi/freecurrencyapi-js": "^1.0.1",
     "@quasar/cli": "^2.4.1",
     "@quasar/extras": "1.16.16",
