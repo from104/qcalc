@@ -5,7 +5,7 @@
  *              클립보드와 같은 시스템 기능에 접근할 수 있는 메서드를 포함합니다.
  */
 
-package ocom.atit.qcalc;
+package com.atit.qcalc;
 
 import android.content.ClipData;
 import android.content.ClipboardManager;

@@ -4,7 +4,7 @@
    * @description 이 파일은 계산기 버튼을 구성하는 Vue 컴포넌트입니다.
    *              사용자가 다양한 계산 기능을 수행할 수 있도록 버튼을 제공하며,
    *              각 버튼에 대한 동작을 설정합니다.
-   * 
+   *
    * @props {string} type - 버튼의 유형 (기본값: 'calc')
    */
 
@@ -43,9 +43,7 @@
   import ToolTip from 'src/components/snippets/ToolTip.vue';
 
   // props 기본값 설정
-  const props = withDefaults(defineProps<{ type?: string }>(), {
-    type: 'calc',
-  });
+  const props = withDefaults(defineProps<{ type?: string }>(), { type: 'calc' });
 
   // 스토어에서 필요한 메서드 추출
   const {
@@ -108,14 +106,9 @@
   const currentRadixBase = computed(() => {
     const radixKey = store.sourceRadix as Radix;
     return (
-      (
-        {
-          [Radix.Binary]: 2,
-          [Radix.Octal]: 8,
-          [Radix.Decimal]: 10,
-          [Radix.Hexadecimal]: 16,
-        } as Record<Radix, number>
-      )[radixKey] ?? 10
+      ({ [Radix.Binary]: 2, [Radix.Octal]: 8, [Radix.Decimal]: 10, [Radix.Hexadecimal]: 16 } as Record<Radix, number>)[
+        radixKey
+      ] ?? 10
     );
   });
 
@@ -164,10 +157,7 @@
     const categoryButtons =
       modeSpecificExtendedFunctions[props.type as keyof typeof modeSpecificExtendedFunctions] ?? {};
 
-    return {
-      ...transformExtendedFunctions(standardExtendedFunctions),
-      ...transformExtendedFunctions(categoryButtons),
-    };
+    return { ...transformExtendedFunctions(standardExtendedFunctions), ...transformExtendedFunctions(categoryButtons) };
   });
 
   type ButtonID = keyof typeof standardExtendedFunctions;
@@ -320,8 +310,29 @@
     { immediate: true },
   );
 
+  // resize 이벤트를 처리하기 위한 ref 생성
+  const screenWidth = ref(store.isWideWidth() ? window.innerWidth / 2 : window.innerWidth);
+  const screenHeight = ref(window.innerHeight);
+
+  // resize 이벤트 핸들러
+  const handleResize = () => {
+    screenWidth.value = store.isWideWidth() ? window.innerWidth / 2 : window.innerWidth;
+    screenHeight.value = window.innerHeight;
+  };
+
+  // 컴포넌트 마운트 시 resize 이벤트 리스너 등록
+  onMounted(() => {
+    window.addEventListener('resize', handleResize);
+  });
+
+  // 컴포넌트 언마운트 시 resize 이벤트 리스너 제거
+  onBeforeUnmount(() => {
+    window.removeEventListener('resize', handleResize);
+  });
+
   // 계산기 버튼 높이 설정
   const baseHeight = ref('136px');
+  // const baseHeight = ref('272px');
   if (['unit', 'currency', 'radix'].includes(props.type)) {
     baseHeight.value = '234px';
   }
@@ -377,8 +388,24 @@
     return button.label;
   };
 
-  const textZoomLevel = computed(() => {
-    return window.isCapacitor ? window.textZoomLevel / 100 : 1;
+  const labelScalingFactor = computed(() => {
+    // screenWidth ref를 사용하여 화면 너비 계산
+    const screenWidthPx = screenWidth.value;
+    const screenHeightPx = screenHeight.value;
+    // 기준이 되는 너비 (Android와 동일한 값 사용)
+    const BASE_WIDTH_PX = 352;
+    const BASE_HEIGHT_PX = 604;
+
+    // 현재 화면 너비를 기준 너비에 대해 상대적으로 스케일링 팩터를 계산합니다
+    const scaleFactorWidth = screenWidthPx / BASE_WIDTH_PX;
+    const scaleFactorHeight = screenHeightPx / BASE_HEIGHT_PX;
+
+    // Android와 동일하게 100을 곱한 후 100으로 나누어 비율을 계산합니다
+    return Math.min(scaleFactorWidth, scaleFactorHeight);
+  });
+
+  const labelSizeAdjustmentRatio = computed(() => {
+    return window.isCapacitor ? 1 / labelScalingFactor.value : 1;
   });
 </script>
 
@@ -473,19 +500,25 @@
   }
 
   .icon {
-    font-size: calc(((100vh - v-bind('baseHeight')) / 6 - 20px) * 0.25 / v-bind('textZoomLevel'));
-    padding-top: calc(((100vh - v-bind('baseHeight')) / 6 - 13px) * 0.25); /* Lower the content by 4px */
+    font-size: calc(((100vh - v-bind('baseHeight')) / 6 - 20px) * 0.25 * v-bind('labelSizeAdjustmentRatio'));
+    padding-top: calc(
+      ((100vh - v-bind('baseHeight')) / 6 - 13px) * 0.27 * v-bind('labelScalingFactor') *
+        v-bind('labelSizeAdjustmentRatio')
+    );
   }
 
   .char {
-    font-size: calc(((100vh - v-bind('baseHeight')) / 6 - 20px) * 0.38 / v-bind('textZoomLevel'));
-    padding-top: calc(((100vh - v-bind('baseHeight')) / 6 - 13px) * 0.27); /* Lower the content by 4px */
+    font-size: calc(((100vh - v-bind('baseHeight')) / 6 - 20px) * 0.38 * v-bind('labelSizeAdjustmentRatio'));
+    padding-top: calc(
+      ((100vh - v-bind('baseHeight')) / 6 - 13px) * 0.26 * v-bind('labelScalingFactor') *
+        v-bind('labelSizeAdjustmentRatio')
+    );
   }
 
   .top-label {
     text-align: center;
     position: absolute;
-    font-size: calc(((100vh - v-bind('baseHeight')) / 6 - 20px) * 0.25 / v-bind('textZoomLevel'));
+    font-size: calc(((100vh - v-bind('baseHeight')) / 6 - 20px) * 0.25 * v-bind('labelSizeAdjustmentRatio'));
     color: rgba(255, 255, 255, 0.7);
     width: 100%; /* 가로 중앙 정렬을 위해 추가 */
   }
