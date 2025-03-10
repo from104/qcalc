@@ -9,6 +9,7 @@
 package ocom.atit.qcalc;
 
 import android.annotation.SuppressLint;
+import android.os.Build;
 import android.os.Bundle;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
@@ -63,8 +64,10 @@ public class MainActivity extends BridgeActivity {
     Log.d(TAG, "onCreate: JavaScript enabled");
 
     // DOM Storage API를 활성화합니다.
-    webSettings.setDomStorageEnabled(true);
-    Log.d(TAG, "onCreate: DOM Storage enabled");
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.ECLAIR_MR1) {
+      webSettings.setDomStorageEnabled(true);
+      Log.d(TAG, "onCreate: DOM Storage enabled");
+    }
 
     // 네이티브 코드와 JavaScript 간의 인터페이스를 추가합니다.
     webView.addJavascriptInterface(new WebAppInterface(this), "AndroidInterface");
