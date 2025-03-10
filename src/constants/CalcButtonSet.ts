@@ -71,9 +71,7 @@ export function createCalcButtonSet(t: ComposerTranslation) {
     [id: string]: [label: string, color: string, keys: string[], action: () => void, isDisabled: boolean];
   };
 
-  type CalculatorModeButtons = {
-    [key in 'unit' | 'currency' | 'radix']: CalculatorButtonDefinition;
-  };
+  type CalculatorModeButtons = { [key in 'unit' | 'currency' | 'radix']: CalculatorButtonDefinition };
 
   // prettier-ignore
   const standardButtons: CalculatorButtonDefinition = {
@@ -121,9 +119,7 @@ export function createCalcButtonSet(t: ComposerTranslation) {
     [key: string]: [label: string, shortcutKeys: string[], action: () => void, isDisabled: boolean];
   };
 
-  type ExtendedButtonFunctionsByMode = {
-    [key in 'unit' | 'currency' | 'radix']: ExtendedButtonFunction;
-  };
+  type ExtendedButtonFunctionsByMode = { [key in 'unit' | 'currency' | 'radix']: ExtendedButtonFunction };
 
   // 공통으로 사용할 기본 버튼 기능
   // prettier-ignore
@@ -201,10 +197,5 @@ export function createCalcButtonSet(t: ComposerTranslation) {
     },
   };
 
-  return {
-    standardButtons,
-    modeSpecificButtons,
-    standardExtendedFunctions,
-    modeSpecificExtendedFunctions,
-  };
+  return { standardButtons, modeSpecificButtons, standardExtendedFunctions, modeSpecificExtendedFunctions };
 }

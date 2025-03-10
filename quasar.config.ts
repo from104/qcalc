@@ -100,30 +100,7 @@ export default defineConfig((/* ctx */) => {
           },
         ],
         // 타입스크립트 및 ESLint 검사 플러그인
-        [
-          'vite-plugin-checker',
-          {
-            vueTsc: true,
-            // eslint: {
-            //   lintCommand: 'eslint -c ./eslint.config.js "./src*/**/*.{ts,js,mjs,cjs,vue}"',
-            //   useFlatConfig: true,
-            //   ignore: [
-            //     '**/node_modules/**',
-            //     '**/dist/**',
-            //     '**/build/**',
-            //     '**/public/**',
-            //     '**/.gradle/**', // .gradle 디렉토리 추가
-            //     '**/src-capacitor/**', // src-capacitor 전체를 무시하도록 추가
-            //   ],
-            // },
-            // 문제되는 경로 무시
-            // chokidar: {
-            //   ignored: ['**/android/.gradle/**'],
-            // },
-          },
-          { server: false },
-        ],
-      ],
+        [ 'vite-plugin-checker', { vueTsc: true, }, { server: false }, ], ],
       typescript: {
         strict: true, // (recommended) enables strict settings for TypeScript
         vueShim: true, // required when using ESLint with type-checked rules, will generate a shim file for `*.vue` files
