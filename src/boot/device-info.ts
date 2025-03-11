@@ -7,7 +7,7 @@
 import { Device } from '@capacitor/device';
 import { ScreenReader } from '@capacitor/screen-reader';
 import { Platform } from 'quasar';
-import { defineImmutableProperty } from 'src/utils/global-helpers';
+import { defineImmutableProperty } from 'src/classes/utils/GlobalHelpers';
 import { defineBoot } from '#q-app/wrappers';
 
 // 디바이스 정보 타입 정의

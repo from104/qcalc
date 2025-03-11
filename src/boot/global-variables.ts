@@ -10,18 +10,21 @@ import { defineBoot } from '#q-app/wrappers';
 import { Platform } from 'quasar';
 import { version } from '../../package.json';
 
+// 불변 속성 정의 함수
+import { defineImmutableProperty } from 'src/classes/utils/GlobalHelpers';
+
 // 전역 변수 정의
 import { useStore } from './../stores/store';
 
 // 불변 속성 정의 함수
-const defineImmutableProperty = <T>(obj: object, prop: string, value: T) => {
-  Object.defineProperty(obj, prop, {
-    value, // 값 설정
-    writable: false, // 값 변경 불가
-    configurable: false, // 속성 재정의 불가
-    enumerable: true, // 열거 가능
-  });
-};
+// const defineImmutableProperty = <T>(obj: object, prop: string, value: T) => {
+//   Object.defineProperty(obj, prop, {
+//     value, // 값 설정
+//     writable: false, // 값 변경 불가
+//     configurable: false, // 속성 재정의 불가
+//     enumerable: true, // 열거 가능
+//   });
+// };
 
 export default defineBoot(() => {
   // 전역 변수 정의
