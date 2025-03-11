@@ -23,6 +23,7 @@
   import HeaderIcons from 'components/HeaderIcons.vue';
   import ToolTip from 'components/snippets/ToolTip.vue';
   import MenuPanel from 'components/MenuPanel.vue';
+  import HelpIcon from 'components/snippets/HelpIcon.vue';
 
   // === 페이지 컴포넌트 임포트 ===
   import CalcPage from 'pages/CalcPage.vue';
@@ -33,7 +34,6 @@
   import AboutPage from 'src/pages/AboutPage.vue';
   import RecordPage from 'src/pages/RecordPage.vue';
   import SettingPage from 'src/pages/SettingPage.vue';
-  import HelpIcon from 'src/components/snippets/HelpIcon.vue';
 
   const router = useRouter();
   const route = useRoute();
@@ -319,7 +319,7 @@
     <q-header id="header" class="z-top noselect" elevated>
       <!-- 메인 페이지 헤더 -->
       <q-toolbar v-if="!isSubPage" v-auto-blur>
-        <q-btn flat dense round icon="menu" aria-label="Menu" @click="toggleLeftDrawer">
+        <q-btn flat dense round class="q-mr-sm" icon="menu" aria-label="Menu" @click="toggleLeftDrawer">
           <ToolTip :text="t('tooltip.menu')" />
         </q-btn>
         <q-tabs
@@ -419,7 +419,7 @@
     <q-header id="header" class="z-top noselect row" elevated>
       <!-- 계산기 영역 헤더 -->
       <q-toolbar v-auto-blur class="col-6 calc-header">
-        <q-btn flat dense round icon="menu" aria-label="Menu" @click="toggleLeftDrawer">
+        <q-btn flat dense round class="q-mr-sm" icon="menu" aria-label="Menu" @click="toggleLeftDrawer">
           <ToolTip :text="t('tooltip.menu')" />
         </q-btn>
         <q-tabs

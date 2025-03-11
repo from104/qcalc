@@ -106,7 +106,7 @@
     id="btn-copy"
     flat
     icon="content_copy"
-    class="q-ma-none q-pa-none q-pl-xs"
+    class="q-ma-none q-pa-none q-pl-sm"
     :aria-label="t('ariaLabel.copy')"
     @click="handleCopy"
   >

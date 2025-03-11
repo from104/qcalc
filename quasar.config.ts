@@ -100,7 +100,8 @@ export default defineConfig((/* ctx */) => {
           },
         ],
         // 타입스크립트 및 ESLint 검사 플러그인
-        [ 'vite-plugin-checker', { vueTsc: true, }, { server: false }, ], ],
+        ['vite-plugin-checker', { vueTsc: true }, { server: false }],
+      ],
       typescript: {
         strict: true, // (recommended) enables strict settings for TypeScript
         vueShim: true, // required when using ESLint with type-checked rules, will generate a shim file for `*.vue` files
@@ -168,6 +169,15 @@ export default defineConfig((/* ctx */) => {
     // Capacitor 설정
     capacitor: {
       hideSplashscreen: true,
+      plugins: {
+        Device: {
+          // 디바이스 정보 관련 설정
+          languageTag: 'ko-KR',
+        },
+        ScreenReader: {
+          // 스크린리더 관련 설정
+        },
+      },
     },
 
     // Electron 설정
