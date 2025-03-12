@@ -5,6 +5,8 @@
  *              개발 및 배포 환경에서의 조건부 로직을 구현하는 데 도움을 줍니다.
  */
 
+import type { DeviceInfo, NativeDeviceInfo, NativeAndroidInterface } from './boot/device-info';
+
 // 빈 모듈을 생성하여 전역 타입 선언을 위한 공간을 확보합니다.
 export {};
 
@@ -27,23 +29,13 @@ declare global {
     // textZoomLevel 값을 저장할 변수
     readonly textZoomLevel: number;
 
-    // 디바이스 정보 인터페이스
-    readonly deviceInfo?: {
-      // 정적 정보
-      readonly model: string;
-      readonly platform: string;
-      readonly operatingSystem: string;
-      readonly osVersion: string;
-      readonly manufacturer: string;
-      readonly isVirtual: boolean;
-      readonly webViewVersion: string;
-      // 디바이스 타입
-      readonly isTablet: boolean;
-      readonly isPhone: boolean;
-      readonly isFoldable: boolean;
-      // 화면 관련 정보
-      readonly orientation: 'portrait' | 'landscape';
-      readonly isScreenReaderEnabled: boolean;
-    };
+    // 디바이스 정보 (DeviceInfo 인터페이스 사용)
+    deviceInfo: DeviceInfo | null;
+
+    // 네이티브 디바이스 정보
+    nativeDeviceInfo: NativeDeviceInfo | null;
+
+    // 안드로이드 인터페이스
+    AndroidInterface: NativeAndroidInterface | null;
   }
 }

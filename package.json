@@ -44,6 +44,7 @@
     "@capacitor/android": "7.0.1",
     "@capacitor/core": "7.0.1",
     "@capacitor/device": "^7.0.0",
+    "@capacitor/screen-orientation": "^7.0.0",
     "@capacitor/screen-reader": "^7.0.0",
     "@everapi/freecurrencyapi-js": "^1.0.1",
     "@quasar/cli": "^2.4.1",
@@ -71,6 +72,7 @@
     "vue-router": "4.5.0"
   },
   "devDependencies": {
+    "@capacitor/cli": "^7.0.1",
     "@eslint/js": "9.21.0",
     "@intlify/vite-plugin-vue-i18n": "6.0.3",
     "@jest/globals": "^29.7.0",
