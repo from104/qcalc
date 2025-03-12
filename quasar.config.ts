@@ -208,8 +208,12 @@ export default defineConfig((/* ctx */) => {
         },
         snap: {
           confinement: 'strict',
-          grade: 'devel',
+          grade: 'stable',
+          base: 'core22',
           plugs: ['default'],
+          environment: {
+            TMPDIR: '$XDG_RUNTIME_DIR',
+          },
         },
         publish: [
           {
