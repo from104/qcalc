@@ -167,9 +167,14 @@ export class Calculator {
     );
   }
 
+  public refreshBuffer(): void {
+    const tmp = this.inputBuffer;
+    this.inputBuffer = '';
+    this.inputBuffer = tmp;
+  }
+
   private setCurrentNumberFromPrevious(): void {
     this.currentNumber = this.previousNumber;
-    this.setCurrentNumberToBuffer();
   }
 
   private setPreviousNumberFromCurrent(): void {

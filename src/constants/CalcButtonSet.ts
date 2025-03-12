@@ -127,7 +127,7 @@ export function createCalcButtonSet(t: ComposerTranslation) {
     a1: ['xⁿ', ['Shift+Control+q'], () => calc.pow(), false],
     b1: ['ⁿ√x', ['Shift+Control+w'], () => calc.root(), false],
     c1: ['MC', ['Shift+Control+e', 'Shift+Delete', 'Shift+Escape'], () => calc.memory.clear(), false],
-    d1: ['MR', ['Shift+Backspace', 'Shift+Control+r'], () => { calc.memory.recall(); calc.addDigit('0'); calc.deleteDigitOrDot(); displayMemoryStatus(); }, false ],
+    d1: ['MR', ['Shift+Backspace', 'Shift+Control+r'], () => { calc.memory.recall(); calc.refreshBuffer(); displayMemoryStatus(); }, false ],
     a2: ['10ⁿ', ['Shift+Control+a'], () => calc.exp10(), false],
     b2: ['x%y', ['Shift+Control+s'], () => calc.mod(), false],
     c2: ['x!', ['Shift+Control+d'], () => calc.fct(), false],
