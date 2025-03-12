@@ -35,7 +35,7 @@ public class DeviceManager {
     float widthDp = metrics.widthPixels / metrics.density;
     float heightDp = metrics.heightPixels / metrics.density;
 
-    boolean isTabletBySize = widthDp >= 600 || heightDp >= 600;
+    boolean isTabletBySize = widthDp >= 660;
 
     setTablet(isTabletByConfig || isTabletBySize);
 
@@ -85,6 +85,7 @@ public class DeviceManager {
   }
 
   public int getTextZoom() {
+    Log.d("QCalc", "textZoom: " + textZoom);
     return textZoom;
   }
 }

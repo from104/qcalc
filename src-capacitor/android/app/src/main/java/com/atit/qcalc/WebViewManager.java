@@ -6,6 +6,7 @@ import android.webkit.SslErrorHandler;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import android.util.Log;
 
 import java.util.Locale;
 
@@ -39,6 +40,7 @@ public class WebViewManager {
     webSettings.setCacheMode(WebSettings.LOAD_NO_CACHE);
 
     // 텍스트 줌 설정을 적용합니다.
+    Log.d("QCalc", "setTextZoom: " + deviceManager.getTextZoom());
     webSettings.setTextZoom(deviceManager.getTextZoom());
 
     // 웹뷰 클라이언트 설정

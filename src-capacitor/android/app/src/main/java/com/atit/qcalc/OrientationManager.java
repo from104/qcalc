@@ -19,7 +19,7 @@ public class OrientationManager {
    */
   public void lockToPortrait() {
     activity.runOnUiThread(() -> {
-      activity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+      activity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED);
       Log.d("QCalc", "화면 방향이 세로 모드로 고정되었습니다.");
     });
   }

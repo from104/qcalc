@@ -18,14 +18,12 @@ import com.getcapacitor.BridgeActivity;
  */
 public class MainActivity extends BridgeActivity {
 
-  private AppManager appManager;
-
   @Override
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
 
     // 앱 매니저를 통한 초기화
-    appManager = new AppManager(this);
+    AppManager appManager = new AppManager(this);
     appManager.initialize();
   }
 }

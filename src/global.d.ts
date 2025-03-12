@@ -5,7 +5,7 @@
  *              개발 및 배포 환경에서의 조건부 로직을 구현하는 데 도움을 줍니다.
  */
 
-import type { DeviceInfo, NativeDeviceInfo, NativeAndroidInterface } from './boot/device-info';
+import type { IDeviceInfoCapacitor, NativeDeviceInfo, NativeAndroidInterface } from './boot/device-info';
 
 // 빈 모듈을 생성하여 전역 타입 선언을 위한 공간을 확보합니다.
 export {};
@@ -13,6 +13,7 @@ export {};
 // 전역 변수 선언
 declare global {
   interface Window {
+    // 환경 관련 플래그
     readonly isDev: boolean;
     readonly isDesktop: boolean;
     readonly isMobile: boolean;
@@ -26,16 +27,16 @@ declare global {
     // Store는 필요에 따라 수정 가능하게 유지
     readonly store: ReturnType<typeof useStore>;
 
-    // textZoomLevel 값을 저장할 변수
+    // 텍스트 줌 레벨
     readonly textZoomLevel: number;
 
-    // 디바이스 정보 (DeviceInfo 인터페이스 사용)
-    deviceInfo: DeviceInfo | null;
+    // 디바이스 정보 (Capacitor 인터페이스)
+    deviceInfo?: IDeviceInfoCapacitor;
 
     // 네이티브 디바이스 정보
-    nativeDeviceInfo: NativeDeviceInfo | null;
+    nativeDeviceInfo?: NativeDeviceInfo;
 
     // 안드로이드 인터페이스
-    AndroidInterface: NativeAndroidInterface | null;
+    AndroidInterface?: NativeAndroidInterface;
   }
 }

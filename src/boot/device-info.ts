@@ -4,11 +4,8 @@
  *              전역 window 객체에 할당하는 부트스트랩 파일입니다.
  */
 
-import { Device } from '@capacitor/device';
-import { ScreenReader } from '@capacitor/screen-reader';
-import { ScreenOrientation } from '@capacitor/screen-orientation';
 import { Platform } from 'quasar';
-import { defineBoot } from '#q-app/wrappers';
+import { boot } from 'quasar/wrappers';
 
 // 타입 정의
 export type OrientationType = 'portrait' | 'landscape';
@@ -22,7 +19,7 @@ export interface NativeDeviceInfo {
 }
 
 // 디바이스 정보 타입 정의
-export interface DeviceInfo {
+export interface IDeviceInfoCapacitor {
   // 정적 정보
   model: string;
   platform: string;
@@ -54,153 +51,121 @@ export interface NativeAndroidInterface {
   unlockOrientation(): void;
 }
 
-// 전역 객체 타입
-type GlobalWithDeviceInfo = {
-  deviceInfo: DeviceInfo | null;
-  nativeDeviceInfo: NativeDeviceInfo | null;
-  AndroidInterface: NativeAndroidInterface | null;
-};
+export interface IDeviceInfo {
+  isTablet: boolean;
+  isPhone: boolean;
+  isFoldable: boolean;
+  textZoomLevel: number;
+  isInitialized: boolean;
+}
 
-// 전역 객체 초기화
-(window as unknown as GlobalWithDeviceInfo).deviceInfo = null;
-(window as unknown as GlobalWithDeviceInfo).nativeDeviceInfo = null;
-(window as unknown as GlobalWithDeviceInfo).AndroidInterface = null;
+class DeviceInfo implements IDeviceInfo {
+  private static instance: DeviceInfo;
+  private _isTablet: boolean = false;
+  private _isPhone: boolean = false;
+  private _isFoldable: boolean = false;
+  private _textZoomLevel: number = 100;
+  private _isInitialized: boolean = false;
 
-export default defineBoot(async () => {
-  if (!Platform.is.capacitor) return;
-
-  try {
-    // 디바이스 정보 가져오기
-    const info = await Device.getInfo();
-    const screenReaderStatus = await ScreenReader.isEnabled();
-
-    // 디바이스 타입 판별 - 네이티브 정보가 있으면 우선 사용
-    let isTablet = false;
-    let isPhone = false;
-    let isFoldable = false;
-
-    // 안드로이드에서 전달한 정보가 있는지 확인
-    const global = window as unknown as GlobalWithDeviceInfo;
-    const androidInterface = global.AndroidInterface;
-    const nativeDeviceInfo = global.nativeDeviceInfo;
-
-    if (androidInterface) {
-      // Android JavascriptInterface 사용
-      isTablet = androidInterface.isTablet();
-      isPhone = androidInterface.isPhone();
-      isFoldable = androidInterface.isFoldable();
-      console.log('AndroidInterface를 통해 디바이스 정보를 가져왔습니다:', { isTablet, isPhone, isFoldable });
-    } else if (nativeDeviceInfo) {
-      // WebViewClient를 통해 주입된 정보 사용
-      isTablet = nativeDeviceInfo.isTablet;
-      isPhone = nativeDeviceInfo.isPhone;
-      isFoldable = nativeDeviceInfo.isFoldable;
-      console.log('nativeDeviceInfo를 통해 디바이스 정보를 가져왔습니다:', nativeDeviceInfo);
-    } else {
-      // 웹뷰에서 자체 판별 (기존 코드 사용)
-      isTablet =
-        info.platform === 'android'
-          ? window.innerWidth >= 600 || window.innerHeight >= 600
-          : info.model.includes('iPad');
-      isPhone = !isTablet;
-      isFoldable = info.model.toLowerCase().includes('fold') || info.model.toLowerCase().includes('flip');
-      console.log('자체 판별한 디바이스 정보:', { isTablet, isPhone, isFoldable });
-    }
-
-    // 방향 제어 함수
-    const lockToPortrait = async (): Promise<void> => {
-      try {
-        if (androidInterface) {
-          androidInterface.lockToPortrait();
-        } else {
-          await ScreenOrientation.lock({ orientation: 'portrait' });
-        }
-        console.log('화면이 세로 모드로 고정되었습니다.');
-      } catch (error) {
-        console.error('화면 방향 고정 실패:', error);
-      }
-    };
-
-    const lockToLandscape = async (): Promise<void> => {
-      try {
-        if (androidInterface) {
-          androidInterface.lockToLandscape();
-        } else {
-          await ScreenOrientation.lock({ orientation: 'landscape' });
-        }
-        console.log('화면이 가로 모드로 고정되었습니다.');
-      } catch (error) {
-        console.error('화면 방향 고정 실패:', error);
-      }
-    };
-
-    const unlockOrientation = async (): Promise<void> => {
-      try {
-        if (androidInterface) {
-          androidInterface.unlockOrientation();
-        } else {
-          await ScreenOrientation.unlock();
-        }
-        console.log('화면 방향 고정이 해제되었습니다.');
-      } catch (error) {
-        console.error('화면 방향 고정 해제 실패:', error);
-      }
-    };
-
-    // 디바이스 정보 객체 생성
-    const appDeviceInfo: DeviceInfo = {
-      model: info.model,
-      platform: info.platform,
-      operatingSystem: info.operatingSystem,
-      osVersion: info.osVersion,
-      manufacturer: info.manufacturer,
-      isVirtual: info.isVirtual,
-      webViewVersion: info.webViewVersion,
-      isTablet,
-      isPhone,
-      isFoldable,
-      orientation: window.innerWidth > window.innerHeight ? 'landscape' : 'portrait',
-      isScreenReaderEnabled: screenReaderStatus.value,
-      unlockOrientation,
-      lockToPortrait,
-      lockToLandscape,
-    };
-
-    // window 객체에 할당
-    (window as unknown as GlobalWithDeviceInfo).deviceInfo = appDeviceInfo;
-
-    // 화면 방향 변경 이벤트 리스너
-    window.addEventListener('resize', () => {
-      const global = window as unknown as GlobalWithDeviceInfo;
-      const deviceInfo = global.deviceInfo;
-      if (!deviceInfo) return;
-
-      const newOrientation: OrientationType = window.innerWidth > window.innerHeight ? 'landscape' : 'portrait';
-      if (deviceInfo.orientation !== newOrientation) {
-        (window as unknown as GlobalWithDeviceInfo).deviceInfo = {
-          ...deviceInfo,
-          orientation: newOrientation,
-        };
-      }
-    });
-
-    // 스크린리더 상태 변경 이벤트 리스너
-    ScreenReader.addListener('stateChange', (state) => {
-      const global = window as unknown as GlobalWithDeviceInfo;
-      const deviceInfo = global.deviceInfo;
-      if (!deviceInfo) return;
-
-      (window as unknown as GlobalWithDeviceInfo).deviceInfo = {
-        ...deviceInfo,
-        isScreenReaderEnabled: state.value,
-      };
-    });
-
-    // 휴대폰인 경우 세로 모드로 고정
-    if (isPhone && !androidInterface) {
-      await lockToPortrait();
-    }
-  } catch (error) {
-    console.error('Failed to initialize device info:', error);
+  private constructor() {
+    // private 생성자
   }
+
+  public static getInstance(): DeviceInfo {
+    if (!DeviceInfo.instance) {
+      DeviceInfo.instance = new DeviceInfo();
+    }
+    return DeviceInfo.instance;
+  }
+
+  public async initialize(): Promise<void> {
+    try {
+      if (Platform.is.android && window.AndroidInterface) {
+        // 안드로이드 네이티브 인터페이스 사용
+        this._isTablet = await window.AndroidInterface.isTablet();
+        console.log('isTablet:', this._isTablet);
+        
+        this._isPhone = await window.AndroidInterface.isPhone();
+        console.log('isPhone:', this._isPhone);
+        
+        this._isFoldable = await window.AndroidInterface.isFoldable();
+        console.log('isFoldable:', this._isFoldable);
+
+        // nativeDeviceInfo가 주입되었는지 확인
+        if (window.nativeDeviceInfo) {
+          this._textZoomLevel = window.nativeDeviceInfo.textZoomLevel;
+          console.log('textZoomLevel:', this._textZoomLevel);
+        }
+      } else {
+        // 기본값 설정 (웹 환경 등)
+        this._isPhone = true;
+        console.log('isPhone (default):', this._isPhone);
+        
+        this._isTablet = false;
+        console.log('isTablet (default):', this._isTablet);
+        
+        this._isFoldable = false;
+        console.log('isFoldable (default):', this._isFoldable);
+        
+        this._textZoomLevel = 100;
+        console.log('textZoomLevel (default):', this._textZoomLevel);
+      }
+
+      this._isInitialized = true;
+      console.log('Device info initialized:', {
+        isTablet: this._isTablet,
+        isPhone: this._isPhone,
+        isFoldable: this._isFoldable,
+        textZoomLevel: this._textZoomLevel,
+      });
+    } catch (error) {
+      console.error('Failed to initialize device info:', error);
+      // 에러 발생 시 기본값 설정
+      this._isPhone = true;
+      console.log('isPhone (error):', this._isPhone);
+      
+      this._isTablet = false;
+      console.log('isTablet (error):', this._isTablet);
+      
+      this._isFoldable = false;
+      console.log('isFoldable (error):', this._isFoldable);
+      
+      this._textZoomLevel = 100;
+      console.log('textZoomLevel (error):', this._textZoomLevel);
+      
+      this._isInitialized = true;
+    }
+  }
+
+  public get isInitialized(): boolean {
+    return this._isInitialized;
+  }
+
+  public get isTablet(): boolean {
+    console.log('get isTablet:', this._isTablet);
+    return this._isTablet;
+  }
+
+  public get isPhone(): boolean {
+    console.log('get isPhone:', this._isPhone);
+    return this._isPhone;
+  }
+
+  public get isFoldable(): boolean {
+    console.log('get isFoldable:', this._isFoldable);
+    return this._isFoldable;
+  }
+
+  public get textZoomLevel(): number {
+    console.log('get textZoomLevel:', this._textZoomLevel);
+    return this._textZoomLevel;
+  }
+}
+
+export default boot(async () => {
+  const deviceInfo = DeviceInfo.getInstance();
+  await deviceInfo.initialize();
 });
+
+// 다른 컴포넌트에서 사용할 수 있도록 export
+export const getDeviceInfo = () => DeviceInfo.getInstance();

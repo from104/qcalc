@@ -1,6 +1,7 @@
 package com.atit.qcalc;
 
 import android.content.pm.ActivityInfo;
+import android.util.Log;
 import android.webkit.WebView;
 import com.getcapacitor.BridgeActivity;
 
@@ -11,8 +12,6 @@ public class AppManager {
   private final BridgeActivity activity;
   private DeviceManager deviceManager;
   private OrientationManager orientationManager;
-  private WebViewManager webViewManager;
-  private ClipboardManager clipboardManager;
   private WebAppBridge webAppBridge;
 
   public AppManager(BridgeActivity activity) {
@@ -34,10 +33,10 @@ public class AppManager {
   private void initializeManagers() {
     deviceManager = new DeviceManager(activity);
     orientationManager = new OrientationManager(activity);
-    clipboardManager = new ClipboardManager(activity);
+    ClipboardManager clipboardManager = new ClipboardManager(activity);
 
     WebView webView = activity.getBridge().getWebView();
-    webViewManager = new WebViewManager(webView, deviceManager);
+    WebViewManager webViewManager = new WebViewManager(webView, deviceManager);
 
     webAppBridge = new WebAppBridge(deviceManager, orientationManager, clipboardManager);
   }
@@ -56,6 +55,7 @@ public class AppManager {
   private void configureInitialSettings() {
     // 디바이스가 폰인 경우 화면 방향을 세로로 고정
     if (deviceManager.isPhone()) {
+      Log.d("AppManager", "Locking screen orientation to portrait for phone devices");
       orientationManager.lockToPortrait();
     }
   }
