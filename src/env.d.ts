@@ -41,10 +41,19 @@ declare module '*.md' {
  * Android 시스템과 상호 작용하기 위한 인터페이스
  */
 declare class AndroidInterface {
-  /**
-   * Android 기기의 클립보드에서 내용을 가져옵니다.
-   * @returns 클립보드에서 가져온 텍스트 내용
-   */
+  // phone 여부 확인
+  static isPhone(): boolean;
+
+  // tablet 여부 확인
+  static isTablet(): boolean;
+
+  // foldable 여부 확인
+  static isFoldable(): boolean;
+
+  // 텍스트 줌 레벨 가져오기
+  static getTextZoom(): number;
+
+  // 클립보드에서 텍스트 가져오기
   static getFromClipboard(): string;
 }
 

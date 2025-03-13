@@ -1,29 +1,38 @@
-/**
- * @file MainActivity.java
- * @description 이 파일은 Capacitor 기반 안드로이드 애플리케이션의 메인 액티비티를 정의합니다.
- *              이 클래스는 BridgeActivity를 상속받아 Capacitor의 기능을 활용하며,
- *              웹뷰 설정, JavaScript 인터페이스 추가, 캐시 관리 및 텍스트 줌 설정과 같은
- *              다양한 초기화 작업을 수행합니다.
- */
-
 package com.atit.qcalc;
 
-import android.os.Bundle;
 import com.getcapacitor.BridgeActivity;
+import android.os.Bundle;
+import android.webkit.WebSettings;
+import android.webkit.WebView;
 
-/**
- * MainActivity 클래스
- * 이 클래스는 Capacitor 기반 안드로이드 앱의 메인 액티비티입니다.
- * 앱의 초기화와 매니저 클래스들의 생성만을 담당합니다.
- */
+import com.atit.qcalc.DeviceManager;
+
+// 메인 액티비티
 public class MainActivity extends BridgeActivity {
-
   @Override
   protected void onCreate(Bundle savedInstanceState) {
+    // 액티비티 생성
     super.onCreate(savedInstanceState);
 
-    // 앱 매니저를 통한 초기화
-    AppManager appManager = new AppManager(this);
-    appManager.initialize();
+    // 웹뷰 생성
+    WebView webView = getBridge().getWebView();
+
+    // 자바스크립트 인터페이스 추가
+    webView.addJavascriptInterface(new AndroidInterface(this), "AndroidInterface");
+
+    // 웹뷰 설정
+    WebSettings settings = webView.getSettings();
+
+    // 자바스크립트 활성화
+    settings.setJavaScriptEnabled(true);
+
+    // DOM Storage 활성화
+    settings.setDomStorageEnabled(true);
+
+    // 캐시 비활성화
+    settings.setCacheMode(WebSettings.LOAD_NO_CACHE);
+
+    // 텍스트 크기 설정
+    settings.setTextZoom(new DeviceManager(this).getTextZoom()); // 텍스트 크기 설정
   }
 }

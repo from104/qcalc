@@ -5,8 +5,6 @@
  *              개발 및 배포 환경에서의 조건부 로직을 구현하는 데 도움을 줍니다.
  */
 
-import type { IDeviceInfoCapacitor, NativeDeviceInfo, NativeAndroidInterface } from './boot/device-info';
-
 // 빈 모듈을 생성하여 전역 타입 선언을 위한 공간을 확보합니다.
 export {};
 
@@ -24,19 +22,23 @@ declare global {
     readonly isCapacitor: boolean;
     readonly isSnap: boolean;
 
+    // 디바이스 타입 정보
+    readonly isTablet: boolean;
+    readonly isPhone: boolean;
+    readonly isFoldable: boolean;
+    readonly textZoom: number;
+
     // Store는 필요에 따라 수정 가능하게 유지
     readonly store: ReturnType<typeof useStore>;
 
-    // 텍스트 줌 레벨
-    readonly textZoomLevel: number;
-
-    // 디바이스 정보 (Capacitor 인터페이스)
-    deviceInfo?: IDeviceInfoCapacitor;
-
-    // 네이티브 디바이스 정보
-    nativeDeviceInfo?: NativeDeviceInfo;
-
-    // 안드로이드 인터페이스
-    AndroidInterface?: NativeAndroidInterface;
+    AndroidInterface?: AndroidInterface;
   }
+}
+
+interface AndroidInterface {
+  isTablet(): boolean;
+  isPhone(): boolean;
+  isFoldable(): boolean;
+  getTextZoom(): number;
+  getFromClipboard(): string;
 }

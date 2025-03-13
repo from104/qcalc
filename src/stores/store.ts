@@ -495,8 +495,28 @@ export const useStore = defineStore('store', {
       this.isDeleteRecordConfirmOpen = value;
     },
 
+    // 화면이 세로인지 확인
+    isPortrait() {
+      return Screen.width < Screen.height;
+    },
+
+    // 화면이 가로인지 확인
+    isLandscape() {
+      return !this.isPortrait();
+    },
+
+    // 넓은 너비 여부 확인
     isWideWidth() {
-      return Screen.width >= 330 * 2;
+      if (window.isTablet) {
+        // 태블릿은 가로 모드만 지원
+        return this.isLandscape();
+      } else if (window.isPhone) {
+        // 폰은 넓은 너비 지원 안함
+        return false;
+      } else {
+        // 데스크탑은 넓은 너비 여부 확인
+        return Screen.width >= 330 * 2;
+      }
     },
 
     // 기본 계산기 여부 확인

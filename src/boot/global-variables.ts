@@ -37,7 +37,9 @@ export default defineBoot(() => {
     isMobile: Platform.is.mobile,
     isWindows: Platform.is.win,
     isLinux: Platform.is.linux,
+    isMac: Platform.is.mac,
     isAndroid: Platform.is.android,
+    isIOS: Platform.is.ios,
     isElectron: Platform.is.electron,
     isCapacitor: Platform.is.capacitor,
 
@@ -49,7 +51,21 @@ export default defineBoot(() => {
 
     // 스토어 인스턴스
     store: useStore(),
+
+    // 디바이스 타입 정보
+    isTablet: false,
+    isPhone: false,
+    isFoldable: false,
+    textZoom: 100,
   };
+
+  // Capacitor 환경에서 자바스크립트 인터페이스 추가
+  if (Platform.is.capacitor) {
+    globalVariables.isTablet = window.AndroidInterface?.isTablet() ?? false;
+    globalVariables.isPhone = window.AndroidInterface?.isPhone() ?? false;
+    globalVariables.isFoldable = window.AndroidInterface?.isFoldable() ?? false;
+    globalVariables.textZoom = window.AndroidInterface?.getTextZoom() ?? 100;
+  }
 
   // 전역 변수 일괄 정의
   Object.entries(globalVariables).forEach(([key, value]) => {

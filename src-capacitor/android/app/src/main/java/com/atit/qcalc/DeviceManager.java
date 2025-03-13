@@ -35,7 +35,8 @@ public class DeviceManager {
     float widthDp = metrics.widthPixels / metrics.density;
     float heightDp = metrics.heightPixels / metrics.density;
 
-    boolean isTabletBySize = widthDp >= 660;
+    // 높이나 너비 중 작은 쪽이 660dp 이상이면 태블릿으로 판단
+    boolean isTabletBySize = Math.min(widthDp, heightDp) >= 660;
 
     setTablet(isTabletByConfig || isTabletBySize);
 
@@ -55,9 +56,13 @@ public class DeviceManager {
   private void calculateTextZoom() {
     float screenWidthDp = activity.getResources().getDisplayMetrics().widthPixels /
         activity.getResources().getDisplayMetrics().density;
-    final float BASE_WIDTH_DP = 350f;
-    float scaleFactor = screenWidthDp / BASE_WIDTH_DP;
-    this.textZoom = (int) (100 * scaleFactor);
+    float screenHeightDp = activity.getResources().getDisplayMetrics().heightPixels /
+        activity.getResources().getDisplayMetrics().density;
+    final float BASE_WIDTH_DP = 352f;
+    final float BASE_HEIGHT_DP = 604f;
+    float scaleFactor = Math.max(screenWidthDp / BASE_WIDTH_DP, screenHeightDp / BASE_HEIGHT_DP);
+    
+    this.textZoom = (int) Math.min(Math.max(100 * scaleFactor, 75), 125);
   }
 
   public boolean isTablet() {
