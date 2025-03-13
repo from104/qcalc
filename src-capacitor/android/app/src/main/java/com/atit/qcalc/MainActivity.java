@@ -5,12 +5,16 @@ import android.os.Bundle;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 
+import plugins.ScreenOrientation.ScreenOrientationPlugin;
 import com.atit.qcalc.DeviceManager;
 
 // 메인 액티비티
 public class MainActivity extends BridgeActivity {
   @Override
   protected void onCreate(Bundle savedInstanceState) {
+    // 화면 방향 잠금
+    registerPlugin(ScreenOrientationPlugin.class);
+
     // 액티비티 생성
     super.onCreate(savedInstanceState);
 

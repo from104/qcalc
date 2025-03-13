@@ -8,9 +8,10 @@
    */
 
   // === 핵심 Vue 및 라우터 의존성 ===
-  import { ref, onBeforeMount, watch, computed } from 'vue';
+  import { ref, onBeforeMount, watch, computed, onBeforeUnmount, onUnmounted } from 'vue';
   import { useRoute } from 'vue-router';
   import { useI18n } from 'vue-i18n';
+  import { ScreenOrientation } from '@capacitor/screen-orientation';
 
   // === 컴포넌트 임포트 ===
   import AutoUpdate from 'components/AutoUpdate.vue';
@@ -133,6 +134,20 @@
    * 현재 적용할 트랜지션 이름을 반환합니다.
    */
   const computeTransition = computed(() => currentTransition.value);
+
+  onBeforeMount(async () => {
+    if (window.isCapacitor && window.isPhone) {
+      await ScreenOrientation.lock({
+        orientation: 'portrait',
+      });
+    }
+  });
+
+  onUnmounted(async () => {
+    if (window.isCapacitor && window.isPhone) {
+      await ScreenOrientation.unlock();
+    }
+  });
 </script>
 
 <template>
