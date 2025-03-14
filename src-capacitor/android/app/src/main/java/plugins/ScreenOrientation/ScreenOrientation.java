@@ -1,13 +1,25 @@
 package plugins.ScreenOrientation;
 
 import android.view.Surface;
+
 import androidx.appcompat.app.AppCompatActivity;
+
+import android.content.pm.ActivityInfo;
 
 public class ScreenOrientation {
    private AppCompatActivity activity;
 
    public ScreenOrientation(AppCompatActivity activity) {
        this.activity = activity;
+   }
+
+   public void lock(String orientationType) {
+       int orientationEnum = fromOrientationTypeToEnum(orientationType);
+       activity.setRequestedOrientation(orientationEnum);
+   }
+
+   public void unlock() {
+       activity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED);
    }
 
    public String getCurrentOrientationType() {
@@ -26,5 +38,30 @@ public class ScreenOrientation {
            default:
                return "portrait-primary";
        }
+   }
+
+   private int configOrientation;
+
+   public boolean hasOrientationChanged(int orientation) {
+       if (orientation == configOrientation) {
+           return false;
+       } else {
+           this.configOrientation = orientation;
+           return true;
+       }
+   }
+
+   private int fromOrientationTypeToEnum(String orientationType) {
+      switch (orientationType) {
+          case "landscape-primary":
+              return ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE;
+          case "landscape-secondary":
+              return ActivityInfo.SCREEN_ORIENTATION_REVERSE_LANDSCAPE;
+          case "portrait-secondary":
+              return ActivityInfo.SCREEN_ORIENTATION_REVERSE_PORTRAIT;
+          default:
+              // Case: portrait-primary
+              return ActivityInfo.SCREEN_ORIENTATION_PORTRAIT;
+      }
    }
 }
