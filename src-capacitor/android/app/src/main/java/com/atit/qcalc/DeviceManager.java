@@ -45,23 +45,22 @@ public class DeviceManager {
 
     setPhone(!isTablet);
 
-    Log.d("QCalc", "디바이스 타입 감지: isTablet=" + this.isTablet +
-        ", isPhone=" + this.isPhone + ", isFoldable=" + this.isFoldable +
-        ", model=" + Build.MODEL + ", width=" + widthDp + "dp, height=" + heightDp + "dp");
+    Log.d("QCalc", "디바이스 타입 감지: isTablet=" + this.isTablet + ", isPhone=" + this.isPhone + ", isFoldable="
+        + this.isFoldable + ", model=" + Build.MODEL + ", width=" + widthDp + "dp, height=" + heightDp + "dp");
   }
 
   /**
    * 텍스트 줌 레벨을 계산하는 메서드
    */
   private void calculateTextZoom() {
-    float screenWidthDp = activity.getResources().getDisplayMetrics().widthPixels /
-        activity.getResources().getDisplayMetrics().density;
-    float screenHeightDp = activity.getResources().getDisplayMetrics().heightPixels /
-        activity.getResources().getDisplayMetrics().density;
+    float screenWidthDp = activity.getResources().getDisplayMetrics().widthPixels
+        / activity.getResources().getDisplayMetrics().density;
+    float screenHeightDp = activity.getResources().getDisplayMetrics().heightPixels
+        / activity.getResources().getDisplayMetrics().density;
     final float BASE_WIDTH_DP = 352f;
     final float BASE_HEIGHT_DP = 604f;
     float scaleFactor = Math.max(screenWidthDp / BASE_WIDTH_DP, screenHeightDp / BASE_HEIGHT_DP);
-    
+
     this.textZoom = (int) Math.min(Math.max(100 * scaleFactor, 75), 125);
   }
 

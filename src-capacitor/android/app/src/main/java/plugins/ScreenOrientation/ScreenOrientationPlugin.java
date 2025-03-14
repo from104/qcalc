@@ -43,7 +43,7 @@ public class ScreenOrientationPlugin extends Plugin {
     implementation.unlock();
     call.resolve();
   }
-  
+
   @Override
   public void handleOnConfigurationChanged(Configuration newConfig) {
     super.handleOnConfigurationChanged(newConfig);

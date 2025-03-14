@@ -7,7 +7,6 @@
 package com.atit.qcalc;
 
 import android.webkit.JavascriptInterface;
-import android.content.Context;
 import android.app.Activity;
 
 public class AndroidInterface {

@@ -21,8 +21,7 @@ public class ClipboardManager {
   public String getFromClipboard() {
     try {
       android.content.ClipboardManager clipboardManager;
-      clipboardManager = (android.content.ClipboardManager) context
-          .getSystemService(Context.CLIPBOARD_SERVICE);
+      clipboardManager = (android.content.ClipboardManager) context.getSystemService(Context.CLIPBOARD_SERVICE);
 
       if (clipboardManager != null && clipboardManager.hasPrimaryClip()) {
         ClipData clipData = clipboardManager.getPrimaryClip();

@@ -1,6 +1,8 @@
 package com.atit.qcalc;
 
 import com.getcapacitor.BridgeActivity;
+
+import android.annotation.SuppressLint;
 import android.os.Bundle;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
@@ -10,6 +12,7 @@ import com.atit.qcalc.DeviceManager;
 
 // 메인 액티비티
 public class MainActivity extends BridgeActivity {
+  @SuppressLint("SetJavaScriptEnabled")
   @Override
   protected void onCreate(Bundle savedInstanceState) {
     // 화면 방향 잠금
@@ -24,6 +27,9 @@ public class MainActivity extends BridgeActivity {
     // 자바스크립트 인터페이스 추가
     webView.addJavascriptInterface(new AndroidInterface(this), "AndroidInterface");
 
+    // 오버스크롤 방지
+    webView.setOverScrollMode(WebView.OVER_SCROLL_NEVER);
+    
     // 웹뷰 설정
     WebSettings settings = webView.getSettings();
 
@@ -37,6 +43,6 @@ public class MainActivity extends BridgeActivity {
     settings.setCacheMode(WebSettings.LOAD_NO_CACHE);
 
     // 텍스트 크기 설정
-    settings.setTextZoom(new DeviceManager(this).getTextZoom()); // 텍스트 크기 설정
+    settings.setTextZoom(new DeviceManager(this).getTextZoom());
   }
 }

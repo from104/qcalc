@@ -7,61 +7,54 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.content.pm.ActivityInfo;
 
 public class ScreenOrientation {
-   private AppCompatActivity activity;
+  private final AppCompatActivity activity;
 
-   public ScreenOrientation(AppCompatActivity activity) {
-       this.activity = activity;
-   }
+  public ScreenOrientation(AppCompatActivity activity) {
+    this.activity = activity;
+  }
 
-   public void lock(String orientationType) {
-       int orientationEnum = fromOrientationTypeToEnum(orientationType);
-       activity.setRequestedOrientation(orientationEnum);
-   }
+  public void lock(String orientationType) {
+    int orientationEnum = fromOrientationTypeToEnum(orientationType);
+    activity.setRequestedOrientation(orientationEnum);
+  }
 
-   public void unlock() {
-       activity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED);
-   }
+  public void unlock() {
+    activity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED);
+  }
 
-   public String getCurrentOrientationType() {
-       int rotation = activity.getWindowManager().getDefaultDisplay().getRotation();
-       return fromRotationToOrientationType(rotation);
-   }
+  public String getCurrentOrientationType() {
+    int rotation = activity.getWindowManager().getDefaultDisplay().getRotation();
+    return fromRotationToOrientationType(rotation);
+  }
 
-   private String fromRotationToOrientationType(int rotation) {
-       switch (rotation) {
-           case Surface.ROTATION_90:
-               return "landscape-primary";
-           case Surface.ROTATION_180:
-               return "portrait-secondary";
-           case Surface.ROTATION_270:
-               return "landscape-secondary";
-           default:
-               return "portrait-primary";
-       }
-   }
+  private String fromRotationToOrientationType(int rotation) {
+    return switch (rotation) {
+      case Surface.ROTATION_90 -> "landscape-primary";
+      case Surface.ROTATION_180 -> "portrait-secondary";
+      case Surface.ROTATION_270 -> "landscape-secondary";
+      default -> "portrait-primary";
+    };
+  }
 
-   private int configOrientation;
+  private int configOrientation;
 
-   public boolean hasOrientationChanged(int orientation) {
-       if (orientation == configOrientation) {
-           return false;
-       } else {
-           this.configOrientation = orientation;
-           return true;
-       }
-   }
+  public boolean hasOrientationChanged(int orientation) {
+    if (orientation == configOrientation) {
+      return false;
+    } else {
+      this.configOrientation = orientation;
+      return true;
+    }
+  }
 
-   private int fromOrientationTypeToEnum(String orientationType) {
-      switch (orientationType) {
-          case "landscape-primary":
-              return ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE;
-          case "landscape-secondary":
-              return ActivityInfo.SCREEN_ORIENTATION_REVERSE_LANDSCAPE;
-          case "portrait-secondary":
-              return ActivityInfo.SCREEN_ORIENTATION_REVERSE_PORTRAIT;
-          default:
-              // Case: portrait-primary
-              return ActivityInfo.SCREEN_ORIENTATION_PORTRAIT;
-      }
-   }
+  private int fromOrientationTypeToEnum(String orientationType) {
+    return switch (orientationType) {
+      case "landscape-primary" -> ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE;
+      case "landscape-secondary" -> ActivityInfo.SCREEN_ORIENTATION_REVERSE_LANDSCAPE;
+      case "portrait-secondary" -> ActivityInfo.SCREEN_ORIENTATION_REVERSE_PORTRAIT;
+      default ->
+        // Case: portrait-primary
+        ActivityInfo.SCREEN_ORIENTATION_PORTRAIT;
+    };
+  }
 }
