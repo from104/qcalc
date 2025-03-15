@@ -464,7 +464,7 @@
     <!-- 기록 목록 -->
     <transition name="slide-fade" mode="out-in">
       <!-- 기록이 없는 경우 -->
-      <q-item v-if="recordStrings.length == 0" class="text-center q-pt-xl">
+      <q-item v-if="recordStrings.length == 0" class="text-center q-pt-xl noselect">
         <q-item-section role="listitem">
           <q-item-label>
             <span class="text-h6">{{

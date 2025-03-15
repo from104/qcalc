@@ -462,6 +462,7 @@
               :aria-label="t('ariaLabel.subPageTitle', { title: SUB_PAGE_CONFIG[currentSubPage]?.title })"
             >
               {{ SUB_PAGE_CONFIG[currentSubPage]?.title }}
+              <HelpIcon v-if="(currentSubPage === 'record' || currentSubPage === '') && window.isMobile" :text="t('tooltip.recordSwipeHelp')" />
             </q-toolbar-title>
             <div class="col-8 row justify-end sub-header-buttons">
               <q-btn

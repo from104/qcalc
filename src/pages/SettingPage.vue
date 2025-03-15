@@ -10,7 +10,7 @@
 </script>
 
 <template>
-  <q-page>
+  <q-page class="scrollbar-custom">
     <q-card flat square>
       <SettingCard />
     </q-card>

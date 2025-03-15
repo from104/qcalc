@@ -15,7 +15,7 @@
 </script>
 
 <template>
-  <q-page>
+  <q-page class="scrollbar-custom">
     <q-card flat class="q-pa-lg">
       <q-markdown
         :src="locale.substring(0, 2) == 'ko' ? AboutPageMD_ko : AboutPageMD_en"
