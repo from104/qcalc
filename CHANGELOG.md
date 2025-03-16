@@ -4,19 +4,21 @@ All notable changes to this project are recorded in this file.
 
 The format is based on [Keep a Changelog] and this project follows [Semantic Versioning].
 
-## [0.11.3] 2025-02-16
+## [0.11.3] 2025-03-16
 
 ### Added
 
-- Mobile optimization tooltip: Added guidance about adding/deleting memos by swiping on the history screen
+- **Mobile optimization tooltip**: Added guidance about adding memo / deleting record by swiping on the history panel
+- **Snap package**: The app can now be launched from the desktop menu (GNOME, KDE, etc.).
 
 ### Changed
 
-- History management UI: Provides quick menu on desktop mouseover and intuitive icon button placement for mobile
+- **History management UI improvements**: Provides quick menu on desktop mouseover and intuitive icon button placement for mobile
+- **Menu style change**: Changed menu style from pull-down menu to more mobile app-like drawer style.
 
 ### Fixed
 
--
+- **Portrait screen orientation issues resolved**: Fixed portrait screen orientation issues (rotation, font size, etc.) in mobile app.
 
 ## [0.11.2] 2025-02-05
 
@@ -98,7 +100,7 @@ The format is based on [Keep a Changelog] and this project follows [Semantic Ver
 
 ### Changed
 
-- Replace icon image 
+- Replace icon image
 
 ## [0.7.2fix1] 2023-10-17
 

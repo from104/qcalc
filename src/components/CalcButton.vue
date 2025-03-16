@@ -390,7 +390,7 @@
 
   const labelScalingFactor = computed(() => {
     if (window.isCapacitor) {
-      console.log('window.textZoom: ', window.textZoom);
+      // console.log('window.textZoom: ', window.textZoom);
       return window.textZoom / 100;
     }
     // screenWidth ref를 사용하여 화면 너비 계산

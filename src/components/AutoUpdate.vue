@@ -102,7 +102,7 @@
   const installUpdate = () => {
     if (window.isDev) {
       // 개발 모드에서는 재시작 확인 다이얼로그 표시
-      console.log('개발 모드: 앱 재시작 시뮬레이션');
+      // console.log('개발 모드: 앱 재시작 시뮬레이션');
       updateDialog.value = false;
       showMessage(t('updateSimulationComplete'), 3000);
     } else {

@@ -60,3 +60,4 @@ src-capacitor/android/build.gradle
 
 # repomix
 repomix-output.txt
+mainToHead.txt
