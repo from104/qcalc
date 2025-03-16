@@ -7,6 +7,8 @@ import android.os.Bundle;
 import android.view.WindowManager;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
+import android.app.ActivityManager;
+import android.content.pm.ActivityInfo;
 
 import plugins.ScreenOrientation.ScreenOrientationPlugin;
 import com.atit.qcalc.DeviceManager;
@@ -21,6 +23,18 @@ public class MainActivity extends BridgeActivity {
 
     // 키보드가 레이아웃을 밀지 않도록 설정
     getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN);
+
+    // DeviceManager 초기화
+    DeviceManager deviceManager = new DeviceManager(this);
+
+    // 폰일 경우 화면 분할 모드 비활성화
+    if (deviceManager.isPhone()) {
+      if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_NOSENSOR);
+        // Android N 이상에서는 manifest에서 android:resizeableActivity="false"로 설정하는 것이 권장됨
+        // 런타임 제한은 완벽하지 않음
+      }
+    }
 
     // 액티비티 생성
     super.onCreate(savedInstanceState);
@@ -47,6 +61,6 @@ public class MainActivity extends BridgeActivity {
     settings.setCacheMode(WebSettings.LOAD_NO_CACHE);
 
     // 텍스트 크기 설정
-    settings.setTextZoom(new DeviceManager(this).getTextZoom());
+    settings.setTextZoom(deviceManager.getTextZoom());
   }
 }
