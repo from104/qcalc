@@ -4,6 +4,7 @@ import com.getcapacitor.BridgeActivity;
 
 import android.annotation.SuppressLint;
 import android.os.Bundle;
+import android.view.WindowManager;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 
@@ -18,6 +19,9 @@ public class MainActivity extends BridgeActivity {
     // 화면 방향 잠금
     registerPlugin(ScreenOrientationPlugin.class);
 
+    // 키보드가 레이아웃을 밀지 않도록 설정
+    getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN);
+
     // 액티비티 생성
     super.onCreate(savedInstanceState);
 
@@ -29,7 +33,7 @@ public class MainActivity extends BridgeActivity {
 
     // 오버스크롤 방지
     webView.setOverScrollMode(WebView.OVER_SCROLL_NEVER);
-    
+
     // 웹뷰 설정
     WebSettings settings = webView.getSettings();
 
