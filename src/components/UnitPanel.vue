@@ -127,6 +127,7 @@
       options-dense
       emit-value
       map-options
+      behavior="menu"
       class="col-3 q-pl-sm shadow-2 text-black"
       :class="!store.isDarkMode() ? 'bg-blue-grey-2' : 'bg-blue-grey-6'"
       :popup-content-class="!store.isDarkMode() ? 'bg-blue-grey-2' : 'bg-blue-grey-6'"
@@ -149,6 +150,7 @@
       options-dense
       emit-value
       map-options
+      behavior="menu"
       class="col-3 q-pl-sm shadow-2"
       :class="!store.isDarkMode() ? 'bg-blue-grey-2' : 'bg-blue-grey-6'"
       :popup-content-class="!store.isDarkMode() ? 'bg-blue-grey-2' : 'bg-blue-grey-6'"
@@ -198,6 +200,7 @@
       options-dense
       emit-value
       map-options
+      behavior="menu"
       class="col-3 q-pl-sm shadow-2"
       :class="!store.isDarkMode() ? 'bg-blue-grey-2' : 'bg-blue-grey-6'"
       :popup-content-class="!store.isDarkMode() ? 'bg-blue-grey-2' : 'bg-blue-grey-6'"

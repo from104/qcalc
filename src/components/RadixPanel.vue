@@ -147,6 +147,7 @@
       map-options
       option-value="value"
       option-label="label"
+      behavior="menu"
       class="col-3 q-pa-none shadow-2"
       :label="t('radixLabel.wordSize')"
       :label-color="!store.isDarkMode() ? 'primary' : 'grey-1'"
@@ -171,6 +172,7 @@
       map-options
       option-value="value"
       option-label="label"
+      behavior="menu"
       class="col-3 q-pl-xs-sm shadow-2"
       :label="t('radixLabel.main')"
       :label-color="!store.isDarkMode() ? 'primary' : 'grey-1'"
@@ -207,6 +209,7 @@
       map-options
       option-value="value"
       option-label="label"
+      behavior="menu"
       class="col-3 q-pl-xs-sm shadow-2"
       :label="t('radixLabel.sub')"
       :label-color="!store.isDarkMode() ? 'primary' : 'grey-1'"

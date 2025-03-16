@@ -128,23 +128,17 @@
     value: currency,
     label: currency,
     desc: currencyDescriptions[currency] ?? '',
-    disable: isSource 
-      ? store.targetCurrency === currency
-      : store.sourceCurrency === currency,
+    disable: isSource ? store.targetCurrency === currency : store.sourceCurrency === currency,
   });
 
   // 출발 통화 옵션 목록
   const sourceCurrencyOptions = reactive<CurrencyOptions[]>(
-    currencyList.map((currency: string) =>
-      createCurrencyOption(currency, true),
-    ),
+    currencyList.map((currency: string) => createCurrencyOption(currency, true)),
   );
 
   // 도착 통화 옵션 목록
   const targetCurrencyOptions = reactive<CurrencyOptions[]>(
-    currencyList.map((currency: string) =>
-      createCurrencyOption(currency, false),
-    ),
+    currencyList.map((currency: string) => createCurrencyOption(currency, false)),
   );
 
   // 통화 옵션 업데이트
@@ -214,11 +208,12 @@
       use-input
       fill-input
       hide-selected
+      behavior="menu"
       class="col-4 q-pl-sm shadow-2"
-      :label-color="!store.isDarkMode() ? 'primary' : 'grey-1'"
-      :options-selected-class="!store.isDarkMode() ? 'text-primary' : 'text-grey-1'"
-      :popup-content-class="!store.isDarkMode() ? 'bg-blue-grey-2' : 'bg-blue-grey-6'"
       :class="!store.isDarkMode() ? 'bg-blue-grey-2' : 'bg-blue-grey-6'"
+      :label-color="!store.isDarkMode() ? 'primary' : 'grey-1'"
+      :popup-content-class="!store.isDarkMode() ? 'bg-blue-grey-2' : 'bg-blue-grey-6'"
+      :options-selected-class="!store.isDarkMode() ? 'text-primary' : 'text-grey-1'"
       @filter="sourceFilterFn"
       @focus="setInputFocused()"
       @blur="setInputBlurred()"
@@ -272,9 +267,10 @@
       use-input
       fill-input
       hide-selected
+      behavior="menu"
       class="col-4 q-pl-sm shadow-2"
-      :label-color="!store.isDarkMode() ? 'primary' : 'grey-1'"
       :class="!store.isDarkMode() ? 'bg-blue-grey-2' : 'bg-blue-grey-6'"
+      :label-color="!store.isDarkMode() ? 'primary' : 'grey-1'"
       :popup-content-class="!store.isDarkMode() ? 'bg-blue-grey-2' : 'bg-blue-grey-6'"
       :options-selected-class="!store.isDarkMode() ? 'text-primary' : 'text-grey-1'"
       @filter="targetFilterFn"
