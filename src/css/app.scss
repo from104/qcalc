@@ -9,33 +9,38 @@
   overflow-y: auto;
   scrollbar-gutter: stable;
 
+  /* Ensure the scrollbar space is always reserved */
+  padding-right: 6px;
+  // box-sizing: content-box;
+
+  /* Firefox specific styles */
+  scrollbar-width: thin;
+  scrollbar-color: rgba(128, 128, 128, 0.267) transparent;
+
+  /* WebKit specific styles */
   &::-webkit-scrollbar {
     width: 12px;
     position: absolute;
     right: 0;
   }
+
   &::-webkit-scrollbar-thumb {
     background-color: rgba(128, 128, 128, 0.267);
     border-radius: 6px;
     background-clip: padding-box;
     border: 3px solid transparent;
+
     @media (prefers-color-scheme: dark) {
       background-color: rgba(128, 128, 128, 0.503);
     }
   }
+
   &::-webkit-scrollbar-track {
     background-color: transparent;
     @media (prefers-color-scheme: dark) {
       background-color: transparent;
     }
   }
-
-  scrollbar-width: thin; /* Firefox */
-  scrollbar-color: rgba(128, 128, 128, 0.267) transparent; /* Firefox */
-
-  /* Ensure the scrollbar space is always reserved */
-  padding-right: 6px;
-  // box-sizing: content-box;
 }
 
 html,
