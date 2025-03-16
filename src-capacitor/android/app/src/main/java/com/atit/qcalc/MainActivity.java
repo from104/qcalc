@@ -7,16 +7,12 @@ import android.os.Bundle;
 import android.view.WindowManager;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
-import android.app.ActivityManager;
 import android.content.pm.ActivityInfo;
-import android.content.res.Configuration;
 
 import plugins.ScreenOrientation.ScreenOrientationPlugin;
-import com.atit.qcalc.DeviceManager;
 
 /**
  * QCalc 앱의 메인 액티비티
- * 
  * Capacitor 브릿지를 통해 웹앱과 네이티브 기능을 연결하고, 앱의 기본 설정 및 웹뷰 최적화를 담당합니다.
  */
 public class MainActivity extends BridgeActivity {
@@ -43,7 +39,7 @@ public class MainActivity extends BridgeActivity {
     // 작은 화면에서의 사용자 경험 최적화
     if (deviceManager.isPhone()) {
       // 세로 모드로 고정
-      setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+      setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED);
     }
 
     // 부모 클래스의 onCreate 호출
