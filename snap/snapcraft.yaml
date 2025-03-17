@@ -14,15 +14,7 @@ apps:
     command: bin/desktop-launch $SNAP/qcalc
     extensions: [gnome]
     plugs:
-      - desktop
-      - desktop-legacy
-      - wayland
-      - x11
-      - unity7
-      - browser-support
-      - network
-      - network-bind
-      - home
+      - default
     desktop: usr/share/applications/qcalc.desktop
 
 parts:

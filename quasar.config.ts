@@ -169,15 +169,15 @@ export default defineConfig((/* ctx */) => {
     // Capacitor 설정
     capacitor: {
       hideSplashscreen: true,
-      plugins: {
-        Device: {
-          // 디바이스 정보 관련 설정
-          languageTag: 'ko-KR',
-        },
-        ScreenReader: {
-          // 스크린리더 관련 설정
-        },
-      },
+      // plugins: {
+      //   Device: {
+      //     // 디바이스 정보 관련 설정
+      //     languageTag: 'ko-KR',
+      //   },
+      //   ScreenReader: {
+      //     // 스크린리더 관련 설정
+      //   },
+      // },
     },
 
     // Electron 설정
@@ -197,6 +197,23 @@ export default defineConfig((/* ctx */) => {
           category: 'Utility',
           // latest-linux.yml 생성을 위한 설정
           generateUpdatesFilesForAllChannels: true,
+          // AppImage 관련 설정
+          executableName: 'qcalc',
+          icon: 'assets/qcalc_icon_v2.png',
+          // 데스크톱 통합 기능 활성화
+          asarUnpack: ['**/*.node'],
+          // AppImage 빌드 설정
+          description: 'Scientific Calculator Application',
+          synopsis: 'A modern scientific calculator',
+        },
+        snap: {
+          confinement: 'strict',
+          grade: 'devel',
+          base: 'core22',
+          plugs: ['default'],
+          environment: {
+            TMPDIR: '$XDG_RUNTIME_DIR',
+          },
         },
         win: {
           target: ['nsis'],
@@ -205,15 +222,6 @@ export default defineConfig((/* ctx */) => {
           //   publisherName: 'ATIT',
           //   sign: '',
           // },
-        },
-        snap: {
-          confinement: 'strict',
-          grade: 'stable',
-          base: 'core22',
-          plugs: ['default'],
-          environment: {
-            TMPDIR: '$XDG_RUNTIME_DIR',
-          },
         },
         publish: [
           {
