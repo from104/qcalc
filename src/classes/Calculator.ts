@@ -79,7 +79,7 @@ export class Calculator {
   }
 
   set inputBuffer(value: string) {
-    this._inputBuffer = value;
+    this._inputBuffer = this.filterNumberCharacters(value);
     this.setBufferToCurrentNumber();
   }
 
@@ -88,7 +88,7 @@ export class Calculator {
   }
 
   set currentNumber(value: string) {
-    this._currentNumber = value;
+    this._currentNumber = this.filterNumberCharacters(value, Radix.Decimal);
     this.setCurrentNumberToBuffer();
   }
 
