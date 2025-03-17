@@ -61,7 +61,7 @@ export class Calculator {
   private repeatedNumber!: string;
   private currentOperator!: Operator;
   private calculationSnapshot!: CalculationResult;
-  private _needsBufferReset!: boolean;
+  private _bufferReset!: boolean;
   private _currentNumber!: string;
   private _inputBuffer!: string;
   private _currentRadix: Radix = Radix.Decimal;
@@ -113,11 +113,11 @@ export class Calculator {
   }
 
   get needsBufferReset(): boolean {
-    return this._needsBufferReset;
+    return this._bufferReset;
   }
 
   set needsBufferReset(value: boolean) {
-    this._needsBufferReset = value;
+    this._bufferReset = value;
   }
 
   /**
@@ -126,20 +126,20 @@ export class Calculator {
   constructor() {
     this.reset();
     this.memory = new CalculatorMemory();
-    this.memory.setOperationCompleteCallback(() => this.setNeedsBufferReset());
+    this.memory.setOperationCompleteCallback(() => this.onBufferReset());
     this.memory.setGetCurrentNumberCallback(() => this.currentNumber);
     this.memory.setSetCurrentNumberCallback((number: string) => (this.currentNumber = number));
     this.record = new CalculatorRecord();
-    this.setDoesNotNeedBufferReset();
+    this.offBufferReset();
   }
 
   // 상태 관리 메서드
-  private setNeedsBufferReset(): void {
-    this._needsBufferReset = true;
+  public onBufferReset(): void {
+    this._bufferReset = true;
   }
 
-  private setDoesNotNeedBufferReset(): void {
-    this._needsBufferReset = false;
+  public offBufferReset(): void {
+    this._bufferReset = false;
   }
 
   /**
@@ -151,7 +151,7 @@ export class Calculator {
     this.previousNumber = '0';
     this.repeatedNumber = '0';
     this.currentOperator = Operator.NONE;
-    this.setDoesNotNeedBufferReset();
+    this.offBufferReset();
   }
 
   // 버퍼 및 숫자 관리 메서드
@@ -245,12 +245,12 @@ export class Calculator {
   private resetOperatorState(): void {
     this.currentOperator = Operator.NONE;
     this.repeatedNumber = '0';
-    this.setNeedsBufferReset();
+    this.onBufferReset();
   }
 
   private resetInputState(): void {
     this.repeatedNumber = '0';
-    this.setNeedsBufferReset();
+    this.onBufferReset();
   }
 
   // 핵심 계산 메서드
@@ -281,13 +281,13 @@ export class Calculator {
   }
 
   private performPreCalculation(): void {
-    const numberForCalc = this._needsBufferReset ? this.repeatedNumber : this.currentNumber;
+    const numberForCalc = this._bufferReset ? this.repeatedNumber : this.currentNumber;
 
-    if (this._needsBufferReset && numberForCalc === '0') {
+    if (this._bufferReset && numberForCalc === '0') {
       return;
     }
 
-    if (!this._needsBufferReset) {
+    if (!this._bufferReset) {
       this.repeatedNumber = numberForCalc;
     }
 
@@ -313,21 +313,26 @@ export class Calculator {
     const digitString = typeof digit === 'string' ? digit.charAt(0) : Math.floor(digit).toString();
     checkError(!this.radixConverter.isValidRadixNumber(digitString, this.currentRadix), 'error.invalid_digit');
 
-    if (this.inputBuffer === '0' || this._needsBufferReset) {
+    if (this.inputBuffer === '0' || this._bufferReset) {
       this.inputBuffer = digitString;
-      this.setDoesNotNeedBufferReset();
+      this.offBufferReset();
     } else {
       this.inputBuffer = this.inputBuffer + digitString;
     }
   }
 
   public addDot(): void {
-    if (this._needsBufferReset) {
+    if (this._bufferReset) {
       this.inputBuffer = '0.';
-      this.setDoesNotNeedBufferReset();
+      this.offBufferReset();
     } else if (!this.inputBuffer.includes('.')) {
       this.inputBuffer = this.inputBuffer + '.';
     }
+  }
+
+  public pasteToBuffer(text: string): void {
+    this.inputBuffer = text;
+    this.offBufferReset();
   }
 
   public deleteDigitOrDot(): void {
@@ -406,7 +411,7 @@ export class Calculator {
       this.setCurrentNumberFromPrevious();
     }
     this.currentOperator = operator;
-    this.setNeedsBufferReset();
+    this.onBufferReset();
   }
 
   public add(): void {
@@ -553,7 +558,7 @@ export class Calculator {
       this.performPreCalculation();
       this.setCurrentNumberFromPrevious();
       this.currentOperator = Operator.NONE;
-      this.setNeedsBufferReset();
+      this.onBufferReset();
       this.repeatedNumber = '0';
     }
   }

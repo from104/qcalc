@@ -268,6 +268,7 @@
   const loadToMainPanel = (id: number) => {
     const record = calc.record.getRecordById(id);
     calc.currentNumber = record.calculationResult.resultNumber;
+    calc.offBufferReset();
     if (!store.isWideWidth()) navigateToPath('/', route, router);
   };
 
@@ -282,6 +283,7 @@
         store.targetUnits[store.selectedCategory] ?? '',
       );
       store.swapUnits();
+      calc.offBufferReset();
     } else if (store.currentTab === 'currency') {
       store.swapCurrencies();
       loadToMainPanel(id);
@@ -289,6 +291,7 @@
         .convert(BigNumber(calc.currentNumber), store.sourceCurrency, store.targetCurrency)
         .toString();
       store.swapCurrencies();
+      calc.offBufferReset();
     }
     if (!store.isWideWidth()) navigateToPath('/', route, router);
   };
