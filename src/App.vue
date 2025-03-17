@@ -8,7 +8,7 @@
    */
 
   // === 핵심 Vue 및 라우터 의존성 ===
-  import { ref, onBeforeMount, watch, computed, onBeforeUnmount, onUnmounted } from 'vue';
+  import { ref, onBeforeMount, watch, computed, onUnmounted } from 'vue';
   import { useRoute } from 'vue-router';
   import { useI18n } from 'vue-i18n';
   import { ScreenOrientation } from '@capacitor/screen-orientation';
@@ -72,14 +72,7 @@
     [['Alt+,'], () => store.setGroupingUnit(store.groupingUnit === 3 ? 4 : 3)],
     [['['], store.decrementDecimalPlaces],
     [[']'], store.incrementDecimalPlaces],
-    [
-      ['q'],
-      () => {
-        if (window.isElectron) {
-          window.electron.quitApp();
-        }
-      },
-    ],
+    [['q'], () => { if (window.isElectron) window.electron.quitApp(); }],
   ]);
 
   // === 라이프사이클 훅 및 감시자 ===

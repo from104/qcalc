@@ -7,6 +7,8 @@
 
 import { Notify } from 'quasar';
 
+type NotificationPosition = 'top' | 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right' | 'bottom' | 'left' | 'right' | 'center' | undefined;
+
 /**
  * 성공 메시지를 표시합니다.
  * @param message - 표시할 메시지 내용
@@ -16,23 +18,14 @@ import { Notify } from 'quasar';
 export function showMessage(
   message: string,
   duration = 2000,
-  position:
-    | 'top'
-    | 'top-left'
-    | 'top-right'
-    | 'bottom-left'
-    | 'bottom-right'
-    | 'bottom'
-    | 'left'
-    | 'right'
-    | 'center'
-    | undefined = 'top',
+  position: NotificationPosition = 'top',
 ): void {
   Notify.create({
     message,
     position,
     timeout: duration,
     color: 'positive',
+    html: true,
   });
 }
 
@@ -45,22 +38,13 @@ export function showMessage(
 export function showError(
   message: string,
   duration = 2000,
-  position:
-    | 'top'
-    | 'top-left'
-    | 'top-right'
-    | 'bottom-left'
-    | 'bottom-right'
-    | 'bottom'
-    | 'left'
-    | 'right'
-    | 'center'
-    | undefined = 'top',
+  position: NotificationPosition = 'top',
 ): void {
   Notify.create({
     message,
     position,
     timeout: duration,
     color: 'negative',
+    html: true,
   });
 }

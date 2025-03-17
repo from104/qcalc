@@ -273,26 +273,26 @@
   };
 
   const loadToSubPanel = (id: number) => {
+    const record = calc.record.getRecordById(id);
     if (store.currentTab === 'unit') {
       store.swapUnits();
-      loadToMainPanel(id);
       calc.currentNumber = UnitConverter.convert(
         store.selectedCategory,
-        BigNumber(calc.currentNumber),
+        BigNumber(record.calculationResult.resultNumber),
         store.sourceUnits[store.selectedCategory] ?? '',
         store.targetUnits[store.selectedCategory] ?? '',
       );
       store.swapUnits();
-      calc.offBufferReset();
     } else if (store.currentTab === 'currency') {
       store.swapCurrencies();
-      loadToMainPanel(id);
-      calc.currentNumber = currencyConverter
-        .convert(BigNumber(calc.currentNumber), store.sourceCurrency, store.targetCurrency)
-        .toString();
+      calc.currentNumber = currencyConverter.convert(
+        BigNumber(record.calculationResult.resultNumber),
+        store.sourceCurrency,
+        store.targetCurrency,
+      ).toString();
       store.swapCurrencies();
-      calc.offBufferReset();
     }
+    calc.offBufferReset();
     if (!store.isWideWidth()) navigateToPath('/', route, router);
   };
 

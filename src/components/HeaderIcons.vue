@@ -7,7 +7,7 @@
    */
 
   // Vue 핵심 기능 및 컴포지션 API 가져오기
-  import { onMounted } from 'vue';
+  import { onMounted, ref } from 'vue';
 
   // i18n 설정
   import { useI18n } from 'vue-i18n';
@@ -19,6 +19,13 @@
 
   // 계산기 관련 타입과 클래스
   import { KeyBinding } from 'classes/KeyBinding';
+
+  // 도움말 팁 인터페이스 정의
+  interface HelpTip {
+    icon: string;
+    title: string;
+    description: string;
+  }
 
   // 전역 window 객체에 접근하기 위한 상수 선언
   const window = globalThis.window;
@@ -33,6 +40,21 @@
   import ToolTip from './snippets/ToolTip.vue';
   import MenuItem from './snippets/MenuItem.vue';
   import { showError, showMessage } from 'src/classes/utils/NotificationUtils';
+  import { UnitConverter } from 'src/classes/UnitConverter';
+  import { BigNumber } from 'src/classes/CalculatorMath';
+
+  // 도움말 팝업 상태 관리
+  const helpDialog = ref(false);
+
+  /**
+   * 도움말 팝업을 표시하고 5초 후에 자동으로 닫는 함수
+   */
+  const showHelpDialog = () => {
+    helpDialog.value = true;
+    setTimeout(() => {
+      helpDialog.value = false;
+    }, 5000);
+  };
 
   /**
    * 선택된 텍스트 또는 계산 결과를 클립보드에 복사하는 함수
@@ -67,21 +89,37 @@
       if (target === 'sub') {
         if (store.currentTab === 'unit') {
           swapUnits();
-          setTimeout(() => (calc.pasteToBuffer(clipboardText)), 5);
-          setTimeout(swapUnits, 10);
+          calc.pasteToBuffer(clipboardText);
+          calc.currentNumber = UnitConverter.convert(
+            store.selectedCategory,
+            BigNumber(calc.currentNumber),
+            store.sourceUnits[store.selectedCategory] ?? '',
+            store.targetUnits[store.selectedCategory] ?? '',
+          );
+          swapUnits();
         } else if (store.currentTab === 'currency') {
           swapCurrencies();
-          setTimeout(() => (calc.pasteToBuffer(clipboardText)), 5);
-          setTimeout(swapCurrencies, 10);
+          calc.pasteToBuffer(clipboardText);
+          calc.currentNumber = store.currencyConverter
+            .convert(BigNumber(calc.currentNumber), store.sourceCurrency, store.targetCurrency)
+            .toString();
+          swapCurrencies();
         } else if (store.currentTab === 'radix') {
           swapRadixes();
-          setTimeout(() => (calc.pasteToBuffer(clipboardText)), 5);
-          setTimeout(swapRadixes, 10);
+          setTimeout(() => {
+            calc.pasteToBuffer(clipboardText.replace(/\((?:2|8|10|16)\)/g, ''));
+            swapRadixes();
+          }, 10);
         }
-        showMessage(t('pastedFromClipboardToSubPanel'));
+        showMessage(t('pastedFromClipboardToSubPanel'), 2000, 'bottom');
       } else {
-        calc.pasteToBuffer(clipboardText);
-        showMessage(t('pastedFromClipboard'));
+        if (store.currentTab === 'radix') {
+          console.log('clipboardText:', clipboardText.replace(/\((?:2|8|10|16)\)/g, ''));
+          calc.pasteToBuffer(clipboardText.replace(/\((?:2|8|10|16)\)/g, ''));
+        } else {
+          calc.pasteToBuffer(clipboardText);
+        }
+        showMessage(t('pastedFromClipboard'), 2000, 'bottom');
       }
     } catch (error) {
       console.error('Failed to paste from clipboard:', error);
@@ -103,42 +141,64 @@
 
 <template>
   <q-btn
-    id="btn-copy"
+    id="btn-help"
     flat
-    icon="content_copy"
-    class="q-ma-none q-pa-none q-pl-sm"
-    :aria-label="t('ariaLabel.copy')"
-    @click="handleCopy"
+    icon="quiz"
+    class="q-ma-none q-pa-none q-pl-sm q-pr-xs"
+    :aria-label="t('ariaLabel.help')"
+    @click="showHelpDialog"
   >
-    <ToolTip :text="t('tooltipCopy')" />
-  </q-btn>
-  <q-btn
-    id="btn-paste"
-    flat
-    icon="content_paste"
-    class="q-ma-none q-pa-none q-pl-xs"
-    :aria-label="t('ariaLabel.paste')"
-    @click="handlePaste()"
-  >
-    <q-menu v-if="!store.isDefaultCalculator()" context-menu auto-close class="z-max shadow-6">
-      <q-list dense style="max-width: 200px">
-        <MenuItem :action="() => handlePaste('main')" :title="t('pasteToMainPanel')" />
-        <MenuItem :action="() => handlePaste('sub')" :title="t('pasteToSubPanel')" />
-      </q-list>
-    </q-menu>
-    <ToolTip :text="t('tooltipPaste')" />
+    <ToolTip :text="t('tooltipHelp')" />
   </q-btn>
   <q-btn
     v-if="!store.isWideWidth()"
     flat
     icon="mdi-history"
-    class="q-ma-none q-pa-none q-pl-xs"
+    class="q-ma-none q-pa-none q-pl-sm q-pr-sm"
     :aria-label="t('ariaLabel.record')"
     @click="router.push('/record')"
   >
     <ToolTip :text="t('openRecordPage')" />
   </q-btn>
+
+  <!-- 도움말 팝업 다이얼로그 -->
+  <q-dialog v-model="helpDialog" persistent>
+    <q-card class="help-dialog">
+      <q-card-section class="row items-center q-pb-none">
+        <div class="text-h6">{{ t('helpTitle') }}</div>
+        <q-space />
+        <q-btn v-close-popup icon="close" flat round dense />
+      </q-card-section>
+
+      <q-card-section class="q-pt-sm">
+        <div class="text-body1">{{ t('helpContent') }}</div>
+        <q-list>
+          <q-item v-for="(tip, index) in t('helpTips') as unknown as HelpTip[]" :key="index">
+            <q-item-section avatar>
+              <q-icon :name="tip.icon" color="primary" />
+            </q-item-section>
+            <q-item-section>
+              <q-item-label>{{ tip.title }}</q-item-label>
+              <q-item-label caption>{{ tip.description }}</q-item-label>
+            </q-item-section>
+          </q-item>
+        </q-list>
+      </q-card-section>
+    </q-card>
+  </q-dialog>
 </template>
+
+<style lang="scss" scoped>
+  .help-dialog {
+    width: 100%;
+    max-width: 500px;
+    border-radius: 8px;
+
+    .q-card__section {
+      padding: 20px;
+    }
+  }
+</style>
 
 <i18n>
 ko:
@@ -154,12 +214,29 @@ ko:
   pasteToSubPanel: '보조 패널에 붙여넣기'
   tooltipCopy: '내용을 복사합니다.'
   tooltipPaste: '숫자를 붙혀넣습니다.'
+  tooltipHelp: '도움말을 표시합니다.'
   openRecordPage: '클릭하면 기록 페이지를 엽니다.'
+  helpTitle: 'QCalc 도움말'
+  helpContent: 'QCalc는 강력하고 사용하기 쉬운 계산기입니다. 다음은 주요 기능들입니다:'
+  helpTips:
+    - icon: 'calculate'
+      title: '기본 계산'
+      description: '사칙연산과 고급 수학 함수를 지원합니다.'
+    - icon: 'swap_horiz'
+      title: '단위 변환'
+      description: '다양한 단위 간 변환이 가능합니다.'
+    - icon: 'currency_exchange'
+      title: '통화 변환'
+      description: '실시간 환율로 통화를 변환합니다.'
+    - icon: 'history'
+      title: '계산 기록'
+      description: '이전 계산 결과를 확인할 수 있습니다.'
   ariaLabel:
     copy: '클립보드에 복사'
     paste: '클립보드에서 붙여넣기'
     record: '기록 페이지 열기'
     menu: '메뉴 열기'
+    help: '도움말 보기'
 en:
   targetToBeCopiedResult: 'the calculation result'
   targetToBeCopiedSelected: 'the selected content'
@@ -173,10 +250,27 @@ en:
   pasteToSubPanel: 'Paste to the sub panel'
   tooltipCopy: 'Copy the content.'
   tooltipPaste: 'Paste the number.'
+  tooltipHelp: 'Show help.'
   openRecordPage: 'Click to open the record page.'
+  helpTitle: 'QCalc Help'
+  helpContent: 'QCalc is a powerful and easy-to-use calculator. Here are the main features:'
+  helpTips:
+    - icon: 'calculate'
+      title: 'Basic Calculations'
+      description: 'Supports arithmetic operations and advanced math functions.'
+    - icon: 'swap_horiz'
+      title: 'Unit Conversion'
+      description: 'Convert between various units of measurement.'
+    - icon: 'currency_exchange'
+      title: 'Currency Conversion'
+      description: 'Convert currencies using real-time exchange rates.'
+    - icon: 'history'
+      title: 'Calculation History'
+      description: 'View your previous calculation results.'
   ariaLabel:
     copy: 'Copy to clipboard'
     paste: 'Paste from clipboard'
     record: 'Open record page'
     menu: 'Open menu'
+    help: 'View help'
 </i18n>

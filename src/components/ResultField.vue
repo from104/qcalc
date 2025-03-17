@@ -5,7 +5,7 @@
    *              사용자가 선택한 필드와 애드온에 따라 결과를 동적으로 렌더링하며,
    *              진법 변환, 단위 변환 및 통화 변환 기능 패널과 연동됩니다.
    *              또한, 메모리 기능을 통해 이전 계산 결과를 관리할 수 있습니다.
-   * 
+   *
    * @props {string} field - 결과를 표시할 필드 (기본값: 'main')
    * @props {string} addon - 추가 기능 (기본값: 'none')
    */
@@ -31,6 +31,7 @@
   // 컴포넌트 import
   import ToolTip from 'src/components/snippets/ToolTip.vue';
   import MenuItem from 'src/components/snippets/MenuItem.vue';
+  import { showError, showMessage } from 'src/classes/utils/NotificationUtils';
 
   // props 정의
   const props = withDefaults(defineProps<{ field?: string; addon?: string }>(), {
@@ -226,10 +227,10 @@
   });
 
   // 진법 모드에서 접두사/접미사를 포함한 결과 문자열 생성
-  const getRadixResult = (number: string) => {
+  const getRadixResult = (number: string, isOnly = false) => {
     const prefix = radixPrefix.value;
     const suffix = radixSuffix.value;
-    const suffixString = suffix ? `(${suffix})` : '';
+    const suffixString = suffix && !isOnly ? `(${suffix})` : '';
     return `${prefix}${number}${suffixString}`;
   };
 
@@ -242,7 +243,7 @@
     if (props.field === 'main') {
       if (props.addon === 'radix') {
         const convertedNumber = store.convertRadix(calc.currentNumber, Radix.Decimal, store.sourceRadix);
-        return getRadixResult(convertedNumber);
+        return getRadixResult(convertedNumber, true);
       }
       return calc.currentNumber;
     }
@@ -258,7 +259,7 @@
     const result = converter?.() || '';
 
     // 진법 모드인 경우 접두사/접미사 추가
-    return props.addon === 'radix' ? getRadixResult(result) : result;
+    return props.addon === 'radix' ? getRadixResult(result, true) : result;
   });
 
   // 연산자 문자열 계산된 속성
@@ -380,6 +381,77 @@
     clearInterval(tooltipInterval);
     window.removeEventListener('resize', checkNeedFieldTooltip);
   });
+
+  // 한번 클릭하면 결과 복사, 2초 안에 다시 클릭하면 숫자 복사
+  const isCopying = ref(false);
+  const handleCopyOneClick = () => {
+    if (isCopying.value) {
+      copyToClipboard(onlyNumber.value, t('copiedOnlyNumber', { result: onlyNumber.value }));
+      isCopying.value = false;
+      return;
+    }
+
+    copyToClipboard(displayedResult.value, t('copiedDisplayedResult', { result: displayedResult.value }));
+    isCopying.value = true;
+    setTimeout(() => {
+      isCopying.value = false;
+    }, 2000);
+  };
+
+  const handleLongPressPaste = async (target: 'main' | 'sub' = 'main'): Promise<void> => {
+    try {
+      let clipboardText = '';
+      if (window.isCapacitor) {
+        clipboardText = await AndroidInterface.getFromClipboard();
+      } else {
+        clipboardText = await navigator.clipboard.readText();
+      }
+
+      if (!clipboardText) {
+        showError(t('clipboardIsEmptyOrContainsDataThatCannotBePasted.'));
+        return;
+      }
+
+      if (target === 'sub') {
+        if (store.currentTab === 'unit') {
+          store.swapUnits();
+          calc.pasteToBuffer(clipboardText);
+          calc.currentNumber = UnitConverter.convert(
+            store.selectedCategory,
+            BigNumber(calc.currentNumber),
+            store.sourceUnits[store.selectedCategory] ?? '',
+            store.targetUnits[store.selectedCategory] ?? '',
+          );
+          store.swapUnits();
+        } else if (store.currentTab === 'currency') {
+          store.swapCurrencies();
+          calc.pasteToBuffer(clipboardText);
+          calc.currentNumber = store.currencyConverter
+            .convert(BigNumber(calc.currentNumber), store.sourceCurrency, store.targetCurrency)
+            .toString();
+          store.swapCurrencies();
+        } else if (store.currentTab === 'radix') {
+          store.swapRadixes();
+          setTimeout(() => {
+            calc.pasteToBuffer(clipboardText.replace(/\((?:2|8|10|16)\)/g, ''));
+            store.swapRadixes();
+          }, 10);
+        }
+        showMessage(t('pastedFromClipboardToSubPanel'), 2000, 'bottom');
+      } else {
+        if (store.currentTab === 'radix') {
+          console.log('clipboardText:', clipboardText.replace(/\((?:2|8|10|16)\)/g, ''));
+          calc.pasteToBuffer(clipboardText.replace(/\((?:2|8|10|16)\)/g, ''));
+        } else {
+          calc.pasteToBuffer(clipboardText);
+        }
+        showMessage(t('pastedFromClipboard'), 2000, 'bottom');
+      }
+    } catch (error) {
+      console.error('Failed to paste from clipboard:', error);
+      showError(t('failedToPasteFromClipboard'));
+    }
+  };
 </script>
 
 <template>
@@ -434,12 +506,14 @@
               return true;
             }
           "
+          v-touch-hold.mouse="() => handleLongPressPaste(props.field as 'main' | 'sub')"
           v-mutation.characterData
           class="self-center no-outline full-width full-height ellipsis text-right q-pt-xs noselect"
           :class="[isMainField ? 'text-h5' : '', getResultColor()]"
           :style="`padding-top: ${store.resultPanelPadding}px;`"
           role="text"
           :aria-label="t('ariaLabel.result', { type: isMainField ? t('ariaLabel.main') : t('ariaLabel.sub') })"
+          @click="handleCopyOneClick()"
         >
           <span v-if="currentTab === 'radix'" id="radixPrefix" role="text" :aria-label="t('ariaLabel.radixPrefix')">{{
             radixPrefix
@@ -465,7 +539,7 @@
             {{ radixSuffix }}
           </span>
           <q-menu
-            context-menu
+            :context-menu="!window.isMobile"
             auto-close
             touch-position
             class="shadow-6"
@@ -474,12 +548,14 @@
           >
             <q-list class="noselect" dense style="min-width: 150px">
               <MenuItem
-                :action="() => copyToClipboard(displayedResult, t('copiedDisplayedResult'))"
+                :action="
+                  () => copyToClipboard(displayedResult, t('copiedDisplayedResult', { result: displayedResult }))
+                "
                 :title="t('copyDisplayedResult')"
                 :caption="displayedResult"
               />
               <MenuItem
-                :action="() => copyToClipboard(onlyNumber, t('copiedOnlyNumber'))"
+                :action="() => copyToClipboard(onlyNumber, t('copiedOnlyNumber', { result: onlyNumber }))"
                 :title="t('copyOnlyNumber')"
                 :caption="onlyNumber"
               />
@@ -543,10 +619,12 @@
 
 <i18n>
   ko:
-    copiedDisplayedResult: '표시된 결과가 복사되었습니다.'
+    copiedDisplayedResult: '표시된 결과가 복사되었습니다.<br><center>{result}</center>'
     copyDisplayedResult: '표시된 결과 복사'
-    copiedOnlyNumber: '결과 숫자가 복사되었습니다.'
+    copiedOnlyNumber: '결과 숫자가 복사되었습니다.<br><center>{result}</center>'
     copyOnlyNumber: '결과 숫자 복사'
+    pastedFromClipboard: '클립보드로부터 숫자를 붙여넣었습니다.'
+    pastedFromClipboardToSubPanel: '클립보드로부터 숫자를 <br> 보조 패널에 붙여넣었습니다.'
     ariaLabel:
       resultField: '{type} 결과 필드'
       main: '주'
@@ -564,10 +642,12 @@
       unit: '단위'
       contextMenu: '결과 복사 메뉴'
   en:
-    copiedDisplayedResult: 'The displayed result has been copied.'
+    copiedDisplayedResult: 'The displayed result has been copied.<br><center>{result}</center>'
     copyDisplayedResult: 'Copy displayed result'
-    copiedOnlyNumber: 'The result number has been copied.'
+    copiedOnlyNumber: 'The result number has been copied.<br><center>{result}</center>'
     copyOnlyNumber: 'Copy result number'
+    pastedFromClipboard: 'The number has been pasted from the clipboard.'
+    pastedFromClipboardToSubPanel: 'The number has been pasted <br>from the clipboard to the sub panel.'
     ariaLabel:
       resultField: '{type} result field'
       main: 'main'
