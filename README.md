@@ -124,9 +124,9 @@ Built with Vue 3, Quasar, and Electron, QCalc delivers native-level performance 
 - C-2: Go to Unit converter
 - C-3: Go to Currency converter
 - C-4: Go to Radix converter
-- C-Tab, ->: Go to the right calculator tab.
-- CS-Tab, <-: Go to the left calculator tab.
-- A-t: Always toggle the above functions
+- C-Tab, ->: Go to the right calculator tab
+- CS-Tab, <-: Go to the left calculator tab
+- A-t: Toggle always on top
 - A-i: Toggle panel initialization on startup
 - A-d: Toggle dark mode
 - A-p: Toggle Haptic mode
@@ -135,6 +135,7 @@ Built with Vue 3, Quasar, and Electron, QCalc delivers native-level performance 
 - A-,: Change number grouping unit (3 or 4)
 - [, ]: Adjust decimal point fixation (no limit to 6 digits)
 - "'": Activate additional functions of the button
+- q: Quit application (desktop app only)
 
 ### Clipboard
 

@@ -1,4 +1,4 @@
- // Start Generation Here
+// Start Generation Here
 /**
  * @file electron-preload.ts
  * @description 이 파일은 Electron 애플리케이션의 프리로드 스크립트를 정의합니다.
@@ -20,6 +20,12 @@ contextBridge.exposeInMainWorld('electron', {
   setAlwaysOnTop: (alwaysOnTop: boolean) => {
     // 메인 프로세스에 'toggle-always-on-top' 이벤트 전송
     ipcRenderer.send('toggle-always-on-top', alwaysOnTop);
+  },
+  /**
+   * 앱을 종료하는 함수
+   */
+  quitApp: () => {
+    ipcRenderer.send('quit-app');
   },
   isSnap: isSnap,
 });

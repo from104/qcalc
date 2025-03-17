@@ -59,6 +59,7 @@
    * Alt+d: 다크모드 토글
    * Alt+p: 햅틱 모드 토글
    * F1-F4: 각종 페이지 이동
+   * q: 앱 종료
    * 기타: 계산기 관련 기능
    */
   const keyBinding = new KeyBinding([
@@ -71,6 +72,14 @@
     [['Alt+,'], () => store.setGroupingUnit(store.groupingUnit === 3 ? 4 : 3)],
     [['['], store.decrementDecimalPlaces],
     [[']'], store.incrementDecimalPlaces],
+    [
+      ['q'],
+      () => {
+        if (window.isElectron) {
+          window.electron.quitApp();
+        }
+      },
+    ],
   ]);
 
   // === 라이프사이클 훅 및 감시자 ===

@@ -1,4 +1,4 @@
- // Start Generation Here
+// Start Generation Here
 /**
  * @file electron.d.ts
  * @description 이 파일은 Electron 애플리케이션의 업데이트 관련 타입과 인터페이스를 정의합니다.
@@ -60,5 +60,10 @@ interface Window {
      * snap 환경인지 확인합니다.
      */
     isSnap: boolean;
+
+    /**
+     * 앱을 종료합니다.
+     */
+    quitApp: () => void;
   };
 }

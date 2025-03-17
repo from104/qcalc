@@ -130,6 +130,7 @@ Built with Vue 3, Quasar, and Electron, QCalc delivers native-level performance 
 - A-,: Change number grouping unit (3 or 4)
 - [, ]: Adjust decimal point fixation (no limit to 6 digits)
 - ': Activate additional functions of the button
+- q: Quit application (desktop app only)
 
 ### Clipboard
 

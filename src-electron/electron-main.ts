@@ -234,6 +234,11 @@ app
     ipcMain.on('toggle-always-on-top', (_event, res) => {
       mainWindow?.setAlwaysOnTop(res);
     });
+
+    // 앱 종료 이벤트 처리
+    ipcMain.on('quit-app', () => {
+      app.quit();
+    });
   })
   .catch((err) => {
     console.error('Error occurred during app preparation:', err);
