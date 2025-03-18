@@ -92,15 +92,16 @@ export default defineConfig((/* ctx */) => {
       vitePlugins: [
         // Vue I18n 플러그인
         [
-          '@intlify/vite-plugin-vue-i18n',
+          '@intlify/unplugin-vue-i18n/vite',
           {
-            compositionOnly: true,
-            include: join(__dirname, './src/i18n/**'),
-            defaultSFCLang: 'yml',
+            defaultSFCLang: 'yaml5',
+            strictMessage: false,
+            escapeHtml: false,
           },
         ],
         // 타입스크립트 및 ESLint 검사 플러그인
         ['vite-plugin-checker', { vueTsc: true }, { server: false }],
+        ['@modyfi/vite-plugin-yaml'],
       ],
       typescript: {
         strict: true, // (recommended) enables strict settings for TypeScript
