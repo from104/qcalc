@@ -5,5 +5,5 @@
  * @param value - 속성 값
  */
 export function defineImmutableProperty<T extends object, K extends PropertyKey>(obj: T, key: K, value: unknown): void {
-  Object.defineProperty(obj, key, { value, writable: false, configurable: true, enumerable: true });
+  Object.defineProperty(obj, key, { value, writable: false, configurable: false, enumerable: true });
 }
