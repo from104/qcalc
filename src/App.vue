@@ -51,6 +51,13 @@
     showMessage(store.darkMode === 'system' ? t('darkMode.message.system') : t('darkMode.message.' + store.darkMode));
   };
 
+  /**
+   * 앱을 종료합니다.
+   */
+  const quitApp = () => {
+    if (window.isElectron) window.electron.quitApp();
+  };
+  
   // === 키 바인딩 설정 ===
   /**
    * 전역 단축키 설정
@@ -72,7 +79,7 @@
     [['Alt+,'], () => store.setGroupingUnit(store.groupingUnit === 3 ? 4 : 3)],
     [['['], store.decrementDecimalPlaces],
     [[']'], store.incrementDecimalPlaces],
-    [['q'], () => { if (window.isElectron) window.electron.quitApp(); }],
+    [['q'], quitApp],
   ]);
 
   // === 라이프사이클 훅 및 감시자 ===
@@ -263,3 +270,14 @@
     transform: translateX(100%);
   }
 </style>
+
+<i18n>
+ko:
+  targetToBeCopiedResult: '계산 결과를'
+  targetToBeCopiedSelected: '선택한 내용을'
+  copiedToClipboard: '{target} 클립보드에 복사했습니다.'
+en:
+  targetToBeCopiedResult: 'the calculation result'
+  targetToBeCopiedSelected: 'the selected content'
+  copiedToClipboard: 'Copied {target} to the clipboard.'
+</i18n>

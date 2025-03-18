@@ -11,7 +11,8 @@
    */
 
   // Vue 핵심 기능 및 컴포지션 API 가져오기
-  import { ref, computed, onBeforeMount, onMounted, watch, onUnmounted } from 'vue';
+  import { ref, computed, onBeforeMount, onMounted, watch, onUnmounted, onBeforeUnmount } from 'vue';
+  import { Haptics, ImpactStyle } from 'capacitor/haptics';
 
   // i18n 설정
   import { useI18n } from 'vue-i18n';
@@ -62,6 +63,19 @@
   // const fieldElement = ref<HTMLElement | null>(null);
   const fieldElement = computed(() => document.getElementById(fieldID));
 
+  // 햅틱 피드백 함수
+  const hapticFeedbackLight = async () => {
+    if (window.isCapacitor && store.hapticsMode) {
+      await Haptics.impact({ style: ImpactStyle.Light });
+    }
+  };
+
+  const hapticFeedbackMedium = async () => {
+    if (window.isCapacitor && store.hapticsMode) {
+      await Haptics.impact({ style: ImpactStyle.Medium });
+    }
+  };
+  
   /**
    * 필드 툴팁 표시 여부를 결정하는 함수
    *
@@ -384,21 +398,23 @@
 
   // 한번 클릭하면 결과 복사, 2초 안에 다시 클릭하면 숫자 복사
   const isCopying = ref(false);
-  const handleCopyOneClick = () => {
+  const handleCopy = () => {
+    hapticFeedbackLight();
+
     if (isCopying.value) {
-      copyToClipboard(onlyNumber.value, t('copiedOnlyNumber', { result: onlyNumber.value }));
+      copyToClipboard(onlyNumber.value, t(props.field === 'main' ? 'copiedOnlyNumber' : 'copiedOnlyNumberSub', { result: onlyNumber.value }));
       isCopying.value = false;
       return;
     }
 
-    copyToClipboard(displayedResult.value, t('copiedDisplayedResult', { result: displayedResult.value }));
+    copyToClipboard(displayedResult.value, t(props.field === 'main' ? 'copiedDisplayedResult' : 'copiedDisplayedResultSub', { result: displayedResult.value }));
     isCopying.value = true;
     setTimeout(() => {
       isCopying.value = false;
     }, 2000);
   };
 
-  const handleLongPressPaste = async (target: 'main' | 'sub' = 'main'): Promise<void> => {
+  const handlePaste = async (target: 'main' | 'sub' = 'main'): Promise<void> => {
     try {
       let clipboardText = '';
       if (window.isCapacitor) {
@@ -411,6 +427,8 @@
         showError(t('clipboardIsEmptyOrContainsDataThatCannotBePasted.'));
         return;
       }
+
+      hapticFeedbackMedium();
 
       if (target === 'sub') {
         if (store.currentTab === 'unit') {
@@ -452,6 +470,41 @@
       showError(t('failedToPasteFromClipboard'));
     }
   };
+
+  // 키 바인딩 설정
+  import { KeyBinding } from 'classes/KeyBinding';
+  const keyBinding = props.field === 'main' ? 
+    new KeyBinding([
+      [['Control+c', 'Control+Insert', 'Copy'], handleCopy],
+      [['Control+v', 'Shift+Insert', 'Paste'], () => handlePaste('main')],
+    ]) : 
+    new KeyBinding([
+      [['Shift+Control+c', 'Alt+Control+Insert', 'Shift+Copy'], handleCopy],
+      [['Shift+Control+v', 'Alt+Shift+Insert', 'Shift+Paste'], () => handlePaste('sub')],
+    ]);
+
+  /**
+   * 입력 필드 포커스 상태에 따라 키 바인딩을 활성화/비활성화합니다.
+   */
+  watch(
+    () => store.inputFocused,
+    () => {
+      if (store.inputFocused) {
+        keyBinding.unsubscribe();
+      } else {
+        keyBinding.subscribe();
+      }
+    },
+    { immediate: true },
+  );
+
+  onMounted(() => {
+    keyBinding.subscribe();
+  });
+
+  onBeforeUnmount(() => {
+    keyBinding.unsubscribe();
+  });
 </script>
 
 <template>
@@ -506,14 +559,14 @@
               return true;
             }
           "
-          v-touch-hold.mouse="() => handleLongPressPaste(props.field as 'main' | 'sub')"
+          v-touch-hold.mouse="() => handlePaste(props.field as 'main' | 'sub')"
           v-mutation.characterData
           class="self-center no-outline full-width full-height ellipsis text-right q-pt-xs noselect"
           :class="[isMainField ? 'text-h5' : '', getResultColor()]"
           :style="`padding-top: ${store.resultPanelPadding}px;`"
           role="text"
           :aria-label="t('ariaLabel.result', { type: isMainField ? t('ariaLabel.main') : t('ariaLabel.sub') })"
-          @click="handleCopyOneClick()"
+          @click="handleCopy()"
         >
           <span v-if="currentTab === 'radix'" id="radixPrefix" role="text" :aria-label="t('ariaLabel.radixPrefix')">{{
             radixPrefix
@@ -620,8 +673,10 @@
 <i18n>
   ko:
     copiedDisplayedResult: '표시된 결과가 복사되었습니다.<br><center>{result}</center>'
+    copiedDisplayedResultSub: '보조 패널에 표시된 결과가 복사되었습니다.<br><center>{result}</center>'
     copyDisplayedResult: '표시된 결과 복사'
     copiedOnlyNumber: '결과 숫자가 복사되었습니다.<br><center>{result}</center>'
+    copiedOnlyNumberSub: '보조 패널에 표시된 결과 숫자가 복사되었습니다.<br><center>{result}</center>'
     copyOnlyNumber: '결과 숫자 복사'
     pastedFromClipboard: '클립보드로부터 숫자를 붙여넣었습니다.'
     pastedFromClipboardToSubPanel: '클립보드로부터 숫자를 <br> 보조 패널에 붙여넣었습니다.'
@@ -643,8 +698,10 @@
       contextMenu: '결과 복사 메뉴'
   en:
     copiedDisplayedResult: 'The displayed result has been copied.<br><center>{result}</center>'
+    copiedDisplayedResultSub: 'The sub panel result has been copied.<br><center>{result}</center>'
     copyDisplayedResult: 'Copy displayed result'
     copiedOnlyNumber: 'The result number has been copied.<br><center>{result}</center>'
+    copiedOnlyNumberSub: 'The sub panel result number has been copied.<br><center>{result}</center>'
     copyOnlyNumber: 'Copy result number'
     pastedFromClipboard: 'The number has been pasted from the clipboard.'
     pastedFromClipboardToSubPanel: 'The number has been pasted <br>from the clipboard to the sub panel.'

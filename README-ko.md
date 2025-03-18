@@ -8,7 +8,7 @@ MIT License
 
 창의 폭을 줄이면 계산기만 나타납니다.
 
-![Screenshot](https://github.com/from104/qcalc/raw/main/assets/screenshot_v0.11.1-ko.png)
+![Screenshot](https://github.com/from104/qcalc/raw/main/assets/screenshot_v0.11.3-ko.png)
 
 ## 주요 기능
 
@@ -23,8 +23,8 @@ MIT License
 
 - 검색과 주석이 가능한 계산 기록
 - 사용자 지정 숫자 서식(3자리 또는 4자리 구분)
-- 최대 64자리 정밀도의 복잡한 계산
 - 빠른 데이터 입력을 위한 다양한 키보드 단축키
+- 빠른 복사 및 붙혀넣기 (패널 클릭 또는 길게 누르기)
 
 ### **전문가용 도구:**
 
@@ -139,8 +139,10 @@ Vue 3, Quasar, Electron으로 제작된 QCalc은 현대적 웹 기술의 안정�
 
 ### 클립보드
 
-- C-c, C-Insert: 계산 결과 또는 선택한 내용을 클립보드로 복사
-- C-v, S-Insert: 클립보드로부터 앱에 붙혀넣기
+- C-c, C-Insert: 메인 패널의 표시된 결과를 클립보드로 복사
+- SC-c, AC-Insert: 보조 패널의 표시된 결과를 클립보드로 복사
+- C-v, S-Insert: 클립보드의 내용을 메인 패널에 붙여넣기
+- SC-v, AS-Insert: 클립보드의 내용을 보조 패널에 붙여넣기
 
 ### 기록 탐색
 

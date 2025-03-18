@@ -8,7 +8,7 @@ A multi-purpose calculator that reimagines my Android graduation project calcula
 
 The calculator alone appears when the window width is reduced.
 
-![Screenshot](https://github.com/from104/qcalc/raw/main/assets/screenshot_v0.11.1.png)
+![Screenshot](https://github.com/from104/qcalc/raw/main/assets/screenshot_v0.11.3.png)
 
 ## Key Features
 
@@ -23,8 +23,8 @@ The calculator alone appears when the window width is reduced.
 
 - Calculation history with search and annotation capabilities
 - Customizable number formatting (3 or 4-digit grouping)
-- Complex calculations with up to 64-digit precision
 - Various keyboard shortcuts for rapid data entry
+- Quick copy and paste (clicking or long-pressing the panel)
 
 ### **Professional Tools:**
 
@@ -139,8 +139,10 @@ Built with Vue 3, Quasar, and Electron, QCalc delivers native-level performance 
 
 ### Clipboard
 
-- C-c, C-Insert: Copy calculation result or selection to clipboard
-- C-v, S-Insert: Paste from the clipboard into the app
+- C-c, C-Insert: Copy displayed result from main panel to clipboard
+- SC-c, AC-Insert: Copy displayed result from sub panel to clipboard
+- C-v, S-Insert: Paste clipboard content to main panel
+- SC-v, AS-Insert: Paste clipboard content to sub panel
 
 ### History Navigation
 
