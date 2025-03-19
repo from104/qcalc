@@ -50,6 +50,7 @@ export const useStore = defineStore('store', {
     initPanel: false,
     showButtonAddedLabel: true,
     hapticsMode: true,
+    showTips: true,
 
     // 테마/디스플레이 관련
     darkMode: 'system',

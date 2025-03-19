@@ -48,7 +48,13 @@
   // 다이얼로그 상태를 computed 속성으로 관리
   const dialogVisible = computed({
     get: () => props.modelValue,
-    set: (value) => emit('update:modelValue', value),
+    set: (value) => {
+      emit('update:modelValue', value);
+      if (!value) {
+        // 다이얼로그가 닫힐 때 로컬 스토리지에 표시 여부 저장
+        localStorage.setItem('tipsShown', 'true');
+      }
+    },
   });
 
   // 현재 팁 인덱스

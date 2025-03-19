@@ -7,7 +7,7 @@
    */
 
   // Vue 핵심 기능 및 컴포지션 API 가져오기
-  import { ref } from 'vue';
+  import { onMounted, ref } from 'vue';
 
   // i18n 설정
   import { useI18n } from 'vue-i18n';
@@ -34,8 +34,20 @@
    * 도움말 팝업을 표시하는 함수
    */
   const showHelpDialog = () => {
-    tipsDialog.value = true;
+    // 로컬 스토리지에서 팁 표시 여부 확인
+    const tipsShown = localStorage.getItem('tipsShown');
+    if (!tipsShown) {
+      tipsDialog.value = true;
+    }
   };
+
+  onMounted(() => {
+    // 로컬 스토리지에서 팁 표시 여부 확인
+    const tipsShown = localStorage.getItem('tipsShown');
+    if (!tipsShown) {
+      tipsDialog.value = store.showTips;
+    }
+  });
 </script>
 
 <template>
@@ -50,7 +62,6 @@
     <ToolTip :text="t('openRecordPage')" />
   </q-btn>
   <q-btn
-    id="btn-help"
     flat
     icon="tips_and_updates"
     class="q-ma-none q-pa-none q-pl-xs q-pr-xs"

@@ -18,7 +18,7 @@ The format is based on [Keep a Changelog] and this project follows [Semantic Ver
 
 - **Mobile optimization tooltip**: Added guidance about adding memo / deleting record by swiping on the history panel
 - **Snap package**: The app can now be launched from the desktop menu (GNOME, KDE, etc.).
-- **Short help added**: Added a dialog to guide users on the changed copy and paste methods, number format changes, and how to use additional button functions.
+- **Quick Tips added**: Added a dialog to guide users on the changed copy and paste methods, number format changes, and how to use additional button functions.
 
 ### Changed
 
