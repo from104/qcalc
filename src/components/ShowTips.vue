@@ -13,6 +13,12 @@
   const { t } = useI18n();
   const { locale } = useI18n({ useScope: 'global' });
 
+  // 전역 window 객체에 접근하기 위한 상수 선언
+  const window = globalThis.window;
+
+  // 스토어 인스턴스 생성
+  const store = window.store;
+
   // 마크다운 파일 import - 한국어
   import CopyPasteTipKo from './tips/ko/copy-paste.md';
   import ButtonFeaturesTipKo from './tips/ko/button-features.md';
@@ -48,13 +54,7 @@
   // 다이얼로그 상태를 computed 속성으로 관리
   const dialogVisible = computed({
     get: () => props.modelValue,
-    set: (value) => {
-      emit('update:modelValue', value);
-      if (!value) {
-        // 다이얼로그가 닫힐 때 로컬 스토리지에 표시 여부 저장
-        localStorage.setItem('tipsShown', 'true');
-      }
-    },
+    set: (value) => emit('update:modelValue', value),
   });
 
   // 현재 팁 인덱스
@@ -124,25 +124,41 @@
 
 <template>
   <q-dialog v-model="dialogVisible">
-    <q-card class="tips-dialog">
+    <q-card class="tips-dialog" :class="{ 'bg-dark': store.isDarkMode() }">
       <q-bar class="bg-primary text-white">
         <q-space />
         <div class="text-subtitle1">{{ t('tipsTitle') }} ({{ pageText }})</div>
         <q-space />
         <q-btn dense flat icon="close" class="q-ml-sm" @click="dialogVisible = false" />
       </q-bar>
-      <q-card-section v-touch-swipe.horizontal="swipeConfig" class="tips-content">
+      <q-card-section
+        v-touch-swipe.horizontal="swipeConfig"
+        class="tips-content"
+        :class="{ 'bg-dark': store.isDarkMode() }"
+      >
         <transition v-bind="transitionClasses">
           <div :key="currentIndex" class="tip-container">
-            <q-markdown :src="currentTip" no-linkify no-heading-anchor-links class="q-px-md q-pt-sm" />
+            <q-markdown
+              :src="currentTip"
+              no-linkify
+              no-heading-anchor-links
+              class="q-px-md q-pt-sm"
+              :class="{ 'text-white': store.isDarkMode() }"
+            />
           </div>
         </transition>
       </q-card-section>
-      <q-card-actions align="between" class="bg-white">
-        <q-btn flat round color="primary" icon="chevron_left" @click="prevTip">
+      <q-card-actions align="between" :class="['q-px-md', store.isDarkMode() ? 'bg-dark' : 'bg-white']">
+        <q-btn flat round :color="store.isDarkMode() ? 'white' : 'primary'" icon="chevron_left" @click="prevTip">
           <q-tooltip>{{ t('prevTip') }}</q-tooltip>
         </q-btn>
-        <q-btn flat round color="primary" icon="chevron_right" @click="nextTip">
+        <q-checkbox
+          v-model="store.showTips"
+          :label="t('showTipsOnStart')"
+          dense
+          :class="store.isDarkMode() ? 'text-white' : 'text-primary'"
+        />
+        <q-btn flat round :color="store.isDarkMode() ? 'white' : 'primary'" icon="chevron_right" @click="nextTip">
           <q-tooltip>{{ t('nextTip') }}</q-tooltip>
         </q-btn>
       </q-card-actions>
@@ -162,6 +178,10 @@
     flex-direction: column;
     overflow: hidden;
 
+    &.bg-dark {
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
     :deep(.q-markdown) {
       ul {
         padding-left: 25px;
@@ -169,7 +189,24 @@
       }
       h5 {
         line-height: 0.8em;
-        // margin: 0;
+      }
+
+      // 다크모드에서의 마크다운 스타일 조정
+      .body--dark & {
+        color: #fff;
+
+        a {
+          color: #7dabf8;
+
+          &:hover {
+            color: #adc8f8;
+          }
+        }
+
+        code {
+          background: rgba(255, 255, 255, 0.1);
+          color: #e0e0e0;
+        }
       }
     }
 
@@ -179,6 +216,10 @@
       padding: 20px;
       touch-action: pan-y pinch-zoom;
       position: relative;
+
+      &.bg-dark {
+        background: #1d1d1d;
+      }
 
       // 스크롤바 숨기기
       &::-webkit-scrollbar {
@@ -273,8 +314,10 @@ ko:
   tipsTitle: '짧은 팁'
   prevTip: '이전 팁'
   nextTip: '다음 팁'
+  showTipsOnStart: '시작 시 팁 보이기'
 en:
   tipsTitle: 'Quick Tips'
   prevTip: 'Previous tip'
   nextTip: 'Next tip'
+  showTipsOnStart: 'Show tips on start'
 </i18n>

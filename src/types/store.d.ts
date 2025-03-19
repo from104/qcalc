@@ -65,6 +65,7 @@ export interface StoreState {
   initPanel: boolean;
   showButtonAddedLabel: boolean;
   hapticsMode: boolean;
+  isAppStarted: boolean;
   showTips: boolean;
 
   // 테마/디스플레이 관련

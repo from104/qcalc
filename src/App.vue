@@ -157,6 +157,8 @@
       await ScreenOrientation.unlock();
     }
   });
+
+  store.isAppStarted = false;
 </script>
 
 <template>

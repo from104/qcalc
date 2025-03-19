@@ -34,19 +34,12 @@
    * 도움말 팝업을 표시하는 함수
    */
   const showHelpDialog = () => {
-    // 로컬 스토리지에서 팁 표시 여부 확인
-    const tipsShown = localStorage.getItem('tipsShown');
-    if (!tipsShown) {
-      tipsDialog.value = true;
-    }
+    tipsDialog.value = true;
   };
 
   onMounted(() => {
-    // 로컬 스토리지에서 팁 표시 여부 확인
-    const tipsShown = localStorage.getItem('tipsShown');
-    if (!tipsShown) {
-      tipsDialog.value = store.showTips;
-    }
+    tipsDialog.value = store.showTips && !store.isAppStarted;
+    store.isAppStarted = true;
   });
 </script>
 

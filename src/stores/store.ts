@@ -50,6 +50,7 @@ export const useStore = defineStore('store', {
     initPanel: false,
     showButtonAddedLabel: true,
     hapticsMode: true,
+    isAppStarted: false,
     showTips: true,
 
     // 테마/디스플레이 관련
