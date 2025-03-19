@@ -53,8 +53,8 @@
     "@quasar/quasar-ui-qmarkdown": "^2.0.5",
     "@quasar/vite-plugin": "^1.8.1",
     "@types/dompurify": "3.0.5",
-    "axios": "^1.8.2",
     "@vitejs/plugin-vue": "^5.2.1",
+    "axios": "^1.8.2",
     "dotenv": "^16.4.7",
     "electron-log": "^5.2.4",
     "electron-updater": "^6.3.9",
@@ -67,7 +67,6 @@
     "ts-pattern": "^5.6.0",
     "vite-plugin-env-types": "^0.1.4",
     "vue": "3.5.13",
-    "vue-i18n": "^11.1.2",
     "vue-i18n": "11.1.1",
     "vue-router": "4.5.0"
   },
