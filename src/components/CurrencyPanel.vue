@@ -39,6 +39,7 @@
 
   // 컴포넌트 import
   import ToolTip from 'src/components/snippets/ToolTip.vue';
+import { round } from 'src/classes/utils/NumberUtils';
 
   // 키 바인딩 설정
   const keyBinding = new KeyBinding([
@@ -178,10 +179,13 @@
   const targetFilterFn = createFilterFn(filteredTargetCurrencyOptions, targetCurrencyOptions);
 
   const handleCurrencySwap = () => {
-    calc.currentNumber = currencyConverter.convert(
-      BigNumber(calc.currentNumber),
-      store.sourceCurrency,
-      store.targetCurrency,
+    calc.currentNumber = round(
+      currencyConverter.convert(
+        BigNumber(calc.currentNumber),
+        store.sourceCurrency,
+        store.targetCurrency,
+      ).toString(),
+      13
     );
     swapCurrencies();
   };

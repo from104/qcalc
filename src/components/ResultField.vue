@@ -75,7 +75,7 @@
       await Haptics.impact({ style: ImpactStyle.Medium });
     }
   };
-  
+
   /**
    * 필드 툴팁 표시 여부를 결정하는 함수
    *
@@ -171,7 +171,7 @@
 
         case 'currency':
           initRecentCurrencies();
-          return toFormattedNumber(getConvertedCurrencyNumber());
+          return toFormattedNumber(round(getConvertedCurrencyNumber(), 13));
 
         case 'radix':
           initRecentRadix();
@@ -402,12 +402,20 @@
     hapticFeedbackLight();
 
     if (isCopying.value) {
-      copyToClipboard(onlyNumber.value, t(props.field === 'main' ? 'copiedOnlyNumber' : 'copiedOnlyNumberSub', { result: onlyNumber.value }));
+      copyToClipboard(
+        onlyNumber.value,
+        t(props.field === 'main' ? 'copiedOnlyNumber' : 'copiedOnlyNumberSub', { result: onlyNumber.value }),
+      );
       isCopying.value = false;
       return;
     }
 
-    copyToClipboard(displayedResult.value, t(props.field === 'main' ? 'copiedDisplayedResult' : 'copiedDisplayedResultSub', { result: displayedResult.value }));
+    copyToClipboard(
+      displayedResult.value,
+      t(props.field === 'main' ? 'copiedDisplayedResult' : 'copiedDisplayedResultSub', {
+        result: displayedResult.value,
+      }),
+    );
     isCopying.value = true;
     setTimeout(() => {
       isCopying.value = false;
@@ -473,15 +481,17 @@
 
   // 키 바인딩 설정
   import { KeyBinding } from 'classes/KeyBinding';
-  const keyBinding = props.field === 'main' ? 
-    new KeyBinding([
-      [['Control+c', 'Control+Insert', 'Copy'], handleCopy],
-      [['Control+v', 'Shift+Insert', 'Paste'], () => handlePaste('main')],
-    ]) : 
-    new KeyBinding([
-      [['Shift+Control+c', 'Alt+Control+Insert', 'Shift+Copy'], handleCopy],
-      [['Shift+Control+v', 'Alt+Shift+Insert', 'Shift+Paste'], () => handlePaste('sub')],
-    ]);
+  import { round } from 'src/classes/utils/NumberUtils';
+  const keyBinding =
+    props.field === 'main'
+      ? new KeyBinding([
+          [['Control+c', 'Control+Insert', 'Copy'], handleCopy],
+          [['Control+v', 'Shift+Insert', 'Paste'], () => handlePaste('main')],
+        ])
+      : new KeyBinding([
+          [['Shift+Control+c', 'Alt+Control+Insert', 'Shift+Copy'], handleCopy],
+          [['Shift+Control+v', 'Alt+Shift+Insert', 'Shift+Paste'], () => handlePaste('sub')],
+        ]);
 
   /**
    * 입력 필드 포커스 상태에 따라 키 바인딩을 활성화/비활성화합니다.
@@ -592,7 +602,8 @@
             {{ radixSuffix }}
           </span>
           <q-menu
-            :context-menu="!window.isMobile"
+            v-if="window.isDesktop"
+            context-menu
             auto-close
             touch-position
             class="shadow-6"
