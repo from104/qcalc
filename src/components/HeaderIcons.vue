@@ -12,7 +12,6 @@
   // i18n 설정
   import { useI18n } from 'vue-i18n';
   const { t } = useI18n();
-  const { locale } = useI18n({ useScope: 'global' });
 
   // router 관련
   import { useRouter } from 'vue-router';
@@ -24,23 +23,18 @@
   // 스토어 인스턴스 생성
   const store = window.store;
 
-  // 스토어에서 필요한 메서드와 속성 추출
-
   // 컴포넌트 import
   import ToolTip from './snippets/ToolTip.vue';
-
-  // 마크다운 파일 import
-  import ShortHelpMD_en from './ShortHelp-en.md';
-  import ShortHelpMD_ko from './ShortHelp-ko.md';
+  import ShowTips from './ShowTips.vue';
 
   // 도움말 팝업 상태 관리
-  const helpDialog = ref(false);
+  const tipsDialog = ref(false);
 
   /**
    * 도움말 팝업을 표시하는 함수
    */
   const showHelpDialog = () => {
-    helpDialog.value = true;
+    tipsDialog.value = true;
   };
 </script>
 
@@ -58,7 +52,7 @@
   <q-btn
     id="btn-help"
     flat
-    icon="help_center"
+    icon="tips_and_updates"
     class="q-ma-none q-pa-none q-pl-xs q-pr-xs"
     :aria-label="t('ariaLabel.help')"
     @click="showHelpDialog"
@@ -66,59 +60,19 @@
     <ToolTip :text="t('tooltipHelp')" />
   </q-btn>
 
-  <!-- 도움말 팝업 다이얼로그 -->
-  <q-dialog v-model="helpDialog">
-    <q-card class="help-dialog">
-      <q-bar class="bg-primary text-white">
-        <q-space />
-        <div class="text-subtitle1">{{ t('helpTitle') }}</div>
-        <q-space />
-        <q-btn dense flat icon="close" class="q-ml-sm" @click="helpDialog = false" />
-      </q-bar>
-      <q-card-section class="help-content scrollbar-custom">
-        <q-markdown
-          :src="locale.substring(0, 2) == 'ko' ? ShortHelpMD_ko : ShortHelpMD_en"
-          no-linkify
-          no-heading-anchor-links
-          style="margin-top: -20px"
-        />
-      </q-card-section>
-    </q-card>
-  </q-dialog>
+  <ShowTips v-model="tipsDialog" />
 </template>
-
-<style lang="scss" scoped>
-  .help-dialog {
-    top: 5%;
-    width: 100%;
-    height: 100%;
-    max-width: 400px;
-    max-height: 450px;
-    border-radius: 8px;
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
-
-    .help-content {
-      flex: 1;
-      overflow-y: auto;
-      padding: 20px;
-    }
-  }
-</style>
 
 <i18n>
 ko:
-  tooltipHelp: '도움말을 표시합니다.'
+  tooltipTips: '팁을 표시합니다.'
   openRecordPage: '클릭하면 기록 페이지를 엽니다.'
-  helpTitle: '짧은 도움말'
   ariaLabel:
     record: '기록 페이지 열기'
     help: '도움말 보기'
 en:
-  tooltipHelp: 'Show help.'
+  tooltipTips: 'Show tips.'
   openRecordPage: 'Click to open the record page.'
-  helpTitle: 'Quick Help'
   ariaLabel:
     record: 'Open record page'
     help: 'View help'
