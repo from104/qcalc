@@ -54,9 +54,6 @@ yarn-error.log*
 !.yarn/releases
 !.yarn/sdks
 !.yarn/versions
-src-capacitor/capacitor.config.json
-src-capacitor/package.json
-src-capacitor/android/build.gradle
 
 # repomix
 repomix-output.txt
