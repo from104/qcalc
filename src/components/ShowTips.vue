@@ -123,21 +123,31 @@
 </script>
 
 <template>
-  <q-dialog v-model="dialogVisible">
-    <q-card class="tips-dialog" :class="{ 'bg-dark': store.isDarkMode() }">
-      <q-bar class="bg-primary text-white">
+  <q-dialog v-model="dialogVisible" role="dialog" :aria-label="t('dialogAriaLabel')">
+    <q-card class="tips-dialog" :class="{ 'bg-dark': store.isDarkMode() }" role="article">
+      <q-bar class="bg-primary text-white" role="banner">
         <q-space />
-        <div class="text-subtitle1">{{ t('tipsTitle') }} ({{ pageText }})</div>
+        <div class="text-subtitle1" role="heading" aria-level="1">{{ t('tipsTitle') }} ({{ pageText }})</div>
         <q-space />
-        <q-btn dense flat icon="close" class="q-ml-sm" @click="dialogVisible = false" />
+        <q-btn
+          dense
+          flat
+          icon="close"
+          class="q-ml-sm"
+          :aria-label="t('closeTips')"
+          role="button"
+          @click="dialogVisible = false"
+        />
       </q-bar>
       <q-card-section
         v-touch-swipe.horizontal="swipeConfig"
         class="tips-content"
         :class="{ 'bg-dark': store.isDarkMode() }"
+        role="main"
+        :aria-label="t('mainContentAriaLabel')"
       >
         <transition v-bind="transitionClasses">
-          <div :key="currentIndex" class="tip-container">
+          <div :key="currentIndex" class="tip-container" role="region" :aria-label="t('tipContent')">
             <q-markdown
               :src="currentTip"
               no-linkify
@@ -148,8 +158,21 @@
           </div>
         </transition>
       </q-card-section>
-      <q-card-actions align="between" :class="['q-px-md', store.isDarkMode() ? 'bg-dark' : 'bg-white']">
-        <q-btn flat round :color="store.isDarkMode() ? 'white' : 'primary'" icon="chevron_left" @click="prevTip">
+      <q-card-actions
+        align="between"
+        :class="['q-px-md', store.isDarkMode() ? 'bg-dark' : 'bg-white']"
+        role="group"
+        :aria-label="t('navigationAriaLabel')"
+      >
+        <q-btn
+          flat
+          round
+          :color="store.isDarkMode() ? 'white' : 'primary'"
+          icon="chevron_left"
+          :aria-label="t('prevTip')"
+          role="button"
+          @click="prevTip"
+        >
           <q-tooltip>{{ t('prevTip') }}</q-tooltip>
         </q-btn>
         <q-checkbox
@@ -157,8 +180,18 @@
           :label="t('showTipsOnStart')"
           dense
           :class="store.isDarkMode() ? 'text-white' : 'text-primary'"
+          role="checkbox"
+          :aria-label="t('showTipsOnStart')"
         />
-        <q-btn flat round :color="store.isDarkMode() ? 'white' : 'primary'" icon="chevron_right" @click="nextTip">
+        <q-btn
+          flat
+          round
+          :color="store.isDarkMode() ? 'white' : 'primary'"
+          icon="chevron_right"
+          :aria-label="t('nextTip')"
+          role="button"
+          @click="nextTip"
+        >
           <q-tooltip>{{ t('nextTip') }}</q-tooltip>
         </q-btn>
       </q-card-actions>
@@ -315,9 +348,19 @@ ko:
   prevTip: '이전 팁'
   nextTip: '다음 팁'
   showTipsOnStart: '시작 시 팁 보이기'
+  closeTips: '팁 닫기'
+  tipContent: '팁 내용'
+  dialogAriaLabel: '도움말 다이얼로그'
+  mainContentAriaLabel: '팁 메인 콘텐츠'
+  navigationAriaLabel: '팁 네비게이션'
 en:
   tipsTitle: 'Quick Tips'
   prevTip: 'Previous tip'
   nextTip: 'Next tip'
   showTipsOnStart: 'Show tips on start'
+  closeTips: 'Close tips'
+  tipContent: 'Tip content'
+  dialogAriaLabel: 'Help dialog'
+  mainContentAriaLabel: 'Tip main content'
+  navigationAriaLabel: 'Tip navigation'
 </i18n>
