@@ -39,7 +39,7 @@
 
   // 컴포넌트 import
   import ToolTip from 'src/components/snippets/ToolTip.vue';
-import { round } from 'src/classes/utils/NumberUtils';
+  import { round } from 'src/classes/utils/NumberUtils';
 
   // 키 바인딩 설정
   const keyBinding = new KeyBinding([
@@ -125,21 +125,20 @@ import { round } from 'src/classes/utils/NumberUtils';
    * @param isSource - 출발 통화 여부
    * @returns 통화 옵션 객체
    */
-  const createCurrencyOption = (currency: string, isSource: boolean) => ({
+  const createCurrencyOption = (currency: string) => ({
     value: currency,
     label: currency,
     desc: currencyDescriptions[currency] ?? '',
-    disable: isSource ? store.targetCurrency === currency : store.sourceCurrency === currency,
   });
 
   // 출발 통화 옵션 목록
   const sourceCurrencyOptions = reactive<CurrencyOptions[]>(
-    currencyList.map((currency: string) => createCurrencyOption(currency, true)),
+    currencyList.map((currency: string) => createCurrencyOption(currency)),
   );
 
   // 도착 통화 옵션 목록
   const targetCurrencyOptions = reactive<CurrencyOptions[]>(
-    currencyList.map((currency: string) => createCurrencyOption(currency, false)),
+    currencyList.map((currency: string) => createCurrencyOption(currency)),
   );
 
   // 통화 옵션 업데이트
@@ -180,12 +179,8 @@ import { round } from 'src/classes/utils/NumberUtils';
 
   const handleCurrencySwap = () => {
     calc.currentNumber = round(
-      currencyConverter.convert(
-        BigNumber(calc.currentNumber),
-        store.sourceCurrency,
-        store.targetCurrency,
-      ).toString(),
-      13
+      currencyConverter.convert(BigNumber(calc.currentNumber), store.sourceCurrency, store.targetCurrency).toString(),
+      13,
     );
     swapCurrencies();
   };
