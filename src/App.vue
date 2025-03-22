@@ -164,7 +164,7 @@
 <template>
   <router-view v-slot="{ Component, route: routeProps }">
     <transition :name="isFirstNavigation ? '' : computeTransition || ''" mode="default">
-      <component :is="Component" :key="routeProps.path" />
+<component :is="Component" :key="routeProps.path + '-' + isWideLayout" />
     </transition>
   </router-view>
   <AutoUpdate />
@@ -206,10 +206,12 @@
   .slide-forward-enter-from {
     transform: translateX(100%);
   }
+  
   .slide-forward-enter-to,
   .slide-forward-leave-from {
     transform: translateX(0);
   }
+
   .slide-forward-leave-to {
     transform: translateX(-100%);
   }
@@ -225,6 +227,7 @@
   .fade-leave-to {
     opacity: 0;
   }
+
   .fade-enter-to,
   .fade-leave-from {
     opacity: 1;
@@ -242,11 +245,13 @@
     transform: scaleX(2);
     transform-origin: left;
   }
+
   .expand-layout-enter-to,
   .expand-layout-leave-from {
     transform: scaleX(1);
     transform-origin: left;
   }
+
   .expand-layout-leave-to {
     transform: scaleX(0.5);
     transform-origin: left;
@@ -263,13 +268,16 @@
     transform: scaleX(0.5);
     transform-origin: left;
   }
+
   .collapse-layout-enter-to,
   .collapse-layout-leave-from {
     transform: scaleX(1);
     transform-origin: left;
   }
+
   .collapse-layout-leave-to {
-    transform: translateX(100%);
+    transform: scaleX(2);
+    transform-origin: left;
   }
 </style>
 
