@@ -20,10 +20,10 @@
   import { navigateToPath } from '../classes/utils/NavigationUtils';
 
   // === 컴포넌트 임포트 ===
-  import HeaderIcons from 'components/HeaderIcons.vue';
   import ToolTip from 'components/snippets/ToolTip.vue';
   import MenuPanel from 'components/MenuPanel.vue';
   import HelpIcon from 'components/snippets/HelpIcon.vue';
+  import ShowTips from 'components/ShowTips.vue';
 
   // === 페이지 컴포넌트 임포트 ===
   import CalcPage from 'pages/CalcPage.vue';
@@ -136,8 +136,16 @@
   const previousSubPage = ref('record');
   const isWideLayout = computed(() => store.isWideWidth());
   const leftDrawerOpen = ref(false);
+  const tipsDialog = ref(false);
 
   // === 유틸리티 함수 ===
+  /**
+   * 도움말 팝업을 표시하는 함수
+   */
+  const showHelpDialog = () => {
+    tipsDialog.value = true;
+  };
+
   /**
    * 서브페이지를 전환하는 함수입니다.
    */
@@ -262,6 +270,10 @@
       }
     });
     store.updateDarkMode();
+
+    // 팁 다이얼로그 초기화
+    tipsDialog.value = store.showTips && !store.isAppStarted;
+    store.isAppStarted = true;
   });
 
   /**
@@ -338,7 +350,25 @@
           <q-tab v-for="tab in tabs" :key="tab.name" :label="tab.title" :name="tab.name" class="q-px-xs" dense />
         </q-tabs>
         <q-space />
-        <HeaderIcons />
+        <q-btn
+          v-if="!store.isWideWidth()"
+          flat
+          icon="mdi-history"
+          class="q-ma-none q-pa-none q-pl-sm q-pr-xs"
+          :aria-label="t('ariaLabel.record')"
+          @click="router.push('/record')"
+        >
+          <ToolTip :text="t('openRecordPage')" />
+        </q-btn>
+        <q-btn
+          flat
+          icon="tips_and_updates"
+          class="q-ma-none q-pa-none q-pl-xs q-pr-xs"
+          :aria-label="t('ariaLabel.help')"
+          @click="showHelpDialog"
+        >
+          <ToolTip :text="t('tooltipHelp')" />
+        </q-btn>
       </q-toolbar>
 
       <!-- 서브 페이지 헤더 -->
@@ -449,7 +479,25 @@
           />
         </q-tabs>
         <q-space />
-        <HeaderIcons />
+        <q-btn
+          v-if="!store.isWideWidth()"
+          flat
+          icon="mdi-history"
+          class="q-ma-none q-pa-none q-pl-sm q-pr-xs"
+          :aria-label="t('ariaLabel.record')"
+          @click="router.push('/record')"
+        >
+          <ToolTip :text="t('openRecordPage')" />
+        </q-btn>
+        <q-btn
+          flat
+          icon="tips_and_updates"
+          class="q-ma-none q-pa-none q-pl-xs q-pr-xs"
+          :aria-label="t('ariaLabel.help')"
+          @click="showHelpDialog"
+        >
+          <ToolTip :text="t('tooltipHelp')" />
+        </q-btn>
       </q-toolbar>
 
       <!-- 서브페이지 영역 헤더 -->
@@ -462,7 +510,10 @@
               :aria-label="t('ariaLabel.subPageTitle', { title: SUB_PAGE_CONFIG[currentSubPage]?.title })"
             >
               {{ SUB_PAGE_CONFIG[currentSubPage]?.title }}
-              <HelpIcon v-if="(currentSubPage === 'record' || currentSubPage === '') && window.isMobile" :text="t('tooltip.recordSwipeHelp')" />
+              <HelpIcon
+                v-if="(currentSubPage === 'record' || currentSubPage === '') && window.isMobile"
+                :text="t('tooltip.recordSwipeHelp')"
+              />
             </q-toolbar-title>
             <div class="col-8 row justify-end sub-header-buttons">
               <q-btn
@@ -556,6 +607,8 @@
       </div>
     </q-page-container>
   </q-layout>
+
+  <ShowTips v-model="tipsDialog" />
 </template>
 
 <style lang="scss" scoped>
@@ -675,6 +728,9 @@ ko:
   unit: 단위
   currency: 환율
   radix: 진법
+  tooltipTips: '팁을 표시합니다.'
+  openRecordPage: '클릭하면 기록 페이지를 엽니다.'
+  tooltipHelp: '도움말을 표시합니다.'
   ariaLabel:
     delete_outline: '모든 기록 삭제'
     back: '이전 페이지로 돌아가기'
@@ -691,6 +747,8 @@ ko:
     subPageContent: '서브페이지 컨텐츠'
     tabSelected: '{name} 탭 선택됨'
     tabUnselected: '{name} 탭 선택되지 않음'
+    record: '기록 페이지 열기'
+    help: '도움말 보기'
   tooltip:
     help: '도움말'
     about: '정보'
@@ -704,6 +762,9 @@ en:
   unit: Unit
   currency: Currency
   radix: Radix
+  tooltipTips: 'Show tips.'
+  openRecordPage: 'Click to open the record page.'
+  tooltipHelp: 'Show help.'
   ariaLabel:
     delete_outline: 'Delete all records'
     back: 'Go back to previous page'
@@ -720,6 +781,8 @@ en:
     subPageContent: 'Sub page content'
     tabSelected: '{name} tab selected'
     tabUnselected: '{name} tab unselected'
+    record: 'Open record page'
+    help: 'View help'
   tooltip:
     help: 'Help'
     about: 'About'

@@ -31,7 +31,6 @@
 
   // 컴포넌트 import
   import ToolTip from 'src/components/snippets/ToolTip.vue';
-  import MenuItem from 'src/components/snippets/MenuItem.vue';
   import { showError, showMessage } from 'src/classes/utils/NotificationUtils';
 
   // props 정의
