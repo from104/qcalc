@@ -18,6 +18,12 @@
   import { useI18n } from 'vue-i18n';
   const { t } = useI18n();
 
+// 전역 window 객체에 접근하기 위한 상수 선언
+  const window = globalThis.window;
+
+  // 스토어 인스턴스 생성
+  const store = window.store;
+
   // MenuItem 컴포넌트의 props 정의
   defineProps({
     title: { type: String, default: '' },
@@ -31,7 +37,7 @@
 
 <template>
   <q-separator v-if="separator" />
-  <q-item v-else v-close-popup clickable role="menuitem" :aria-label="title" @click="(evt: Event) => action(evt)">
+  <q-item v-else v-close-popup clickable role="menuitem" :class="store.isDarkMode() ? 'bg-grey-9' : 'bg-grey-3'" :aria-label="title" @click="(evt: Event) => action(evt)">
     <q-item-section v-if="icon" avatar class="col-3">
       <q-icon :name="icon" role="img" :aria-label="t('ariaLabel.icon', { name: title })" />
     </q-item-section>

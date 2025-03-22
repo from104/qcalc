@@ -601,30 +601,6 @@
           >
             {{ radixSuffix }}
           </span>
-          <q-menu
-            v-if="window.isDesktop"
-            context-menu
-            auto-close
-            touch-position
-            class="shadow-6"
-            role="menu"
-            :aria-label="t('ariaLabel.contextMenu')"
-          >
-            <q-list class="noselect" dense style="min-width: 150px">
-              <MenuItem
-                :action="
-                  () => copyToClipboard(displayedResult, t('copiedDisplayedResult', { result: displayedResult }))
-                "
-                :title="t('copyDisplayedResult')"
-                :caption="displayedResult"
-              />
-              <MenuItem
-                :action="() => copyToClipboard(onlyNumber, t('copiedOnlyNumber', { result: onlyNumber }))"
-                :title="t('copyOnlyNumber')"
-                :caption="onlyNumber"
-              />
-            </q-list>
-          </q-menu>
           <ToolTip v-if="needFieldTooltip">
             {{ displayedResult }}
           </ToolTip>
