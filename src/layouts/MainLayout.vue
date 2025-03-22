@@ -214,7 +214,7 @@
     [['F2'], () => navigateToPath('/about', route, router)],
     [['F3'], () => navigateToPath('/settings', route, router)],
     [['F4'], () => navigateToPath('/record', route, router)],
-    [['F5'], () => store.showTipsDialog = true],
+    [['F5'], () => (store.showTipsDialog = true)],
     [['Escape'], closeSubPage],
   ]);
 
@@ -305,288 +305,299 @@
 </script>
 
 <template>
-  <!-- 좁은 화면 레이아웃 -->
-  <q-layout v-if="!isWideLayout" view="hHh LpR fFf">
-    <q-drawer
-      v-model="leftDrawerOpen"
-      show-if-above
-      elevated
-      :width="250"
-      :dark="store.isDarkMode()"
-      :swipe-only="window.isMobile"
-      behavior="mobile"
-      @click="leftDrawerOpen = false"
-    >
-      <q-card :class="store.isDarkMode() ? 'bg-grey-9' : 'bg-grey-3'" class="full-height menu-card">
-        <MenuPanel />
-      </q-card>
-    </q-drawer>
+  <div class="main-layout">
+    <!-- 좁은 화면 레이아웃 -->
+    <q-layout v-if="!isWideLayout" view="hHh LpR fFf">
+      <q-drawer
+        v-model="leftDrawerOpen"
+        show-if-above
+        elevated
+        :width="250"
+        :dark="store.isDarkMode()"
+        :swipe-only="window.isMobile"
+        behavior="mobile"
+        @click="leftDrawerOpen = false"
+      >
+        <q-card :class="store.isDarkMode() ? 'bg-grey-9' : 'bg-grey-3'" class="full-height menu-card">
+          <MenuPanel />
+        </q-card>
+      </q-drawer>
 
-    <q-header id="header" class="z-top noselect" elevated>
-      <!-- 메인 페이지 헤더 -->
-      <q-toolbar v-if="!isSubPage" v-auto-blur>
-        <q-btn flat dense round class="q-mr-sm" icon="menu" aria-label="Menu" @click="toggleLeftDrawer">
-          <ToolTip :text="t('tooltip.menu')" />
-        </q-btn>
-        <q-tabs
-          v-model="store.currentTab"
-          align="left"
-          class="col-8 q-px-none"
-          active-color="text-primary"
-          indicator-color="secondary"
-          dense
-          shrink
-          inline-label
-          outside-arrows
-          mobile-arrows
-          @update:model-value="store.setCurrentTab($event)"
-        >
-          <q-tab v-for="tab in tabs" :key="tab.name" :label="tab.title" :name="tab.name" class="q-px-xs" dense />
-        </q-tabs>
-        <q-space />
-        <q-btn
-          v-if="!store.isWideWidth()"
-          flat
-          icon="mdi-history"
-          class="q-ma-none q-pa-none q-pl-sm q-pr-xs"
-          :aria-label="t('ariaLabel.record')"
-          @click="router.push('/record')"
-        >
-          <ToolTip :text="t('openRecordPage')" />
-        </q-btn>
-        <q-btn
-          v-if="!store.isWideWidth()"
-          flat
-          icon="settings"
-          class="q-ma-none q-pa-none q-pl-xs q-pr-xs"
-          :aria-label="t('ariaLabel.settings')"
-          @click="navigateToPath('/settings', route, router)"
-        >
-          <ToolTip :text="t('tooltip.settings')" />
-        </q-btn>
-      </q-toolbar>
+      <q-header id="header" class="z-top noselect" elevated>
+        <!-- 메인 페이지 헤더 -->
+        <q-toolbar v-if="!isSubPage" v-auto-blur>
+          <q-btn flat dense round class="q-mr-sm" icon="menu" aria-label="Menu" @click="toggleLeftDrawer">
+            <ToolTip :text="t('tooltip.menu')" />
+          </q-btn>
+          <q-tabs
+            v-model="store.currentTab"
+            align="left"
+            class="col-8 q-px-none"
+            active-color="text-primary"
+            indicator-color="secondary"
+            dense
+            shrink
+            inline-label
+            outside-arrows
+            mobile-arrows
+            @update:model-value="store.setCurrentTab($event)"
+          >
+            <q-tab v-for="tab in tabs" :key="tab.name" :label="tab.title" :name="tab.name" class="q-px-xs" dense />
+          </q-tabs>
+          <q-space />
+          <q-btn
+            v-if="!store.isWideWidth()"
+            flat
+            icon="mdi-history"
+            class="q-ma-none q-pa-none q-pl-sm q-pr-xs"
+            :aria-label="t('ariaLabel.record')"
+            @click="router.push('/record')"
+          >
+            <ToolTip :text="t('openRecordPage')" />
+          </q-btn>
+          <q-btn
+            v-if="!store.isWideWidth()"
+            flat
+            icon="settings"
+            class="q-ma-none q-pa-none q-pl-xs q-pr-xs"
+            :aria-label="t('ariaLabel.settings')"
+            @click="navigateToPath('/settings', route, router)"
+          >
+            <ToolTip :text="t('tooltip.settings')" />
+          </q-btn>
+        </q-toolbar>
 
-      <!-- 서브 페이지 헤더 -->
-      <q-toolbar v-else v-auto-blur class="q-px-sm">
-        <q-btn
-          flat
-          dense
-          round
-          icon="arrow_back"
-          role="button"
-          :aria-label="t('ariaLabel.back')"
-          @click="router.back()"
-        />
-        <q-toolbar-title class="text-subtitle1">
-          {{ SUB_PAGE_CONFIG[currentSubPage as keyof typeof SUB_PAGE_CONFIG]?.title }}
-          <HelpIcon v-if="currentSubPage === 'record' && window.isMobile" :text="t('tooltip.recordSwipeHelp')" />
-        </q-toolbar-title>
-        <q-space />
-        <q-btn
-          v-for="button in SUB_PAGE_CONFIG[currentSubPage as keyof typeof SUB_PAGE_CONFIG]?.buttons"
-          :key="button.icon"
-          dense
-          flat
-          size="md"
-          class="high-z-index"
-          :icon="button.icon"
-          role="button"
-          :aria-label="t(`ariaLabel.${button.icon}`)"
-          :disable="button.disabled as unknown as boolean"
-          @click="button.action"
-        >
-          <ToolTip :text="button.tooltip as unknown as string" />
-        </q-btn>
-      </q-toolbar>
-    </q-header>
+        <!-- 서브 페이지 헤더 -->
+        <q-toolbar v-else v-auto-blur class="q-px-sm">
+          <q-btn
+            flat
+            dense
+            round
+            icon="arrow_back"
+            role="button"
+            :aria-label="t('ariaLabel.back')"
+            @click="router.back()"
+          />
+          <q-toolbar-title class="text-subtitle1">
+            {{ SUB_PAGE_CONFIG[currentSubPage as keyof typeof SUB_PAGE_CONFIG]?.title }}
+            <HelpIcon v-if="currentSubPage === 'record' && window.isMobile" :text="t('tooltip.recordSwipeHelp')" />
+          </q-toolbar-title>
+          <q-space />
+          <q-btn
+            v-for="button in SUB_PAGE_CONFIG[currentSubPage as keyof typeof SUB_PAGE_CONFIG]?.buttons"
+            :key="button.icon"
+            dense
+            flat
+            size="md"
+            class="high-z-index"
+            :icon="button.icon"
+            role="button"
+            :aria-label="t(`ariaLabel.${button.icon}`)"
+            :disable="button.disabled as unknown as boolean"
+            @click="button.action"
+          >
+            <ToolTip :text="button.tooltip as unknown as string" />
+          </q-btn>
+        </q-toolbar>
+      </q-header>
 
-    <q-page-container class="row no-padding-bottom">
-      <!-- 메인 페이지 컨텐츠 -->
-      <template v-if="!isSubPage">
-        <q-tab-panels v-model="store.currentTab" animated infinite :swipeable="window.isMobile">
-          <q-tab-panel v-for="(tab, index) in tabs" :key="index" :name="tab.name">
-            <component :is="tab.component" />
-          </q-tab-panel>
-        </q-tab-panels>
-      </template>
+      <q-page-container class="row no-padding-bottom">
+        <!-- 메인 페이지 컨텐츠 -->
+        <template v-if="!isSubPage">
+          <q-tab-panels v-model="store.currentTab" animated infinite :swipeable="window.isMobile">
+            <q-tab-panel v-for="(tab, index) in tabs" :key="index" :name="tab.name">
+              <component :is="tab.component" />
+            </q-tab-panel>
+          </q-tab-panels>
+        </template>
 
-      <!-- 서브 페이지 컨텐츠 -->
-      <template v-else>
-        <div class="col-12">
-          <q-scroll-area class="sub-scroll-area" :class="{ 'hide-scrollbar': currentSubPage === 'record' }">
-            <component
-              :is="SUB_PAGE_CONFIG[currentSubPage as keyof typeof SUB_PAGE_CONFIG]?.component"
-              class="sub-page"
+        <!-- 서브 페이지 컨텐츠 -->
+        <template v-else>
+          <div class="col-12">
+            <q-scroll-area class="sub-scroll-area" :class="{ 'hide-scrollbar': currentSubPage === 'record' }">
+              <component
+                :is="SUB_PAGE_CONFIG[currentSubPage as keyof typeof SUB_PAGE_CONFIG]?.component"
+                class="sub-page"
+              />
+            </q-scroll-area>
+          </div>
+        </template>
+      </q-page-container>
+    </q-layout>
+
+    <!-- 넓은 화면 레이아웃 -->
+    <q-layout v-else>
+      <q-drawer
+        v-model="leftDrawerOpen"
+        show-if-above
+        elevated
+        :width="250"
+        :dark="store.isDarkMode()"
+        :swipe-only="window.isMobile"
+        behavior="mobile"
+        @click="leftDrawerOpen = false"
+      >
+        <q-card class="full-height menu-card">
+          <MenuPanel />
+        </q-card>
+      </q-drawer>
+
+      <q-header id="header" class="z-top noselect row" elevated>
+        <!-- 계산기 영역 헤더 -->
+        <q-toolbar v-auto-blur class="col-6 calc-header">
+          <q-btn flat dense round class="q-mr-sm" icon="menu" aria-label="Menu" @click="toggleLeftDrawer">
+            <ToolTip :text="t('tooltip.menu')" />
+          </q-btn>
+          <q-tabs
+            v-model="store.currentTab"
+            align="left"
+            class="col-grow"
+            active-color="text-primary"
+            indicator-color="secondary"
+            dense
+            shrink
+            inline-label
+            role="tablist"
+            :aria-label="t('ariaLabel.mainTabs')"
+            @update:model-value="store.setCurrentTab($event)"
+          >
+            <q-tab
+              v-for="tab in tabs"
+              :key="tab.name"
+              :label="tab.title"
+              :name="tab.name"
+              class="q-px-xs"
+              dense
+              role="tab"
+              :aria-label="t('ariaLabel.tab', { name: tab.title })"
+              :aria-selected="store.currentTab === tab.name"
+              :aria-controls="`panel-${tab.name}`"
             />
+          </q-tabs>
+        </q-toolbar>
+
+        <!-- 서브페이지 영역 헤더 -->
+        <q-toolbar v-auto-blur class="col-6 sub-header">
+          <transition name="animate-sub-page">
+            <div :key="currentSubPage" :data-page="currentSubPage" class="header-content full-width row items-center">
+              <q-toolbar-title
+                class="text-subtitle1 col-4"
+                role="heading"
+                :aria-label="t('ariaLabel.subPageTitle', { title: SUB_PAGE_CONFIG[currentSubPage]?.title })"
+              >
+                {{ SUB_PAGE_CONFIG[currentSubPage]?.title }}
+                <HelpIcon
+                  v-if="(currentSubPage === 'record' || currentSubPage === '') && window.isMobile"
+                  :text="t('tooltip.recordSwipeHelp')"
+                />
+              </q-toolbar-title>
+              <div class="col-8 row justify-end sub-header-buttons">
+                <q-btn
+                  v-for="button in SUB_PAGE_BUTTONS"
+                  :key="button.label"
+                  dense
+                  flat
+                  size="md"
+                  :icon="button.icon"
+                  role="button"
+                  :aria-label="t('ariaLabel.subPageButton', { label: t(`message.${button.label}`) })"
+                  @click="navigateToPath(button.path, route, router)"
+                >
+                  <ToolTip :text="button.tooltip" />
+                </q-btn>
+                <!-- <HelpIcon v-if="currentSubPage === 'record' && window.isMobile" :text="t('tooltip.recordSwipeHelp')" /> -->
+                <q-separator vertical class="sub-header-separator q-mx-sm" />
+                <q-btn
+                  v-for="button in SUB_PAGE_CONFIG[currentSubPage]?.buttons"
+                  :key="button.icon"
+                  dense
+                  flat
+                  size="md"
+                  :icon="button.icon"
+                  role="button"
+                  :aria-label="t(`ariaLabel.${button.icon}`)"
+                  :disable="button.disabled as unknown as boolean"
+                  @click="button.action"
+                >
+                  <ToolTip :text="button.tooltip as unknown as string" />
+                </q-btn>
+                <q-btn
+                  v-if="SUB_PAGE_CONFIG[currentSubPage]?.showClose"
+                  class="q-mx-none q-px-none"
+                  flat
+                  dense
+                  round
+                  icon="close"
+                  role="button"
+                  :aria-label="t('ariaLabel.closeSubPage')"
+                  @click="switchSubPage('record')"
+                />
+              </div>
+            </div>
+          </transition>
+        </q-toolbar>
+      </q-header>
+
+      <q-page-container class="row" style="padding-bottom: 0px">
+        <!-- 계산기 영역 -->
+        <div class="col-6 calc-content" role="region" :aria-label="t('ariaLabel.calculatorSection')">
+          <q-tab-panels
+            v-model="store.currentTab"
+            animated
+            infinite
+            :swipeable="false"
+            role="tabpanel"
+            :aria-label="t('ariaLabel.calculatorContent')"
+          >
+            <q-tab-panel
+              v-for="(tab, index) in tabs"
+              :id="`panel-${tab.name}`"
+              :key="index"
+              :name="tab.name"
+              role="tabpanel"
+              :aria-label="t('ariaLabel.tabPanel', { name: tab.title })"
+              :aria-labelledby="`tab-${tab.name}`"
+            >
+              <component :is="tab.component" />
+            </q-tab-panel>
+          </q-tab-panels>
+        </div>
+
+        <!-- 서브페이지 영역 -->
+        <div
+          class="col-6 relative-position sub-content"
+          role="complementary"
+          :aria-label="t('ariaLabel.subPageSection')"
+        >
+          <q-scroll-area
+            class="sub-scroll-area"
+            :class="{ 'hide-scrollbar': currentSubPage === 'record' }"
+            role="region"
+            :aria-label="t('ariaLabel.subPageContent')"
+          >
+            <transition name="animate-sub-page">
+              <component
+                :is="SUB_PAGE_CONFIG[currentSubPage]?.component"
+                :key="currentSubPage"
+                :data-page="currentSubPage"
+                class="sub-page"
+              />
+            </transition>
           </q-scroll-area>
         </div>
-      </template>
-    </q-page-container>
-  </q-layout>
+      </q-page-container>
+    </q-layout>
 
-  <!-- 넓은 화면 레이아웃 -->
-  <q-layout v-else>
-    <q-drawer
-      v-model="leftDrawerOpen"
-      show-if-above
-      elevated
-      :width="250"
-      :dark="store.isDarkMode()"
-      :swipe-only="window.isMobile"
-      behavior="mobile"
-      @click="leftDrawerOpen = false"
-    >
-      <q-card class="full-height menu-card">
-        <MenuPanel />
-      </q-card>
-    </q-drawer>
-
-    <q-header id="header" class="z-top noselect row" elevated>
-      <!-- 계산기 영역 헤더 -->
-      <q-toolbar v-auto-blur class="col-6 calc-header">
-        <q-btn flat dense round class="q-mr-sm" icon="menu" aria-label="Menu" @click="toggleLeftDrawer">
-          <ToolTip :text="t('tooltip.menu')" />
-        </q-btn>
-        <q-tabs
-          v-model="store.currentTab"
-          align="left"
-          class="col-grow"
-          active-color="text-primary"
-          indicator-color="secondary"
-          dense
-          shrink
-          inline-label
-          role="tablist"
-          :aria-label="t('ariaLabel.mainTabs')"
-          @update:model-value="store.setCurrentTab($event)"
-        >
-          <q-tab
-            v-for="tab in tabs"
-            :key="tab.name"
-            :label="tab.title"
-            :name="tab.name"
-            class="q-px-xs"
-            dense
-            role="tab"
-            :aria-label="t('ariaLabel.tab', { name: tab.title })"
-            :aria-selected="store.currentTab === tab.name"
-            :aria-controls="`panel-${tab.name}`"
-          />
-        </q-tabs>
-      </q-toolbar>
-
-      <!-- 서브페이지 영역 헤더 -->
-      <q-toolbar v-auto-blur class="col-6 sub-header">
-        <transition name="animate-sub-page">
-          <div :key="currentSubPage" :data-page="currentSubPage" class="header-content full-width row items-center">
-            <q-toolbar-title
-              class="text-subtitle1 col-4"
-              role="heading"
-              :aria-label="t('ariaLabel.subPageTitle', { title: SUB_PAGE_CONFIG[currentSubPage]?.title })"
-            >
-              {{ SUB_PAGE_CONFIG[currentSubPage]?.title }}
-              <HelpIcon
-                v-if="(currentSubPage === 'record' || currentSubPage === '') && window.isMobile"
-                :text="t('tooltip.recordSwipeHelp')"
-              />
-            </q-toolbar-title>
-            <div class="col-8 row justify-end sub-header-buttons">
-              <q-btn
-                v-for="button in SUB_PAGE_BUTTONS"
-                :key="button.label"
-                dense
-                flat
-                size="md"
-                :icon="button.icon"
-                role="button"
-                :aria-label="t('ariaLabel.subPageButton', { label: t(`message.${button.label}`) })"
-                @click="navigateToPath(button.path, route, router)"
-              >
-                <ToolTip :text="button.tooltip" />
-              </q-btn>
-              <!-- <HelpIcon v-if="currentSubPage === 'record' && window.isMobile" :text="t('tooltip.recordSwipeHelp')" /> -->
-              <q-separator vertical class="sub-header-separator q-mx-sm" />
-              <q-btn
-                v-for="button in SUB_PAGE_CONFIG[currentSubPage]?.buttons"
-                :key="button.icon"
-                dense
-                flat
-                size="md"
-                :icon="button.icon"
-                role="button"
-                :aria-label="t(`ariaLabel.${button.icon}`)"
-                :disable="button.disabled as unknown as boolean"
-                @click="button.action"
-              >
-                <ToolTip :text="button.tooltip as unknown as string" />
-              </q-btn>
-              <q-btn
-                v-if="SUB_PAGE_CONFIG[currentSubPage]?.showClose"
-                class="q-mx-none q-px-none"
-                flat
-                dense
-                round
-                icon="close"
-                role="button"
-                :aria-label="t('ariaLabel.closeSubPage')"
-                @click="switchSubPage('record')"
-              />
-            </div>
-          </div>
-        </transition>
-      </q-toolbar>
-    </q-header>
-
-    <q-page-container class="row" style="padding-bottom: 0px">
-      <!-- 계산기 영역 -->
-      <div class="col-6 calc-content" role="region" :aria-label="t('ariaLabel.calculatorSection')">
-        <q-tab-panels
-          v-model="store.currentTab"
-          animated
-          infinite
-          :swipeable="false"
-          role="tabpanel"
-          :aria-label="t('ariaLabel.calculatorContent')"
-        >
-          <q-tab-panel
-            v-for="(tab, index) in tabs"
-            :id="`panel-${tab.name}`"
-            :key="index"
-            :name="tab.name"
-            role="tabpanel"
-            :aria-label="t('ariaLabel.tabPanel', { name: tab.title })"
-            :aria-labelledby="`tab-${tab.name}`"
-          >
-            <component :is="tab.component" />
-          </q-tab-panel>
-        </q-tab-panels>
-      </div>
-
-      <!-- 서브페이지 영역 -->
-      <div class="col-6 relative-position sub-content" role="complementary" :aria-label="t('ariaLabel.subPageSection')">
-        <q-scroll-area
-          class="sub-scroll-area"
-          :class="{ 'hide-scrollbar': currentSubPage === 'record' }"
-          role="region"
-          :aria-label="t('ariaLabel.subPageContent')"
-        >
-          <transition name="animate-sub-page">
-            <component
-              :is="SUB_PAGE_CONFIG[currentSubPage]?.component"
-              :key="currentSubPage"
-              :data-page="currentSubPage"
-              class="sub-page"
-            />
-          </transition>
-        </q-scroll-area>
-      </div>
-    </q-page-container>
-  </q-layout>
-
-  <ShowTips v-model="store.showTipsDialog" />
+    <ShowTips v-model="store.showTipsDialog" />
+  </div>
 </template>
 
 <style lang="scss" scoped>
+  .main-layout {
+    width: 100%;
+    height: 100%;
+  }
+
   .q-tab {
     :deep(.q-tab__label) {
       font-size: 16px;

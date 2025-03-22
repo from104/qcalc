@@ -57,7 +57,7 @@
   const quitApp = () => {
     if (window.isElectron) window.electron.quitApp();
   };
-  
+
   // === 키 바인딩 설정 ===
   /**
    * 전역 단축키 설정
