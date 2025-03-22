@@ -87,29 +87,29 @@
    * @param isSource - 출발 단위 여부
    * @returns 단위 옵션 객체
    */
-  const createUnitOption = (unit: string, isSource: boolean): UnitOption => ({
+  const createUnitOption = (unit: string): UnitOption => ({
     value: unit,
     label: unit,
     desc: UnitConverter.getUnitDesc(store.selectedCategory, unit),
-    disable: isSource
-      ? store.targetUnits[store.selectedCategory] === unit
-      : store.sourceUnits[store.selectedCategory] === unit,
   });
 
   // 출발 단위 옵션 목록을 computed로 관리
-  const sourceUnitOptions = computed(() => availableUnits.value.map((unit) => createUnitOption(unit, true)));
+  const sourceUnitOptions = computed(() => availableUnits.value.map((unit) => createUnitOption(unit)));
 
   // 도착 단위 옵션 목록을 computed로 관리
-  const targetUnitOptions = computed(() => availableUnits.value.map((unit) => createUnitOption(unit, false)));
+  const targetUnitOptions = computed(() => availableUnits.value.map((unit) => createUnitOption(unit)));
 
   const handleUnitSwap = () => {
-    calc.currentNumber = UnitConverter.convert(
-      store.selectedCategory,
-      BigNumber(calc.currentNumber),
-      store.sourceUnits[store.selectedCategory] ?? '',
-      store.targetUnits[store.selectedCategory] ?? '',
-    );
-    swapUnits();
+    // 동일한 단위인 경우 변환하지 않음
+    if (store.sourceUnits[store.selectedCategory] !== store.targetUnits[store.selectedCategory]) {
+      calc.currentNumber = UnitConverter.convert(
+        store.selectedCategory,
+        BigNumber(calc.currentNumber),
+        store.sourceUnits[store.selectedCategory] ?? '',
+        store.targetUnits[store.selectedCategory] ?? '',
+      );
+      swapUnits();
+    }
   };
 </script>
 
@@ -130,9 +130,9 @@
       behavior="menu"
       class="col-3 q-pl-sm shadow-2 text-black"
       :class="!store.isDarkMode() ? 'bg-blue-grey-2' : 'bg-blue-grey-6'"
-      :popup-content-class="!store.isDarkMode() ? 'bg-blue-grey-2' : 'bg-blue-grey-6'"
-      :options-selected-class="!store.isDarkMode() ? 'text-primary' : 'text-grey-1'"
       :label-color="!store.isDarkMode() ? 'primary' : 'grey-1'"
+      :popup-content-class="[!store.isDarkMode() ? 'bg-blue-grey-2' : 'bg-blue-grey-6', 'scrollbar-custom', 'q-select-popup'].join(' ')"
+      :options-selected-class="!store.isDarkMode() ? 'text-primary' : 'text-grey-1'"
     />
 
     <!-- 원본 방향 -->
@@ -153,7 +153,7 @@
       behavior="menu"
       class="col-3 q-pl-sm shadow-2"
       :class="!store.isDarkMode() ? 'bg-blue-grey-2' : 'bg-blue-grey-6'"
-      :popup-content-class="!store.isDarkMode() ? 'bg-blue-grey-2' : 'bg-blue-grey-6'"
+      :popup-content-class="[!store.isDarkMode() ? 'bg-blue-grey-2' : 'bg-blue-grey-6', 'scrollbar-custom', 'q-select-popup'].join(' ')"
       :options-selected-class="!store.isDarkMode() ? 'text-primary' : 'text-grey-1'"
       :label-color="!store.isDarkMode() ? 'primary' : 'grey-1'"
     >
@@ -203,7 +203,7 @@
       behavior="menu"
       class="col-3 q-pl-sm shadow-2"
       :class="!store.isDarkMode() ? 'bg-blue-grey-2' : 'bg-blue-grey-6'"
-      :popup-content-class="!store.isDarkMode() ? 'bg-blue-grey-2' : 'bg-blue-grey-6'"
+      :popup-content-class="[!store.isDarkMode() ? 'bg-blue-grey-2' : 'bg-blue-grey-6', 'scrollbar-custom', 'q-select-popup'].join(' ')"
       :options-selected-class="!store.isDarkMode() ? 'text-primary' : 'text-grey-1'"
       :label-color="!store.isDarkMode() ? 'primary' : 'grey-1'"
     >
@@ -232,5 +232,16 @@
     />
   </q-card-section>
 </template>
+
+<style lang="scss">
+  .q-select-popup {
+    .q-item {
+      @media (prefers-color-scheme: dark) {
+        border-top: 1px dotted rgba(255, 255, 255, 0.377);
+        border-bottom: 1px dotted rgba(255, 255, 255, 0.377);
+      }
+    }
+  }
+</style>
 
 <i18n lang="yaml5" src="../i18n/components/UnitPanel.yml" />

@@ -6,33 +6,29 @@
 
 .scrollbar-custom {
   position: relative;
-  overflow-y: auto;
-  scrollbar-gutter: stable;
+  overflow-y: overlay;
+  scrollbar-gutter: auto;
 
   /* Ensure the scrollbar space is always reserved */
-  padding-right: 6px;
+  padding-right: 0;
   // box-sizing: content-box;
 
   /* Firefox specific styles */
   scrollbar-width: thin;
-  scrollbar-color: rgba(128, 128, 128, 0.267) transparent;
+  scrollbar-color: transparent transparent;
+  @media (prefers-color-scheme: dark) {
+    scrollbar-color: rgba(159, 159, 159, 0.53) transparent;
+  }
 
   /* WebKit specific styles */
   &::-webkit-scrollbar {
-    width: 12px;
+    width: 4px;
     position: absolute;
     right: 0;
   }
 
   &::-webkit-scrollbar-thumb {
-    background-color: rgba(128, 128, 128, 0.267);
-    border-radius: 6px;
-    background-clip: padding-box;
-    border: 3px solid transparent;
-
-    @media (prefers-color-scheme: dark) {
-      background-color: rgba(128, 128, 128, 0.503);
-    }
+    display: none;
   }
 
   &::-webkit-scrollbar-track {

@@ -3,8 +3,6 @@
   "appName": "Q Calc",
   "webDir": "www",
   "server": {
-    "androidScheme": "file",
-    "url": "http://192.168.219.113:9500",
-    "cleartext": true
+    "androidScheme": "file"
   }
 }

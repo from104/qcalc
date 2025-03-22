@@ -177,13 +177,37 @@
   const filteredTargetCurrencyOptions = ref<CurrencyOptions[]>(targetCurrencyOptions);
   const targetFilterFn = createFilterFn(filteredTargetCurrencyOptions, targetCurrencyOptions);
 
+  let isSwapped = false;
   const handleCurrencySwap = () => {
-    calc.currentNumber = round(
-      currencyConverter.convert(BigNumber(calc.currentNumber), store.sourceCurrency, store.targetCurrency).toString(),
-      13,
-    );
-    swapCurrencies();
+    if (store.sourceCurrency !== store.targetCurrency) {
+      if (!isSwapped) {
+        swapCurrencies();
+      }
+      calc.currentNumber = round(
+        currencyConverter
+          .convert(
+            BigNumber(calc.currentNumber),
+            isSwapped ? store.sourceCurrency : store.targetCurrency,
+            isSwapped ? store.targetCurrency : store.sourceCurrency,
+          )
+          .toString(),
+        13,
+      );
+      if (isSwapped) {
+        swapCurrencies();
+      }
+      isSwapped = !isSwapped;
+    }
   };
+
+  watch(
+    () => calc.inputBuffer,
+    (oldNumber, newNumber) => {
+      if (oldNumber !== newNumber) {
+        isSwapped = false;
+      }
+    },
+  );
 </script>
 
 <template>
@@ -211,7 +235,14 @@
       class="col-4 q-pl-sm shadow-2"
       :class="!store.isDarkMode() ? 'bg-blue-grey-2' : 'bg-blue-grey-6'"
       :label-color="!store.isDarkMode() ? 'primary' : 'grey-1'"
-      :popup-content-class="!store.isDarkMode() ? 'bg-blue-grey-2' : 'bg-blue-grey-6'"
+      :popup-content-class="
+        [
+          !store.isDarkMode() ? 'bg-blue-grey-2' : 'bg-blue-grey-6',
+          'scrollbar-custom',
+          'q-select-popup',
+          store.isMobile ? 'popup-mobile' : '',
+        ].join(' ')
+      "
       :options-selected-class="!store.isDarkMode() ? 'text-primary' : 'text-grey-1'"
       @filter="sourceFilterFn"
       @focus="setInputFocused()"
@@ -270,7 +301,14 @@
       class="col-4 q-pl-sm shadow-2"
       :class="!store.isDarkMode() ? 'bg-blue-grey-2' : 'bg-blue-grey-6'"
       :label-color="!store.isDarkMode() ? 'primary' : 'grey-1'"
-      :popup-content-class="!store.isDarkMode() ? 'bg-blue-grey-2' : 'bg-blue-grey-6'"
+      :popup-content-class="
+        [
+          !store.isDarkMode() ? 'bg-blue-grey-2' : 'bg-blue-grey-6',
+          'scrollbar-custom',
+          'q-select-popup',
+          store.isMobile ? 'popup-mobile' : '',
+        ].join(' ')
+      "
       :options-selected-class="!store.isDarkMode() ? 'text-primary' : 'text-grey-1'"
       @filter="targetFilterFn"
       @keyup.enter="blurElement()"
@@ -307,5 +345,21 @@
     />
   </q-card-section>
 </template>
+
+<style lang="scss">
+  .q-select-popup {
+    .q-item {
+      @media (prefers-color-scheme: dark) {
+        border-top: 1px dotted rgba(255, 255, 255, 0.377);
+        border-bottom: 1px dotted rgba(255, 255, 255, 0.377);
+      }
+    }
+  }
+
+  .popup-mobile {
+    height: 100% !important;
+    max-height: 180px !important;
+  }
+</style>
 
 <i18n lang="yaml5" src="../i18n/components/CurrencyPanel.yml" />

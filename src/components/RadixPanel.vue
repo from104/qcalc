@@ -7,7 +7,6 @@
    *              또한, 진법 스왑 및 최근 사용한 진법 초기화 기능을 포함하고 있습니다.
    */
 
-
   // Vue 핵심 기능 및 컴포지션 API 가져오기
   import type { ComputedRef } from 'vue';
   import { onMounted, onBeforeUnmount, reactive, watch, computed } from 'vue';
@@ -90,7 +89,6 @@
   interface RadixOption {
     value: Radix;
     label: ComputedRef<string>;
-    disable: ComputedRef<boolean>;
   }
 
   interface ReactiveRadixOptionList {
@@ -100,19 +98,18 @@
   const radixList = Object.values(Radix);
 
   // 진법 옵션 초기화 시 computed 사용
-  const createRadixOptions = (isSource: boolean) =>
+  const createRadixOptions = () =>
     radixList.map((radix) => ({
       value: radix,
       label: computed(() => t(`radixLabel.${radix}`)),
-      disable: computed(() => (isSource ? store.targetRadix === radix : store.sourceRadix === radix)),
     }));
 
   const sourceRadixOptions = reactive<ReactiveRadixOptionList>({
-    values: createRadixOptions(true),
+    values: createRadixOptions(),
   });
 
   const targetRadixOptions = reactive<ReactiveRadixOptionList>({
-    values: createRadixOptions(false),
+    values: createRadixOptions(),
   });
 
   watch(
@@ -120,17 +117,10 @@
     () => (calc.currentRadix = store.sourceRadix),
   );
 
-  // 수정된 SelectOption 인터페이스
-  interface SelectOption {
-    value: string;
-    label: string;
-    disable: boolean;
-  }
-
   // 단순화된 컴퓨티드 속성
-  const sourceSelectOptions = computed<SelectOption[]>(() => sourceRadixOptions.values);
+  const sourceSelectOptions = computed(() => sourceRadixOptions.values);
 
-  const targetSelectOptions = computed<SelectOption[]>(() => targetRadixOptions.values);
+  const targetSelectOptions = computed(() => targetRadixOptions.values);
 </script>
 
 <template>
@@ -152,7 +142,7 @@
       :label="t('radixLabel.wordSize')"
       :label-color="!store.isDarkMode() ? 'primary' : 'grey-1'"
       :class="!store.isDarkMode() ? 'bg-blue-grey-2' : 'bg-blue-grey-6'"
-      :popup-content-class="!store.isDarkMode() ? 'bg-blue-grey-2' : 'bg-blue-grey-6'"
+      :popup-content-class="[!store.isDarkMode() ? 'bg-blue-grey-2' : 'bg-blue-grey-6', 'scrollbar-custom', 'q-select-popup'].join(' ')"
       :options-selected-class="!store.isDarkMode() ? 'text-primary' : 'text-grey-1'"
       @update:model-value="store.updateWordSize($event)"
     />
@@ -177,7 +167,7 @@
       :label="t('radixLabel.main')"
       :label-color="!store.isDarkMode() ? 'primary' : 'grey-1'"
       :options-selected-class="!store.isDarkMode() ? 'text-primary' : 'text-grey-1'"
-      :popup-content-class="!store.isDarkMode() ? 'bg-blue-grey-2' : 'bg-blue-grey-6'"
+      :popup-content-class="[!store.isDarkMode() ? 'bg-blue-grey-2' : 'bg-blue-grey-6', 'scrollbar-custom', 'q-select-popup'].join(' ')"
       :class="!store.isDarkMode() ? 'bg-blue-grey-2' : 'bg-blue-grey-6'"
     />
 
@@ -214,7 +204,7 @@
       :label="t('radixLabel.sub')"
       :label-color="!store.isDarkMode() ? 'primary' : 'grey-1'"
       :class="!store.isDarkMode() ? 'bg-blue-grey-2' : 'bg-blue-grey-6'"
-      :popup-content-class="!store.isDarkMode() ? 'bg-blue-grey-2' : 'bg-blue-grey-6'"
+      :popup-content-class="[!store.isDarkMode() ? 'bg-blue-grey-2' : 'bg-blue-grey-6', 'scrollbar-custom', 'q-select-popup'].join(' ')"
       :options-selected-class="!store.isDarkMode() ? 'text-primary' : 'text-grey-1'"
     />
 
@@ -239,6 +229,15 @@
     }
     .q-field__append {
       padding-left: $left !important;
+    }
+  }
+
+  .q-select-popup {
+    .q-item {
+      @media (prefers-color-scheme: dark) {
+        border-top: 1px dotted rgba(255, 255, 255, 0.377);
+        border-bottom: 1px dotted rgba(255, 255, 255, 0.377);
+      }
     }
   }
 </style>

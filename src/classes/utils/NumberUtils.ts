@@ -170,7 +170,7 @@ export function round(value: string, decimalPlaces: number, currentRadixNumber: 
  * @param currentRadixNumber - 현재 진법
  * @returns 올림된 숫자 문자열
  */
-export function roundUp(value: string, decimalPlaces: number, currentRadixNumber: number): string {
+export function roundUp(value: string, decimalPlaces: number, currentRadixNumber: number = 10): string {
   if (!value) return '';
 
   // 음수 자릿수 처리 (정수부 자릿수에서 올림)
@@ -222,7 +222,7 @@ export function roundUp(value: string, decimalPlaces: number, currentRadixNumber
  * @param currentRadixNumber - 현재 진법
  * @returns 내림된 숫자 문자열
  */
-export function roundDown(value: string, decimalPlaces: number, currentRadixNumber: number): string {
+export function roundDown(value: string, decimalPlaces: number, currentRadixNumber: number = 10): string {
   if (!value) return '';
 
   // 음수 자릿수 처리 (정수부 자릿수에서 내림)

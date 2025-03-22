@@ -221,11 +221,6 @@ export const useStore = defineStore('store', {
       if (!isValidRadixType(this.targetRadix)) {
         this.targetRadix = Radix.Hexadecimal;
       }
-      if (this.sourceRadix === this.targetRadix) {
-        this.targetRadix = this.radixList[
-          (this.radixList.indexOf(this.sourceRadix) + 1) % this.radixList.length
-        ] as Radix;
-      }
     },
 
     swapRadixes() {
