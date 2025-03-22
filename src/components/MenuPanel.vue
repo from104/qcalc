@@ -49,9 +49,7 @@
       caption: t('item.calc.caption'),
       shortcut: 'Ctrl-1',
       icon: 'calculate',
-      action: () => {
-        store.currentTab = 'calc';
-      },
+      action: () => store.currentTab = 'calc',
     },
     {
       id: 'unit',
@@ -59,9 +57,7 @@
       caption: t('item.unit.caption'),
       shortcut: 'Ctrl-2',
       icon: 'swap_vert',
-      action: () => {
-        store.currentTab = 'unit';
-      },
+      action: () => store.currentTab = 'unit',
     },
     {
       id: 'currency',
@@ -69,9 +65,7 @@
       caption: t('item.currency.caption'),
       shortcut: 'Ctrl-3',
       icon: 'currency_exchange',
-      action: () => {
-        store.currentTab = 'currency';
-      },
+      action: () => store.currentTab = 'currency',
     },
     {
       id: 'radix',
@@ -79,22 +73,35 @@
       caption: t('item.radix.caption'),
       shortcut: 'Ctrl-4',
       icon: 'transform',
-      action: () => {
-        store.currentTab = 'radix';
-      },
+      action: () => store.currentTab = 'radix',
     },
     { id: 'separator1', separator: true },
+    {
+      id: 'record',
+      title: t('item.record.title'),
+      caption: t('item.record.caption'),
+      shortcut: 'F4',
+      icon: 'history',
+      action: () => navigateToPath('/record', route, router),
+    },
     {
       id: 'settings',
       title: t('item.settings.title'),
       caption: t('item.settings.caption'),
       shortcut: 'F3',
       icon: 'settings',
-      action: () => {
-        navigateToPath('/settings', route, router);
-      },
+      action: () => navigateToPath('/settings', route, router),
     },
     { id: 'separator2', separator: true },
+    {
+      id: 'tips',
+      title: t('item.tips.title'),
+      caption: t('item.tips.caption'),
+      shortcut: 'F5',
+      icon: 'report',
+      action: () => store.showTipsDialog = true,
+    },
+    
     {
       id: 'help',
       title: t('item.help.title'),
@@ -162,9 +169,15 @@ ko:
     radix:
       title: '진법 변환'
       caption: '진법 변환기'
+    record:
+      title: '기록'
+      caption: '기록 페이지'
     settings:
       title: '설정'
       caption: '설정'
+    tips:
+      title: '팁'
+      caption: '팁 다이얼로그'
     help:
       title: '도움말'
       caption: '기능과 사용법'
@@ -187,9 +200,15 @@ en:
     radix:
       title: 'Radix Converter'
       caption: 'Radix Converter'  
+    record:
+      title: 'Record'
+      caption: 'Record page'
     settings:
       title: 'Settings'
       caption: 'Settings'
+    tips:
+      title: 'Tips'
+      caption: 'Tips dialog'
     help:
       title: 'Help'
       caption: 'Features and Usage'

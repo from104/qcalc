@@ -67,7 +67,8 @@ export interface StoreState {
   hapticsMode: boolean;
   isAppStarted: boolean;
   showTips: boolean;
-
+  showTipsDialog: boolean;
+  
   // 테마/디스플레이 관련
   darkMode: DarkModeType;
   alwaysOnTop: boolean;

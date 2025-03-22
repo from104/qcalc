@@ -140,13 +140,6 @@
 
   // === 유틸리티 함수 ===
   /**
-   * 도움말 팝업을 표시하는 함수
-   */
-  const showHelpDialog = () => {
-    tipsDialog.value = true;
-  };
-
-  /**
    * 서브페이지를 전환하는 함수입니다.
    */
   const switchSubPage = async (pageName: string) => {
@@ -221,6 +214,7 @@
     [['F2'], () => navigateToPath('/about', route, router)],
     [['F3'], () => navigateToPath('/settings', route, router)],
     [['F4'], () => navigateToPath('/record', route, router)],
+    [['F5'], () => store.showTipsDialog = true],
     [['Escape'], closeSubPage],
   ]);
 
@@ -361,13 +355,14 @@
           <ToolTip :text="t('openRecordPage')" />
         </q-btn>
         <q-btn
+          v-if="!store.isWideWidth()"
           flat
-          icon="tips_and_updates"
+          icon="settings"
           class="q-ma-none q-pa-none q-pl-xs q-pr-xs"
-          :aria-label="t('ariaLabel.help')"
-          @click="showHelpDialog"
+          :aria-label="t('ariaLabel.settings')"
+          @click="navigateToPath('/settings', route, router)"
         >
-          <ToolTip :text="t('tooltipHelp')" />
+          <ToolTip :text="t('tooltip.settings')" />
         </q-btn>
       </q-toolbar>
 
@@ -478,26 +473,6 @@
             :aria-controls="`panel-${tab.name}`"
           />
         </q-tabs>
-        <q-space />
-        <q-btn
-          v-if="!store.isWideWidth()"
-          flat
-          icon="mdi-history"
-          class="q-ma-none q-pa-none q-pl-sm q-pr-xs"
-          :aria-label="t('ariaLabel.record')"
-          @click="router.push('/record')"
-        >
-          <ToolTip :text="t('openRecordPage')" />
-        </q-btn>
-        <q-btn
-          flat
-          icon="tips_and_updates"
-          class="q-ma-none q-pa-none q-pl-xs q-pr-xs"
-          :aria-label="t('ariaLabel.help')"
-          @click="showHelpDialog"
-        >
-          <ToolTip :text="t('tooltipHelp')" />
-        </q-btn>
       </q-toolbar>
 
       <!-- 서브페이지 영역 헤더 -->
@@ -608,7 +583,7 @@
     </q-page-container>
   </q-layout>
 
-  <ShowTips v-model="tipsDialog" />
+  <ShowTips v-model="store.showTipsDialog" />
 </template>
 
 <style lang="scss" scoped>

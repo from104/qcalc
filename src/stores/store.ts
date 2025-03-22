@@ -52,6 +52,7 @@ export const useStore = defineStore('store', {
     hapticsMode: true,
     isAppStarted: false,
     showTips: true,
+    showTipsDialog: false,
 
     // 테마/디스플레이 관련
     darkMode: 'system',
