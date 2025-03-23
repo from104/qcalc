@@ -68,7 +68,7 @@ function roundFractionalPart(
   // 반올림 필요 없는 경우
   if (nextValue < halfRadix) {
     return {
-      roundedFraction: retainPart,
+      roundedFraction: retainPart.padEnd(decimalPlaces, '0'),
       carryOver: 0,
     };
   }
@@ -84,7 +84,7 @@ function roundFractionalPart(
   }
 
   return {
-    roundedFraction: digits.join(''),
+    roundedFraction: digits.join('').padEnd(decimalPlaces, '0'),
     carryOver: carryOver,
   };
 }
@@ -92,10 +92,15 @@ function roundFractionalPart(
 /**
  * 소수점 이하의 불필요한 0을 제거합니다.
  * @param value - 처리할 숫자 문자열
+ * @param keepDecimalPlaces - 유지할 소수점 자릿수
  * @returns 불필요한 0이 제거된 숫자 문자열
  */
-function trimTrailingZeros(value: string): string {
+function trimTrailingZeros(value: string, keepDecimalPlaces: number = 0): string {
   if (!value.includes('.')) return value;
+  if (keepDecimalPlaces > 0) {
+    const [integerPart, decimalPart = ''] = value.split('.');
+    return `${integerPart}.${decimalPart.padEnd(keepDecimalPlaces, '0')}`;
+  }
   return value.replace(/\.?0+$/, '');
 }
 
@@ -109,6 +114,9 @@ function trimTrailingZeros(value: string): string {
 export function formatDecimalPlaces(value: string, decimalPlaces: number, currentRadixNumber: number): string {
   if (!value) return '';
   if (decimalPlaces < 0) return value;
+
+  // 숫자가 아닌 문자가 포함된 경우 빈 문자열 반환
+  if (!/^-?\d*\.?\d*$/.test(value)) return '';
 
   const [integerPart = '', fractionalPart = ''] = value.split('.');
 
@@ -124,7 +132,7 @@ export function formatDecimalPlaces(value: string, decimalPlaces: number, curren
 
   // 소수점 이하 처리
   if (!value.includes('.')) {
-    return decimalPlaces > 0 ? `${value}.${'0'.repeat(decimalPlaces)}` : value;
+    return `${value}.${'0'.repeat(decimalPlaces)}`;
   }
 
   // 반올림 처리
@@ -137,8 +145,7 @@ export function formatDecimalPlaces(value: string, decimalPlaces: number, curren
   }
 
   // 최종 결과 조합
-  const formattedDecimal = roundedFraction.padEnd(decimalPlaces, '0');
-  return trimTrailingZeros(`${finalInteger}${formattedDecimal ? `.${formattedDecimal}` : ''}`);
+  return `${finalInteger}.${roundedFraction}`;
 }
 
 /**

@@ -152,7 +152,6 @@ export class UnitConverter extends BaseConverter {
         : BigNumber(originalValue).mul(BigNumber(fromUnitValue));
 
     checkError(!baseValue, 'unit.invalid_base_value');
-    console.log('baseValue:', baseValue);
 
     const convertedValue =
       typeof toUnitValue === 'function'
@@ -160,7 +159,6 @@ export class UnitConverter extends BaseConverter {
         : baseValue.div(BigNumber(toUnitValue));
 
     checkError(!convertedValue, 'unit.conversion_failed');
-    console.log('convertedValue:', convertedValue);
 
     return convertedValue.toFixed();
   }
