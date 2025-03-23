@@ -35,7 +35,7 @@
     "build": "quasar build -m electron",
     "build:win32": "quasar build -m electron -T win32",
     "build:android": "quasar build -m capacitor -T android",
-    "icons": "icongenie g -m spa,electron -i ./assets/qcalc_icon_v2.png; icongenie g -m capacitor -i ./assets/qcalc_icon_v2.png --skip-trim; rm -r src-capacitor/ios"
+    "icons": "icongenie g -m spa,electron -i ./assets/qcalc_icon_v3.png; icongenie g -m capacitor -i ./assets/qcalc_icon_v3.png --skip-trim; rm -r src-capacitor/ios"
   },
   "exports": {
     "./src/boot/*": "./src/boot/*.ts"
