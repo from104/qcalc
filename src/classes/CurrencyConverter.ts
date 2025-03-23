@@ -4,6 +4,7 @@ import { BaseConverter } from './BaseConverter';
 import type { CurrencyExchangeRates, CurrencyData } from '../constants/CurrencyBaseData';
 import { currencyBaseData } from '../constants/CurrencyBaseData';
 import { checkError } from './utils/ErrorUtils';
+import { BigNumber } from './CalculatorMath';
 
 /**
  * CurrencyConverter 클래스
@@ -145,8 +146,8 @@ export class CurrencyConverter extends BaseConverter {
    * @param {string} to - 도착 통화
    * @returns {number} 변환된 금액
    */
-  convert(amount: BigNumberType, from: string, to: string): BigNumberType {
-    return amount.times(this.getRate(from, to));
+  convert(amount: BigNumberType, from: string, to: string): string {
+    return BigNumber(amount).times(this.getRate(from, to)).toFixed();
   }
 
   /**
