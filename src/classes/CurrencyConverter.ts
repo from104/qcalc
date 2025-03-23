@@ -128,7 +128,7 @@ export class CurrencyConverter extends BaseConverter {
    * @param {string} to - 도착 통화 (선택적)
    * @returns {number} 계산된 환율
    */
-  getRate(from: string, to?: string): number {
+  getRate(from: string, to?: string): BigNumberType {
     checkError(this.isRatesEmpty(), 'error.currency.exchange_rates_not_available');
 
     const actualTo = to ?? from;
@@ -136,7 +136,7 @@ export class CurrencyConverter extends BaseConverter {
 
     checkError(!this.currentRates[actualTo] || !this.currentRates[actualFrom], 'error.currency.invalid_currency');
 
-    return this.currentRates[actualTo]! / this.currentRates[actualFrom]!;
+    return BigNumber(this.currentRates[actualTo]!).div(this.currentRates[actualFrom]!);
   }
 
   /**

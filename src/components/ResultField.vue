@@ -170,7 +170,7 @@
 
         case 'currency':
           initRecentCurrencies();
-          return toFormattedNumber(round(getConvertedCurrencyNumber(), 13));
+          return toFormattedNumber(getConvertedCurrencyNumber());
 
         case 'radix':
           initRecentRadix();

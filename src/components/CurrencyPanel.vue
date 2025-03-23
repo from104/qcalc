@@ -39,7 +39,6 @@
 
   // 컴포넌트 import
   import ToolTip from 'src/components/snippets/ToolTip.vue';
-  import { round } from 'src/classes/utils/NumberUtils';
 
   // 키 바인딩 설정
   const keyBinding = new KeyBinding([
@@ -177,37 +176,19 @@
   const filteredTargetCurrencyOptions = ref<CurrencyOptions[]>(targetCurrencyOptions);
   const targetFilterFn = createFilterFn(filteredTargetCurrencyOptions, targetCurrencyOptions);
 
-  let isSwapped = false;
+  // let isSwapped = false;
+  // let originalValue: string | null = null;
+
   const handleCurrencySwap = () => {
     if (store.sourceCurrency !== store.targetCurrency) {
-      if (!isSwapped) {
-        swapCurrencies();
-      }
-      calc.currentNumber = round(
-        currencyConverter
-          .convert(
-            BigNumber(calc.currentNumber),
-            isSwapped ? store.sourceCurrency : store.targetCurrency,
-            isSwapped ? store.targetCurrency : store.sourceCurrency,
-          )
-          .toString(),
-        13,
-      );
-      if (isSwapped) {
-        swapCurrencies();
-      }
-      isSwapped = !isSwapped;
+      // 첫 번째 변환 수행
+      const convertedValue = currencyConverter
+        .convert(BigNumber(calc.currentNumber), store.sourceCurrency, store.targetCurrency)
+        .toString();
+      swapCurrencies();
+      calc.currentNumber = convertedValue;
     }
   };
-
-  watch(
-    () => calc.inputBuffer,
-    (oldNumber, newNumber) => {
-      if (oldNumber !== newNumber) {
-        isSwapped = false;
-      }
-    },
-  );
 </script>
 
 <template>
