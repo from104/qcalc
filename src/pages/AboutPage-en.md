@@ -12,7 +12,7 @@ All notable changes to this project are recorded in this file.
 
 The format is based on [Keep a Changelog] and this project follows [Semantic Versioning].
 
-## [0.11.3] 2025-03-16
+## [0.11.3] 2025-03-24$$
 
 ### Added
 
