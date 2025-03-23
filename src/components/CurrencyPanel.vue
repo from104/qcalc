@@ -240,7 +240,7 @@
           !store.isDarkMode() ? 'bg-blue-grey-2' : 'bg-blue-grey-6',
           'scrollbar-custom',
           'q-select-popup',
-          store.isMobile ? 'popup-mobile' : '',
+          window.isMobile ? 'popup-mobile' : '',
         ].join(' ')
       "
       :options-selected-class="!store.isDarkMode() ? 'text-primary' : 'text-grey-1'"
@@ -306,7 +306,7 @@
           !store.isDarkMode() ? 'bg-blue-grey-2' : 'bg-blue-grey-6',
           'scrollbar-custom',
           'q-select-popup',
-          store.isMobile ? 'popup-mobile' : '',
+          window.isMobile ? 'popup-mobile' : '',
         ].join(' ')
       "
       :options-selected-class="!store.isDarkMode() ? 'text-primary' : 'text-grey-1'"

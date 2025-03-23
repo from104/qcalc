@@ -136,7 +136,6 @@
   const previousSubPage = ref('record');
   const isWideLayout = computed(() => store.isWideWidth());
   const leftDrawerOpen = ref(false);
-  const tipsDialog = ref(false);
 
   // === 유틸리티 함수 ===
   /**
@@ -266,7 +265,7 @@
     store.updateDarkMode();
 
     // 팁 다이얼로그 초기화
-    tipsDialog.value = store.showTips && !store.isAppStarted;
+    store.showTipsDialog = store.showTips && !store.isAppStarted;
     store.isAppStarted = true;
   });
 
