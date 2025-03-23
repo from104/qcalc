@@ -544,7 +544,7 @@
             v-model="store.currentTab"
             animated
             infinite
-            :swipeable="false"
+            :swipeable="window.isMobile"
             role="tabpanel"
             :aria-label="t('ariaLabel.calculatorContent')"
           >

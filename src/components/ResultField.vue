@@ -462,15 +462,14 @@
             store.swapRadixes();
           }, 10);
         }
-        showMessage(t('pastedFromClipboardToSubPanel'), 2000, 'bottom');
+        showMessage(t('pastedFromClipboardToSubPanel'));
       } else {
         if (store.currentTab === 'radix') {
-          console.log('clipboardText:', clipboardText.replace(/\((?:2|8|10|16)\)/g, ''));
           calc.pasteToBuffer(clipboardText.replace(/\((?:2|8|10|16)\)/g, ''));
         } else {
           calc.pasteToBuffer(clipboardText);
         }
-        showMessage(t('pastedFromClipboard'), 2000, 'bottom');
+        showMessage(t('pastedFromClipboard'));
       }
     } catch (error) {
       console.error('Failed to paste from clipboard:', error);
@@ -666,6 +665,8 @@
     copyOnlyNumber: '결과 숫자 복사'
     pastedFromClipboard: '클립보드로부터 숫자를 붙여넣었습니다.'
     pastedFromClipboardToSubPanel: '클립보드로부터 숫자를 <br> 보조 패널에 붙여넣었습니다.'
+    clipboardIsEmptyOrContainsDataThatCannotBePasted: '클립보드가 비어있거나 붙여넣을 수 없는 데이터가 포함되어 있습니다.'
+    failedToPasteFromClipboard: '클립보드로부터 붙여넣기에 실패했습니다.'
     ariaLabel:
       resultField: '{type} 결과 필드'
       main: '주'
@@ -691,6 +692,8 @@
     copyOnlyNumber: 'Copy result number'
     pastedFromClipboard: 'The number has been pasted from the clipboard.'
     pastedFromClipboardToSubPanel: 'The number has been pasted <br>from the clipboard to the sub panel.'
+    clipboardIsEmptyOrContainsDataThatCannotBePasted: 'The clipboard is empty or contains data that cannot be pasted.'
+    failedToPasteFromClipboard: 'Failed to paste from clipboard.'
     ariaLabel:
       resultField: '{type} result field'
       main: 'main'

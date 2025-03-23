@@ -333,7 +333,7 @@ export const useStore = defineStore('store', {
     // 클립보드 관련
     copyToClipboard(text: string, message: string): void {
       copyToClipboard(text);
-      showMessage(message, 2000, 'bottom');
+      showMessage(message);
     },
 
     // 단위 변환 관련
