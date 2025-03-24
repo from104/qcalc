@@ -16,7 +16,7 @@
   const { t } = useI18n();
 
   // 계산기 관련 타입과 클래스
-  import { BigNumber } from 'classes/CalculatorMath';
+  import { toBigNumber } from 'classes/CalculatorMath';
   import { KeyBinding } from 'classes/KeyBinding';
 
   // 전역 window 객체에 접근하기 위한 상수 선언
@@ -182,11 +182,8 @@
   const handleCurrencySwap = () => {
     if (store.sourceCurrency !== store.targetCurrency) {
       // 첫 번째 변환 수행
-      const convertedValue = currencyConverter
-        .convert(BigNumber(calc.currentNumber), store.sourceCurrency, store.targetCurrency)
-        .toString();
       swapCurrencies();
-      calc.currentNumber = convertedValue;
+      calc.currentNumber = store.convertedCurrencyNumber;
     }
   };
 </script>

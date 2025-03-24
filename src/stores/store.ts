@@ -80,11 +80,13 @@ export const useStore = defineStore('store', {
     targetUnits: {},
     showUnit: true,
     showSymbol: true,
+    convertedUnitNumber: '',
 
     // 통화 변환 관련
     currencyConverter: new CurrencyConverter(),
     sourceCurrency: 'USD',
     targetCurrency: 'KRW',
+    convertedCurrencyNumber: '',
 
     // 진법 변환 관련
     wordSize: 32,

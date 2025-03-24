@@ -20,7 +20,7 @@
 
   // 계산기 관련 타입과 클래스
   import { UnitConverter } from 'src/classes/UnitConverter';
-  import { BigNumber } from 'classes/CalculatorMath';
+  import { toBigNumber } from 'classes/CalculatorMath';
   import { Radix } from 'classes/RadixConverter';
 
   // 전역 window 객체에 접근하기 위한 상수 선언
@@ -103,12 +103,13 @@
   const getConvertedUnitNumber = () => {
     const { selectedCategory, sourceUnits, targetUnits } = store;
 
-    return UnitConverter.convert(
+    store.convertedUnitNumber = UnitConverter.convert(
       selectedCategory,
-      BigNumber(calc.currentNumber),
+      toBigNumber(calc.currentNumber),
       sourceUnits[selectedCategory] ?? '',
       targetUnits[selectedCategory] ?? '',
     );
+    return store.convertedUnitNumber;
   };
 
   /**
@@ -119,11 +120,13 @@
    * - 현재 숫자를 시작 통화에서 목표 통화로 변환
    */
   const getConvertedCurrencyNumber = () => {
-    const currentNumber = BigNumber(calc.currentNumber);
+    const currentNumber = toBigNumber(calc.currentNumber);
     const fromCurrency = store.sourceCurrency;
     const toCurrency = store.targetCurrency;
 
-    return store.currencyConverter.convert(currentNumber, fromCurrency, toCurrency).toString();
+    store.convertedCurrencyNumber = store.currencyConverter.convert(currentNumber, fromCurrency, toCurrency).toFixed();
+
+    return store.convertedCurrencyNumber;
   };
 
   // 진법 변환 결과 계산 함수
@@ -443,7 +446,7 @@
           calc.pasteToBuffer(clipboardText);
           calc.currentNumber = UnitConverter.convert(
             store.selectedCategory,
-            BigNumber(calc.currentNumber),
+            toBigNumber(calc.currentNumber),
             store.sourceUnits[store.selectedCategory] ?? '',
             store.targetUnits[store.selectedCategory] ?? '',
           );
@@ -452,7 +455,7 @@
           store.swapCurrencies();
           calc.pasteToBuffer(clipboardText);
           calc.currentNumber = store.currencyConverter
-            .convert(BigNumber(calc.currentNumber), store.sourceCurrency, store.targetCurrency)
+            .convert(toBigNumber(calc.currentNumber), store.sourceCurrency, store.targetCurrency)
             .toString();
           store.swapCurrencies();
         } else if (store.currentTab === 'radix') {
@@ -479,7 +482,6 @@
 
   // 키 바인딩 설정
   import { KeyBinding } from 'classes/KeyBinding';
-  import { round } from 'src/classes/utils/NumberUtils';
   const keyBinding =
     props.field === 'main'
       ? new KeyBinding([

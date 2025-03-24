@@ -1,5 +1,5 @@
 import { unitBaseData } from '../constants/UnitBaseData';
-import { BigNumber } from './CalculatorMath';
+import { toBigNumber } from './CalculatorMath';
 import { BaseConverter } from './BaseConverter';
 import { checkError, throwError } from './utils/ErrorUtils';
 
@@ -83,13 +83,10 @@ export class UnitConverter extends BaseConverter {
    * 특정 범주와 단위의 값을 반환합니다.
    * @param {string} category - 단위 범주
    * @param {string} unit - 단위
-   * @returns {BigNumber | ((value: BigNumberType, toBase?: boolean) => BigNumber)} 단위 값 또는 변환 함수
+   * @returns {BigNumber | ((value: BigNumber, toBase?: boolean) => BigNumber)} 단위 값 또는 변환 함수
    * @throws {Error} 유효하지 않은 범주나 단위일 경우 에러를 발생시킵니다.
    */
-  static getUnitValue(
-    category: string,
-    unit: string,
-  ): BigNumberType | ((value: BigNumberType, toBase?: boolean) => BigNumberType) {
+  static getUnitValue(category: string, unit: string): BigNumber | ((value: BigNumber, toBase?: boolean) => BigNumber) {
     const isValidUnit = UnitConverter.getCategories().includes(category) && unitBaseData[category]?.[unit];
     checkError(!isValidUnit, 'unit.invalid_unit', { unit: `${category}.${unit}` });
 
@@ -97,7 +94,7 @@ export class UnitConverter extends BaseConverter {
     const unitData = categoryData?.[unit];
     if (categoryData && unitData) {
       const unitValue = unitData.value;
-      return typeof unitValue === 'function' ? unitValue : BigNumber(unitValue);
+      return typeof unitValue === 'function' ? unitValue : toBigNumber(unitValue);
     }
 
     throwError('unit.invalid_unit', { unit: `${category}.${unit}` });
@@ -126,7 +123,7 @@ export class UnitConverter extends BaseConverter {
   /**
    * 한 단위에서 다른 단위로 값을 변환합니다.
    * @param {T} category - 단위 범주
-   * @param {BigNumberType} originalValue - 변환할 원래 값
+   * @param {BigNumber} originalValue - 변환할 원래 값
    * @param {string} from - 원래 단위
    * @param {string} to - 변환할 단위
    * @returns {string} 변환된 값 (문자열 형태)
@@ -134,7 +131,7 @@ export class UnitConverter extends BaseConverter {
    */
   static convert<T extends keyof UnitBaseData>(
     category: T,
-    originalValue: BigNumberType,
+    originalValue: BigNumber,
     from: string,
     to: string,
   ): string {
@@ -149,14 +146,12 @@ export class UnitConverter extends BaseConverter {
     const baseValue =
       typeof fromUnitValue === 'function'
         ? fromUnitValue(originalValue, true)
-        : BigNumber(originalValue).mul(BigNumber(fromUnitValue));
+        : toBigNumber(originalValue).mul(toBigNumber(fromUnitValue));
 
     checkError(!baseValue, 'unit.invalid_base_value');
 
     const convertedValue =
-      typeof toUnitValue === 'function'
-        ? toUnitValue(baseValue)
-        : baseValue.div(BigNumber(toUnitValue));
+      typeof toUnitValue === 'function' ? toUnitValue(baseValue) : baseValue.div(toBigNumber(toUnitValue));
 
     checkError(!convertedValue, 'unit.conversion_failed');
 

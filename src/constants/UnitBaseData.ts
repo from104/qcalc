@@ -6,14 +6,14 @@
  */
 
 // mathjs 라이브러리에서 필요한 함수와 타입을 가져옵니다.
-import { BigNumber } from 'classes/CalculatorMath';
+import { toBigNumber } from 'classes/CalculatorMath';
 
 // Unit 인터페이스는 각 단위에 대한 정보를 정의합니다.
 interface Unit {
   [unit: string]: {
     // value는 숫자이거나 함수일 수 있습니다.
     // 함수인 경우, 원래 값과 역변환 여부를 인자로 받아 BigNumber를 반환합니다.
-    value: number | ((originalValue: BigNumberType, isReverse?: boolean) => BigNumberType);
+    value: number | ((originalValue: BigNumber, isReverse?: boolean) => BigNumber);
     desc: string; // 단위에 대한 설명
   };
 }
@@ -108,8 +108,8 @@ export const unitBaseData: UnitBaseData = {
     '°C': { value: 1, desc: 'Celsius' }, // 섭씨
     '°F': {
       // 화씨
-      value: (originalValue: BigNumberType, isReverse = false): BigNumberType => {
-        const value = BigNumber(originalValue);
+      value: (originalValue: BigNumber, isReverse = false): BigNumber => {
+        const value = toBigNumber(originalValue);
         return isReverse
           ? value.minus(32).times(5).dividedBy(9) // (originalValue - 32) * (5 / 9)
           : value.times(9).dividedBy(5).plus(32); // originalValue * (9 / 5) + 32
@@ -118,8 +118,8 @@ export const unitBaseData: UnitBaseData = {
     },
     K: {
       // 켈빈
-      value: (originalValue: BigNumberType, isReverse = false): BigNumberType => {
-        const value = BigNumber(originalValue);
+      value: (originalValue: BigNumber, isReverse = false): BigNumber => {
+        const value = toBigNumber(originalValue);
         return isReverse
           ? value.minus(273.15) // originalValue - 273.15 (From Kelvin to Celsius)
           : value.plus(273.15); // originalValue + 273.15 (From Celsius to Kelvin)
@@ -128,8 +128,8 @@ export const unitBaseData: UnitBaseData = {
     },
     '°R': {
       // 랭킨
-      value: (originalValue: BigNumberType, isReverse = false): BigNumberType => {
-        const value = BigNumber(originalValue);
+      value: (originalValue: BigNumber, isReverse = false): BigNumber => {
+        const value = toBigNumber(originalValue);
         return isReverse
           ? value.minus(491.67).times(5).dividedBy(9) // (originalValue - 491.67) * (5 / 9)
           : value.times(9).dividedBy(5).plus(491.67); // originalValue * (9 / 5) + 491.67
@@ -138,18 +138,18 @@ export const unitBaseData: UnitBaseData = {
     },
     '°De': {
       // 열씨
-      value: (originalValue: BigNumberType, isReverse = false): BigNumberType => {
-        const value = BigNumber(originalValue);
+      value: (originalValue: BigNumber, isReverse = false): BigNumber => {
+        const value = toBigNumber(originalValue);
         return isReverse
-          ? BigNumber(100).minus(value.times(2).dividedBy(3)) // 100 - (originalValue * 2 / 3)
-          : BigNumber(100).minus(value).times(3).dividedBy(2); // (100 - originalValue) * 3 / 2
+          ? toBigNumber(100).minus(value.times(2).dividedBy(3)) // 100 - (originalValue * 2 / 3)
+          : toBigNumber(100).minus(value).times(3).dividedBy(2); // (100 - originalValue) * 3 / 2
       },
       desc: 'Delisle',
     },
     '°N': {
       // 뉴튼
-      value: (originalValue: BigNumberType, isReverse = false): BigNumberType => {
-        const value = BigNumber(originalValue);
+      value: (originalValue: BigNumber, isReverse = false): BigNumber => {
+        const value = toBigNumber(originalValue);
         return isReverse
           ? value.times(100).dividedBy(33) // originalValue * 100 / 33
           : value.times(33).dividedBy(100); // originalValue * 33 / 100
@@ -158,8 +158,8 @@ export const unitBaseData: UnitBaseData = {
     },
     '°Rø': {
       // 로머
-      value: (originalValue: BigNumberType, isReverse = false): BigNumberType => {
-        const value = BigNumber(originalValue);
+      value: (originalValue: BigNumber, isReverse = false): BigNumber => {
+        const value = toBigNumber(originalValue);
         return isReverse
           ? value.minus(7.5).times(40).dividedBy(21) // (originalValue - 7.5) * 40 / 21
           : value.times(21).dividedBy(40).plus(7.5); // originalValue * 21 / 40 + 7.5
@@ -168,8 +168,8 @@ export const unitBaseData: UnitBaseData = {
     },
     '°Ré': {
       // 레오미르
-      value: (originalValue: BigNumberType, isReverse = false): BigNumberType => {
-        const value = BigNumber(originalValue);
+      value: (originalValue: BigNumber, isReverse = false): BigNumber => {
+        const value = toBigNumber(originalValue);
         return isReverse
           ? value.times(5).dividedBy(4) // originalValue * 5 / 4
           : value.times(4).dividedBy(5); // originalValue * 4 / 5

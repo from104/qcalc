@@ -17,7 +17,7 @@
   // 계산기 관련 타입과 클래스
   import { KeyBinding } from 'classes/KeyBinding';
   import { UnitConverter } from 'classes/UnitConverter';
-  import { BigNumber } from 'classes/CalculatorMath';
+  import { toBigNumber } from 'classes/CalculatorMath';
 
   // 전역 window 객체에 접근하기 위한 상수 선언
   const window = globalThis.window;
@@ -102,13 +102,8 @@
   const handleUnitSwap = () => {
     // 동일한 단위인 경우 변환하지 않음
     if (store.sourceUnits[store.selectedCategory] !== store.targetUnits[store.selectedCategory]) {
-      calc.currentNumber = UnitConverter.convert(
-        store.selectedCategory,
-        BigNumber(calc.currentNumber),
-        store.sourceUnits[store.selectedCategory] ?? '',
-        store.targetUnits[store.selectedCategory] ?? '',
-      );
       swapUnits();
+      calc.currentNumber = store.convertedUnitNumber;
     }
   };
 </script>
@@ -131,7 +126,9 @@
       class="col-3 q-pl-sm shadow-2 text-black"
       :class="!store.isDarkMode() ? 'bg-blue-grey-2' : 'bg-blue-grey-6'"
       :label-color="!store.isDarkMode() ? 'primary' : 'grey-1'"
-      :popup-content-class="[!store.isDarkMode() ? 'bg-blue-grey-2' : 'bg-blue-grey-6', 'scrollbar-custom', 'q-select-popup'].join(' ')"
+      :popup-content-class="
+        [!store.isDarkMode() ? 'bg-blue-grey-2' : 'bg-blue-grey-6', 'scrollbar-custom', 'q-select-popup'].join(' ')
+      "
       :options-selected-class="!store.isDarkMode() ? 'text-primary' : 'text-grey-1'"
     />
 
@@ -153,7 +150,9 @@
       behavior="menu"
       class="col-3 q-pl-sm shadow-2"
       :class="!store.isDarkMode() ? 'bg-blue-grey-2' : 'bg-blue-grey-6'"
-      :popup-content-class="[!store.isDarkMode() ? 'bg-blue-grey-2' : 'bg-blue-grey-6', 'scrollbar-custom', 'q-select-popup'].join(' ')"
+      :popup-content-class="
+        [!store.isDarkMode() ? 'bg-blue-grey-2' : 'bg-blue-grey-6', 'scrollbar-custom', 'q-select-popup'].join(' ')
+      "
       :options-selected-class="!store.isDarkMode() ? 'text-primary' : 'text-grey-1'"
       :label-color="!store.isDarkMode() ? 'primary' : 'grey-1'"
     >
@@ -203,7 +202,9 @@
       behavior="menu"
       class="col-3 q-pl-sm shadow-2"
       :class="!store.isDarkMode() ? 'bg-blue-grey-2' : 'bg-blue-grey-6'"
-      :popup-content-class="[!store.isDarkMode() ? 'bg-blue-grey-2' : 'bg-blue-grey-6', 'scrollbar-custom', 'q-select-popup'].join(' ')"
+      :popup-content-class="
+        [!store.isDarkMode() ? 'bg-blue-grey-2' : 'bg-blue-grey-6', 'scrollbar-custom', 'q-select-popup'].join(' ')
+      "
       :options-selected-class="!store.isDarkMode() ? 'text-primary' : 'text-grey-1'"
       :label-color="!store.isDarkMode() ? 'primary' : 'grey-1'"
     >

@@ -4,7 +4,7 @@ import { BaseConverter } from './BaseConverter';
 import type { CurrencyExchangeRates, CurrencyData } from '../constants/CurrencyBaseData';
 import { currencyBaseData } from '../constants/CurrencyBaseData';
 import { checkError } from './utils/ErrorUtils';
-import { BigNumber } from './CalculatorMath';
+import { toBigNumber } from './CalculatorMath';
 
 /**
  * CurrencyConverter 클래스
@@ -114,11 +114,17 @@ export class CurrencyConverter extends BaseConverter {
       return this.baseExchangeRates;
     }
 
-    checkError(!Object.prototype.hasOwnProperty.call(this.baseExchangeRates, baseCurrency), 'error.currency.invalid_base_currency');
+    checkError(
+      !Object.prototype.hasOwnProperty.call(this.baseExchangeRates, baseCurrency),
+      'error.currency.invalid_base_currency',
+    );
 
     const baseRate = this.baseExchangeRates[baseCurrency];
     return Object.fromEntries(
-      Object.entries(this.baseExchangeRates).map(([currency, rate]) => [currency, rate / (baseRate ?? 1)]),
+      Object.entries(this.baseExchangeRates).map(([currency, rate]) => [
+        currency,
+        toBigNumber(rate).div(toBigNumber(baseRate)).toFixed(),
+      ]),
     );
   }
 
@@ -128,7 +134,7 @@ export class CurrencyConverter extends BaseConverter {
    * @param {string} to - 도착 통화 (선택적)
    * @returns {number} 계산된 환율
    */
-  getRate(from: string, to?: string): BigNumberType {
+  getRate(from: string, to?: string): BigNumber {
     checkError(this.isRatesEmpty(), 'error.currency.exchange_rates_not_available');
 
     const actualTo = to ?? from;
@@ -136,18 +142,22 @@ export class CurrencyConverter extends BaseConverter {
 
     checkError(!this.currentRates[actualTo] || !this.currentRates[actualFrom], 'error.currency.invalid_currency');
 
-    return BigNumber(this.currentRates[actualTo]!).div(this.currentRates[actualFrom]!);
+    const toRate = this.currentRates[actualTo] ?? 0;
+    const fromRate = this.currentRates[actualFrom] ?? 1;
+
+    return toBigNumber(toRate).div(toBigNumber(fromRate));
   }
 
   /**
    * 주어진 금액을 한 통화에서 다른 통화로 변환하는 메소드
-   * @param {BigNumberType} amount - 변환할 금액
+   * @param {BigNumber} amount - 변환할 금액
    * @param {string} from - 출발 통화
    * @param {string} to - 도착 통화
-   * @returns {number} 변환된 금액
+   * @returns {string} 변환된 금액
    */
-  convert(amount: BigNumberType, from: string, to: string): string {
-    return BigNumber(amount).times(this.getRate(from, to)).toFixed();
+  convert(amount: BigNumber, from: string, to: string): BigNumber {
+    const rate = this.getRate(from, to);
+    return toBigNumber(amount.toString()).times(rate);
   }
 
   /**
@@ -156,7 +166,7 @@ export class CurrencyConverter extends BaseConverter {
    * @param {string} currency - 통화 코드
    * @returns {string} 포맷팅된 금액 문자열
    */
-  format(amount: BigNumberType, currency: string): string {
+  format(amount: BigNumber, currency: string): string {
     return `${this.currencyData[currency]?.symbol ?? ''}${amount.toFixed(2)}`;
   }
 
@@ -185,7 +195,10 @@ export class CurrencyConverter extends BaseConverter {
    */
   getSymbol(currency: string): string {
     checkError(this.isRatesEmpty(), 'error.currency.exchange_rates_not_available');
-    checkError(!this.currencyData[currency] || !this.currentRates[currency], `error.currency.invalid_currency: ${currency}`);
+    checkError(
+      !this.currencyData[currency] || !this.currentRates[currency],
+      `error.currency.invalid_currency: ${currency}`,
+    );
     return this.currencyData[currency]!.symbol;
   }
 

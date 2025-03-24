@@ -9,7 +9,7 @@ import type { BigNumber as tBigNumber } from 'mathjs';
 import type { Radix } from 'classes/RadixConverter';
 
 declare global {
-  type BigNumberType = tBigNumber;
+  type BigNumber = tBigNumber;
 
   type RadixType = Radix;
 
@@ -46,4 +46,4 @@ declare global {
   };
 }
 
-export { WordSize, CalculationResult, ResultRecord, RecordString }; 
+export { WordSize, CalculationResult, ResultRecord, RecordString };

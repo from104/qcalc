@@ -39,7 +39,7 @@ export const DECIMAL_PLACES: { [key: number]: number } = {
   '2': 4,
   '3': 6,
   '4': 8,
-  5: 16,
+  '5': 16,
 } as const;
 
 // DecimalPlacesType을 배열로부터 생성
@@ -95,11 +95,13 @@ export interface StoreState {
   targetUnits: { [key: string]: string };
   showUnit: boolean;
   showSymbol: boolean;
+  convertedUnitNumber: string;
 
   // 통화 변환 관련
   currencyConverter: CurrencyConverter;
   sourceCurrency: string;
   targetCurrency: string;
+  convertedCurrencyNumber: string;
 
   // 진법 변환 관련
   wordSize: WordSize;

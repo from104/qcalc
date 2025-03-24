@@ -210,5 +210,5 @@ export const currencyBaseData: CurrencyData = {
 
 // 환율을 저장하는 인터페이스
 export interface CurrencyExchangeRates {
-  [key: string]: number;
+  [key: string]: string;
 }

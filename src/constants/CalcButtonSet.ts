@@ -9,7 +9,7 @@ import { match } from 'ts-pattern';
 
 import type { ComposerTranslation } from 'vue-i18n';
 
-import { BigNumber } from 'classes/CalculatorMath';
+import { toBigNumber } from 'classes/CalculatorMath';
 import { Operator } from 'classes/Calculator';
 import { useStore } from 'stores/store';
 import { showMessage } from 'src/classes/utils/NotificationUtils';
@@ -23,8 +23,8 @@ export function createCalcButtonSet(t: ComposerTranslation) {
 
   // 비트 연산 사전 처리 메서드
   const bitOperationPreprocessing = (action: () => void, isBinary: boolean = true) => {
-    if (BigNumber(calc.currentNumber).abs().floor().toString() !== calc.currentNumber) {
-      calc.currentNumber = BigNumber(calc.currentNumber).abs().floor().toString();
+    if (toBigNumber(calc.currentNumber).abs().floor().toString() !== calc.currentNumber) {
+      calc.currentNumber = toBigNumber(calc.currentNumber).abs().floor().toString();
       if (isBinary) {
         showMessage(t('bitOperationPreprocessingReady'));
       } else {

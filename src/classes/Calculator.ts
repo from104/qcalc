@@ -10,11 +10,12 @@ import { match } from 'ts-pattern';
 
 import { RadixConverter, Radix } from './RadixConverter';
 import { CalculatorMath } from './CalculatorMath';
-import { BigNumber } from './CalculatorMath';
 import { CalculatorRecord } from './CalculatorRecord';
 import { CalculatorMemory } from './CalculatorMemory';
 
 import { checkError, getErrorMessage } from './utils/ErrorUtils';
+
+import { toBigNumber } from './CalculatorMath';
 
 /**
  * 계산기에서 사용되는 연산자 열거형
@@ -356,12 +357,12 @@ export class Calculator {
   }
 
   public rec(): void {
-    checkError(BigNumber(this.currentNumber).eq(0), 'error.divide_by_zero');
+    checkError(toBigNumber(this.currentNumber).eq(0), 'error.divide_by_zero');
     this.performUnaryOperation(Operator.REC, () => this.math.div('1', this.currentNumber));
   }
 
   public sqrt(): void {
-    checkError(BigNumber(this.currentNumber).lt(0), 'error.math.negative_root');
+    checkError(toBigNumber(this.currentNumber).lt(0), 'error.math.negative_root');
     this.performUnaryOperation(Operator.SQRT, () => this.math.root(this.currentNumber, '2'));
   }
 
@@ -370,7 +371,7 @@ export class Calculator {
   }
 
   public fct(): void {
-    checkError(BigNumber(this.currentNumber).lt(0), 'error.math.negative_factorial');
+    checkError(toBigNumber(this.currentNumber).lt(0), 'error.math.negative_factorial');
     this.performUnaryOperation(Operator.FCT, () => this.math.fact(this.currentNumber));
   }
 
@@ -575,8 +576,8 @@ export class Calculator {
       const operator = [Operator.PCT, this.currentOperator];
       const resultNumber =
         this.currentOperator === Operator.DIV
-          ? BigNumber(this.previousNumber).mul(100).toString()
-          : BigNumber(this.previousNumber).div(100).toString();
+          ? toBigNumber(this.previousNumber).mul(100).toString()
+          : toBigNumber(this.previousNumber).div(100).toString();
 
       this.previousNumber = this.addRecord({
         previousNumber,

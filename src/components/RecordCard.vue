@@ -46,7 +46,7 @@
   import ToolTip from 'components/snippets/ToolTip.vue';
   import HighlightText from 'components/snippets/HighlightText.vue';
   import { UnitConverter } from 'src/classes/UnitConverter';
-  import { BigNumber } from 'src/classes/CalculatorMath';
+  import { toBigNumber } from 'src/classes/CalculatorMath';
 
   // 기존 코드 상단에 인터페이스 추가
   interface Record {
@@ -278,18 +278,16 @@
       store.swapUnits();
       calc.currentNumber = UnitConverter.convert(
         store.selectedCategory,
-        BigNumber(record.calculationResult.resultNumber),
+        toBigNumber(record.calculationResult.resultNumber),
         store.sourceUnits[store.selectedCategory] ?? '',
         store.targetUnits[store.selectedCategory] ?? '',
       );
       store.swapUnits();
     } else if (store.currentTab === 'currency') {
       store.swapCurrencies();
-      calc.currentNumber = currencyConverter.convert(
-        BigNumber(record.calculationResult.resultNumber),
-        store.sourceCurrency,
-        store.targetCurrency,
-      ).toString();
+      calc.currentNumber = currencyConverter
+        .convert(toBigNumber(record.calculationResult.resultNumber), store.sourceCurrency, store.targetCurrency)
+        .toString();
       store.swapCurrencies();
     }
     calc.offBufferReset();
@@ -579,7 +577,11 @@
                             :action="() => loadToSubPanel(record.id as number)"
                           />
                           <MenuItem v-if="window.isDesktop" separator />
-                          <MenuItem v-if="window.isDesktop" :title="t('deleteResult')" :action="() => deleteRecordItem(record.id as number)" />
+                          <MenuItem
+                            v-if="window.isDesktop"
+                            :title="t('deleteResult')"
+                            :action="() => deleteRecordItem(record.id as number)"
+                          />
                         </q-list>
                       </q-menu>
                     </q-btn>
@@ -654,8 +656,18 @@
           color="primary"
           @focus="store.setInputFocused"
           @blur="store.setInputBlurred"
-          @keyup.enter="() => { store.setInputBlurred; saveMemo(); }"
-          @keyup.escape="() => { store.setInputBlurred; cancelMemo(); }"
+          @keyup.enter="
+            () => {
+              store.setInputBlurred;
+              saveMemo();
+            }
+          "
+          @keyup.escape="
+            () => {
+              store.setInputBlurred;
+              cancelMemo();
+            }
+          "
         />
       </q-card-section>
     </q-card>

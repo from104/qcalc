@@ -1,6 +1,6 @@
 import { match } from 'ts-pattern';
 import { BaseConverter } from './BaseConverter';
-import { BigNumber, MathB } from './CalculatorMath';
+import { toBigNumber, MathB } from './CalculatorMath';
 import { checkError } from './utils/ErrorUtils';
 
 export enum Radix {
@@ -103,7 +103,7 @@ export class RadixConverter extends BaseConverter {
 
     const result = patterns[radix].test(number);
 
-    checkError(!result, 'error.radix.invalid_radix', { radix: radix, number: number, });
+    checkError(!result, 'error.radix.invalid_radix', { radix: radix, number: number });
     return result;
   }
 
@@ -183,7 +183,7 @@ export class RadixConverter extends BaseConverter {
    * @param radix 변환할 진법 ('bin' | 'oct' | 'hex')
    * @returns 변환된 진법 문자열
    */
-  private convertDecimalToRadix(decimal: string | BigNumberType, radix: Radix): string {
+  private convertDecimalToRadix(decimal: string | BigNumber, radix: Radix): string {
     if (!decimal) return '0';
     if (radix === Radix.Decimal) return decimal.toString();
     // 입력값을 BigNumber로 변환하고 정수부와 소수부 분리
@@ -305,7 +305,7 @@ export class RadixConverter extends BaseConverter {
       .with(Radix.Hexadecimal, () => '0x')
       .exhaustive();
     // 정수부 변환 (빈 문자열이면 0으로 처리)
-    let result = BigNumber(integerPart ? BigInt(radixPrefix + integerPart).toString() : '0');
+    let result = toBigNumber(integerPart ? BigInt(radixPrefix + integerPart).toString() : '0');
 
     // 소수부가 존재하면 변환하여 더하기
     if (fractionPart) {
@@ -339,19 +339,19 @@ export class RadixConverter extends BaseConverter {
     // 각 자릿수별로 계산하여 합산
     return digits
       .split('')
-      .reduce<BigNumberType>((accumulator: BigNumberType, currentDigit: string, position: number): BigNumberType => {
+      .reduce<BigNumber>((accumulator: BigNumber, currentDigit: string, position: number): BigNumber => {
         // 현재 자릿수를 10진수로 변환
         const digitValue = parseInt(currentDigit, radixValue);
 
         // 현재 자릿수의 가중치 계산: value / (radix^position)
         const weightedValue = MathB.divide(
-          BigNumber(digitValue),
-          MathB.pow(BigNumber(radixValue), position + 1),
-        ) as BigNumberType;
+          toBigNumber(digitValue),
+          MathB.pow(toBigNumber(radixValue), position + 1),
+        ) as BigNumber;
 
         // 누적값에 현재 자릿수의 가중치를 더함
         return MathB.add(accumulator, weightedValue);
-      }, BigNumber(0));
+      }, toBigNumber(0));
   }
 
   /**
@@ -374,7 +374,7 @@ export class RadixConverter extends BaseConverter {
   private convertFromDecimal(decimal: string, toRadix: Radix): string {
     // 입력된 10진수의 유효성 검사
     // isValidDecimal 메서드를 통해 올바른 10진수 형식인지 확인
-    checkError(!this.isValidDecimal(decimal), 'error.radix.invalid_decimal', { decimal: decimal, });
+    checkError(!this.isValidDecimal(decimal), 'error.radix.invalid_decimal', { decimal: decimal });
 
     // 유효성 검사를 통과한 경우 실제 진법 변환을 수행
     // convertDecimalToRadix 메서드에 decimal과 목표 진법을 전달

@@ -6,6 +6,8 @@
  *              이 유틸리티는 숫자 처리의 일관성을 유지하고, 사용자 경험을 향상시키는 데 기여합니다.
  */
 
+import { MathB, toBigNumber } from '../CalculatorMath';
+
 /**
  * 숫자를 그룹화하여 포맷팅합니다.
  * @param value - 포맷팅할 숫자 문자열
@@ -113,7 +115,7 @@ function trimTrailingZeros(value: string, keepDecimalPlaces: number = 0): string
  */
 export function formatDecimalPlaces(value: string, decimalPlaces: number, currentRadixNumber: number): string {
   if (!value) return '';
-  if (decimalPlaces < 0) return value;
+  if (decimalPlaces < 0) return trimTrailingZeros(toBigNumber(value).toFixed(64).substring(0, 64));
 
   // 숫자가 아닌 문자가 포함된 경우 빈 문자열 반환
   if (!/^-?\d*\.?\d*$/.test(value)) return '';
@@ -146,106 +148,4 @@ export function formatDecimalPlaces(value: string, decimalPlaces: number, curren
 
   // 최종 결과 조합
   return `${finalInteger}.${roundedFraction}`;
-}
-
-/**
- * 숫자를 지정된 소수점 자리에서 반올림합니다. (Excel의 ROUND 함수와 동일)
- * @param value - 반올림할 숫자 문자열
- * @param decimalPlaces - 소수점 자릿수 (음수인 경우 정수부 자릿수에서 반올림)
- * @param currentRadixNumber - 현재 진법
- * @returns 반올림된 숫자 문자열
- */
-export function round(value: string, decimalPlaces: number, currentRadixNumber: number = 10): string {
-  if (!value) return '';
-
-  // 음수 자릿수 처리 (정수부 자릿수에서 반올림)
-  if (decimalPlaces < 0) {
-    const absPlaces = Math.abs(decimalPlaces);
-    const multiplier = Math.pow(currentRadixNumber, absPlaces);
-    const divided = (parseInt(value, currentRadixNumber) / multiplier).toString(currentRadixNumber);
-    const rounded = formatDecimalPlaces(divided, 0, currentRadixNumber);
-    return (parseInt(rounded, currentRadixNumber) * multiplier).toString(currentRadixNumber).toUpperCase();
-  }
-
-  return trimTrailingZeros(formatDecimalPlaces(value, decimalPlaces, currentRadixNumber));
-}
-
-/**
- * 숫자를 지정된 소수점 자리에서 올림합니다. (Excel의 ROUNDUP 함수와 동일)
- * @param value - 올림할 숫자 문자열
- * @param decimalPlaces - 소수점 자릿수 (음수인 경우 정수부 자릿수에서 올림)
- * @param currentRadixNumber - 현재 진법
- * @returns 올림된 숫자 문자열
- */
-export function roundUp(value: string, decimalPlaces: number, currentRadixNumber: number = 10): string {
-  if (!value) return '';
-
-  // 음수 자릿수 처리 (정수부 자릿수에서 올림)
-  if (decimalPlaces < 0) {
-    const absPlaces = Math.abs(decimalPlaces);
-    const multiplier = Math.pow(currentRadixNumber, absPlaces);
-    const divided = (parseInt(value, currentRadixNumber) / multiplier).toString(currentRadixNumber);
-    const [integerPart = '', fractionalPart = ''] = divided.split('.');
-
-    // 소수부가 있으면 무조건 올림
-    const shouldRoundUp = fractionalPart !== '';
-    const roundedInteger = shouldRoundUp ? incrementInteger(integerPart, currentRadixNumber) : integerPart;
-    return (parseInt(roundedInteger, currentRadixNumber) * multiplier).toString(currentRadixNumber).toUpperCase();
-  }
-
-  const [integerPart = '', fractionalPart = ''] = value.split('.');
-  if (decimalPlaces === 0) {
-    return fractionalPart ? incrementInteger(integerPart, currentRadixNumber) : integerPart;
-  }
-
-  // 소수부 처리
-  const roundedFractionArray = fractionalPart.padEnd(decimalPlaces, '0').split('').slice(0, decimalPlaces);
-  const nextDigit = fractionalPart[decimalPlaces] || '0';
-
-  // 다음 자리에 숫자가 있으면 무조건 올림
-  if (parseInt(nextDigit, currentRadixNumber) > 0) {
-    let carryOver = 1;
-    for (let i = roundedFractionArray.length - 1; i >= 0; i--) {
-      const digit = roundedFractionArray[i] || '0';
-      const currentValue = parseInt(digit, currentRadixNumber) + carryOver;
-      carryOver = currentValue >= currentRadixNumber ? 1 : 0;
-      roundedFractionArray[i] = (currentValue % currentRadixNumber).toString(currentRadixNumber).toUpperCase();
-    }
-
-    const roundedFraction = roundedFractionArray.join('');
-    if (carryOver > 0) {
-      return trimTrailingZeros(`${incrementInteger(integerPart, currentRadixNumber)}.${roundedFraction}`);
-    }
-    return trimTrailingZeros(`${integerPart}.${roundedFraction}`);
-  }
-
-  return trimTrailingZeros(`${integerPart}.${roundedFractionArray.join('')}`);
-}
-
-/**
- * 숫자를 지정된 소수점 자리에서 내림합니다. (Excel의 ROUNDDOWN 함수와 동일)
- * @param value - 내림할 숫자 문자열
- * @param decimalPlaces - 소수점 자릿수 (음수인 경우 정수부 자릿수에서 내림)
- * @param currentRadixNumber - 현재 진법
- * @returns 내림된 숫자 문자열
- */
-export function roundDown(value: string, decimalPlaces: number, currentRadixNumber: number = 10): string {
-  if (!value) return '';
-
-  // 음수 자릿수 처리 (정수부 자릿수에서 내림)
-  if (decimalPlaces < 0) {
-    const absPlaces = Math.abs(decimalPlaces);
-    const multiplier = Math.pow(currentRadixNumber, absPlaces);
-    const divided = Math.floor(parseInt(value, currentRadixNumber) / multiplier).toString(currentRadixNumber);
-    return (parseInt(divided, currentRadixNumber) * multiplier).toString(currentRadixNumber).toUpperCase();
-  }
-
-  const [integerPart = '', fractionalPart = ''] = value.split('.');
-  if (decimalPlaces === 0) {
-    return integerPart;
-  }
-
-  // 소수부 처리 - 단순히 지정된 자릿수만큼 잘라냄
-  const roundedFraction = fractionalPart.padEnd(decimalPlaces, '0').substring(0, decimalPlaces);
-  return trimTrailingZeros(`${integerPart}${roundedFraction ? `.${roundedFraction}` : ''}`);
 }
