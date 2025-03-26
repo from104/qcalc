@@ -121,6 +121,11 @@
   const sourceSelectOptions = computed(() => sourceRadixOptions.values);
 
   const targetSelectOptions = computed(() => targetRadixOptions.values);
+
+  const handleRadixSwap = () => {
+    swapRadixes();
+    calc.needsBufferReset = true;
+  };
 </script>
 
 <template>
@@ -174,6 +179,7 @@
     <!-- 원본, 대상 진법 바꾸기 버튼 -->
     <q-btn
       id="btn-swap-radix"
+      v-auto-blur
       dense
       round
       flat
@@ -182,7 +188,7 @@
       class="col-1 q-mx-none q-px-sm blur"
       role="button"
       :aria-label="t('ariaLabel.swapRadix')"
-      @click="swapRadixes()"
+      @click="handleRadixSwap"
     >
       <ToolTip :auto-hide="3000" :text="t('tooltipSwap')" />
     </q-btn>

@@ -16,7 +16,7 @@
   const { t } = useI18n();
 
   // 계산기 관련 타입과 클래스
-  import { toBigNumber } from 'classes/CalculatorMath';
+  // import { toBigNumber } from 'classes/CalculatorMath';
   import { KeyBinding } from 'classes/KeyBinding';
 
   // 전역 window 객체에 접근하기 위한 상수 선언
@@ -184,6 +184,7 @@
       // 첫 번째 변환 수행
       swapCurrencies();
       calc.currentNumber = store.convertedCurrencyNumber;
+      calc.needsBufferReset = true;
     }
   };
 </script>
@@ -246,6 +247,7 @@
     <!-- 원본, 대상 통화 바꾸기 버튼 -->
     <q-btn
       id="btn-swap-currency"
+      v-auto-blur
       dense
       round
       flat

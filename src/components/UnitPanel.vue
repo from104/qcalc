@@ -17,7 +17,7 @@
   // 계산기 관련 타입과 클래스
   import { KeyBinding } from 'classes/KeyBinding';
   import { UnitConverter } from 'classes/UnitConverter';
-  import { toBigNumber } from 'classes/CalculatorMath';
+  // import { toBigNumber } from 'classes/CalculatorMath';
 
   // 전역 window 객체에 접근하기 위한 상수 선언
   const window = globalThis.window;
@@ -104,6 +104,7 @@
     if (store.sourceUnits[store.selectedCategory] !== store.targetUnits[store.selectedCategory]) {
       swapUnits();
       calc.currentNumber = store.convertedUnitNumber;
+      calc.needsBufferReset = true;
     }
   };
 </script>
@@ -174,6 +175,7 @@
     <!-- 원본, 대상 단위 바꾸기 버튼 -->
     <q-btn
       id="btn-swap-unit"
+      v-auto-blur
       dense
       round
       flat

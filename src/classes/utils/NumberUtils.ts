@@ -6,7 +6,27 @@
  *              이 유틸리티는 숫자 처리의 일관성을 유지하고, 사용자 경험을 향상시키는 데 기여합니다.
  */
 
-import { MathB, toBigNumber } from '../CalculatorMath';
+import { toBigNumber } from '../CalculatorMath';
+
+/**
+ * 진법에 따른 유효한 문자 패턴을 반환합니다.
+ * @param radix - 진법 (2, 8, 10, 16)
+ * @returns 해당 진법에서 유효한 문자들의 정규식 패턴
+ */
+function getValidDigitPattern(radix: number): string {
+  switch (radix) {
+    case 2:
+      return '[0-1]';
+    case 8:
+      return '[0-7]';
+    case 10:
+      return '\\d';
+    case 16:
+      return '[0-9a-fA-F]';
+    default:
+      throw new Error('Unsupported radix. Only 2, 8, 10, and 16 are supported.');
+  }
+}
 
 /**
  * 숫자를 그룹화하여 포맷팅합니다.
@@ -114,38 +134,84 @@ function trimTrailingZeros(value: string, keepDecimalPlaces: number = 0): string
  * @returns 포맷팅된 숫자 문자열
  */
 export function formatDecimalPlaces(value: string, decimalPlaces: number, currentRadixNumber: number): string {
-  if (!value) return '';
-  if (decimalPlaces < 0) return trimTrailingZeros(toBigNumber(value).toFixed(64).substring(0, 64));
+  // 빈 문자열일 경우 0 반환
+  if (!value) return '0';
 
-  // 숫자가 아닌 문자가 포함된 경우 빈 문자열 반환
-  if (!/^-?\d*\.?\d*$/.test(value)) return '';
+  // 진법에 따른 유효한 문자 패턴 가져오기
+  const digitPattern = getValidDigitPattern(currentRadixNumber);
+
+  // 숫자가 아닌 문자가 포함된 경우 0 반환
+  const validNumberPattern = new RegExp(`^-?${digitPattern}+\\.?${digitPattern}*$`);
+  if (!validNumberPattern.test(value)) return '0';
 
   const [integerPart = '', fractionalPart = ''] = value.split('.');
 
-  // 소수점 이하 처리 필요 없는 경우
-  if (decimalPlaces === 0) {
+  if (decimalPlaces < 0) {
+    // 소수점 이하 부분이 없는 경우 정수부만 반환
+    if (!fractionalPart) return integerPart ?? '0';
+    // 반복 횟수 최소 10회
+    const minConsecutiveDigits = 10;
+
+    // x.yz000000000000a 일 경우 x.yz만 반환
+    const trailingZeroesWithDigitPattern = new RegExp(`0{${minConsecutiveDigits},}${digitPattern}$`);
+    if (trailingZeroesWithDigitPattern.test(fractionalPart)) {
+      return (integerPart + '.' + fractionalPart.replace(trailingZeroesWithDigitPattern, '')).replace(/\.$/, '');
+    }
+
+    // 진법에 따른 최대 자릿수 패턴
+    const maxDigitForRadix =
+      currentRadixNumber === 2 ? '1' : currentRadixNumber === 8 ? '7' : currentRadixNumber === 16 ? '[fF]' : '9';
+
+    // x.yz999999999999a 일 경우 x.yz9에서 반올림 반환
+    const trailingNinesWithDigitPattern = new RegExp(`${maxDigitForRadix}{${minConsecutiveDigits},}${digitPattern}$`);
+    if (trailingNinesWithDigitPattern.test(fractionalPart)) {
+      // 패턴 적용 후 소수점 이하 자릿수 계산
+      const significantDecimalPlaces = fractionalPart.replace(trailingNinesWithDigitPattern, '').length;
+      // 소수점 이하 자릿수 계산 후 0,'.' 제거
+      return formatDecimalPlaces(
+        integerPart +
+          '.' +
+          fractionalPart.replace(trailingNinesWithDigitPattern, currentRadixNumber == 16 ? 'f' : maxDigitForRadix),
+        significantDecimalPlaces,
+        currentRadixNumber,
+      )
+        .replace(/0+$/, '')
+        .replace(/\.$/, '');
+    }
+    return value;
+  } else if (decimalPlaces === 0) {
+    // 소수점 이하 처리 필요 없는 경우
     if (!fractionalPart) return integerPart;
 
     // 첫 번째 소수점 자리에서 반올림
     const firstDigit = parseInt(fractionalPart[0] || '0', currentRadixNumber);
     const shouldRoundUp = firstDigit >= Math.floor(currentRadixNumber / 2);
     return shouldRoundUp ? incrementInteger(integerPart, currentRadixNumber) : integerPart;
+  } else {
+    // decimalPlaces > 0
+    if (!value.includes('.')) {
+      return `${value}.${'0'.repeat(decimalPlaces)}`;
+    }
+
+    // 반올림 처리
+    const { roundedFraction, carryOver } = roundFractionalPart(fractionalPart, decimalPlaces, currentRadixNumber);
+
+    // 정수부 자리 올림 처리
+    let finalInteger = integerPart;
+    if (carryOver > 0) {
+      finalInteger = incrementInteger(integerPart, currentRadixNumber);
+    }
+
+    // 최종 결과 조합
+    return `${finalInteger}.${roundedFraction}`;
   }
-
-  // 소수점 이하 처리
-  if (!value.includes('.')) {
-    return `${value}.${'0'.repeat(decimalPlaces)}`;
-  }
-
-  // 반올림 처리
-  const { roundedFraction, carryOver } = roundFractionalPart(fractionalPart, decimalPlaces, currentRadixNumber);
-
-  // 정수부 자리 올림 처리
-  let finalInteger = integerPart;
-  if (carryOver > 0) {
-    finalInteger = incrementInteger(integerPart, currentRadixNumber);
-  }
-
-  // 최종 결과 조합
-  return `${finalInteger}.${roundedFraction}`;
 }
+
+// console.log(formatDecimalPlaces('0.000011', -1, 10));
+// console.log(formatDecimalPlaces('0.0000000000000000000000000000000000000000000000000000001', -1, 10));
+// console.log(formatDecimalPlaces('0.0000999999999999', -1, 10));
+// console.log(formatDecimalPlaces('0.00099999999999999999999999999999999995', -1, 10));
+// console.log(formatDecimalPlaces('1.9999999999999999999999', -1, 10));
+// console.log(formatDecimalPlaces('0.11111111111111', -1, 2));
+// console.log(formatDecimalPlaces('0.0000ffffffffffffffffffffffffff0', -1, 16));
+// console.log(formatDecimalPlaces('0.999999999999999999999999999999999999999999999999999999999999999', -1, 10));
