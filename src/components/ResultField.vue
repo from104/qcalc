@@ -58,9 +58,6 @@
   } = store;
 
   const calcRecord = calc.record;
-  const needFieldTooltip = ref(false);
-  // const fieldElement = ref<HTMLElement | null>(null);
-  const fieldElement = computed(() => document.getElementById(fieldID));
 
   // 햅틱 피드백 함수
   const hapticFeedbackLight = async () => {
@@ -75,6 +72,15 @@
     }
   };
 
+  // const fieldElement = ref<HTMLElement | null>(null);
+  const fieldElement = computed(() => document.getElementById(fieldID));
+  const needFieldTooltip = ref(false);
+  // const needFieldTooltip = computed(() => {
+  //   console.log('fieldElement', fieldElement.value?.offsetWidth, fieldElement.value?.scrollWidth);
+  //   if (!fieldElement.value) return false;
+  //   return fieldElement.value.offsetWidth < fieldElement.value.scrollWidth;
+  // });
+
   /**
    * 필드 툴팁 표시 여부를 결정하는 함수
    *
@@ -82,14 +88,23 @@
    * - 필드 요소의 너비가 스크롤 너비보다 작은 경우 툴팁 표시 필요
    */
   const checkNeedFieldTooltip = () => {
+    // console.log('checkNeedFieldTooltip place: ', place);
     // 필드 요소 가져오기
     // fieldElement.value = document.getElementById(fieldID);
 
     // 필드가 없으면 종료
     if (!fieldElement.value) return false;
 
+    // 현재 탭 확인
+    // console.log('currentTab', store.currentTab);
+    // 필드 ID 확인
+    // console.log('field', fieldID);
+
     // 필드의 실제 너비가 콘텐츠 너비보다 작으면 툴팁 필요
     needFieldTooltip.value = fieldElement.value.offsetWidth < fieldElement.value.scrollWidth;
+    // 툴팁 필요 여부 확인
+    // console.log('width: ', fieldElement.value.offsetWidth, fieldElement.value.scrollWidth);
+    // console.log('needFieldTooltip', needFieldTooltip.value);
     return true;
   };
 
@@ -159,9 +174,10 @@
       // 소수점 자릿수 설정이 -2이고 소수점이 있는 경우
       const hasSpecialDecimalPlaces = store.decimalPlaces === -1 && inputBuffer.includes('.');
 
-      const result = hasSpecialDecimalPlaces && !calc.needsBufferReset
-        ? `${formattedNumber.split('.')[0]}.${inputBuffer.split('.')[1]}`
-        : formattedNumber;
+      const result =
+        hasSpecialDecimalPlaces && !calc.needsBufferReset
+          ? `${formattedNumber.split('.')[0]}.${inputBuffer.split('.')[1]}`
+          : formattedNumber;
 
       return result;
     } else {
@@ -369,8 +385,6 @@
     () => store.currentTab,
     () => {
       // UI 업데이트
-      checkNeedFieldTooltip();
-
       if (computedCurrentTab.value === 'radix') {
         calc.currentRadix = store.sourceRadix;
       } else {
@@ -382,27 +396,53 @@
 
   // 컴포넌트 마운트 전 이벤트 리스너 등록
   onBeforeMount(() => {
-    window.addEventListener('resize', checkNeedFieldTooltip);
+    window.addEventListener('resize', () => checkNeedFieldTooltip());
   });
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   let tooltipInterval: NodeJS.Timeout;
+
+  // 현재 탭에 따른 상태 스왑 함수
+  const swapCurrentTabState = () => {
+    switch (calc.currentTab) {
+      case 'unit':
+        store.swapUnits();
+        break;
+      case 'currency':
+        store.swapCurrencies();
+        break;
+      case 'radix':
+        store.swapRadixes();
+        break;
+    }
+  };
+
   // 컴포넌트 마운트 후 초기 설정
   onMounted(() => {
-    tooltipInterval = setInterval(checkNeedFieldTooltip, 50);
-    checkNeedFieldTooltip();
+    tooltipInterval = setTimeout(() => {
+      swapCurrentTabState();
+      setTimeout(() => {
+        swapCurrentTabState();
+        checkNeedFieldTooltip();
+      }, 200);
+    }, 200);
   });
 
   // 컴포넌트 언마운트 시 이벤트 리스너 제거
   onUnmounted(() => {
-    clearInterval(tooltipInterval);
-    window.removeEventListener('resize', checkNeedFieldTooltip);
+    // clearInterval(tooltipInterval);
+    window.removeEventListener('resize', () => checkNeedFieldTooltip());
   });
 
-  // 한번 클릭하면 결과 복사, 2초 안에 다시 클릭하면 숫자 복사
+  // 결과 복사 상태 관리
   const isCopying = ref(false);
+
+  // 한번 클릭하면 결과 복사, 2초 안에 다시 클릭하면 숫자 복사
   const handleCopy = () => {
+    // 햅틱 피드백
     hapticFeedbackLight();
 
+    // 이미 복사 중인 경우 숫자 복사
     if (isCopying.value) {
       copyToClipboard(
         onlyNumber.value,
@@ -412,19 +452,24 @@
       return;
     }
 
+    // 결과 복사
     copyToClipboard(
       displayedResult.value,
       t(props.field === 'main' ? 'copiedDisplayedResult' : 'copiedDisplayedResultSub', {
         result: displayedResult.value,
       }),
     );
+
+    // 2초 후 복사 상태 초기화
     isCopying.value = true;
     setTimeout(() => {
       isCopying.value = false;
     }, 2000);
   };
 
+  // 클립보드 붙여넣기 처리
   const handlePaste = async (target: 'main' | 'sub' = 'main'): Promise<void> => {
+    // 클립보드 읽기 시도
     try {
       let clipboardText = '';
       if (window.isCapacitor) {
@@ -433,48 +478,73 @@
         clipboardText = await navigator.clipboard.readText();
       }
 
+      // 클립보드가 비어있거나 붙여넣을 수 없는 데이터가 포함되어 있는 경우
       if (!clipboardText) {
         showError(t('clipboardIsEmptyOrContainsDataThatCannotBePasted.'));
         return;
       }
 
+      // 햅틱 피드백
       hapticFeedbackMedium();
 
+      // 보조 필드 처리
       if (target === 'sub') {
         if (store.currentTab === 'unit') {
+          // 단위 탭 스왑
           store.swapUnits();
+          // 버퍼에 붙여넣기
           calc.pasteToBuffer(clipboardText);
+          // 현재 숫자 변환
           calc.currentNumber = UnitConverter.convert(
             store.selectedCategory,
             toBigNumber(calc.currentNumber),
             store.sourceUnits[store.selectedCategory] ?? '',
             store.targetUnits[store.selectedCategory] ?? '',
           );
+          // 단위 탭 스왑
           store.swapUnits();
         } else if (store.currentTab === 'currency') {
+          // 통화 탭 스왑
           store.swapCurrencies();
+          // 버퍼에 붙여넣기
           calc.pasteToBuffer(clipboardText);
+          // 현재 숫자 변환
           calc.currentNumber = store.currencyConverter
             .convert(toBigNumber(calc.currentNumber), store.sourceCurrency, store.targetCurrency)
             .toString();
+          // 통화 탭 스왑
           store.swapCurrencies();
         } else if (store.currentTab === 'radix') {
+          // 진법 탭 스왑
           store.swapRadixes();
+          // 버퍼에 붙여넣기
           setTimeout(() => {
             calc.pasteToBuffer(clipboardText.replace(/\((?:2|8|10|16)\)/g, ''));
+            // 진법 탭 스왑
             store.swapRadixes();
           }, 10);
         }
         showMessage(t('pastedFromClipboardToSubPanel'));
       } else {
         if (store.currentTab === 'radix') {
-          calc.pasteToBuffer(clipboardText.replace(/\((?:2|8|10|16)\)/g, ''));
+          // 진법 탭 스왑
+          store.swapRadixes();
+          // 버퍼에 붙여넣기
+          setTimeout(() => {
+            calc.pasteToBuffer(clipboardText.replace(/\((?:2|8|10|16)\)/g, ''));
+            // 진법 탭 스왑
+            store.swapRadixes();
+          }, 10);
         } else {
+          // 버퍼에 붙여넣기
           calc.pasteToBuffer(clipboardText);
         }
+
+        // 클립보드 붙여넣기 메시지 표시
         showMessage(t('pastedFromClipboard'));
       }
     } catch (error) {
+      // 클립보드 붙여넣기 실패 메시지 표시
       console.error('Failed to paste from clipboard:', error);
       showError(t('failedToPasteFromClipboard'));
     }
@@ -569,8 +639,8 @@
               return true;
             }
           "
-          v-touch-hold.mouse="() => handlePaste(props.field as 'main' | 'sub')"
           v-mutation.characterData
+          v-touch-hold.mouse="() => handlePaste(props.field as 'main' | 'sub')"
           class="self-center no-outline full-width full-height ellipsis text-right q-pt-xs noselect"
           :class="[isMainField ? 'text-h5' : '', getResultColor()]"
           :style="`padding-top: ${store.resultPanelPadding}px;`"
