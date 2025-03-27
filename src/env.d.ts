@@ -1,9 +1,8 @@
 /**
  * @file env.d.ts
- * @description 이 파일은 TypeScript 환경 설정을 위한 타입 선언을 포함합니다.
- *              다양한 모듈과 인터페이스를 정의하여 애플리케이션의 타입 안전성을 높이고,
- *              외부 라이브러리와의 상호작용을 원활하게 합니다.
- *              또한, Android 시스템과의 상호작용을 위한 인터페이스를 정의합니다.
+ * @description 이 파일은 외부 모듈에 대한 타입 선언을 포함합니다.
+ *              애플리케이션에서 사용하는 외부 라이브러리와 파일 타입에 대한
+ *              타입 정의를 제공합니다.
  */
 
 /**
@@ -35,26 +34,6 @@ declare module '*.md' {
 
   // 마크다운 파일의 내용을 기본 내보내기로 설정
   export default content;
-}
-
-/**
- * Android 시스템과 상호 작용하기 위한 인터페이스
- */
-declare class AndroidInterface {
-  // phone 여부 확인
-  static isPhone(): boolean;
-
-  // tablet 여부 확인
-  static isTablet(): boolean;
-
-  // foldable 여부 확인
-  static isFoldable(): boolean;
-
-  // 텍스트 줌 레벨 가져오기
-  static getTextZoom(): number;
-
-  // 클립보드에서 텍스트 가져오기
-  static getFromClipboard(): string;
 }
 
 /**

@@ -22,8 +22,8 @@
   import { showMessage } from './classes/utils/NotificationUtils';
 
   // === 전역 객체 및 인스턴스 초기화 ===
-  const window = globalThis.window;
-  const store = window.store;
+  const globalVars = globalThis.window.globalVars;
+  const store = globalVars.store;
   const route = useRoute();
   const { t } = useI18n();
 
@@ -37,7 +37,7 @@
    * '항상 위에' 기능을 토글하고 사용자에게 알림을 표시합니다.
    */
   const toggleAlwaysOnTopWithNotification = () => {
-    if (window.isElectron) {
+    if (globalVars.isElectron) {
       store.toggleAlwaysOnTop();
       showMessage(store.alwaysOnTop ? t('alwaysOnTopOn') : t('alwaysOnTopOff'));
     }
@@ -55,7 +55,7 @@
    * 앱을 종료합니다.
    */
   const quitApp = () => {
-    if (window.isElectron) window.electron.quitApp();
+    if (globalVars.isElectron) window.electron.quitApp();
   };
 
   // === 키 바인딩 설정 ===
@@ -145,7 +145,7 @@
   const computeTransition = computed(() => currentTransition.value);
 
   onBeforeMount(async () => {
-    if (window.isCapacitor && window.isPhone) {
+    if (globalVars.isCapacitor && globalVars.isPhone) {
       await ScreenOrientation.lock({
         orientation: 'portrait',
       });
@@ -153,7 +153,7 @@
   });
 
   onUnmounted(async () => {
-    if (window.isCapacitor && window.isPhone) {
+    if (globalVars.isCapacitor && globalVars.isPhone) {
       await ScreenOrientation.unlock();
     }
   });

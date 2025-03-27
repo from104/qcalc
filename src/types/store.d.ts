@@ -9,7 +9,7 @@
 import type { Calculator } from '../classes/Calculator';
 import type { CurrencyConverter } from '../classes/CurrencyConverter';
 import type { RadixType } from '../classes/RadixConverter';
-import type { StoreDefinition } from 'pinia';
+import type { DefineStore } from 'pinia';
 import type { WordSize } from './calculator';
 import type { CalculationResult } from './calculator';
 
@@ -68,7 +68,7 @@ export interface StoreState {
   isAppStarted: boolean;
   showTips: boolean;
   showTipsDialog: boolean;
-  
+
   // 테마/디스플레이 관련
   darkMode: DarkModeType;
   alwaysOnTop: boolean;
@@ -216,4 +216,4 @@ export interface StoreActions {
 /**
  * 스토어 인터페이스
  */
-export type Store = StoreDefinition<'store', StoreState, Record<never, never>, StoreActions>;
+export type Store = DefineStore<'store', StoreState, Record<string, never>, StoreActions>;

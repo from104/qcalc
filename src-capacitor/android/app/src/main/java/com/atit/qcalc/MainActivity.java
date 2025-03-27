@@ -51,7 +51,7 @@ public class MainActivity extends BridgeActivity {
     WebView webView = getBridge().getWebView();
 
     // 네이티브 인터페이스 설정 - 웹앱과 네이티브 코드 간 통신 브릿지
-    webView.addJavascriptInterface(new AndroidInterface(this), "AndroidInterface");
+    webView.addJavascriptInterface(new AndroidInterface(this), "androidInterface");
 
     // 스크롤 바운스 효과 비활성화 - 네이티브 앱과 같은 사용자 경험 제공
     webView.setOverScrollMode(WebView.OVER_SCROLL_NEVER);

@@ -41,8 +41,8 @@
   const { t } = useI18n();
 
   // === 전역 객체 및 인스턴스 초기화 ===
-  const window = globalThis.window;
-  const store = window.store;
+  const globalVars = globalThis.window.globalVars;
+  const store = globalVars.store;
 
   // === 메타데이터 설정 ===
   /**
@@ -239,9 +239,9 @@
     locale.value = store.locale;
 
     // OS별 UI 최적화
-    if (window.isWindows) {
+    if (globalVars.isWindows) {
       store.resultPanelPadding = 8;
-    } else if (window.isLinux) {
+    } else if (globalVars.isLinux) {
       store.resultPanelPadding = 3;
     } else {
       store.resultPanelPadding = 0;
@@ -251,7 +251,7 @@
     if (store.initPanel && store.calc) {
       store.calc.reset();
     }
-    if (window.isElectron) {
+    if (globalVars.isElectron) {
       store.setAlwaysOnTop(store.alwaysOnTop);
     }
 
@@ -313,7 +313,7 @@
         elevated
         :width="250"
         :dark="store.isDarkMode()"
-        :swipe-only="window.isMobile"
+        :swipe-only="globalVars.isMobile"
         behavior="mobile"
         @click="leftDrawerOpen = false"
       >
@@ -379,7 +379,7 @@
           />
           <q-toolbar-title class="text-subtitle1">
             {{ SUB_PAGE_CONFIG[currentSubPage as keyof typeof SUB_PAGE_CONFIG]?.title }}
-            <HelpIcon v-if="currentSubPage === 'record' && window.isMobile" :text="t('tooltip.recordSwipeHelp')" />
+            <HelpIcon v-if="currentSubPage === 'record' && globalVars.isMobile" :text="t('tooltip.recordSwipeHelp')" />
           </q-toolbar-title>
           <q-space />
           <q-btn
@@ -403,7 +403,7 @@
       <q-page-container class="row no-padding-bottom">
         <!-- 메인 페이지 컨텐츠 -->
         <template v-if="!isSubPage">
-          <q-tab-panels v-model="store.currentTab" animated infinite :swipeable="window.isMobile">
+          <q-tab-panels v-model="store.currentTab" animated infinite :swipeable="globalVars.isMobile">
             <q-tab-panel v-for="(tab, index) in tabs" :key="index" :name="tab.name">
               <component :is="tab.component" />
             </q-tab-panel>
@@ -432,7 +432,7 @@
         elevated
         :width="250"
         :dark="store.isDarkMode()"
-        :swipe-only="window.isMobile"
+        :swipe-only="globalVars.isMobile"
         behavior="mobile"
         @click="leftDrawerOpen = false"
       >
@@ -486,7 +486,7 @@
               >
                 {{ SUB_PAGE_CONFIG[currentSubPage]?.title }}
                 <HelpIcon
-                  v-if="(currentSubPage === 'record' || currentSubPage === '') && window.isMobile"
+                  v-if="(currentSubPage === 'record' || currentSubPage === '') && globalVars.isMobile"
                   :text="t('tooltip.recordSwipeHelp')"
                 />
               </q-toolbar-title>
@@ -544,7 +544,7 @@
             v-model="store.currentTab"
             animated
             infinite
-            :swipeable="window.isMobile"
+            :swipeable="globalVars.isMobile"
             role="tabpanel"
             :aria-label="t('ariaLabel.calculatorContent')"
           >

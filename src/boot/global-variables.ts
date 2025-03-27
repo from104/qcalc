@@ -27,8 +27,8 @@ import { useStore } from './../stores/store';
 // };
 
 export default defineBoot(() => {
-  // 전역 변수 정의
-  const globalVariables = {
+  // globalVars 객체 생성
+  const globalVars = {
     // 개발 모드 여부
     isDev: !!import.meta.env.DEV,
 
@@ -61,14 +61,12 @@ export default defineBoot(() => {
 
   // Capacitor 환경에서 자바스크립트 인터페이스 추가
   if (Platform.is.capacitor) {
-    globalVariables.isTablet = window.AndroidInterface?.isTablet() ?? false;
-    globalVariables.isPhone = window.AndroidInterface?.isPhone() ?? false;
-    globalVariables.isFoldable = window.AndroidInterface?.isFoldable() ?? false;
-    globalVariables.textZoom = window.AndroidInterface?.getTextZoom() ?? 100;
+    globalVars.isTablet = window.androidInterface?.isTablet() ?? false;
+    globalVars.isPhone = window.androidInterface?.isPhone() ?? false;
+    globalVars.isFoldable = window.androidInterface?.isFoldable() ?? false;
+    globalVars.textZoom = window.androidInterface?.getTextZoom() ?? 100;
   }
 
-  // 전역 변수 일괄 정의
-  Object.entries(globalVariables).forEach(([key, value]) => {
-    defineImmutableProperty(window, key, value);
-  });
+  // window.globalVars로 전역 변수 설정
+  defineImmutableProperty(window, 'globalVars', globalVars);
 });
