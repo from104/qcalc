@@ -24,10 +24,10 @@
   import { Radix } from 'classes/RadixConverter';
 
   // 전역 window 객체에 접근하기 위한 상수 선언
-  const window = globalThis.window;
+  const $g = window.globalVars;
 
   // 스토어 인스턴스 생성
-  const store = window.store;
+  const $s = $g.store;
 
   // 컴포넌트 import
   import ToolTip from 'src/components/snippets/ToolTip.vue';
@@ -55,19 +55,19 @@
     initRecentUnits,
     initRecentCurrencies,
     initRecentRadix,
-  } = store;
+  } = $s;
 
   const calcRecord = calc.record;
 
   // 햅틱 피드백 함수
   const hapticFeedbackLight = async () => {
-    if (window.isCapacitor && store.hapticsMode) {
+    if ($g.isCapacitor && $s.hapticsMode) {
       await Haptics.impact({ style: ImpactStyle.Light });
     }
   };
 
   const hapticFeedbackMedium = async () => {
-    if (window.isCapacitor && store.hapticsMode) {
+    if ($g.isCapacitor && $s.hapticsMode) {
       await Haptics.impact({ style: ImpactStyle.Medium });
     }
   };
@@ -96,7 +96,7 @@
     if (!fieldElement.value) return false;
 
     // 현재 탭 확인
-    // console.log('currentTab', store.currentTab);
+    // console.log('currentTab', $s.currentTab);
     // 필드 ID 확인
     // console.log('field', fieldID);
 
@@ -116,15 +116,15 @@
    * - 현재 카테고리의 시작 단위에서 목표 단위로 변환
    */
   const getConvertedUnitNumber = () => {
-    const { selectedCategory, sourceUnits, targetUnits } = store;
+    const { selectedCategory, sourceUnits, targetUnits } = $s;
 
-    store.convertedUnitNumber = UnitConverter.convert(
+    $s.convertedUnitNumber = UnitConverter.convert(
       selectedCategory,
       toBigNumber(calc.currentNumber),
       sourceUnits[selectedCategory] ?? '',
       targetUnits[selectedCategory] ?? '',
     );
-    return store.convertedUnitNumber;
+    return $s.convertedUnitNumber;
   };
 
   /**
@@ -136,12 +136,12 @@
    */
   const getConvertedCurrencyNumber = () => {
     const currentNumber = toBigNumber(calc.currentNumber);
-    const fromCurrency = store.sourceCurrency;
-    const toCurrency = store.targetCurrency;
+    const fromCurrency = $s.sourceCurrency;
+    const toCurrency = $s.targetCurrency;
 
-    store.convertedCurrencyNumber = store.currencyConverter.convert(currentNumber, fromCurrency, toCurrency).toFixed();
+    $s.convertedCurrencyNumber = $s.currencyConverter.convert(currentNumber, fromCurrency, toCurrency).toFixed();
 
-    return store.convertedCurrencyNumber;
+    return $s.convertedCurrencyNumber;
   };
 
   // 진법 변환 결과 계산 함수
@@ -153,7 +153,7 @@
    * - 현재 버퍼의 값을 메인 진법에서 서브 진법으로 변환
    */
   const getConvertedRadixNumber = () => {
-    return store.convertRadix(calc.inputBuffer, store.sourceRadix, store.targetRadix);
+    return $s.convertRadix(calc.inputBuffer, $s.sourceRadix, $s.targetRadix);
   };
 
   /**
@@ -172,7 +172,7 @@
       const formattedNumber = toFormattedNumber(inputBuffer);
 
       // 소수점 자릿수 설정이 -2이고 소수점이 있는 경우
-      const hasSpecialDecimalPlaces = store.decimalPlaces === -1 && inputBuffer.includes('.');
+      const hasSpecialDecimalPlaces = $s.decimalPlaces === -1 && inputBuffer.includes('.');
 
       const result =
         hasSpecialDecimalPlaces && !calc.needsBufferReset
@@ -210,12 +210,12 @@
    * - 메인 필드면 시작 통화의 기호를, 서브 필드면 대상 통화의 기호를 반환
    */
   const symbol = computed(() => {
-    const isShowingCurrencySymbol = store.showSymbol && props.addon === 'currency';
+    const isShowingCurrencySymbol = $s.showSymbol && props.addon === 'currency';
     if (!isShowingCurrencySymbol) return '';
 
-    const currencyCode = isMainField ? store.sourceCurrency : store.targetCurrency;
+    const currencyCode = isMainField ? $s.sourceCurrency : $s.targetCurrency;
 
-    return store.currencyConverter.getSymbol(currencyCode);
+    return $s.currencyConverter.getSymbol(currencyCode);
   });
 
   /**
@@ -223,12 +223,12 @@
    * 단위 표시 설정이 켜져있고 단위 애드온인 경우에만 단위를 표시
    */
   const unit = computed(() => {
-    const shouldShowUnit = store.showUnit && props.addon === 'unit';
+    const shouldShowUnit = $s.showUnit && props.addon === 'unit';
     if (!shouldShowUnit) return '';
 
     const selectedUnit = isMainField
-      ? store.sourceUnits[store.selectedCategory]
-      : store.targetUnits[store.selectedCategory];
+      ? $s.sourceUnits[$s.selectedCategory]
+      : $s.targetUnits[$s.selectedCategory];
 
     return ` ${selectedUnit}`;
   });
@@ -238,13 +238,13 @@
    * 현재 탭이 radix일 경우에만 진법을 표시
    */
   const radixPrefix = computed(() => {
-    const radix = isMainField ? store.sourceRadix : store.targetRadix;
-    return currentTab === 'radix' && store.showRadix && store.radixType === 'prefix' ? store.getRadixPrefix(radix) : '';
+    const radix = isMainField ? $s.sourceRadix : $s.targetRadix;
+    return currentTab === 'radix' && $s.showRadix && $s.radixType === 'prefix' ? $s.getRadixPrefix(radix) : '';
   });
 
   const radixSuffix = computed(() => {
-    const radix = isMainField ? store.sourceRadix : store.targetRadix;
-    return currentTab === 'radix' && store.showRadix && store.radixType === 'suffix' ? store.getRadixSuffix(radix) : '';
+    const radix = isMainField ? $s.sourceRadix : $s.targetRadix;
+    return currentTab === 'radix' && $s.showRadix && $s.radixType === 'suffix' ? $s.getRadixSuffix(radix) : '';
   });
 
   const displayedResult = computed(() => {
@@ -252,7 +252,7 @@
     const baseString = `${radixPrefix.value}${symbol.value}${result.value}${unit.value}`;
 
     // 진법 접미사 조건 확인
-    const shouldShowSuffix = currentTab === 'radix' && store.showRadix && store.radixType === 'suffix';
+    const shouldShowSuffix = currentTab === 'radix' && $s.showRadix && $s.radixType === 'suffix';
 
     // 진법 접미사 추가 여부에 따라 최종 문자열 반환
     return shouldShowSuffix ? `${baseString}(${radixSuffix.value})` : baseString;
@@ -274,7 +274,7 @@
     // 메인 필드 처리
     if (props.field === 'main') {
       if (props.addon === 'radix') {
-        const convertedNumber = store.convertRadix(calc.currentNumber, Radix.Decimal, store.sourceRadix);
+        const convertedNumber = $s.convertRadix(calc.currentNumber, Radix.Decimal, $s.sourceRadix);
         return getRadixResult(convertedNumber, true);
       }
       return calc.currentNumber;
@@ -372,21 +372,21 @@
 
   // 결과 색상 선택 함수
   const getResultColor = () => {
-    if (isMainField && store.isMemoryVisible) {
+    if (isMainField && $s.isMemoryVisible) {
       return !needFieldTooltip.value ? resultColors.normalDark : resultColors.warningDark;
     }
     return !needFieldTooltip.value ? resultColors.normal : resultColors.warning;
   };
 
-  const computedCurrentTab = computed(() => store.currentTab);
+  const computedCurrentTab = computed(() => $s.currentTab);
 
   // 감시자 설정
   watch(
-    () => store.currentTab,
+    () => $s.currentTab,
     () => {
       // UI 업데이트
       if (computedCurrentTab.value === 'radix') {
-        calc.currentRadix = store.sourceRadix;
+        calc.currentRadix = $s.sourceRadix;
       } else {
         calc.currentRadix = Radix.Decimal;
       }
@@ -406,13 +406,13 @@
   const swapCurrentTabState = () => {
     switch (calc.currentTab) {
       case 'unit':
-        store.swapUnits();
+        $s.swapUnits();
         break;
       case 'currency':
-        store.swapCurrencies();
+        $s.swapCurrencies();
         break;
       case 'radix':
-        store.swapRadixes();
+        $s.swapRadixes();
         break;
     }
   };
@@ -472,8 +472,8 @@
     // 클립보드 읽기 시도
     try {
       let clipboardText = '';
-      if (window.isCapacitor) {
-        clipboardText = await AndroidInterface.getFromClipboard();
+      if ($g.isCapacitor) {
+        clipboardText = (await window.androidInterface?.getFromClipboard()) ?? '';
       } else {
         clipboardText = await navigator.clipboard.readText();
       }
@@ -489,51 +489,51 @@
 
       // 보조 필드 처리
       if (target === 'sub') {
-        if (store.currentTab === 'unit') {
+        if ($s.currentTab === 'unit') {
           // 단위 탭 스왑
-          store.swapUnits();
+          $s.swapUnits();
           // 버퍼에 붙여넣기
           calc.pasteToBuffer(clipboardText);
           // 현재 숫자 변환
           calc.currentNumber = UnitConverter.convert(
-            store.selectedCategory,
+            $s.selectedCategory,
             toBigNumber(calc.currentNumber),
-            store.sourceUnits[store.selectedCategory] ?? '',
-            store.targetUnits[store.selectedCategory] ?? '',
+            $s.sourceUnits[$s.selectedCategory] ?? '',
+            $s.targetUnits[$s.selectedCategory] ?? '',
           );
           // 단위 탭 스왑
-          store.swapUnits();
-        } else if (store.currentTab === 'currency') {
+          $s.swapUnits();
+        } else if ($s.currentTab === 'currency') {
           // 통화 탭 스왑
-          store.swapCurrencies();
+          $s.swapCurrencies();
           // 버퍼에 붙여넣기
           calc.pasteToBuffer(clipboardText);
           // 현재 숫자 변환
-          calc.currentNumber = store.currencyConverter
-            .convert(toBigNumber(calc.currentNumber), store.sourceCurrency, store.targetCurrency)
+          calc.currentNumber = $s.currencyConverter
+            .convert(toBigNumber(calc.currentNumber), $s.sourceCurrency, $s.targetCurrency)
             .toString();
           // 통화 탭 스왑
-          store.swapCurrencies();
-        } else if (store.currentTab === 'radix') {
+          $s.swapCurrencies();
+        } else if ($s.currentTab === 'radix') {
           // 진법 탭 스왑
-          store.swapRadixes();
+          $s.swapRadixes();
           // 버퍼에 붙여넣기
           setTimeout(() => {
             calc.pasteToBuffer(clipboardText.replace(/\((?:2|8|10|16)\)/g, ''));
             // 진법 탭 스왑
-            store.swapRadixes();
+            $s.swapRadixes();
           }, 10);
         }
         showMessage(t('pastedFromClipboardToSubPanel'));
       } else {
-        if (store.currentTab === 'radix') {
+        if ($s.currentTab === 'radix') {
           // 진법 탭 스왑
-          store.swapRadixes();
+          $s.swapRadixes();
           // 버퍼에 붙여넣기
           setTimeout(() => {
             calc.pasteToBuffer(clipboardText.replace(/\((?:2|8|10|16)\)/g, ''));
             // 진법 탭 스왑
-            store.swapRadixes();
+            $s.swapRadixes();
           }, 10);
         } else {
           // 버퍼에 붙여넣기
@@ -567,9 +567,9 @@
    * 입력 필드 포커스 상태에 따라 키 바인딩을 활성화/비활성화합니다.
    */
   watch(
-    () => store.inputFocused,
+    () => $s.inputFocused,
     () => {
-      if (store.inputFocused) {
+      if ($s.inputFocused) {
         keyBinding.unsubscribe();
       } else {
         keyBinding.subscribe();
@@ -643,7 +643,7 @@
           v-touch-hold.mouse="() => handlePaste(props.field as 'main' | 'sub')"
           class="self-center no-outline full-width full-height ellipsis text-right q-pt-xs noselect"
           :class="[isMainField ? 'text-h5' : '', getResultColor()]"
-          :style="`padding-top: ${store.resultPanelPadding}px;`"
+          :style="`padding-top: ${$s.resultPanelPadding}px;`"
           role="text"
           :aria-label="t('ariaLabel.result', { type: isMainField ? t('ariaLabel.main') : t('ariaLabel.sub') })"
           @click="handleCopy()"
@@ -660,11 +660,11 @@
             role="text"
             :aria-label="t('ariaLabel.value')"
           >
-            {{ isMainField && store.isMemoryVisible ? memoryValue : result }}
+            {{ isMainField && $s.isMemoryVisible ? memoryValue : result }}
           </span>
           <span v-if="currentTab === 'unit'" id="unit" role="text" :aria-label="t('ariaLabel.unit')">{{ unit }}</span>
           <span
-            v-if="currentTab === 'radix' && store.showRadix && store.radixType === 'suffix'"
+            v-if="currentTab === 'radix' && $s.showRadix && $s.radixType === 'suffix'"
             id="radixSuffix"
             role="text"
             :aria-label="t('ariaLabel.radixSuffix')"

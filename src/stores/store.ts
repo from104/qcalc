@@ -30,7 +30,11 @@ import { DECIMAL_PLACES } from '../types/store.d';
 import { numberGrouping, formatDecimalPlaces } from '../classes/utils/NumberUtils';
 import { showMessage } from '../classes/utils/NotificationUtils';
 
+// 전역 객체 가져오기
 const radixConverter = new RadixConverter();
+
+// 전역 window 객체에 접근하기 위한 상수 선언
+// const $g = globalThis.window.globalVars;
 
 // 기본 스토어 정의
 export const useStore = defineStore('store', {
@@ -507,10 +511,11 @@ export const useStore = defineStore('store', {
 
     // 넓은 너비 여부 확인
     isWideWidth() {
-      if (window.isTablet) {
+      const $g = globalThis.window.globalVars;
+      if ($g.isTablet) {
         // 태블릿은 가로 모드만 지원
         return this.isLandscape();
-      } else if (window.isPhone) {
+      } else if ($g.isPhone) {
         // 폰은 넓은 너비 지원 안함
         return false;
       } else {

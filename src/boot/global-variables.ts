@@ -60,12 +60,12 @@ export default defineBoot(() => {
   };
 
   // Capacitor 환경에서 자바스크립트 인터페이스 추가
-  if (Platform.is.capacitor) {
-    globalVars.isTablet = window.androidInterface?.isTablet() ?? false;
-    globalVars.isPhone = window.androidInterface?.isPhone() ?? false;
-    globalVars.isFoldable = window.androidInterface?.isFoldable() ?? false;
-    globalVars.textZoom = window.androidInterface?.getTextZoom() ?? 100;
-  }
+  // if (Platform.is.capacitor) {
+  globalVars.isTablet = window.androidInterface?.isTablet() ?? false;
+  globalVars.isPhone = window.androidInterface?.isPhone() ?? false;
+  globalVars.isFoldable = window.androidInterface?.isFoldable() ?? false;
+  globalVars.textZoom = window.androidInterface?.getTextZoom() ?? 100;
+  // }
 
   // window.globalVars로 전역 변수 설정
   defineImmutableProperty(window, 'globalVars', globalVars);

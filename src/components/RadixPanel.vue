@@ -20,12 +20,14 @@
   import { Radix } from 'classes/RadixConverter';
 
   // 스토어 관련
-  // 스토어 관련
-  import { useStore } from 'src/stores/store';
-  // 스토어 인스턴스 초기화
-  const store = useStore();
+  // 전역 window 객체에 접근하기 위한 상수 선언
+  const $g = window.globalVars;
+
+  // 스토어 인스턴스 생성
+  const $s = $g.store;
+
   // 스토어에서 필요한 메서드 추출
-  const { swapRadixes, initRecentRadix, clickButtonById, setInputBlurred, calc } = store;
+  const { swapRadixes, initRecentRadix, clickButtonById, setInputBlurred, calc } = $s;
 
   // 컴포넌트 import
   import ToolTip from 'src/components/snippets/ToolTip.vue';
@@ -34,7 +36,7 @@
   initRecentRadix();
 
   // 언어 변경 시 비트 표시 업데이트
-  watch([() => store.locale], () => {
+  watch([() => $s.locale], () => {
     wordSizeOptions.values.forEach((option, index) => {
       const value = index === 0 ? '∞' : option.value.toString();
       option.label = `${value} ${t('bit')}`;
@@ -44,15 +46,15 @@
   // 키 바인딩 설정
   const keyBinding = new KeyBinding([
     [['Alt+w'], () => clickButtonById('btn-swap-radix')],
-    [['Alt+y'], () => store.toggleShowRadix()],
-    [['Alt+u'], () => store.setRadixType(store.radixType == 'prefix' ? 'suffix' : 'prefix')],
+    [['Alt+y'], () => $s.toggleShowRadix()],
+    [['Alt+u'], () => $s.setRadixType($s.radixType == 'prefix' ? 'suffix' : 'prefix')],
   ]);
 
   // 입력 포커스에 따른 키 바인딩 활성화/비활성화
   watch(
-    () => store.inputFocused,
+    () => $s.inputFocused,
     () => {
-      if (store.inputFocused) {
+      if ($s.inputFocused) {
         keyBinding.unsubscribe();
       } else {
         keyBinding.subscribe();
@@ -62,7 +64,7 @@
 
   onMounted(() => {
     initRecentRadix();
-    store.updateWordSize(store.wordSize);
+    $s.updateWordSize($s.wordSize);
     keyBinding.subscribe();
   });
 
@@ -113,8 +115,8 @@
   });
 
   watch(
-    () => store.sourceRadix,
-    () => (calc.currentRadix = store.sourceRadix),
+    () => $s.sourceRadix,
+    () => (calc.currentRadix = $s.sourceRadix),
   );
 
   // 단순화된 컴퓨티드 속성
@@ -132,7 +134,7 @@
   <q-card-section v-auto-blur class="row q-px-sm q-pt-none q-pb-sm">
     <!-- 워드사이즈 선택 -->
     <q-select
-      v-model="store.wordSize"
+      v-model="$s.wordSize"
       :options="wordSizeOptions.values"
       role="combobox"
       :aria-label="t('ariaLabel.wordSize')"
@@ -145,11 +147,11 @@
       behavior="menu"
       class="col-3 q-pa-none shadow-2"
       :label="t('radixLabel.wordSize')"
-      :label-color="!store.isDarkMode() ? 'primary' : 'grey-1'"
-      :class="!store.isDarkMode() ? 'bg-blue-grey-2' : 'bg-blue-grey-6'"
-      :popup-content-class="[!store.isDarkMode() ? 'bg-blue-grey-2' : 'bg-blue-grey-6', 'scrollbar-custom', 'q-select-popup'].join(' ')"
-      :options-selected-class="!store.isDarkMode() ? 'text-primary' : 'text-grey-1'"
-      @update:model-value="store.updateWordSize($event)"
+      :label-color="!$s.isDarkMode() ? 'primary' : 'grey-1'"
+      :class="!$s.isDarkMode() ? 'bg-blue-grey-2' : 'bg-blue-grey-6'"
+      :popup-content-class="[!$s.isDarkMode() ? 'bg-blue-grey-2' : 'bg-blue-grey-6', 'scrollbar-custom', 'q-select-popup'].join(' ')"
+      :options-selected-class="!$s.isDarkMode() ? 'text-primary' : 'text-grey-1'"
+      @update:model-value="$s.updateWordSize($event)"
     />
 
     <!-- 원본 방향 -->
@@ -157,7 +159,7 @@
 
     <!-- 원본 진법 -->
     <q-select
-      v-model="store.sourceRadix"
+      v-model="$s.sourceRadix"
       :options="sourceSelectOptions"
       role="combobox"
       :aria-label="t('ariaLabel.sourceRadix')"
@@ -170,10 +172,10 @@
       behavior="menu"
       class="col-3 q-pl-xs-sm shadow-2"
       :label="t('radixLabel.main')"
-      :label-color="!store.isDarkMode() ? 'primary' : 'grey-1'"
-      :options-selected-class="!store.isDarkMode() ? 'text-primary' : 'text-grey-1'"
-      :popup-content-class="[!store.isDarkMode() ? 'bg-blue-grey-2' : 'bg-blue-grey-6', 'scrollbar-custom', 'q-select-popup'].join(' ')"
-      :class="!store.isDarkMode() ? 'bg-blue-grey-2' : 'bg-blue-grey-6'"
+      :label-color="!$s.isDarkMode() ? 'primary' : 'grey-1'"
+      :options-selected-class="!$s.isDarkMode() ? 'text-primary' : 'text-grey-1'"
+      :popup-content-class="[!$s.isDarkMode() ? 'bg-blue-grey-2' : 'bg-blue-grey-6', 'scrollbar-custom', 'q-select-popup'].join(' ')"
+      :class="!$s.isDarkMode() ? 'bg-blue-grey-2' : 'bg-blue-grey-6'"
     />
 
     <!-- 원본, 대상 진법 바꾸기 버튼 -->
@@ -195,7 +197,7 @@
 
     <!-- 대상 진법 -->
     <q-select
-      v-model="store.targetRadix"
+      v-model="$s.targetRadix"
       :options="targetSelectOptions"
       role="combobox"
       :aria-label="t('ariaLabel.targetRadix')"
@@ -208,10 +210,10 @@
       behavior="menu"
       class="col-3 q-pl-xs-sm shadow-2"
       :label="t('radixLabel.sub')"
-      :label-color="!store.isDarkMode() ? 'primary' : 'grey-1'"
-      :class="!store.isDarkMode() ? 'bg-blue-grey-2' : 'bg-blue-grey-6'"
-      :popup-content-class="[!store.isDarkMode() ? 'bg-blue-grey-2' : 'bg-blue-grey-6', 'scrollbar-custom', 'q-select-popup'].join(' ')"
-      :options-selected-class="!store.isDarkMode() ? 'text-primary' : 'text-grey-1'"
+      :label-color="!$s.isDarkMode() ? 'primary' : 'grey-1'"
+      :class="!$s.isDarkMode() ? 'bg-blue-grey-2' : 'bg-blue-grey-6'"
+      :popup-content-class="[!$s.isDarkMode() ? 'bg-blue-grey-2' : 'bg-blue-grey-6', 'scrollbar-custom', 'q-select-popup'].join(' ')"
+      :options-selected-class="!$s.isDarkMode() ? 'text-primary' : 'text-grey-1'"
     />
 
     <!-- 대상 방향 -->

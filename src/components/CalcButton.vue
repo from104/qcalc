@@ -12,10 +12,10 @@
   import { onMounted, onBeforeUnmount, ref, watch, reactive, computed } from 'vue';
 
   // 전역 window 객체에 접근하기 위한 상수 선언
-  const window = globalThis.window;
+  const $g = window.globalVars;
 
   // 스토어 인스턴스 생성
-  const store = window.store;
+  const $s = $g.store;
 
   // i18n 설정
   import { useI18n } from 'vue-i18n';
@@ -56,17 +56,17 @@
     toggleShiftLock,
     convertRadix,
     clickButtonById,
-  } = store;
+  } = $s;
 
   // 햅틱 피드백 함수
   const hapticFeedbackLight = async () => {
-    if (window.isCapacitor && store.hapticsMode) {
+    if ($g.isCapacitor && $s.hapticsMode) {
       await Haptics.impact({ style: ImpactStyle.Light });
     }
   };
 
   const hapticFeedbackMedium = async () => {
-    if (window.isCapacitor && store.hapticsMode) {
+    if ($g.isCapacitor && $s.hapticsMode) {
       await Haptics.impact({ style: ImpactStyle.Medium });
     }
   };
@@ -104,7 +104,7 @@
 
   // mainRadix의 변경을 감지하는 computed 속성 추가
   const currentRadixBase = computed(() => {
-    const radixKey = store.sourceRadix as Radix;
+    const radixKey = $s.sourceRadix as Radix;
     return (
       ({ [Radix.Binary]: 2, [Radix.Octal]: 8, [Radix.Decimal]: 10, [Radix.Hexadecimal]: 16 } as Record<Radix, number>)[
         radixKey
@@ -184,7 +184,7 @@
 
   // 추가 기능 툴팁 표시 함수
   const displayActionTooltip = (id: ButtonID) => {
-    if (tooltipTimers[id] || id === shiftButtonId.value || (!store.showButtonAddedLabel && store.isShiftPressed))
+    if (tooltipTimers[id] || id === shiftButtonId.value || (!$s.showButtonAddedLabel && $s.isShiftPressed))
       return;
     tooltipTimers[id] = true;
     setTimeout(() => {
@@ -195,10 +195,10 @@
   // 버튼 시프트 상태에 따른 기능 실행
   const handleShiftFunction = (id: ButtonID) => {
     const isShiftButton = id === shiftButtonId.value;
-    const isDisabled = store.isShiftPressed
+    const isDisabled = $s.isShiftPressed
       ? (extendedFunctionSet.value[id]?.isDisabled ?? false)
       : (activeButtonSet.value[id]?.isDisabled ?? false);
-    const action = store.isShiftPressed ? extendedFunctionSet.value[id]?.action : activeButtonSet.value[id]?.action;
+    const action = $s.isShiftPressed ? extendedFunctionSet.value[id]?.action : activeButtonSet.value[id]?.action;
 
     if (isShiftButton) {
       toggleShift();
@@ -213,10 +213,10 @@
 
     executeActionWithErrorHandling(action as () => void);
 
-    if (store.isShiftPressed) {
+    if ($s.isShiftPressed) {
       displayActionTooltip(id);
       displayButtonNotification(id);
-      if (!store.isShiftLocked) disableShift();
+      if (!$s.isShiftLocked) disableShift();
     }
   };
 
@@ -224,8 +224,8 @@
   const handleLongPress = (id: ButtonID) => {
     hapticFeedbackMedium();
     const isShiftButton = id === shiftButtonId.value;
-    const isShiftActive = store.isShiftPressed;
-    const isShiftLocked = store.isShiftLocked;
+    const isShiftActive = $s.isShiftPressed;
+    const isShiftLocked = $s.isShiftLocked;
     if (isShiftButton) {
       if (isShiftLocked) {
         disableShiftLock();
@@ -299,7 +299,7 @@
 
   // 입력 포커스 상태에 따른 키 바인딩 관리
   watch(
-    () => store.inputFocused,
+    () => $s.inputFocused,
     (focused) => {
       if (focused) {
         keyBinding.unsubscribe();
@@ -311,12 +311,12 @@
   );
 
   // resize 이벤트를 처리하기 위한 ref 생성
-  const screenWidth = ref(store.isWideWidth() ? window.innerWidth / 2 : window.innerWidth);
+  const screenWidth = ref($s.isWideWidth() ? window.innerWidth / 2 : window.innerWidth);
   const screenHeight = ref(window.innerHeight);
 
   // resize 이벤트 핸들러
   const handleResize = () => {
-    screenWidth.value = store.isWideWidth() ? window.innerWidth / 2 : window.innerWidth;
+    screenWidth.value = $s.isWideWidth() ? window.innerWidth / 2 : window.innerWidth;
     screenHeight.value = window.innerHeight;
   };
 
@@ -366,7 +366,7 @@
   };
 
   // const baseWidth = computed(() => {
-  //   return store.isWideWidth() ? '50vw' : '100vw';
+  //   return $s.isWideWidth() ? '50vw' : '100vw';
   // });
 
   // 버튼의 aria-label 설정
@@ -389,9 +389,9 @@
   };
 
   const labelScalingFactor = computed(() => {
-    if (window.isCapacitor) {
+    if ($g.isCapacitor) {
       // console.log('window.textZoom: ', window.textZoom);
-      return window.textZoom / 100;
+      return $g.textZoom / 100;
     }
     // screenWidth ref를 사용하여 화면 너비 계산
     const screenWidthPx = screenWidth.value;
@@ -409,7 +409,7 @@
   });
 
   const labelSizeAdjustmentRatio = computed(() => {
-    return window.isCapacitor ? 1 / labelScalingFactor.value : 1;
+    return $g.isCapacitor ? 1 / labelScalingFactor.value : 1;
   });
 </script>
 
@@ -423,45 +423,45 @@
         no-caps
         push
         :label="
-          store.isShiftPressed && !store.showButtonAddedLabel && id !== shiftButtonId
+          $s.isShiftPressed && !$s.showButtonAddedLabel && id !== shiftButtonId
             ? (extendedFunctionSet[id]?.label ?? '')
             : button.label.charAt(0) === '@'
               ? undefined
               : button.label
         "
         :icon="
-          store.isShiftPressed && !store.showButtonAddedLabel && id !== shiftButtonId
+          $s.isShiftPressed && !$s.showButtonAddedLabel && id !== shiftButtonId
             ? undefined
             : button.label.charAt(0) === '@'
               ? button.label.slice(1)
               : undefined
         "
         :class="[
-          store.isShiftPressed && !store.showButtonAddedLabel && id !== shiftButtonId
+          $s.isShiftPressed && !$s.showButtonAddedLabel && id !== shiftButtonId
             ? 'char'
             : button.label.charAt(0) === '@'
               ? 'icon'
               : 'char',
-          id === shiftButtonId && store.isShiftPressed ? 'button-shift' : '',
-          store.isShiftPressed && !store.showButtonAddedLabel && !(extendedFunctionSet[id]?.isDisabled ?? false)
+          id === shiftButtonId && $s.isShiftPressed ? 'button-shift' : '',
+          $s.isShiftPressed && !$s.showButtonAddedLabel && !(extendedFunctionSet[id]?.isDisabled ?? false)
             ? ''
-            : (button.isDisabled ?? false) || store.isShiftPressed
+            : (button.isDisabled ?? false) || $s.isShiftPressed
               ? 'disabled-button'
               : '',
         ]"
-        :style="[!store.showButtonAddedLabel || !(extendedFunctionSet[id]?.label ?? '') ? { paddingTop: '4px' } : {}]"
+        :style="[!$s.showButtonAddedLabel || !(extendedFunctionSet[id]?.label ?? '') ? { paddingTop: '4px' } : {}]"
         :color="`btn-${button.color}`"
         :aria-label="getAriaLabel(id, button)"
         @click="() => (button.isDisabled ? displayDisabledButtonNotification() : handleShiftFunction(id))"
         @touchstart="() => hapticFeedbackLight()"
       >
         <span
-          v-if="store.showButtonAddedLabel && extendedFunctionSet[id]"
+          v-if="$s.showButtonAddedLabel && extendedFunctionSet[id]"
           class="top-label"
           :class="[
             `top-label-${button.label.charAt(0) === '@' ? 'icon' : 'char'}`,
             extendedFunctionSet[id].isDisabled ? 'disabled-button-added-label' : '',
-            store.isShiftPressed && !extendedFunctionSet[id].isDisabled ? 'shifted-button-added-label' : '',
+            $s.isShiftPressed && !extendedFunctionSet[id].isDisabled ? 'shifted-button-added-label' : '',
           ]"
         >
           {{ extendedFunctionSet[id].label }}
@@ -481,7 +481,7 @@
         </q-tooltip>
         <ToolTip>
           {{
-            store.isShiftPressed
+            $s.isShiftPressed
               ? (extendedFunctionSet[id]?.isDisabled ?? false)
                 ? t('disabledButton')
                 : getTooltipsOfKeys(id, true)

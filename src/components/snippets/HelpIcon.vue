@@ -45,12 +45,12 @@
     lineBreak: true,
   });
 
-  const window = globalThis.window;
+  const $g = window.globalVars;
   const showTooltip = ref(false);
   let tooltipTimer: ReturnType<typeof setTimeout> | null = null;
 
   const handleTooltipTrigger = () => {
-    if (window.isMobile) {
+    if ($g.isMobile) {
       showTooltip.value = true;
 
       // 이전 타이머가 있다면 제거
@@ -69,12 +69,12 @@
 <template>
   <q-icon name="help_outline" :size="size" class="cursor-pointer" @click="handleTooltipTrigger">
     <ToolTip
-      v-if="!window.isMobile || (window.isMobile && showTooltip)"
-      :model-value="window.isMobile ? showTooltip : null"
+      v-if="!$g.isMobile || ($g.isMobile && showTooltip)"
+      :model-value="$g.isMobile ? showTooltip : null"
       :text="text ?? ''"
       :text-color="textColor ?? 'green-10'"
       :bg-color="bgColor ?? 'green-2'"
-      :delay="window.isMobile ? 0 : delay ?? 500"
+      :delay="$g.isMobile ? 0 : delay ?? 500"
       :line-break="lineBreak ?? true"
     >
       <slot />

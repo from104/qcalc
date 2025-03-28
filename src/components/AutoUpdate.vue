@@ -10,10 +10,10 @@
   import { showError, showMessage } from 'src/classes/utils/NotificationUtils';
 
   // 전역 window 객체에 접근하기 위한 상수 선언
-  const window = globalThis.window;
+  const $g = window.globalVars;
 
   // 스토어 인스턴스 생성
-  const store = window.store;
+  const $s = $g.store;
 
   // i18n 설정
   const { t } = useI18n();
@@ -33,7 +33,7 @@
     info?: UpdateInfo | UpdateProgressInfo | UpdateError,
   ) => {
     // 자동 업데이트가 비활성화되어 있으면 패스
-    if (!store.autoUpdate) {
+    if (!$s.autoUpdate) {
       // 새 패키지 버전
       if (status === 'available' && 'version' in (info || {})) {
         const newVersion = (info as UpdateInfo).version;
@@ -74,7 +74,7 @@
    * 업데이트를 시작하는 함수입니다.
    */
   const startUpdate = () => {
-    if (window.isDev) {
+    if ($g.isDev) {
       // 개발 모드에서는 진행 상태를 시뮬레이션
       let progress = 0;
       const interval = setInterval(() => {
@@ -100,7 +100,7 @@
    * 업데이트를 설치하는 함수입니다.
    */
   const installUpdate = () => {
-    if (window.isDev) {
+    if ($g.isDev) {
       // 개발 모드에서는 재시작 확인 다이얼로그 표시
       // console.log('개발 모드: 앱 재시작 시뮬레이션');
       updateDialog.value = false;
@@ -148,7 +148,7 @@
    * 테스트 업데이트를 시작하는 함수입니다.
    */
   const testUpdate = () => {
-    if (window.isDev) {
+    if ($g.isDev) {
       handleUpdateStatus('available', testUpdateInfo);
     } else {
       window.electronUpdater.testUpdate();
@@ -158,11 +158,11 @@
   // 컴포넌트가 마운트될 때 실행
   onMounted(() => {
     // Electron 환경에서만 업데이트 리스너 등록
-    if (window.isElectron && !window.isSnap) {
+    if ($g.isElectron && !$g.isSnap) {
       window.electronUpdater.onUpdateStatus(handleUpdateStatus);
 
       // 개발 모드가 아닐 때만 업데이트 확인
-      if (!window.isDev) {
+      if (!$g.isDev) {
         window.electronUpdater.checkForUpdates();
       }
     }
@@ -171,7 +171,7 @@
   // 컴포넌트가 언마운트될 때 실행
   onUnmounted(() => {
     // Electron 환경에서만 리스너 제거
-    if (window.isElectron && !window.isSnap) {
+    if ($g.isElectron && !$g.isSnap) {
       window.electronUpdater.removeUpdateStatusListener();
     }
   });
@@ -179,7 +179,7 @@
 
 <template>
   <!-- Electron 환경에서만 업데이트 관련 UI 표시 -->
-  <template v-if="window.isElectron && !window.isSnap">
+  <template v-if="$g.isElectron && !$g.isSnap">
     <q-dialog v-model="updateDialog" persistent>
       <q-card style="min-width: 350px; margin-top: 25px">
         <q-card-section>
@@ -212,14 +212,14 @@
               flat
               :label="t('later')"
               color="primary"
-              :text-color="store.isDarkMode() ? 'blue-grey-2' : 'primary'"
+              :text-color="$s.isDarkMode() ? 'blue-grey-2' : 'primary'"
               class="q-mr-sm"
             />
             <q-btn
               flat
               :label="t('update')"
               color="primary"
-              :text-color="store.isDarkMode() ? 'blue-grey-2' : 'primary'"
+              :text-color="$s.isDarkMode() ? 'blue-grey-2' : 'primary'"
               @click="startUpdate"
             />
           </template>
@@ -229,14 +229,14 @@
               flat
               :label="t('later')"
               color="primary"
-              :text-color="store.isDarkMode() ? 'blue-grey-2' : 'primary'"
+              :text-color="$s.isDarkMode() ? 'blue-grey-2' : 'primary'"
               class="q-mr-sm"
             />
             <q-btn
               flat
               :label="t('installNow')"
               color="primary"
-              :text-color="store.isDarkMode() ? 'blue-grey-2' : 'primary'"
+              :text-color="$s.isDarkMode() ? 'blue-grey-2' : 'primary'"
               @click="installUpdate"
             />
           </template>
@@ -246,7 +246,7 @@
               flat
               :label="t('close')"
               color="primary"
-              :text-color="store.isDarkMode() ? 'blue-grey-2' : 'primary'"
+              :text-color="$s.isDarkMode() ? 'blue-grey-2' : 'primary'"
             />
           </template>
         </q-card-actions>
@@ -254,7 +254,7 @@
     </q-dialog>
     <!-- 개발 환경에서만 표시되는 테스트 버튼 -->
     <q-btn
-      v-if="window.isDev"
+      v-if="$g.isDev"
       class="fixed-bottom-right q-ma-md"
       color="primary"
       icon="refresh"

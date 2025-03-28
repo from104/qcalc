@@ -20,10 +20,10 @@
   import { KeyBinding } from 'classes/KeyBinding';
 
   // 전역 window 객체에 접근하기 위한 상수 선언
-  const window = globalThis.window;
+  const $g = window.globalVars;
 
   // 스토어 인스턴스 생성
-  const store = window.store;
+  const $s = $g.store;
 
   // 스토어에서 필요한 메서드 추출
   const {
@@ -35,7 +35,7 @@
     setInputBlurred,
     setInputFocused,
     blurElement,
-  } = store;
+  } = $s;
 
   // 컴포넌트 import
   import ToolTip from 'src/components/snippets/ToolTip.vue';
@@ -43,7 +43,7 @@
   // 키 바인딩 설정
   const keyBinding = new KeyBinding([
     [['Alt+w'], () => clickButtonById('btn-swap-currency')],
-    [['Alt+y'], () => store.toggleShowSymbol()],
+    [['Alt+y'], () => $s.toggleShowSymbol()],
   ]);
 
   // 단위 초기화
@@ -63,7 +63,7 @@
   );
 
   // 언어 변경 시 통화 이름 업데이트
-  watch([() => store.locale], () => {
+  watch([() => $s.locale], () => {
     currencyConverter.getCurrencyLists().forEach((currency: string) => {
       currencyDescriptions[currency] = t(`currencyDesc.${currency}`);
     });
@@ -71,9 +71,9 @@
 
   // 입력 포커스에 따른 키 바인딩 활성화/비활성화
   watch(
-    () => store.inputFocused,
+    () => $s.inputFocused,
     () => {
-      if (store.inputFocused) {
+      if ($s.inputFocused) {
         keyBinding.unsubscribe();
       } else {
         keyBinding.subscribe();
@@ -142,8 +142,8 @@
 
   // 통화 옵션 업데이트
   watch(
-    () => store.sourceCurrency,
-    () => currencyConverter.setBase(store.sourceCurrency),
+    () => $s.sourceCurrency,
+    () => currencyConverter.setBase($s.sourceCurrency),
   );
 
   // 통화 선택 필터 함수 생성
@@ -180,10 +180,10 @@
   // let originalValue: string | null = null;
 
   const handleCurrencySwap = () => {
-    if (store.sourceCurrency !== store.targetCurrency) {
+    if ($s.sourceCurrency !== $s.targetCurrency) {
       // 첫 번째 변환 수행
       swapCurrencies();
-      calc.currentNumber = store.convertedCurrencyNumber;
+      calc.currentNumber = $s.convertedCurrencyNumber;
       calc.needsBufferReset = true;
     }
   };
@@ -196,9 +196,9 @@
 
     <!-- 원본 통화 -->
     <q-select
-      v-model="store.sourceCurrency"
+      v-model="$s.sourceCurrency"
       :options="filteredSourceCurrencyOptions"
-      :label="currencyDescriptions[store.sourceCurrency]"
+      :label="currencyDescriptions[$s.sourceCurrency]"
       role="combobox"
       :aria-label="t('ariaLabel.sourceCurrency')"
       stack-label
@@ -212,17 +212,17 @@
       hide-selected
       behavior="menu"
       class="col-4 q-pl-sm shadow-2"
-      :class="!store.isDarkMode() ? 'bg-blue-grey-2' : 'bg-blue-grey-6'"
-      :label-color="!store.isDarkMode() ? 'primary' : 'grey-1'"
+      :class="!$s.isDarkMode() ? 'bg-blue-grey-2' : 'bg-blue-grey-6'"
+      :label-color="!$s.isDarkMode() ? 'primary' : 'grey-1'"
       :popup-content-class="
         [
-          !store.isDarkMode() ? 'bg-blue-grey-2' : 'bg-blue-grey-6',
+          !$s.isDarkMode() ? 'bg-blue-grey-2' : 'bg-blue-grey-6',
           'scrollbar-custom',
           'q-select-popup',
-          window.isMobile ? 'popup-mobile' : '',
+          $g.isMobile ? 'popup-mobile' : '',
         ].join(' ')
       "
-      :options-selected-class="!store.isDarkMode() ? 'text-primary' : 'text-grey-1'"
+      :options-selected-class="!$s.isDarkMode() ? 'text-primary' : 'text-grey-1'"
       @filter="sourceFilterFn"
       @focus="setInputFocused()"
       @blur="setInputBlurred()"
@@ -239,7 +239,7 @@
       </template>
       <ToolTip>
         <div class="text-left" style="white-space: pre-wrap">
-          {{ `${currencyDescriptions[store.sourceCurrency]}\n${store.sourceCurrency}` }}
+          {{ `${currencyDescriptions[$s.sourceCurrency]}\n${$s.sourceCurrency}` }}
         </div>
       </ToolTip>
     </q-select>
@@ -263,9 +263,9 @@
 
     <!-- 대상 통화 -->
     <q-select
-      v-model="store.targetCurrency"
+      v-model="$s.targetCurrency"
       :options="filteredTargetCurrencyOptions"
-      :label="currencyDescriptions[store.targetCurrency]"
+      :label="currencyDescriptions[$s.targetCurrency]"
       role="combobox"
       :aria-label="t('ariaLabel.targetCurrency')"
       stack-label
@@ -279,17 +279,17 @@
       hide-selected
       behavior="menu"
       class="col-4 q-pl-sm shadow-2"
-      :class="!store.isDarkMode() ? 'bg-blue-grey-2' : 'bg-blue-grey-6'"
-      :label-color="!store.isDarkMode() ? 'primary' : 'grey-1'"
+      :class="!$s.isDarkMode() ? 'bg-blue-grey-2' : 'bg-blue-grey-6'"
+      :label-color="!$s.isDarkMode() ? 'primary' : 'grey-1'"
       :popup-content-class="
         [
-          !store.isDarkMode() ? 'bg-blue-grey-2' : 'bg-blue-grey-6',
+          !$s.isDarkMode() ? 'bg-blue-grey-2' : 'bg-blue-grey-6',
           'scrollbar-custom',
           'q-select-popup',
-          window.isMobile ? 'popup-mobile' : '',
+          $g.isMobile ? 'popup-mobile' : '',
         ].join(' ')
       "
-      :options-selected-class="!store.isDarkMode() ? 'text-primary' : 'text-grey-1'"
+      :options-selected-class="!$s.isDarkMode() ? 'text-primary' : 'text-grey-1'"
       @filter="targetFilterFn"
       @keyup.enter="blurElement()"
       @update:model-value="blurElement()"
@@ -309,7 +309,7 @@
       <ToolTip>
         <div class="text-left" style="white-space: pre-wrap">
           {{
-            `${currencyDescriptions[store.targetCurrency]}\n${store.targetCurrency}, ${currencyConverter.getRate(store.targetCurrency).toFixed(4)}`
+            `${currencyDescriptions[$s.targetCurrency]}\n${$s.targetCurrency}, ${currencyConverter.getRate($s.targetCurrency).toFixed(4)}`
           }}
         </div>
       </ToolTip>

@@ -41,8 +41,8 @@
   const { t } = useI18n();
 
   // === 전역 객체 및 인스턴스 초기화 ===
-  const globalVars = globalThis.window.globalVars;
-  const store = globalVars.store;
+  const $g = window.globalVars;
+  const $s = $g.store;
 
   // === 메타데이터 설정 ===
   /**
@@ -85,7 +85,7 @@
    * 기록 삭제 버튼의 비활성화 상태를 계산합니다.
    */
   const isRecordDisabled = computed(() => {
-    return store.calc.record.getAllRecords().length === 0 || store.isDeleteRecordConfirmOpen;
+    return $s.calc.record.getAllRecords().length === 0 || $s.isDeleteRecordConfirmOpen;
   });
 
   /**
@@ -110,7 +110,7 @@
           icon: 'search',
           disabled: computed(() => false),
           action: () => {
-            store.isSearchOpen = !store.isSearchOpen;
+            $s.isSearchOpen = !$s.isSearchOpen;
           },
           tooltip: computed(() => t('tooltip.search')),
         },
@@ -118,7 +118,7 @@
           icon: 'delete_outline',
           disabled: isRecordDisabled,
           action: () => {
-            store.isDeleteRecordConfirmOpen = true;
+            $s.isDeleteRecordConfirmOpen = true;
           },
           tooltip: computed(() => t('tooltip.deleteRecord')),
         },
@@ -134,7 +134,7 @@
   // === 상태 관리 ===
   const currentSubPage = ref('record');
   const previousSubPage = ref('record');
-  const isWideLayout = computed(() => store.isWideWidth());
+  const isWideLayout = computed(() => $s.isWideWidth());
   const leftDrawerOpen = ref(false);
 
   // === 유틸리티 함수 ===
@@ -159,7 +159,7 @@
    */
   const isSubPage = computed(() => {
     return Object.keys(SUB_PAGE_CONFIG)
-      .filter((key) => !store.isWideWidth() || key !== 'record')
+      .filter((key) => !$s.isWideWidth() || key !== 'record')
       .includes(String(route.name));
   });
 
@@ -167,15 +167,15 @@
    * 탭 이동 관련 함수들
    */
   const moveTabRight = () => {
-    const currentIndex = tabs.findIndex((tab) => tab.name === store.currentTab);
+    const currentIndex = tabs.findIndex((tab) => tab.name === $s.currentTab);
     const nextTab = tabs[(currentIndex + 1) % tabs.length]?.name;
-    if (nextTab) store.setCurrentTab(nextTab);
+    if (nextTab) $s.setCurrentTab(nextTab);
   };
 
   const moveTabLeft = () => {
-    const currentIndex = tabs.findIndex((tab) => tab.name === store.currentTab);
+    const currentIndex = tabs.findIndex((tab) => tab.name === $s.currentTab);
     const prevTab = tabs[(currentIndex - 1 + tabs.length) % tabs.length]?.name;
-    if (prevTab) store.setCurrentTab(prevTab);
+    if (prevTab) $s.setCurrentTab(prevTab);
   };
 
   /**
@@ -183,7 +183,7 @@
    */
   const closeSubPage = () => {
     if (isSubPage.value) {
-      if (store.isWideWidth()) {
+      if ($s.isWideWidth()) {
         switchSubPage('record');
       } else {
         router.back();
@@ -203,17 +203,17 @@
    * 전역 키보드 단축키를 설정합니다.
    */
   const keyBinding = new KeyBinding([
-    [['Control+1'], () => store.setCurrentTab('calc')],
-    [['Control+2'], () => store.setCurrentTab('unit')],
-    [['Control+3'], () => store.setCurrentTab('currency')],
-    [['Control+4'], () => store.setCurrentTab('radix')],
+    [['Control+1'], () => $s.setCurrentTab('calc')],
+    [['Control+2'], () => $s.setCurrentTab('unit')],
+    [['Control+3'], () => $s.setCurrentTab('currency')],
+    [['Control+4'], () => $s.setCurrentTab('radix')],
     [['Control+Tab', 'ArrowRight'], moveTabRight],
     [['Control+Shift+Tab', 'ArrowLeft'], moveTabLeft],
     [['F1'], () => navigateToPath('/help', route, router)],
     [['F2'], () => navigateToPath('/about', route, router)],
     [['F3'], () => navigateToPath('/settings', route, router)],
     [['F4'], () => navigateToPath('/record', route, router)],
-    [['F5'], () => (store.showTipsDialog = true)],
+    [['F5'], () => ($s.showTipsDialog = true)],
     [['Escape'], closeSubPage],
   ]);
 
@@ -229,44 +229,44 @@
     currentSubPage.value = validPages.includes(route.name as string) ? (route.name as string) : 'record';
 
     // 로케일 설정
-    if (!store.locale) {
-      store.useSystemLocale = true;
-      store.locale = navigator.language.substring(0, 2);
+    if (!$s.locale) {
+      $s.useSystemLocale = true;
+      $s.locale = navigator.language.substring(0, 2);
     }
-    if (!store.userLocale) {
-      store.userLocale = store.locale;
+    if (!$s.userLocale) {
+      $s.userLocale = $s.locale;
     }
-    locale.value = store.locale;
+    locale.value = $s.locale;
 
     // OS별 UI 최적화
-    if (globalVars.isWindows) {
-      store.resultPanelPadding = 8;
-    } else if (globalVars.isLinux) {
-      store.resultPanelPadding = 3;
+    if ($g.isWindows) {
+      $s.resultPanelPadding = 8;
+    } else if ($g.isLinux) {
+      $s.resultPanelPadding = 3;
     } else {
-      store.resultPanelPadding = 0;
+      $s.resultPanelPadding = 0;
     }
 
     // 초기 설정 적용
-    if (store.initPanel && store.calc) {
-      store.calc.reset();
+    if ($s.initPanel && $s.calc) {
+      $s.calc.reset();
     }
-    if (globalVars.isElectron) {
-      store.setAlwaysOnTop(store.alwaysOnTop);
+    if ($g.isElectron) {
+      $s.setAlwaysOnTop($s.alwaysOnTop);
     }
 
     // 다크모드 설정
     const darkModeMediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
     darkModeMediaQuery.addEventListener('change', () => {
-      if (store.darkMode === 'system') {
-        store.updateDarkMode();
+      if ($s.darkMode === 'system') {
+        $s.updateDarkMode();
       }
     });
-    store.updateDarkMode();
+    $s.updateDarkMode();
 
     // 팁 다이얼로그 초기화
-    store.showTipsDialog = store.showTips && !store.isAppStarted;
-    store.isAppStarted = true;
+    $s.showTipsDialog = $s.showTips && !$s.isAppStarted;
+    $s.isAppStarted = true;
   });
 
   /**
@@ -281,9 +281,9 @@
    */
 
   watch(
-    () => store.inputFocused,
+    () => $s.inputFocused,
     () => {
-      if (store.inputFocused) {
+      if ($s.inputFocused) {
         keyBinding.unsubscribe();
       } else {
         keyBinding.subscribe();
@@ -312,12 +312,12 @@
         show-if-above
         elevated
         :width="250"
-        :dark="store.isDarkMode()"
-        :swipe-only="globalVars.isMobile"
+        :dark="$s.isDarkMode()"
+        :swipe-only="$g.isMobile"
         behavior="mobile"
         @click="leftDrawerOpen = false"
       >
-        <q-card :class="store.isDarkMode() ? 'bg-grey-9' : 'bg-grey-3'" class="full-height menu-card">
+        <q-card :class="$s.isDarkMode() ? 'bg-grey-9' : 'bg-grey-3'" class="full-height menu-card">
           <MenuPanel />
         </q-card>
       </q-drawer>
@@ -329,7 +329,7 @@
             <ToolTip :text="t('tooltip.menu')" />
           </q-btn>
           <q-tabs
-            v-model="store.currentTab"
+            v-model="$s.currentTab"
             align="left"
             class="col-8 q-px-none"
             active-color="text-primary"
@@ -339,13 +339,13 @@
             inline-label
             outside-arrows
             mobile-arrows
-            @update:model-value="store.setCurrentTab($event)"
+            @update:model-value="$s.setCurrentTab($event)"
           >
             <q-tab v-for="tab in tabs" :key="tab.name" :label="tab.title" :name="tab.name" class="q-px-xs" dense />
           </q-tabs>
           <q-space />
           <q-btn
-            v-if="!store.isWideWidth()"
+            v-if="!$s.isWideWidth()"
             flat
             icon="mdi-history"
             class="q-ma-none q-pa-none q-pl-sm q-pr-xs"
@@ -355,7 +355,7 @@
             <ToolTip :text="t('openRecordPage')" />
           </q-btn>
           <q-btn
-            v-if="!store.isWideWidth()"
+            v-if="!$s.isWideWidth()"
             flat
             icon="settings"
             class="q-ma-none q-pa-none q-pl-xs q-pr-xs"
@@ -379,7 +379,7 @@
           />
           <q-toolbar-title class="text-subtitle1">
             {{ SUB_PAGE_CONFIG[currentSubPage as keyof typeof SUB_PAGE_CONFIG]?.title }}
-            <HelpIcon v-if="currentSubPage === 'record' && globalVars.isMobile" :text="t('tooltip.recordSwipeHelp')" />
+            <HelpIcon v-if="currentSubPage === 'record' && $g.isMobile" :text="t('tooltip.recordSwipeHelp')" />
           </q-toolbar-title>
           <q-space />
           <q-btn
@@ -403,7 +403,7 @@
       <q-page-container class="row no-padding-bottom">
         <!-- 메인 페이지 컨텐츠 -->
         <template v-if="!isSubPage">
-          <q-tab-panels v-model="store.currentTab" animated infinite :swipeable="globalVars.isMobile">
+          <q-tab-panels v-model="$s.currentTab" animated infinite :swipeable="$g.isMobile">
             <q-tab-panel v-for="(tab, index) in tabs" :key="index" :name="tab.name">
               <component :is="tab.component" />
             </q-tab-panel>
@@ -431,8 +431,8 @@
         show-if-above
         elevated
         :width="250"
-        :dark="store.isDarkMode()"
-        :swipe-only="globalVars.isMobile"
+        :dark="$s.isDarkMode()"
+        :swipe-only="$g.isMobile"
         behavior="mobile"
         @click="leftDrawerOpen = false"
       >
@@ -448,7 +448,7 @@
             <ToolTip :text="t('tooltip.menu')" />
           </q-btn>
           <q-tabs
-            v-model="store.currentTab"
+            v-model="$s.currentTab"
             align="left"
             class="col-grow"
             active-color="text-primary"
@@ -458,7 +458,7 @@
             inline-label
             role="tablist"
             :aria-label="t('ariaLabel.mainTabs')"
-            @update:model-value="store.setCurrentTab($event)"
+            @update:model-value="$s.setCurrentTab($event)"
           >
             <q-tab
               v-for="tab in tabs"
@@ -469,7 +469,7 @@
               dense
               role="tab"
               :aria-label="t('ariaLabel.tab', { name: tab.title })"
-              :aria-selected="store.currentTab === tab.name"
+              :aria-selected="$s.currentTab === tab.name"
               :aria-controls="`panel-${tab.name}`"
             />
           </q-tabs>
@@ -486,7 +486,7 @@
               >
                 {{ SUB_PAGE_CONFIG[currentSubPage]?.title }}
                 <HelpIcon
-                  v-if="(currentSubPage === 'record' || currentSubPage === '') && globalVars.isMobile"
+                  v-if="(currentSubPage === 'record' || currentSubPage === '') && $g.isMobile"
                   :text="t('tooltip.recordSwipeHelp')"
                 />
               </q-toolbar-title>
@@ -541,10 +541,10 @@
         <!-- 계산기 영역 -->
         <div class="col-6 calc-content" role="region" :aria-label="t('ariaLabel.calculatorSection')">
           <q-tab-panels
-            v-model="store.currentTab"
+            v-model="$s.currentTab"
             animated
             infinite
-            :swipeable="globalVars.isMobile"
+            :swipeable="$g.isMobile"
             role="tabpanel"
             :aria-label="t('ariaLabel.calculatorContent')"
           >
@@ -587,7 +587,7 @@
       </q-page-container>
     </q-layout>
 
-    <ShowTips v-model="store.showTipsDialog" />
+    <ShowTips v-model="$s.showTipsDialog" />
   </div>
 </template>
 

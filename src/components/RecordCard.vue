@@ -33,13 +33,13 @@
   import { showMessage, showError } from 'src/classes/utils/NotificationUtils';
 
   // 전역 window 객체에 접근하기 위한 상수 선언
-  const window = globalThis.window;
+  const $g = window.globalVars;
 
   // 스토어 인스턴스 생성
-  const store = window.store;
+  const $s = $g.store;
 
   // 스토어에서 필요한 메서드와 속성 추출
-  const { calc, getRightSideInRecord, getLeftSideInRecord, currencyConverter } = store;
+  const { calc, getRightSideInRecord, getLeftSideInRecord, currencyConverter } = $s;
 
   // 컴포넌트 import
   import MenuItem from 'components/snippets/MenuItem.vue';
@@ -139,15 +139,15 @@
   };
 
   const openDeleteRecordConfirmDialog = () => {
-    if (calc.record.getAllRecords().length > 0) store.isDeleteRecordConfirmOpen = true;
+    if (calc.record.getAllRecords().length > 0) $s.isDeleteRecordConfirmOpen = true;
   };
 
   const openSearchDialogByKey = () => {
-    store.isSearchOpen = !store.isSearchOpen;
-    if (store.isSearchOpen) {
+    $s.isSearchOpen = !$s.isSearchOpen;
+    if ($s.isSearchOpen) {
       setTimeout(() => {
         // 끝의 s 삭제
-        store.searchKeyword = store.searchKeyword.slice(0, -1);
+        $s.searchKeyword = $s.searchKeyword.slice(0, -1);
       }, 100);
     }
   };
@@ -166,9 +166,9 @@
 
   // 입력 포커스 상태에 따른 키 바인딩 활성화/비활성화
   watch(
-    () => store.inputFocused,
+    () => $s.inputFocused,
     () => {
-      if (store.inputFocused) {
+      if ($s.inputFocused) {
         keyBinding.unsubscribe();
       } else {
         keyBinding.subscribe();
@@ -181,9 +181,9 @@
   onMounted(() => {
     keyBinding.subscribe();
     setTimeout(() => {
-      document.getElementById('record')?.scrollTo({ top: store.recordLastScrollPosition });
-      if (store.isSearchOpen) {
-        store.setInputFocused();
+      document.getElementById('record')?.scrollTo({ top: $s.recordLastScrollPosition });
+      if ($s.isSearchOpen) {
+        $s.setInputFocused();
       }
     }, 50);
     showScrollToTop.value = false;
@@ -192,9 +192,9 @@
   // 컴포넌트 언마운트 시 키 바인딩 비활성화
   onBeforeUnmount(() => {
     keyBinding.unsubscribe();
-    store.recordLastScrollPosition = document.getElementById('record')?.scrollTop ?? 0;
+    $s.recordLastScrollPosition = document.getElementById('record')?.scrollTop ?? 0;
 
-    store.isDeleteRecordConfirmOpen = false;
+    $s.isDeleteRecordConfirmOpen = false;
   });
 
   // 메모 편집 관련 상태 변수
@@ -269,29 +269,29 @@
     const record = calc.record.getRecordById(id);
     calc.currentNumber = record.calculationResult.resultNumber;
     calc.offBufferReset();
-    if (!store.isWideWidth()) navigateToPath('/', route, router);
+    if (!$s.isWideWidth()) navigateToPath('/', route, router);
   };
 
   const loadToSubPanel = (id: number) => {
     const record = calc.record.getRecordById(id);
-    if (store.currentTab === 'unit') {
-      store.swapUnits();
+    if ($s.currentTab === 'unit') {
+      $s.swapUnits();
       calc.currentNumber = UnitConverter.convert(
-        store.selectedCategory,
+        $s.selectedCategory,
         toBigNumber(record.calculationResult.resultNumber),
-        store.sourceUnits[store.selectedCategory] ?? '',
-        store.targetUnits[store.selectedCategory] ?? '',
+        $s.sourceUnits[$s.selectedCategory] ?? '',
+        $s.targetUnits[$s.selectedCategory] ?? '',
       );
-      store.swapUnits();
-    } else if (store.currentTab === 'currency') {
-      store.swapCurrencies();
+      $s.swapUnits();
+    } else if ($s.currentTab === 'currency') {
+      $s.swapCurrencies();
       calc.currentNumber = currencyConverter
-        .convert(toBigNumber(record.calculationResult.resultNumber), store.sourceCurrency, store.targetCurrency)
+        .convert(toBigNumber(record.calculationResult.resultNumber), $s.sourceCurrency, $s.targetCurrency)
         .toString();
-      store.swapCurrencies();
+      $s.swapCurrencies();
     }
     calc.offBufferReset();
-    if (!store.isWideWidth()) navigateToPath('/', route, router);
+    if (!$s.isWideWidth()) navigateToPath('/', route, router);
   };
 
   // 히스토리 항목 삭제 함수
@@ -338,10 +338,10 @@
     });
 
     // 검색이 활성화되지 않은 경우 전체 결과 반환
-    if (!store.isSearchOpen) return strings;
+    if (!$s.isSearchOpen) return strings;
 
     // 검색어가 없는 경우 전체 결과 반환
-    const searchTerm = store.searchKeyword.trim().toLowerCase();
+    const searchTerm = $s.searchKeyword.trim().toLowerCase();
     if (!searchTerm) return strings;
 
     // 검색어로 필터링
@@ -358,7 +358,7 @@
 
   // 계산된 상단 여백 추가
   const calculatedTopMargin = computed(() => {
-    return store.isSearchOpen ? `${searchBarHeight.value}px` : '0px';
+    return $s.isSearchOpen ? `${searchBarHeight.value}px` : '0px';
   });
 
   interface QSlideEvent {
@@ -405,7 +405,7 @@
         color="secondary"
         icon="publish"
         class="fixed"
-        :class="store.isSearchOpen ? 'q-ma-xl' : 'q-ma-md'"
+        :class="$s.isSearchOpen ? 'q-ma-xl' : 'q-ma-md'"
         style="z-index: 15"
         :aria-label="t('ariaLabel.scrollToTop')"
         @click="scrollToTop"
@@ -415,14 +415,14 @@
     <!---검색 바 -->
     <transition name="search-bar">
       <q-bar
-        v-if="store.isSearchOpen"
+        v-if="$s.isSearchOpen"
         class="search-bar"
         :class="{
-          'input-focused': store.inputFocused,
+          'input-focused': $s.inputFocused,
         }"
       >
         <q-input
-          v-model="store.searchKeyword"
+          v-model="$s.searchKeyword"
           :placeholder="t('search')"
           borderless
           filled
@@ -431,13 +431,13 @@
           class="search-input"
           :aria-label="t('ariaLabel.searchInput')"
           role="searchbox"
-          @focus="store.setInputFocused"
-          @blur="store.setInputBlurred"
+          @focus="$s.setInputFocused"
+          @blur="$s.setInputBlurred"
           @keyup.enter="$event.target.blur()"
           @keyup.escape="
             () => {
-              store.isSearchOpen = false;
-              store.setInputBlurred();
+              $s.isSearchOpen = false;
+              $s.setInputBlurred();
             }
           "
         >
@@ -452,8 +452,8 @@
               :aria-label="t('ariaLabel.closeSearch')"
               @click="
                 () => {
-                  store.isSearchOpen = false;
-                  store.setInputBlurred();
+                  $s.isSearchOpen = false;
+                  $s.setInputBlurred();
                 }
               "
             />
@@ -469,7 +469,7 @@
         <q-item-section role="listitem">
           <q-item-label>
             <span class="text-h6">{{
-              store.isSearchOpen && store.searchKeyword.trim() !== '' ? t('noSearchResult') : t('noRecord')
+              $s.isSearchOpen && $s.searchKeyword.trim() !== '' ? t('noSearchResult') : t('noRecord')
             }}</span>
           </q-item-label>
         </q-item-section>
@@ -486,10 +486,10 @@
             @left="deleteRecordItem(record.id as number)"
             @right="(event: QSlideEvent) => slideToOpenMemoDialog(event.reset, record.id)"
           >
-            <template v-if="window.isMobile" #left>
+            <template v-if="$g.isMobile" #left>
               <q-icon name="delete_outline" :aria-label="t('ariaLabel.deleteRecord')" role="button" />
             </template>
-            <template v-if="window.isMobile" #right>
+            <template v-if="$g.isMobile" #right>
               <q-icon name="edit_note" :aria-label="t('ariaLabel.editMemo')" role="button" />
             </template>
             <q-item
@@ -501,7 +501,7 @@
                 <q-item-label v-if="record.memo" class="memo-text">
                   <HighlightText
                     :text="record.memo"
-                    :search-term="store.searchKeyword"
+                    :search-term="$s.searchKeyword"
                     @show-tooltip="(isShow) => handleMemoTooltip(record.id, isShow)"
                   />
                   <ToolTip v-if="isShowMemoTooltip[record.id]" :delay="1000">
@@ -511,7 +511,7 @@
                 <q-item-label class="record-text">
                   <HighlightText
                     :text="record.displayText"
-                    :search-term="store.searchKeyword"
+                    :search-term="$s.searchKeyword"
                     allow-line-break
                     @show-tooltip="(isShow) => handleResultTooltip(record.id, isShow)"
                   />
@@ -523,17 +523,17 @@
                   <div class="col-6 text-left record-menu-btn">
                     <q-btn
                       class="q-px-xs q-py-none menu-btn"
-                      :class="store.isDarkMode() ? 'body--dark' : 'body--light'"
+                      :class="$s.isDarkMode() ? 'body--dark' : 'body--light'"
                       icon="more_vert"
                       size="sm"
                       flat
                       rounded
-                      @click="() => window.isDesktop && openRecordMenu(record.id as number)"
+                      @click="() => $g.isDesktop && openRecordMenu(record.id as number)"
                     >
                       <q-menu
                         :model-value="recordMenu[record.id] ?? false"
                         class="shadow-6"
-                        :context-menu="window.isDesktop"
+                        :context-menu="$g.isDesktop"
                         auto-close
                         anchor="bottom left"
                         self="top left"
@@ -572,13 +572,13 @@
                             :action="() => loadToMainPanel(record.id as number)"
                           />
                           <MenuItem
-                            v-if="store.currentTab === 'unit' || store.currentTab === 'currency'"
+                            v-if="$s.currentTab === 'unit' || $s.currentTab === 'currency'"
                             :title="t('loadToSubPanel')"
                             :action="() => loadToSubPanel(record.id as number)"
                           />
-                          <MenuItem v-if="window.isDesktop" separator />
+                          <MenuItem v-if="$g.isDesktop" separator />
                           <MenuItem
-                            v-if="window.isDesktop"
+                            v-if="$g.isDesktop"
                             :title="t('deleteResult')"
                             :action="() => deleteRecordItem(record.id as number)"
                           />
@@ -586,9 +586,9 @@
                       </q-menu>
                     </q-btn>
                     <q-btn
-                      v-if="window.isDesktop"
+                      v-if="$g.isDesktop"
                       class="q-px-xs menu-btn"
-                      :class="store.isDarkMode() ? 'body--dark' : 'body--light'"
+                      :class="$s.isDarkMode() ? 'body--dark' : 'body--light'"
                       icon="edit_note"
                       size="sm"
                       flat
@@ -599,9 +599,9 @@
                   <div class="col-6 text-right text-caption record-timestamp">
                     <HighlightText
                       class="self-center"
-                      :class="store.isDarkMode() ? 'body--dark' : 'body--light'"
+                      :class="$s.isDarkMode() ? 'body--dark' : 'body--light'"
                       :text="formatDateTime(record.timestamp)"
-                      :search-term="store.searchKeyword"
+                      :search-term="$s.searchKeyword"
                     />
                   </div>
                 </q-item-label>
@@ -615,7 +615,7 @@
 
   <!-- 기록 전체 삭제 다이얼로그 -->
   <q-dialog
-    v-model="store.isDeleteRecordConfirmOpen"
+    v-model="$s.isDeleteRecordConfirmOpen"
     transition-show="scale"
     transition-hide="scale"
     style="z-index: 15"
@@ -636,8 +636,8 @@
     transition-show="slide-right"
     :transition-hide="memoSlideDirection"
     style="z-index: 15"
-    @show="store.setInputFocused"
-    @hide="store.setInputBlurred"
+    @show="$s.setInputFocused"
+    @hide="$s.setInputBlurred"
   >
     <q-card class="noselect text-center" style="width: 250px">
       <q-bar v-auto-blur dark class="full-width justify-between nnoselect text-body1 text-white bg-primary">
@@ -654,17 +654,17 @@
           autofocus
           clear-icon="close"
           color="primary"
-          @focus="store.setInputFocused"
-          @blur="store.setInputBlurred"
+          @focus="$s.setInputFocused"
+          @blur="$s.setInputBlurred"
           @keyup.enter="
             () => {
-              store.setInputBlurred;
+              $s.setInputBlurred;
               saveMemo();
             }
           "
           @keyup.escape="
             () => {
-              store.setInputBlurred;
+              $s.setInputBlurred;
               cancelMemo();
             }
           "
@@ -826,8 +826,8 @@
     @include dark-mode-fg-colors;
 
     .menu-btn {
-      opacity: v-bind('window.isMobile ? 1 : 0');
-      visibility: v-bind('window.isMobile ? "visible" : "hidden"');
+      opacity: v-bind('$g.isMobile ? 1 : 0');
+      visibility: v-bind('$g.isMobile ? "visible" : "hidden"');
       transition: all 0.3s ease-in-out;
     }
   }

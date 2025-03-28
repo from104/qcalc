@@ -22,24 +22,24 @@
   import { showMessage } from './classes/utils/NotificationUtils';
 
   // === 전역 객체 및 인스턴스 초기화 ===
-  const globalVars = globalThis.window.globalVars;
-  const store = globalVars.store;
+  const $g = globalThis.window.globalVars;
+  const $s = $g.store;
   const route = useRoute();
   const { t } = useI18n();
 
   // === 상태 관리 ===
   const isFirstNavigation = ref(true);
   const previousPath = ref(route.path);
-  const isWideLayout = ref(store.isWideWidth());
+  const isWideLayout = ref($s.isWideWidth());
   const currentTransition = ref('');
 
   /**
    * '항상 위에' 기능을 토글하고 사용자에게 알림을 표시합니다.
    */
   const toggleAlwaysOnTopWithNotification = () => {
-    if (globalVars.isElectron) {
-      store.toggleAlwaysOnTop();
-      showMessage(store.alwaysOnTop ? t('alwaysOnTopOn') : t('alwaysOnTopOff'));
+    if ($g.isElectron) {
+      $s.toggleAlwaysOnTop();
+      showMessage($s.alwaysOnTop ? t('alwaysOnTopOn') : t('alwaysOnTopOff'));
     }
   };
 
@@ -47,15 +47,15 @@
    * 다크모드를 토글하고 현재 설정 상태를 사용자에게 알립니다.
    */
   const toggleDarkModeWithNotification = () => {
-    store.toggleDarkMode();
-    showMessage(store.darkMode === 'system' ? t('darkMode.message.system') : t('darkMode.message.' + store.darkMode));
+    $s.toggleDarkMode();
+    showMessage($s.darkMode === 'system' ? t('darkMode.message.system') : t('darkMode.message.' + $s.darkMode));
   };
 
   /**
    * 앱을 종료합니다.
    */
   const quitApp = () => {
-    if (globalVars.isElectron) window.electron.quitApp();
+    if ($g.isElectron) window.electron.quitApp();
   };
 
   // === 키 바인딩 설정 ===
@@ -71,14 +71,14 @@
    */
   const keyBinding = new KeyBinding([
     [['Alt+t'], toggleAlwaysOnTopWithNotification],
-    [['Alt+i'], store.toggleInitPanel],
+    [['Alt+i'], $s.toggleInitPanel],
     [['Alt+d'], toggleDarkModeWithNotification],
-    [['Alt+p'], store.toggleHapticsMode],
-    [[';'], store.toggleButtonAddedLabel],
-    [[','], store.toggleUseGrouping],
-    [['Alt+,'], () => store.setGroupingUnit(store.groupingUnit === 3 ? 4 : 3)],
-    [['['], store.decrementDecimalPlaces],
-    [[']'], store.incrementDecimalPlaces],
+    [['Alt+p'], $s.toggleHapticsMode],
+    [[';'], $s.toggleButtonAddedLabel],
+    [[','], $s.toggleUseGrouping],
+    [['Alt+,'], () => $s.setGroupingUnit($s.groupingUnit === 3 ? 4 : 3)],
+    [['['], $s.decrementDecimalPlaces],
+    [[']'], $s.incrementDecimalPlaces],
     [['q'], quitApp],
   ]);
 
@@ -97,9 +97,9 @@
    * 입력 필드 포커스 상태에 따라 키 바인딩을 활성화/비활성화합니다.
    */
   watch(
-    () => store.inputFocused,
+    () => $s.inputFocused,
     () => {
-      if (store.inputFocused) {
+      if ($s.inputFocused) {
         keyBinding.unsubscribe();
       } else {
         keyBinding.subscribe();
@@ -112,7 +112,7 @@
    * 레이아웃 너비 변경을 감시하고 적절한 트랜지션을 설정합니다.
    */
   watch(
-    () => store.isWideWidth(),
+    () => $s.isWideWidth(),
     (newValue) => {
       if (isWideLayout.value !== newValue) {
         currentTransition.value = newValue ? 'expand-layout' : 'collapse-layout';
@@ -145,7 +145,7 @@
   const computeTransition = computed(() => currentTransition.value);
 
   onBeforeMount(async () => {
-    if (globalVars.isCapacitor && globalVars.isPhone) {
+    if ($g.isCapacitor && $g.isPhone) {
       await ScreenOrientation.lock({
         orientation: 'portrait',
       });
@@ -153,12 +153,12 @@
   });
 
   onUnmounted(async () => {
-    if (globalVars.isCapacitor && globalVars.isPhone) {
+    if ($g.isCapacitor && $g.isPhone) {
       await ScreenOrientation.unlock();
     }
   });
 
-  store.isAppStarted = false;
+  $s.isAppStarted = false;
 </script>
 
 <template>
