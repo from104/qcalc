@@ -1,7 +1,7 @@
 import { match } from 'ts-pattern';
 import { BaseConverter } from './BaseConverter';
 import { toBigNumber, MathB } from './CalculatorMath';
-import { checkError } from './utils/ErrorUtils';
+import { checkError } from '../utils/ErrorUtils';
 
 export enum Radix {
   Binary = 'bin',

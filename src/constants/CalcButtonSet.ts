@@ -11,15 +11,15 @@ import type { ComposerTranslation } from 'vue-i18n';
 
 import { toBigNumber } from 'classes/CalculatorMath';
 import { Operator } from 'classes/Calculator';
-import { useStore } from 'stores/store';
-import { showMessage } from 'src/classes/utils/NotificationUtils';
+import { showMessage } from 'src/utils/NotificationUtils';
+
+const $g = window.globalVars;
+const $s = $g.store;
 
 // ComposerTranslation 타입 사용
 export function createCalcButtonSet(t: ComposerTranslation) {
-  const store = useStore();
-
   // 스토어에서 필요한 메서드 추출
-  const { calc, showMemoryTemporarily } = store;
+  const { calc, showMemoryTemporarily } = $s;
 
   // 비트 연산 사전 처리 메서드
   const bitOperationPreprocessing = (action: () => void, isBinary: boolean = true) => {

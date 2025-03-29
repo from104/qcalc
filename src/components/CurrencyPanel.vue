@@ -19,13 +19,14 @@
   // import { toBigNumber } from 'classes/CalculatorMath';
   import { KeyBinding } from 'classes/KeyBinding';
 
-  // 전역 window 객체에 접근하기 위한 상수 선언
+  // 전역 변수 import
   const $g = window.globalVars;
-
-  // 스토어 인스턴스 생성
   const $s = $g.store;
+  
+  // 컴포넌트 import
+  import ToolTip from 'src/components/snippets/ToolTip.vue';
 
-  // 스토어에서 필요한 메서드 추출
+  // 필요한 메서드와 속성 추출
   const {
     calc,
     currencyConverter,
@@ -36,9 +37,6 @@
     setInputFocused,
     blurElement,
   } = $s;
-
-  // 컴포넌트 import
-  import ToolTip from 'src/components/snippets/ToolTip.vue';
 
   // 키 바인딩 설정
   const keyBinding = new KeyBinding([

@@ -1,7 +1,7 @@
 import { unitBaseData } from '../constants/UnitBaseData';
 import { toBigNumber } from './CalculatorMath';
 import { BaseConverter } from './BaseConverter';
-import { checkError, throwError } from './utils/ErrorUtils';
+import { checkError, throwError } from '../utils/ErrorUtils';
 
 import type { UnitBaseData } from '../constants/UnitBaseData';
 

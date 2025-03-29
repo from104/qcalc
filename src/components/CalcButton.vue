@@ -13,8 +13,6 @@
 
   // 전역 window 객체에 접근하기 위한 상수 선언
   const $g = window.globalVars;
-
-  // 스토어 인스턴스 생성
   const $s = $g.store;
 
   // i18n 설정
@@ -96,7 +94,8 @@
   const shiftButtonPressedColor = lighten(calculatorButtonColors.important ?? '', -30);
 
   import { createCalcButtonSet } from 'src/constants/CalcButtonSet';
-  import { showError, showMessage } from 'src/classes/utils/NotificationUtils';
+  import { showError, showMessage } from 'src/utils/NotificationUtils';
+import { isWideWidth } from 'src/utils/GlobalHelpers';
 
   // const i18n = useI18n();
   const { standardButtons, modeSpecificButtons, standardExtendedFunctions, modeSpecificExtendedFunctions } =
@@ -184,8 +183,7 @@
 
   // 추가 기능 툴팁 표시 함수
   const displayActionTooltip = (id: ButtonID) => {
-    if (tooltipTimers[id] || id === shiftButtonId.value || (!$s.showButtonAddedLabel && $s.isShiftPressed))
-      return;
+    if (tooltipTimers[id] || id === shiftButtonId.value || (!$s.showButtonAddedLabel && $s.isShiftPressed)) return;
     tooltipTimers[id] = true;
     setTimeout(() => {
       tooltipTimers[id] = false;
@@ -311,12 +309,12 @@
   );
 
   // resize 이벤트를 처리하기 위한 ref 생성
-  const screenWidth = ref($s.isWideWidth() ? window.innerWidth / 2 : window.innerWidth);
+  const screenWidth = ref(isWideWidth() ? window.innerWidth / 2 : window.innerWidth);
   const screenHeight = ref(window.innerHeight);
 
   // resize 이벤트 핸들러
   const handleResize = () => {
-    screenWidth.value = $s.isWideWidth() ? window.innerWidth / 2 : window.innerWidth;
+    screenWidth.value = isWideWidth() ? window.innerWidth / 2 : window.innerWidth;
     screenHeight.value = window.innerHeight;
   };
 

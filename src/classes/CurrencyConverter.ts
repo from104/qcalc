@@ -3,7 +3,7 @@ import { BaseConverter } from './BaseConverter';
 
 import type { CurrencyExchangeRates, CurrencyData } from '../constants/CurrencyBaseData';
 import { currencyBaseData } from '../constants/CurrencyBaseData';
-import { checkError } from './utils/ErrorUtils';
+import { checkError } from '../utils/ErrorUtils';
 import { toBigNumber } from './CalculatorMath';
 
 /**

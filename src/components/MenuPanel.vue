@@ -22,13 +22,11 @@
 
   // 전역 window 객체에 접근하기 위한 상수 선언
   const $g = window.globalVars;
-
-  // 스토어 인스턴스 생성
   const $s = $g.store;
-
+    
   // 컴포넌트 import
   import MenuItem from 'components/snippets/MenuItem.vue';
-  import { navigateToPath } from 'src/classes/utils/NavigationUtils';
+  import { navigateToPath } from 'src/utils/NavigationUtils';
 
   // 메뉴 아이템 인터페이스 정의
   interface MenuItem {
@@ -49,7 +47,7 @@
       caption: t('item.calc.caption'),
       shortcut: 'Ctrl-1',
       icon: 'calculate',
-      action: () => $s.currentTab = 'calc',
+      action: () => ($s.currentTab = 'calc'),
     },
     {
       id: 'unit',
@@ -57,7 +55,7 @@
       caption: t('item.unit.caption'),
       shortcut: 'Ctrl-2',
       icon: 'swap_vert',
-      action: () => $s.currentTab = 'unit',
+      action: () => ($s.currentTab = 'unit'),
     },
     {
       id: 'currency',
@@ -65,7 +63,7 @@
       caption: t('item.currency.caption'),
       shortcut: 'Ctrl-3',
       icon: 'currency_exchange',
-      action: () => $s.currentTab = 'currency',
+      action: () => ($s.currentTab = 'currency'),
     },
     {
       id: 'radix',
@@ -73,7 +71,7 @@
       caption: t('item.radix.caption'),
       shortcut: 'Ctrl-4',
       icon: 'transform',
-      action: () => $s.currentTab = 'radix',
+      action: () => ($s.currentTab = 'radix'),
     },
     { id: 'separator1', separator: true },
     {
@@ -99,9 +97,9 @@
       caption: t('item.tips.caption'),
       shortcut: 'F5',
       icon: 'report',
-      action: () => $s.showTipsDialog = true,
+      action: () => ($s.showTipsDialog = true),
     },
-    
+
     {
       id: 'help',
       title: t('item.help.title'),
@@ -146,11 +144,7 @@
 
 <template>
   <q-list v-auto-blur role="menu" :aria-label="t('ariaLabel.menu')">
-    <MenuItem 
-      v-for="item in items" 
-      :key="item.id" 
-      v-bind="item" 
-    />
+    <MenuItem v-for="item in items" :key="item.id" v-bind="item" />
   </q-list>
 </template>
 

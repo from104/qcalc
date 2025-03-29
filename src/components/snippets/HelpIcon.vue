@@ -5,7 +5,7 @@
    *              사용자는 prop 또는 slot을 통해 텍스트를 전달할 수 있으며,
    *              모바일 환경에서는 아이콘 클릭 시 툴팁이 표시됩니다.
    *              툴팁의 표시 시간은 설정할 수 있습니다.
-   * 
+   *
    * @props {string} text - 툴팁에 표시할 텍스트
    * @props {string} size - 아이콘 크기 (xs, sm, md, lg, xl)
    * @props {string} textColor - 툴팁 텍스트 색상
@@ -17,6 +17,13 @@
 
   import { ref } from 'vue';
   import ToolTip from 'components/snippets/ToolTip.vue';
+
+  // === 전역 변수 설정 ===
+  /**
+   * 전역 변수와 상태 저장소를 설정합니다.
+   */
+  const $g = window.globalVars;
+  // const $s = $g.store;
 
   interface Props {
     /** 툴팁에 표시할 텍스트 */
@@ -45,7 +52,6 @@
     lineBreak: true,
   });
 
-  const $g = window.globalVars;
   const showTooltip = ref(false);
   let tooltipTimer: ReturnType<typeof setTimeout> | null = null;
 
@@ -74,7 +80,7 @@
       :text="text ?? ''"
       :text-color="textColor ?? 'green-10'"
       :bg-color="bgColor ?? 'green-2'"
-      :delay="$g.isMobile ? 0 : delay ?? 500"
+      :delay="$g.isMobile ? 0 : (delay ?? 500)"
       :line-break="lineBreak ?? true"
     >
       <slot />

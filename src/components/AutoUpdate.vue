@@ -7,14 +7,12 @@
   import { ref, onMounted, onUnmounted } from 'vue';
   import { useI18n } from 'vue-i18n';
 
-  import { showError, showMessage } from 'src/classes/utils/NotificationUtils';
+  import { showError, showMessage } from '../utils/NotificationUtils';
 
   // 전역 window 객체에 접근하기 위한 상수 선언
   const $g = window.globalVars;
-
-  // 스토어 인스턴스 생성
   const $s = $g.store;
-
+  
   // i18n 설정
   const { t } = useI18n();
 

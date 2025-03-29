@@ -24,20 +24,18 @@
   const router = useRouter();
   const route = useRoute() as RouteLocationNormalizedLoaded & { meta: RouteTransitionMeta };
 
-  import { navigateToPath } from 'src/classes/utils/NavigationUtils';
+  import { navigateToPath } from 'src/utils/NavigationUtils';
 
   // 계산기 관련 타입과 클래스
   import { KeyBinding } from 'classes/KeyBinding';
 
   // 알림 관련 유틸리티 함수
-  import { showMessage, showError } from 'src/classes/utils/NotificationUtils';
+  import { showMessage, showError } from 'src/utils/NotificationUtils';
 
   // 전역 window 객체에 접근하기 위한 상수 선언
   const $g = window.globalVars;
-
-  // 스토어 인스턴스 생성
   const $s = $g.store;
-
+  
   // 스토어에서 필요한 메서드와 속성 추출
   const { calc, getRightSideInRecord, getLeftSideInRecord, currencyConverter } = $s;
 
@@ -614,12 +612,7 @@
   </q-card-section>
 
   <!-- 기록 전체 삭제 다이얼로그 -->
-  <q-dialog
-    v-model="$s.isDeleteRecordConfirmOpen"
-    transition-show="scale"
-    transition-hide="scale"
-    style="z-index: 15"
-  >
+  <q-dialog v-model="$s.isDeleteRecordConfirmOpen" transition-show="scale" transition-hide="scale" style="z-index: 15">
     <q-card class="noselect text-center text-white bg-negative" style="width: 240px">
       <q-card-section>{{ t('doYouDeleteRecord') }} </q-card-section>
       <q-card-actions align="center" class="text-negative bg-white">

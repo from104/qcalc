@@ -13,10 +13,8 @@
 
   // 전역 globalVars 객체에 접근하기 위한 상수 선언
   const $g = window.globalVars;
-
-  // 스토어 인스턴스 생성
   const $s = $g.store;
-
+  
   // i18n 설정
   import { useI18n } from 'vue-i18n';
   const { locale } = useI18n({ useScope: 'global' });

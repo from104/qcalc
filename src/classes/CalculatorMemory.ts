@@ -1,5 +1,5 @@
 import { CalculatorMath } from './CalculatorMath';
-import { checkError } from './utils/ErrorUtils';
+import { checkError } from '../utils/ErrorUtils';
 
 /**
  * 계산기의 메모리 기능을 관리하는 클래스

@@ -17,7 +17,8 @@
   import { useMeta } from 'quasar';
   import { KeyBinding } from 'classes/KeyBinding';
 
-  import { navigateToPath } from '../classes/utils/NavigationUtils';
+  import { navigateToPath } from '../utils/NavigationUtils';
+  import { isWideWidth } from '../utils/GlobalHelpers';
 
   // === 컴포넌트 임포트 ===
   import ToolTip from 'components/snippets/ToolTip.vue';
@@ -40,7 +41,10 @@
   const { locale } = useI18n({ useScope: 'global' });
   const { t } = useI18n();
 
-  // === 전역 객체 및 인스턴스 초기화 ===
+  // === 전역 변수 설정 ===
+  /**
+   * 전역 변수와 상태 저장소를 설정합니다.
+   */
   const $g = window.globalVars;
   const $s = $g.store;
 
@@ -134,7 +138,7 @@
   // === 상태 관리 ===
   const currentSubPage = ref('record');
   const previousSubPage = ref('record');
-  const isWideLayout = computed(() => $s.isWideWidth());
+  const isWideLayout = computed(() => isWideWidth());
   const leftDrawerOpen = ref(false);
 
   // === 유틸리티 함수 ===
@@ -159,7 +163,7 @@
    */
   const isSubPage = computed(() => {
     return Object.keys(SUB_PAGE_CONFIG)
-      .filter((key) => !$s.isWideWidth() || key !== 'record')
+      .filter((key) => !isWideWidth() || key !== 'record')
       .includes(String(route.name));
   });
 
@@ -183,7 +187,7 @@
    */
   const closeSubPage = () => {
     if (isSubPage.value) {
-      if ($s.isWideWidth()) {
+      if (isWideWidth()) {
         switchSubPage('record');
       } else {
         router.back();
@@ -345,7 +349,7 @@
           </q-tabs>
           <q-space />
           <q-btn
-            v-if="!$s.isWideWidth()"
+            v-if="!isWideWidth()"
             flat
             icon="mdi-history"
             class="q-ma-none q-pa-none q-pl-sm q-pr-xs"
@@ -355,7 +359,7 @@
             <ToolTip :text="t('openRecordPage')" />
           </q-btn>
           <q-btn
-            v-if="!$s.isWideWidth()"
+            v-if="!isWideWidth()"
             flat
             icon="settings"
             class="q-ma-none q-pa-none q-pl-xs q-pr-xs"

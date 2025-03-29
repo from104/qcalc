@@ -19,18 +19,20 @@
 
   // === 유틸리티 클래스 임포트 ===
   import { KeyBinding } from 'classes/KeyBinding';
-  import { showMessage } from './classes/utils/NotificationUtils';
+  import { showMessage } from './utils/NotificationUtils';
+  import { isWideWidth } from './utils/GlobalHelpers';
 
-  // === 전역 객체 및 인스턴스 초기화 ===
-  const $g = globalThis.window.globalVars;
+  // === 전역 객체 및 상태 저장소 설정 ===
+  const $g = window.globalVars;
   const $s = $g.store;
+  
   const route = useRoute();
   const { t } = useI18n();
 
   // === 상태 관리 ===
   const isFirstNavigation = ref(true);
   const previousPath = ref(route.path);
-  const isWideLayout = ref($s.isWideWidth());
+  const isWideLayout = ref(isWideWidth());
   const currentTransition = ref('');
 
   /**
@@ -48,7 +50,9 @@
    */
   const toggleDarkModeWithNotification = () => {
     $s.toggleDarkMode();
-    showMessage($s.darkMode === 'system' ? t('darkMode.message.system') : t('darkMode.message.' + $s.darkMode));
+    showMessage(
+      $s.darkMode === 'system' ? t('darkMode.message.system') : t('darkMode.message.' + $s.darkMode),
+    );
   };
 
   /**
@@ -112,7 +116,7 @@
    * 레이아웃 너비 변경을 감시하고 적절한 트랜지션을 설정합니다.
    */
   watch(
-    () => $s.isWideWidth(),
+    () => isWideWidth(),
     (newValue) => {
       if (isWideLayout.value !== newValue) {
         currentTransition.value = newValue ? 'expand-layout' : 'collapse-layout';
@@ -164,7 +168,7 @@
 <template>
   <router-view v-slot="{ Component, route: routeProps }">
     <transition :name="isFirstNavigation ? '' : computeTransition || ''" mode="default">
-<component :is="Component" :key="routeProps.path + '-' + isWideLayout" />
+      <component :is="Component" :key="routeProps.path + '-' + isWideLayout" />
     </transition>
   </router-view>
   <AutoUpdate />
@@ -206,7 +210,7 @@
   .slide-forward-enter-from {
     transform: translateX(100%);
   }
-  
+
   .slide-forward-enter-to,
   .slide-forward-leave-from {
     transform: translateX(0);

@@ -13,12 +13,10 @@
   const { t } = useI18n();
   const { locale } = useI18n({ useScope: 'global' });
 
-  // 전역 window 객체에 접근하기 위한 상수 선언
+  // 전역 변수 import
   const $g = window.globalVars;
-
-  // 스토어 인스턴스 생성
   const $s = $g.store;
-
+  
   // 마크다운 파일 import - 한국어
   import CopyPasteTipKo from './tips/ko/copy-paste.md';
   import ButtonFeaturesTipKo from './tips/ko/button-features.md';

@@ -4,8 +4,6 @@
  *              Window 인터페이스를 확장하여 애플리케이션의 상태 및 환경 정보를 추가합니다.
  */
 
-import type { Store } from './types/store';
-
 // 전역 타입 선언을 위한 모듈 선언
 export {};
 

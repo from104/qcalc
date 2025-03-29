@@ -21,10 +21,8 @@
 
   // 전역 window 객체에 접근하기 위한 상수 선언
   const $g = window.globalVars;
-
-  // 스토어 인스턴스 생성
   const $s = $g.store;
-
+  
   // 스토어에서 필요한 메서드 추출
   const { calc, clickButtonById, swapUnits, initRecentUnits } = $s;
 

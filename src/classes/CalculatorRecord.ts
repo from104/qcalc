@@ -1,4 +1,4 @@
-import { checkError, throwError } from './utils/ErrorUtils';
+import { checkError, throwError } from '../utils/ErrorUtils';
 
 /**
  * 계산기의 기록을 관리하는 클래스입니다.

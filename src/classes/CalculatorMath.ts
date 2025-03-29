@@ -1,6 +1,6 @@
 import { match } from 'ts-pattern';
 import { all, create } from 'mathjs';
-import { checkError } from './utils/ErrorUtils';
+import { checkError } from '../utils/ErrorUtils';
 
 import type { FactoryFunctionMap } from 'mathjs';
 
@@ -10,7 +10,7 @@ import { Radix } from './RadixConverter';
 // MathJS 라이브러리 설정
 export const MathB = create(all as FactoryFunctionMap, {
   number: 'BigNumber',
-  precision: 64
+  precision: 64,
 });
 
 // BigNumber 타입 정의

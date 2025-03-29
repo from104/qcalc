@@ -13,7 +13,7 @@ import { CalculatorMath } from './CalculatorMath';
 import { CalculatorRecord } from './CalculatorRecord';
 import { CalculatorMemory } from './CalculatorMemory';
 
-import { checkError, getErrorMessage } from './utils/ErrorUtils';
+import { checkError, getErrorMessage } from '../utils/ErrorUtils';
 
 import { toBigNumber } from './CalculatorMath';
 

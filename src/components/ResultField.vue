@@ -25,13 +25,11 @@
 
   // 전역 window 객체에 접근하기 위한 상수 선언
   const $g = window.globalVars;
-
-  // 스토어 인스턴스 생성
   const $s = $g.store;
-
+  
   // 컴포넌트 import
   import ToolTip from 'src/components/snippets/ToolTip.vue';
-  import { showError, showMessage } from 'src/classes/utils/NotificationUtils';
+  import { showError, showMessage } from 'src/utils/NotificationUtils';
 
   // props 정의
   const props = withDefaults(defineProps<{ field?: string; addon?: string }>(), {
@@ -226,9 +224,7 @@
     const shouldShowUnit = $s.showUnit && props.addon === 'unit';
     if (!shouldShowUnit) return '';
 
-    const selectedUnit = isMainField
-      ? $s.sourceUnits[$s.selectedCategory]
-      : $s.targetUnits[$s.selectedCategory];
+    const selectedUnit = isMainField ? $s.sourceUnits[$s.selectedCategory] : $s.targetUnits[$s.selectedCategory];
 
     return ` ${selectedUnit}`;
   });
