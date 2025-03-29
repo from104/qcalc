@@ -19,21 +19,26 @@
   import { KeyBinding } from 'classes/KeyBinding';
   import { Radix } from 'classes/RadixConverter';
 
-  // 전역 window 객체에 접근하기 위한 상수 선언
-  const $g = window.globalVars;
-  const $s = $g.store;
-  
-  // 스토어에서 필요한 메서드 추출
-  const { swapRadixes, initRecentRadix, clickButtonById, setInputBlurred, calc } = $s;
+  // 스토어 import
+  import { useUIStore } from 'stores/uiStore';
+  import { useSettingsStore } from 'stores/settingsStore';
+  import { useRadixStore } from 'stores/radixStore';
+  import { useCalculatorStore } from 'stores/calculatorStore';
+
+  // 스토어 인스턴스 생성
+  const uiStore = useUIStore();
+  const settingsStore = useSettingsStore();
+  const radixStore = useRadixStore();
+  const calculatorStore = useCalculatorStore();
 
   // 컴포넌트 import
   import ToolTip from 'src/components/snippets/ToolTip.vue';
 
   // 단위 초기화
-  initRecentRadix();
+  radixStore.initRecentRadix();
 
   // 언어 변경 시 비트 표시 업데이트
-  watch([() => $s.locale], () => {
+  watch([() => settingsStore.locale], () => {
     wordSizeOptions.values.forEach((option, index) => {
       const value = index === 0 ? '∞' : option.value.toString();
       option.label = `${value} ${t('bit')}`;
@@ -42,16 +47,16 @@
 
   // 키 바인딩 설정
   const keyBinding = new KeyBinding([
-    [['Alt+w'], () => clickButtonById('btn-swap-radix')],
-    [['Alt+y'], () => $s.toggleShowRadix()],
-    [['Alt+u'], () => $s.setRadixType($s.radixType == 'prefix' ? 'suffix' : 'prefix')],
+    [['Alt+w'], () => document.getElementById('btn-swap-radix')?.click()],
+    [['Alt+y'], () => radixStore.toggleShowRadix()],
+    [['Alt+u'], () => radixStore.setRadixType(radixStore.radixType == 'prefix' ? 'suffix' : 'prefix')],
   ]);
 
   // 입력 포커스에 따른 키 바인딩 활성화/비활성화
   watch(
-    () => $s.inputFocused,
+    () => uiStore.inputFocused,
     () => {
-      if ($s.inputFocused) {
+      if (uiStore.inputFocused) {
         keyBinding.unsubscribe();
       } else {
         keyBinding.subscribe();
@@ -60,14 +65,14 @@
   );
 
   onMounted(() => {
-    initRecentRadix();
-    $s.updateWordSize($s.wordSize);
+    radixStore.initRecentRadix();
+    radixStore.updateWordSize(radixStore.wordSize);
     keyBinding.subscribe();
   });
 
   onBeforeUnmount(() => {
     keyBinding.unsubscribe();
-    setInputBlurred();
+    uiStore.setInputBlurred();
   });
 
   // 워드사이즈 옵션 타입 정의
@@ -112,8 +117,8 @@
   });
 
   watch(
-    () => $s.sourceRadix,
-    () => (calc.currentRadix = $s.sourceRadix),
+    () => radixStore.sourceRadix,
+    () => (calculatorStore.calc.currentRadix = radixStore.sourceRadix),
   );
 
   // 단순화된 컴퓨티드 속성
@@ -122,8 +127,8 @@
   const targetSelectOptions = computed(() => targetRadixOptions.values);
 
   const handleRadixSwap = () => {
-    swapRadixes();
-    calc.needsBufferReset = true;
+    radixStore.swapRadixes();
+    calculatorStore.calc.needsBufferReset = true;
   };
 </script>
 
@@ -131,7 +136,7 @@
   <q-card-section v-auto-blur class="row q-px-sm q-pt-none q-pb-sm">
     <!-- 워드사이즈 선택 -->
     <q-select
-      v-model="$s.wordSize"
+      v-model="radixStore.wordSize"
       :options="wordSizeOptions.values"
       role="combobox"
       :aria-label="t('ariaLabel.wordSize')"
@@ -144,11 +149,13 @@
       behavior="menu"
       class="col-3 q-pa-none shadow-2"
       :label="t('radixLabel.wordSize')"
-      :label-color="!$s.isDarkMode() ? 'primary' : 'grey-1'"
-      :class="!$s.isDarkMode() ? 'bg-blue-grey-2' : 'bg-blue-grey-6'"
-      :popup-content-class="[!$s.isDarkMode() ? 'bg-blue-grey-2' : 'bg-blue-grey-6', 'scrollbar-custom', 'q-select-popup'].join(' ')"
-      :options-selected-class="!$s.isDarkMode() ? 'text-primary' : 'text-grey-1'"
-      @update:model-value="$s.updateWordSize($event)"
+      :label-color="!settingsStore.darkMode ? 'primary' : 'grey-1'"
+      :class="!settingsStore.darkMode ? 'bg-blue-grey-2' : 'bg-blue-grey-6'"
+      :popup-content-class="
+        [!settingsStore.darkMode ? 'bg-blue-grey-2' : 'bg-blue-grey-6', 'scrollbar-custom', 'q-select-popup'].join(' ')
+      "
+      :options-selected-class="!settingsStore.darkMode ? 'text-primary' : 'text-grey-1'"
+      @update:model-value="radixStore.updateWordSize($event)"
     />
 
     <!-- 원본 방향 -->
@@ -156,7 +163,7 @@
 
     <!-- 원본 진법 -->
     <q-select
-      v-model="$s.sourceRadix"
+      v-model="radixStore.sourceRadix"
       :options="sourceSelectOptions"
       role="combobox"
       :aria-label="t('ariaLabel.sourceRadix')"
@@ -169,10 +176,12 @@
       behavior="menu"
       class="col-3 q-pl-xs-sm shadow-2"
       :label="t('radixLabel.main')"
-      :label-color="!$s.isDarkMode() ? 'primary' : 'grey-1'"
-      :options-selected-class="!$s.isDarkMode() ? 'text-primary' : 'text-grey-1'"
-      :popup-content-class="[!$s.isDarkMode() ? 'bg-blue-grey-2' : 'bg-blue-grey-6', 'scrollbar-custom', 'q-select-popup'].join(' ')"
-      :class="!$s.isDarkMode() ? 'bg-blue-grey-2' : 'bg-blue-grey-6'"
+      :label-color="!settingsStore.darkMode ? 'primary' : 'grey-1'"
+      :options-selected-class="!settingsStore.darkMode ? 'text-primary' : 'text-grey-1'"
+      :popup-content-class="
+        [!settingsStore.darkMode ? 'bg-blue-grey-2' : 'bg-blue-grey-6', 'scrollbar-custom', 'q-select-popup'].join(' ')
+      "
+      :class="!settingsStore.darkMode ? 'bg-blue-grey-2' : 'bg-blue-grey-6'"
     />
 
     <!-- 원본, 대상 진법 바꾸기 버튼 -->
@@ -194,7 +203,7 @@
 
     <!-- 대상 진법 -->
     <q-select
-      v-model="$s.targetRadix"
+      v-model="radixStore.targetRadix"
       :options="targetSelectOptions"
       role="combobox"
       :aria-label="t('ariaLabel.targetRadix')"
@@ -207,10 +216,12 @@
       behavior="menu"
       class="col-3 q-pl-xs-sm shadow-2"
       :label="t('radixLabel.sub')"
-      :label-color="!$s.isDarkMode() ? 'primary' : 'grey-1'"
-      :class="!$s.isDarkMode() ? 'bg-blue-grey-2' : 'bg-blue-grey-6'"
-      :popup-content-class="[!$s.isDarkMode() ? 'bg-blue-grey-2' : 'bg-blue-grey-6', 'scrollbar-custom', 'q-select-popup'].join(' ')"
-      :options-selected-class="!$s.isDarkMode() ? 'text-primary' : 'text-grey-1'"
+      :label-color="!settingsStore.darkMode ? 'primary' : 'grey-1'"
+      :class="!settingsStore.darkMode ? 'bg-blue-grey-2' : 'bg-blue-grey-6'"
+      :popup-content-class="
+        [!settingsStore.darkMode ? 'bg-blue-grey-2' : 'bg-blue-grey-6', 'scrollbar-custom', 'q-select-popup'].join(' ')
+      "
+      :options-selected-class="!settingsStore.darkMode ? 'text-primary' : 'text-grey-1'"
     />
 
     <!-- 대상 방향 -->

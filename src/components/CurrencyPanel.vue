@@ -8,44 +8,44 @@
 
   // Vue 핵심 기능 및 컴포지션 API 가져오기
   import { ref, onMounted, onBeforeUnmount, reactive, watch } from 'vue';
-
   import type { Ref } from 'vue';
 
   // i18n 설정
   import { useI18n } from 'vue-i18n';
   const { t } = useI18n();
 
+  // 스토어 import
+  import { useUIStore } from 'stores/uiStore';
+  import { useCurrencyStore } from 'stores/currencyStore';
+  import { useSettingsStore } from 'stores/settingsStore';
+  import { useUnitStore } from 'stores/unitStore';
+  import { useCalculatorStore } from 'stores/calculatorStore';
+
+  // 스토어 인스턴스 생성
+  const uiStore = useUIStore();
+  const currencyStore = useCurrencyStore();
+  const settingsStore = useSettingsStore();
+  const unitStore = useUnitStore();
+  const calculatorStore = useCalculatorStore();
+
   // 계산기 관련 타입과 클래스
-  // import { toBigNumber } from 'classes/CalculatorMath';
   import { KeyBinding } from 'classes/KeyBinding';
 
   // 전역 변수 import
   const $g = window.globalVars;
-  const $s = $g.store;
-  
+
   // 컴포넌트 import
   import ToolTip from 'src/components/snippets/ToolTip.vue';
-
-  // 필요한 메서드와 속성 추출
-  const {
-    calc,
-    currencyConverter,
-    swapCurrencies,
-    initRecentCurrencies,
-    clickButtonById,
-    setInputBlurred,
-    setInputFocused,
-    blurElement,
-  } = $s;
+  import { clickButtonById, blurElement } from 'src/utils/GlobalHelpers';
 
   // 키 바인딩 설정
   const keyBinding = new KeyBinding([
     [['Alt+w'], () => clickButtonById('btn-swap-currency')],
-    [['Alt+y'], () => $s.toggleShowSymbol()],
+    [['Alt+y'], () => unitStore.toggleShowSymbol()],
   ]);
 
   // 단위 초기화
-  initRecentCurrencies();
+  currencyStore.initRecentCurrencies();
 
   // 통화 설명을 위한 인터페이스 정의
   interface CurrencyDescription {
@@ -54,24 +54,24 @@
 
   // 통화 이름을 현재 언어에 맞게 초기화
   const currencyDescriptions = reactive<CurrencyDescription>(
-    currencyConverter.getAvailableItems().reduce((acc: CurrencyDescription, currency: string) => {
+    currencyStore.currencyConverter.getAvailableItems().reduce((acc: CurrencyDescription, currency: string) => {
       acc[currency] = t(`currencyDesc.${currency}`);
       return acc;
     }, {}),
   );
 
   // 언어 변경 시 통화 이름 업데이트
-  watch([() => $s.locale], () => {
-    currencyConverter.getCurrencyLists().forEach((currency: string) => {
+  watch([() => settingsStore.locale], () => {
+    currencyStore.currencyConverter.getAvailableItems().forEach((currency: string) => {
       currencyDescriptions[currency] = t(`currencyDesc.${currency}`);
     });
   });
 
   // 입력 포커스에 따른 키 바인딩 활성화/비활성화
   watch(
-    () => $s.inputFocused,
+    () => uiStore.inputFocused,
     () => {
-      if ($s.inputFocused) {
+      if (uiStore.inputFocused) {
         keyBinding.unsubscribe();
       } else {
         keyBinding.subscribe();
@@ -82,18 +82,18 @@
   let rateUpdateTimer: number | undefined;
 
   onMounted(() => {
-    initRecentCurrencies();
+    currencyStore.initRecentCurrencies();
     keyBinding.subscribe();
 
     // 초기 환율 정보 업데이트
     (async () => {
-      await currencyConverter.updateRates();
+      await currencyStore.currencyConverter.updateRates();
     })();
 
     // 주기적으로 환율 정보 업데이트 (1시간마다)
     rateUpdateTimer = window.setInterval(
       async () => {
-        await currencyConverter.updateRates();
+        await currencyStore.currencyConverter.updateRates();
       },
       1000 * 60 * 60 * 1,
     );
@@ -101,7 +101,7 @@
 
   onBeforeUnmount(() => {
     keyBinding.unsubscribe();
-    setInputBlurred();
+    uiStore.setInputBlurred();
     clearInterval(rateUpdateTimer);
   });
 
@@ -113,7 +113,7 @@
     disable?: boolean;
   };
 
-  const currencyList = currencyConverter.getAvailableItems();
+  const currencyList = currencyStore.currencyConverter.getAvailableItems();
 
   // 통화 옵션 초기화
   /**
@@ -140,8 +140,8 @@
 
   // 통화 옵션 업데이트
   watch(
-    () => $s.sourceCurrency,
-    () => currencyConverter.setBase($s.sourceCurrency),
+    () => currencyStore.sourceCurrency,
+    () => currencyStore.currencyConverter.setBase(currencyStore.sourceCurrency),
   );
 
   // 통화 선택 필터 함수 생성
@@ -174,15 +174,12 @@
   const filteredTargetCurrencyOptions = ref<CurrencyOptions[]>(targetCurrencyOptions);
   const targetFilterFn = createFilterFn(filteredTargetCurrencyOptions, targetCurrencyOptions);
 
-  // let isSwapped = false;
-  // let originalValue: string | null = null;
-
   const handleCurrencySwap = () => {
-    if ($s.sourceCurrency !== $s.targetCurrency) {
+    if (currencyStore.sourceCurrency !== currencyStore.targetCurrency) {
       // 첫 번째 변환 수행
-      swapCurrencies();
-      calc.currentNumber = $s.convertedCurrencyNumber;
-      calc.needsBufferReset = true;
+      currencyStore.swapCurrencies();
+      calculatorStore.calc.currentNumber = currencyStore.convertedCurrencyNumber;
+      calculatorStore.calc.needsBufferReset = true;
     }
   };
 </script>
@@ -194,9 +191,9 @@
 
     <!-- 원본 통화 -->
     <q-select
-      v-model="$s.sourceCurrency"
+      v-model="currencyStore.sourceCurrency"
       :options="filteredSourceCurrencyOptions"
-      :label="currencyDescriptions[$s.sourceCurrency]"
+      :label="currencyDescriptions[currencyStore.sourceCurrency]"
       role="combobox"
       :aria-label="t('ariaLabel.sourceCurrency')"
       stack-label
@@ -210,20 +207,20 @@
       hide-selected
       behavior="menu"
       class="col-4 q-pl-sm shadow-2"
-      :class="!$s.isDarkMode() ? 'bg-blue-grey-2' : 'bg-blue-grey-6'"
-      :label-color="!$s.isDarkMode() ? 'primary' : 'grey-1'"
+      :class="!settingsStore.darkMode ? 'bg-blue-grey-2' : 'bg-blue-grey-6'"
+      :label-color="!settingsStore.darkMode ? 'primary' : 'grey-1'"
       :popup-content-class="
         [
-          !$s.isDarkMode() ? 'bg-blue-grey-2' : 'bg-blue-grey-6',
+          !settingsStore.darkMode ? 'bg-blue-grey-2' : 'bg-blue-grey-6',
           'scrollbar-custom',
           'q-select-popup',
           $g.isMobile ? 'popup-mobile' : '',
         ].join(' ')
       "
-      :options-selected-class="!$s.isDarkMode() ? 'text-primary' : 'text-grey-1'"
+      :options-selected-class="!settingsStore.darkMode ? 'text-primary' : 'text-grey-1'"
       @filter="sourceFilterFn"
-      @focus="setInputFocused()"
-      @blur="setInputBlurred()"
+      @focus="uiStore.setInputFocused()"
+      @blur="uiStore.setInputBlurred()"
       @keyup.enter="blurElement()"
       @update:model-value="blurElement()"
     >
@@ -237,7 +234,7 @@
       </template>
       <ToolTip>
         <div class="text-left" style="white-space: pre-wrap">
-          {{ `${currencyDescriptions[$s.sourceCurrency]}\n${$s.sourceCurrency}` }}
+          {{ `${currencyDescriptions[currencyStore.sourceCurrency]}\n${currencyStore.sourceCurrency}` }}
         </div>
       </ToolTip>
     </q-select>
@@ -261,9 +258,9 @@
 
     <!-- 대상 통화 -->
     <q-select
-      v-model="$s.targetCurrency"
+      v-model="currencyStore.targetCurrency"
       :options="filteredTargetCurrencyOptions"
-      :label="currencyDescriptions[$s.targetCurrency]"
+      :label="currencyDescriptions[currencyStore.targetCurrency]"
       role="combobox"
       :aria-label="t('ariaLabel.targetCurrency')"
       stack-label
@@ -277,29 +274,29 @@
       hide-selected
       behavior="menu"
       class="col-4 q-pl-sm shadow-2"
-      :class="!$s.isDarkMode() ? 'bg-blue-grey-2' : 'bg-blue-grey-6'"
-      :label-color="!$s.isDarkMode() ? 'primary' : 'grey-1'"
+      :class="!settingsStore.darkMode ? 'bg-blue-grey-2' : 'bg-blue-grey-6'"
+      :label-color="!settingsStore.darkMode ? 'primary' : 'grey-1'"
       :popup-content-class="
         [
-          !$s.isDarkMode() ? 'bg-blue-grey-2' : 'bg-blue-grey-6',
+          !settingsStore.darkMode ? 'bg-blue-grey-2' : 'bg-blue-grey-6',
           'scrollbar-custom',
           'q-select-popup',
           $g.isMobile ? 'popup-mobile' : '',
         ].join(' ')
       "
-      :options-selected-class="!$s.isDarkMode() ? 'text-primary' : 'text-grey-1'"
+      :options-selected-class="!settingsStore.darkMode ? 'text-primary' : 'text-grey-1'"
       @filter="targetFilterFn"
       @keyup.enter="blurElement()"
       @update:model-value="blurElement()"
-      @focus="setInputFocused()"
-      @blur="setInputBlurred()"
+      @focus="uiStore.setInputFocused()"
+      @blur="uiStore.setInputBlurred()"
     >
       <template #option="scope">
         <q-item v-bind="scope.itemProps">
           <q-item-section>
             <q-item-label caption>{{ currencyDescriptions[scope.opt.label] }}</q-item-label>
             <q-item-label>
-              {{ `${scope.opt.label}, ${currencyConverter.getRate(scope.opt.label).toFixed(4)}` }}
+              {{ `${scope.opt.label}, ${currencyStore.currencyConverter.getRate(scope.opt.label).toFixed(4)}` }}
             </q-item-label>
           </q-item-section>
         </q-item>
@@ -307,7 +304,7 @@
       <ToolTip>
         <div class="text-left" style="white-space: pre-wrap">
           {{
-            `${currencyDescriptions[$s.targetCurrency]}\n${$s.targetCurrency}, ${currencyConverter.getRate($s.targetCurrency).toFixed(4)}`
+            `${currencyDescriptions[currencyStore.targetCurrency]}\n${currencyStore.targetCurrency}, ${currencyStore.currencyConverter.getRate(currencyStore.targetCurrency).toFixed(4)}`
           }}
         </div>
       </ToolTip>

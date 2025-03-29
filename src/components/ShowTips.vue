@@ -13,10 +13,14 @@
   const { t } = useI18n();
   const { locale } = useI18n({ useScope: 'global' });
 
-  // 전역 변수 import
-  const $g = window.globalVars;
-  const $s = $g.store;
-  
+  // 스토어 import
+  import { useUIStore } from 'stores/uiStore';
+  import { useSettingsStore } from 'stores/settingsStore';
+
+  // 스토어 인스턴스 생성
+  const uiStore = useUIStore();
+  const settingsStore = useSettingsStore();
+
   // 마크다운 파일 import - 한국어
   import CopyPasteTipKo from './tips/ko/copy-paste.md';
   import ButtonFeaturesTipKo from './tips/ko/button-features.md';
@@ -122,7 +126,7 @@
 
 <template>
   <q-dialog v-model="dialogVisible" role="dialog" :aria-label="t('dialogAriaLabel')">
-    <q-card class="tips-dialog" :class="{ 'bg-dark': $s.isDarkMode() }" role="article">
+    <q-card class="tips-dialog" :class="{ 'bg-dark': settingsStore.darkMode }" role="article">
       <q-bar class="bg-primary text-white" role="banner">
         <q-space />
         <div class="text-subtitle1" role="heading" aria-level="1">{{ t('tipsTitle') }} ({{ pageText }})</div>
@@ -140,7 +144,7 @@
       <q-card-section
         v-touch-swipe.horizontal="swipeConfig"
         class="tips-content"
-        :class="{ 'bg-dark': $s.isDarkMode() }"
+        :class="{ 'bg-dark': settingsStore.darkMode }"
         role="main"
         :aria-label="t('mainContentAriaLabel')"
       >
@@ -151,21 +155,21 @@
               no-linkify
               no-heading-anchor-links
               class="q-px-md q-pt-sm"
-              :class="{ 'text-white': $s.isDarkMode() }"
+              :class="{ 'text-white': settingsStore.darkMode }"
             />
           </div>
         </transition>
       </q-card-section>
       <q-card-actions
         align="between"
-        :class="['q-px-md', $s.isDarkMode() ? 'bg-dark' : 'bg-white']"
+        :class="['q-px-md', settingsStore.darkMode ? 'bg-dark' : 'bg-white']"
         role="group"
         :aria-label="t('navigationAriaLabel')"
       >
         <q-btn
           flat
           round
-          :color="$s.isDarkMode() ? 'white' : 'primary'"
+          :color="settingsStore.darkMode ? 'white' : 'primary'"
           icon="chevron_left"
           :aria-label="t('prevTip')"
           role="button"
@@ -174,17 +178,17 @@
           <q-tooltip>{{ t('prevTip') }}</q-tooltip>
         </q-btn>
         <q-checkbox
-          v-model="$s.showTips"
+          v-model="uiStore.showTips"
           :label="t('showTipsOnStart')"
           dense
-          :class="$s.isDarkMode() ? 'text-white' : 'text-primary'"
+          :class="settingsStore.darkMode ? 'text-white' : 'text-primary'"
           role="checkbox"
           :aria-label="t('showTipsOnStart')"
         />
         <q-btn
           flat
           round
-          :color="$s.isDarkMode() ? 'white' : 'primary'"
+          :color="settingsStore.darkMode ? 'white' : 'primary'"
           icon="chevron_right"
           :aria-label="t('nextTip')"
           role="button"

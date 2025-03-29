@@ -12,9 +12,9 @@
 
   import { h, ref, onMounted, watch, onUnmounted } from 'vue';
 
-  // 전역 window 객체에 접근하기 위한 상수 선언
-  const $g = window.globalVars;
-  const $s = $g.store;
+  import { useUIStore } from 'stores/uiStore';
+
+  const uiStore = useUIStore();
 
   interface Props {
     text: string;
@@ -81,7 +81,7 @@
     const id = `highlight-${generateUUID()}`;
     textIDs.value.push(id);
 
-    if (!$s.isSearchOpen || !searchTerm.trim()) {
+    if (!uiStore.isSearchOpen || !searchTerm.trim()) {
       return h(
         'span',
         {

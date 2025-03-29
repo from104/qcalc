@@ -13,13 +13,12 @@ import { toBigNumber } from 'classes/CalculatorMath';
 import { Operator } from 'classes/Calculator';
 import { showMessage } from 'src/utils/NotificationUtils';
 
-const $g = window.globalVars;
-const $s = $g.store;
+import { useCalculatorStore } from 'stores/calculatorStore';
 
 // ComposerTranslation 타입 사용
 export function createCalcButtonSet(t: ComposerTranslation) {
   // 스토어에서 필요한 메서드 추출
-  const { calc, showMemoryTemporarily } = $s;
+  const { calc, showMemoryTemporarily } = useCalculatorStore();
 
   // 비트 연산 사전 처리 메서드
   const bitOperationPreprocessing = (action: () => void, isBinary: boolean = true) => {

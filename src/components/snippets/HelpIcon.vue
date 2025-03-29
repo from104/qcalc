@@ -23,7 +23,6 @@
    * 전역 변수와 상태 저장소를 설정합니다.
    */
   const $g = window.globalVars;
-  // const $s = $g.store;
 
   interface Props {
     /** 툴팁에 표시할 텍스트 */

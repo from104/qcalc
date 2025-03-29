@@ -2,19 +2,22 @@
   import { useI18n } from 'vue-i18n';
 
   const $g = window.globalVars;
-  const $s = $g.store;
-  
+
+  import { useUIStore } from 'stores/uiStore';
+
+  const uiStore = useUIStore();
+
   const { t } = useI18n();
 </script>
 
 <template>
-  <q-dialog v-if="$g.isSnap" v-model="$s.isSnapFirstRun" persistent>
+  <q-dialog v-if="$g.isSnap" v-model="uiStore.isSnapFirstRun" persistent>
     <q-card>
       <q-card-section class="text-body1 text-center">
         {{ t('snapFirstRun') }}
       </q-card-section>
       <q-card-actions class="justify-center">
-        <q-btn :label="t('confirm')" @click="$s.isSnapFirstRun = false" />
+        <q-btn :label="t('confirm')" @click="uiStore.isSnapFirstRun = false" />
       </q-card-actions>
     </q-card>
   </q-dialog>

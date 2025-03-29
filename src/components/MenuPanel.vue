@@ -20,10 +20,14 @@
   const router = useRouter();
   const route = useRoute() as RouteLocationNormalizedLoaded & { meta: RouteTransitionMeta };
 
-  // 전역 window 객체에 접근하기 위한 상수 선언
-  const $g = window.globalVars;
-  const $s = $g.store;
-    
+  // 스토어 import
+  import { useUIStore } from 'stores/uiStore';
+  import { useSettingsStore } from 'stores/settingsStore';
+
+  // 스토어 인스턴스 생성
+  const uiStore = useUIStore();
+  const settingsStore = useSettingsStore();
+
   // 컴포넌트 import
   import MenuItem from 'components/snippets/MenuItem.vue';
   import { navigateToPath } from 'src/utils/NavigationUtils';
@@ -47,7 +51,7 @@
       caption: t('item.calc.caption'),
       shortcut: 'Ctrl-1',
       icon: 'calculate',
-      action: () => ($s.currentTab = 'calc'),
+      action: () => (uiStore.currentTab = 'calc'),
     },
     {
       id: 'unit',
@@ -55,7 +59,7 @@
       caption: t('item.unit.caption'),
       shortcut: 'Ctrl-2',
       icon: 'swap_vert',
-      action: () => ($s.currentTab = 'unit'),
+      action: () => (uiStore.currentTab = 'unit'),
     },
     {
       id: 'currency',
@@ -63,7 +67,7 @@
       caption: t('item.currency.caption'),
       shortcut: 'Ctrl-3',
       icon: 'currency_exchange',
-      action: () => ($s.currentTab = 'currency'),
+      action: () => (uiStore.currentTab = 'currency'),
     },
     {
       id: 'radix',
@@ -71,7 +75,7 @@
       caption: t('item.radix.caption'),
       shortcut: 'Ctrl-4',
       icon: 'transform',
-      action: () => ($s.currentTab = 'radix'),
+      action: () => (uiStore.currentTab = 'radix'),
     },
     { id: 'separator1', separator: true },
     {
@@ -97,7 +101,7 @@
       caption: t('item.tips.caption'),
       shortcut: 'F5',
       icon: 'report',
-      action: () => ($s.showTipsDialog = true),
+      action: () => (uiStore.showTipsDialog = true),
     },
 
     {
@@ -130,7 +134,7 @@
 
   // 언어 변경 감지 및 메뉴 아이템 텍스트 업데이트
   watch(
-    () => $s.locale,
+    () => settingsStore.locale,
     () => {
       updateLocale();
     },

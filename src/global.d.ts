@@ -36,11 +36,6 @@ declare global {
       readonly textZoom: number; // 텍스트 줌 레벨
 
       /**
-       * 전역 상태 관리
-       */
-      readonly store: Store;
-
-      /**
        * 버전 정보
        */
       readonly version: string;

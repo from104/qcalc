@@ -56,17 +56,12 @@ export interface CalculatorState {
   paddingOnResult: number;
   isShiftPressed: boolean;
   isShiftLocked: boolean;
-  inputFocused: boolean;
-  isDeleteRecordConfirmOpen: boolean;
-  recordLastScrollPosition: number;
-  isSearchOpen: boolean;
-  searchKeyword: string;
 }
 
 /**
  * 단위 변환 스토어 상태 인터페이스
  */
-export interface UnitConverterState {
+export interface UnitState {
   selectedCategory: string;
   sourceUnits: Record<string, string>;
   targetUnits: Record<string, string>;
@@ -78,7 +73,7 @@ export interface UnitConverterState {
 /**
  * 통화 변환 스토어 상태 인터페이스
  */
-export interface CurrencyConverterState {
+export interface CurrencyState {
   currencyConverter: CurrencyConverter;
   sourceCurrency: string;
   targetCurrency: string;
@@ -88,7 +83,7 @@ export interface CurrencyConverterState {
 /**
  * 진법 변환 스토어 상태 인터페이스
  */
-export interface RadixConverterState {
+export interface RadixState {
   wordSize: WordSize;
   radixList: Radix[];
   sourceRadix: Radix;
@@ -101,21 +96,27 @@ export interface RadixConverterState {
  * UI 스토어 상태 인터페이스
  */
 export interface UIState {
-  darkMode: DarkModeType;
-  alwaysOnTop: boolean;
-  initPanel: boolean;
-  showButtonAddedLabel: boolean;
-  hapticsMode: boolean;
   isAppStarted: boolean;
   showTips: boolean;
   showTipsDialog: boolean;
   currentTab: string;
+  inputFocused: boolean;
+  isDeleteRecordConfirmOpen: boolean;
+  recordLastScrollPosition: number;
+  isSearchOpen: boolean;
+  searchKeyword: string;
+  isSnapFirstRun: boolean;
 }
 
 /**
  * 설정 스토어 상태 인터페이스
  */
 export interface SettingsState {
+  darkMode: DarkModeType;
+  alwaysOnTop: boolean;
+  initPanel: boolean;
+  showButtonAddedLabel: boolean;
+  hapticsMode: boolean;
   useGrouping: boolean;
   groupingUnit: GroupingUnitType;
   decimalPlaces: DecimalPlacesType;
@@ -123,7 +124,6 @@ export interface SettingsState {
   locale: string;
   userLocale: string;
   autoUpdate: boolean;
-  isSnapFirstRun: boolean;
 }
 
 /**
@@ -141,16 +141,12 @@ export interface CalculatorActions {
   showMemoryTemporarily(): void;
   getLeftSideInRecord(result: CalculationResult, useLineBreak?: boolean): string;
   getRightSideInRecord(result: CalculationResult): string;
-  setInputFocused(): void;
-  setInputBlurred(): void;
-  setDeleteRecordConfirmOpen(value: boolean): void;
-  isDefaultCalculator(): boolean;
 }
 
 /**
  * 단위 변환 스토어 액션 인터페이스
  */
-export interface UnitConverterActions {
+export interface UnitActions {
   initRecentUnits(): void;
   swapUnits(): void;
   toggleShowUnit(): void;
@@ -160,7 +156,7 @@ export interface UnitConverterActions {
 /**
  * 통화 변환 스토어 액션 인터페이스
  */
-export interface CurrencyConverterActions {
+export interface CurrencyActions {
   initRecentCurrencies(): void;
   swapCurrencies(): void;
 }
@@ -168,7 +164,7 @@ export interface CurrencyConverterActions {
 /**
  * 진법 변환 스토어 액션 인터페이스
  */
-export interface RadixConverterActions {
+export interface RadixActions {
   convertIfRadix(value: string): string;
   convertRadix(value: string, fromRadix: Radix, toRadix: Radix): string;
   validateRadixNumber(value: string, radix: Radix): boolean;
@@ -188,6 +184,15 @@ export interface RadixConverterActions {
  */
 export interface UIActions {
   setCurrentTab(tab: string): void;
+  setInputFocused(): void;
+  setInputBlurred(): void;
+  setDeleteRecordConfirmOpen(value: boolean): void;
+}
+
+/**
+ * 설정 스토어 액션 인터페이스
+ */
+export interface SettingsActions {
   setDarkMode(mode: DarkModeType): void;
   updateDarkMode(): void;
   toggleDarkMode(): void;
@@ -199,12 +204,6 @@ export interface UIActions {
   toggleButtonAddedLabel(): void;
   setHapticsMode(isEnabled: boolean): void;
   toggleHapticsMode(): void;
-}
-
-/**
- * 설정 스토어 액션 인터페이스
- */
-export interface SettingsActions {
   toggleUseGrouping(): void;
   setGroupingUnit(digitCount: GroupingUnitType): void;
   setDecimalPlaces(places: DecimalPlacesType): void;
@@ -215,34 +214,11 @@ export interface SettingsActions {
 }
 
 /**
- * 메인 스토어 액션 인터페이스
- */
-export interface MainStoreActions {
-  initializeStores(): void;
-}
-
-/**
  * 스토어 타입 정의
  */
 export type CalculatorStore = DefineStore<'calculator', CalculatorState, Record<string, never>, CalculatorActions>;
-export type UnitConverterStore = DefineStore<
-  'unitConverter',
-  UnitConverterState,
-  Record<string, never>,
-  UnitConverterActions
->;
-export type CurrencyConverterStore = DefineStore<
-  'currencyConverter',
-  CurrencyConverterState,
-  Record<string, never>,
-  CurrencyConverterActions
->;
-export type RadixConverterStore = DefineStore<
-  'radixConverter',
-  RadixConverterState,
-  Record<string, never>,
-  RadixConverterActions
->;
+export type UnitStore = DefineStore<'unit', UnitState, Record<string, never>, UnitActions>;
+export type CurrencyStore = DefineStore<'currency', CurrencyState, Record<string, never>, CurrencyActions>;
+export type RadixStore = DefineStore<'radix', RadixState, Record<string, never>, RadixActions>;
 export type UIStore = DefineStore<'ui', UIState, Record<string, never>, UIActions>;
 export type SettingsStore = DefineStore<'settings', SettingsState, Record<string, never>, SettingsActions>;
-export type MainStore = DefineStore<'store', Record<string, never>, Record<string, never>, MainStoreActions>;

@@ -22,9 +22,16 @@
   import { showMessage } from './utils/NotificationUtils';
   import { isWideWidth } from './utils/GlobalHelpers';
 
+  // === 스토어 임포트 및 설정 ===
+  import { useUIStore } from 'stores/uiStore';
+  import { useSettingsStore } from 'stores/settingsStore';
+
+  const uiStore = useUIStore();
+  const settingsStore = useSettingsStore();
+
   // === 전역 객체 및 상태 저장소 설정 ===
   const $g = window.globalVars;
-  const $s = $g.store;
+  
   
   const route = useRoute();
   const { t } = useI18n();
@@ -40,8 +47,8 @@
    */
   const toggleAlwaysOnTopWithNotification = () => {
     if ($g.isElectron) {
-      $s.toggleAlwaysOnTop();
-      showMessage($s.alwaysOnTop ? t('alwaysOnTopOn') : t('alwaysOnTopOff'));
+      settingsStore.toggleAlwaysOnTop();
+      showMessage(settingsStore.alwaysOnTop ? t('alwaysOnTopOn') : t('alwaysOnTopOff'));
     }
   };
 
@@ -49,9 +56,9 @@
    * 다크모드를 토글하고 현재 설정 상태를 사용자에게 알립니다.
    */
   const toggleDarkModeWithNotification = () => {
-    $s.toggleDarkMode();
+    settingsStore.toggleDarkMode();
     showMessage(
-      $s.darkMode === 'system' ? t('darkMode.message.system') : t('darkMode.message.' + $s.darkMode),
+      settingsStore.darkMode === 'system' ? t('darkMode.message.system') : t('darkMode.message.' + settingsStore.darkMode),
     );
   };
 
@@ -75,14 +82,14 @@
    */
   const keyBinding = new KeyBinding([
     [['Alt+t'], toggleAlwaysOnTopWithNotification],
-    [['Alt+i'], $s.toggleInitPanel],
+    [['Alt+i'], settingsStore.toggleInitPanel],
     [['Alt+d'], toggleDarkModeWithNotification],
-    [['Alt+p'], $s.toggleHapticsMode],
-    [[';'], $s.toggleButtonAddedLabel],
-    [[','], $s.toggleUseGrouping],
-    [['Alt+,'], () => $s.setGroupingUnit($s.groupingUnit === 3 ? 4 : 3)],
-    [['['], $s.decrementDecimalPlaces],
-    [[']'], $s.incrementDecimalPlaces],
+    [['Alt+p'], settingsStore.toggleHapticsMode],
+    [[';'], settingsStore.toggleButtonAddedLabel],
+    [[','], settingsStore.toggleUseGrouping],
+    [['Alt+,'], () => settingsStore.setGroupingUnit(settingsStore.groupingUnit === 3 ? 4 : 3)],
+    [['['], settingsStore.decrementDecimalPlaces],
+    [[']'], settingsStore.incrementDecimalPlaces],
     [['q'], quitApp],
   ]);
 
@@ -101,9 +108,9 @@
    * 입력 필드 포커스 상태에 따라 키 바인딩을 활성화/비활성화합니다.
    */
   watch(
-    () => $s.inputFocused,
+    () => uiStore.inputFocused,
     () => {
-      if ($s.inputFocused) {
+      if (uiStore.inputFocused) {
         keyBinding.unsubscribe();
       } else {
         keyBinding.subscribe();
@@ -162,7 +169,7 @@
     }
   });
 
-  $s.isAppStarted = false;
+  uiStore.isAppStarted = false;
 </script>
 
 <template>

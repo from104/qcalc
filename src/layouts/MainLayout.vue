@@ -41,12 +41,20 @@
   const { locale } = useI18n({ useScope: 'global' });
   const { t } = useI18n();
 
+  // === 스토어 임포트 ===
+  import { useCalculatorStore } from 'stores/calculatorStore';
+  import { useUIStore } from 'stores/uiStore';
+  import { useSettingsStore } from 'stores/settingsStore';
+
+  const calculatorStore = useCalculatorStore();
+  const uiStore = useUIStore();
+  const settingsStore = useSettingsStore();
+
   // === 전역 변수 설정 ===
   /**
    * 전역 변수와 상태 저장소를 설정합니다.
    */
   const $g = window.globalVars;
-  const $s = $g.store;
 
   // === 메타데이터 설정 ===
   /**
@@ -89,7 +97,7 @@
    * 기록 삭제 버튼의 비활성화 상태를 계산합니다.
    */
   const isRecordDisabled = computed(() => {
-    return $s.calc.record.getAllRecords().length === 0 || $s.isDeleteRecordConfirmOpen;
+    return calculatorStore.calc.record.getAllRecords().length === 0 || uiStore.isDeleteRecordConfirmOpen;
   });
 
   /**
@@ -114,7 +122,7 @@
           icon: 'search',
           disabled: computed(() => false),
           action: () => {
-            $s.isSearchOpen = !$s.isSearchOpen;
+            uiStore.isSearchOpen = !uiStore.isSearchOpen;
           },
           tooltip: computed(() => t('tooltip.search')),
         },
@@ -122,7 +130,7 @@
           icon: 'delete_outline',
           disabled: isRecordDisabled,
           action: () => {
-            $s.isDeleteRecordConfirmOpen = true;
+            uiStore.isDeleteRecordConfirmOpen = true;
           },
           tooltip: computed(() => t('tooltip.deleteRecord')),
         },
@@ -171,15 +179,15 @@
    * 탭 이동 관련 함수들
    */
   const moveTabRight = () => {
-    const currentIndex = tabs.findIndex((tab) => tab.name === $s.currentTab);
+    const currentIndex = tabs.findIndex((tab) => tab.name === uiStore.currentTab);
     const nextTab = tabs[(currentIndex + 1) % tabs.length]?.name;
-    if (nextTab) $s.setCurrentTab(nextTab);
+    if (nextTab) uiStore.setCurrentTab(nextTab);
   };
 
   const moveTabLeft = () => {
-    const currentIndex = tabs.findIndex((tab) => tab.name === $s.currentTab);
+    const currentIndex = tabs.findIndex((tab) => tab.name === uiStore.currentTab);
     const prevTab = tabs[(currentIndex - 1 + tabs.length) % tabs.length]?.name;
-    if (prevTab) $s.setCurrentTab(prevTab);
+    if (prevTab) uiStore.setCurrentTab(prevTab);
   };
 
   /**
@@ -207,17 +215,17 @@
    * 전역 키보드 단축키를 설정합니다.
    */
   const keyBinding = new KeyBinding([
-    [['Control+1'], () => $s.setCurrentTab('calc')],
-    [['Control+2'], () => $s.setCurrentTab('unit')],
-    [['Control+3'], () => $s.setCurrentTab('currency')],
-    [['Control+4'], () => $s.setCurrentTab('radix')],
+    [['Control+1'], () => uiStore.setCurrentTab('calc')],
+    [['Control+2'], () => uiStore.setCurrentTab('unit')],
+    [['Control+3'], () => uiStore.setCurrentTab('currency')],
+    [['Control+4'], () => uiStore.setCurrentTab('radix')],
     [['Control+Tab', 'ArrowRight'], moveTabRight],
     [['Control+Shift+Tab', 'ArrowLeft'], moveTabLeft],
     [['F1'], () => navigateToPath('/help', route, router)],
     [['F2'], () => navigateToPath('/about', route, router)],
     [['F3'], () => navigateToPath('/settings', route, router)],
     [['F4'], () => navigateToPath('/record', route, router)],
-    [['F5'], () => ($s.showTipsDialog = true)],
+    [['F5'], () => (uiStore.showTipsDialog = true)],
     [['Escape'], closeSubPage],
   ]);
 
@@ -233,44 +241,44 @@
     currentSubPage.value = validPages.includes(route.name as string) ? (route.name as string) : 'record';
 
     // 로케일 설정
-    if (!$s.locale) {
-      $s.useSystemLocale = true;
-      $s.locale = navigator.language.substring(0, 2);
+    if (!settingsStore.locale) {
+      settingsStore.useSystemLocale = true;
+      settingsStore.locale = navigator.language.substring(0, 2);
     }
-    if (!$s.userLocale) {
-      $s.userLocale = $s.locale;
+    if (!settingsStore.userLocale) {
+      settingsStore.userLocale = settingsStore.locale;
     }
-    locale.value = $s.locale;
+    locale.value = settingsStore.locale;
 
     // OS별 UI 최적화
     if ($g.isWindows) {
-      $s.resultPanelPadding = 8;
+      calculatorStore.resultPanelPadding = 8;
     } else if ($g.isLinux) {
-      $s.resultPanelPadding = 3;
+      calculatorStore.resultPanelPadding = 3;
     } else {
-      $s.resultPanelPadding = 0;
+      calculatorStore.resultPanelPadding = 0;
     }
 
     // 초기 설정 적용
-    if ($s.initPanel && $s.calc) {
-      $s.calc.reset();
+    if (settingsStore.initPanel && calculatorStore.calc) {
+      calculatorStore.calc.reset();
     }
     if ($g.isElectron) {
-      $s.setAlwaysOnTop($s.alwaysOnTop);
+      settingsStore.setAlwaysOnTop(settingsStore.alwaysOnTop);
     }
 
     // 다크모드 설정
     const darkModeMediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
     darkModeMediaQuery.addEventListener('change', () => {
-      if ($s.darkMode === 'system') {
-        $s.updateDarkMode();
+      if (settingsStore.darkMode === 'system') {
+        settingsStore.updateDarkMode();
       }
     });
-    $s.updateDarkMode();
+    settingsStore.updateDarkMode();
 
     // 팁 다이얼로그 초기화
-    $s.showTipsDialog = $s.showTips && !$s.isAppStarted;
-    $s.isAppStarted = true;
+    uiStore.showTipsDialog = uiStore.showTips && !uiStore.isAppStarted;
+    uiStore.isAppStarted = true;
   });
 
   /**
@@ -285,9 +293,9 @@
    */
 
   watch(
-    () => $s.inputFocused,
+    () => uiStore.inputFocused,
     () => {
-      if ($s.inputFocused) {
+      if (uiStore.inputFocused) {
         keyBinding.unsubscribe();
       } else {
         keyBinding.subscribe();
@@ -316,12 +324,12 @@
         show-if-above
         elevated
         :width="250"
-        :dark="$s.isDarkMode()"
+        :dark="settingsStore.isDarkMode()"
         :swipe-only="$g.isMobile"
         behavior="mobile"
         @click="leftDrawerOpen = false"
       >
-        <q-card :class="$s.isDarkMode() ? 'bg-grey-9' : 'bg-grey-3'" class="full-height menu-card">
+        <q-card :class="settingsStore.isDarkMode() ? 'bg-grey-9' : 'bg-grey-3'" class="full-height menu-card">
           <MenuPanel />
         </q-card>
       </q-drawer>
@@ -333,7 +341,7 @@
             <ToolTip :text="t('tooltip.menu')" />
           </q-btn>
           <q-tabs
-            v-model="$s.currentTab"
+            v-model="uiStore.currentTab"
             align="left"
             class="col-8 q-px-none"
             active-color="text-primary"
@@ -343,7 +351,7 @@
             inline-label
             outside-arrows
             mobile-arrows
-            @update:model-value="$s.setCurrentTab($event)"
+            @update:model-value="uiStore.setCurrentTab($event)"
           >
             <q-tab v-for="tab in tabs" :key="tab.name" :label="tab.title" :name="tab.name" class="q-px-xs" dense />
           </q-tabs>
@@ -407,7 +415,7 @@
       <q-page-container class="row no-padding-bottom">
         <!-- 메인 페이지 컨텐츠 -->
         <template v-if="!isSubPage">
-          <q-tab-panels v-model="$s.currentTab" animated infinite :swipeable="$g.isMobile">
+          <q-tab-panels v-model="uiStore.currentTab" animated infinite :swipeable="$g.isMobile">
             <q-tab-panel v-for="(tab, index) in tabs" :key="index" :name="tab.name">
               <component :is="tab.component" />
             </q-tab-panel>
@@ -435,7 +443,7 @@
         show-if-above
         elevated
         :width="250"
-        :dark="$s.isDarkMode()"
+        :dark="settingsStore.isDarkMode()"
         :swipe-only="$g.isMobile"
         behavior="mobile"
         @click="leftDrawerOpen = false"
@@ -452,7 +460,7 @@
             <ToolTip :text="t('tooltip.menu')" />
           </q-btn>
           <q-tabs
-            v-model="$s.currentTab"
+            v-model="uiStore.currentTab"
             align="left"
             class="col-grow"
             active-color="text-primary"
@@ -462,7 +470,7 @@
             inline-label
             role="tablist"
             :aria-label="t('ariaLabel.mainTabs')"
-            @update:model-value="$s.setCurrentTab($event)"
+            @update:model-value="uiStore.setCurrentTab($event)"
           >
             <q-tab
               v-for="tab in tabs"
@@ -473,7 +481,7 @@
               dense
               role="tab"
               :aria-label="t('ariaLabel.tab', { name: tab.title })"
-              :aria-selected="$s.currentTab === tab.name"
+              :aria-selected="uiStore.currentTab === tab.name"
               :aria-controls="`panel-${tab.name}`"
             />
           </q-tabs>
@@ -545,7 +553,7 @@
         <!-- 계산기 영역 -->
         <div class="col-6 calc-content" role="region" :aria-label="t('ariaLabel.calculatorSection')">
           <q-tab-panels
-            v-model="$s.currentTab"
+            v-model="uiStore.currentTab"
             animated
             infinite
             :swipeable="$g.isMobile"
@@ -591,7 +599,7 @@
       </q-page-container>
     </q-layout>
 
-    <ShowTips v-model="$s.showTipsDialog" />
+    <ShowTips v-model="uiStore.showTipsDialog" />
   </div>
 </template>
 

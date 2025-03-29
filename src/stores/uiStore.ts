@@ -57,11 +57,6 @@ export const useUIStore = defineStore('ui', {
     setDeleteRecordConfirmOpen(value: boolean) {
       this.isDeleteRecordConfirmOpen = value;
     },
-
-    // 기본 계산기 여부 확인
-    isDefaultCalculator(): boolean {
-      return true;
-    },
   },
 
   persist: true,

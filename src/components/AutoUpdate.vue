@@ -11,8 +11,11 @@
 
   // 전역 window 객체에 접근하기 위한 상수 선언
   const $g = window.globalVars;
-  const $s = $g.store;
-  
+
+  import { useSettingsStore } from 'stores/settingsStore';
+
+  const settingsStore = useSettingsStore();
+
   // i18n 설정
   const { t } = useI18n();
 
@@ -31,7 +34,7 @@
     info?: UpdateInfo | UpdateProgressInfo | UpdateError,
   ) => {
     // 자동 업데이트가 비활성화되어 있으면 패스
-    if (!$s.autoUpdate) {
+    if (!settingsStore.autoUpdate) {
       // 새 패키지 버전
       if (status === 'available' && 'version' in (info || {})) {
         const newVersion = (info as UpdateInfo).version;
@@ -210,14 +213,14 @@
               flat
               :label="t('later')"
               color="primary"
-              :text-color="$s.isDarkMode() ? 'blue-grey-2' : 'primary'"
+              :text-color="settingsStore.isDarkMode() ? 'blue-grey-2' : 'primary'"
               class="q-mr-sm"
             />
             <q-btn
               flat
               :label="t('update')"
               color="primary"
-              :text-color="$s.isDarkMode() ? 'blue-grey-2' : 'primary'"
+              :text-color="settingsStore.isDarkMode() ? 'blue-grey-2' : 'primary'"
               @click="startUpdate"
             />
           </template>
@@ -227,14 +230,14 @@
               flat
               :label="t('later')"
               color="primary"
-              :text-color="$s.isDarkMode() ? 'blue-grey-2' : 'primary'"
+              :text-color="settingsStore.isDarkMode() ? 'blue-grey-2' : 'primary'"
               class="q-mr-sm"
             />
             <q-btn
               flat
               :label="t('installNow')"
               color="primary"
-              :text-color="$s.isDarkMode() ? 'blue-grey-2' : 'primary'"
+              :text-color="settingsStore.isDarkMode() ? 'blue-grey-2' : 'primary'"
               @click="installUpdate"
             />
           </template>
@@ -244,7 +247,7 @@
               flat
               :label="t('close')"
               color="primary"
-              :text-color="$s.isDarkMode() ? 'blue-grey-2' : 'primary'"
+              :text-color="settingsStore.isDarkMode() ? 'blue-grey-2' : 'primary'"
             />
           </template>
         </q-card-actions>

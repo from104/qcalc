@@ -34,10 +34,20 @@
 
   // 전역 window 객체에 접근하기 위한 상수 선언
   const $g = window.globalVars;
-  const $s = $g.store;
-  
-  // 스토어에서 필요한 메서드와 속성 추출
-  const { calc, getRightSideInRecord, getLeftSideInRecord, currencyConverter } = $s;
+
+  // 스토어 import
+  import { useUIStore } from 'stores/uiStore';
+  import { useSettingsStore } from 'stores/settingsStore';
+  import { useCalculatorStore } from 'stores/calculatorStore';
+  import { useCurrencyStore } from 'stores/currencyStore';
+  import { useUnitStore } from 'stores/unitStore';
+
+  // 스토어 인스턴스 생성
+  const uiStore = useUIStore();
+  const settingsStore = useSettingsStore();
+  const calculatorStore = useCalculatorStore();
+  const currencyStore = useCurrencyStore();
+  const unitStore = useUnitStore();
 
   // 컴포넌트 import
   import MenuItem from 'components/snippets/MenuItem.vue';
@@ -48,10 +58,10 @@
 
   // 기존 코드 상단에 인터페이스 추가
   interface Record {
-    id: number;
+    id?: number;
     calculationResult: CalculationResult;
     timestamp: number;
-    memo?: string;
+    memo?: string | undefined;
   }
 
   interface CalculationResult {
@@ -69,7 +79,10 @@
   }
 
   // records 계산 속성 수정
-  const records = computed<Record[]>(() => calc.record.getAllRecords());
+  const records = computed(() => calculatorStore.calc.record.getAllRecords());
+
+  // 화면 너비가 특정 값보다 큰지 확인하는 함수
+  const isWideWidth = () => window.innerWidth > 768;
 
   // 계산 결과 메뉴의 열림 상태를 관리하는 반응형 객체
   const recordMenu = reactive(Object.fromEntries(records.value.map((h: Record) => [h.id, false])));
@@ -137,15 +150,15 @@
   };
 
   const openDeleteRecordConfirmDialog = () => {
-    if (calc.record.getAllRecords().length > 0) $s.isDeleteRecordConfirmOpen = true;
+    if (calculatorStore.calc.record.getAllRecords().length > 0) uiStore.isDeleteRecordConfirmOpen = true;
   };
 
   const openSearchDialogByKey = () => {
-    $s.isSearchOpen = !$s.isSearchOpen;
-    if ($s.isSearchOpen) {
+    uiStore.isSearchOpen = !uiStore.isSearchOpen;
+    if (uiStore.isSearchOpen) {
       setTimeout(() => {
         // 끝의 s 삭제
-        $s.searchKeyword = $s.searchKeyword.slice(0, -1);
+        uiStore.searchKeyword = uiStore.searchKeyword.slice(0, -1);
       }, 100);
     }
   };
@@ -164,9 +177,9 @@
 
   // 입력 포커스 상태에 따른 키 바인딩 활성화/비활성화
   watch(
-    () => $s.inputFocused,
+    () => uiStore.inputFocused,
     () => {
-      if ($s.inputFocused) {
+      if (uiStore.inputFocused) {
         keyBinding.unsubscribe();
       } else {
         keyBinding.subscribe();
@@ -179,9 +192,9 @@
   onMounted(() => {
     keyBinding.subscribe();
     setTimeout(() => {
-      document.getElementById('record')?.scrollTo({ top: $s.recordLastScrollPosition });
-      if ($s.isSearchOpen) {
-        $s.setInputFocused();
+      document.getElementById('record')?.scrollTo({ top: uiStore.recordLastScrollPosition });
+      if (uiStore.isSearchOpen) {
+        uiStore.setInputFocused();
       }
     }, 50);
     showScrollToTop.value = false;
@@ -190,9 +203,9 @@
   // 컴포넌트 언마운트 시 키 바인딩 비활성화
   onBeforeUnmount(() => {
     keyBinding.unsubscribe();
-    $s.recordLastScrollPosition = document.getElementById('record')?.scrollTop ?? 0;
+    uiStore.recordLastScrollPosition = document.getElementById('record')?.scrollTop ?? 0;
 
-    $s.isDeleteRecordConfirmOpen = false;
+    uiStore.isDeleteRecordConfirmOpen = false;
   });
 
   // 메모 편집 관련 상태 변수
@@ -204,7 +217,7 @@
   // 메모 다이얼로그 열기 함수
   const openMemoDialog = (id: number) => {
     selectedMemoId = id;
-    memoText.value = (calc.record.getMemo(id) as string) || '';
+    memoText.value = (calculatorStore.calc.record.getMemo(id) as string) || '';
     showMemoDialog.value = true;
   };
 
@@ -216,7 +229,7 @@
 
   // 메모 편집 확인 함수
   const saveMemo = () => {
-    calc.record.setMemo(selectedMemoId, memoText.value);
+    calculatorStore.calc.record.setMemo(selectedMemoId, memoText.value);
     memoSlideDirection.value = 'slide-right';
     showMemoDialog.value = false;
     memoText.value = '';
@@ -231,25 +244,19 @@
     selectedMemoId = 0;
   };
 
-  // 메모 삭제 함수
-  // const deleteMemo = (id: number) => {
-  //   calc.record.deleteMemo(id);
-  //   memoText.value = '';
-  // };
-
   // 히스토리 항목 복사 함수
   const copyRecordItem = async (
     id: number,
     copyType: 'formattedNumber' | 'onlyNumber' | 'memo' | 'time',
   ): Promise<void> => {
-    const record = calc.record.getRecordById(id);
+    const record = calculatorStore.calc.record.getRecordById(id);
     const copyText =
       copyType === 'formattedNumber'
-        ? getRightSideInRecord(record.calculationResult)
+        ? calculatorStore.getRightSideInRecord(record.calculationResult)
         : copyType === 'onlyNumber'
           ? record.calculationResult.resultNumber
           : copyType === 'memo'
-            ? (calc.record.getMemo(id) as string)
+            ? (calculatorStore.calc.record.getMemo(id) as string)
             : copyType === 'time'
               ? formatDateTime(record.timestamp)
               : '';
@@ -264,37 +271,41 @@
 
   // 메인 결과로 이동 함수
   const loadToMainPanel = (id: number) => {
-    const record = calc.record.getRecordById(id);
-    calc.currentNumber = record.calculationResult.resultNumber;
-    calc.offBufferReset();
-    if (!$s.isWideWidth()) navigateToPath('/', route, router);
+    const record = calculatorStore.calc.record.getRecordById(id);
+    calculatorStore.calc.currentNumber = record.calculationResult.resultNumber;
+    calculatorStore.calc.offBufferReset();
+    if (!isWideWidth()) navigateToPath('/', route, router);
   };
 
   const loadToSubPanel = (id: number) => {
-    const record = calc.record.getRecordById(id);
-    if ($s.currentTab === 'unit') {
-      $s.swapUnits();
-      calc.currentNumber = UnitConverter.convert(
-        $s.selectedCategory,
+    const record = calculatorStore.calc.record.getRecordById(id);
+    if (uiStore.currentTab === 'unit') {
+      unitStore.swapUnits();
+      calculatorStore.calc.currentNumber = UnitConverter.convert(
+        unitStore.selectedCategory,
         toBigNumber(record.calculationResult.resultNumber),
-        $s.sourceUnits[$s.selectedCategory] ?? '',
-        $s.targetUnits[$s.selectedCategory] ?? '',
+        unitStore.sourceUnits[unitStore.selectedCategory] ?? '',
+        unitStore.targetUnits[unitStore.selectedCategory] ?? '',
       );
-      $s.swapUnits();
-    } else if ($s.currentTab === 'currency') {
-      $s.swapCurrencies();
-      calc.currentNumber = currencyConverter
-        .convert(toBigNumber(record.calculationResult.resultNumber), $s.sourceCurrency, $s.targetCurrency)
+      unitStore.swapUnits();
+    } else if (uiStore.currentTab === 'currency') {
+      currencyStore.swapCurrencies();
+      calculatorStore.calc.currentNumber = currencyStore.currencyConverter
+        .convert(
+          toBigNumber(record.calculationResult.resultNumber),
+          currencyStore.sourceCurrency,
+          currencyStore.targetCurrency,
+        )
         .toString();
-      $s.swapCurrencies();
+      currencyStore.swapCurrencies();
     }
-    calc.offBufferReset();
-    if (!$s.isWideWidth()) navigateToPath('/', route, router);
+    calculatorStore.calc.offBufferReset();
+    if (!isWideWidth()) navigateToPath('/', route, router);
   };
 
   // 히스토리 항목 삭제 함수
   const deleteRecordItem = (id: number) => {
-    calc.record.deleteRecord(id);
+    calculatorStore.calc.record.deleteRecord(id);
   };
 
   // 헤더의 높이를 동적으로 계산하는 computed 속성입니다.
@@ -321,9 +332,9 @@
     // 기본 레코드 문자열 생성
     const strings = records.value.map((record: Record) => {
       const displayText = [
-        getLeftSideInRecord(record.calculationResult, true),
+        calculatorStore.getLeftSideInRecord(record.calculationResult, true),
         '\n= ',
-        getRightSideInRecord(record.calculationResult),
+        calculatorStore.getRightSideInRecord(record.calculationResult),
       ].join('');
 
       return {
@@ -336,10 +347,10 @@
     });
 
     // 검색이 활성화되지 않은 경우 전체 결과 반환
-    if (!$s.isSearchOpen) return strings;
+    if (!uiStore.isSearchOpen) return strings;
 
     // 검색어가 없는 경우 전체 결과 반환
-    const searchTerm = $s.searchKeyword.trim().toLowerCase();
+    const searchTerm = uiStore.searchKeyword.trim().toLowerCase();
     if (!searchTerm) return strings;
 
     // 검색어로 필터링
@@ -356,7 +367,7 @@
 
   // 계산된 상단 여백 추가
   const calculatedTopMargin = computed(() => {
-    return $s.isSearchOpen ? `${searchBarHeight.value}px` : '0px';
+    return uiStore.isSearchOpen ? `${searchBarHeight.value}px` : '0px';
   });
 
   interface QSlideEvent {
@@ -403,7 +414,7 @@
         color="secondary"
         icon="publish"
         class="fixed"
-        :class="$s.isSearchOpen ? 'q-ma-xl' : 'q-ma-md'"
+        :class="uiStore.isSearchOpen ? 'q-ma-xl' : 'q-ma-md'"
         style="z-index: 15"
         :aria-label="t('ariaLabel.scrollToTop')"
         @click="scrollToTop"
@@ -413,14 +424,14 @@
     <!---검색 바 -->
     <transition name="search-bar">
       <q-bar
-        v-if="$s.isSearchOpen"
+        v-if="uiStore.isSearchOpen"
         class="search-bar"
         :class="{
-          'input-focused': $s.inputFocused,
+          'input-focused': uiStore.inputFocused,
         }"
       >
         <q-input
-          v-model="$s.searchKeyword"
+          v-model="uiStore.searchKeyword"
           :placeholder="t('search')"
           borderless
           filled
@@ -429,13 +440,13 @@
           class="search-input"
           :aria-label="t('ariaLabel.searchInput')"
           role="searchbox"
-          @focus="$s.setInputFocused"
-          @blur="$s.setInputBlurred"
+          @focus="uiStore.setInputFocused"
+          @blur="uiStore.setInputBlurred"
           @keyup.enter="$event.target.blur()"
           @keyup.escape="
             () => {
-              $s.isSearchOpen = false;
-              $s.setInputBlurred();
+              uiStore.isSearchOpen = false;
+              uiStore.setInputBlurred();
             }
           "
         >
@@ -450,8 +461,8 @@
               :aria-label="t('ariaLabel.closeSearch')"
               @click="
                 () => {
-                  $s.isSearchOpen = false;
-                  $s.setInputBlurred();
+                  uiStore.isSearchOpen = false;
+                  uiStore.setInputBlurred();
                 }
               "
             />
@@ -467,7 +478,7 @@
         <q-item-section role="listitem">
           <q-item-label>
             <span class="text-h6">{{
-              $s.isSearchOpen && $s.searchKeyword.trim() !== '' ? t('noSearchResult') : t('noRecord')
+              uiStore.isSearchOpen && uiStore.searchKeyword.trim() !== '' ? t('noSearchResult') : t('noRecord')
             }}</span>
           </q-item-label>
         </q-item-section>
@@ -499,7 +510,7 @@
                 <q-item-label v-if="record.memo" class="memo-text">
                   <HighlightText
                     :text="record.memo"
-                    :search-term="$s.searchKeyword"
+                    :search-term="uiStore.searchKeyword"
                     @show-tooltip="(isShow) => handleMemoTooltip(record.id, isShow)"
                   />
                   <ToolTip v-if="isShowMemoTooltip[record.id]" :delay="1000">
@@ -509,7 +520,7 @@
                 <q-item-label class="record-text">
                   <HighlightText
                     :text="record.displayText"
-                    :search-term="$s.searchKeyword"
+                    :search-term="uiStore.searchKeyword"
                     allow-line-break
                     @show-tooltip="(isShow) => handleResultTooltip(record.id, isShow)"
                   />
@@ -521,7 +532,7 @@
                   <div class="col-6 text-left record-menu-btn">
                     <q-btn
                       class="q-px-xs q-py-none menu-btn"
-                      :class="$s.isDarkMode() ? 'body--dark' : 'body--light'"
+                      :class="settingsStore.darkMode ? 'body--dark' : 'body--light'"
                       icon="more_vert"
                       size="sm"
                       flat
@@ -551,7 +562,7 @@
                           <MenuItem
                             :title="t('copyDisplayedResult')"
                             :action="() => copyRecordItem(record.id as number, 'formattedNumber')"
-                            :caption="getRightSideInRecord(record.origResult)"
+                            :caption="calculatorStore.getRightSideInRecord(record.origResult)"
                           />
                           <MenuItem
                             :title="t('copyResultNumber')"
@@ -570,7 +581,7 @@
                             :action="() => loadToMainPanel(record.id as number)"
                           />
                           <MenuItem
-                            v-if="$s.currentTab === 'unit' || $s.currentTab === 'currency'"
+                            v-if="uiStore.currentTab === 'unit' || uiStore.currentTab === 'currency'"
                             :title="t('loadToSubPanel')"
                             :action="() => loadToSubPanel(record.id as number)"
                           />
@@ -586,7 +597,7 @@
                     <q-btn
                       v-if="$g.isDesktop"
                       class="q-px-xs menu-btn"
-                      :class="$s.isDarkMode() ? 'body--dark' : 'body--light'"
+                      :class="settingsStore.darkMode ? 'body--dark' : 'body--light'"
                       icon="edit_note"
                       size="sm"
                       flat
@@ -597,9 +608,9 @@
                   <div class="col-6 text-right text-caption record-timestamp">
                     <HighlightText
                       class="self-center"
-                      :class="$s.isDarkMode() ? 'body--dark' : 'body--light'"
+                      :class="settingsStore.darkMode ? 'body--dark' : 'body--light'"
                       :text="formatDateTime(record.timestamp)"
-                      :search-term="$s.searchKeyword"
+                      :search-term="uiStore.searchKeyword"
                     />
                   </div>
                 </q-item-label>
@@ -612,12 +623,17 @@
   </q-card-section>
 
   <!-- 기록 전체 삭제 다이얼로그 -->
-  <q-dialog v-model="$s.isDeleteRecordConfirmOpen" transition-show="scale" transition-hide="scale" style="z-index: 15">
+  <q-dialog
+    v-model="uiStore.isDeleteRecordConfirmOpen"
+    transition-show="scale"
+    transition-hide="scale"
+    style="z-index: 15"
+  >
     <q-card class="noselect text-center text-white bg-negative" style="width: 240px">
       <q-card-section>{{ t('doYouDeleteRecord') }} </q-card-section>
       <q-card-actions align="center" class="text-negative bg-white">
         <q-btn v-close-popup flat :label="t('message.no')" autofocus />
-        <q-btn v-close-popup flat :label="t('message.yes')" @click="calc.record.clearRecords()" />
+        <q-btn v-close-popup flat :label="t('message.yes')" @click="calculatorStore.calc.record.clearRecords()" />
       </q-card-actions>
     </q-card>
   </q-dialog>
@@ -629,8 +645,8 @@
     transition-show="slide-right"
     :transition-hide="memoSlideDirection"
     style="z-index: 15"
-    @show="$s.setInputFocused"
-    @hide="$s.setInputBlurred"
+    @show="uiStore.setInputFocused"
+    @hide="uiStore.setInputBlurred"
   >
     <q-card class="noselect text-center" style="width: 250px">
       <q-bar v-auto-blur dark class="full-width justify-between nnoselect text-body1 text-white bg-primary">
@@ -647,17 +663,17 @@
           autofocus
           clear-icon="close"
           color="primary"
-          @focus="$s.setInputFocused"
-          @blur="$s.setInputBlurred"
+          @focus="uiStore.setInputFocused"
+          @blur="uiStore.setInputBlurred"
           @keyup.enter="
             () => {
-              $s.setInputBlurred;
+              uiStore.setInputBlurred;
               saveMemo();
             }
           "
           @keyup.escape="
             () => {
-              $s.setInputBlurred;
+              uiStore.setInputBlurred;
               cancelMemo();
             }
           "

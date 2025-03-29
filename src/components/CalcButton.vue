@@ -11,9 +11,22 @@
   // Vue 핵심 기능 및 컴포지션 API 가져오기
   import { onMounted, onBeforeUnmount, ref, watch, reactive, computed } from 'vue';
 
+  import { createCalcButtonSet } from 'src/constants/CalcButtonSet';
+  import { showError, showMessage } from 'src/utils/NotificationUtils';
+  import { clickButtonById, isWideWidth } from 'src/utils/GlobalHelpers';
+
   // 전역 window 객체에 접근하기 위한 상수 선언
   const $g = window.globalVars;
-  const $s = $g.store;
+
+  import { useSettingsStore } from 'stores/settingsStore';
+  import { useCalculatorStore } from 'stores/calculatorStore';
+  import { useUIStore } from 'stores/uiStore';
+  import { useRadixStore } from 'stores/radixStore';
+
+  const settingsStore = useSettingsStore();
+  const uiStore = useUIStore();
+  const calculatorStore = useCalculatorStore();
+  const radixStore = useRadixStore();
 
   // i18n 설정
   import { useI18n } from 'vue-i18n';
@@ -52,19 +65,17 @@
     enableShiftLock,
     toggleShift,
     toggleShiftLock,
-    convertRadix,
-    clickButtonById,
-  } = $s;
+  } = calculatorStore;
 
   // 햅틱 피드백 함수
   const hapticFeedbackLight = async () => {
-    if ($g.isCapacitor && $s.hapticsMode) {
+    if ($g.isCapacitor && settingsStore.hapticsMode) {
       await Haptics.impact({ style: ImpactStyle.Light });
     }
   };
 
   const hapticFeedbackMedium = async () => {
-    if ($g.isCapacitor && $s.hapticsMode) {
+    if ($g.isCapacitor && settingsStore.hapticsMode) {
       await Haptics.impact({ style: ImpactStyle.Medium });
     }
   };
@@ -93,17 +104,13 @@
 
   const shiftButtonPressedColor = lighten(calculatorButtonColors.important ?? '', -30);
 
-  import { createCalcButtonSet } from 'src/constants/CalcButtonSet';
-  import { showError, showMessage } from 'src/utils/NotificationUtils';
-import { isWideWidth } from 'src/utils/GlobalHelpers';
-
   // const i18n = useI18n();
   const { standardButtons, modeSpecificButtons, standardExtendedFunctions, modeSpecificExtendedFunctions } =
     createCalcButtonSet(t);
 
   // mainRadix의 변경을 감지하는 computed 속성 추가
   const currentRadixBase = computed(() => {
-    const radixKey = $s.sourceRadix as Radix;
+    const radixKey = radixStore.sourceRadix as Radix;
     return (
       ({ [Radix.Binary]: 2, [Radix.Octal]: 8, [Radix.Decimal]: 10, [Radix.Hexadecimal]: 16 } as Record<Radix, number>)[
         radixKey
@@ -118,7 +125,7 @@ import { isWideWidth } from 'src/utils/GlobalHelpers';
     const value = label.match(/^[0-9A-F]+$/)?.[0];
     if (!value) return false;
 
-    return Number(convertRadix(value, Radix.Hexadecimal, Radix.Decimal)) >= currentRadixBase.value;
+    return Number(radixStore.convertRadix(value, Radix.Hexadecimal, Radix.Decimal)) >= currentRadixBase.value;
   };
 
   // 버튼 변환 함수 추출
@@ -183,7 +190,7 @@ import { isWideWidth } from 'src/utils/GlobalHelpers';
 
   // 추가 기능 툴팁 표시 함수
   const displayActionTooltip = (id: ButtonID) => {
-    if (tooltipTimers[id] || id === shiftButtonId.value || (!$s.showButtonAddedLabel && $s.isShiftPressed)) return;
+    if (tooltipTimers[id] || id === shiftButtonId.value || (settingsStore.showButtonAddedLabel && calculatorStore.isShiftPressed)) return;
     tooltipTimers[id] = true;
     setTimeout(() => {
       tooltipTimers[id] = false;
@@ -193,10 +200,10 @@ import { isWideWidth } from 'src/utils/GlobalHelpers';
   // 버튼 시프트 상태에 따른 기능 실행
   const handleShiftFunction = (id: ButtonID) => {
     const isShiftButton = id === shiftButtonId.value;
-    const isDisabled = $s.isShiftPressed
+    const isDisabled = calculatorStore.isShiftPressed
       ? (extendedFunctionSet.value[id]?.isDisabled ?? false)
       : (activeButtonSet.value[id]?.isDisabled ?? false);
-    const action = $s.isShiftPressed ? extendedFunctionSet.value[id]?.action : activeButtonSet.value[id]?.action;
+    const action = calculatorStore.isShiftPressed ? extendedFunctionSet.value[id]?.action : activeButtonSet.value[id]?.action;
 
     if (isShiftButton) {
       toggleShift();
@@ -211,10 +218,10 @@ import { isWideWidth } from 'src/utils/GlobalHelpers';
 
     executeActionWithErrorHandling(action as () => void);
 
-    if ($s.isShiftPressed) {
+    if (calculatorStore.isShiftPressed) {
       displayActionTooltip(id);
       displayButtonNotification(id);
-      if (!$s.isShiftLocked) disableShift();
+      if (calculatorStore.isShiftLocked) disableShift();
     }
   };
 
@@ -222,8 +229,8 @@ import { isWideWidth } from 'src/utils/GlobalHelpers';
   const handleLongPress = (id: ButtonID) => {
     hapticFeedbackMedium();
     const isShiftButton = id === shiftButtonId.value;
-    const isShiftActive = $s.isShiftPressed;
-    const isShiftLocked = $s.isShiftLocked;
+    const isShiftActive = calculatorStore.isShiftPressed;
+    const isShiftLocked = calculatorStore.isShiftLocked;
     if (isShiftButton) {
       if (isShiftLocked) {
         disableShiftLock();
@@ -297,7 +304,7 @@ import { isWideWidth } from 'src/utils/GlobalHelpers';
 
   // 입력 포커스 상태에 따른 키 바인딩 관리
   watch(
-    () => $s.inputFocused,
+    () => uiStore.inputFocused,
     (focused) => {
       if (focused) {
         keyBinding.unsubscribe();
@@ -421,45 +428,45 @@ import { isWideWidth } from 'src/utils/GlobalHelpers';
         no-caps
         push
         :label="
-          $s.isShiftPressed && !$s.showButtonAddedLabel && id !== shiftButtonId
+          calculatorStore.isShiftPressed && !settingsStore.showButtonAddedLabel && id !== shiftButtonId
             ? (extendedFunctionSet[id]?.label ?? '')
             : button.label.charAt(0) === '@'
               ? undefined
               : button.label
         "
         :icon="
-          $s.isShiftPressed && !$s.showButtonAddedLabel && id !== shiftButtonId
+          calculatorStore.isShiftPressed && !settingsStore.showButtonAddedLabel && id !== shiftButtonId
             ? undefined
             : button.label.charAt(0) === '@'
               ? button.label.slice(1)
               : undefined
         "
         :class="[
-          $s.isShiftPressed && !$s.showButtonAddedLabel && id !== shiftButtonId
+          calculatorStore.isShiftPressed && !settingsStore.showButtonAddedLabel && id !== shiftButtonId
             ? 'char'
             : button.label.charAt(0) === '@'
               ? 'icon'
               : 'char',
-          id === shiftButtonId && $s.isShiftPressed ? 'button-shift' : '',
-          $s.isShiftPressed && !$s.showButtonAddedLabel && !(extendedFunctionSet[id]?.isDisabled ?? false)
+          id === shiftButtonId && calculatorStore.isShiftPressed ? 'button-shift' : '',
+          calculatorStore.isShiftPressed && !settingsStore.showButtonAddedLabel && !(extendedFunctionSet[id]?.isDisabled ?? false)
             ? ''
-            : (button.isDisabled ?? false) || $s.isShiftPressed
+            : (button.isDisabled ?? false) || calculatorStore.isShiftPressed
               ? 'disabled-button'
               : '',
         ]"
-        :style="[!$s.showButtonAddedLabel || !(extendedFunctionSet[id]?.label ?? '') ? { paddingTop: '4px' } : {}]"
+        :style="[!settingsStore.showButtonAddedLabel || !(extendedFunctionSet[id]?.label ?? '') ? { paddingTop: '4px' } : {}]"
         :color="`btn-${button.color}`"
         :aria-label="getAriaLabel(id, button)"
         @click="() => (button.isDisabled ? displayDisabledButtonNotification() : handleShiftFunction(id))"
         @touchstart="() => hapticFeedbackLight()"
       >
         <span
-          v-if="$s.showButtonAddedLabel && extendedFunctionSet[id]"
+          v-if="settingsStore.showButtonAddedLabel && extendedFunctionSet[id]"
           class="top-label"
           :class="[
             `top-label-${button.label.charAt(0) === '@' ? 'icon' : 'char'}`,
             extendedFunctionSet[id].isDisabled ? 'disabled-button-added-label' : '',
-            $s.isShiftPressed && !extendedFunctionSet[id].isDisabled ? 'shifted-button-added-label' : '',
+            calculatorStore.isShiftPressed && !extendedFunctionSet[id].isDisabled ? 'shifted-button-added-label' : '',
           ]"
         >
           {{ extendedFunctionSet[id].label }}
@@ -479,7 +486,7 @@ import { isWideWidth } from 'src/utils/GlobalHelpers';
         </q-tooltip>
         <ToolTip>
           {{
-            $s.isShiftPressed
+            calculatorStore.isShiftPressed
               ? (extendedFunctionSet[id]?.isDisabled ?? false)
                 ? t('disabledButton')
                 : getTooltipsOfKeys(id, true)

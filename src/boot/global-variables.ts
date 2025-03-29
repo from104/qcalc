@@ -13,14 +13,6 @@ import { version } from '../../package.json';
 // 불변 속성 정의 함수
 import { defineImmutableProperty } from 'src/utils/GlobalHelpers';
 
-// 전역 변수 정의
-import { useStore } from './../stores/store';
-import { useCalculatorStore } from './../stores/calculatorStore';
-import { useSettingsStore } from './../stores/settingsStore';
-import { useUIStore } from './../stores/uiStore';
-import { useUnitConverterStore } from '../stores/unitStore';
-import { useCurrencyConverterStore } from '../stores/currencyStore';
-import { useRadixConverterStore } from '../stores/radixStore';
 
 // 불변 속성 정의 함수
 // const defineImmutableProperty = <T>(obj: object, prop: string, value: T) => {
@@ -33,14 +25,6 @@ import { useRadixConverterStore } from '../stores/radixStore';
 // };
 
 export default defineBoot(() => {
-  const store = {
-    ...(useCalculatorStore() ?? {}),
-    ...(useSettingsStore() ?? {}),
-    ...(useUnitConverterStore() ?? {}),
-    ...(useCurrencyConverterStore() ?? {}),
-    ...(useRadixConverterStore() ?? {}),
-    ...(useUIStore() ?? {}),
-  };
   // globalVars 객체 생성
   const globalVars = {
     // 개발 모드 여부
@@ -68,9 +52,6 @@ export default defineBoot(() => {
 
     // 버전 정보
     version: version,
-
-    // 스토어 인스턴스
-    store: store,
   };
 
   // Capacitor 환경에서 자바스크립트 인터페이스 추가
