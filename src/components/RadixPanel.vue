@@ -23,13 +23,13 @@
   import { useUIStore } from 'stores/uiStore';
   import { useSettingsStore } from 'stores/settingsStore';
   import { useRadixStore } from 'stores/radixStore';
-  import { useCalculatorStore } from 'stores/calculatorStore';
+  import { useCalcStore } from 'src/stores/calcStore';
 
   // 스토어 인스턴스 생성
   const uiStore = useUIStore();
   const settingsStore = useSettingsStore();
   const radixStore = useRadixStore();
-  const calculatorStore = useCalculatorStore();
+  const calcStore = useCalcStore();
 
   // 컴포넌트 import
   import ToolTip from 'src/components/snippets/ToolTip.vue';
@@ -66,7 +66,7 @@
 
   onMounted(() => {
     radixStore.initRecentRadix();
-    radixStore.updateWordSize(radixStore.wordSize);
+    calcStore.calc.wordSize = radixStore.wordSize;
     keyBinding.subscribe();
   });
 
@@ -118,7 +118,7 @@
 
   watch(
     () => radixStore.sourceRadix,
-    () => (calculatorStore.calc.currentRadix = radixStore.sourceRadix),
+    () => (calcStore.calc.currentRadix = radixStore.sourceRadix),
   );
 
   // 단순화된 컴퓨티드 속성
@@ -128,7 +128,7 @@
 
   const handleRadixSwap = () => {
     radixStore.swapRadixes();
-    calculatorStore.calc.needsBufferReset = true;
+    calcStore.calc.needsBufferReset = true;
   };
 </script>
 
@@ -155,7 +155,7 @@
         [!settingsStore.darkMode ? 'bg-blue-grey-2' : 'bg-blue-grey-6', 'scrollbar-custom', 'q-select-popup'].join(' ')
       "
       :options-selected-class="!settingsStore.darkMode ? 'text-primary' : 'text-grey-1'"
-      @update:model-value="radixStore.updateWordSize($event)"
+      @update:model-value="() => (calcStore.calc.wordSize = radixStore.wordSize)"
     />
 
     <!-- 원본 방향 -->

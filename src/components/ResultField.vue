@@ -20,7 +20,7 @@
   const { t } = useI18n();
 
   // Store import
-  import { useCalculatorStore } from 'src/stores/calculatorStore';
+  import { useCalcStore } from 'src/stores/calcStore';
   import { useUnitStore } from 'src/stores/unitStore';
   import { useRadixStore } from 'src/stores/radixStore';
   import { useCurrencyStore } from 'src/stores/currencyStore';
@@ -36,7 +36,7 @@
   const $g = window.globalVars;
 
   // Store 인스턴스 생성
-  const calculatorStore = useCalculatorStore();
+  const calcStore = useCalcStore();
   const unitStore = useUnitStore();
   const radixStore = useRadixStore();
   const currencyStore = useCurrencyStore();
@@ -58,7 +58,7 @@
   const fieldID = `${props.field}Field`;
 
   // 스토어에서 필요한 메서드와 속성 추출
-  const { calc, toFormattedNumber, getLeftSideInRecord, showMemoryTemporarily } = calculatorStore;
+  const { calc, toFormattedNumber, getLeftSideInRecord, showMemoryTemporarily } = calcStore;
 
   const currentTab = computed(() => uiStore.currentTab);
 
@@ -101,7 +101,6 @@
    * - 현재 카테고리의 시작 단위에서 목표 단위로 변환
    */
   const getConvertedUnitNumber = () => {
-
     const convertedNumber = UnitConverter.convert(
       unitStore.selectedCategory,
       toBigNumber(calc.currentNumber),
@@ -145,7 +144,11 @@
    * - 현재 버퍼의 값을 메인 진법에서 서브 진법으로 변환
    */
   const getConvertedRadixNumber = () => {
-    return radixStore.convertRadix(calc.inputBuffer, radixStore.sourceRadix, radixStore.targetRadix);
+    const convertedNumber = radixStore.convertRadix(calc.inputBuffer, radixStore.sourceRadix, radixStore.targetRadix);
+
+    // console.log('convertedNumber', convertedNumber);
+    // 진법 변환 결과 반환
+    return convertedNumber;
   };
 
   /**
@@ -161,7 +164,7 @@
     if (isMainField) {
       const inputBuffer = calc.inputBuffer;
 
-      const formattedNumber = toFormattedNumber(inputBuffer);
+      const formattedNumber = toFormattedNumber(inputBuffer, radixStore.sourceRadix);
 
       // 소수점 자릿수 설정이 -2이고 소수점이 있는 경우
       const hasSpecialDecimalPlaces = settingsStore.decimalPlaces === -1 && inputBuffer.includes('.');
@@ -183,9 +186,14 @@
           currencyStore.initRecentCurrencies();
           return toFormattedNumber(getConvertedCurrencyNumber());
 
-        case 'radix':
+        case 'radix': {
           radixStore.initRecentRadix();
-          return toFormattedNumber(getConvertedRadixNumber());
+
+          const convertedNumber = getConvertedRadixNumber();
+
+          const formattedNumber = toFormattedNumber(convertedNumber, radixStore.targetRadix);
+          return formattedNumber;
+        }
 
         default:
           return '';
@@ -316,7 +324,9 @@
   const isMemoryEmpty = computed(() => calc.memory.isEmpty);
 
   // 메모리 값 계산된 속성
-  const memoryValue = computed(() => toFormattedNumber(radixStore.convertRadix(calc.memory.getNumber(), Radix.Decimal, radixStore.sourceRadix)));
+  const memoryValue = computed(() =>
+    toFormattedNumber(radixStore.convertRadix(calc.memory.getNumber(), Radix.Decimal, radixStore.sourceRadix)),
+  );
 
   /**
    * 계산 인자나 계산 결과에 대한 식을 문자열로 생성하는 함수
@@ -367,7 +377,7 @@
 
   // 결과 색상 선택 함수
   const getResultColor = () => {
-    if (isMainField && calculatorStore.isMemoryVisible) {
+    if (isMainField && calcStore.isMemoryVisible) {
       return !needFieldTooltip.value ? resultColors.normalDark : resultColors.warningDark;
     }
     return !needFieldTooltip.value ? resultColors.normal : resultColors.warning;
@@ -590,7 +600,7 @@
   });
 
   // 결과 패널 패딩 설정
-  const resultPanelPadding = computed(() => calculatorStore.resultPanelPadding);
+  const resultPanelPadding = computed(() => calcStore.resultPanelPadding);
 </script>
 
 <template>
@@ -666,7 +676,7 @@
             role="text"
             :aria-label="t('ariaLabel.value')"
           >
-            {{ isMainField && calculatorStore.isMemoryVisible ? memoryValue : result }}
+            {{ isMainField && calcStore.isMemoryVisible ? memoryValue : result }}
           </span>
           <span v-if="currentTab === 'unit'" id="unit" role="text" :aria-label="t('ariaLabel.unit')">{{ unit }}</span>
           <span

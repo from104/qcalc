@@ -238,10 +238,7 @@ QCalc is a cross-platform calculator application utilizing modern web technologi
 
 - Advertising Features (Monetization)
 - Theme Functionality
-- Large Tablet Layout Scale Adjustment
-- Automatic Updates (electron)
 - iOS App Development
-- Calculation History Search Function
 - Enhanced Accessibility Features
 
 ## 6. License

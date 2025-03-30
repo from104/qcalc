@@ -19,13 +19,13 @@
   const $g = window.globalVars;
 
   import { useSettingsStore } from 'stores/settingsStore';
-  import { useCalculatorStore } from 'stores/calculatorStore';
+  import { useCalcStore } from 'src/stores/calcStore';
   import { useUIStore } from 'stores/uiStore';
   import { useRadixStore } from 'stores/radixStore';
 
   const settingsStore = useSettingsStore();
   const uiStore = useUIStore();
-  const calculatorStore = useCalculatorStore();
+  const calcStore = useCalcStore();
   const radixStore = useRadixStore();
 
   // i18n 설정
@@ -57,15 +57,8 @@
   const props = withDefaults(defineProps<{ type?: string }>(), { type: 'calc' });
 
   // 스토어에서 필요한 메서드 추출
-  const {
-    calc,
-    disableShift,
-    disableShiftLock,
-    enableShift,
-    enableShiftLock,
-    toggleShift,
-    toggleShiftLock,
-  } = calculatorStore;
+  const { calc, disableShift, disableShiftLock, enableShift, enableShiftLock, toggleShift, toggleShiftLock } =
+    calcStore;
 
   // 햅틱 피드백 함수
   const hapticFeedbackLight = async () => {
@@ -190,7 +183,12 @@
 
   // 추가 기능 툴팁 표시 함수
   const displayActionTooltip = (id: ButtonID) => {
-    if (tooltipTimers[id] || id === shiftButtonId.value || (settingsStore.showButtonAddedLabel && calculatorStore.isShiftPressed)) return;
+    if (
+      tooltipTimers[id] ||
+      id === shiftButtonId.value ||
+      (settingsStore.showButtonAddedLabel && calcStore.isShiftPressed)
+    )
+      return;
     tooltipTimers[id] = true;
     setTimeout(() => {
       tooltipTimers[id] = false;
@@ -200,10 +198,10 @@
   // 버튼 시프트 상태에 따른 기능 실행
   const handleShiftFunction = (id: ButtonID) => {
     const isShiftButton = id === shiftButtonId.value;
-    const isDisabled = calculatorStore.isShiftPressed
+    const isDisabled = calcStore.isShiftPressed
       ? (extendedFunctionSet.value[id]?.isDisabled ?? false)
       : (activeButtonSet.value[id]?.isDisabled ?? false);
-    const action = calculatorStore.isShiftPressed ? extendedFunctionSet.value[id]?.action : activeButtonSet.value[id]?.action;
+    const action = calcStore.isShiftPressed ? extendedFunctionSet.value[id]?.action : activeButtonSet.value[id]?.action;
 
     if (isShiftButton) {
       toggleShift();
@@ -218,10 +216,10 @@
 
     executeActionWithErrorHandling(action as () => void);
 
-    if (calculatorStore.isShiftPressed) {
+    if (calcStore.isShiftPressed) {
       displayActionTooltip(id);
       displayButtonNotification(id);
-      if (calculatorStore.isShiftLocked) disableShift();
+      if (calcStore.isShiftLocked) disableShift();
     }
   };
 
@@ -229,8 +227,8 @@
   const handleLongPress = (id: ButtonID) => {
     hapticFeedbackMedium();
     const isShiftButton = id === shiftButtonId.value;
-    const isShiftActive = calculatorStore.isShiftPressed;
-    const isShiftLocked = calculatorStore.isShiftLocked;
+    const isShiftActive = calcStore.isShiftPressed;
+    const isShiftLocked = calcStore.isShiftLocked;
     if (isShiftButton) {
       if (isShiftLocked) {
         disableShiftLock();
@@ -428,33 +426,37 @@
         no-caps
         push
         :label="
-          calculatorStore.isShiftPressed && !settingsStore.showButtonAddedLabel && id !== shiftButtonId
+          calcStore.isShiftPressed && !settingsStore.showButtonAddedLabel && id !== shiftButtonId
             ? (extendedFunctionSet[id]?.label ?? '')
             : button.label.charAt(0) === '@'
               ? undefined
               : button.label
         "
         :icon="
-          calculatorStore.isShiftPressed && !settingsStore.showButtonAddedLabel && id !== shiftButtonId
+          calcStore.isShiftPressed && !settingsStore.showButtonAddedLabel && id !== shiftButtonId
             ? undefined
             : button.label.charAt(0) === '@'
               ? button.label.slice(1)
               : undefined
         "
         :class="[
-          calculatorStore.isShiftPressed && !settingsStore.showButtonAddedLabel && id !== shiftButtonId
+          calcStore.isShiftPressed && !settingsStore.showButtonAddedLabel && id !== shiftButtonId
             ? 'char'
             : button.label.charAt(0) === '@'
               ? 'icon'
               : 'char',
-          id === shiftButtonId && calculatorStore.isShiftPressed ? 'button-shift' : '',
-          calculatorStore.isShiftPressed && !settingsStore.showButtonAddedLabel && !(extendedFunctionSet[id]?.isDisabled ?? false)
+          id === shiftButtonId && calcStore.isShiftPressed ? 'button-shift' : '',
+          calcStore.isShiftPressed &&
+          !settingsStore.showButtonAddedLabel &&
+          !(extendedFunctionSet[id]?.isDisabled ?? false)
             ? ''
-            : (button.isDisabled ?? false) || calculatorStore.isShiftPressed
+            : (button.isDisabled ?? false) || calcStore.isShiftPressed
               ? 'disabled-button'
               : '',
         ]"
-        :style="[!settingsStore.showButtonAddedLabel || !(extendedFunctionSet[id]?.label ?? '') ? { paddingTop: '4px' } : {}]"
+        :style="[
+          !settingsStore.showButtonAddedLabel || !(extendedFunctionSet[id]?.label ?? '') ? { paddingTop: '4px' } : {},
+        ]"
         :color="`btn-${button.color}`"
         :aria-label="getAriaLabel(id, button)"
         @click="() => (button.isDisabled ? displayDisabledButtonNotification() : handleShiftFunction(id))"
@@ -466,7 +468,7 @@
           :class="[
             `top-label-${button.label.charAt(0) === '@' ? 'icon' : 'char'}`,
             extendedFunctionSet[id].isDisabled ? 'disabled-button-added-label' : '',
-            calculatorStore.isShiftPressed && !extendedFunctionSet[id].isDisabled ? 'shifted-button-added-label' : '',
+            calcStore.isShiftPressed && !extendedFunctionSet[id].isDisabled ? 'shifted-button-added-label' : '',
           ]"
         >
           {{ extendedFunctionSet[id].label }}
@@ -486,7 +488,7 @@
         </q-tooltip>
         <ToolTip>
           {{
-            calculatorStore.isShiftPressed
+            calcStore.isShiftPressed
               ? (extendedFunctionSet[id]?.isDisabled ?? false)
                 ? t('disabledButton')
                 : getTooltipsOfKeys(id, true)

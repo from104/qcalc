@@ -1,5 +1,5 @@
 /**
- * @file calculatorStore.ts
+ * @file calcStore.ts
  * @description 계산기 관련 상태와 액션을 관리하는 스토어입니다.
  */
 
@@ -13,7 +13,11 @@ import { useSettingsStore } from './settingsStore';
 import { useRadixStore } from './radixStore';
 import { useUIStore } from './uiStore';
 
-interface CalculatorState {
+const settingsStore = useSettingsStore();
+const radixStore = useRadixStore();
+const uiStore = useUIStore();
+
+interface CalcState {
   calc: Calculator;
   isMemoryVisible: boolean;
   resultPanelPadding: number;
@@ -22,8 +26,8 @@ interface CalculatorState {
   isShiftLocked: boolean;
 }
 
-export const useCalculatorStore = defineStore('calculator', {
-  state: (): CalculatorState => ({
+export const useCalcStore = defineStore('calc', {
+  state: (): CalcState => ({
     calc: new Calculator(),
     isMemoryVisible: false,
     resultPanelPadding: 0,
@@ -33,25 +37,6 @@ export const useCalculatorStore = defineStore('calculator', {
   }),
 
   actions: {
-    // 숫자 포맷팅 관련
-    toFormattedNumber(value: string): string {
-      if (!value) return '';
-
-      const settingsStore = useSettingsStore();
-      const radixStore = useRadixStore();
-      const uiStore = useUIStore();
-
-      const formattedValue = formatDecimalPlaces(
-        value,
-        settingsStore.getDecimalPlaces,
-        radixStore.radixEnumToNumber(
-          uiStore.currentTab === 'radix' ? radixStore.sourceRadix : Radix.Decimal,
-        ),
-      );
-
-      return settingsStore.useGrouping ? numberGrouping(formattedValue, settingsStore.groupingUnit) : formattedValue;
-    },
-
     // Shift 키 관련
     toggleShift(): void {
       this.isShiftPressed = !this.isShiftPressed;
@@ -89,11 +74,36 @@ export const useCalculatorStore = defineStore('calculator', {
       }, 2000);
     },
 
+    // 숫자 포맷팅 관련
+    toFormattedNumber(value: string, radix = Radix.Decimal): string {
+      if (!value) return '';
+
+      const formattedValue = formatDecimalPlaces(
+        value,
+        settingsStore.getDecimalPlaces,
+        radixStore.radixEnumToNumber(uiStore.currentTab === 'radix' ? radix : Radix.Decimal),
+      );
+
+      return settingsStore.useGrouping ? numberGrouping(formattedValue, settingsStore.groupingUnit) : formattedValue;
+    },
+
     // 계산 기록 관련
     getLeftSideInRecord(result: CalculationResult, useLineBreak = false): string {
+      const radixPrefix =
+        uiStore.currentTab === 'radix' && radixStore.showRadix && radixStore.radixType === 'prefix'
+          ? radixStore.getRadixPrefix(radixStore.sourceRadix)
+          : '';
+      const radixSuffix =
+        uiStore.currentTab === 'radix' && radixStore.showRadix && radixStore.radixType === 'suffix'
+          ? `(${radixStore.getRadixSuffix(radixStore.sourceRadix)})`
+          : '';
+
       const lineBreak = useLineBreak ? '\n' : '';
-      const formattedPrev = this.toFormattedNumber(result.previousNumber);
-      const formattedArg = result.argumentNumber ? this.toFormattedNumber(result.argumentNumber) : '';
+
+      const prevValue = radixStore.convertIfRadix(result.previousNumber);
+      const argValue = result.argumentNumber ? radixStore.convertIfRadix(result.argumentNumber) : '';
+      const formattedPrev = radixPrefix + this.toFormattedNumber(prevValue, radixStore.sourceRadix) + radixSuffix;
+      const formattedArg = radixPrefix + this.toFormattedNumber(argValue, radixStore.sourceRadix) + radixSuffix;
       const operator = Array.isArray(result.operator) ? result.operator[0] : result.operator || '';
 
       return match(operator)
@@ -125,7 +135,7 @@ export const useCalculatorStore = defineStore('calculator', {
         })
         .with(Operator.REC, () => `1${lineBreak} ÷ ${formattedPrev}`)
         .with(Operator.POW2, () => `${formattedPrev} ^ 2`)
-        .with(Operator.EXP10, () => `${this.toFormattedNumber('10')} ^ ${formattedPrev}`)
+        .with(Operator.EXP10, () => `${this.toFormattedNumber('10', radixStore.sourceRadix)} ^ ${formattedPrev}`)
         .with(
           Operator.SQRT,
           Operator.SIN,
@@ -140,7 +150,19 @@ export const useCalculatorStore = defineStore('calculator', {
     },
 
     getRightSideInRecord(result: CalculationResult): string {
-      return this.toFormattedNumber(result.resultNumber);
+      const radixPrefix =
+        uiStore.currentTab === 'radix' && radixStore.showRadix && radixStore.radixType === 'prefix'
+          ? radixStore.getRadixPrefix(radixStore.sourceRadix)
+          : '';
+      const radixSuffix =
+        uiStore.currentTab === 'radix' && radixStore.showRadix && radixStore.radixType === 'suffix'
+          ? `(${radixStore.getRadixSuffix(radixStore.sourceRadix)})`
+          : '';
+      return (
+        radixPrefix +
+        this.toFormattedNumber(radixStore.convertIfRadix(result.resultNumber), radixStore.sourceRadix) +
+        radixSuffix
+      );
     },
   },
 

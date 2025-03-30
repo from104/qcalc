@@ -22,12 +22,12 @@
   // 스토어 import
   import { useSettingsStore } from 'stores/settingsStore';
   import { useUnitStore } from 'stores/unitStore';
-  import { useCalculatorStore } from 'stores/calculatorStore';
+  import { useCalcStore } from 'src/stores/calcStore';
 
   // 스토어 인스턴스 생성
   const settingsStore = useSettingsStore();
   const unitStore = useUnitStore();
-  const calculatorStore = useCalculatorStore();
+  const calcStore = useCalcStore();
 
   // 컴포넌트 import
   import ToolTip from 'src/components/snippets/ToolTip.vue';
@@ -104,8 +104,8 @@
     // 동일한 단위인 경우 변환하지 않음
     if (unitStore.sourceUnits[unitStore.selectedCategory] !== unitStore.targetUnits[unitStore.selectedCategory]) {
       unitStore.swapUnits();
-      calculatorStore.calc.currentNumber = unitStore.convertedUnitNumber;
-      calculatorStore.calc.needsBufferReset = true;
+      calcStore.calc.currentNumber = unitStore.convertedUnitNumber;
+      calcStore.calc.needsBufferReset = true;
     }
   };
 </script>

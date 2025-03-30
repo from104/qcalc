@@ -1,7 +1,5 @@
 # QCalc - Calculator for Productivity
 
-MIT License
-
 A multi-purpose calculator that reimagines my Android graduation project calculator using modern web technologies like Vue3 (Quasar v2), TypeScript, and Electron. It combines precise calculation capabilities with a clean interface, making it suitable for both desktop and mobile environments.
 
 ## Key Features

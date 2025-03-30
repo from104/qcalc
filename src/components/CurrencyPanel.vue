@@ -19,14 +19,14 @@
   import { useCurrencyStore } from 'stores/currencyStore';
   import { useSettingsStore } from 'stores/settingsStore';
   import { useUnitStore } from 'stores/unitStore';
-  import { useCalculatorStore } from 'stores/calculatorStore';
+  import { useCalcStore } from 'src/stores/calcStore';
 
   // 스토어 인스턴스 생성
   const uiStore = useUIStore();
   const currencyStore = useCurrencyStore();
   const settingsStore = useSettingsStore();
   const unitStore = useUnitStore();
-  const calculatorStore = useCalculatorStore();
+  const calcStore = useCalcStore();
 
   // 계산기 관련 타입과 클래스
   import { KeyBinding } from 'classes/KeyBinding';
@@ -178,8 +178,8 @@
     if (currencyStore.sourceCurrency !== currencyStore.targetCurrency) {
       // 첫 번째 변환 수행
       currencyStore.swapCurrencies();
-      calculatorStore.calc.currentNumber = currencyStore.convertedCurrencyNumber;
-      calculatorStore.calc.needsBufferReset = true;
+      calcStore.calc.currentNumber = currencyStore.convertedCurrencyNumber;
+      calcStore.calc.needsBufferReset = true;
     }
   };
 </script>

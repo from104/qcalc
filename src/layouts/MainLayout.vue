@@ -42,11 +42,11 @@
   const { t } = useI18n();
 
   // === 스토어 임포트 ===
-  import { useCalculatorStore } from 'stores/calculatorStore';
+  import { useCalcStore } from 'src/stores/calcStore';
   import { useUIStore } from 'stores/uiStore';
   import { useSettingsStore } from 'stores/settingsStore';
 
-  const calculatorStore = useCalculatorStore();
+  const calcStore = useCalcStore();
   const uiStore = useUIStore();
   const settingsStore = useSettingsStore();
 
@@ -97,7 +97,7 @@
    * 기록 삭제 버튼의 비활성화 상태를 계산합니다.
    */
   const isRecordDisabled = computed(() => {
-    return calculatorStore.calc.record.getAllRecords().length === 0 || uiStore.isDeleteRecordConfirmOpen;
+    return calcStore.calc.record.getAllRecords().length === 0 || uiStore.isDeleteRecordConfirmOpen;
   });
 
   /**
@@ -252,16 +252,16 @@
 
     // OS별 UI 최적화
     if ($g.isWindows) {
-      calculatorStore.resultPanelPadding = 8;
+      calcStore.resultPanelPadding = 8;
     } else if ($g.isLinux) {
-      calculatorStore.resultPanelPadding = 3;
+      calcStore.resultPanelPadding = 3;
     } else {
-      calculatorStore.resultPanelPadding = 0;
+      calcStore.resultPanelPadding = 0;
     }
 
     // 초기 설정 적용
-    if (settingsStore.initPanel && calculatorStore.calc) {
-      calculatorStore.calc.reset();
+    if (settingsStore.initPanel && calcStore.calc) {
+      calcStore.calc.reset();
     }
     if ($g.isElectron) {
       settingsStore.setAlwaysOnTop(settingsStore.alwaysOnTop);

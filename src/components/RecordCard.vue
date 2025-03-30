@@ -38,14 +38,14 @@
   // 스토어 import
   import { useUIStore } from 'stores/uiStore';
   import { useSettingsStore } from 'stores/settingsStore';
-  import { useCalculatorStore } from 'stores/calculatorStore';
+  import { useCalcStore } from 'src/stores/calcStore';
   import { useCurrencyStore } from 'stores/currencyStore';
   import { useUnitStore } from 'stores/unitStore';
 
   // 스토어 인스턴스 생성
   const uiStore = useUIStore();
   const settingsStore = useSettingsStore();
-  const calculatorStore = useCalculatorStore();
+  const calcStore = useCalcStore();
   const currencyStore = useCurrencyStore();
   const unitStore = useUnitStore();
 
@@ -79,7 +79,7 @@
   }
 
   // records 계산 속성 수정
-  const records = computed(() => calculatorStore.calc.record.getAllRecords());
+  const records = computed(() => calcStore.calc.record.getAllRecords());
 
   // 화면 너비가 특정 값보다 큰지 확인하는 함수
   const isWideWidth = () => window.innerWidth > 768;
@@ -150,7 +150,7 @@
   };
 
   const openDeleteRecordConfirmDialog = () => {
-    if (calculatorStore.calc.record.getAllRecords().length > 0) uiStore.isDeleteRecordConfirmOpen = true;
+    if (calcStore.calc.record.getAllRecords().length > 0) uiStore.isDeleteRecordConfirmOpen = true;
   };
 
   const openSearchDialogByKey = () => {
@@ -217,7 +217,7 @@
   // 메모 다이얼로그 열기 함수
   const openMemoDialog = (id: number) => {
     selectedMemoId = id;
-    memoText.value = (calculatorStore.calc.record.getMemo(id) as string) || '';
+    memoText.value = (calcStore.calc.record.getMemo(id) as string) || '';
     showMemoDialog.value = true;
   };
 
@@ -229,7 +229,7 @@
 
   // 메모 편집 확인 함수
   const saveMemo = () => {
-    calculatorStore.calc.record.setMemo(selectedMemoId, memoText.value);
+    calcStore.calc.record.setMemo(selectedMemoId, memoText.value);
     memoSlideDirection.value = 'slide-right';
     showMemoDialog.value = false;
     memoText.value = '';
@@ -249,14 +249,14 @@
     id: number,
     copyType: 'formattedNumber' | 'onlyNumber' | 'memo' | 'time',
   ): Promise<void> => {
-    const record = calculatorStore.calc.record.getRecordById(id);
+    const record = calcStore.calc.record.getRecordById(id);
     const copyText =
       copyType === 'formattedNumber'
-        ? calculatorStore.getRightSideInRecord(record.calculationResult)
+        ? calcStore.getRightSideInRecord(record.calculationResult)
         : copyType === 'onlyNumber'
           ? record.calculationResult.resultNumber
           : copyType === 'memo'
-            ? (calculatorStore.calc.record.getMemo(id) as string)
+            ? (calcStore.calc.record.getMemo(id) as string)
             : copyType === 'time'
               ? formatDateTime(record.timestamp)
               : '';
@@ -271,17 +271,17 @@
 
   // 메인 결과로 이동 함수
   const loadToMainPanel = (id: number) => {
-    const record = calculatorStore.calc.record.getRecordById(id);
-    calculatorStore.calc.currentNumber = record.calculationResult.resultNumber;
-    calculatorStore.calc.offBufferReset();
+    const record = calcStore.calc.record.getRecordById(id);
+    calcStore.calc.currentNumber = record.calculationResult.resultNumber;
+    calcStore.calc.offBufferReset();
     if (!isWideWidth()) navigateToPath('/', route, router);
   };
 
   const loadToSubPanel = (id: number) => {
-    const record = calculatorStore.calc.record.getRecordById(id);
+    const record = calcStore.calc.record.getRecordById(id);
     if (uiStore.currentTab === 'unit') {
       unitStore.swapUnits();
-      calculatorStore.calc.currentNumber = UnitConverter.convert(
+      calcStore.calc.currentNumber = UnitConverter.convert(
         unitStore.selectedCategory,
         toBigNumber(record.calculationResult.resultNumber),
         unitStore.sourceUnits[unitStore.selectedCategory] ?? '',
@@ -290,7 +290,7 @@
       unitStore.swapUnits();
     } else if (uiStore.currentTab === 'currency') {
       currencyStore.swapCurrencies();
-      calculatorStore.calc.currentNumber = currencyStore.currencyConverter
+      calcStore.calc.currentNumber = currencyStore.currencyConverter
         .convert(
           toBigNumber(record.calculationResult.resultNumber),
           currencyStore.sourceCurrency,
@@ -299,13 +299,13 @@
         .toString();
       currencyStore.swapCurrencies();
     }
-    calculatorStore.calc.offBufferReset();
+    calcStore.calc.offBufferReset();
     if (!isWideWidth()) navigateToPath('/', route, router);
   };
 
   // 히스토리 항목 삭제 함수
   const deleteRecordItem = (id: number) => {
-    calculatorStore.calc.record.deleteRecord(id);
+    calcStore.calc.record.deleteRecord(id);
   };
 
   // 헤더의 높이를 동적으로 계산하는 computed 속성입니다.
@@ -332,9 +332,9 @@
     // 기본 레코드 문자열 생성
     const strings = records.value.map((record: Record) => {
       const displayText = [
-        calculatorStore.getLeftSideInRecord(record.calculationResult, true),
+        calcStore.getLeftSideInRecord(record.calculationResult, true),
         '\n= ',
-        calculatorStore.getRightSideInRecord(record.calculationResult),
+        calcStore.getRightSideInRecord(record.calculationResult),
       ].join('');
 
       return {
@@ -562,7 +562,7 @@
                           <MenuItem
                             :title="t('copyDisplayedResult')"
                             :action="() => copyRecordItem(record.id as number, 'formattedNumber')"
-                            :caption="calculatorStore.getRightSideInRecord(record.origResult)"
+                            :caption="calcStore.getRightSideInRecord(record.origResult)"
                           />
                           <MenuItem
                             :title="t('copyResultNumber')"
@@ -633,7 +633,7 @@
       <q-card-section>{{ t('doYouDeleteRecord') }} </q-card-section>
       <q-card-actions align="center" class="text-negative bg-white">
         <q-btn v-close-popup flat :label="t('message.no')" autofocus />
-        <q-btn v-close-popup flat :label="t('message.yes')" @click="calculatorStore.calc.record.clearRecords()" />
+        <q-btn v-close-popup flat :label="t('message.yes')" @click="calcStore.calc.record.clearRecords()" />
       </q-card-actions>
     </q-card>
   </q-dialog>

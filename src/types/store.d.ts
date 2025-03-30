@@ -49,7 +49,7 @@ export type DecimalPlacesType = keyof typeof DECIMAL_PLACES;
 /**
  * 계산기 스토어 상태 인터페이스
  */
-export interface CalculatorState {
+export interface CalcState {
   calc: Calculator;
   isMemoryVisible: boolean;
   resultPanelPadding: number;
@@ -129,8 +129,7 @@ export interface SettingsState {
 /**
  * 계산기 스토어 액션 인터페이스
  */
-export interface CalculatorActions {
-  toFormattedNumber(value: string): string;
+export interface CalcActions {
   toggleShift(): void;
   enableShift(): void;
   disableShift(): void;
@@ -139,6 +138,7 @@ export interface CalculatorActions {
   disableShiftLock(): void;
   hideMemory(): void;
   showMemoryTemporarily(): void;
+  toFormattedNumber(value: string, radix?: Radix): string;
   getLeftSideInRecord(result: CalculationResult, useLineBreak?: boolean): string;
   getRightSideInRecord(result: CalculationResult): string;
 }
@@ -216,7 +216,7 @@ export interface SettingsActions {
 /**
  * 스토어 타입 정의
  */
-export type CalculatorStore = DefineStore<'calculator', CalculatorState, Record<string, never>, CalculatorActions>;
+export type CalcStore = DefineStore<'calc', CalcState, Record<string, never>, CalcActions>;
 export type UnitStore = DefineStore<'unit', UnitState, Record<string, never>, UnitActions>;
 export type CurrencyStore = DefineStore<'currency', CurrencyState, Record<string, never>, CurrencyActions>;
 export type RadixStore = DefineStore<'radix', RadixState, Record<string, never>, RadixActions>;
