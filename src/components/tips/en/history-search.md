@@ -1,6 +1,11 @@
-##### Using Calculation History
+##### Calculation History Management
 
-- Add notes to calculations for easy future reference
-- Quickly find needed calculations with search
-- Auto-save of last 100 calculations
-- Reuse recorded results with a click
+- Open history: Press **F4** or use top menu
+- Search history: Press **Ctrl+F** to open search
+- Scroll history:
+  - ↑/↓ keys: Move 50px
+  - Page Up/Down: Move 400px
+  - Home/End: Jump to start/end
+- Delete history: Press **Ctrl+D** to delete selected item
+- Reuse calculation: Click history item
+- Add note: Right-click history item

@@ -1,5 +1,8 @@
-##### Copying and Pasting
+##### Copy and Paste Functions
 
-- Click or touch the panel to copy as it appears
-- Press again within 2 seconds to copy only the numbers
-- Long press the panel to paste from the clipboard
+- Copy result: Click or long press main/auxiliary panel
+- Copy main panel: **Ctrl+C** or **Ctrl+Insert**
+- Copy auxiliary panel: **Shift+Ctrl+C** or **Alt+Insert**
+- Paste to main panel: **Ctrl+V** or **Shift+Insert**
+- Paste to auxiliary panel: **Shift+Ctrl+V** or **Alt+Shift+Insert**
+- Copied numbers maintain current display format

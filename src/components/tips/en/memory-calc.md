@@ -1,6 +1,11 @@
-##### Using Memory for Complex Calculations
+##### Memory Calculation Features
 
-- Store intermediate results in memory for later use
-- Accumulate results from multiple formulas for total sum
-- Use memory multiply/divide for ratio calculations
-- Store with Shift + Enter, recall with Ctrl + Shift + R
+- Store memory(MS): **Ctrl+Enter** or **Ctrl+=**
+- Recall memory(MR): **Ctrl+Backspace**
+- Clear memory(MC): **Ctrl+Delete**
+- Memory operations:
+  - Add(M+): **Ctrl++**
+  - Subtract(M-): **Ctrl+-**
+  - Multiply(M×): **Ctrl+\***
+  - Divide(M÷): **Ctrl+/**
+- Memory value persists until session ends

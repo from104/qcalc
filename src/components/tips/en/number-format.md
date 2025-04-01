@@ -1,5 +1,8 @@
-##### Changing Number Format
+##### Number Display Format Settings
 
-- Toggle comma: "**,**" key
-- change grouping unit (3 or 4) with "**Alt-,**" key
-- Change the number of decimal places (unlimited up to 16): "**\[**" key, "**\]**" key
+- Toggle digit grouping: Press **,** key
+- Change grouping unit (3/4 digits): Press **Alt+,**
+- Increase decimal places: Press **]** key (up to 16)
+- Decrease decimal places: Press **[** key
+- Scientific notation: Large numbers auto-convert
+- Negative numbers: Highlighted in red

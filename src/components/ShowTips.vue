@@ -207,7 +207,7 @@
     width: 100%;
     height: 100%;
     max-width: 400px;
-    max-height: 300px;
+    max-height: 450px;
     border-radius: 8px;
     display: flex;
     flex-direction: column;

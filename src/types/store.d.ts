@@ -56,6 +56,7 @@ export interface CalcState {
   paddingOnResult: number;
   isShiftPressed: boolean;
   isShiftLocked: boolean;
+  needButtonNotification: boolean;
 }
 
 /**
@@ -138,6 +139,8 @@ export interface CalcActions {
   disableShiftLock(): void;
   hideMemory(): void;
   showMemoryTemporarily(): void;
+  onNeedButtonNotification(): void;
+  offNeedButtonNotification(): void;
   toFormattedNumber(value: string, radix?: Radix): string;
   getLeftSideInRecord(result: CalculationResult, useLineBreak?: boolean): string;
   getRightSideInRecord(result: CalculationResult): string;

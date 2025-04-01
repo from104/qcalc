@@ -73,7 +73,7 @@
   };
 
   // 에러 처리 함수
-  const executeActionWithErrorHandling = (action: () => void) => {
+  const executeActionWithErrorHandling = (action: () => void, id: ButtonID) => {
     try {
       action();
     } catch (e: unknown) {
@@ -84,7 +84,9 @@
         // 알 수 없는 에러의 경우 기본 에러 메시지 표시
         showError(t('error.unknown'));
       }
+      return;
     }
+    displayButtonNotification(id);
   };
 
   // 버튼 색상 정의
@@ -160,18 +162,6 @@
 
   type ButtonID = keyof typeof standardExtendedFunctions;
 
-  // 버튼 클릭 시 알림 표시 함수
-  const displayButtonNotification = (id: ButtonID) => {
-    const buttonFunc = extendedFunctionSet.value[id];
-    if (buttonFunc?.label === 'MC' && !calc.memory.isEmpty) {
-      showMessage(t('memoryCleared'));
-    } else if (buttonFunc?.label === 'MR' && !calc.memory.isEmpty) {
-      showMessage(t('memoryRecalled'));
-    } else if (buttonFunc?.label === 'MS') {
-      showMessage(t('memorySaved'));
-    }
-  };
-
   // 시프트 버튼의 ID 찾기
   const shiftButtonId = computed(() =>
     Object.keys(extendedFunctionSet.value).find((key) => extendedFunctionSet.value[key]?.label === ''),
@@ -196,30 +186,37 @@
     }, 1000);
   };
 
+  // 버튼 클릭 시 알림 표시 함수
+  const displayButtonNotification = (id: ButtonID) => {
+    if (!calcStore.needButtonNotification) return;
+
+    const buttonFunc = extendedFunctionSet.value[id];
+    if (buttonFunc?.label === 'MC' && calc.memory.isEmpty) {
+      showMessage(t('memoryCleared'));
+    } else if (buttonFunc?.label === 'MR' && !calc.memory.isEmpty) {
+      showMessage(t('memoryRecalled'));
+    } else if (buttonFunc?.label === 'MS' && !calc.memory.isEmpty) {
+      showMessage(t('memorySaved'));
+    }
+    calcStore.offNeedButtonNotification();
+  };
+  
   // 버튼 시프트 상태에 따른 기능 실행
   const handleClickBtn = (id: ButtonID) => {
-    // const isShiftButton = id === shiftButtonId.value;
     const isDisabled = calcStore.isShiftPressed
       ? (extendedFunctionSet.value[id]?.isDisabled ?? false)
       : (activeButtonSet.value[id]?.isDisabled ?? false);
     const action = calcStore.isShiftPressed ? extendedFunctionSet.value[id]?.action : activeButtonSet.value[id]?.action;
-
-    // if (isShiftButton) {
-    //   calcStore.toggleShift();
-    //   calcStore.disableShiftLock();
-    //   return;
-    // }
 
     if (isDisabled) {
       displayDisabledButtonNotification();
       return;
     }
 
-    executeActionWithErrorHandling(action as () => void);
+    executeActionWithErrorHandling(action as () => void, id);
 
     if (id !== shiftButtonId.value && calcStore.isShiftPressed) {
       displayActionTooltip(id);
-      displayButtonNotification(id);
       if (!calcStore.isShiftLocked) calcStore.disableShift();
     }
   };
@@ -227,21 +224,7 @@
   // 버튼 길게 누르기 기능
   const handleLongPress = (id: ButtonID) => {
     hapticFeedbackMedium();
-    // const isShiftButton = id === shiftButtonId.value;
-    const isShiftActive = calcStore.isShiftPressed;
-    const isShiftLocked = calcStore.isShiftLocked;
-    // if (isShiftButton) {
-    //   if (isShiftLocked) {
-    //     calcStore.disableShiftLock();
-    //     calcStore.disableShift();
-    //   } else {
-    //     calcStore.enableShiftLock();
-    //     calcStore.enableShift();
-    //   }
-    //   return;
-    // }
-
-    const buttonFunctions = isShiftActive ? activeButtonSet.value : extendedFunctionSet.value;
+    const buttonFunctions = calcStore.isShiftPressed ? activeButtonSet.value : extendedFunctionSet.value;
     const buttonAction = buttonFunctions[id]?.action;
     const isDisabled = buttonFunctions[id]?.isDisabled ?? false;
 
@@ -250,13 +233,12 @@
       return;
     }
 
-    executeActionWithErrorHandling(buttonAction as () => void);
+    executeActionWithErrorHandling(buttonAction as () => void, id);
 
-    if (id !== shiftButtonId.value && isShiftActive) {
-      if (!isShiftLocked) calcStore.disableShift();
+    if (calcStore.isShiftPressed) {
+      if (!calcStore.isShiftLocked) calcStore.disableShift();
     } else {
       displayActionTooltip(id);
-      displayButtonNotification(id);
     }
   };
 

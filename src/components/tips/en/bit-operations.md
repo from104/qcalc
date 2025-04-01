@@ -1,5 +1,13 @@
-##### Bit Operations for Programmers
+##### Programmer Calculator Usage
 
-- The word size limits the size of bit operations.
-- Fast shift operations like x<<1, x>>1, x<<4, x>>4, etc.
-- It is recommended to group binary and hexadecimal numbers in units of 4.
+- Base conversion mode: **Ctrl+4** or top tab
+- Bit shift operations:
+  - 1-bit shift: **r/t** keys (x<<1, x>>1)
+  - 4-bit shift: **f/g** keys (x<<4, x>>4)
+  - Custom shift: **u/i** keys (x<<y, x>>y)
+- Logic operations:
+  - NOT: **h** key
+  - AND/OR/XOR: **j/k/l** keys
+  - NAND/NOR/XNOR: **q/w/e** keys
+- Hex input: **a,s,d,z,x,c** keys
+- Recommended 4-digit grouping: Set with **Alt+,**

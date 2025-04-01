@@ -13,7 +13,6 @@ import { version } from '../../package.json';
 // 불변 속성 정의 함수
 import { defineImmutableProperty } from 'src/utils/GlobalHelpers';
 
-
 // 불변 속성 정의 함수
 // const defineImmutableProperty = <T>(obj: object, prop: string, value: T) => {
 //   Object.defineProperty(obj, prop, {

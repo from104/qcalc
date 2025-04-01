@@ -4,7 +4,7 @@
  *              계산 결과의 저장, 조회, 삭제 등의 기능을 제공하며, 각 기록은
  *              고유 ID와 함께 LIFO(Last In First Out) 구조로 관리됩니다.
  *              메모리 관리를 위해 최대 100개까지의 기록만 유지합니다.
-*/
+ */
 
 import { checkError, throwError } from '../utils/ErrorUtils';
 

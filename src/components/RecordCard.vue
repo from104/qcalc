@@ -165,8 +165,8 @@
 
   // 키 바인딩 설정
   const keyBinding = new KeyBinding([
-    [['d'], () => openDeleteRecordConfirmDialog()],
-    [['s'], () => openSearchDialogByKey()],
+    [['Control+d'], () => openDeleteRecordConfirmDialog()],
+    [['Control+f'], () => openSearchDialogByKey()],
     [['ArrowUp'], () => scrollToRecord(-50)],
     [['ArrowDown'], () => scrollToRecord(50)],
     [['PageUp'], () => scrollToRecord(-400)],

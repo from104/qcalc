@@ -24,6 +24,7 @@ interface CalcState {
   paddingOnResult: number;
   isShiftPressed: boolean;
   isShiftLocked: boolean;
+  needButtonNotification: boolean;
 }
 
 export const useCalcStore = defineStore('calc', {
@@ -34,6 +35,7 @@ export const useCalcStore = defineStore('calc', {
     paddingOnResult: 20,
     isShiftPressed: false,
     isShiftLocked: false,
+    needButtonNotification: false,
   }),
 
   actions: {
@@ -72,6 +74,14 @@ export const useCalcStore = defineStore('calc', {
       setTimeout(() => {
         this.isMemoryVisible = false;
       }, 2000);
+    },
+
+    onNeedButtonNotification(): void {
+      this.needButtonNotification = true;
+    },
+
+    offNeedButtonNotification(): void {
+      this.needButtonNotification = false;
     },
 
     // 숫자 포맷팅 관련
@@ -160,11 +170,7 @@ export const useCalcStore = defineStore('calc', {
         uiStore.currentTab === 'radix' && radixStore.showRadix && radixStore.radixType === 'suffix'
           ? `(${radixStore.getRadixSuffix(radix)})`
           : '';
-      return (
-        radixPrefix +
-        this.toFormattedNumber(radixStore.convertIfRadix(result.resultNumber), radix) +
-        radixSuffix
-      );
+      return radixPrefix + this.toFormattedNumber(radixStore.convertIfRadix(result.resultNumber), radix) + radixSuffix;
     },
   },
 
