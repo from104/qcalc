@@ -1,3 +1,11 @@
+/**
+ * @file CurrencyConverter.ts
+ * @description 이 파일은 통화 변환 기능을 제공하는 클래스를 정의합니다.
+ *              실시간 환율 정보를 관리하고 통화 간 변환을 지원하며,
+ *              FreeCurrency API를 통해 최신 환율 데이터를 주기적으로 업데이트합니다.
+ *              다양한 통화에 대한 정보와 변환 기능을 제공하도록 설계되었습니다.
+*/
+
 import Freecurrencyapi from '@everapi/freecurrencyapi-js';
 import { BaseConverter } from './BaseConverter';
 

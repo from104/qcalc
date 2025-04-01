@@ -13,7 +13,7 @@
     />
     <meta
       http-equiv="Content-Security-Policy"
-      content="default-src 'self' data: gap: https://ssl.gstatic.com 'unsafe-eval' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; media-src *; img-src 'self' data: content:; connect-src 'self' https://api.freecurrencyapi.com localhost:* http://localhost:* https://localhost:* http://127.0.0.1:* https://127.0.0.1:*;"
+      content="<% if (ctx.dev) { %>default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' http://localhost:* https://localhost:*; style-src 'self' 'unsafe-inline'; media-src *; img-src 'self' data: content:; connect-src 'self' https://api.freecurrencyapi.com localhost:* http://localhost:* https://localhost:* http://127.0.0.1:* https://127.0.0.1:*; font-src 'self' data:; object-src 'none'<% } else { %>default-src 'self'; script-src 'self' 'strict-dynamic'; style-src 'self' 'unsafe-inline'; media-src *; img-src 'self' data: content:; connect-src 'self' https://api.freecurrencyapi.com; font-src 'self' data:; object-src 'none'<% } %>"
     />
     <!--
       <link rel="icon" type="image/png" sizes="128x128" href="icons/favicon-128x128.png">

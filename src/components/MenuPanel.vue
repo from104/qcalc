@@ -169,7 +169,7 @@ ko:
       caption: '진법 변환기'
     record:
       title: '기록'
-      caption: '기록 페이지'
+      caption: '기록 화면'
     settings:
       title: '설정'
       caption: '설정'
@@ -200,7 +200,7 @@ en:
       caption: 'Radix Converter'  
     record:
       title: 'Record'
-      caption: 'Record page'
+      caption: 'Record Screen'
     settings:
       title: 'Settings'
       caption: 'Settings'

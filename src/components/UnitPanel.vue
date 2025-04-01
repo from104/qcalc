@@ -17,8 +17,7 @@
   // 계산기 관련 타입과 클래스
   import { KeyBinding } from 'classes/KeyBinding';
   import { UnitConverter } from 'classes/UnitConverter';
-  // import { toBigNumber } from 'classes/CalculatorMath';
-
+  
   // 스토어 import
   import { useSettingsStore } from 'stores/settingsStore';
   import { useUnitStore } from 'stores/unitStore';
@@ -55,8 +54,8 @@
 
   // 키 바인딩 설정
   const keyBindingManager = new KeyBinding([
-    [['Alt+w'], () => document.getElementById('btn-swap-unit')?.click()],
-    [['Alt+y'], () => unitStore.toggleShowUnit()],
+    [['\\'], () => document.getElementById('btn-swap-unit')?.click()],
+    [['Alt+\\'], () => unitStore.toggleShowUnit()],
   ]);
 
   // 컴포넌트 마운트 시 실행

@@ -1,4 +1,12 @@
 <script setup lang="ts">
+  /**
+   * @file ToolTip.vue
+   * @description 이 파일은 툴팁을 표시하는 Vue 컴포넌트입니다.
+   *              사용자가 지정한 텍스트, 색상, 지연 시간 등의 설정에 따라
+   *              툴팁을 표시하고 숨기는 기능을 제공합니다. 자동 숨김 기능을 통해
+   *              지정된 시간 후 툴팁이 자동으로 사라지도록 설정할 수 있습니다.
+   */
+
   import { ref } from 'vue';
   import { QTooltip } from 'quasar';
 

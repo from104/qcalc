@@ -1,3 +1,10 @@
+/**
+ * @file KeyBinding.ts
+ * @description 이 파일은 키 바인딩 기능을 관리하는 클래스를 정의합니다.
+ *              키 바인딩을 추가, 구독, 해제, 제거 등의 기능을 제공하며,
+ *              키 바인딩 목록을 관리하고 상태를 확인할 수 있습니다.
+ */
+
 import { tinykeys } from 'tinykeys';
 
 import type { KeyBindingMap } from 'tinykeys';

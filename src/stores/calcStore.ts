@@ -89,21 +89,22 @@ export const useCalcStore = defineStore('calc', {
 
     // 계산 기록 관련
     getLeftSideInRecord(result: CalculationResult, useLineBreak = false): string {
+      const radix = uiStore.currentTab === 'radix' ? radixStore.sourceRadix : Radix.Decimal;
       const radixPrefix =
         uiStore.currentTab === 'radix' && radixStore.showRadix && radixStore.radixType === 'prefix'
-          ? radixStore.getRadixPrefix(radixStore.sourceRadix)
+          ? radixStore.getRadixPrefix(radix)
           : '';
       const radixSuffix =
         uiStore.currentTab === 'radix' && radixStore.showRadix && radixStore.radixType === 'suffix'
-          ? `(${radixStore.getRadixSuffix(radixStore.sourceRadix)})`
+          ? `(${radixStore.getRadixSuffix(radix)})`
           : '';
 
       const lineBreak = useLineBreak ? '\n' : '';
 
       const prevValue = radixStore.convertIfRadix(result.previousNumber);
       const argValue = result.argumentNumber ? radixStore.convertIfRadix(result.argumentNumber) : '';
-      const formattedPrev = radixPrefix + this.toFormattedNumber(prevValue, radixStore.sourceRadix) + radixSuffix;
-      const formattedArg = radixPrefix + this.toFormattedNumber(argValue, radixStore.sourceRadix) + radixSuffix;
+      const formattedPrev = radixPrefix + this.toFormattedNumber(prevValue, radix) + radixSuffix;
+      const formattedArg = radixPrefix + this.toFormattedNumber(argValue, radix) + radixSuffix;
       const operator = Array.isArray(result.operator) ? result.operator[0] : result.operator || '';
 
       return match(operator)
@@ -150,17 +151,18 @@ export const useCalcStore = defineStore('calc', {
     },
 
     getRightSideInRecord(result: CalculationResult): string {
+      const radix = uiStore.currentTab === 'radix' ? radixStore.sourceRadix : Radix.Decimal;
       const radixPrefix =
         uiStore.currentTab === 'radix' && radixStore.showRadix && radixStore.radixType === 'prefix'
-          ? radixStore.getRadixPrefix(radixStore.sourceRadix)
+          ? radixStore.getRadixPrefix(radix)
           : '';
       const radixSuffix =
         uiStore.currentTab === 'radix' && radixStore.showRadix && radixStore.radixType === 'suffix'
-          ? `(${radixStore.getRadixSuffix(radixStore.sourceRadix)})`
+          ? `(${radixStore.getRadixSuffix(radix)})`
           : '';
       return (
         radixPrefix +
-        this.toFormattedNumber(radixStore.convertIfRadix(result.resultNumber), radixStore.sourceRadix) +
+        this.toFormattedNumber(radixStore.convertIfRadix(result.resultNumber), radix) +
         radixSuffix
       );
     },

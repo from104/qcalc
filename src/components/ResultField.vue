@@ -210,11 +210,13 @@
    * - 메인 필드면 시작 통화의 기호를, 서브 필드면 대상 통화의 기호를 반환
    */
   const symbol = computed(() => {
-    const isShowingCurrencySymbol = props.addon === 'currency';
-    if (!isShowingCurrencySymbol) return '';
+    // 통화 기호 표시가 비활성화된 경우 빈 문자열 반환
+    if (props.addon !== 'currency' || !currencyStore.showSymbol) {
+      return '';
+    }
 
+    // 현재 필드에 따른 통화 코드의 기호 반환
     const currencyCode = isMainField ? currencyStore.sourceCurrency : currencyStore.targetCurrency;
-
     return currencyStore.currencyConverter.getSymbol(currencyCode);
   });
 
@@ -223,7 +225,7 @@
    * 단위 표시 설정이 켜져있고 단위 애드온인 경우에만 단위를 표시
    */
   const unit = computed(() => {
-    const shouldShowUnit = props.addon === 'unit';
+    const shouldShowUnit = props.addon === 'unit' && unitStore.showUnit;
     if (!shouldShowUnit) return '';
 
     const selectedUnit = isMainField
@@ -324,9 +326,11 @@
   const isMemoryEmpty = computed(() => calc.memory.isEmpty);
 
   // 메모리 값 계산된 속성
-  const memoryValue = computed(() =>
-    toFormattedNumber(radixStore.convertRadix(calc.memory.getNumber(), Radix.Decimal, radixStore.sourceRadix)),
-  );
+  const memoryValue = computed(() => {
+    const convertedNumber = radixStore.convertIfRadix(calc.memory.getNumber());
+    // console.log('convertedNumber', convertedNumber);
+    return toFormattedNumber(convertedNumber, radixStore.sourceRadix);
+  });
 
   /**
    * 계산 인자나 계산 결과에 대한 식을 문자열로 생성하는 함수

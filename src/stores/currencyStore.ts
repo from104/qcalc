@@ -10,6 +10,7 @@ interface CurrencyState {
   currencyConverter: CurrencyConverter;
   sourceCurrency: string;
   targetCurrency: string;
+  showSymbol: boolean;
   convertedCurrencyNumber: string;
 }
 
@@ -18,6 +19,7 @@ export const useCurrencyStore = defineStore('currency', {
     currencyConverter: new CurrencyConverter(),
     sourceCurrency: 'USD',
     targetCurrency: 'KRW',
+    showSymbol: true,
     convertedCurrencyNumber: '',
   }),
 
@@ -39,6 +41,10 @@ export const useCurrencyStore = defineStore('currency', {
 
     swapCurrencies(): void {
       [this.sourceCurrency, this.targetCurrency] = [this.targetCurrency, this.sourceCurrency];
+    },
+
+    toggleShowSymbol(): void {
+      this.showSymbol = !this.showSymbol;
     },
   },
 

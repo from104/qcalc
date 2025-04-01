@@ -47,9 +47,9 @@
 
   // 키 바인딩 설정
   const keyBinding = new KeyBinding([
-    [['Alt+w'], () => document.getElementById('btn-swap-radix')?.click()],
-    [['Alt+y'], () => radixStore.toggleShowRadix()],
-    [['Alt+u'], () => radixStore.setRadixType(radixStore.radixType == 'prefix' ? 'suffix' : 'prefix')],
+    [['\\'], () => document.getElementById('btn-swap-radix')?.click()],
+    [['Alt+\\'], () => radixStore.toggleShowRadix()],
+    [['Alt+Control+\\'], () => radixStore.setRadixType(radixStore.radixType == 'prefix' ? 'suffix' : 'prefix')],
   ]);
 
   // 입력 포커스에 따른 키 바인딩 활성화/비활성화

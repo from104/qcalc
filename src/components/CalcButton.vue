@@ -57,8 +57,7 @@
   const props = withDefaults(defineProps<{ type?: string }>(), { type: 'calc' });
 
   // 스토어에서 필요한 메서드 추출
-  const { calc, disableShift, disableShiftLock, enableShift, enableShiftLock, toggleShift, toggleShiftLock } =
-    calcStore;
+  const { calc } = calcStore;
 
   // 햅틱 피드백 함수
   const hapticFeedbackLight = async () => {
@@ -168,6 +167,8 @@
       showMessage(t('memoryCleared'));
     } else if (buttonFunc?.label === 'MR' && !calc.memory.isEmpty) {
       showMessage(t('memoryRecalled'));
+    } else if (buttonFunc?.label === 'MS') {
+      showMessage(t('memorySaved'));
     }
   };
 
@@ -196,18 +197,18 @@
   };
 
   // 버튼 시프트 상태에 따른 기능 실행
-  const handleShiftFunction = (id: ButtonID) => {
-    const isShiftButton = id === shiftButtonId.value;
+  const handleClickBtn = (id: ButtonID) => {
+    // const isShiftButton = id === shiftButtonId.value;
     const isDisabled = calcStore.isShiftPressed
       ? (extendedFunctionSet.value[id]?.isDisabled ?? false)
       : (activeButtonSet.value[id]?.isDisabled ?? false);
     const action = calcStore.isShiftPressed ? extendedFunctionSet.value[id]?.action : activeButtonSet.value[id]?.action;
 
-    if (isShiftButton) {
-      toggleShift();
-      disableShiftLock();
-      return;
-    }
+    // if (isShiftButton) {
+    //   calcStore.toggleShift();
+    //   calcStore.disableShiftLock();
+    //   return;
+    // }
 
     if (isDisabled) {
       displayDisabledButtonNotification();
@@ -216,32 +217,29 @@
 
     executeActionWithErrorHandling(action as () => void);
 
-    if (calcStore.isShiftPressed) {
+    if (id !== shiftButtonId.value && calcStore.isShiftPressed) {
       displayActionTooltip(id);
       displayButtonNotification(id);
-      if (calcStore.isShiftLocked) disableShift();
+      if (!calcStore.isShiftLocked) calcStore.disableShift();
     }
   };
 
   // 버튼 길게 누르기 기능
   const handleLongPress = (id: ButtonID) => {
     hapticFeedbackMedium();
-    const isShiftButton = id === shiftButtonId.value;
+    // const isShiftButton = id === shiftButtonId.value;
     const isShiftActive = calcStore.isShiftPressed;
     const isShiftLocked = calcStore.isShiftLocked;
-    if (isShiftButton) {
-      if (isShiftLocked) {
-        disableShiftLock();
-      } else {
-        enableShiftLock();
-      }
-      if (isShiftLocked) {
-        disableShift();
-      } else {
-        enableShift();
-      }
-      return;
-    }
+    // if (isShiftButton) {
+    //   if (isShiftLocked) {
+    //     calcStore.disableShiftLock();
+    //     calcStore.disableShift();
+    //   } else {
+    //     calcStore.enableShiftLock();
+    //     calcStore.enableShift();
+    //   }
+    //   return;
+    // }
 
     const buttonFunctions = isShiftActive ? activeButtonSet.value : extendedFunctionSet.value;
     const buttonAction = buttonFunctions[id]?.action;
@@ -254,8 +252,8 @@
 
     executeActionWithErrorHandling(buttonAction as () => void);
 
-    if (isShiftActive) {
-      if (!isShiftLocked) disableShift();
+    if (id !== shiftButtonId.value && isShiftActive) {
+      if (!isShiftLocked) calcStore.disableShift();
     } else {
       displayActionTooltip(id);
       displayButtonNotification(id);
@@ -265,7 +263,7 @@
   // 키 입력에 따른 버튼 클릭 함수
   const triggerButtonClickByKey = (id: ButtonID, isShift: boolean) => {
     if (isShift) {
-      toggleShiftLock();
+      calcStore.toggleShiftLock();
       setTimeout(() => {
         clickButtonById('btn-' + id);
       }, 5);
@@ -283,7 +281,13 @@
   // 보조 키 바인딩 설정
   const keyBindingsSecondary: KeyBindings = Object.entries(extendedFunctionSet.value).map(([id, button]) => [
     button.shortcutKeys,
-    () => triggerButtonClickByKey(id, true),
+    () => {
+      calcStore.enableShift();
+      triggerButtonClickByKey(id, true);
+      setTimeout(() => {
+        calcStore.disableShift();
+      }, 5);
+    },
   ]);
 
   // 모든 키 바인딩 통합
@@ -459,7 +463,7 @@
         ]"
         :color="`btn-${button.color}`"
         :aria-label="getAriaLabel(id, button)"
-        @click="() => (button.isDisabled ? displayDisabledButtonNotification() : handleShiftFunction(id))"
+        @click="() => (button.isDisabled ? displayDisabledButtonNotification() : handleClickBtn(id))"
         @touchstart="() => hapticFeedbackLight()"
       >
         <span

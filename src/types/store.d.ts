@@ -66,7 +66,6 @@ export interface UnitState {
   sourceUnits: Record<string, string>;
   targetUnits: Record<string, string>;
   showUnit: boolean;
-  showSymbol: boolean;
   convertedUnitNumber: string;
 }
 
@@ -77,6 +76,7 @@ export interface CurrencyState {
   currencyConverter: CurrencyConverter;
   sourceCurrency: string;
   targetCurrency: string;
+  showSymbol: boolean;
   convertedCurrencyNumber: string;
 }
 
@@ -150,7 +150,6 @@ export interface UnitActions {
   initRecentUnits(): void;
   swapUnits(): void;
   toggleShowUnit(): void;
-  toggleShowSymbol(): void;
 }
 
 /**
@@ -159,6 +158,7 @@ export interface UnitActions {
 export interface CurrencyActions {
   initRecentCurrencies(): void;
   swapCurrencies(): void;
+  toggleShowSymbol(): void;
 }
 
 /**

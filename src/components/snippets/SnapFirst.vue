@@ -1,4 +1,12 @@
 <script setup lang="ts">
+  /**
+   * @file SnapFirst.vue
+   * @description 이 파일은 Snap 환경에서 첫 실행 시 표시되는 다이얼로그를 구현한 Vue 컴포넌트입니다.
+   *              Snap 환경에서 폰트 캐싱 문제로 인한 초기 실행 시 지연을 사용자에게 안내하고,
+   *              강제 종료를 방지하기 위한 경고 메시지를 표시합니다. 이후 실행 시에는
+   *              이 다이얼로그가 표시되지 않습니다.
+   */
+
   import { useI18n } from 'vue-i18n';
 
   const $g = window.globalVars;

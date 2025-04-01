@@ -2,8 +2,11 @@
   /**
    * @file AutoUpdate.vue
    * @description 이 파일은 자동 업데이트 기능을 관리하는 Vue 컴포넌트입니다.
-   *              업데이트 확인, 다운로드 및 설치와 같은 기능을 처리합니다.
+   *              업데이트 확인, 다운로드 및 설치 프로세스를 관리하고,
+   *              사용자에게 업데이트 진행 상황을 알리며 필요한 경우 재시작을 안내합니다.
+   *              또한 개발 환경에서는 업데이트 테스트 기능을 제공합니다.
    */
+  
   import { ref, onMounted, onUnmounted } from 'vue';
   import { useI18n } from 'vue-i18n';
 

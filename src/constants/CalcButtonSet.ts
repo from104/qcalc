@@ -15,10 +15,29 @@ import { showMessage } from 'src/utils/NotificationUtils';
 
 import { useCalcStore } from 'src/stores/calcStore';
 
+const calcStore = useCalcStore();
+
+const { calc } = calcStore;
+
 // ComposerTranslation 타입 사용
 export function createCalcButtonSet(t: ComposerTranslation) {
-  // 스토어에서 필요한 메서드 추출
-  const { calc, showMemoryTemporarily } = useCalcStore();
+  // 시프트 버튼 메서드
+  const handleShift = () => {
+    calcStore.toggleShift();
+    calcStore.disableShiftLock();
+  };
+
+  // 시프트 버튼 잠금 메서드
+  const handleShiftLock = () => {
+    console.log('handleShiftLock');
+    if (calcStore.isShiftLocked) {
+      calcStore.disableShiftLock();
+      calcStore.disableShift();
+    } else {
+      calcStore.enableShiftLock();
+      calcStore.enableShift();
+    }
+  };
 
   // 비트 연산 사전 처리 메서드
   const bitOperationPreprocessing = (action: () => void, isBinary: boolean = true) => {
@@ -60,7 +79,7 @@ export function createCalcButtonSet(t: ComposerTranslation) {
   const displayMemoryStatus = () => {
     if (!calc.memory.isEmpty) {
       setTimeout(() => {
-        showMemoryTemporarily();
+        calcStore.showMemoryTemporarily();
       }, 10);
     }
   };
@@ -74,13 +93,13 @@ export function createCalcButtonSet(t: ComposerTranslation) {
 
   // prettier-ignore
   const standardButtons: CalculatorButtonDefinition = {
-    a1: ['x²', 'function', ['Control+q'], () => calc.pow2(), false],
-    b1: ['√x', 'function', ['Control+w'], () => calc.sqrt(), false],
-    c1: ['Ｃ', 'important', ['Control+e', 'Delete'], () => calc.reset(), false],
-    d1: ['@mdi-backspace', 'important', ['Backspace', 'Control+r'], () => calc.deleteDigitOrDot(), false],
-    a2: ['@mdi-plus-minus-variant', 'function', ['Control+a'], () => calc.changeSign(), false],
-    b2: ['%', 'function', ['Control+s'], () => calc.percent(), false],
-    c2: ['1/x', 'function', ['Control+d'], () => calc.rec(), false],
+    a1: ['x²', 'function', ['t'], () => calc.pow2(), false],
+    b1: ['√x', 'function', ['y'], () => calc.sqrt(), false],
+    c1: ['Ｃ', 'important', ['Delete'], () => calc.reset(), false],
+    d1: ['@mdi-backspace', 'important', ['Backspace'], () => calc.deleteDigitOrDot(), false],
+    a2: ['@mdi-plus-minus-variant', 'function', ['g'], () => calc.changeSign(), false],
+    b2: ['%', 'function', ['h'], () => calc.percent(), false],
+    c2: ['1/x', 'function', ['j'], () => calc.rec(), false],
     d2: ['@mdi-division', 'function', ['/'], () => calc.div(), false],
     a3: ['7', 'normal', ['7'], () => calc.addDigit(7), false],
     b3: ['8', 'normal', ['8'], () => calc.addDigit(8), false],
@@ -94,7 +113,7 @@ export function createCalcButtonSet(t: ComposerTranslation) {
     b5: ['2', 'normal', ['2'], () => calc.addDigit(2), false],
     c5: ['3', 'normal', ['3'], () => calc.addDigit(3), false],
     d5: ['@mdi-plus', 'function', ['+'], () => calc.add(), false],
-    a6: ['@keyboard_capslock', 'important', ["'"], () => null, false],
+    a6: ['@keyboard_capslock', 'important', ["'"], () => handleShift(), false],
     b6: ['0', 'normal', ['0'], () => calc.addDigit(0), false],
     c6: ['@mdi-circle-small', 'normal', ['.'], () => calc.addDot(), false],
     d6: ['@mdi-equal', 'important', ['=', 'Enter'], () => equalForBitOperation(), false],
@@ -105,11 +124,11 @@ export function createCalcButtonSet(t: ComposerTranslation) {
     unit: {},
     currency: {},
     radix: {
-        a1: ['x<<y', 'function', ['Control+q'], () => bitOperationPreprocessing(() => calc.bitSftL()), false],
-        b1: ['x>>y', 'function', ['Control+w'], () => bitOperationPreprocessing(() => calc.bitSftR()), false],
-        a2: ['AND', 'function', ['Control+a'], () => bitOperationPreprocessing(() => calc.bitAnd()), false],
-        b2: ['OR', 'function', ['Control+s'], () => bitOperationPreprocessing(() => calc.bitOr()), false],
-        c2: ['XOR', 'function', ['Control+d'], () => bitOperationPreprocessing(() => calc.bitXor()), false],
+        a1: ['x<<y', 'function', ['t'], () => bitOperationPreprocessing(() => calc.bitSftL()), false],
+        b1: ['x>>y', 'function', ['y'], () => bitOperationPreprocessing(() => calc.bitSftR()), false],
+        a2: ['AND', 'function', ['g'], () => bitOperationPreprocessing(() => calc.bitAnd()), false],
+        b2: ['OR', 'function', ['h'], () => bitOperationPreprocessing(() => calc.bitOr()), false],
+        c2: ['XOR', 'function', ['j'], () => bitOperationPreprocessing(() => calc.bitXor()), false],
     },
   };
 
@@ -123,76 +142,76 @@ export function createCalcButtonSet(t: ComposerTranslation) {
   // 공통으로 사용할 기본 버튼 기능
   // prettier-ignore
   const standardExtendedFunctions: ExtendedButtonFunction = {
-    a1: ['xⁿ', ['Shift+Control+q'], () => calc.pow(), false],
-    b1: ['ⁿ√x', ['Shift+Control+w'], () => calc.root(), false],
-    c1: ['MC', ['Shift+Control+e', 'Shift+Delete', 'Shift+Escape'], () => calc.memory.clear(), false],
-    d1: ['MR', ['Shift+Backspace', 'Shift+Control+r'], () => { calc.memory.recall(); calc.refreshBuffer(); displayMemoryStatus(); }, false ],
-    a2: ['10ⁿ', ['Shift+Control+a'], () => calc.exp10(), false],
-    b2: ['x%y', ['Shift+Control+s'], () => calc.mod(), false],
-    c2: ['x!', ['Shift+Control+d'], () => calc.fct(), false],
-    d2: ['M÷', ['Shift+Slash', 'Shift+NumpadDivide'], () => { calc.memory.div(); displayMemoryStatus(); }, false ],
-    a3: ['sin', ['Shift+Digit7', 'Shift+Numpad7'], () => calc.sin(), false],
-    b3: ['cos', ['Shift+Digit8', 'Shift+Numpad8'], () => calc.cos(), false],
-    c3: ['tan', ['Shift+Digit9', 'Shift+Numpad9'], () => calc.tan(), false],
-    d3: ['M×', ['Shift+NumpadMultiply'], () => { calc.memory.mul(); displayMemoryStatus(); }, false ],
-    a4: ['Pi/2', ['Shift+Digit4', 'Shift+Numpad4'], () => calc.setConstant('pi2'), false],
-    b4: ['ln10', ['Shift+Digit5', 'Shift+Numpad5'], () => calc.setConstant('ln10'), false],
-    c4: ['ln2', ['Shift+Digit6', 'Shift+Numpad6'], () => calc.setConstant('ln2'), false],
-    d4: ['M-', ['Shift+Minus', 'Shift+NumpadSubtract'], () => { calc.memory.sub(); displayMemoryStatus(); }, false ],
-    a5: ['Pi', ['Shift+Digit1', 'Shift+Numpad1'], () => calc.setConstant('pi'), false],
-    b5: ['phi', ['Shift+Digit2', 'Shift+Numpad2'], () => calc.setConstant('phi'), false],
-    c5: ['e', ['Shift+Digit3', 'Shift+Numpad3'], () => calc.setConstant('e'), false],
-    d5: ['M+', ['Shift+Plus', 'Shift+NumpadAdd'], () => { calc.memory.add(); displayMemoryStatus(); }, false ],
-    a6: ['', ['\''], () => null, false],
-    b6: ['int', ['Shift+Digit0', 'Shift+Numpad0'], () => calc.int(), false],
-    c6: ['frac', ['Shift+Period', 'Shift+NumpadDecimal'], () => calc.frac(), false],
-    d6: ['MS', ['Shift+Equal', 'Shift+Enter', 'Shift+NumpadEnter'], () => { calc.memory.save(); displayMemoryStatus(); }, false ],
+    a1: ['xⁿ', ['Control+t'], () => calc.pow(), false],
+    b1: ['ⁿ√x', ['Control+y'], () => calc.root(), false],
+    c1: ['MC', ['Control+Delete'], () => calc.memory.clear(), false],
+    d1: ['MR', ['Control+Backspace'], () => { calc.memory.recall(); calc.refreshBuffer(); displayMemoryStatus(); }, false ],
+    a2: ['10ⁿ', ['Control+g'], () => calc.exp10(), false],
+    b2: ['x%y', ['Control+h'], () => calc.mod(), false],
+    c2: ['x!', ['Control+j'], () => calc.fct(), false],
+    d2: ['M÷', ['Control+Slash', 'Control+NumpadDivide'], () => { calc.memory.div(); displayMemoryStatus(); }, false ],
+    a3: ['sin', ['Control+Digit7', 'Control+Numpad7'], () => calc.sin(), false],
+    b3: ['cos', ['Control+Digit8', 'Control+Numpad8'], () => calc.cos(), false],
+    c3: ['tan', ['Control+Digit9', 'Control+Numpad9'], () => calc.tan(), false],
+    d3: ['M×', ['Control+NumpadMultiply'], () => { calc.memory.mul(); displayMemoryStatus(); }, false ],
+    a4: ['Pi/2', ['Control+Digit4', 'Control+Numpad4'], () => calc.setConstant('pi2'), false],
+    b4: ['ln10', ['Control+Digit5', 'Control+Numpad5'], () => calc.setConstant('ln10'), false],
+    c4: ['ln2', ['Control+Digit6', 'Control+Numpad6'], () => calc.setConstant('ln2'), false],
+    d4: ['M-', ['Control+Minus', 'Control+NumpadSubtract'], () => { calc.memory.sub(); displayMemoryStatus(); }, false ],
+    a5: ['Pi', ['Control+Digit1', 'Control+Numpad1'], () => calc.setConstant('pi'), false],
+    b5: ['phi', ['Control+Digit2', 'Control+Numpad2'], () => calc.setConstant('phi'), false],
+    c5: ['e', ['Control+Digit3', 'Control+Numpad3'], () => calc.setConstant('e'), false],
+    d5: ['M+', ['Control+Plus', 'Control+NumpadAdd'], () => { calc.memory.add(); displayMemoryStatus(); }, false ],
+    a6: ['', [], () => handleShiftLock(), false],
+    b6: ['int', ['Control+Digit0', 'Control+Numpad0'], () => calc.int(), false],
+    c6: ['frac', ['Control+Period', 'Control+NumpadDecimal'], () => calc.frac(), false],
+    d6: ['MS', ['Control+Equal', 'Control+Enter', 'Control+NumpadEnter'], () => { calc.memory.save(); displayMemoryStatus(); }, false ],
   };
 
   const modeSpecificExtendedFunctions: ExtendedButtonFunctionsByMode = {
     unit: {
-      a2: ['×2', ['Shift+Control+a'], () => calc.mulNumber(2), false],
-      b2: ['×3', ['Shift+Control+s'], () => calc.mulNumber(3), false],
-      c2: ['×5', ['Shift+Control+d'], () => calc.mulNumber(5), false],
-      a3: ['÷2', ['Shift+Digit7', 'Shift+Numpad7'], () => calc.divNumber(2), false],
-      b3: ['÷3', ['Shift+Digit8', 'Shift+Numpad8'], () => calc.divNumber(3), false],
-      c3: ['÷5', ['Shift+Digit9', 'Shift+Numpad9'], () => calc.divNumber(5), false],
-      a4: ['×10', ['Shift+Digit4', 'Shift+Numpad4'], () => calc.mulNumber(10), false],
-      b4: ['×100', ['Shift+Digit5', 'Shift+Numpad5'], () => calc.mulNumber(100), false],
-      c4: ['×1000', ['Shift+Digit6', 'Shift+Numpad6'], () => calc.mulNumber(1000), false],
-      a5: ['÷10', ['Shift+Digit1', 'Shift+Numpad1'], () => calc.divNumber(10), false],
-      b5: ['÷100', ['Shift+Digit2', 'Shift+Numpad2'], () => calc.divNumber(100), false],
-      c5: ['÷1000', ['Shift+Digit3', 'Shift+Numpad3'], () => calc.divNumber(1000), false],
+      a2: ['×2', ['Control+g'], () => calc.mulNumber(2), false],
+      b2: ['×3', ['Control+h'], () => calc.mulNumber(3), false],
+      c2: ['×5', ['Control+j'], () => calc.mulNumber(5), false],
+      a3: ['÷2', ['Control+Digit7', 'Control+Numpad7'], () => calc.divNumber(2), false],
+      b3: ['÷3', ['Control+Digit8', 'Control+Numpad8'], () => calc.divNumber(3), false],
+      c3: ['÷5', ['Control+Digit9', 'Control+Numpad9'], () => calc.divNumber(5), false],
+      a4: ['×10', ['Control+Digit4', 'Control+Numpad4'], () => calc.mulNumber(10), false],
+      b4: ['×100', ['Control+Digit5', 'Control+Numpad5'], () => calc.mulNumber(100), false],
+      c4: ['×1000', ['Control+Digit6', 'Control+Numpad6'], () => calc.mulNumber(1000), false],
+      a5: ['÷10', ['Control+Digit1', 'Control+Numpad1'], () => calc.divNumber(10), false],
+      b5: ['÷100', ['Control+Digit2', 'Control+Numpad2'], () => calc.divNumber(100), false],
+      c5: ['÷1000', ['Control+Digit3', 'Control+Numpad3'], () => calc.divNumber(1000), false],
     },
     currency: {
-      a2: ['+5', ['Shift+Control+a'], () => calc.addNumber(5), false],
-      b2: ['+10', ['Shift+Control+s'], () => calc.addNumber(10), false],
-      c2: ['+100', ['Shift+Control+d'], () => calc.addNumber(100), false],
-      a3: ['-5', ['Shift+Digit7', 'Shift+Numpad7'], () => calc.subNumber(5), false],
-      b3: ['-10', ['Shift+Digit8', 'Shift+Numpad8'], () => calc.subNumber(10), false],
-      c3: ['-100', ['Shift+Digit9', 'Shift+Numpad9'], () => calc.subNumber(100), false],
-      a4: ['×10', ['Shift+Digit4', 'Shift+Numpad4'], () => calc.mulNumber(10), false],
-      b4: ['×100', ['Shift+Digit5', 'Shift+Numpad5'], () => calc.mulNumber(100), false],
-      c4: ['×1000', ['Shift+Digit6', 'Shift+Numpad6'], () => calc.mulNumber(1000), false],
-      a5: ['÷10', ['Shift+Digit1', 'Shift+Numpad1'], () => calc.divNumber(10), false],
-      b5: ['÷100', ['Shift+Digit2', 'Shift+Numpad2'], () => calc.divNumber(100), false],
-      c5: ['÷1000', ['Shift+Digit3', 'Shift+Numpad3'], () => calc.divNumber(1000), false],
+      a2: ['+5', ['Control+g'], () => calc.addNumber(5), false],
+      b2: ['+10', ['Control+h'], () => calc.addNumber(10), false],
+      c2: ['+100', ['Control+j'], () => calc.addNumber(100), false],
+      a3: ['-5', ['Control+Digit7', 'Control+Numpad7'], () => calc.subNumber(5), false],
+      b3: ['-10', ['Control+Digit8', 'Control+Numpad8'], () => calc.subNumber(10), false],
+      c3: ['-100', ['Control+Digit9', 'Control+Numpad9'], () => calc.subNumber(100), false],
+      a4: ['×10', ['Control+Digit4', 'Control+Numpad4'], () => calc.mulNumber(10), false],
+      b4: ['×100', ['Control+Digit5', 'Control+Numpad5'], () => calc.mulNumber(100), false],
+      c4: ['×1000', ['Control+Digit6', 'Control+Numpad6'], () => calc.mulNumber(1000), false],
+      a5: ['÷10', ['Control+Digit1', 'Control+Numpad1'], () => calc.divNumber(10), false],
+      b5: ['÷100', ['Control+Digit2', 'Control+Numpad2'], () => calc.divNumber(100), false],
+      c5: ['÷1000', ['Control+Digit3', 'Control+Numpad3'], () => calc.divNumber(1000), false],
     },
     radix: {
-      a1: ['x<<1', ['Shift+Control+q'], () => bitOperationPreprocessing(() => calc.bitSftLNumber(1), false), false],
-      b1: ['x>>1', ['Shift+Control+w'], () => bitOperationPreprocessing(() => calc.bitSftRNumber(1), false), false],
-      a2: ['x<<4', ['Shift+Control+a'], () => bitOperationPreprocessing(() => calc.bitSftLNumber(4), false), false],
-      b2: ['x>>4', ['Shift+Control+s'], () => bitOperationPreprocessing(() => calc.bitSftRNumber(4), false), false],
-      c2: ['NOT', ['Shift+Control+d'], () => bitOperationPreprocessing(() => calc.bitNot(), false), false],
-      a3: ['NAND', ['Shift+Digit7', 'Shift+Numpad7'], () => bitOperationPreprocessing(() => calc.bitNand()), false],
-      b3: ['NOR', ['Shift+Digit8', 'Shift+Numpad8'], () => bitOperationPreprocessing(() => calc.bitNor()), false],
-      c3: ['XNOR', ['Shift+Digit9', 'Shift+Numpad9'], () => bitOperationPreprocessing(() => calc.bitXnor()), false],
-      a4: ['D', ['Shift+Digit4', 'Shift+Numpad4'], () => calc.addDigit('D'), false],
-      b4: ['E', ['Shift+Digit5', 'Shift+Numpad5'], () => calc.addDigit('E'), false],
-      c4: ['F', ['Shift+Digit6', 'Shift+Numpad6'], () => calc.addDigit('F'), false],
-      a5: ['A', ['Shift+Digit1', 'Shift+Numpad1'], () => calc.addDigit('A'), false],
-      b5: ['B', ['Shift+Digit2', 'Shift+Numpad2'], () => calc.addDigit('B'), false],
-      c5: ['C', ['Shift+Digit3', 'Shift+Numpad3'], () => calc.addDigit('C'), false],
+      a1: ['x<<1', ['Control+t'], () => bitOperationPreprocessing(() => calc.bitSftLNumber(1), false), false],
+      b1: ['x>>1', ['Control+y'], () => bitOperationPreprocessing(() => calc.bitSftRNumber(1), false), false],
+      a2: ['x<<4', ['Control+g'], () => bitOperationPreprocessing(() => calc.bitSftLNumber(4), false), false],
+      b2: ['x>>4', ['Control+h'], () => bitOperationPreprocessing(() => calc.bitSftRNumber(4), false), false],
+      c2: ['NOT', ['Control+j'], () => bitOperationPreprocessing(() => calc.bitNot(), false), false],
+      a3: ['NAND', ['Control+Digit7', 'Control+Numpad7'], () => bitOperationPreprocessing(() => calc.bitNand()), false],
+      b3: ['NOR', ['Control+Digit8', 'Control+Numpad8'], () => bitOperationPreprocessing(() => calc.bitNor()), false],
+      c3: ['XNOR', ['Control+Digit9', 'Control+Numpad9'], () => bitOperationPreprocessing(() => calc.bitXnor()), false],
+      a4: ['D', ['Control+Digit4', 'Control+Numpad4'], () => calc.addDigit('D'), false],
+      b4: ['E', ['Control+Digit5', 'Control+Numpad5'], () => calc.addDigit('E'), false],
+      c4: ['F', ['Control+Digit6', 'Control+Numpad6'], () => calc.addDigit('F'), false],
+      a5: ['A', ['Control+Digit1', 'Control+Numpad1'], () => calc.addDigit('A'), false],
+      b5: ['B', ['Control+Digit2', 'Control+Numpad2'], () => calc.addDigit('B'), false],
+      c5: ['C', ['Control+Digit3', 'Control+Numpad3'], () => calc.addDigit('C'), false],
     },
   };
 

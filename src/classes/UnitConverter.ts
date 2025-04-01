@@ -1,3 +1,11 @@
+/**
+ * @file UnitConverter.ts
+ * @description 이 파일은 단위 변환 기능을 제공하는 클래스를 정의합니다.
+ *              길이, 무게, 온도 등 다양한 단위 간의 변환을 지원하며,
+ *              단위 변환에 필요한 기준 데이터와 변환 공식을 포함합니다.
+ *              사용자가 입력한 값을 원하는 단위로 변환하여 결과를 반환합니다.
+*/
+
 import { unitBaseData } from '../constants/UnitBaseData';
 import { toBigNumber } from './CalculatorMath';
 import { BaseConverter } from './BaseConverter';

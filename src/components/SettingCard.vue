@@ -19,13 +19,14 @@
   import { useSettingsStore } from 'stores/settingsStore';
   import { useUnitStore } from 'stores/unitStore';
   import { useRadixStore } from 'stores/radixStore';
-
+  import { useCurrencyStore } from 'stores/currencyStore';
+  
   // 스토어 인스턴스 생성
   const uiStore = useUIStore();
   const settingsStore = useSettingsStore();
   const unitStore = useUnitStore();
   const radixStore = useRadixStore();
-
+  const currencyStore = useCurrencyStore();
   // i18n 설정
   import { useI18n } from 'vue-i18n';
   const { locale } = useI18n({ useScope: 'global' });
@@ -230,7 +231,7 @@
         <q-item class="q-mb-sm">
           <q-item-label class="self-center" role="text"> {{ t('showSymbol') }} (Alt-Y) </q-item-label>
           <q-space />
-          <q-toggle v-model="unitStore.showSymbol" keep-color dense />
+          <q-toggle v-model="currencyStore.showSymbol" keep-color dense />
         </q-item>
       </template>
 

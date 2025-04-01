@@ -1,3 +1,11 @@
+/**
+ * @file RadixConverter.ts
+ * @description 이 파일은 진법 변환 기능을 제공하는 클래스를 정의합니다.
+ *              2진수, 8진수, 10진수, 16진수 간의 상호 변환을 지원하며,
+ *              정수부와 소수부의 변환, 음수 처리, 유효성 검사 등의 기능을 포함합니다.
+ *              진법 변환에 필요한 다양한 유틸리티 메서드도 함께 제공합니다.
+ */
+
 import { match } from 'ts-pattern';
 import { BaseConverter } from './BaseConverter';
 import { toBigNumber, MathB } from './CalculatorMath';

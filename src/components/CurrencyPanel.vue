@@ -4,6 +4,8 @@
    * @description 이 파일은 통화 패널을 구성하는 Vue 컴포넌트입니다.
    *              사용자가 다양한 통화 간의 변환을 수행할 수 있도록 통화 선택 및 필터링 기능을 제공합니다.
    *              또한, 통화 스왑 및 최근 통화 초기화 기능을 포함하고 있습니다.
+   *              통화 심볼 표시 여부를 토글할 수 있으며, 키보드 단축키를 통한 빠른 조작이 가능합니다.
+   *              최근 사용한 통화 목록을 관리하고 초기화할 수 있습니다.
    */
 
   // Vue 핵심 기능 및 컴포지션 API 가져오기
@@ -18,14 +20,12 @@
   import { useUIStore } from 'stores/uiStore';
   import { useCurrencyStore } from 'stores/currencyStore';
   import { useSettingsStore } from 'stores/settingsStore';
-  import { useUnitStore } from 'stores/unitStore';
   import { useCalcStore } from 'src/stores/calcStore';
 
   // 스토어 인스턴스 생성
   const uiStore = useUIStore();
   const currencyStore = useCurrencyStore();
   const settingsStore = useSettingsStore();
-  const unitStore = useUnitStore();
   const calcStore = useCalcStore();
 
   // 계산기 관련 타입과 클래스
@@ -40,8 +40,8 @@
 
   // 키 바인딩 설정
   const keyBinding = new KeyBinding([
-    [['Alt+w'], () => clickButtonById('btn-swap-currency')],
-    [['Alt+y'], () => unitStore.toggleShowSymbol()],
+    [['\\'], () => clickButtonById('btn-swap-currency')],
+    [['Alt+\\'], () => currencyStore.toggleShowSymbol()],
   ]);
 
   // 단위 초기화

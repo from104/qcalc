@@ -11,7 +11,6 @@ interface UnitState {
   sourceUnits: Record<string, string>;
   targetUnits: Record<string, string>;
   showUnit: boolean;
-  showSymbol: boolean;
   convertedUnitNumber: string;
 }
 
@@ -21,7 +20,6 @@ export const useUnitStore = defineStore('unit', {
     sourceUnits: {},
     targetUnits: {},
     showUnit: true,
-    showSymbol: true,
     convertedUnitNumber: '',
   }),
 
@@ -59,10 +57,6 @@ export const useUnitStore = defineStore('unit', {
     // UI 표시 설정
     toggleShowUnit(): void {
       this.showUnit = !this.showUnit;
-    },
-
-    toggleShowSymbol(): void {
-      this.showSymbol = !this.showSymbol;
     },
   },
 

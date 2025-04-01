@@ -3,7 +3,7 @@
    * @file MainLayout.vue
    * @description 이 파일은 Vue.js 애플리케이션의 메인 레이아웃을 정의합니다.
    *              레이아웃은 헤더, 사이드바, 메인 콘텐츠 영역으로 구성되어 있으며,
-   *              다양한 페이지 컴포넌트를 동적으로 로드하여 사용자에게 보여줍니다.
+   *              다양한 컴포넌트를 동적으로 로드하여 사용자에게 보여줍니다.
    *              또한, 다국어 지원을 위한 i18n 기능을 통합하여
    *              사용자의 언어 설정에 따라 적절한 메시지를 표시합니다.
    *              이 레이아웃은 반응형 디자인을 지원하여 다양한 화면 크기에서
@@ -26,7 +26,7 @@
   import HelpIcon from 'components/snippets/HelpIcon.vue';
   import ShowTips from 'components/ShowTips.vue';
 
-  // === 페이지 컴포넌트 임포트 ===
+  // === 화면 컴포넌트 임포트 ===
   import CalcPage from 'pages/CalcPage.vue';
   import UnitPage from 'pages/UnitPage.vue';
   import CurrencyPage from 'pages/CurrencyPage.vue';
@@ -75,9 +75,9 @@
     { name: 'radix', title: computed(() => t('radix')), component: shallowRef(RadixPage) },
   ]);
 
-  // === 서브페이지 설정 ===
+  // === 서브화면 설정 ===
   /**
-   * 서브페이지의 구성을 정의하는 인터페이스입니다.
+   * 서브화면의 구성을 정의하는 인터페이스입니다.
    */
   interface SubPageConfig {
     [key: string]: {
@@ -101,7 +101,7 @@
   });
 
   /**
-   * 서브페이지의 상세 설정을 정의합니다.
+   * 서브화면의 상세 설정을 정의합니다.
    */
   const SUB_PAGE_CONFIG = reactive<SubPageConfig>({
     help: {
@@ -151,7 +151,7 @@
 
   // === 유틸리티 함수 ===
   /**
-   * 서브페이지를 전환하는 함수입니다.
+   * 서브화면를 전환하는 함수입니다.
    */
   const switchSubPage = async (pageName: string) => {
     if (currentSubPage.value === pageName) return;
@@ -167,7 +167,7 @@
   };
 
   /**
-   * 현재 페이지가 서브페이지인지 확인합니다.
+   * 현재 화면가 서브화면인지 확인합니다.
    */
   const isSubPage = computed(() => {
     return Object.keys(SUB_PAGE_CONFIG)
@@ -191,7 +191,7 @@
   };
 
   /**
-   * 서브페이지를 닫는 함수입니다.
+   * 서브화면를 닫는 함수입니다.
    */
   const closeSubPage = () => {
     if (isSubPage.value) {
@@ -236,7 +236,7 @@
   onMounted(() => {
     keyBinding.subscribe();
 
-    // 현재 서브페이지 설정
+    // 현재 서브화면 설정
     const validPages = ['help', 'about', 'settings'];
     currentSubPage.value = validPages.includes(route.name as string) ? (route.name as string) : 'record';
 
@@ -304,9 +304,9 @@
     { immediate: true },
   );
 
-  // === 서브페이지 버튼 설정 ===
+  // === 서브화면 버튼 설정 ===
   /**
-   * 서브페이지 버튼의 구성을 정의합니다.
+   * 서브화면 버튼의 구성을 정의합니다.
    */
   const SUB_PAGE_BUTTONS = reactive([
     { label: 'help', icon: 'help_outline', path: '/help', tooltip: computed(() => t('tooltip.help')) },
@@ -335,7 +335,7 @@
       </q-drawer>
 
       <q-header id="header" class="z-top noselect" elevated>
-        <!-- 메인 페이지 헤더 -->
+        <!-- 메인 화면 헤더 -->
         <q-toolbar v-if="!isSubPage" v-auto-blur>
           <q-btn flat dense round class="q-mr-sm" icon="menu" aria-label="Menu" @click="toggleLeftDrawer">
             <ToolTip :text="t('tooltip.menu')" />
@@ -378,7 +378,7 @@
           </q-btn>
         </q-toolbar>
 
-        <!-- 서브 페이지 헤더 -->
+        <!-- 서브 화면 헤더 -->
         <q-toolbar v-else v-auto-blur class="q-px-sm">
           <q-btn
             flat
@@ -413,7 +413,7 @@
       </q-header>
 
       <q-page-container class="row no-padding-bottom">
-        <!-- 메인 페이지 컨텐츠 -->
+        <!-- 메인 화면 컨텐츠 -->
         <template v-if="!isSubPage">
           <q-tab-panels v-model="uiStore.currentTab" animated infinite :swipeable="$g.isMobile">
             <q-tab-panel v-for="(tab, index) in tabs" :key="index" :name="tab.name">
@@ -422,7 +422,7 @@
           </q-tab-panels>
         </template>
 
-        <!-- 서브 페이지 컨텐츠 -->
+        <!-- 서브 화면 컨텐츠 -->
         <template v-else>
           <div class="col-12">
             <q-scroll-area class="sub-scroll-area" :class="{ 'hide-scrollbar': currentSubPage === 'record' }">
@@ -487,7 +487,7 @@
           </q-tabs>
         </q-toolbar>
 
-        <!-- 서브페이지 영역 헤더 -->
+        <!-- 서브화면 영역 헤더 -->
         <q-toolbar v-auto-blur class="col-6 sub-header">
           <transition name="animate-sub-page">
             <div :key="currentSubPage" :data-page="currentSubPage" class="header-content full-width row items-center">
@@ -574,7 +574,7 @@
           </q-tab-panels>
         </div>
 
-        <!-- 서브페이지 영역 -->
+        <!-- 서브화면 영역 -->
         <div
           class="col-6 relative-position sub-content"
           role="complementary"
@@ -726,25 +726,25 @@ ko:
   currency: 환율
   radix: 진법
   tooltipTips: '팁을 표시합니다.'
-  openRecordPage: '클릭하면 기록 페이지를 엽니다.'
+  openRecordPage: '클릭하면 기록 화면를 엽니다.'
   tooltipHelp: '도움말을 표시합니다.'
   ariaLabel:
     delete_outline: '모든 기록 삭제'
-    back: '이전 페이지로 돌아가기'
-    backToRecord: '기록 페이지로 돌아가기'
+    back: '이전 화면로 돌아가기'
+    backToRecord: '기록 화면로 돌아가기'
     mainTabs: '메인 탭 목록'
     tab: '{name} 탭'
-    subPageTitle: '{title} 페이지'
+    subPageTitle: '{title} 화면'
     subPageButton: '{label} 버튼'
-    closeSubPage: '서브페이지 닫기'
+    closeSubPage: '서브화면 닫기'
     calculatorSection: '계산기 영역'
     calculatorContent: '계산기 컨텐츠'
     tabPanel: '{name} 탭 패널'
-    subPageSection: '서브페이지 영역'
-    subPageContent: '서브페이지 컨텐츠'
+    subPageSection: '서브화면 영역'
+    subPageContent: '서브화면 컨텐츠'
     tabSelected: '{name} 탭 선택됨'
     tabUnselected: '{name} 탭 선택되지 않음'
-    record: '기록 페이지 열기'
+    record: '기록 화면 열기'
     help: '도움말 보기'
   tooltip:
     help: '도움말'
@@ -753,32 +753,32 @@ ko:
     deleteRecord: '모든 기록 삭제'
     search: '검색'
     menu: '메뉴 열기'
-    recordSwipeHelp: '기록 페이지에서 왼쪽으로 스와이프하여 메모를 추가,수정하거나 오른쪽으로 스와이프하여 기록을 삭제할 수 있습니다.'
+    recordSwipeHelp: '기록 화면에서 왼쪽으로 스와이프하여 메모를 추가,수정하거나 오른쪽으로 스와이프하여 기록을 삭제할 수 있습니다.'
 en:
   calc: Basic
   unit: Unit
   currency: Currency
   radix: Radix
   tooltipTips: 'Show tips.'
-  openRecordPage: 'Click to open the record page.'
+  openRecordPage: 'Click to open the record screen.'
   tooltipHelp: 'Show help.'
   ariaLabel:
     delete_outline: 'Delete all records'
-    back: 'Go back to previous page'
-    backToRecord: 'Return to record page'
+    back: 'Go back to previous screen'
+    backToRecord: 'Return to record screen'
     mainTabs: 'Main tab list'
     tab: '{name} tab'
-    subPageTitle: '{title} page'
+    subPageTitle: '{title} screen'
     subPageButton: '{label} button'
-    closeSubPage: 'Close sub page'
+    closeSubPage: 'Close sub screen'
     calculatorSection: 'Calculator section'
     calculatorContent: 'Calculator content'
     tabPanel: '{name} tab panel'
-    subPageSection: 'Sub page section'
-    subPageContent: 'Sub page content'
+    subPageSection: 'Sub screen section'
+    subPageContent: 'Sub screen content'
     tabSelected: '{name} tab selected'
     tabUnselected: '{name} tab unselected'
-    record: 'Open record page'
+    record: 'Open record screen'
     help: 'View help'
   tooltip:
     help: 'Help'
@@ -787,5 +787,5 @@ en:
     deleteRecord: 'Delete all records'
     search: 'Search'
     menu: 'Open menu'
-    recordSwipeHelp: 'You can add, modify, or delete records by swiping left on the record page, or by swiping right to delete the record.'
+    recordSwipeHelp: 'You can add, modify, or delete records by swiping left on the record screen, or by swiping right to delete the record.'
 </i18n>

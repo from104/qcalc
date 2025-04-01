@@ -5,6 +5,9 @@
 
 import { defineStore } from 'pinia';
 import { Radix, RadixConverter } from 'classes/RadixConverter';
+import { useUIStore } from './uiStore';
+
+const uiStore = useUIStore();
 
 type WordSize = 8 | 16 | 32 | 64;
 
@@ -38,7 +41,11 @@ export const useRadixStore = defineStore('radix', {
   actions: {
     // 진법 변환 관련
     convertIfRadix(value: string): string {
-      return this.convertRadix(value, Radix.Decimal, this.sourceRadix);
+      return this.convertRadix(
+        value,
+        Radix.Decimal,
+        uiStore.currentTab === 'radix' ? this.sourceRadix : Radix.Decimal,
+      );
     },
 
     convertRadix(value: string, fromRadix: Radix, toRadix: Radix): string {

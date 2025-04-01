@@ -1,3 +1,11 @@
+/**
+ * @file CalculatorMath.ts
+ * @description 이 파일은 계산기의 수학적 연산을 처리하는 핵심 클래스를 정의합니다.
+ *              MathJS 라이브러리를 기반으로 고정밀 수치 계산을 지원하며,
+ *              기본 산술 연산부터 삼각함수, 지수/로그, 비트 연산까지
+ *              다양한 수학적 기능을 제공합니다. 또한 수학 상수와 진법 변환 기능도 포함합니다.
+*/
+
 import { match } from 'ts-pattern';
 import { all, create } from 'mathjs';
 import { checkError } from '../utils/ErrorUtils';
