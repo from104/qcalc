@@ -31,8 +31,8 @@ const CONSTANTS: { [key: string]: string } = {
   pi: MathB.pi.toFixed(), // 원주율
   pi2: toBigNumber(MathB.pi).div(2).toFixed(), // 원주율의 절반
   e: MathB.e.toFixed(), // 자연로그의 밑
-  ln2: MathB.log(2).toFixed(), // 자연로그 2
-  ln10: MathB.log(10).toFixed(), // 자연로그 10
+  ln2: MathB.log(toBigNumber(2)).toFixed(), // 자연로그 2
+  ln10: MathB.log(toBigNumber(10)).toFixed(), // 자연로그 10
   phi: MathB.phi.toFixed(), // 황금비
 };
 
