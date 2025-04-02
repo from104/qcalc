@@ -1,6 +1,15 @@
-import { match } from 'ts-pattern';
+/**
+ * @file RadixConverter.ts
+ * @description 이 파일은 진법 변환 기능을 제공하는 클래스를 정의합니다.
+ *              2진수, 8진수, 10진수, 16진수 간의 상호 변환을 지원하며,
+ *              정수부와 소수부의 변환, 음수 처리, 유효성 검사 등의 기능을 포함합니다.
+ *              진법 변환에 필요한 다양한 유틸리티 메서드도 함께 제공합니다.
+ */
 
-import { BigNumber, MathB } from './CalculatorMath';
+import { match } from 'ts-pattern';
+import { BaseConverter } from './BaseConverter';
+import { toBigNumber, MathB } from './CalculatorMath';
+import { checkError } from '../utils/ErrorUtils';
 
 export enum Radix {
   Binary = 'bin',
@@ -32,7 +41,9 @@ export type RadixType = Radix;
  * const converter = new RadixConverter();
  * const binary = converter.convertDecimalToBinary("42");  // "101010"
  */
-export class RadixConverter {
+export class RadixConverter extends BaseConverter {
+  protected readonly converterName = 'RadixConverter';
+
   // 16진수 변환에 사용될 문자 집합
   private readonly hexDigits = '0123456789ABCDEF';
   // 소수점 이하 최대 자릿수
@@ -44,6 +55,44 @@ export class RadixConverter {
     [Radix.Decimal]: 10,
     [Radix.Hexadecimal]: 16,
   } as const;
+
+  /**
+   * 사용 가능한 진법 목록을 반환합니다.
+   * @returns {string[]} 진법 목록
+   */
+  getAvailableItems(): string[] {
+    return Object.values(Radix);
+  }
+
+  /**
+   * 특정 진법의 설명을 반환합니다.
+   * @param {string} item - 설명을 조회할 진법
+   * @returns {string} 진법 설명
+   */
+  getItemDescription(item: string): string {
+    const descriptions = {
+      [Radix.Binary]: '2진수 (Binary)',
+      [Radix.Octal]: '8진수 (Octal)',
+      [Radix.Decimal]: '10진수 (Decimal)',
+      [Radix.Hexadecimal]: '16진수 (Hexadecimal)',
+    };
+
+    checkError(!descriptions[item as Radix], 'error.radix.invalid_radix', {
+      radix: item,
+    });
+
+    return descriptions[item as Radix];
+  }
+
+  /**
+   * 입력값이 유효한 진법인지 검사합니다.
+   * @param {string} value - 검사할 값
+   * @param {string} format - 검사할 진법
+   * @returns {boolean} 유효성 여부
+   */
+  isValid(value: string, format: string): boolean {
+    return this.isValidRadixNumber(value, format as Radix);
+  }
 
   /**
    * 주어진 문자열이 지정된 진법에 유효한지 검사
@@ -60,7 +109,10 @@ export class RadixConverter {
       [Radix.Hexadecimal]: /^-?[0-9A-Fa-f]+(\.[0-9A-Fa-f]*)?$/,
     };
 
-    return patterns[radix].test(number);
+    const result = patterns[radix].test(number);
+
+    checkError(!result, 'error.radix.invalid_radix', { radix: radix, number: number });
+    return result;
   }
 
   /**
@@ -139,7 +191,7 @@ export class RadixConverter {
    * @param radix 변환할 진법 ('bin' | 'oct' | 'hex')
    * @returns 변환된 진법 문자열
    */
-  private convertDecimalToRadix(decimal: string | BigNumberType, radix: Radix): string {
+  private convertDecimalToRadix(decimal: string | BigNumber, radix: Radix): string {
     if (!decimal) return '0';
     if (radix === Radix.Decimal) return decimal.toString();
     // 입력값을 BigNumber로 변환하고 정수부와 소수부 분리
@@ -261,7 +313,7 @@ export class RadixConverter {
       .with(Radix.Hexadecimal, () => '0x')
       .exhaustive();
     // 정수부 변환 (빈 문자열이면 0으로 처리)
-    let result = BigNumber(integerPart ? BigInt(radixPrefix + integerPart).toString() : '0');
+    let result = toBigNumber(integerPart ? BigInt(radixPrefix + integerPart).toString() : '0');
 
     // 소수부가 존재하면 변환하여 더하기
     if (fractionPart) {
@@ -295,19 +347,19 @@ export class RadixConverter {
     // 각 자릿수별로 계산하여 합산
     return digits
       .split('')
-      .reduce<BigNumberType>((accumulator: BigNumberType, currentDigit: string, position: number): BigNumberType => {
+      .reduce<BigNumber>((accumulator: BigNumber, currentDigit: string, position: number): BigNumber => {
         // 현재 자릿수를 10진수로 변환
         const digitValue = parseInt(currentDigit, radixValue);
 
         // 현재 자릿수의 가중치 계산: value / (radix^position)
         const weightedValue = MathB.divide(
-          BigNumber(digitValue),
-          MathB.pow(BigNumber(radixValue), position + 1),
-        ) as BigNumberType;
+          toBigNumber(digitValue),
+          MathB.pow(toBigNumber(radixValue), position + 1),
+        ) as BigNumber;
 
         // 누적값에 현재 자릿수의 가중치를 더함
         return MathB.add(accumulator, weightedValue);
-      }, BigNumber(0));
+      }, toBigNumber(0));
   }
 
   /**
@@ -330,9 +382,7 @@ export class RadixConverter {
   private convertFromDecimal(decimal: string, toRadix: Radix): string {
     // 입력된 10진수의 유효성 검사
     // isValidDecimal 메서드를 통해 올바른 10진수 형식인지 확인
-    if (!this.isValidDecimal(decimal)) {
-      throw new Error('Invalid decimal number format');
-    }
+    checkError(!this.isValidDecimal(decimal), 'error.radix.invalid_decimal', { decimal: decimal });
 
     // 유효성 검사를 통과한 경우 실제 진법 변환을 수행
     // convertDecimalToRadix 메서드에 decimal과 목표 진법을 전달
@@ -349,9 +399,10 @@ export class RadixConverter {
    */
   private convertToDecimal(value: string, fromRadix: Radix): string {
     // 입력값이 해당 진법에 유효한지 검사
-    if (!this.isValidRadixNumber(value, fromRadix)) {
-      throw new Error(`Invalid ${fromRadix} number format`);
-    }
+    checkError(!this.isValidRadixNumber(value, fromRadix), 'error.radix.invalid_radix', {
+      radix: fromRadix,
+      value: value,
+    });
 
     // 실제 10진수 변환 수행
     return this.convertRadixToDecimal(value, fromRadix);

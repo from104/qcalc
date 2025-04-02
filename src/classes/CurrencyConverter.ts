@@ -1,14 +1,27 @@
+/**
+ * @file CurrencyConverter.ts
+ * @description 이 파일은 통화 변환 기능을 제공하는 클래스를 정의합니다.
+ *              실시간 환율 정보를 관리하고 통화 간 변환을 지원하며,
+ *              FreeCurrency API를 통해 최신 환율 데이터를 주기적으로 업데이트합니다.
+ *              다양한 통화에 대한 정보와 변환 기능을 제공하도록 설계되었습니다.
+ */
+
 import Freecurrencyapi from '@everapi/freecurrencyapi-js';
+import { BaseConverter } from './BaseConverter';
 
 import type { CurrencyExchangeRates, CurrencyData } from '../constants/CurrencyBaseData';
 import { currencyBaseData } from '../constants/CurrencyBaseData';
+import { checkError } from '../utils/ErrorUtils';
+import { toBigNumber } from './CalculatorMath';
 
 /**
  * CurrencyConverter 클래스
  *
  * 이 클래스는 환율 정보를 관리하고 통화 변환 기능을 제공합니다.
  */
-export class CurrencyConverter {
+export class CurrencyConverter extends BaseConverter {
+  protected readonly converterName = 'CurrencyConverter';
+
   // FreeCurrency API 접근 키
   private accessKey = process.env.FREECURRENCY_API_KEY;
 
@@ -35,6 +48,7 @@ export class CurrencyConverter {
    * 인스턴스 생성 시 환율 정보를 업데이트합니다.
    */
   constructor() {
+    super();
     this.updateRates();
   }
 
@@ -69,7 +83,7 @@ export class CurrencyConverter {
    * 사용 가능한 통화 목록을 반환하는 메소드
    * @returns {string[]} 통화 코드 배열
    */
-  getCurrencyLists(): string[] {
+  getAvailableItems(): string[] {
     return this.isRatesEmpty() ? [] : Object.keys(this.baseExchangeRates);
   }
 
@@ -78,12 +92,9 @@ export class CurrencyConverter {
    * @param {string} baseCurrency - 새로운 기준 통화
    */
   setBase(baseCurrency: string) {
-    if (this.isRatesEmpty()) {
-      throw new Error('Exchange rates are not available');
-    }
-    if (!this.baseExchangeRates[baseCurrency]) {
-      throw new Error('Invalid base currency');
-    }
+    checkError(this.isRatesEmpty(), 'error.currency.exchange_rates_not_available');
+    checkError(!this.baseExchangeRates[baseCurrency], 'error.currency.invalid_base_currency');
+    this.currentBaseCurrency = baseCurrency;
     this.currentBaseCurrency = baseCurrency;
     this.currentRates = this.getRates(baseCurrency);
   }
@@ -100,6 +111,7 @@ export class CurrencyConverter {
    * 특정 기준 통화에 대한 환율 정보를 계산하는 메소드
    * @param {string} baseCurrency - 기준 통화 (기본값: 'EUR')
    * @returns {CurrencyExchangeRates} 계산된 환율 정보
+   * @throws {Error} 환율 정보가 비어있거나 유효하지 않은 기준 통화인 경우
    */
   getRates(baseCurrency = 'EUR'): CurrencyExchangeRates {
     if (this.isRatesEmpty()) {
@@ -110,13 +122,17 @@ export class CurrencyConverter {
       return this.baseExchangeRates;
     }
 
-    if (!Object.prototype.hasOwnProperty.call(this.baseExchangeRates, baseCurrency)) {
-      throw new Error('Invalid base currency');
-    }
+    checkError(
+      !Object.prototype.hasOwnProperty.call(this.baseExchangeRates, baseCurrency),
+      'error.currency.invalid_base_currency',
+    );
 
     const baseRate = this.baseExchangeRates[baseCurrency];
     return Object.fromEntries(
-      Object.entries(this.baseExchangeRates).map(([currency, rate]) => [currency, rate / (baseRate ?? 1)]),
+      Object.entries(this.baseExchangeRates).map(([currency, rate]) => [
+        currency,
+        toBigNumber(rate).div(toBigNumber(baseRate)).toFixed(),
+      ]),
     );
   }
 
@@ -126,30 +142,30 @@ export class CurrencyConverter {
    * @param {string} to - 도착 통화 (선택적)
    * @returns {number} 계산된 환율
    */
-  getRate(from: string, to?: string): number {
-    if (this.isRatesEmpty()) {
-      throw new Error('Exchange rates are not available');
-    }
+  getRate(from: string, to?: string): BigNumber {
+    checkError(this.isRatesEmpty(), 'error.currency.exchange_rates_not_available');
 
     const actualTo = to ?? from;
     const actualFrom = to ? from : this.currentBaseCurrency;
 
-    if (!this.currentRates[actualTo] || !this.currentRates[actualFrom]) {
-      throw new Error('Invalid currency');
-    }
+    checkError(!this.currentRates[actualTo] || !this.currentRates[actualFrom], 'error.currency.invalid_currency');
 
-    return this.currentRates[actualTo] / this.currentRates[actualFrom];
+    const toRate = this.currentRates[actualTo] ?? 0;
+    const fromRate = this.currentRates[actualFrom] ?? 1;
+
+    return toBigNumber(toRate).div(toBigNumber(fromRate));
   }
 
   /**
    * 주어진 금액을 한 통화에서 다른 통화로 변환하는 메소드
-   * @param {BigNumberType} amount - 변환할 금액
+   * @param {BigNumber} amount - 변환할 금액
    * @param {string} from - 출발 통화
    * @param {string} to - 도착 통화
-   * @returns {number} 변환된 금액
+   * @returns {string} 변환된 금액
    */
-  convert(amount: BigNumberType, from: string, to: string): BigNumberType {
-    return amount.times(this.getRate(from, to));
+  convert(amount: BigNumber, from: string, to: string): BigNumber {
+    const rate = this.getRate(from, to);
+    return toBigNumber(amount.toString()).times(rate);
   }
 
   /**
@@ -158,7 +174,7 @@ export class CurrencyConverter {
    * @param {string} currency - 통화 코드
    * @returns {string} 포맷팅된 금액 문자열
    */
-  format(amount: BigNumberType, currency: string): string {
+  format(amount: BigNumber, currency: string): string {
     return `${this.currencyData[currency]?.symbol ?? ''}${amount.toFixed(2)}`;
   }
 
@@ -186,13 +202,12 @@ export class CurrencyConverter {
    * @returns {string} 통화 심볼
    */
   getSymbol(currency: string): string {
-    if (this.isRatesEmpty()) {
-      throw new Error('Exchange rates are not available');
-    }
-    if (!this.currencyData[currency] || !this.currentRates[currency]) {
-      throw new Error(`Invalid currency: ${currency}`);
-    }
-    return this.currencyData[currency].symbol;
+    checkError(this.isRatesEmpty(), 'error.currency.exchange_rates_not_available');
+    checkError(
+      !this.currencyData[currency] || !this.currentRates[currency],
+      `error.currency.invalid_currency: ${currency}`,
+    );
+    return this.currencyData[currency]!.symbol;
   }
 
   /**
@@ -200,13 +215,18 @@ export class CurrencyConverter {
    * @param {string} currency - 통화 코드
    * @returns {string} 통화 설명
    */
-  getDesc(currency: string): string {
-    if (this.isRatesEmpty()) {
-      throw new Error('Exchange rates are not available');
-    }
-    if (!this.currencyData[currency] || !this.currentRates[currency]) {
-      throw new Error(`Invalid currency: ${currency}`);
-    }
-    return this.currencyData[currency].desc;
+  getItemDescription(currency: string): string {
+    checkError(!this.currencyData[currency], `error.currency.invalid_currency: ${currency}`);
+    return this.currencyData[currency]!.desc;
+  }
+
+  /**
+   * 입력값이 유효한 통화인지 검사합니다.
+   * @param {string} value - 검사할 값
+   * @param {string} format - 검사할 통화 코드
+   * @returns {boolean} 유효성 여부
+   */
+  isValid(value: string, format: string): boolean {
+    return !this.isRatesEmpty() && !!this.currentRates[format];
   }
 }

@@ -1,4 +1,12 @@
 <script setup lang="ts">
+  /**
+   * @file UnitPanel.vue
+   * @description 이 파일은 단위 패널 컴포넌트를 구성하는 Vue 컴포넌트입니다.
+   *              사용자가 다양한 단위를 선택하고 변환할 수 있도록 지원하며,
+   *              단위 변환 기능을 통해 계산기와 상호작용합니다.
+   *              이 컴포넌트는 사용자 경험을 향상시키기 위해 단위 목록을 동적으로 관리합니다.
+   */
+
   // Vue 핵심 기능 및 컴포지션 API 가져오기
   import { onMounted, onBeforeUnmount, reactive, watch, computed } from 'vue';
 
@@ -9,26 +17,26 @@
   // 계산기 관련 타입과 클래스
   import { KeyBinding } from 'classes/KeyBinding';
   import { UnitConverter } from 'classes/UnitConverter';
-  import { BigNumber } from 'classes/CalculatorMath';
-
-  // 전역 window 객체에 접근하기 위한 상수 선언
-  const window = globalThis.window;
+  
+  // 스토어 import
+  import { useSettingsStore } from 'stores/settingsStore';
+  import { useUnitStore } from 'stores/unitStore';
+  import { useCalcStore } from 'src/stores/calcStore';
 
   // 스토어 인스턴스 생성
-  const store = window.store;
-
-  // 스토어에서 필요한 메서드 추출
-  const { calc, clickButtonById, swapUnits, initRecentUnits } = store;
+  const settingsStore = useSettingsStore();
+  const unitStore = useUnitStore();
+  const calcStore = useCalcStore();
 
   // 컴포넌트 import
   import ToolTip from 'src/components/snippets/ToolTip.vue';
 
   // 단위 초기화
-  initRecentUnits();
+  unitStore.initRecentUnits();
 
   // 범주 이름을 현재 언어에 맞게 초기화
   const categoryList = reactive(
-    UnitConverter.categories.map((category) => ({
+    UnitConverter.getCategories().map((category) => ({
       value: category,
       label: t(`categories.${category}`),
     })),
@@ -36,7 +44,7 @@
 
   // 언어 변경 시 범주 이름 업데이트
   watch(
-    () => store.locale,
+    () => settingsStore.locale,
     () => {
       categoryList.forEach((category) => {
         category.label = t(`categories.${category.value}`);
@@ -46,13 +54,13 @@
 
   // 키 바인딩 설정
   const keyBindingManager = new KeyBinding([
-    [['Alt+w'], () => clickButtonById('btn-swap-unit')],
-    [['Alt+y'], () => store.toggleShowUnit()],
+    [['\\'], () => document.getElementById('btn-swap-unit')?.click()],
+    [['Alt+\\'], () => unitStore.toggleShowUnit()],
   ]);
 
   // 컴포넌트 마운트 시 실행
   onMounted(() => {
-    initRecentUnits();
+    unitStore.initRecentUnits();
     keyBindingManager.subscribe();
   });
 
@@ -70,7 +78,7 @@
   };
 
   // 사용 가능한 단위 목록을 computed로 관리
-  const availableUnits = computed(() => UnitConverter.getUnitLists(store.selectedCategory));
+  const availableUnits = computed(() => UnitConverter.getUnitLists(unitStore.selectedCategory));
 
   // 단위 옵션 초기화
   /**
@@ -79,31 +87,25 @@
    * @param isSource - 출발 단위 여부
    * @returns 단위 옵션 객체
    */
-  const createUnitOption = (unit: string, isSource: boolean): UnitOption => ({
+  const createUnitOption = (unit: string): UnitOption => ({
     value: unit,
     label: unit,
-    desc: UnitConverter.getUnitDesc(store.selectedCategory, unit),
-    disable: isSource
-      ? store.targetUnits[store.selectedCategory] === unit
-      : store.sourceUnits[store.selectedCategory] === unit,
+    desc: UnitConverter.getUnitDesc(unitStore.selectedCategory, unit),
   });
 
   // 출발 단위 옵션 목록을 computed로 관리
-  const sourceUnitOptions = computed(() => availableUnits.value.map((unit) => createUnitOption(unit, true)));
+  const sourceUnitOptions = computed(() => availableUnits.value.map((unit) => createUnitOption(unit)));
 
   // 도착 단위 옵션 목록을 computed로 관리
-  const targetUnitOptions = computed(() => availableUnits.value.map((unit) => createUnitOption(unit, false)));
+  const targetUnitOptions = computed(() => availableUnits.value.map((unit) => createUnitOption(unit)));
 
   const handleUnitSwap = () => {
-    calc.setCurrentNumber(
-      UnitConverter.convert(
-        store.selectedCategory,
-        BigNumber(calc.currentNumber),
-        store.sourceUnits[store.selectedCategory] ?? '',
-        store.targetUnits[store.selectedCategory] ?? '',
-      ),
-    );
-    swapUnits();
+    // 동일한 단위인 경우 변환하지 않음
+    if (unitStore.sourceUnits[unitStore.selectedCategory] !== unitStore.targetUnits[unitStore.selectedCategory]) {
+      unitStore.swapUnits();
+      calcStore.calc.currentNumber = unitStore.convertedUnitNumber;
+      calcStore.calc.needsBufferReset = true;
+    }
   };
 </script>
 
@@ -111,7 +113,7 @@
   <q-card-section v-auto-blur class="row q-px-sm q-pt-none q-pb-sm">
     <!-- 카테고리 -->
     <q-select
-      v-model="store.selectedCategory"
+      v-model="unitStore.selectedCategory"
       :options="categoryList"
       :label="t('category')"
       role="combobox"
@@ -121,11 +123,14 @@
       options-dense
       emit-value
       map-options
+      behavior="menu"
       class="col-3 q-pl-sm shadow-2 text-black"
-      :class="!store.isDarkMode() ? 'bg-blue-grey-2' : 'bg-blue-grey-6'"
-      :popup-content-class="!store.isDarkMode() ? 'bg-blue-grey-2' : 'bg-blue-grey-6'"
-      :options-selected-class="!store.isDarkMode() ? 'text-primary' : 'text-grey-1'"
-      :label-color="!store.isDarkMode() ? 'primary' : 'grey-1'"
+      :class="!settingsStore.darkMode ? 'bg-blue-grey-2' : 'bg-blue-grey-6'"
+      :label-color="!settingsStore.darkMode ? 'primary' : 'grey-1'"
+      :popup-content-class="
+        [!settingsStore.darkMode ? 'bg-blue-grey-2' : 'bg-blue-grey-6', 'scrollbar-custom', 'q-select-popup'].join(' ')
+      "
+      :options-selected-class="!settingsStore.darkMode ? 'text-primary' : 'text-grey-1'"
     />
 
     <!-- 원본 방향 -->
@@ -133,9 +138,9 @@
 
     <!-- 원본 단위 -->
     <q-select
-      v-model="store.sourceUnits[store.selectedCategory]"
+      v-model="unitStore.sourceUnits[unitStore.selectedCategory]"
       :options="sourceUnitOptions"
-      :label="t(`unitDesc.${store.selectedCategory}.${store.sourceUnits[store.selectedCategory]}`)"
+      :label="t(`unitDesc.${unitStore.selectedCategory}.${unitStore.sourceUnits[unitStore.selectedCategory]}`)"
       role="combobox"
       :aria-label="t('ariaLabel.sourceUnit')"
       stack-label
@@ -143,30 +148,34 @@
       options-dense
       emit-value
       map-options
+      behavior="menu"
       class="col-3 q-pl-sm shadow-2"
-      :class="!store.isDarkMode() ? 'bg-blue-grey-2' : 'bg-blue-grey-6'"
-      :popup-content-class="!store.isDarkMode() ? 'bg-blue-grey-2' : 'bg-blue-grey-6'"
-      :options-selected-class="!store.isDarkMode() ? 'text-primary' : 'text-grey-1'"
-      :label-color="!store.isDarkMode() ? 'primary' : 'grey-1'"
+      :class="!settingsStore.darkMode ? 'bg-blue-grey-2' : 'bg-blue-grey-6'"
+      :popup-content-class="
+        [!settingsStore.darkMode ? 'bg-blue-grey-2' : 'bg-blue-grey-6', 'scrollbar-custom', 'q-select-popup'].join(' ')
+      "
+      :options-selected-class="!settingsStore.darkMode ? 'text-primary' : 'text-grey-1'"
+      :label-color="!settingsStore.darkMode ? 'primary' : 'grey-1'"
     >
       <template #option="scope">
         <q-item v-bind="scope.itemProps">
           <q-item-section>
             <q-item-label caption>
-              {{ t(`unitDesc.${store.selectedCategory}.${scope.opt.label}`) }}
+              {{ t(`unitDesc.${unitStore.selectedCategory}.${scope.opt.label}`) }}
             </q-item-label>
             <q-item-label>{{ scope.opt.label }}</q-item-label>
           </q-item-section>
         </q-item>
       </template>
       <ToolTip>
-        {{ t(`unitDesc.${store.selectedCategory}.${store.sourceUnits[store.selectedCategory]}`) }}
+        {{ t(`unitDesc.${unitStore.selectedCategory}.${unitStore.sourceUnits[unitStore.selectedCategory]}`) }}
       </ToolTip>
     </q-select>
 
     <!-- 원본, 대상 단위 바꾸기 버튼 -->
     <q-btn
       id="btn-swap-unit"
+      v-auto-blur
       dense
       round
       flat
@@ -182,9 +191,9 @@
 
     <!-- 대상 단위 -->
     <q-select
-      v-model="store.targetUnits[store.selectedCategory]"
+      v-model="unitStore.targetUnits[unitStore.selectedCategory]"
       :options="targetUnitOptions"
-      :label="t(`unitDesc.${store.selectedCategory}.${store.targetUnits[store.selectedCategory]}`)"
+      :label="t(`unitDesc.${unitStore.selectedCategory}.${unitStore.targetUnits[unitStore.selectedCategory]}`)"
       role="combobox"
       :aria-label="t('ariaLabel.targetUnit')"
       stack-label
@@ -192,24 +201,27 @@
       options-dense
       emit-value
       map-options
+      behavior="menu"
       class="col-3 q-pl-sm shadow-2"
-      :class="!store.isDarkMode() ? 'bg-blue-grey-2' : 'bg-blue-grey-6'"
-      :popup-content-class="!store.isDarkMode() ? 'bg-blue-grey-2' : 'bg-blue-grey-6'"
-      :options-selected-class="!store.isDarkMode() ? 'text-primary' : 'text-grey-1'"
-      :label-color="!store.isDarkMode() ? 'primary' : 'grey-1'"
+      :class="!settingsStore.darkMode ? 'bg-blue-grey-2' : 'bg-blue-grey-6'"
+      :popup-content-class="
+        [!settingsStore.darkMode ? 'bg-blue-grey-2' : 'bg-blue-grey-6', 'scrollbar-custom', 'q-select-popup'].join(' ')
+      "
+      :options-selected-class="!settingsStore.darkMode ? 'text-primary' : 'text-grey-1'"
+      :label-color="!settingsStore.darkMode ? 'primary' : 'grey-1'"
     >
       <template #option="scope">
         <q-item v-bind="scope.itemProps">
           <q-item-section>
             <q-item-label caption>
-              {{ t(`unitDesc.${store.selectedCategory}.${scope.opt.label}`) }}
+              {{ t(`unitDesc.${unitStore.selectedCategory}.${scope.opt.label}`) }}
             </q-item-label>
             <q-item-label>{{ scope.opt.label }}</q-item-label>
           </q-item-section>
         </q-item>
       </template>
       <ToolTip>
-        {{ t(`unitDesc.${store.selectedCategory}.${store.targetUnits[store.selectedCategory]}`) }}
+        {{ t(`unitDesc.${unitStore.selectedCategory}.${unitStore.targetUnits[unitStore.selectedCategory]}`) }}
       </ToolTip>
     </q-select>
 
@@ -223,5 +235,16 @@
     />
   </q-card-section>
 </template>
+
+<style lang="scss">
+  .q-select-popup {
+    .q-item {
+      @media (prefers-color-scheme: dark) {
+        border-top: 1px dotted rgba(255, 255, 255, 0.377);
+        border-bottom: 1px dotted rgba(255, 255, 255, 0.377);
+      }
+    }
+  }
+</style>
 
 <i18n lang="yaml5" src="../i18n/components/UnitPanel.yml" />

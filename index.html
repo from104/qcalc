@@ -9,11 +9,11 @@
     <meta name="msapplication-tap-highlight" content="no" />
     <meta
       name="viewport"
-      content="initial-scale=1, width=device-width<% if (ctx.mode.cordova || ctx.mode.capacitor) { %>, viewport-fit=cover<% } %>"
+      content="initial-scale=1, width=device-width, viewport-fit=cover<% if (ctx.mode.cordova || ctx.mode.capacitor) { %>, viewport-fit=cover<% } %>"
     />
     <meta
       http-equiv="Content-Security-Policy"
-      content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self' https://api.freecurrencyapi.com;"
+      content="default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' http://localhost:* https://localhost:*; style-src 'self' 'unsafe-inline'; media-src *; img-src 'self' data: content:; connect-src 'self' https://api.freecurrencyapi.com localhost:* http://localhost:* https://localhost:* http://127.0.0.1:* https://127.0.0.1:*; font-src 'self' data:; object-src 'none'"
     />
     <!--
       <link rel="icon" type="image/png" sizes="128x128" href="icons/favicon-128x128.png">

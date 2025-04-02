@@ -92,10 +92,18 @@ build_linux() {
     quasar build -m electron -T linux
     if [ $? -eq 0 ]; then
         echo "Linux build completed successfully"
-        mv dist/electron/Packaged/*.AppImage "$BUILD_DIR/QCalc-$VERSION-linux.AppImage"
-        mv dist/electron/Packaged/*.snap "$BUILD_DIR/QCalc-$VERSION-linux.snap"
-        # latest-linux.yml 파일 복사
-        cp dist/electron/Packaged/latest-linux.yml "$BUILD_DIR/latest-linux.yml"
+        # 선택적으로 AppImage 파일 이동 (있는 경우에만)
+        if ls dist/electron/Packaged/*.AppImage 1> /dev/null 2>&1; then
+            mv dist/electron/Packaged/*.AppImage "$BUILD_DIR/QCalc-$VERSION-linux.AppImage"
+        fi
+        # 선택적으로 snap 파일 이동 (있는 경우에만)
+        if ls dist/electron/Packaged/*.snap 1> /dev/null 2>&1; then
+            mv dist/electron/Packaged/*.snap "$BUILD_DIR/QCalc-$VERSION-linux.snap"
+        fi
+        # 선택적으로 latest-linux.yml 파일 복사 (있는 경우에만)
+        if [ -f dist/electron/Packaged/latest-linux.yml ]; then
+            cp dist/electron/Packaged/latest-linux.yml "$BUILD_DIR/latest-linux.yml"
+        fi
     else
         echo "Linux build failed"
         exit 1

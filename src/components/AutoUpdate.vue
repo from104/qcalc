@@ -1,24 +1,26 @@
 <script setup lang="ts">
   /**
-   * 자동 업데이트 기능을 관리하는 컴포넌트입니다.
-   * 업데이트 확인, 다운로드, 설치 등의 기능을 처리합니다.
+   * @file AutoUpdate.vue
+   * @description 이 파일은 자동 업데이트 기능을 관리하는 Vue 컴포넌트입니다.
+   *              업데이트 확인, 다운로드 및 설치 프로세스를 관리하고,
+   *              사용자에게 업데이트 진행 상황을 알리며 필요한 경우 재시작을 안내합니다.
+   *              또한 개발 환경에서는 업데이트 테스트 기능을 제공합니다.
    */
-  import { ref, computed, onMounted, onUnmounted } from 'vue';
+  
+  import { ref, onMounted, onUnmounted } from 'vue';
   import { useI18n } from 'vue-i18n';
-  import { useQuasar } from 'quasar';
-  import DOMPurify from 'dompurify';
 
-    // 전역 window 객체에 접근하기 위한 상수 선언
-  const window = globalThis.window;
+  import { showError, showMessage } from '../utils/NotificationUtils';
 
-  // 스토어 인스턴스 생성
-  const store = window.store;
+  // 전역 window 객체에 접근하기 위한 상수 선언
+  const $g = window.globalVars;
+
+  import { useSettingsStore } from 'stores/settingsStore';
+
+  const settingsStore = useSettingsStore();
 
   // i18n 설정
   const { t } = useI18n();
-
-  // Quasar 프레임워크 인스턴스 초기화
-  const $q = useQuasar();
 
   // 상태 관리
   const updateDialog = ref(false);
@@ -26,13 +28,6 @@
   const updateInfo = ref<UpdateInfo | null>(null);
   const updateProgress = ref<UpdateProgressInfo | null>(null);
   const updateError = ref<UpdateError | null>(null);
-
-  // 릴리스 노트 sanitize
-  const sanitizedReleaseNotes = computed(() =>
-    updateInfo.value?.releaseNotes
-      ? DOMPurify.sanitize(updateInfo.value.releaseNotes).replace(/h3>/gm, 'h6>').replace(/h2>/gm, 'h5>')
-      : '',
-  );
 
   /**
    * 업데이트 상태를 처리하는 함수입니다.
@@ -42,13 +37,13 @@
     info?: UpdateInfo | UpdateProgressInfo | UpdateError,
   ) => {
     // 자동 업데이트가 비활성화되어 있으면 패스
-    if (!store.autoUpdate) {
+    if (!settingsStore.autoUpdate) {
       // 새 패키지 버전
       if (status === 'available' && 'version' in (info || {})) {
         const newVersion = (info as UpdateInfo).version;
         const newVersionMessage = t('newVersionMessage', { version: newVersion });
         const newVersionAddedMessage = t('newVersionAddedMessage');
-        store.showMessage(`${newVersionMessage} - ${newVersionAddedMessage}`, 3000);
+        showMessage(`${newVersionMessage} - ${newVersionAddedMessage}`, 3000);
       }
       return;
     }
@@ -73,11 +68,7 @@
       case 'error':
         updateError.value = info as UpdateError;
         updateDialog.value = true;
-        $q.notify({
-          type: 'negative',
-          message: t('error'),
-          caption: t('errorMessage'),
-        });
+        showError(`${t('error')}: ${t('errorMessage')}`);
         console.error((info as UpdateError).message);
         break;
     }
@@ -87,7 +78,7 @@
    * 업데이트를 시작하는 함수입니다.
    */
   const startUpdate = () => {
-    if (window.isDev) {
+    if ($g.isDev) {
       // 개발 모드에서는 진행 상태를 시뮬레이션
       let progress = 0;
       const interval = setInterval(() => {
@@ -113,11 +104,11 @@
    * 업데이트를 설치하는 함수입니다.
    */
   const installUpdate = () => {
-    if (window.isDev) {
+    if ($g.isDev) {
       // 개발 모드에서는 재시작 확인 다이얼로그 표시
-      console.log('개발 모드: 앱 재시작 시뮬레이션');
+      // console.log('개발 모드: 앱 재시작 시뮬레이션');
       updateDialog.value = false;
-      store.showMessage(t('updateSimulationComplete'), 3000);
+      showMessage(t('updateSimulationComplete'), 3000);
     } else {
       window.electronUpdater.installUpdate();
     }
@@ -138,31 +129,30 @@
     releaseDate: new Date().toISOString(),
     releaseName: 'v0.11.1',
     releaseNotes: `
-    <h2>[0.11.1] 2025-01-29</h2>
-    <h3>Added</h3>
-    <ul>
-      <li>Added temperature units: Delisle (°De), Newton (°N), Romer (°Rø), Réaumur (°Ré).</li>
-      <li>Added support for adaptive layout: displays calculation history and sub-panel when the window width increases.</li>
-      <li>Added search to calculation history</li>
-      <li>Added automatic updates in electron package format</li>
-    </ul>
-    <h3>Changed</h3>
-    <ul>
-      <li>Increased currency conversion precision from Number to BigNumber.</li>
-      <li>Expanded decimal point display limit up to 16 digits</li>
-    </ul>
-    <h3>Fixed</h3>
-    <ul>
-      <li>Fixed display error in percentage functionality.</li>
-    </ul>
-  `,
+## [0.11.1] 2025-01-29
+
+### Added
+
+- Added temperature units: Delisle (°De), Newton (°N), Romer (°Rø), Réaumur (°Ré).
+- Added support for adaptive layout: displays calculation history and sub-panel when the window width increases.
+- Added search to calculation history
+- Added automatic updates in electron package format
+
+### Changed
+
+- Increased currency conversion precision from Number to BigNumber.
+- Expanded decimal point display limit up to 16 digits
+
+### Fixed
+
+- Fixed display error in percentage functionality.`,
   };
 
   /**
    * 테스트 업데이트를 시작하는 함수입니다.
    */
   const testUpdate = () => {
-    if (window.isDev) {
+    if ($g.isDev) {
       handleUpdateStatus('available', testUpdateInfo);
     } else {
       window.electronUpdater.testUpdate();
@@ -172,11 +162,11 @@
   // 컴포넌트가 마운트될 때 실행
   onMounted(() => {
     // Electron 환경에서만 업데이트 리스너 등록
-    if (window.isElectron && !window.isSnap) {
+    if ($g.isElectron && !$g.isSnap) {
       window.electronUpdater.onUpdateStatus(handleUpdateStatus);
 
       // 개발 모드가 아닐 때만 업데이트 확인
-      if (!window.isDev) {
+      if (!$g.isDev) {
         window.electronUpdater.checkForUpdates();
       }
     }
@@ -185,7 +175,7 @@
   // 컴포넌트가 언마운트될 때 실행
   onUnmounted(() => {
     // Electron 환경에서만 리스너 제거
-    if (window.isElectron && !window.isSnap) {
+    if ($g.isElectron && !$g.isSnap) {
       window.electronUpdater.removeUpdateStatusListener();
     }
   });
@@ -193,7 +183,7 @@
 
 <template>
   <!-- Electron 환경에서만 업데이트 관련 UI 표시 -->
-  <template v-if="window.isElectron && !window.isSnap">
+  <template v-if="$g.isElectron && !$g.isSnap">
     <q-dialog v-model="updateDialog" persistent>
       <q-card style="min-width: 350px; margin-top: 25px">
         <q-card-section>
@@ -203,8 +193,7 @@
         <q-card-section class="q-pt-none">
           <template v-if="updateStatus === 'available'">
             <p>{{ t('newVersionMessage', { version: updateInfo?.version }) }}</p>
-            <!-- eslint-disable-next-line vue/no-v-html -->
-            <div v-if="updateInfo?.releaseNotes" class="release-notes q-mb-lg" v-html="sanitizedReleaseNotes" />
+            <q-markdown :src="updateInfo?.releaseNotes || ''" class="q-mb-lg" no-linkify />
             <p>{{ t('confirmUpdate') }}</p>
           </template>
           <template v-else-if="updateStatus === 'progress'">
@@ -227,14 +216,14 @@
               flat
               :label="t('later')"
               color="primary"
-              :text-color="store.isDarkMode() ? 'blue-grey-2' : 'primary'"
+              :text-color="settingsStore.isDarkMode() ? 'blue-grey-2' : 'primary'"
               class="q-mr-sm"
             />
             <q-btn
               flat
               :label="t('update')"
               color="primary"
-              :text-color="store.isDarkMode() ? 'blue-grey-2' : 'primary'"
+              :text-color="settingsStore.isDarkMode() ? 'blue-grey-2' : 'primary'"
               @click="startUpdate"
             />
           </template>
@@ -244,14 +233,14 @@
               flat
               :label="t('later')"
               color="primary"
-              :text-color="store.isDarkMode() ? 'blue-grey-2' : 'primary'"
+              :text-color="settingsStore.isDarkMode() ? 'blue-grey-2' : 'primary'"
               class="q-mr-sm"
             />
             <q-btn
               flat
               :label="t('installNow')"
               color="primary"
-              :text-color="store.isDarkMode() ? 'blue-grey-2' : 'primary'"
+              :text-color="settingsStore.isDarkMode() ? 'blue-grey-2' : 'primary'"
               @click="installUpdate"
             />
           </template>
@@ -261,7 +250,7 @@
               flat
               :label="t('close')"
               color="primary"
-              :text-color="store.isDarkMode() ? 'blue-grey-2' : 'primary'"
+              :text-color="settingsStore.isDarkMode() ? 'blue-grey-2' : 'primary'"
             />
           </template>
         </q-card-actions>
@@ -269,7 +258,7 @@
     </q-dialog>
     <!-- 개발 환경에서만 표시되는 테스트 버튼 -->
     <q-btn
-      v-if="window.isDev"
+      v-if="$g.isDev"
       class="fixed-bottom-right q-ma-md"
       color="primary"
       icon="refresh"
@@ -278,28 +267,6 @@
     />
   </template>
 </template>
-
-<style scoped lang="scss">
-  .release-notes {
-    :deep(h5),
-    :deep(h6) {
-      font-weight: 700;
-      margin-top: 0.5em;
-      margin-bottom: 0.5em;
-      padding: 0;
-      line-height: 1;
-      background: none;
-    }
-
-    :deep(h5) {
-      font-size: 1.6em;
-    }
-
-    :deep(h6) {
-      font-size: 1.4em;
-    }
-  }
-</style>
 
 <i18n lang="yaml5">
   ko:

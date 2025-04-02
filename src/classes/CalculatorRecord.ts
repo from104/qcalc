@@ -1,4 +1,14 @@
 /**
+ * @file CalculatorRecord.ts
+ * @description 이 파일은 계산기의 계산 기록을 관리하는 클래스를 정의합니다.
+ *              계산 결과의 저장, 조회, 삭제 등의 기능을 제공하며, 각 기록은
+ *              고유 ID와 함께 LIFO(Last In First Out) 구조로 관리됩니다.
+ *              메모리 관리를 위해 최대 100개까지의 기록만 유지합니다.
+ */
+
+import { checkError, throwError } from '../utils/ErrorUtils';
+
+/**
  * 계산기의 기록을 관리하는 클래스입니다.
  *
  * 이 클래스는 다음과 같은 주요 기능을 제공합니다:
@@ -63,16 +73,13 @@ export class CalculatorRecord {
       // 오래된 항목을 제거하여 크기 조정
       this.trimRecordsIfNeeded();
     } catch (error) {
-      console.error('Failed to add record item:', error);
-      throw new Error('Failed to add record item');
+      throwError('error.calc.failed_to_add_record_item', { error });
     }
   }
 
   /**
    * 가장 오래된(첫 번째) 기록 항목을 제거합니다.
    * LIFO(Last In First Out) 구조에서 가장 마지막에 추가된 항목을 제거합니다.
-   *
-   * @throws {Error} 기록 항목 제거 중 오류가 발생한 경우
    */
   public removeFirst(): void {
     if (this.records.length > 0) {
@@ -108,7 +115,7 @@ export class CalculatorRecord {
    */
   public findIndexById(id: number): number {
     const index = this.records.findIndex((record) => record.id === id);
-    if (index === -1) throw new Error('Record item not found');
+    checkError(index === -1, 'error.calc.record_not_found');
     return index;
   }
 
@@ -120,12 +127,10 @@ export class CalculatorRecord {
    * @throws {Error} 유효하지 않은 인덱스가 전달된 경우
    */
   public getRecordByIndex(index: number): ResultRecord {
-    if (index < 0 || index >= this.records.length) {
-      throw new Error('Invalid record index');
-    }
+    checkError(index < 0 || index >= this.records.length, 'error.calc.invalid_record_index');
     const record = this.records[index];
-    if (!record) throw new Error('Record not found');
-    return record;
+    checkError(!record, 'error.calc.record_not_found');
+    return record as ResultRecord;
   }
 
   /**
@@ -133,7 +138,6 @@ export class CalculatorRecord {
    *
    * @param {number} id - 찾고자 하는 기록 항목의 고유 ID
    * @returns {ResultRecord} 해당 ID의 기록 항목
-   * @throws {Error} 해당 ID의 기록을 찾을 수 없는 경우
    */
   public getRecordById(id: number): ResultRecord {
     return this.getRecordByIndex(this.findIndexById(id));
@@ -143,7 +147,6 @@ export class CalculatorRecord {
    * 주어진 ID에 해당하는 기록 항목을 삭제합니다.
    *
    * @param {number} id - 삭제하고자 하는 기록 항목의 고유 ID
-   * @throws {Error} 해당 ID의 기록을 찾을 수 없는 경우
    */
   public deleteRecord(id: number): void {
     const index = this.findIndexById(id);
@@ -163,7 +166,6 @@ export class CalculatorRecord {
    *
    * @param {number} id - 메모를 추가할 기록 항목의 고유 ID
    * @param {string} memo - 추가할 메모 내용
-   * @throws {Error} 해당 ID의 기록을 찾을 수 없는 경우 'Record item not found' 에러 발생
    */
   public setMemo(id: number, memo: string): void {
     const index = this.findIndexById(id);
@@ -175,7 +177,6 @@ export class CalculatorRecord {
    *
    * @param {number} id - 메모를 조회할 기록 항목의 고유 ID
    * @returns {string | null} 메모가 있는 경우 메모 내용, 없는 경우 null 반환
-   * @throws {Error} 해당 ID의 기록을 찾을 수 없는 경우 'Record item not found' 에러 발생
    */
   public getMemo(id: number): string | null {
     const index = this.findIndexById(id);
@@ -186,7 +187,6 @@ export class CalculatorRecord {
    * 기록 항목의 메모를 삭제합니다.
    *
    * @param {number} id - 메모를 삭제할 기록 항목의 고유 ID
-   * @throws {Error} 해당 ID의 기록을 찾을 수 없는 경우 'Record item not found' 에러 발생
    */
   public deleteMemo(id: number): void {
     const index = this.findIndexById(id);

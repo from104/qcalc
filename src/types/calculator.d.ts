@@ -1,8 +1,15 @@
+/**
+ * @file calculator.d.ts
+ * @description 이 파일은 계산기 관련 타입과 인터페이스를 정의합니다.
+ *              계산 결과, 버튼 정의, 기록 등의 구조를 포함하여
+ *              계산기 기능을 구현하는 데 필요한 타입 정보를 제공합니다.
+ */
+
 import type { BigNumber as tBigNumber } from 'mathjs';
 import type { Radix } from 'classes/RadixConverter';
 
 declare global {
-  type BigNumberType = tBigNumber;
+  type BigNumber = tBigNumber;
 
   type RadixType = Radix;
 
@@ -39,4 +46,4 @@ declare global {
   };
 }
 
-export { WordSize, CalculationResult, ResultRecord, RecordString }; 
+export { WordSize, CalculationResult, ResultRecord, RecordString };

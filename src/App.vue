@@ -1,14 +1,17 @@
 <script setup lang="ts">
   /**
-   * App.vue 
-   * 애플리케이션의 루트 컴포넌트입니다.
-   * 전역 키 바인딩, 라우팅 트랜지션, 레이아웃 관리를 담당합니다.
+   * @file App.vue
+   * @description 이 파일은 Vue 애플리케이션의 주요 컴포넌트를 정의합니다.
+   *              사용자 인터페이스의 상태를 관리하고, 라우팅 및 다크모드와 같은 기능을 처리합니다.
+   *              또한, 전역 단축키 설정 및 사용자 알림 기능을 포함하여
+   *              애플리케이션의 전반적인 사용자 경험을 향상시키는 역할을 합니다.
    */
 
   // === 핵심 Vue 및 라우터 의존성 ===
-  import { ref, onBeforeMount, watch, computed } from 'vue';
+  import { ref, onBeforeMount, watch, computed, onUnmounted } from 'vue';
   import { useRoute } from 'vue-router';
   import { useI18n } from 'vue-i18n';
+  import { ScreenOrientation } from '@capacitor/screen-orientation';
 
   // === 컴포넌트 임포트 ===
   import AutoUpdate from 'components/AutoUpdate.vue';
@@ -16,26 +19,36 @@
 
   // === 유틸리티 클래스 임포트 ===
   import { KeyBinding } from 'classes/KeyBinding';
+  import { showMessage } from './utils/NotificationUtils';
+  import { isWideWidth } from './utils/GlobalHelpers';
 
-  // === 전역 객체 및 인스턴스 초기화 ===
-  const window = globalThis.window;
-  const store = window.store;
+  // === 스토어 임포트 및 설정 ===
+  import { useUIStore } from 'stores/uiStore';
+  import { useSettingsStore } from 'stores/settingsStore';
+
+  const uiStore = useUIStore();
+  const settingsStore = useSettingsStore();
+
+  // === 전역 객체 및 상태 저장소 설정 ===
+  const $g = window.globalVars;
+  
+  
   const route = useRoute();
   const { t } = useI18n();
 
   // === 상태 관리 ===
   const isFirstNavigation = ref(true);
   const previousPath = ref(route.path);
-  const isWideLayout = ref(store.isAtLeastDoubleWidth());
+  const isWideLayout = ref(isWideWidth());
   const currentTransition = ref('');
 
   /**
    * '항상 위에' 기능을 토글하고 사용자에게 알림을 표시합니다.
    */
   const toggleAlwaysOnTopWithNotification = () => {
-    if (window.isElectron) {
-      store.toggleAlwaysOnTop();
-      store.showMessage(store.alwaysOnTop ? t('alwaysOnTopOn') : t('alwaysOnTopOff'));
+    if ($g.isElectron) {
+      settingsStore.toggleAlwaysOnTop();
+      showMessage(settingsStore.alwaysOnTop ? t('alwaysOnTopOn') : t('alwaysOnTopOff'));
     }
   };
 
@@ -43,10 +56,17 @@
    * 다크모드를 토글하고 현재 설정 상태를 사용자에게 알립니다.
    */
   const toggleDarkModeWithNotification = () => {
-    store.toggleDarkMode();
-    store.showMessage(
-      store.darkMode === 'system' ? t('darkMode.message.system') : t('darkMode.message.' + store.darkMode),
+    settingsStore.toggleDarkMode();
+    showMessage(
+      settingsStore.darkMode === 'system' ? t('darkMode.message.system') : t('darkMode.message.' + settingsStore.darkMode),
     );
+  };
+
+  /**
+   * 앱을 종료합니다.
+   */
+  const quitApp = () => {
+    if ($g.isElectron) window.electron.quitApp();
   };
 
   // === 키 바인딩 설정 ===
@@ -57,18 +77,20 @@
    * Alt+d: 다크모드 토글
    * Alt+p: 햅틱 모드 토글
    * F1-F4: 각종 페이지 이동
+   * q: 앱 종료
    * 기타: 계산기 관련 기능
    */
   const keyBinding = new KeyBinding([
     [['Alt+t'], toggleAlwaysOnTopWithNotification],
-    [['Alt+i'], store.toggleInitPanel],
+    [['Alt+i'], settingsStore.toggleInitPanel],
     [['Alt+d'], toggleDarkModeWithNotification],
-    [['Alt+p'], store.toggleHapticsMode],
-    [[';'], store.toggleButtonAddedLabel],
-    [[','], store.toggleUseGrouping],
-    [['Alt+,'], () => store.setGroupingUnit(store.groupingUnit === 3 ? 4 : 3)],
-    [['['], store.decrementDecimalPlaces],
-    [[']'], store.incrementDecimalPlaces],
+    [['Alt+p'], settingsStore.toggleHapticsMode],
+    [[';'], settingsStore.toggleButtonAddedLabel],
+    [[','], settingsStore.toggleUseGrouping],
+    [['Alt+,'], () => settingsStore.setGroupingUnit(settingsStore.groupingUnit === 3 ? 4 : 3)],
+    [['['], settingsStore.decrementDecimalPlaces],
+    [[']'], settingsStore.incrementDecimalPlaces],
+    [['q'], quitApp],
   ]);
 
   // === 라이프사이클 훅 및 감시자 ===
@@ -86,9 +108,9 @@
    * 입력 필드 포커스 상태에 따라 키 바인딩을 활성화/비활성화합니다.
    */
   watch(
-    () => store.inputFocused,
+    () => uiStore.inputFocused,
     () => {
-      if (store.inputFocused) {
+      if (uiStore.inputFocused) {
         keyBinding.unsubscribe();
       } else {
         keyBinding.subscribe();
@@ -101,7 +123,7 @@
    * 레이아웃 너비 변경을 감시하고 적절한 트랜지션을 설정합니다.
    */
   watch(
-    () => store.isAtLeastDoubleWidth(),
+    () => isWideWidth(),
     (newValue) => {
       if (isWideLayout.value !== newValue) {
         currentTransition.value = newValue ? 'expand-layout' : 'collapse-layout';
@@ -132,12 +154,28 @@
    * 현재 적용할 트랜지션 이름을 반환합니다.
    */
   const computeTransition = computed(() => currentTransition.value);
+
+  onBeforeMount(async () => {
+    if ($g.isCapacitor && $g.isPhone) {
+      await ScreenOrientation.lock({
+        orientation: 'portrait',
+      });
+    }
+  });
+
+  onUnmounted(async () => {
+    if ($g.isCapacitor && $g.isPhone) {
+      await ScreenOrientation.unlock();
+    }
+  });
+
+  uiStore.isAppStarted = false;
 </script>
 
 <template>
   <router-view v-slot="{ Component, route: routeProps }">
     <transition :name="isFirstNavigation ? '' : computeTransition || ''" mode="default">
-      <component :is="Component" :key="routeProps.path" />
+      <component :is="Component" :key="routeProps.path + '-' + isWideLayout" />
     </transition>
   </router-view>
   <AutoUpdate />
@@ -179,10 +217,12 @@
   .slide-forward-enter-from {
     transform: translateX(100%);
   }
+
   .slide-forward-enter-to,
   .slide-forward-leave-from {
     transform: translateX(0);
   }
+
   .slide-forward-leave-to {
     transform: translateX(-100%);
   }
@@ -198,6 +238,7 @@
   .fade-leave-to {
     opacity: 0;
   }
+
   .fade-enter-to,
   .fade-leave-from {
     opacity: 1;
@@ -215,11 +256,13 @@
     transform: scaleX(2);
     transform-origin: left;
   }
+
   .expand-layout-enter-to,
   .expand-layout-leave-from {
     transform: scaleX(1);
     transform-origin: left;
   }
+
   .expand-layout-leave-to {
     transform: scaleX(0.5);
     transform-origin: left;
@@ -236,12 +279,26 @@
     transform: scaleX(0.5);
     transform-origin: left;
   }
+
   .collapse-layout-enter-to,
   .collapse-layout-leave-from {
     transform: scaleX(1);
     transform-origin: left;
   }
+
   .collapse-layout-leave-to {
-    transform: translateX(100%);
+    transform: scaleX(2);
+    transform-origin: left;
   }
 </style>
+
+<i18n>
+ko:
+  targetToBeCopiedResult: '계산 결과를'
+  targetToBeCopiedSelected: '선택한 내용을'
+  copiedToClipboard: '{target} 클립보드에 복사했습니다.'
+en:
+  targetToBeCopiedResult: 'the calculation result'
+  targetToBeCopiedSelected: 'the selected content'
+  copiedToClipboard: 'Copied {target} to the clipboard.'
+</i18n>

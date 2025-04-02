@@ -1,4 +1,11 @@
 <script setup lang="ts">
+  /**
+   * @file MenuPanel.vue
+   * @description 이 파일은 QCalc 애플리케이션의 메뉴 패널을 구성하는 Vue 컴포넌트입니다.
+   *              사용자가 다양한 계산기 기능에 접근할 수 있도록 메뉴 아이템을 정의하고,
+   *              각 메뉴 아이템에 대한 동작을 설정합니다.
+   */
+
   // Vue 핵심 기능 및 컴포지션 API 가져오기
   import { onMounted, reactive, watch } from 'vue';
 
@@ -13,14 +20,17 @@
   const router = useRouter();
   const route = useRoute() as RouteLocationNormalizedLoaded & { meta: RouteTransitionMeta };
 
-  // 전역 window 객체에 접근하기 위한 상수 선언
-  const window = globalThis.window;
+  // 스토어 import
+  import { useUIStore } from 'stores/uiStore';
+  import { useSettingsStore } from 'stores/settingsStore';
 
   // 스토어 인스턴스 생성
-  const store = window.store;
+  const uiStore = useUIStore();
+  const settingsStore = useSettingsStore();
 
   // 컴포넌트 import
   import MenuItem from 'components/snippets/MenuItem.vue';
+  import { navigateToPath } from 'src/utils/NavigationUtils';
 
   // 메뉴 아이템 인터페이스 정의
   interface MenuItem {
@@ -41,9 +51,7 @@
       caption: t('item.calc.caption'),
       shortcut: 'Ctrl-1',
       icon: 'calculate',
-      action: () => {
-        store.currentTab = 'calc';
-      },
+      action: () => (uiStore.currentTab = 'calc'),
     },
     {
       id: 'unit',
@@ -51,9 +59,7 @@
       caption: t('item.unit.caption'),
       shortcut: 'Ctrl-2',
       icon: 'swap_vert',
-      action: () => {
-        store.currentTab = 'unit';
-      },
+      action: () => (uiStore.currentTab = 'unit'),
     },
     {
       id: 'currency',
@@ -61,9 +67,7 @@
       caption: t('item.currency.caption'),
       shortcut: 'Ctrl-3',
       icon: 'currency_exchange',
-      action: () => {
-        store.currentTab = 'currency';
-      },
+      action: () => (uiStore.currentTab = 'currency'),
     },
     {
       id: 'radix',
@@ -71,29 +75,42 @@
       caption: t('item.radix.caption'),
       shortcut: 'Ctrl-4',
       icon: 'transform',
-      action: () => {
-        store.currentTab = 'radix';
-      },
+      action: () => (uiStore.currentTab = 'radix'),
     },
     { id: 'separator1', separator: true },
+    {
+      id: 'record',
+      title: t('item.record.title'),
+      caption: t('item.record.caption'),
+      shortcut: 'F4',
+      icon: 'history',
+      action: () => navigateToPath('/record', route, router),
+    },
     {
       id: 'settings',
       title: t('item.settings.title'),
       caption: t('item.settings.caption'),
       shortcut: 'F3',
       icon: 'settings',
-      action: () => {
-        store.navigateToPath('/settings', route, router);
-      },
+      action: () => navigateToPath('/settings', route, router),
     },
     { id: 'separator2', separator: true },
+    {
+      id: 'tips',
+      title: t('item.tips.title'),
+      caption: t('item.tips.caption'),
+      shortcut: 'F5',
+      icon: 'report',
+      action: () => (uiStore.showTipsDialog = true),
+    },
+
     {
       id: 'help',
       title: t('item.help.title'),
       caption: t('item.help.caption'),
       shortcut: 'F1',
       icon: 'help',
-      action: () => store.navigateToPath('/help', route, router),
+      action: () => navigateToPath('/help', route, router),
     },
     {
       id: 'about',
@@ -101,7 +118,7 @@
       caption: t('iem.about.caption'),
       shortcut: 'F2',
       icon: 'info',
-      action: () => store.navigateToPath('/about', route, router),
+      action: () => navigateToPath('/about', route, router),
     },
   ]);
 
@@ -117,7 +134,7 @@
 
   // 언어 변경 감지 및 메뉴 아이템 텍스트 업데이트
   watch(
-    () => store.locale,
+    () => settingsStore.locale,
     () => {
       updateLocale();
     },
@@ -131,11 +148,7 @@
 
 <template>
   <q-list v-auto-blur role="menu" :aria-label="t('ariaLabel.menu')">
-    <MenuItem 
-      v-for="item in items" 
-      :key="item.id" 
-      v-bind="item" 
-    />
+    <MenuItem v-for="item in items" :key="item.id" v-bind="item" />
   </q-list>
 </template>
 
@@ -154,9 +167,15 @@ ko:
     radix:
       title: '진법 변환'
       caption: '진법 변환기'
+    record:
+      title: '기록'
+      caption: '기록 화면'
     settings:
       title: '설정'
       caption: '설정'
+    tips:
+      title: '팁'
+      caption: '팁 다이얼로그'
     help:
       title: '도움말'
       caption: '기능과 사용법'
@@ -179,9 +198,15 @@ en:
     radix:
       title: 'Radix Converter'
       caption: 'Radix Converter'  
+    record:
+      title: 'Record'
+      caption: 'Record Screen'
     settings:
       title: 'Settings'
       caption: 'Settings'
+    tips:
+      title: 'Tips'
+      caption: 'Tips dialog'
     help:
       title: 'Help'
       caption: 'Features and Usage'

@@ -1,30 +1,50 @@
 // app global css in SCSS form
 
 .noselect {
-  -webkit-touch-callout: none;
-  -webkit-user-select: none;
-  -khtml-user-select: none;
-  -moz-user-select: none;
-  -ms-user-select: none;
   user-select: none;
 }
 
 .scrollbar-custom {
+  position: relative;
+  overflow-y: overlay;
+  scrollbar-gutter: auto;
+
+  /* Ensure the scrollbar space is always reserved */
+  padding-right: 0;
+  // box-sizing: content-box;
+
+  /* Firefox specific styles */
+  scrollbar-width: thin;
+  scrollbar-color: transparent transparent;
+  @media (prefers-color-scheme: dark) {
+    scrollbar-color: rgba(159, 159, 159, 0.53) transparent;
+  }
+
+  /* WebKit specific styles */
   &::-webkit-scrollbar {
-    width: 12px;
+    width: 4px;
+    position: absolute;
+    right: 0;
   }
+
   &::-webkit-scrollbar-thumb {
-    background-color: rgba(128, 128, 128, 0.267);
-    @media (prefers-color-scheme: dark) {
-      background-color: rgba(128, 128, 128, 0.503);
-    }
+    display: none;
   }
+
   &::-webkit-scrollbar-track {
-    background-color: rgba(85, 85, 85, 0.112);
+    background-color: transparent;
     @media (prefers-color-scheme: dark) {
-      background-color: rgba(124, 124, 124, 0.439);
+      background-color: transparent;
     }
   }
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  overflow: hidden;
 }
 
 body::-webkit-scrollbar {
@@ -38,3 +58,8 @@ body {
   overflow: hidden; /* 스크롤바 숨기기 */
 }
 
+@media (min-width: 350px) {
+  html {
+    font-size: calc(100% * 350 / env(--device-width));
+  }
+}

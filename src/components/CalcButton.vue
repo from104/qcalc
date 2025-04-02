@@ -1,12 +1,32 @@
 <script setup lang="ts">
+  /**
+   * @file CalcButton.vue
+   * @description 이 파일은 계산기 버튼을 구성하는 Vue 컴포넌트입니다.
+   *              사용자가 다양한 계산 기능을 수행할 수 있도록 버튼을 제공하며,
+   *              각 버튼에 대한 동작을 설정합니다.
+   *
+   * @props {string} type - 버튼의 유형 (기본값: 'calc')
+   */
+
   // Vue 핵심 기능 및 컴포지션 API 가져오기
   import { onMounted, onBeforeUnmount, ref, watch, reactive, computed } from 'vue';
 
-  // 전역 window 객체에 접근하기 위한 상수 선언
-  const window = globalThis.window;
+  import { createCalcButtonSet } from 'src/constants/CalcButtonSet';
+  import { showError, showMessage } from 'src/utils/NotificationUtils';
+  import { clickButtonById, isWideWidth } from 'src/utils/GlobalHelpers';
 
-  // 스토어 인스턴스 생성
-  const store = window.store;
+  // 전역 window 객체에 접근하기 위한 상수 선언
+  const $g = window.globalVars;
+
+  import { useSettingsStore } from 'stores/settingsStore';
+  import { useCalcStore } from 'src/stores/calcStore';
+  import { useUIStore } from 'stores/uiStore';
+  import { useRadixStore } from 'stores/radixStore';
+
+  const settingsStore = useSettingsStore();
+  const uiStore = useUIStore();
+  const calcStore = useCalcStore();
+  const radixStore = useRadixStore();
 
   // i18n 설정
   import { useI18n } from 'vue-i18n';
@@ -34,56 +54,39 @@
   import ToolTip from 'src/components/snippets/ToolTip.vue';
 
   // props 기본값 설정
-  const props = withDefaults(defineProps<{ type?: string }>(), {
-    type: 'calc',
-  });
+  const props = withDefaults(defineProps<{ type?: string }>(), { type: 'calc' });
 
   // 스토어에서 필요한 메서드 추출
-  const {
-    calc,
-    disableShift,
-    disableShiftLock,
-    enableShift,
-    enableShiftLock,
-    toggleShift,
-    toggleShiftLock,
-    showError,
-    showMessage,
-    convertRadix,
-    clickButtonById,
-  } = store;
+  const { calc } = calcStore;
 
   // 햅틱 피드백 함수
   const hapticFeedbackLight = async () => {
-    if (window.isCapacitor && store.hapticsMode) {
+    if ($g.isCapacitor && settingsStore.hapticsMode) {
       await Haptics.impact({ style: ImpactStyle.Light });
     }
   };
 
   const hapticFeedbackMedium = async () => {
-    if (window.isCapacitor && store.hapticsMode) {
+    if ($g.isCapacitor && settingsStore.hapticsMode) {
       await Haptics.impact({ style: ImpactStyle.Medium });
     }
   };
 
   // 에러 처리 함수
-  const executeActionWithErrorHandling = (action: () => void) => {
-    const errorMessages: { [key: string]: string } = {
-      'Cannot divide by zero.': 'cannotDivideByZero',
-      'The square root of a negative number is not allowed.': 'squareRootOfANegativeNumberIsNotAllowed',
-      'The factorial of a negative number is not allowed.': 'factorialOfANegativeNumberIsNotAllowed',
-      'No memory to recall.': 'noMemoryToRecall',
-    } as const;
+  const executeActionWithErrorHandling = (action: () => void, id: ButtonID) => {
     try {
       action();
     } catch (e: unknown) {
-      const message = e instanceof Error ? e.message : 'Unknown error';
-      if (errorMessages[message]) {
-        showError(t(errorMessages[message]));
+      if (e instanceof Error) {
+        // 에러 메시지가 이미 i18n 처리된 경우 그대로 표시
+        showError(e.message);
       } else {
-        showError(message);
+        // 알 수 없는 에러의 경우 기본 에러 메시지 표시
+        showError(t('error.unknown'));
       }
+      return;
     }
+    displayButtonNotification(id);
   };
 
   // 버튼 색상 정의
@@ -95,24 +98,17 @@
 
   const shiftButtonPressedColor = lighten(calculatorButtonColors.important ?? '', -30);
 
-  import { createCalcButtonSet } from 'src/constants/CalcButtonSet';
-
   // const i18n = useI18n();
   const { standardButtons, modeSpecificButtons, standardExtendedFunctions, modeSpecificExtendedFunctions } =
     createCalcButtonSet(t);
 
   // mainRadix의 변경을 감지하는 computed 속성 추가
   const currentRadixBase = computed(() => {
-    const radixKey = store.sourceRadix as Radix;
+    const radixKey = radixStore.sourceRadix as Radix;
     return (
-      (
-        {
-          [Radix.Binary]: 2,
-          [Radix.Octal]: 8,
-          [Radix.Decimal]: 10,
-          [Radix.Hexadecimal]: 16,
-        } as Record<Radix, number>
-      )[radixKey] ?? 10
+      ({ [Radix.Binary]: 2, [Radix.Octal]: 8, [Radix.Decimal]: 10, [Radix.Hexadecimal]: 16 } as Record<Radix, number>)[
+        radixKey
+      ] ?? 10
     );
   });
 
@@ -123,7 +119,7 @@
     const value = label.match(/^[0-9A-F]+$/)?.[0];
     if (!value) return false;
 
-    return Number(convertRadix(value, Radix.Hexadecimal, Radix.Decimal)) >= currentRadixBase.value;
+    return Number(radixStore.convertRadix(value, Radix.Hexadecimal, Radix.Decimal)) >= currentRadixBase.value;
   };
 
   // 버튼 변환 함수 추출
@@ -161,23 +157,10 @@
     const categoryButtons =
       modeSpecificExtendedFunctions[props.type as keyof typeof modeSpecificExtendedFunctions] ?? {};
 
-    return {
-      ...transformExtendedFunctions(standardExtendedFunctions),
-      ...transformExtendedFunctions(categoryButtons),
-    };
+    return { ...transformExtendedFunctions(standardExtendedFunctions), ...transformExtendedFunctions(categoryButtons) };
   });
 
   type ButtonID = keyof typeof standardExtendedFunctions;
-
-  // 버튼 클릭 시 알림 표시 함수
-  const displayButtonNotification = (id: ButtonID) => {
-    const buttonFunc = extendedFunctionSet.value[id];
-    if (buttonFunc?.label === 'MC') {
-      showMessage(t('memoryCleared'));
-    } else if (buttonFunc?.label === 'MR' && !calc.isMemoryEmpty) {
-      showMessage(t('memoryRecalled'));
-    }
-  };
 
   // 시프트 버튼의 ID 찾기
   const shiftButtonId = computed(() =>
@@ -191,7 +174,11 @@
 
   // 추가 기능 툴팁 표시 함수
   const displayActionTooltip = (id: ButtonID) => {
-    if (tooltipTimers[id] || id === shiftButtonId.value || (!store.showButtonAddedLabel && store.isShiftPressed))
+    if (
+      tooltipTimers[id] ||
+      id === shiftButtonId.value ||
+      (settingsStore.showButtonAddedLabel && calcStore.isShiftPressed)
+    )
       return;
     tooltipTimers[id] = true;
     setTimeout(() => {
@@ -199,55 +186,45 @@
     }, 1000);
   };
 
+  // 버튼 클릭 시 알림 표시 함수
+  const displayButtonNotification = (id: ButtonID) => {
+    if (!calcStore.needButtonNotification) return;
+
+    const buttonFunc = extendedFunctionSet.value[id];
+    if (buttonFunc?.label === 'MC' && calc.memory.isEmpty) {
+      showMessage(t('memoryCleared'));
+    } else if (buttonFunc?.label === 'MR' && !calc.memory.isEmpty) {
+      showMessage(t('memoryRecalled'));
+    } else if (buttonFunc?.label === 'MS' && !calc.memory.isEmpty) {
+      showMessage(t('memorySaved'));
+    }
+    calcStore.offNeedButtonNotification();
+  };
+  
   // 버튼 시프트 상태에 따른 기능 실행
-  const handleShiftFunction = (id: ButtonID) => {
-    const isShiftButton = id === shiftButtonId.value;
-    const isDisabled = store.isShiftPressed
+  const handleClickBtn = (id: ButtonID) => {
+    const isDisabled = calcStore.isShiftPressed
       ? (extendedFunctionSet.value[id]?.isDisabled ?? false)
       : (activeButtonSet.value[id]?.isDisabled ?? false);
-    const action = store.isShiftPressed ? extendedFunctionSet.value[id]?.action : activeButtonSet.value[id]?.action;
-
-    if (isShiftButton) {
-      toggleShift();
-      disableShiftLock();
-      return;
-    }
+    const action = calcStore.isShiftPressed ? extendedFunctionSet.value[id]?.action : activeButtonSet.value[id]?.action;
 
     if (isDisabled) {
       displayDisabledButtonNotification();
       return;
     }
 
-    executeActionWithErrorHandling(action as () => void);
+    executeActionWithErrorHandling(action as () => void, id);
 
-    if (store.isShiftPressed) {
+    if (id !== shiftButtonId.value && calcStore.isShiftPressed) {
       displayActionTooltip(id);
-      displayButtonNotification(id);
-      if (!store.isShiftLocked) disableShift();
+      if (!calcStore.isShiftLocked) calcStore.disableShift();
     }
   };
 
   // 버튼 길게 누르기 기능
   const handleLongPress = (id: ButtonID) => {
     hapticFeedbackMedium();
-    const isShiftButton = id === shiftButtonId.value;
-    const isShiftActive = store.isShiftPressed;
-    const isShiftLocked = store.isShiftLocked;
-    if (isShiftButton) {
-      if (isShiftLocked) {
-        disableShiftLock();
-      } else {
-        enableShiftLock();
-      }
-      if (isShiftLocked) {
-        disableShift();
-      } else {
-        enableShift();
-      }
-      return;
-    }
-
-    const buttonFunctions = isShiftActive ? activeButtonSet.value : extendedFunctionSet.value;
+    const buttonFunctions = calcStore.isShiftPressed ? activeButtonSet.value : extendedFunctionSet.value;
     const buttonAction = buttonFunctions[id]?.action;
     const isDisabled = buttonFunctions[id]?.isDisabled ?? false;
 
@@ -256,20 +233,19 @@
       return;
     }
 
-    executeActionWithErrorHandling(buttonAction as () => void);
+    executeActionWithErrorHandling(buttonAction as () => void, id);
 
-    if (isShiftActive) {
-      if (!isShiftLocked) disableShift();
+    if (calcStore.isShiftPressed) {
+      if (!calcStore.isShiftLocked) calcStore.disableShift();
     } else {
       displayActionTooltip(id);
-      displayButtonNotification(id);
     }
   };
 
   // 키 입력에 따른 버튼 클릭 함수
   const triggerButtonClickByKey = (id: ButtonID, isShift: boolean) => {
     if (isShift) {
-      toggleShiftLock();
+      calcStore.toggleShiftLock();
       setTimeout(() => {
         clickButtonById('btn-' + id);
       }, 5);
@@ -287,7 +263,13 @@
   // 보조 키 바인딩 설정
   const keyBindingsSecondary: KeyBindings = Object.entries(extendedFunctionSet.value).map(([id, button]) => [
     button.shortcutKeys,
-    () => triggerButtonClickByKey(id, true),
+    () => {
+      calcStore.enableShift();
+      triggerButtonClickByKey(id, true);
+      setTimeout(() => {
+        calcStore.disableShift();
+      }, 5);
+    },
   ]);
 
   // 모든 키 바인딩 통합
@@ -306,7 +288,7 @@
 
   // 입력 포커스 상태에 따른 키 바인딩 관리
   watch(
-    () => store.inputFocused,
+    () => uiStore.inputFocused,
     (focused) => {
       if (focused) {
         keyBinding.unsubscribe();
@@ -317,8 +299,29 @@
     { immediate: true },
   );
 
+  // resize 이벤트를 처리하기 위한 ref 생성
+  const screenWidth = ref(isWideWidth() ? window.innerWidth / 2 : window.innerWidth);
+  const screenHeight = ref(window.innerHeight);
+
+  // resize 이벤트 핸들러
+  const handleResize = () => {
+    screenWidth.value = isWideWidth() ? window.innerWidth / 2 : window.innerWidth;
+    screenHeight.value = window.innerHeight;
+  };
+
+  // 컴포넌트 마운트 시 resize 이벤트 리스너 등록
+  onMounted(() => {
+    window.addEventListener('resize', handleResize);
+  });
+
+  // 컴포넌트 언마운트 시 resize 이벤트 리스너 제거
+  onBeforeUnmount(() => {
+    window.removeEventListener('resize', handleResize);
+  });
+
   // 계산기 버튼 높이 설정
   const baseHeight = ref('136px');
+  // const baseHeight = ref('272px');
   if (['unit', 'currency', 'radix'].includes(props.type)) {
     baseHeight.value = '234px';
   }
@@ -351,9 +354,9 @@
       .join(', ');
   };
 
-  const baseWidth = computed(() => {
-    return store.isAtLeastDoubleWidth() ? '50vw' : '100vw';
-  });
+  // const baseWidth = computed(() => {
+  //   return $s.isWideWidth() ? '50vw' : '100vw';
+  // });
 
   // 버튼의 aria-label 설정
   const getAriaLabel = (id: ButtonID, button: { label: string }) => {
@@ -373,6 +376,30 @@
     }
     return button.label;
   };
+
+  const labelScalingFactor = computed(() => {
+    if ($g.isCapacitor) {
+      // console.log('window.textZoom: ', window.textZoom);
+      return $g.textZoom / 100;
+    }
+    // screenWidth ref를 사용하여 화면 너비 계산
+    const screenWidthPx = screenWidth.value;
+    const screenHeightPx = screenHeight.value;
+    // 기준이 되는 너비 (Android와 동일한 값 사용)
+    const BASE_WIDTH_PX = 352;
+    const BASE_HEIGHT_PX = 604;
+
+    // 현재 화면 너비를 기준 너비에 대해 상대적으로 스케일링 팩터를 계산합니다
+    const scaleFactorWidth = screenWidthPx / BASE_WIDTH_PX;
+    const scaleFactorHeight = screenHeightPx / BASE_HEIGHT_PX;
+
+    // Android와 동일하게 100을 곱한 후 100으로 나누어 비율을 계산합니다
+    return Math.min(scaleFactorWidth, scaleFactorHeight);
+  });
+
+  const labelSizeAdjustmentRatio = computed(() => {
+    return $g.isCapacitor ? 1 / labelScalingFactor.value : 1;
+  });
 </script>
 
 <template>
@@ -385,45 +412,49 @@
         no-caps
         push
         :label="
-          store.isShiftPressed && !store.showButtonAddedLabel && id !== shiftButtonId
+          calcStore.isShiftPressed && !settingsStore.showButtonAddedLabel && id !== shiftButtonId
             ? (extendedFunctionSet[id]?.label ?? '')
             : button.label.charAt(0) === '@'
               ? undefined
               : button.label
         "
         :icon="
-          store.isShiftPressed && !store.showButtonAddedLabel && id !== shiftButtonId
+          calcStore.isShiftPressed && !settingsStore.showButtonAddedLabel && id !== shiftButtonId
             ? undefined
             : button.label.charAt(0) === '@'
               ? button.label.slice(1)
               : undefined
         "
         :class="[
-          store.isShiftPressed && !store.showButtonAddedLabel && id !== shiftButtonId
+          calcStore.isShiftPressed && !settingsStore.showButtonAddedLabel && id !== shiftButtonId
             ? 'char'
             : button.label.charAt(0) === '@'
               ? 'icon'
               : 'char',
-          id === shiftButtonId && store.isShiftPressed ? 'button-shift' : '',
-          store.isShiftPressed && !store.showButtonAddedLabel && !(extendedFunctionSet[id]?.isDisabled ?? false)
+          id === shiftButtonId && calcStore.isShiftPressed ? 'button-shift' : '',
+          calcStore.isShiftPressed &&
+          !settingsStore.showButtonAddedLabel &&
+          !(extendedFunctionSet[id]?.isDisabled ?? false)
             ? ''
-            : (button.isDisabled ?? false) || store.isShiftPressed
+            : (button.isDisabled ?? false) || calcStore.isShiftPressed
               ? 'disabled-button'
               : '',
         ]"
-        :style="[!store.showButtonAddedLabel || !(extendedFunctionSet[id]?.label ?? '') ? { paddingTop: '4px' } : {}]"
+        :style="[
+          !settingsStore.showButtonAddedLabel || !(extendedFunctionSet[id]?.label ?? '') ? { paddingTop: '4px' } : {},
+        ]"
         :color="`btn-${button.color}`"
         :aria-label="getAriaLabel(id, button)"
-        @click="() => (button.isDisabled ? displayDisabledButtonNotification() : handleShiftFunction(id))"
+        @click="() => (button.isDisabled ? displayDisabledButtonNotification() : handleClickBtn(id))"
         @touchstart="() => hapticFeedbackLight()"
       >
         <span
-          v-if="store.showButtonAddedLabel && extendedFunctionSet[id]"
+          v-if="settingsStore.showButtonAddedLabel && extendedFunctionSet[id]"
           class="top-label"
           :class="[
             `top-label-${button.label.charAt(0) === '@' ? 'icon' : 'char'}`,
             extendedFunctionSet[id].isDisabled ? 'disabled-button-added-label' : '',
-            store.isShiftPressed && !extendedFunctionSet[id].isDisabled ? 'shifted-button-added-label' : '',
+            calcStore.isShiftPressed && !extendedFunctionSet[id].isDisabled ? 'shifted-button-added-label' : '',
           ]"
         >
           {{ extendedFunctionSet[id].label }}
@@ -443,7 +474,7 @@
         </q-tooltip>
         <ToolTip>
           {{
-            store.isShiftPressed
+            calcStore.isShiftPressed
               ? (extendedFunctionSet[id]?.isDisabled ?? false)
                 ? t('disabledButton')
                 : getTooltipsOfKeys(id, true)
@@ -466,23 +497,25 @@
   }
 
   .icon {
-    font-size: calc(
-      min(calc((100vh - v-bind('baseHeight')) / 6 * 0.25), calc((v-bind('baseWidth') - 40px) / 4 * 0.3)) * 0.7
+    font-size: calc(((100vh - v-bind('baseHeight')) / 6 - 20px) * 0.25 * v-bind('labelSizeAdjustmentRatio'));
+    padding-top: calc(
+      ((100vh - v-bind('baseHeight')) / 6 - 13px) * 0.27 * v-bind('labelScalingFactor') *
+        v-bind('labelSizeAdjustmentRatio')
     );
-    padding-top: calc(((100vh - v-bind('baseHeight')) / 6 - 13px) * 0.25); /* Lower the content by 4px */
   }
 
   .char {
-    font-size: calc(
-      min(calc((100vh - v-bind('baseHeight')) / 6 * 0.26), calc((v-bind('baseWidth') - 40px) / 4 * 0.3)) * 1.1
+    font-size: calc(((100vh - v-bind('baseHeight')) / 6 - 20px) * 0.38 * v-bind('labelSizeAdjustmentRatio'));
+    padding-top: calc(
+      ((100vh - v-bind('baseHeight')) / 6 - 13px) * 0.26 * v-bind('labelScalingFactor') *
+        v-bind('labelSizeAdjustmentRatio')
     );
-    padding-top: calc(((100vh - v-bind('baseHeight')) / 6 - 13px) * 0.23); /* Lower the content by 4px */
   }
 
   .top-label {
     text-align: center;
     position: absolute;
-    font-size: calc(min(calc((100vh - v-bind('baseHeight')) / 6 * 0.26), calc((100vw - 40px) / 4 * 0.3)) * 1.2 * 0.7);
+    font-size: calc(((100vh - v-bind('baseHeight')) / 6 - 20px) * 0.25 * v-bind('labelSizeAdjustmentRatio'));
     color: rgba(255, 255, 255, 0.7);
     width: 100%; /* 가로 중앙 정렬을 위해 추가 */
   }
@@ -492,7 +525,7 @@
   }
 
   .top-label-char {
-    top: -7%;
+    top: -6%;
   }
 
   .bg-btn-important {

@@ -1,4 +1,12 @@
 <script setup lang="ts">
+  /**
+   * @file RadixPanel.vue
+   * @description 이 파일은 진법 변환 패널을 구성하는 Vue 컴포넌트입니다.
+   *              사용자가 다양한 진법(2진수, 8진수, 10진수, 16진수 등) 간의 변환을 수행할 수 있도록
+   *              진법 선택 및 변환 기능을 제공합니다.
+   *              또한, 진법 스왑 및 최근 사용한 진법 초기화 기능을 포함하고 있습니다.
+   */
+
   // Vue 핵심 기능 및 컴포지션 API 가져오기
   import type { ComputedRef } from 'vue';
   import { onMounted, onBeforeUnmount, reactive, watch, computed } from 'vue';
@@ -11,22 +19,26 @@
   import { KeyBinding } from 'classes/KeyBinding';
   import { Radix } from 'classes/RadixConverter';
 
-  // 스토어 관련
-  // 스토어 관련
-  import { useStore } from 'src/stores/store';
-  // 스토어 인스턴스 초기화
-  const store = useStore();
-  // 스토어에서 필요한 메서드 추출
-  const { swapRadixes, initRecentRadix, clickButtonById, setInputBlurred, calc } = store;
+  // 스토어 import
+  import { useUIStore } from 'stores/uiStore';
+  import { useSettingsStore } from 'stores/settingsStore';
+  import { useRadixStore } from 'stores/radixStore';
+  import { useCalcStore } from 'src/stores/calcStore';
+
+  // 스토어 인스턴스 생성
+  const uiStore = useUIStore();
+  const settingsStore = useSettingsStore();
+  const radixStore = useRadixStore();
+  const calcStore = useCalcStore();
 
   // 컴포넌트 import
   import ToolTip from 'src/components/snippets/ToolTip.vue';
 
   // 단위 초기화
-  initRecentRadix();
+  radixStore.initRecentRadix();
 
   // 언어 변경 시 비트 표시 업데이트
-  watch([() => store.locale], () => {
+  watch([() => settingsStore.locale], () => {
     wordSizeOptions.values.forEach((option, index) => {
       const value = index === 0 ? '∞' : option.value.toString();
       option.label = `${value} ${t('bit')}`;
@@ -35,16 +47,16 @@
 
   // 키 바인딩 설정
   const keyBinding = new KeyBinding([
-    [['Alt+w'], () => clickButtonById('btn-swap-radix')],
-    [['Alt+y'], () => store.toggleShowRadix()],
-    [['Alt+u'], () => store.setRadixType(store.radixType == 'prefix' ? 'suffix' : 'prefix')],
+    [['\\'], () => document.getElementById('btn-swap-radix')?.click()],
+    [['Alt+\\'], () => radixStore.toggleShowRadix()],
+    [['Alt+Control+\\'], () => radixStore.setRadixType(radixStore.radixType == 'prefix' ? 'suffix' : 'prefix')],
   ]);
 
   // 입력 포커스에 따른 키 바인딩 활성화/비활성화
   watch(
-    () => store.inputFocused,
+    () => uiStore.inputFocused,
     () => {
-      if (store.inputFocused) {
+      if (uiStore.inputFocused) {
         keyBinding.unsubscribe();
       } else {
         keyBinding.subscribe();
@@ -53,14 +65,14 @@
   );
 
   onMounted(() => {
-    initRecentRadix();
-    store.updateWordSize(store.wordSize);
+    radixStore.initRecentRadix();
+    calcStore.calc.wordSize = radixStore.wordSize;
     keyBinding.subscribe();
   });
 
   onBeforeUnmount(() => {
     keyBinding.unsubscribe();
-    setInputBlurred();
+    uiStore.setInputBlurred();
   });
 
   // 워드사이즈 옵션 타입 정의
@@ -81,7 +93,6 @@
   interface RadixOption {
     value: Radix;
     label: ComputedRef<string>;
-    disable: ComputedRef<boolean>;
   }
 
   interface ReactiveRadixOptionList {
@@ -91,44 +102,41 @@
   const radixList = Object.values(Radix);
 
   // 진법 옵션 초기화 시 computed 사용
-  const createRadixOptions = (isSource: boolean) =>
+  const createRadixOptions = () =>
     radixList.map((radix) => ({
       value: radix,
       label: computed(() => t(`radixLabel.${radix}`)),
-      disable: computed(() => (isSource ? store.targetRadix === radix : store.sourceRadix === radix)),
     }));
 
   const sourceRadixOptions = reactive<ReactiveRadixOptionList>({
-    values: createRadixOptions(true),
+    values: createRadixOptions(),
   });
 
   const targetRadixOptions = reactive<ReactiveRadixOptionList>({
-    values: createRadixOptions(false),
+    values: createRadixOptions(),
   });
 
   watch(
-    () => store.sourceRadix,
-    () => (calc.currentRadix = store.sourceRadix),
+    () => radixStore.sourceRadix,
+    () => (calcStore.calc.currentRadix = radixStore.sourceRadix),
   );
 
-  // 수정된 SelectOption 인터페이스
-  interface SelectOption {
-    value: string;
-    label: string;
-    disable: boolean;
-  }
-
   // 단순화된 컴퓨티드 속성
-  const sourceSelectOptions = computed<SelectOption[]>(() => sourceRadixOptions.values);
+  const sourceSelectOptions = computed(() => sourceRadixOptions.values);
 
-  const targetSelectOptions = computed<SelectOption[]>(() => targetRadixOptions.values);
+  const targetSelectOptions = computed(() => targetRadixOptions.values);
+
+  const handleRadixSwap = () => {
+    radixStore.swapRadixes();
+    calcStore.calc.needsBufferReset = true;
+  };
 </script>
 
 <template>
   <q-card-section v-auto-blur class="row q-px-sm q-pt-none q-pb-sm">
     <!-- 워드사이즈 선택 -->
     <q-select
-      v-model="store.wordSize"
+      v-model="radixStore.wordSize"
       :options="wordSizeOptions.values"
       role="combobox"
       :aria-label="t('ariaLabel.wordSize')"
@@ -138,13 +146,16 @@
       map-options
       option-value="value"
       option-label="label"
+      behavior="menu"
       class="col-3 q-pa-none shadow-2"
       :label="t('radixLabel.wordSize')"
-      :label-color="!store.isDarkMode() ? 'primary' : 'grey-1'"
-      :class="!store.isDarkMode() ? 'bg-blue-grey-2' : 'bg-blue-grey-6'"
-      :popup-content-class="!store.isDarkMode() ? 'bg-blue-grey-2' : 'bg-blue-grey-6'"
-      :options-selected-class="!store.isDarkMode() ? 'text-primary' : 'text-grey-1'"
-      @update:model-value="store.updateWordSize($event)"
+      :label-color="!settingsStore.darkMode ? 'primary' : 'grey-1'"
+      :class="!settingsStore.darkMode ? 'bg-blue-grey-2' : 'bg-blue-grey-6'"
+      :popup-content-class="
+        [!settingsStore.darkMode ? 'bg-blue-grey-2' : 'bg-blue-grey-6', 'scrollbar-custom', 'q-select-popup'].join(' ')
+      "
+      :options-selected-class="!settingsStore.darkMode ? 'text-primary' : 'text-grey-1'"
+      @update:model-value="() => (calcStore.calc.wordSize = radixStore.wordSize)"
     />
 
     <!-- 원본 방향 -->
@@ -152,7 +163,7 @@
 
     <!-- 원본 진법 -->
     <q-select
-      v-model="store.sourceRadix"
+      v-model="radixStore.sourceRadix"
       :options="sourceSelectOptions"
       role="combobox"
       :aria-label="t('ariaLabel.sourceRadix')"
@@ -162,17 +173,21 @@
       map-options
       option-value="value"
       option-label="label"
+      behavior="menu"
       class="col-3 q-pl-xs-sm shadow-2"
       :label="t('radixLabel.main')"
-      :label-color="!store.isDarkMode() ? 'primary' : 'grey-1'"
-      :options-selected-class="!store.isDarkMode() ? 'text-primary' : 'text-grey-1'"
-      :popup-content-class="!store.isDarkMode() ? 'bg-blue-grey-2' : 'bg-blue-grey-6'"
-      :class="!store.isDarkMode() ? 'bg-blue-grey-2' : 'bg-blue-grey-6'"
+      :label-color="!settingsStore.darkMode ? 'primary' : 'grey-1'"
+      :options-selected-class="!settingsStore.darkMode ? 'text-primary' : 'text-grey-1'"
+      :popup-content-class="
+        [!settingsStore.darkMode ? 'bg-blue-grey-2' : 'bg-blue-grey-6', 'scrollbar-custom', 'q-select-popup'].join(' ')
+      "
+      :class="!settingsStore.darkMode ? 'bg-blue-grey-2' : 'bg-blue-grey-6'"
     />
 
     <!-- 원본, 대상 진법 바꾸기 버튼 -->
     <q-btn
       id="btn-swap-radix"
+      v-auto-blur
       dense
       round
       flat
@@ -181,14 +196,14 @@
       class="col-1 q-mx-none q-px-sm blur"
       role="button"
       :aria-label="t('ariaLabel.swapRadix')"
-      @click="swapRadixes()"
+      @click="handleRadixSwap"
     >
       <ToolTip :auto-hide="3000" :text="t('tooltipSwap')" />
     </q-btn>
 
     <!-- 대상 진법 -->
     <q-select
-      v-model="store.targetRadix"
+      v-model="radixStore.targetRadix"
       :options="targetSelectOptions"
       role="combobox"
       :aria-label="t('ariaLabel.targetRadix')"
@@ -198,12 +213,15 @@
       map-options
       option-value="value"
       option-label="label"
+      behavior="menu"
       class="col-3 q-pl-xs-sm shadow-2"
       :label="t('radixLabel.sub')"
-      :label-color="!store.isDarkMode() ? 'primary' : 'grey-1'"
-      :class="!store.isDarkMode() ? 'bg-blue-grey-2' : 'bg-blue-grey-6'"
-      :popup-content-class="!store.isDarkMode() ? 'bg-blue-grey-2' : 'bg-blue-grey-6'"
-      :options-selected-class="!store.isDarkMode() ? 'text-primary' : 'text-grey-1'"
+      :label-color="!settingsStore.darkMode ? 'primary' : 'grey-1'"
+      :class="!settingsStore.darkMode ? 'bg-blue-grey-2' : 'bg-blue-grey-6'"
+      :popup-content-class="
+        [!settingsStore.darkMode ? 'bg-blue-grey-2' : 'bg-blue-grey-6', 'scrollbar-custom', 'q-select-popup'].join(' ')
+      "
+      :options-selected-class="!settingsStore.darkMode ? 'text-primary' : 'text-grey-1'"
     />
 
     <!-- 대상 방향 -->
@@ -227,6 +245,15 @@
     }
     .q-field__append {
       padding-left: $left !important;
+    }
+  }
+
+  .q-select-popup {
+    .q-item {
+      @media (prefers-color-scheme: dark) {
+        border-top: 1px dotted rgba(255, 255, 255, 0.377);
+        border-bottom: 1px dotted rgba(255, 255, 255, 0.377);
+      }
     }
   }
 </style>

@@ -1,11 +1,20 @@
 <script setup lang="ts">
-  import { h, ref, onMounted, watch, onUnmounted } from 'vue';
-  
-  // 전역 window 객체에 접근하기 위한 상수 선언
-  const window = globalThis.window;
+  /**
+   * @file HighlightText.vue
+   * @description 이 파일은 주어진 텍스트에서 특정 검색어를 강조 표시하는 Vue 컴포넌트입니다.
+   *              사용자는 검색어를 입력하고, 해당 검색어가 포함된 텍스트 부분이 강조 표시됩니다.
+   *              이 컴포넌트는 텍스트가 줄임표로 표시되는 경우 툴팁을 통해 전체 텍스트를 보여주는 기능도 포함하고 있습니다.
+   * 
+   * @props {string} text - 강조 표시할 텍스트
+   * @props {string} searchTerm - 강조할 검색어
+   * @props {boolean} allowLineBreak - 줄바꿈 허용 여부
+   */
 
-  // 스토어 인스턴스 생성
-  const store = window.store;
+  import { h, ref, onMounted, watch, onUnmounted } from 'vue';
+
+  import { useUIStore } from 'stores/uiStore';
+
+  const uiStore = useUIStore();
 
   interface Props {
     text: string;
@@ -72,7 +81,7 @@
     const id = `highlight-${generateUUID()}`;
     textIDs.value.push(id);
 
-    if (!store.isSearchOpen || !searchTerm.trim()) {
+    if (!uiStore.isSearchOpen || !searchTerm.trim()) {
       return h(
         'span',
         {

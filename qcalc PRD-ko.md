@@ -17,7 +17,7 @@ QCalc은 최신 웹 기술을 활용한 크로스 플랫폼 계산기 애플리�
 - 수학 연산: MathJS
 - 통화 API: freecurrencyapi-js
 - 키보드 이벤트: tinykeys
-- 마크다운 렌더링: markdown-it
+- 마크다운 렌더링: qmarkdown
 
 ### 1.3 지원 플랫폼
 
@@ -25,7 +25,7 @@ QCalc은 최신 웹 기술을 활용한 크로스 플랫폼 계산기 애플리�
   - Windows
   - Linux (AppImage, Snap 패키지 지원)
 - 모바일
-  - Android (Play Store 배포 예정)
+  - Android (버전 9/API 28 이상, Play Store 배포 예정)
 - 향후 계획
   - macOS
   - iOS
@@ -239,10 +239,7 @@ QCalc은 최신 웹 기술을 활용한 크로스 플랫폼 계산기 애플리�
 
 - 광고 기능 (수익화)
 - 테마 기능
-- 큰 태블릿 대응 레이아웃 배율 조정
-- 자동 업데이트 (electron)
 - iOS 앱 개발
-- 계산 기록 검색 기능
 - 접근성 기능 강화
 
 ## 6. 라이선스

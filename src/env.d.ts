@@ -1,4 +1,11 @@
 /**
+ * @file env.d.ts
+ * @description 이 파일은 외부 모듈에 대한 타입 선언을 포함합니다.
+ *              애플리케이션에서 사용하는 외부 라이브러리와 파일 타입에 대한
+ *              타입 정의를 제공합니다.
+ */
+
+/**
  * freecurrencyapi-js 모듈 선언
  */
 declare module '@everapi/freecurrencyapi-js';
@@ -27,17 +34,6 @@ declare module '*.md' {
 
   // 마크다운 파일의 내용을 기본 내보내기로 설정
   export default content;
-}
-
-/**
- * Android 시스템과 상호 작용하기 위한 인터페이스
- */
-declare class AndroidInterface {
-  /**
-   * Android 기기의 클립보드에서 내용을 가져옵니다.
-   * @returns 클립보드에서 가져온 텍스트 내용
-   */
-  static getFromClipboard(): string;
 }
 
 /**

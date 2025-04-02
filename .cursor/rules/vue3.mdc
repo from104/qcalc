@@ -1,0 +1,22 @@
+---
+description: Vue 3 Best Practices
+globs: *.vue
+---
+1. **Adopt the Composition API:**
+   - Utilize the Composition API for better code organization and reusability.
+   - Encapsulate related logic into composable functions for modularity.
+2. **Implement TypeScript:**
+   - Integrate TypeScript to catch errors early and improve code quality.
+   - Define explicit types for props, state, and events to enhance maintainability.
+3. **Employ Single-File Components (SFCs):**
+   - Use SFCs to encapsulate template, logic, and styles within a single file.
+   - Ensure styles are scoped to prevent unintended global CSS conflicts.
+4. **Optimize State Management:**
+   - For global state, consider using Pinia, the recommended state management library for Vue 3.
+   - For local component state, leverage the Composition API's `reactive` and `ref` functions.
+5. **Enhance Performance:**
+   - Implement lazy loading for components and routes to reduce initial load times.
+   - Use the `v-once` directive for static content to prevent unnecessary re-renders.
+6. **Maintain Consistent Coding Standards:**
+   - Follow the official Vue.js style guide to ensure code consistency and readability.
+   - Utilize linters and formatters to enforce coding standards across the codebase.

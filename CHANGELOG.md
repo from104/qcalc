@@ -4,6 +4,25 @@ All notable changes to this project are recorded in this file.
 
 The format is based on [Keep a Changelog] and this project follows [Semantic Versioning].
 
+## [0.11.3] 2025-04-03
+
+### Added
+
+- **Mobile optimization tooltip**: Added guidance about adding memo / deleting record by swiping on the history panel
+- **Snap package**: The app can now be launched from the desktop menu (GNOME, KDE, etc.).
+- **Quick Tips added**: Added a dialog to guide users on the changed copy and paste methods, number format changes, and how to use additional button functions.
+
+### Changed
+
+- **History management UI improvements**: Provides quick menu on desktop mouseover and intuitive icon button placement for mobile
+- **Menu style change**: Changed menu style from pull-down menu to more mobile app-like drawer style.
+- **Result copy and paste method changed**: Now you can copy by clicking on the calculation result instead of clicking the icon, and long-press to paste the clipboard content into the app.
+- **Accessibility-focused shortcut key rearrangement**: Completely reorganized UI and keyboard shortcuts considering button positions and functions.
+
+### Fixed
+
+- **Portrait screen orientation issues resolved**: Fixed portrait screen orientation issues (rotation, font size, etc.) in mobile app.
+
 ## [0.11.2] 2025-02-05
 
 ### Added
@@ -84,7 +103,7 @@ The format is based on [Keep a Changelog] and this project follows [Semantic Ver
 
 ### Changed
 
-- Replace icon image 
+- Replace icon image
 
 ## [0.7.2fix1] 2023-10-17
 

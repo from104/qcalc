@@ -92,25 +92,16 @@ export default defineConfig((/* ctx */) => {
       vitePlugins: [
         // Vue I18n 플러그인
         [
-          '@intlify/vite-plugin-vue-i18n',
+          '@intlify/unplugin-vue-i18n/vite',
           {
-            compositionOnly: true,
-            include: join(__dirname, './src/i18n/**'),
-            defaultSFCLang: 'yml',
+            defaultSFCLang: 'yaml5',
+            strictMessage: false,
+            escapeHtml: false,
           },
         ],
         // 타입스크립트 및 ESLint 검사 플러그인
-        [
-          'vite-plugin-checker',
-          {
-            vueTsc: true,
-            eslint: {
-              lintCommand: 'eslint -c ./eslint.config.js "./src*/**/*.{ts,js,mjs,cjs,vue}"',
-              useFlatConfig: true,
-            },
-          },
-          { server: false },
-        ],
+        ['vite-plugin-checker', { vueTsc: true }, { server: false }],
+        ['@modyfi/vite-plugin-yaml'],
       ],
       typescript: {
         strict: true, // (recommended) enables strict settings for TypeScript
@@ -124,7 +115,8 @@ export default defineConfig((/* ctx */) => {
 
     // 개발 서버 설정
     devServer: {
-      open: true,
+      open: false,
+      host: '0.0.0.0',
     },
 
     // Quasar 프레임워크 설정
@@ -178,6 +170,15 @@ export default defineConfig((/* ctx */) => {
     // Capacitor 설정
     capacitor: {
       hideSplashscreen: true,
+      // plugins: {
+      //   Device: {
+      //     // 디바이스 정보 관련 설정
+      //     languageTag: 'ko-KR',
+      //   },
+      //   ScreenReader: {
+      //     // 스크린리더 관련 설정
+      //   },
+      // },
     },
 
     // Electron 설정
@@ -197,6 +198,23 @@ export default defineConfig((/* ctx */) => {
           category: 'Utility',
           // latest-linux.yml 생성을 위한 설정
           generateUpdatesFilesForAllChannels: true,
+          // AppImage 관련 설정
+          executableName: 'qcalc',
+          icon: 'assets/qcalc_icon_v2.png',
+          // 데스크톱 통합 기능 활성화
+          asarUnpack: ['**/*.node'],
+          // AppImage 빌드 설정
+          description: 'Scientific Calculator Application',
+          synopsis: 'A modern scientific calculator',
+        },
+        snap: {
+          confinement: 'strict',
+          grade: 'devel',
+          base: 'core22',
+          plugs: ['default'],
+          environment: {
+            TMPDIR: '$XDG_RUNTIME_DIR',
+          },
         },
         win: {
           target: ['nsis'],
@@ -205,21 +223,6 @@ export default defineConfig((/* ctx */) => {
           //   publisherName: 'ATIT',
           //   sign: '',
           // },
-        },
-        snap: {
-          confinement: 'strict',
-          grade: 'devel',
-          plugs: [
-            'desktop',
-            {
-              'desktop-legacy': {
-                interface: 'desktop-legacy',
-              },
-            },
-            'home',
-            'network',
-            'system-observe',
-          ],
         },
         publish: [
           {

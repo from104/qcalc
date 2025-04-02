@@ -1,5 +1,14 @@
+/**
+ * @file CalculatorMath.ts
+ * @description 이 파일은 계산기의 수학적 연산을 처리하는 핵심 클래스를 정의합니다.
+ *              MathJS 라이브러리를 기반으로 고정밀 수치 계산을 지원하며,
+ *              기본 산술 연산부터 삼각함수, 지수/로그, 비트 연산까지
+ *              다양한 수학적 기능을 제공합니다. 또한 수학 상수와 진법 변환 기능도 포함합니다.
+ */
+
 import { match } from 'ts-pattern';
 import { all, create } from 'mathjs';
+import { checkError } from '../utils/ErrorUtils';
 
 import type { FactoryFunctionMap } from 'mathjs';
 
@@ -13,14 +22,14 @@ export const MathB = create(all as FactoryFunctionMap, {
 });
 
 // BigNumber 타입 정의
-export const BigNumber = MathB.bignumber;
+export const toBigNumber = MathB.bignumber;
 
 /**
  * 수학 상수 정의 객체
  */
-export const CONSTANTS: { [key: string]: string } = {
+const CONSTANTS: { [key: string]: string } = {
   pi: MathB.pi.toFixed(), // 원주율
-  pi2: MathB.bignumber(MathB.pi).div(2).toFixed(), // 원주율의 절반
+  pi2: toBigNumber(MathB.pi).div(2).toFixed(), // 원주율의 절반
   e: MathB.e.toFixed(), // 자연로그의 밑
   ln2: MathB.log(2).toFixed(), // 자연로그 2
   ln10: MathB.log(10).toFixed(), // 자연로그 10
@@ -49,13 +58,6 @@ export const CONSTANTS: { [key: string]: string } = {
  * - 문자열 기반 입/출력으로 정확한 값 처리
  */
 export class CalculatorMath {
-  // 에러 검사를 위한 헬퍼 메서드
-  private checkError(condition: boolean, message: string): void {
-    if (condition) {
-      throw new Error(message);
-    }
-  }
-
   /**
    * ===== 기본 수학 함수 =====
    */
@@ -66,7 +68,7 @@ export class CalculatorMath {
    * @returns 절대값 결과 (문자열)
    */
   public abs(value: string): string {
-    return BigNumber(value).abs().toFixed();
+    return toBigNumber(value).abs().toFixed();
   }
 
   /**
@@ -75,7 +77,7 @@ export class CalculatorMath {
    * @returns 정수 부분 (문자열)
    */
   public int(value: string): string {
-    return BigNumber(value).floor().toFixed();
+    return toBigNumber(value).floor().toFixed();
   }
 
   /**
@@ -84,7 +86,7 @@ export class CalculatorMath {
    * @returns 소수 부분 (문자열)
    */
   public frac(value: string): string {
-    return BigNumber(value).mod(1).toFixed();
+    return toBigNumber(value).mod(1).toFixed();
   }
 
   /**
@@ -93,7 +95,7 @@ export class CalculatorMath {
    * @returns 팩토리얼 결과 (문자열)
    */
   public fact(value: string): string {
-    return MathB.factorial(BigNumber(value)).toFixed();
+    return MathB.factorial(toBigNumber(value)).toFixed();
   }
 
   /**
@@ -102,7 +104,7 @@ export class CalculatorMath {
    * @returns 10^exponent 결과 (문자열)
    */
   public exp10(exponent: string): string {
-    return BigNumber(10).pow(BigNumber(exponent)).toFixed();
+    return toBigNumber(10).pow(toBigNumber(exponent)).toFixed();
   }
 
   /**
@@ -114,8 +116,8 @@ export class CalculatorMath {
    * @param degrees 변환할 각도 (문자열)
    * @returns 라디안 값 (typeof BigNumber)
    */
-  private convertDegreesToRadians(degrees: string): BigNumberType {
-    return BigNumber(degrees).times(MathB.pi).div(180);
+  private convertDegreesToRadians(degrees: string): BigNumber {
+    return toBigNumber(degrees).times(MathB.pi).div(180);
   }
 
   /**
@@ -156,7 +158,7 @@ export class CalculatorMath {
    * @returns augend + addend 결과 (문자열)
    */
   public add(augend: string, addend: string): string {
-    return BigNumber(augend).add(BigNumber(addend)).toFixed();
+    return toBigNumber(augend).add(toBigNumber(addend)).toFixed();
   }
 
   /**
@@ -166,7 +168,7 @@ export class CalculatorMath {
    * @returns minuend - subtrahend 결과 (문자열)
    */
   public sub(minuend: string, subtrahend: string): string {
-    return BigNumber(minuend).sub(BigNumber(subtrahend)).toFixed();
+    return toBigNumber(minuend).sub(toBigNumber(subtrahend)).toFixed();
   }
 
   /**
@@ -176,7 +178,7 @@ export class CalculatorMath {
    * @returns multiplicand × multiplier 결과 (문자열)
    */
   public mul(multiplicand: string, multiplier: string): string {
-    return BigNumber(multiplicand).mul(BigNumber(multiplier)).toFixed();
+    return toBigNumber(multiplicand).mul(toBigNumber(multiplier)).toFixed();
   }
 
   /**
@@ -187,10 +189,10 @@ export class CalculatorMath {
    * @throws 0으로 나누려고 할 때 에러 발생
    */
   public div(dividend: string, divisor: string): string {
-    this.checkError(BigNumber(divisor).eq(0), 'Division by zero');
+    checkError(toBigNumber(divisor).eq(0), 'error.math.divide_by_zero');
 
-    const result = BigNumber(dividend).div(divisor);
-    this.checkError(!result.isFinite(), 'Numerical error in division');
+    const result = toBigNumber(dividend).div(divisor);
+    checkError(!result.isFinite(), 'error.math.division_error');
 
     return result.toFixed();
   }
@@ -203,8 +205,8 @@ export class CalculatorMath {
    * @throws 0으로 나누려고 할 때 에러 발생
    */
   public mod(dividend: string, divisor: string): string {
-    this.checkError(BigNumber(divisor).eq(0), 'Division by zero');
-    return BigNumber(dividend).mod(BigNumber(divisor)).toFixed();
+    checkError(toBigNumber(divisor).eq(0), 'error.math.divide_by_zero');
+    return toBigNumber(dividend).mod(toBigNumber(divisor)).toFixed();
   }
 
   /**
@@ -214,7 +216,7 @@ export class CalculatorMath {
    * @returns base^exponent 결과 (문자열)
    */
   public pow(base: string, exponent: string): string {
-    return BigNumber(base).pow(BigNumber(exponent)).toFixed();
+    return toBigNumber(base).pow(toBigNumber(exponent)).toFixed();
   }
 
   /**
@@ -225,16 +227,13 @@ export class CalculatorMath {
    * @throws 음수의 제곱근을 계산하려 할 때 에러 발생
    */
   public root(radicand: string, index: string): string {
-    const bnRadicand = BigNumber(radicand);
-    const bnIndex = BigNumber(index);
+    const bnRadicand = toBigNumber(radicand);
+    const bnIndex = toBigNumber(index);
 
-    this.checkError(bnIndex.lt(0), 'Negative roots are not supported');
+    checkError(bnIndex.lt(0), 'error.math.negative_root_index');
 
     const isEvenRoot = this.mod(this.int(index), '2') === '0';
-    this.checkError(
-      bnRadicand.isNegative() && isEvenRoot,
-      'Even root of negative number is not allowed',
-    );
+    checkError(bnRadicand.isNegative() && isEvenRoot, 'error.math.negative_root');
 
     const result = bnRadicand.pow(MathB.bignumber(1).div(bnIndex));
     return result.toFixed();
@@ -250,9 +249,9 @@ export class CalculatorMath {
    * @throws 음수가 입력되면 에러 발생
    */
   private validateNonNegativeNumbers(...values: string[]): void {
-    this.checkError(
-      values.some((value) => BigNumber(value).isNegative()),
-      'Negative numbers are not allowed in bit operations',
+    checkError(
+      values.some((value) => toBigNumber(value).isNegative()),
+      'error.math.negative_bit_operation',
     );
   }
 
@@ -265,8 +264,8 @@ export class CalculatorMath {
   public truncateToBitSize(value: string, wordSize: number = 8): string {
     this.validateNonNegativeNumbers(value);
     return wordSize === 0
-      ? BigNumber(value).floor().toFixed()
-      : BigNumber(value).mod(BigNumber(2).pow(wordSize)).floor().toFixed();
+      ? toBigNumber(value).floor().toFixed()
+      : toBigNumber(value).mod(toBigNumber(2).pow(wordSize)).floor().toFixed();
   }
 
   /**
@@ -279,10 +278,10 @@ export class CalculatorMath {
   public bitwiseLeftShift(value: string, shiftAmount: string, wordSize: number = 8): string {
     this.validateNonNegativeNumbers(value, shiftAmount);
     return this.truncateToBitSize(
-      BigNumber(value)
+      toBigNumber(value)
         .abs()
         .floor()
-        .mul(BigNumber(2).pow(BigNumber(shiftAmount).abs().floor()))
+        .mul(toBigNumber(2).pow(toBigNumber(shiftAmount).abs().floor()))
         .toFixed(),
       wordSize,
     );
@@ -298,10 +297,10 @@ export class CalculatorMath {
   public bitwiseRightShift(value: string, shiftAmount: string, wordSize: number = 8): string {
     this.validateNonNegativeNumbers(value, shiftAmount);
     return this.truncateToBitSize(
-      BigNumber(value)
+      toBigNumber(value)
         .abs()
         .floor()
-        .div(BigNumber(2).pow(BigNumber(shiftAmount).abs().floor()))
+        .div(toBigNumber(2).pow(toBigNumber(shiftAmount).abs().floor()))
         .toFixed(),
       wordSize,
     );
@@ -413,5 +412,17 @@ export class CalculatorMath {
 
   public bitwiseXnor(firstValue: string, secondValue: string, wordSize: number = 8): string {
     return this.bitwiseNot(this.bitwiseXor(firstValue, secondValue, wordSize), wordSize);
+  }
+
+  /**
+   * 수학 상수 값을 조회하는 메서드
+   * @param constant - 조회 상수의 이름 (예: 'PI', 'E' 등)
+   * @returns 요청한 상수의 문자열 값
+   * @throws {Error} 존재하지 않는 상수를 요청할 경우 에러 발생
+   */
+  public getConstant(constant: keyof typeof CONSTANTS): string {
+    const value = CONSTANTS[constant];
+    checkError(!value, 'error.calc.constant_not_found');
+    return value as string;
   }
 }

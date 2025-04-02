@@ -1,5 +1,9 @@
+// Start Generation Here
 /**
- * Electron 관련 타입 정의
+ * @file electron.d.ts
+ * @description 이 파일은 Electron 애플리케이션의 업데이트 관련 타입과 인터페이스를 정의합니다.
+ *              업데이트 진행 정보, 업데이트 정보, 업데이트 오류 및 상태 정보를 포함하여
+ *              애플리케이션의 업데이트 기능을 구현하는 데 필요한 타입 정보를 제공합니다.
  */
 
 interface UpdateProgressInfo {
@@ -56,5 +60,10 @@ interface Window {
      * snap 환경인지 확인합니다.
      */
     isSnap: boolean;
+
+    /**
+     * 앱을 종료합니다.
+     */
+    quitApp: () => void;
   };
 }
