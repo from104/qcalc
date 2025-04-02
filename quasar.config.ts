@@ -200,7 +200,7 @@ export default defineConfig((/* ctx */) => {
           generateUpdatesFilesForAllChannels: true,
           // AppImage 관련 설정
           executableName: 'qcalc',
-          icon: 'assets/qcalc_icon_v2.png',
+          icon: 'assets/qcalc_icon.png',
           // 데스크톱 통합 기능 활성화
           asarUnpack: ['**/*.node'],
           // AppImage 빌드 설정
