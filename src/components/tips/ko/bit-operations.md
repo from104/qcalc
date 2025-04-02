@@ -9,5 +9,5 @@
   - NOT: **h** 키
   - AND/OR/XOR: **j/k/l** 키
   - NAND/NOR/XNOR: **q/w/e** 키
-- 16진수 입력: **a,s,d,z,x,c** 키
+- 16진수 \[A-F\] 입력: **z,x,c,a,s,d** 키
 - 4자리 구분 권장: **Alt+,** 키로 설정

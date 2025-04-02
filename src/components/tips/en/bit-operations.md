@@ -9,5 +9,5 @@
   - NOT: **h** key
   - AND/OR/XOR: **j/k/l** keys
   - NAND/NOR/XNOR: **q/w/e** keys
-- Hex input: **a,s,d,z,x,c** keys
+- Hexadecimal \[A-F\] input: **z,x,c,a,s,d** keys
 - Recommended 4-digit grouping: Set with **Alt+,**

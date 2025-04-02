@@ -149,7 +149,7 @@
         :aria-label="t('mainContentAriaLabel')"
       >
         <transition v-bind="transitionClasses">
-          <div :key="currentIndex" class="tip-container" role="region" :aria-label="t('tipContent')">
+          <div :key="currentIndex" class="tip-container scrollbar-custom" role="region" :aria-label="t('tipContent')">
             <q-markdown
               :src="currentTip"
               no-linkify
@@ -207,7 +207,7 @@
     width: 100%;
     height: 100%;
     max-width: 400px;
-    max-height: 450px;
+    max-height: 350px;
     border-radius: 8px;
     display: flex;
     flex-direction: column;
