@@ -1,5 +1,5 @@
 name: qcalc
-version: '0.11.3'
+version: '0.11.4'
 summary: Q Calc - Advanced Calculator
 description: |
   Q Calc is an advanced calculator application built with Quasar Framework and Electron.
