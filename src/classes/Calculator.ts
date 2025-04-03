@@ -58,7 +58,7 @@ export enum Operator {
  */
 export class Calculator {
   // 내부 상태 관리 속성
-  private previousNumber!: string;
+  private _previousNumber!: string;
   private repeatedNumber!: string;
   private currentOperator!: Operator;
   private calculationSnapshot!: CalculationResult;
@@ -75,6 +75,11 @@ export class Calculator {
   private radixConverter: RadixConverter = new RadixConverter();
 
   // 게터/세터
+
+  get previousNumber(): string {
+    return this._previousNumber;
+  }
+
   get inputBuffer(): string {
     return this._inputBuffer;
   }
@@ -149,7 +154,7 @@ export class Calculator {
   public reset(): void {
     this.inputBuffer = '0';
     this.currentNumber = '0';
-    this.previousNumber = '0';
+    this._previousNumber = '0';
     this.repeatedNumber = '0';
     this.currentOperator = Operator.NONE;
     this.offBufferReset();
@@ -175,11 +180,11 @@ export class Calculator {
   }
 
   private setCurrentNumberFromPrevious(): void {
-    this.currentNumber = this.previousNumber;
+    this.currentNumber = this._previousNumber;
   }
 
   private setPreviousNumberFromCurrent(): void {
-    this.previousNumber = this.currentNumber;
+    this._previousNumber = this.currentNumber;
   }
 
   // 유틸리티 메서드
@@ -259,7 +264,7 @@ export class Calculator {
    * 이항 연산 계산을 수행합니다.
    */
   private performBinaryOperationCalculation(numberForCalc: string): string {
-    const prevValue = this.previousNumber;
+    const prevValue = this._previousNumber;
     const currentValue = numberForCalc;
 
     return match(this.currentOperator)
@@ -278,7 +283,7 @@ export class Calculator {
       .with(Operator.BIT_NAND, () => this.math.bitwiseNand(prevValue, currentValue, this.wordSize))
       .with(Operator.BIT_NOR, () => this.math.bitwiseNor(prevValue, currentValue, this.wordSize))
       .with(Operator.BIT_XNOR, () => this.math.bitwiseXnor(prevValue, currentValue, this.wordSize))
-      .otherwise(() => this.previousNumber);
+      .otherwise(() => this._previousNumber);
   }
 
   private performPreCalculation(): void {
@@ -293,8 +298,8 @@ export class Calculator {
     }
 
     const result = this.performBinaryOperationCalculation(numberForCalc);
-    this.previousNumber = this.addRecord({
-      previousNumber: this.previousNumber.toString(),
+    this._previousNumber = this.addRecord({
+      previousNumber: this._previousNumber.toString(),
       operator: this.currentOperator,
       argumentNumber: numberForCalc.toString(),
       resultNumber: result.toString(),
@@ -576,10 +581,10 @@ export class Calculator {
       const operator = [Operator.PCT, this.currentOperator];
       const resultNumber =
         this.currentOperator === Operator.DIV
-          ? toBigNumber(this.previousNumber).mul(100).toString()
-          : toBigNumber(this.previousNumber).div(100).toString();
+          ? toBigNumber(this._previousNumber).mul(100).toString()
+          : toBigNumber(this._previousNumber).div(100).toString();
 
-      this.previousNumber = this.addRecord({
+      this._previousNumber = this.addRecord({
         previousNumber,
         operator,
         argumentNumber: argumentNumber ?? '',
@@ -592,5 +597,6 @@ export class Calculator {
 
   public setConstant(constant: string): void {
     this.currentNumber = this.math.getConstant(constant);
+    this.offBufferReset();
   }
 }
