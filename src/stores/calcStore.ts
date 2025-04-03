@@ -85,7 +85,7 @@ export const useCalcStore = defineStore('calc', {
     },
 
     // 숫자 포맷팅 관련
-    toFormattedNumber(value: string, radix = Radix.Decimal): string {
+    toFormattedNumber(value: string, radix: Radix = Radix.Decimal): string {
       if (!value) return '';
 
       const formattedValue = formatDecimalPlaces(

@@ -29,8 +29,9 @@
 
   // 계산기 관련 타입과 클래스
   import { UnitConverter } from 'src/classes/UnitConverter';
-  import { toBigNumber } from 'classes/CalculatorMath';
-  import { Radix } from 'classes/RadixConverter';
+  import { toBigNumber } from 'src/classes/CalculatorMath';
+  import { Radix } from 'src/classes/RadixConverter';
+  import { KeyBinding } from 'src/classes/KeyBinding';
 
   // 전역 window 객체에 접근하기 위한 상수 선언
   const $g = window.globalVars;
@@ -58,7 +59,7 @@
   const fieldID = `${props.field}Field`;
 
   // 스토어에서 필요한 메서드와 속성 추출
-  const { calc, toFormattedNumber, getLeftSideInRecord, showMemoryTemporarily } = calcStore;
+  const { calc } = calcStore;
 
   const currentTab = computed(() => uiStore.currentTab);
 
@@ -164,7 +165,7 @@
     if (isMainField) {
       const inputBuffer = calc.inputBuffer;
 
-      const formattedNumber = toFormattedNumber(inputBuffer, radixStore.sourceRadix);
+      const formattedNumber = calcStore.toFormattedNumber(inputBuffer, radixStore.sourceRadix);
 
       // 소수점 자릿수 설정이 -2이고 소수점이 있는 경우
       const hasSpecialDecimalPlaces = settingsStore.decimalPlaces === -1 && inputBuffer.includes('.');
@@ -180,18 +181,18 @@
       switch (props.addon) {
         case 'unit':
           unitStore.initRecentUnits();
-          return toFormattedNumber(getConvertedUnitNumber());
+          return calcStore.toFormattedNumber(getConvertedUnitNumber());
 
         case 'currency':
           currencyStore.initRecentCurrencies();
-          return toFormattedNumber(getConvertedCurrencyNumber());
+          return calcStore.toFormattedNumber(getConvertedCurrencyNumber());
 
         case 'radix': {
           radixStore.initRecentRadix();
 
           const convertedNumber = getConvertedRadixNumber();
 
-          const formattedNumber = toFormattedNumber(convertedNumber, radixStore.targetRadix);
+          const formattedNumber = calcStore.toFormattedNumber(convertedNumber, radixStore.targetRadix);
           return formattedNumber;
         }
 
@@ -328,8 +329,7 @@
   // 메모리 값 계산된 속성
   const memoryValue = computed(() => {
     const convertedNumber = radixStore.convertIfRadix(calc.memory.getNumber());
-    // console.log('convertedNumber', convertedNumber);
-    return toFormattedNumber(convertedNumber, radixStore.sourceRadix);
+    return calcStore.toFormattedNumber(convertedNumber, radixStore.sourceRadix);
   });
 
   /**
@@ -353,13 +353,14 @@
       lastRecord !== null && needsReset && calc.currentNumber === lastRecord?.calculationResult.resultNumber;
 
     if (isLastRecordValid) {
-      return `${getLeftSideInRecord(lastRecord.calculationResult)} =`;
+      return `${calcStore.getLeftSideInRecord(lastRecord.calculationResult)} =`;
     }
 
     // 연산자가 있고 초기화가 필요없는 경우
     if (hasOperator && !needsReset) {
-      const lastRecord = calcRecord.getCount() > 0 ? calcRecord.getAllRecords()[0] : null;
-      return lastRecord ? toFormattedNumber(lastRecord.calculationResult.previousNumber) : '';
+      const radix = currentTab.value === 'radix' ? radixStore.sourceRadix : Radix.Decimal;
+      const convrtedPreviousNumber = calcStore.toFormattedNumber(radixStore.convertIfRadix(calc.previousNumber), radix);
+      return currentTab.value === 'radix' ? getRadixResult(convrtedPreviousNumber) : convrtedPreviousNumber;
     }
 
     return '';
@@ -568,7 +569,6 @@
   };
 
   // 키 바인딩 설정
-  import { KeyBinding } from 'classes/KeyBinding';
   const keyBinding =
     props.field === 'main'
       ? new KeyBinding([
@@ -635,7 +635,7 @@
           :class="getResultColor()"
           role="button"
           :aria-label="t('ariaLabel.memory')"
-          @click="showMemoryTemporarily()"
+          @click="calcStore.showMemoryTemporarily()"
         >
           <q-icon name="mdi-chip" role="img" :aria-label="t('ariaLabel.memoryIcon')" />
         </div>
