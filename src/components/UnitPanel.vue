@@ -125,12 +125,12 @@
       map-options
       behavior="menu"
       class="col-3 q-pl-sm shadow-2 text-black"
-      :class="!settingsStore.darkMode ? 'bg-blue-grey-2' : 'bg-blue-grey-6'"
-      :label-color="!settingsStore.darkMode ? 'primary' : 'grey-1'"
+      :class="!settingsStore.isDarkMode() ? 'bg-blue-grey-2' : 'bg-blue-grey-6'"
+      :label-color="!settingsStore.isDarkMode() ? 'primary' : 'grey-1'"
       :popup-content-class="
-        [!settingsStore.darkMode ? 'bg-blue-grey-2' : 'bg-blue-grey-6', 'scrollbar-custom', 'q-select-popup'].join(' ')
+        [!settingsStore.isDarkMode() ? 'bg-blue-grey-2' : 'bg-blue-grey-6', 'scrollbar-custom', 'q-select-popup'].join(' ')
       "
-      :options-selected-class="!settingsStore.darkMode ? 'text-primary' : 'text-grey-1'"
+      :options-selected-class="!settingsStore.isDarkMode() ? 'text-primary' : 'text-grey-1'"
     />
 
     <!-- 원본 방향 -->
@@ -150,12 +150,12 @@
       map-options
       behavior="menu"
       class="col-3 q-pl-sm shadow-2"
-      :class="!settingsStore.darkMode ? 'bg-blue-grey-2' : 'bg-blue-grey-6'"
+      :class="!settingsStore.isDarkMode() ? 'bg-blue-grey-2' : 'bg-blue-grey-6'"
       :popup-content-class="
-        [!settingsStore.darkMode ? 'bg-blue-grey-2' : 'bg-blue-grey-6', 'scrollbar-custom', 'q-select-popup'].join(' ')
+        [!settingsStore.isDarkMode() ? 'bg-blue-grey-2' : 'bg-blue-grey-6', 'scrollbar-custom', 'q-select-popup'].join(' ')
       "
-      :options-selected-class="!settingsStore.darkMode ? 'text-primary' : 'text-grey-1'"
-      :label-color="!settingsStore.darkMode ? 'primary' : 'grey-1'"
+      :options-selected-class="!settingsStore.isDarkMode() ? 'text-primary' : 'text-grey-1'"
+      :label-color="!settingsStore.isDarkMode() ? 'primary' : 'grey-1'"
     >
       <template #option="scope">
         <q-item v-bind="scope.itemProps">
@@ -203,12 +203,12 @@
       map-options
       behavior="menu"
       class="col-3 q-pl-sm shadow-2"
-      :class="!settingsStore.darkMode ? 'bg-blue-grey-2' : 'bg-blue-grey-6'"
+      :class="!settingsStore.isDarkMode() ? 'bg-blue-grey-2' : 'bg-blue-grey-6'"
       :popup-content-class="
-        [!settingsStore.darkMode ? 'bg-blue-grey-2' : 'bg-blue-grey-6', 'scrollbar-custom', 'q-select-popup'].join(' ')
+        [!settingsStore.isDarkMode() ? 'bg-blue-grey-2' : 'bg-blue-grey-6', 'scrollbar-custom', 'q-select-popup'].join(' ')
       "
-      :options-selected-class="!settingsStore.darkMode ? 'text-primary' : 'text-grey-1'"
-      :label-color="!settingsStore.darkMode ? 'primary' : 'grey-1'"
+      :options-selected-class="!settingsStore.isDarkMode() ? 'text-primary' : 'text-grey-1'"
+      :label-color="!settingsStore.isDarkMode() ? 'primary' : 'grey-1'"
     >
       <template #option="scope">
         <q-item v-bind="scope.itemProps">

@@ -130,10 +130,10 @@
           options-dense
           emit-value
           map-options
-          :label-color="!settingsStore.darkMode ? 'primary' : 'grey-1'"
-          :options-selected-class="!settingsStore.darkMode ? 'text-primary' : 'text-grey-1'"
-          :popup-content-class="!settingsStore.darkMode ? 'bg-blue-grey-2' : 'bg-blue-grey-6'"
-          :class="!settingsStore.darkMode ? 'bg-blue-grey-2' : 'bg-blue-grey-6'"
+          :label-color="!settingsStore.isDarkMode() ? 'primary' : 'grey-1'"
+          :options-selected-class="!settingsStore.isDarkMode() ? 'text-primary' : 'text-grey-1'"
+          :popup-content-class="!settingsStore.isDarkMode() ? 'bg-blue-grey-2' : 'bg-blue-grey-6'"
+          :class="!settingsStore.isDarkMode() ? 'bg-blue-grey-2' : 'bg-blue-grey-6'"
           @update:model-value="settingsStore.setDarkMode"
         />
       </q-item>
@@ -260,10 +260,10 @@
             map-options
             options-dense
             :disable="!radixStore.showRadix"
-            :label-color="!settingsStore.darkMode ? 'primary' : 'grey-1'"
-            :options-selected-class="!settingsStore.darkMode ? 'text-primary' : 'text-grey-1'"
-            :popup-content-class="!settingsStore.darkMode ? 'bg-blue-grey-2' : 'bg-blue-grey-6'"
-            :class="!settingsStore.darkMode ? 'bg-blue-grey-2' : 'bg-blue-grey-6'"
+            :label-color="!settingsStore.isDarkMode() ? 'primary' : 'grey-1'"
+            :options-selected-class="!settingsStore.isDarkMode() ? 'text-primary' : 'text-grey-1'"
+            :popup-content-class="!settingsStore.isDarkMode() ? 'bg-blue-grey-2' : 'bg-blue-grey-6'"
+            :class="!settingsStore.isDarkMode() ? 'bg-blue-grey-2' : 'bg-blue-grey-6'"
           />
         </q-item>
       </template>
@@ -293,10 +293,10 @@
           emit-value
           map-options
           options-dense
-          :label-color="!settingsStore.darkMode ? 'primary' : 'grey-1'"
-          :options-selected-class="!settingsStore.darkMode ? 'text-primary' : 'text-grey-1'"
-          :popup-content-class="!settingsStore.darkMode ? 'bg-blue-grey-2' : 'bg-blue-grey-6'"
-          :class="!settingsStore.darkMode ? 'bg-blue-grey-2' : 'bg-blue-grey-6'"
+          :label-color="!settingsStore.isDarkMode() ? 'primary' : 'grey-1'"
+          :options-selected-class="!settingsStore.isDarkMode() ? 'text-primary' : 'text-grey-1'"
+          :popup-content-class="!settingsStore.isDarkMode() ? 'bg-blue-grey-2' : 'bg-blue-grey-6'"
+          :class="!settingsStore.isDarkMode() ? 'bg-blue-grey-2' : 'bg-blue-grey-6'"
           @update:model-value="setLanguage()"
         />
       </q-item>
