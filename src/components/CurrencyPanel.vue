@@ -207,17 +207,17 @@
       hide-selected
       behavior="menu"
       class="col-4 q-pl-sm shadow-2"
-      :class="!settingsStore.darkMode ? 'bg-blue-grey-2' : 'bg-blue-grey-6'"
-      :label-color="!settingsStore.darkMode ? 'primary' : 'grey-1'"
+      :class="!settingsStore.isDarkMode() ? 'bg-blue-grey-2' : 'bg-blue-grey-6'"
+      :label-color="!settingsStore.isDarkMode() ? 'primary' : 'grey-1'"
       :popup-content-class="
         [
-          !settingsStore.darkMode ? 'bg-blue-grey-2' : 'bg-blue-grey-6',
+          !settingsStore.isDarkMode() ? 'bg-blue-grey-2' : 'bg-blue-grey-6',
           'scrollbar-custom',
           'q-select-popup',
           $g.isMobile ? 'popup-mobile' : '',
         ].join(' ')
       "
-      :options-selected-class="!settingsStore.darkMode ? 'text-primary' : 'text-grey-1'"
+      :options-selected-class="!settingsStore.isDarkMode() ? 'text-primary' : 'text-grey-1'"
       @filter="sourceFilterFn"
       @focus="uiStore.setInputFocused()"
       @blur="uiStore.setInputBlurred()"
@@ -274,17 +274,17 @@
       hide-selected
       behavior="menu"
       class="col-4 q-pl-sm shadow-2"
-      :class="!settingsStore.darkMode ? 'bg-blue-grey-2' : 'bg-blue-grey-6'"
-      :label-color="!settingsStore.darkMode ? 'primary' : 'grey-1'"
+      :class="!settingsStore.isDarkMode() ? 'bg-blue-grey-2' : 'bg-blue-grey-6'"
+      :label-color="!settingsStore.isDarkMode() ? 'primary' : 'grey-1'"
       :popup-content-class="
         [
-          !settingsStore.darkMode ? 'bg-blue-grey-2' : 'bg-blue-grey-6',
+          !settingsStore.isDarkMode() ? 'bg-blue-grey-2' : 'bg-blue-grey-6',
           'scrollbar-custom',
           'q-select-popup',
           $g.isMobile ? 'popup-mobile' : '',
         ].join(' ')
       "
-      :options-selected-class="!settingsStore.darkMode ? 'text-primary' : 'text-grey-1'"
+      :options-selected-class="!settingsStore.isDarkMode() ? 'text-primary' : 'text-grey-1'"
       @filter="targetFilterFn"
       @keyup.enter="blurElement()"
       @update:model-value="blurElement()"

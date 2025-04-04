@@ -149,12 +149,12 @@
       behavior="menu"
       class="col-3 q-pa-none shadow-2"
       :label="t('radixLabel.wordSize')"
-      :label-color="!settingsStore.darkMode ? 'primary' : 'grey-1'"
-      :class="!settingsStore.darkMode ? 'bg-blue-grey-2' : 'bg-blue-grey-6'"
+      :label-color="!settingsStore.isDarkMode() ? 'primary' : 'grey-1'"
+      :class="!settingsStore.isDarkMode() ? 'bg-blue-grey-2' : 'bg-blue-grey-6'"
       :popup-content-class="
-        [!settingsStore.darkMode ? 'bg-blue-grey-2' : 'bg-blue-grey-6', 'scrollbar-custom', 'q-select-popup'].join(' ')
+        [!settingsStore.isDarkMode() ? 'bg-blue-grey-2' : 'bg-blue-grey-6', 'scrollbar-custom', 'q-select-popup'].join(' ')
       "
-      :options-selected-class="!settingsStore.darkMode ? 'text-primary' : 'text-grey-1'"
+      :options-selected-class="!settingsStore.isDarkMode() ? 'text-primary' : 'text-grey-1'"
       @update:model-value="() => (calcStore.calc.wordSize = radixStore.wordSize)"
     />
 
@@ -176,12 +176,12 @@
       behavior="menu"
       class="col-3 q-pl-xs-sm shadow-2"
       :label="t('radixLabel.main')"
-      :label-color="!settingsStore.darkMode ? 'primary' : 'grey-1'"
-      :options-selected-class="!settingsStore.darkMode ? 'text-primary' : 'text-grey-1'"
+      :label-color="!settingsStore.isDarkMode() ? 'primary' : 'grey-1'"
+      :options-selected-class="!settingsStore.isDarkMode() ? 'text-primary' : 'text-grey-1'"
       :popup-content-class="
-        [!settingsStore.darkMode ? 'bg-blue-grey-2' : 'bg-blue-grey-6', 'scrollbar-custom', 'q-select-popup'].join(' ')
+        [!settingsStore.isDarkMode() ? 'bg-blue-grey-2' : 'bg-blue-grey-6', 'scrollbar-custom', 'q-select-popup'].join(' ')
       "
-      :class="!settingsStore.darkMode ? 'bg-blue-grey-2' : 'bg-blue-grey-6'"
+      :class="!settingsStore.isDarkMode() ? 'bg-blue-grey-2' : 'bg-blue-grey-6'"
     />
 
     <!-- 원본, 대상 진법 바꾸기 버튼 -->
@@ -216,12 +216,12 @@
       behavior="menu"
       class="col-3 q-pl-xs-sm shadow-2"
       :label="t('radixLabel.sub')"
-      :label-color="!settingsStore.darkMode ? 'primary' : 'grey-1'"
-      :class="!settingsStore.darkMode ? 'bg-blue-grey-2' : 'bg-blue-grey-6'"
+      :label-color="!settingsStore.isDarkMode() ? 'primary' : 'grey-1'"
+      :class="!settingsStore.isDarkMode() ? 'bg-blue-grey-2' : 'bg-blue-grey-6'"
       :popup-content-class="
-        [!settingsStore.darkMode ? 'bg-blue-grey-2' : 'bg-blue-grey-6', 'scrollbar-custom', 'q-select-popup'].join(' ')
+        [!settingsStore.isDarkMode() ? 'bg-blue-grey-2' : 'bg-blue-grey-6', 'scrollbar-custom', 'q-select-popup'].join(' ')
       "
-      :options-selected-class="!settingsStore.darkMode ? 'text-primary' : 'text-grey-1'"
+      :options-selected-class="!settingsStore.isDarkMode() ? 'text-primary' : 'text-grey-1'"
     />
 
     <!-- 대상 방향 -->
