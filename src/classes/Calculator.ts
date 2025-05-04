@@ -199,7 +199,7 @@ export class Calculator {
   /**
    * 문자열에서 현재 진법에 맞는 유효한 숫자만 추출합니다.
    */
-  private filterNumberCharacters(originalString: string, radix: Radix = this.currentRadix): string {
+  public filterNumberCharacters(originalString: string, radix: Radix = this.currentRadix): string {
     // 진법에 따라 적절한 정규식 패턴 선택
     let onlyNumber = (() => {
       switch (radix) {
