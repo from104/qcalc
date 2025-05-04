@@ -45,11 +45,17 @@
   const uiStore = useUIStore();
 
   // 컴포넌트 import
+  import MenuItem from 'components/snippets/MenuItem.vue';
   import ToolTip from 'src/components/snippets/ToolTip.vue';
   import { showError, showMessage } from 'src/utils/NotificationUtils';
 
+  type PropsType = {
+    field?: 'main' | 'sub';
+    addon?: 'none' | 'unit' | 'currency' | 'radix';
+  };
+
   // props 정의
-  const props = withDefaults(defineProps<{ field?: string; addon?: string }>(), {
+  const props = withDefaults(defineProps<PropsType>(), {
     field: 'main',
     addon: 'none',
   });
@@ -442,16 +448,13 @@
     window.removeEventListener('resize', () => checkNeedFieldTooltip());
   });
 
-  // 결과 복사 상태 관리
-  const isCopying = ref(false);
-
-  // 한번 클릭하면 결과 복사, 2초 안에 다시 클릭하면 숫자 복사
-  const handleCopy = () => {
+  // 결과 복사, 숫자 복사
+  const handleCopy = (isOnlyNumber: 'number' | 'result' = 'result') => {
     // 햅틱 피드백
     hapticFeedbackLight();
 
     // 이미 복사 중인 경우 숫자 복사
-    if (isCopying.value) {
+    if (isOnlyNumber === 'number') {
       copyToClipboard(onlyNumber.value)
         .then(() => {
           showMessage(
@@ -461,33 +464,30 @@
         .catch(() => {
           showError(t('failedToPasteFromClipboard'));
         });
-      isCopying.value = false;
-      return;
+    } else {
+      // 결과 복사
+      copyToClipboard(displayedResult.value)
+        .then(() => {
+          showMessage(
+            t(props.field === 'main' ? 'copiedDisplayedResult' : 'copiedDisplayedResultSub', {
+              result: displayedResult.value,
+            }),
+          );
+        })
+        .catch(() => {
+          showError(t('failedToPasteFromClipboard'));
+        });
     }
-
-    // 결과 복사
-    copyToClipboard(displayedResult.value)
-      .then(() => {
-        showMessage(
-          t(props.field === 'main' ? 'copiedDisplayedResult' : 'copiedDisplayedResultSub', {
-            result: displayedResult.value,
-          }),
-        );
-      })
-      .catch(() => {
-        showError(t('failedToPasteFromClipboard'));
-      });
-
-    // 2초 후 복사 상태 초기화
-    isCopying.value = true;
-    setTimeout(() => {
-      isCopying.value = false;
-    }, 2000);
   };
 
-  // 클립보드 붙여넣기 처리
-  const handlePaste = async (target: 'main' | 'sub' = 'main'): Promise<void> => {
-    // 클립보드 읽기 시도
+  // 붙여넣을 수 있는 숫자 계산
+  const numberToPaste = ref('');
+
+  // 결과 패널 메뉴 표시 여부
+  const showPanelMenu = ref(false);
+
+  // 클립보드에서 텍스트 가져오기 함수
+  const getClipboardText = async (): Promise<string> => {
     try {
       let clipboardText = '';
       if ($g.isCapacitor) {
@@ -495,6 +495,42 @@
       } else {
         clipboardText = await navigator.clipboard.readText();
       }
+      return clipboardText;
+    } catch (error) {
+      console.error('Failed to get clipboard content:', error);
+      return '';
+    }
+  };
+
+  // 클립보드에서 값 가져오기
+  const updateClipboardValue = async () => {
+    const clipboardText = await getClipboardText();
+    if (currentTab.value === 'radix') {
+      if (props.field === 'main') {
+        numberToPaste.value = calc.filterNumberCharacters(clipboardText, radixStore.sourceRadix);
+      } else {
+        numberToPaste.value = calc.filterNumberCharacters(clipboardText, radixStore.targetRadix);
+      }
+    } else {
+      numberToPaste.value = calc.filterNumberCharacters(clipboardText);
+    }
+  };
+
+  // 메뉴가 열릴 때 클립보드 값 업데이트
+  watch(
+    () => showPanelMenu.value,
+    async (newVal) => {
+      if (newVal) {
+        await updateClipboardValue();
+      }
+    },
+  );
+
+  // 클립보드 붙여넣기 처리
+  const handlePaste = async (target: 'main' | 'sub' = 'main'): Promise<void> => {
+    // 클립보드 읽기 시도
+    try {
+      const clipboardText = await getClipboardText();
 
       // 클립보드가 비어있거나 붙여넣을 수 없는 데이터가 포함되어 있는 경우
       if (!clipboardText) {
@@ -660,13 +696,11 @@
             }
           "
           v-mutation.characterData
-          v-touch-hold.mouse="() => handlePaste(props.field as 'main' | 'sub')"
           class="self-center no-outline full-width full-height ellipsis text-right q-pt-xs noselect"
           :class="[isMainField ? 'text-h5' : '', getResultColor()]"
           :style="`padding-top: ${resultPanelPadding}px;`"
           role="text"
           :aria-label="t('ariaLabel.result', { type: isMainField ? t('ariaLabel.main') : t('ariaLabel.sub') })"
-          @click="handleCopy()"
         >
           <span v-if="currentTab === 'radix'" id="radixPrefix" role="text" :aria-label="t('ariaLabel.radixPrefix')">{{
             radixPrefix
@@ -695,6 +729,30 @@
             {{ displayedResult }}
           </ToolTip>
         </div>
+        <q-menu
+          :model-value="showPanelMenu"
+          class="shadow-6"
+          :context-menu="$g.isDesktop"
+          auto-close
+          anchor="bottom left"
+          self="top left"
+          @update:model-value="
+            (val) => {
+              showPanelMenu = val;
+            }
+          "
+        >
+          <q-list dense class="noselect" style="max-width: 200px" role="list">
+            <MenuItem :title="t('copyDisplayedResult')" :action="() => handleCopy()" :caption="displayedResult" />
+            <MenuItem :title="t('copyOnlyNumber')" :action="() => handleCopy('number')" :caption="onlyNumber" />
+            <MenuItem separator />
+            <MenuItem
+              :title="t('paste')"
+              :action="() => handlePaste(props.field)"
+              :caption="numberToPaste"
+            />
+          </q-list>
+        </q-menu>
       </template>
     </q-field>
   </q-card-section>
@@ -759,6 +817,7 @@
     pastedFromClipboardToSubPanel: '클립보드로부터 숫자를 <br> 보조 패널에 붙여넣었습니다.'
     clipboardIsEmptyOrContainsDataThatCannotBePasted: '클립보드가 비어있거나 붙여넣을 수 없는 데이터가 포함되어 있습니다.'
     failedToPasteFromClipboard: '클립보드로부터 붙여넣기에 실패했습니다.'
+    paste: '붙여넣기'
     ariaLabel:
       resultField: '{type} 결과 필드'
       main: '주'
@@ -786,6 +845,7 @@
     pastedFromClipboardToSubPanel: 'The number has been pasted <br>from the clipboard to the sub panel.'
     clipboardIsEmptyOrContainsDataThatCannotBePasted: 'The clipboard is empty or contains data that cannot be pasted.'
     failedToPasteFromClipboard: 'Failed to paste from clipboard.'
+    paste: 'Paste'
     ariaLabel:
       resultField: '{type} result field'
       main: 'main'
