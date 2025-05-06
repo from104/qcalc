@@ -34,13 +34,26 @@
 </script>
 
 <template>
-  <q-separator v-if="separator" />
-  <q-item v-else v-close-popup clickable role="menuitem" :class="settingsStore.isDarkMode() ? 'bg-grey-9' : 'bg-grey-3'" :aria-label="title" @click="(evt: Event) => action(evt)">
+  <q-separator
+    v-if="separator"
+    :color="settingsStore.isDarkMode() ? 'grey-7' : 'grey-5'"
+    size="1px"
+    spaced="md"
+  />
+  <q-item
+    v-else
+    v-close-popup
+    clickable
+    role="menuitem"
+    :class="settingsStore.isDarkMode() ? 'bg-grey-9' : 'bg-grey-3'"
+    :aria-label="title"
+    @click="(evt: Event) => action(evt)"
+  >
     <q-item-section v-if="icon" avatar class="col-3">
       <q-icon :name="icon" role="img" :aria-label="t('ariaLabel.icon', { name: title })" />
     </q-item-section>
     <q-item-section>
-      <q-item-label v-if="title" role="text">
+      <q-item-label v-if="title" role="text" class="text-weight-bold" >
         {{ title }}
       </q-item-label>
       <q-item-label v-if="caption" caption role="text" class="ellipsis">

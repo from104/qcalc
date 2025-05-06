@@ -646,6 +646,7 @@
 <template>
   <q-card-section class="col-12 q-px-sm" :class="field == 'main' ? 'q-pt-md q-pb-sm' : 'q-py-none'">
     <q-field
+      v-touch-hold.mouse="() => { showPanelMenu = true; hapticFeedbackMedium(); }"
       class="shadow-2 justify-end self-center"
       :class="[isMainField ? '' : 'q-mt-none q-mb-xs']"
       filled
@@ -729,31 +730,30 @@
             {{ displayedResult }}
           </ToolTip>
         </div>
-        <q-menu
-          :model-value="showPanelMenu"
-          class="shadow-6"
-          :context-menu="$g.isDesktop"
-          auto-close
-          anchor="bottom left"
-          self="top left"
-          @update:model-value="
-            (val) => {
-              showPanelMenu = val;
-            }
-          "
-        >
-          <q-list dense class="noselect" style="max-width: 200px" role="list">
-            <MenuItem :title="t('copyDisplayedResult')" :action="() => handleCopy()" :caption="displayedResult" />
-            <MenuItem :title="t('copyOnlyNumber')" :action="() => handleCopy('number')" :caption="onlyNumber" />
-            <MenuItem separator />
-            <MenuItem
-              :title="t('paste')"
-              :action="() => handlePaste(props.field)"
-              :caption="numberToPaste"
-            />
-          </q-list>
-        </q-menu>
       </template>
+      <q-menu
+        :model-value="showPanelMenu"
+        class="shadow-6"
+        :context-menu="$g.isDesktop"
+        auto-close
+        anchor="bottom left"
+        self="top left"
+        @update:model-value="(val) => { showPanelMenu = val; }"
+      >
+        <q-list
+          dense
+          class="noselect q-py-sm"
+          :class="settingsStore.isDarkMode() ? 'bg-grey-9' : 'bg-grey-3'"
+          style="max-width: 200px"
+          role="list"
+          :dark="settingsStore.isDarkMode()"
+        >
+          <MenuItem :title="t('copyDisplayedResult')" :action="() => handleCopy()" :caption="displayedResult" />
+          <MenuItem :title="t('copyOnlyNumber')" :action="() => handleCopy('number')" :caption="onlyNumber" />
+          <MenuItem separator />
+          <MenuItem :title="t('paste')" :action="() => handlePaste(props.field)" :caption="numberToPaste" />
+        </q-list>
+      </q-menu>
     </q-field>
   </q-card-section>
 </template>
