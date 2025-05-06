@@ -546,13 +546,16 @@
                         auto-close
                         anchor="bottom left"
                         self="top left"
-                        @update:model-value="
-                          (val) => {
-                            recordMenu[record.id] = val;
-                          }
-                        "
+                        @update:model-value="(val) => { recordMenu[record.id] = val; }"
                       >
-                        <q-list dense class="noselect" style="max-width: 200px" role="list">
+                        <q-list 
+                          dense
+                          class="noselect q-py-sm"
+                          :class="settingsStore.isDarkMode() ? 'bg-grey-9' : 'bg-grey-3'"
+                          style="max-width: 200px"
+                          role="list"
+                          :dark="settingsStore.isDarkMode()"
+                        >
                           <MenuItem
                             v-if="record.memo"
                             :title="t('copyMemo')"
