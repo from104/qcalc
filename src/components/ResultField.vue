@@ -646,7 +646,6 @@
 <template>
   <q-card-section class="col-12 q-px-sm" :class="field == 'main' ? 'q-pt-md q-pb-sm' : 'q-py-none'">
     <q-field
-      v-touch-hold.mouse="() => { showPanelMenu = true; hapticFeedbackMedium(); }"
       class="shadow-2 justify-end self-center"
       :class="[isMainField ? '' : 'q-mt-none q-mb-xs']"
       filled
@@ -697,11 +696,24 @@
             }
           "
           v-mutation.characterData
+          v-touch-hold.mouse="
+            () => {
+              showPanelMenu = true;
+              hapticFeedbackMedium();
+            }
+          "
           class="self-center no-outline full-width full-height ellipsis text-right q-pt-xs noselect"
           :class="[isMainField ? 'text-h5' : '', getResultColor()]"
           :style="`padding-top: ${resultPanelPadding}px;`"
           role="text"
           :aria-label="t('ariaLabel.result', { type: isMainField ? t('ariaLabel.main') : t('ariaLabel.sub') })"
+          @click="
+            () => {
+              if (showPanelMenu) {
+                showPanelMenu = false;
+              }
+            }
+          "
         >
           <span v-if="currentTab === 'radix'" id="radixPrefix" role="text" :aria-label="t('ariaLabel.radixPrefix')">{{
             radixPrefix
@@ -734,11 +746,15 @@
       <q-menu
         :model-value="showPanelMenu"
         class="shadow-6"
-        :context-menu="$g.isDesktop"
         auto-close
-        anchor="bottom left"
-        self="top left"
-        @update:model-value="(val) => { showPanelMenu = val; }"
+        no-parent-event
+        anchor="bottom right"
+        self="top right"
+        @update:model-value="
+          (val) => {
+            showPanelMenu = val;
+          }
+        "
       >
         <q-list
           dense
