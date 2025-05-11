@@ -441,25 +441,25 @@
       }, 200);
     }, 200);
 
-    // 창이 포커스를 잃었을 때 메뉴를 닫기 위한 이벤트 리스너 등록
-    window.addEventListener('blur', () => {
-      // 결과 패널 메뉴가 열려 있다면 닫음
-      if (showPanelMenu.value) {
-        showPanelMenu.value = false;
-      }
-    });
+    // // 창이 포커스를 잃었을 때 메뉴를 닫기 위한 이벤트 리스너 등록
+    // window.addEventListener('blur', () => {
+    //   // 결과 패널 메뉴가 열려 있다면 닫음
+    //   if (showPanelMenu.value) {
+    //     showPanelMenu.value = false;
+    //   }
+    // });
   });
 
   // 컴포넌트 언마운트 시 이벤트 리스너 제거
   onUnmounted(() => {
-    // clearInterval(tooltipInterval);
+    // 화면 크기 변경 이벤트 리스너 제거
     window.removeEventListener('resize', () => checkNeedFieldTooltip());
-    // blur 이벤트 리스너 제거
-    window.removeEventListener('blur', () => {
-      if (showPanelMenu.value) {
-        showPanelMenu.value = false;
-      }
-    });
+    // // blur 이벤트 리스너 제거
+    // window.removeEventListener('blur', () => {
+    //   if (showPanelMenu.value) {
+    //     showPanelMenu.value = false;
+    //   }
+    // });
   });
 
   // 결과 복사, 숫자 복사
