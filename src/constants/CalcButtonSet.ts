@@ -98,7 +98,7 @@ export function createCalcButtonSet(t: ComposerTranslation) {
     c1: ['Ｃ', 'important', ['Delete'], () => calc.reset(), false],
     d1: ['@mdi-backspace', 'important', ['Backspace'], () => calc.deleteDigitOrDot(), false],
     a2: ['@mdi-plus-minus-variant', 'function', ['j'], () => calc.changeSign(), false],
-    b2: ['%', 'function', ['k'], () => calc.percent(), false],
+    b2: ['%', 'function', ['Shift+Digit5','k'], () => calc.percent(), false],
     c2: ['1/x', 'function', ['l'], () => calc.rec(), false],
     d2: ['@mdi-division', 'function', ['/'], () => calc.div(), false],
     a3: ['7', 'normal', ['7'], () => calc.addDigit(7), false],

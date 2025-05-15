@@ -4,6 +4,16 @@ All notable changes to this project are recorded in this file.
 
 The format is based on [Keep a Changelog] and this project follows [Semantic Versioning].
 
+## [0.11.4] 2025-05-12
+
+### Added
+
+### Changed
+
+- **Panel content copy or paste method changed**: Changed from copying by clicking (touching) the panel or long-pressing to paste, to a method where you long-press (or right-click) to bring up a menu and select an option.
+
+### Fixed
+
 ## [0.11.3] 2025-04-03
 
 ### Added
