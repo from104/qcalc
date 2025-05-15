@@ -329,7 +329,10 @@
         behavior="mobile"
         @click="leftDrawerOpen = false"
       >
-        <q-card :class="settingsStore.isDarkMode() ? 'bg-grey-9' : 'bg-grey-3'" class="full-height menu-card">
+        <q-card
+          :class="settingsStore.isDarkMode() ? 'bg-grey-9' : 'bg-grey-3'"
+          class="full-height menu-card"
+        >
           <MenuPanel />
         </q-card>
       </q-drawer>
@@ -448,7 +451,10 @@
         behavior="mobile"
         @click="leftDrawerOpen = false"
       >
-        <q-card class="full-height menu-card">
+        <q-card
+          :class="settingsStore.isDarkMode() ? 'bg-grey-9' : 'bg-grey-3'"
+          class="full-height menu-card"
+        >
           <MenuPanel />
         </q-card>
       </q-drawer>
