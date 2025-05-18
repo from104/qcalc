@@ -4,7 +4,7 @@
   "webDir": "www",
   "server": {
     "androidScheme": "file",
-    "url": "http://192.168.219.109:9500",
+    "url": "http://192.168.219.20:9500",
     "cleartext": true
   }
 }
