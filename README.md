@@ -122,7 +122,7 @@ The calculator alone appears when the window width is reduced.
 ### Basic Calculator and Common Functions
 
 | Shortcut    | Function                  |
-| ----------- | ------------------------- |
+|-------------|---------------------------|
 | 0-9\.       | Enter numbers and decimal |
 | +, -, \*, / | Basic arithmetic          |
 | Enter, =    | Calculate result          |
@@ -138,7 +138,7 @@ The calculator alone appears when the window width is reduced.
 ### Advanced Math Functions (Shift Mode)
 
 | Shortcut | Function                    |
-| -------- | --------------------------- |
+|----------|-----------------------------|
 | r        | Power (xⁿ)                  |
 | t        | Root (ⁿ√x)                  |
 | f        | Power of 10 (10ⁿ)           |
@@ -153,7 +153,7 @@ The calculator alone appears when the window width is reduced.
 ### Memory Operations
 
 | Shortcut          | Function             |
-| ----------------- | -------------------- |
+|-------------------|----------------------|
 | C-Delete          | Memory clear (MC)    |
 | C-Backspace       | Memory recall (MR)   |
 | C-Enter, C-=      | Memory store (MS)    |
@@ -164,30 +164,35 @@ The calculator alone appears when the window width is reduced.
 
 ### Unit/Currency Conversion Mode (Shift Mode)
 
-| Shortcut | Function                |
-| -------- | ----------------------- |
-| f,g,h    | ×2/×3/×5 or +5/+10/+100 |
-| q,w,e    | ÷2/÷3/÷5 or -5/-10/-100 |
-| a,s,d    | ×10/×100/×1000          |
-| z,x,c    | ÷10/÷100/÷1000          |
+| Shortcut | Function                     |
+|----------|------------------------------|
+| f,g,h    | ×2/×3/×5 or +5/+10/+100      |
+| q,w,e    | ÷2/÷3/÷5 or -5/-10/-100      |
+| a,s,d    | ×10/×100/×1000               |
+| z,x,c    | ÷10/÷100/÷1000               |
+| \        | Swap source and target       |
+| A-\      | Toggle unit/currency display |
 
 ### Radix Converter Mode
 
-| Shortcut | Function                      |
-| -------- | ----------------------------- |
-| r,t      | 1-bit shift (x<<1, x>>1)      |
-| u,i      | Left/right shift (x<<y, x>>y) |
-| f,g      | 4-bit shift (x<<4, x>>4)      |
-| h        | NOT operation                 |
-| j,k,l    | Bit operations (AND, OR, XOR) |
-| q,w,e    | NAND, NOR, XNOR               |
-| z,x,c    | Hex input (A, B, C)           |
-| a,s,d    | Hex input (D, E, F)           |
+| Shortcut | Function                         |
+|----------|----------------------------------|
+| r,t      | 1-bit shift (x<<1, x>>1)         |
+| u,i      | Left/right shift (x<<y, x>>y)    |
+| f,g      | 4-bit shift (x<<4, x>>4)         |
+| h        | NOT operation                    |
+| j,k,l    | Bit operations (AND, OR, XOR)    |
+| q,w,e    | NAND, NOR, XNOR                  |
+| z,x,c    | Hex input (A, B, C)              |
+| a,s,d    | Hex input (D, E, F)              |
+| \        | Swap source and target           |
+| A-\      | Toggle radix display             |
+| AC-\     | Toggle radix position (pre/post) |
 
 ### Screen Navigation and UI Control
 
 | Shortcut  | Function               |
-| --------- | ---------------------- |
+|-----------|------------------------|
 | F1        | Help                   |
 | F2        | About                  |
 | F3        | Settings               |
@@ -201,7 +206,7 @@ The calculator alone appears when the window width is reduced.
 ### UI Settings
 
 | Shortcut | Function                     |
-| -------- | ---------------------------- |
+|----------|------------------------------|
 | A-t      | Toggle always on top         |
 | A-i      | Toggle init panel on startup |
 | A-d      | Toggle dark mode             |
@@ -214,7 +219,7 @@ The calculator alone appears when the window width is reduced.
 ### Clipboard Operations
 
 | Shortcut        | Function               |
-| --------------- | ---------------------- |
+|-----------------|------------------------|
 | C-c, C-Insert   | Copy main panel result |
 | SC-c, AC-Insert | Copy sub panel result  |
 | C-v, S-Insert   | Paste to main panel    |
@@ -223,7 +228,7 @@ The calculator alone appears when the window width is reduced.
 ### History Navigation
 
 | Shortcut        | Function             |
-| --------------- | -------------------- |
+|-----------------|----------------------|
 | ↑/↓             | Scroll 50px up/down  |
 | PageUp/PageDown | Scroll 400px up/down |
 | Home/End        | Scroll to top/bottom |
