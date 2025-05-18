@@ -156,25 +156,30 @@ QCalc is more than just a simple calculator - it's evolving into a modern produc
 
 ### Unit/Currency Conversion Mode (Shift Mode)
 
-| Shortcut | Function                |
-| -------- | ----------------------- |
-| f,g,h    | ×2/×3/×5 or +5/+10/+100 |
-| q,w,e    | ÷2/÷3/÷5 or -5/-10/-100 |
-| a,s,d    | ×10/×100/×1000          |
-| z,x,c    | ÷10/÷100/÷1000          |
+| Shortcut | Function                     |
+|----------|------------------------------|
+| f,g,h    | ×2/×3/×5 or +5/+10/+100      |
+| q,w,e    | ÷2/÷3/÷5 or -5/-10/-100      |
+| a,s,d    | ×10/×100/×1000               |
+| z,x,c    | ÷10/÷100/÷1000               |
+| \        | Swap source and target       |
+| A-\      | Toggle unit/currency display |
 
 ### Radix Converter Mode
 
-| Shortcut | Function                      |
-| -------- | ----------------------------- |
-| r,t      | 1-bit shift (x<<1, x>>1)      |
-| u,i      | Left/right shift (x<<y, x>>y) |
-| f,g      | 4-bit shift (x<<4, x>>4)      |
-| h        | NOT operation                 |
-| j,k,l    | Bit operations (AND, OR, XOR) |
-| q,w,e    | NAND, NOR, XNOR               |
-| z,x,c    | Hex input (A, B, C)           |
-| a,s,d    | Hex input (D, E, F)           |
+| Shortcut | Function                         |
+|----------|----------------------------------|
+| r,t      | 1-bit shift (x<<1, x>>1)         |
+| u,i      | Left/right shift (x<<y, x>>y)    |
+| f,g      | 4-bit shift (x<<4, x>>4)         |
+| h        | NOT operation                    |
+| j,k,l    | Bit operations (AND, OR, XOR)    |
+| q,w,e    | NAND, NOR, XNOR                  |
+| z,x,c    | Hex input (A, B, C)              |
+| a,s,d    | Hex input (D, E, F)              |
+| \        | Swap source and target           |
+| A-\      | Toggle radix display             |
+| AC-\     | Toggle radix position (pre/post) |
 
 ### Screen Navigation and UI Control
 
