@@ -21,27 +21,40 @@
   const uiStore = useUIStore();
   const settingsStore = useSettingsStore();
 
-  // 마크다운 파일 import - 한국어
-  import CopyPasteTipKo from './tips/ko/copy-paste.md';
-  import ButtonFeaturesTipKo from './tips/ko/button-features.md';
-  import NumberFormatTipKo from './tips/ko/number-format.md';
-  import MemoryCalcTipKo from './tips/ko/memory-calc.md';
-  import BitOperationsTipKo from './tips/ko/bit-operations.md';
-  import FinanceCalcTipKo from './tips/ko/finance-calc.md';
-  import ScientificCalcTipKo from './tips/ko/scientific-calc.md';
-  import HistorySearchTipKo from './tips/ko/history-search.md';
-  import UnitConvertTipKo from './tips/ko/unit-convert.md';
+  // tips 폴더 내의 모든 .md 파일을 동적으로 import
+  const koTipModules = import.meta.glob('./tips/ko/*.md', { eager: true });
+  const enTipModules = import.meta.glob('./tips/en/*.md', { eager: true });
 
-  // 마크다운 파일 import - 영어
-  import CopyPasteTipEn from './tips/en/copy-paste.md';
-  import ButtonFeaturesTipEn from './tips/en/button-features.md';
-  import NumberFormatTipEn from './tips/en/number-format.md';
-  import MemoryCalcTipEn from './tips/en/memory-calc.md';
-  import BitOperationsTipEn from './tips/en/bit-operations.md';
-  import FinanceCalcTipEn from './tips/en/finance-calc.md';
-  import ScientificCalcTipEn from './tips/en/scientific-calc.md';
-  import HistorySearchTipEn from './tips/en/history-search.md';
-  import UnitConvertTipEn from './tips/en/unit-convert.md';
+  /**
+   * tips 폴더 내의 .md 파일을 파일명 기준으로 정렬하여 배열로 반환합니다.
+   * @param modules - import.meta.glob으로 가져온 모듈 객체
+   * @returns 정렬된 마크다운 파일 배열
+   */
+  function getSortedTips(modules: Record<string, { default: string }>): string[] {
+    // 파일명만 추출하여 정렬
+    return Object.entries(modules)
+      .map(([path, mod]) => ({
+        // './tips/ko/01-basic-calc.md' -> '01-basic-calc.md'
+        filename: path.split('/').pop() ?? '',
+        src: mod.default,
+      }))
+      .sort((a, b) => a.filename.localeCompare(b.filename))
+      .map((item) => item.src);
+  }
+
+  // 한글, 영어 팁 배열 생성
+  const koTips = getSortedTips(koTipModules as Record<string, { default: string }>);
+  const enTips = getSortedTips(enTipModules as Record<string, { default: string }>);
+
+  // tips 배열을 현재 언어에 따라 선택
+  const tips = computed(() => {
+    const isKorean = locale.value.substring(0, 2) === 'ko';
+    // 한/영 팁 개수가 다르면 오류 발생
+    if (koTips.length !== enTips.length) {
+      throw new Error('The number of Korean and English tips does not match.');
+    }
+    return isKorean ? koTips : enTips;
+  });
 
   // Props 정의
   const props = defineProps<{
@@ -64,22 +77,6 @@
 
   // 슬라이드 방향
   const slideDirection = ref<'left' | 'right'>('right');
-
-  // 팁 목록 가져오기
-  const tips = computed(() => {
-    const isKorean = locale.value.substring(0, 2) === 'ko';
-    return [
-      isKorean ? CopyPasteTipKo : CopyPasteTipEn,
-      isKorean ? ButtonFeaturesTipKo : ButtonFeaturesTipEn,
-      isKorean ? NumberFormatTipKo : NumberFormatTipEn,
-      isKorean ? MemoryCalcTipKo : MemoryCalcTipEn,
-      isKorean ? BitOperationsTipKo : BitOperationsTipEn,
-      isKorean ? FinanceCalcTipKo : FinanceCalcTipEn,
-      isKorean ? ScientificCalcTipKo : ScientificCalcTipEn,
-      isKorean ? HistorySearchTipKo : HistorySearchTipEn,
-      isKorean ? UnitConvertTipKo : UnitConvertTipEn,
-    ];
-  });
 
   // 현재 팁 가져오기
   const currentTip = computed(() => tips.value[currentIndex.value]);
