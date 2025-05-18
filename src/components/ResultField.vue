@@ -712,20 +712,34 @@
           v-mutation.characterData
           v-touch-hold.mouse="
             () => {
-              showPanelMenu = true;
-              hapticFeedbackMedium();
-              console.log('touch hold');
+              if (!$g.isMobile) {
+                // 데스크탑 환경에서 메뉴 열기
+                showPanelMenu = true;
+              }
             }
           "
           class="self-center no-outline full-width full-height ellipsis text-right q-pt-xs noselect"
-          :class="[isMainField ? 'text-h5' : '', getResultColor()]"
+          :class="[getResultColor()]"
           :style="`padding-top: ${resultPanelPadding}px;`"
           role="text"
           :aria-label="t('ariaLabel.result', { type: isMainField ? t('ariaLabel.main') : t('ariaLabel.sub') })"
           @click="
             () => {
-              if (showPanelMenu) {
-                showPanelMenu = false;
+              if ($g.isMobile) {
+                // 모바일 환경에서 메뉴 토글
+                showPanelMenu = !showPanelMenu;
+                if (showPanelMenu) {
+                  // 메뉴 열림 시 강한 햅틱 피드백
+                  hapticFeedbackMedium();
+                } else {
+                  // 메뉴 닫힘 시 약한 햅틱 피드백
+                  hapticFeedbackLight();
+                }
+              } else {
+                // 데스크탑 환경에서 메뉴가 열려있을 때만 메뉴 닫기
+                if (showPanelMenu) {
+                  showPanelMenu = false;
+                }
               }
             }
           "
@@ -829,6 +843,12 @@
     min-width: 2ch; /* 2글자 폭 확보 */
     display: inline-block; /* 폭 설정을 위해 필요 */
     text-align: left; /* 왼쪽 정렬 (선택사항) */
+  }
+
+  // 메인 필드의 결과 영역 커서를 기본 커서로 설정
+  #mainField,
+  #subField {
+    cursor: context-menu !important;
   }
 
   .q-field {
