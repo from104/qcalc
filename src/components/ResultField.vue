@@ -710,14 +710,6 @@
             }
           "
           v-mutation.characterData
-          v-touch-hold.mouse="
-            () => {
-              if (!$g.isMobile) {
-                // 데스크탑 환경에서 메뉴 열기
-                showPanelMenu = true;
-              }
-            }
-          "
           class="self-center no-outline full-width full-height ellipsis text-right q-pt-xs noselect"
           :class="[getResultColor()]"
           :style="`padding-top: ${resultPanelPadding}px;`"
@@ -725,28 +717,15 @@
           :aria-label="t('ariaLabel.result', { type: isMainField ? t('ariaLabel.main') : t('ariaLabel.sub') })"
           @click="
             () => {
-              if ($g.isMobile) {
-                // 모바일 환경에서 메뉴 토글
-                showPanelMenu = !showPanelMenu;
-                if (showPanelMenu) {
-                  // 메뉴 열림 시 강한 햅틱 피드백
-                  hapticFeedbackMedium();
-                } else {
-                  // 메뉴 닫힘 시 약한 햅틱 피드백
-                  hapticFeedbackLight();
-                }
-              } else {
-                // 데스크탑 환경에서 메뉴가 열려있을 때만 메뉴 닫기
-                if (showPanelMenu) {
-                  showPanelMenu = false;
-                }
-              }
+              showPanelMenu = !showPanelMenu;
+              hapticFeedbackLight();
             }
           "
           @contextmenu.prevent="
-            // 마우스 오른쪽 버튼 클릭 시 메뉴 열기
-            showPanelMenu = !showPanelMenu;
-            hapticFeedbackMedium();
+            () => {
+              // 마우스 오른쪽 버튼 클릭 시 메뉴 열기
+              showPanelMenu = !showPanelMenu;
+            }
           "
         >
           <span v-if="currentTab === 'radix'" id="radixPrefix" role="text" :aria-label="t('ariaLabel.radixPrefix')">{{
