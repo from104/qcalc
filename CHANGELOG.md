@@ -4,7 +4,7 @@ All notable changes to this project are recorded in this file.
 
 The format is based on [Keep a Changelog] and this project follows [Semantic Versioning].
 
-## [0.11.4] 2025-05-19
+## [0.11.4] 2025-05-20
 
 ### Added
 
@@ -12,7 +12,7 @@ The format is based on [Keep a Changelog] and this project follows [Semantic Ver
 
 ### Changed
 
-- **Panel content copy or paste method changed**: Changed from copying by clicking (touching) the panel or long-pressing to paste, to a method where you long-press (or right-click) to bring up a menu and select an option.
+- **Changed the way to copy or paste panel content**: Instead of copying by clicking (touching) the panel or pasting by long-pressing, you now open a menu by clicking (touching) (or right-clicking) the panel and select the desired action from the menu.
 - **Percentage calculation shortcut changed**: Added the `%` key as a shortcut for the percentage calculation function, in addition to the existing `k` key.
 
 ### Fixed
