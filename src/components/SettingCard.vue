@@ -158,7 +158,6 @@
           :class="`bg-${selectBackgroundColor}`"
           :color="selectTextColor"
           :bg-color="selectBackgroundColor"
-          :popup-content-style="{ backgroundColor: selectBackgroundColor, color: selectTextColor }"
           @update:model-value="settingsStore.setDarkMode"
         />
       </q-item>
@@ -180,7 +179,6 @@
           :class="`bg-${selectBackgroundColor}`"
           :color="selectTextColor"
           :bg-color="selectBackgroundColor"
-          :popup-content-style="{ backgroundColor: selectBackgroundColor, color: selectTextColor }"
           @update:model-value="onThemeChange"
         />
       </q-item>
