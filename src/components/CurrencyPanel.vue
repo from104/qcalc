@@ -9,7 +9,7 @@
    */
 
   // Vue 핵심 기능 및 컴포지션 API 가져오기
-  import { ref, onMounted, onBeforeUnmount, reactive, watch } from 'vue';
+  import { ref, onMounted, onBeforeUnmount, reactive, watch, computed } from 'vue';
   import type { Ref } from 'vue';
 
   // i18n 설정
@@ -182,6 +182,11 @@
       calcStore.calc.needsBufferReset = true;
     }
   };
+
+  // settingsStore에서 select 색상을 가져오는 computed 속성
+  const selectTextColor = computed(() => settingsStore.getSelectColor('text'));
+  const selectBackgroundColor = computed(() => settingsStore.getSelectColor('background'));
+
 </script>
 
 <template>
@@ -207,17 +212,17 @@
       hide-selected
       behavior="menu"
       class="col-4 q-pl-sm shadow-2"
-      :class="!settingsStore.isDarkMode() ? 'bg-blue-grey-2' : 'bg-blue-grey-6'"
-      :label-color="!settingsStore.isDarkMode() ? 'primary' : 'grey-1'"
+      :class="`bg-${selectBackgroundColor}`"
+      :label-color="selectTextColor"
       :popup-content-class="
         [
-          !settingsStore.isDarkMode() ? 'bg-blue-grey-2' : 'bg-blue-grey-6',
+          `bg-${selectBackgroundColor}`,
           'scrollbar-custom',
           'q-select-popup',
           $g.isMobile ? 'popup-mobile' : '',
         ].join(' ')
       "
-      :options-selected-class="!settingsStore.isDarkMode() ? 'text-primary' : 'text-grey-1'"
+      :options-selected-class="`text-${selectTextColor}`"
       @filter="sourceFilterFn"
       @focus="uiStore.setInputFocused()"
       @blur="uiStore.setInputBlurred()"
@@ -274,17 +279,17 @@
       hide-selected
       behavior="menu"
       class="col-4 q-pl-sm shadow-2"
-      :class="!settingsStore.isDarkMode() ? 'bg-blue-grey-2' : 'bg-blue-grey-6'"
-      :label-color="!settingsStore.isDarkMode() ? 'primary' : 'grey-1'"
+      :class="`bg-${selectBackgroundColor}`"
+      :label-color="selectTextColor"
       :popup-content-class="
         [
-          !settingsStore.isDarkMode() ? 'bg-blue-grey-2' : 'bg-blue-grey-6',
+          `bg-${selectBackgroundColor}`,
           'scrollbar-custom',
           'q-select-popup',
           $g.isMobile ? 'popup-mobile' : '',
         ].join(' ')
       "
-      :options-selected-class="!settingsStore.isDarkMode() ? 'text-primary' : 'text-grey-1'"
+      :options-selected-class="`text-${selectTextColor}`"
       @filter="targetFilterFn"
       @keyup.enter="blurElement()"
       @update:model-value="blurElement()"

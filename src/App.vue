@@ -161,6 +161,7 @@
         orientation: 'portrait',
       });
     }
+    settingsStore.updateDarkModeAndTheme();
   });
 
   onUnmounted(async () => {

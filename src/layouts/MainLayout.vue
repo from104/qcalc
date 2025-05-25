@@ -254,7 +254,7 @@
     if ($g.isWindows) {
       calcStore.resultPanelPadding = 8;
     } else if ($g.isLinux) {
-      calcStore.resultPanelPadding = 3;
+      calcStore.resultPanelPadding = 9;
     } else {
       calcStore.resultPanelPadding = 0;
     }

@@ -89,14 +89,12 @@
     displayButtonNotification(id);
   };
 
-  // 버튼 색상 정의
-  const calculatorButtonColors: { [key: string]: string } = {
-    important: '#cb9247',
-    function: '#1d8fb6',
-    normal: '#5e9e7d',
-  };
+  // settingsStore에서 버튼 색상을 가져오는 computed 속성
+  const importantButtonColor = computed(() => settingsStore.getButtonColor('important'));
+  const functionButtonColor = computed(() => settingsStore.getButtonColor('function'));
+  const normalButtonColor = computed(() => settingsStore.getButtonColor('normal'));
 
-  const shiftButtonPressedColor = lighten(calculatorButtonColors.important ?? '', -30);
+  const shiftButtonPressedColor = computed(() => lighten(importantButtonColor.value ?? '', -30));
 
   // const i18n = useI18n();
   const { standardButtons, modeSpecificButtons, standardExtendedFunctions, modeSpecificExtendedFunctions } =
@@ -200,7 +198,7 @@
     }
     calcStore.offNeedButtonNotification();
   };
-  
+
   // 버튼 시프트 상태에 따른 기능 실행
   const handleClickBtn = (id: ButtonID) => {
     const isDisabled = calcStore.isShiftPressed
@@ -320,10 +318,10 @@
   });
 
   // 계산기 버튼 높이 설정
-  const baseHeight = ref('136px');
+  const baseHeight = ref('132px');
   // const baseHeight = ref('272px');
   if (['unit', 'currency', 'radix'].includes(props.type)) {
-    baseHeight.value = '234px';
+    baseHeight.value = '230px';
   }
 
   const displayDisabledButtonNotification = () => {
@@ -463,7 +461,7 @@
           :model-value="tooltipTimers[id] ?? false"
           no-parent-event
           class="noselect"
-          :style="`background: ${calculatorButtonColors[button.color]}; border: 2px outset ${calculatorButtonColors[button.color]}; border-radius: 10px;`"
+          :style="`background: ${settingsStore.getButtonColor(button.color as 'normal' | 'important' | 'function')}; border: 2px outset ${settingsStore.getButtonColor(button.color as 'normal' | 'important' | 'function')}; border-radius: 10px;`"
           anchor="top middle"
           self="center middle"
           transition-show="jump-up"
@@ -529,15 +527,15 @@
   }
 
   .bg-btn-important {
-    background: v-bind('calculatorButtonColors.important') !important; // 아이콘의 밝은 녹색
+    background: v-bind(importantButtonColor) !important; // 아이콘의 밝은 녹색
   }
 
   .bg-btn-function {
-    background: v-bind('calculatorButtonColors.function') !important; // 아이콘의 밝은 파란색과 어울리게 조정
+    background: v-bind(functionButtonColor) !important; // 아이콘의 밝은 파란색과 어울리게 조정
   }
 
   .bg-btn-normal {
-    background: v-bind('calculatorButtonColors.normal') !important; // 어두운 색
+    background: v-bind(normalButtonColor) !important; // 어두운 색
   }
 
   .button-shift {

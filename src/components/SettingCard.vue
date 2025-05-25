@@ -20,7 +20,8 @@
   import { useUnitStore } from 'stores/unitStore';
   import { useRadixStore } from 'stores/radixStore';
   import { useCurrencyStore } from 'stores/currencyStore';
-  
+  import { themes } from 'stores/settingsStore';
+
   // 스토어 인스턴스 생성
   const uiStore = useUIStore();
   const settingsStore = useSettingsStore();
@@ -66,6 +67,27 @@
       locale.value = settingsStore.userLocale;
     }
   };
+
+  // 색상 테마 옵션을 계산합니다.
+  const themeOptions = computed(() => {
+    return Object.keys(themes).map((themeKey) => ({
+      label: t(`themeName.${themeKey}`, themeKey),
+      value: themeKey,
+    }));
+  });
+
+  /**
+   * 테마가 변경될 때 호출되는 함수입니다.
+   * @param themeName - 선택된 테마 이름
+   */
+  import type { ThemeType } from 'stores/settingsStore';
+  const onThemeChange = (themeName: ThemeType) => {
+    settingsStore.setTheme(themeName);
+  };
+
+  // settingsStore에서 select 색상을 가져오는 computed 속성
+  const selectTextColor = computed(() => settingsStore.getSelectColor('text'));
+  const selectBackgroundColor = computed(() => settingsStore.getSelectColor('background'));
 </script>
 
 <template>
@@ -130,11 +152,36 @@
           options-dense
           emit-value
           map-options
-          :label-color="!settingsStore.isDarkMode() ? 'primary' : 'grey-1'"
-          :options-selected-class="!settingsStore.isDarkMode() ? 'text-primary' : 'text-grey-1'"
-          :popup-content-class="!settingsStore.isDarkMode() ? 'bg-blue-grey-2' : 'bg-blue-grey-6'"
-          :class="!settingsStore.isDarkMode() ? 'bg-blue-grey-2' : 'bg-blue-grey-6'"
+          :label-color="selectTextColor"
+          :options-selected-class="`text-${selectTextColor}`"
+          :popup-content-class="`bg-${selectBackgroundColor}`"
+          :class="`bg-${selectBackgroundColor}`"
+          :color="selectTextColor"
+          :bg-color="selectBackgroundColor"
+          :popup-content-style="{ backgroundColor: selectBackgroundColor, color: selectTextColor }"
           @update:model-value="settingsStore.setDarkMode"
+        />
+      </q-item>
+
+      <!-- 색상 테마 선택 추가 -->
+      <q-item class="q-mb-md">
+        <q-item-label class="self-center" role="text">{{ t('colorTheme') }}</q-item-label>
+        <q-space />
+        <q-select
+          v-model="settingsStore.currentTheme"
+          :options="themeOptions"
+          dense
+          options-dense
+          emit-value
+          map-options
+          :label-color="selectTextColor"
+          :options-selected-class="`text-${selectTextColor}`"
+          :popup-content-class="`bg-${selectBackgroundColor}`"
+          :class="`bg-${selectBackgroundColor}`"
+          :color="selectTextColor"
+          :bg-color="selectBackgroundColor"
+          :popup-content-style="{ backgroundColor: selectBackgroundColor, color: selectTextColor }"
+          @update:model-value="onThemeChange"
         />
       </q-item>
 
@@ -260,10 +307,11 @@
             map-options
             options-dense
             :disable="!radixStore.showRadix"
-            :label-color="!settingsStore.isDarkMode() ? 'primary' : 'grey-1'"
-            :options-selected-class="!settingsStore.isDarkMode() ? 'text-primary' : 'text-grey-1'"
-            :popup-content-class="!settingsStore.isDarkMode() ? 'bg-blue-grey-2' : 'bg-blue-grey-6'"
-            :class="!settingsStore.isDarkMode() ? 'bg-blue-grey-2' : 'bg-blue-grey-6'"
+            :label-color="selectTextColor"
+            :options-selected-class="`text-${selectTextColor}`"
+            :popup-content-class="`bg-${selectBackgroundColor}`"
+            :class="`bg-${selectBackgroundColor}`"
+            :color="selectTextColor"
           />
         </q-item>
       </template>
@@ -293,10 +341,11 @@
           emit-value
           map-options
           options-dense
-          :label-color="!settingsStore.isDarkMode() ? 'primary' : 'grey-1'"
-          :options-selected-class="!settingsStore.isDarkMode() ? 'text-primary' : 'text-grey-1'"
-          :popup-content-class="!settingsStore.isDarkMode() ? 'bg-blue-grey-2' : 'bg-blue-grey-6'"
-          :class="!settingsStore.isDarkMode() ? 'bg-blue-grey-2' : 'bg-blue-grey-6'"
+          :label-color="selectTextColor"
+          :options-selected-class="`text-${selectTextColor}`"
+          :popup-content-class="`bg-${selectBackgroundColor}`"
+          :class="`bg-${selectBackgroundColor}`"
+          :color="selectTextColor"
           @update:model-value="setLanguage()"
         />
       </q-item>
@@ -402,6 +451,15 @@ ko:
     useSystemLocale: '시스템 언어 사용 설정'
     language: '언어 설정'
     autoUpdate: '자동 업데이트 설정'
+  colorTheme: '색상 테마'
+  themeName:
+    default: '기본'
+    forest: '숲'
+    ocean: '바다'
+    autumn: '가을'
+    amethyst: '자수정'
+    slate: '잿빛'
+    highcontrast: '고대비'
 en:
   alwaysOnTop: 'Always on top'
   alwaysOnTopOn: 'Always on top ON'
@@ -451,4 +509,13 @@ en:
     useSystemLocale: 'Use system locale setting'
     language: 'Language setting'
     autoUpdate: 'Auto update setting'
+  colorTheme: 'Color Theme'
+  themeName:
+    default: 'Default'
+    forest: 'Forest'
+    ocean: 'Ocean'
+    autumn: 'Autumn'
+    amethyst: 'Amethyst'
+    slate: 'Slate'
+    highcontrast: 'High Contrast'
 </i18n>
