@@ -18,6 +18,11 @@ import type { CalculationResult } from './calculator';
 export type DarkModeType = 'system' | 'light' | 'dark';
 
 /**
+ * 계산기 버튼 색상/종류 타입
+ */
+export type ButtonType = 'normal' | 'important' | 'function';
+
+/**
  * 그룹핑 단위 설정 타입
  */
 export type GroupingUnitType = 3 | 4;
@@ -109,12 +114,27 @@ export interface UIState {
   isSnapFirstRun: boolean;
 }
 
+// 추가: 테마 타입 및 색상 인터페이스 (settingsStore.ts와 동일하게)
+export type ThemeType = 'default' | 'forest' | 'ocean' | 'sunset';
+
+export interface ThemeColors {
+  primary: string;
+  secondary: string;
+  accent: string;
+  positive: string;
+  negative: string;
+  info: string;
+  warning: string;
+  dark: string;
+}
+
 /**
  * 설정 스토어 상태 인터페이스
  */
 export interface SettingsState {
   darkMode: DarkModeType;
-  alwaysOnTop: boolean;
+  currentTheme: ThemeType; // 추가
+  lwaysOnTop: boolean;
   initPanel: boolean;
   showButtonAddedLabel: boolean;
   hapticsMode: boolean;
@@ -214,6 +234,8 @@ export interface SettingsActions {
   decrementDecimalPlaces(): void;
   setAutoUpdate(value: boolean): void;
   toggleAutoUpdate(): void;
+  setTheme(themeName: ThemeType): void; // 추가
+  updateDarkModeAndTheme(): void; // 추가
 }
 
 /**
@@ -224,4 +246,12 @@ export type UnitStore = DefineStore<'unit', UnitState, Record<string, never>, Un
 export type CurrencyStore = DefineStore<'currency', CurrencyState, Record<string, never>, CurrencyActions>;
 export type RadixStore = DefineStore<'radix', RadixState, Record<string, never>, RadixActions>;
 export type UIStore = DefineStore<'ui', UIState, Record<string, never>, UIActions>;
-export type SettingsStore = DefineStore<'settings', SettingsState, Record<string, never>, SettingsActions>;
+export type SettingsStore = DefineStore<
+  'settings',
+  SettingsState,
+  {
+    getDecimalPlaces: (state: SettingsState) => number;
+    getCurrentThemeColors: (state: SettingsState) => ThemeColors;
+  },
+  SettingsActions
+>; // Getter 추가

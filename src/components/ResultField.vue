@@ -372,27 +372,39 @@
     return '';
   });
 
-  // 결과 색상 정의
-  const resultColors = {
-    normal: 'text-light-green-8',
-    warning: 'text-deep-orange-5',
-    normalDark: 'text-light-green-10',
-    warningDark: 'text-deep-orange-8',
-  };
+  // 결과 색상 관련 computed 속성 (settingsStore 사용)
+  const panelNormalTextColor = computed(() => settingsStore.getPanelColor('text', 'normal'));
+  const panelWarningTextColor = computed(() => settingsStore.getPanelColor('text', 'warning'));
+  const panelNormalBackgroundColor = computed(() => settingsStore.getPanelColor('background', 'normal'));
+  const panelWarningBackgroundColor = computed(() => settingsStore.getPanelColor('background', 'warning'));
 
-  // 결과 배경색 정의
-  const resultBackgroundColors = {
-    normal: 'light-green-3',
-    warning: 'deep-orange-2',
-  };
-
-  // 결과 색상 선택 함수
-  const getResultColor = () => {
-    if (isMainField && calcStore.isMemoryVisible) {
-      return !needFieldTooltip.value ? resultColors.normalDark : resultColors.warningDark;
+  // 결과 색상 선택 함수 (실제 색상 값을 반환하도록 수정)
+  const getResultColor = computed(() => {
+    // isMainField와 calcStore.isMemoryVisible 조건에 따라 일반 텍스트 또는 경고 텍스트 색상 반환
+    // needFieldTooltip 조건은 툴팁 표시 여부이므로, 텍스트 색상 결정에 직접 사용하기보다는
+    // 툴팁이 필요할 때 (텍스트가 넘칠 때) 경고색을 사용한다는 의미로 해석하여 적용합니다.
+    if (needFieldTooltip.value) {
+      return panelWarningTextColor.value; // 텍스트가 넘치면 경고색
     }
-    return !needFieldTooltip.value ? resultColors.normal : resultColors.warning;
-  };
+    // isMemoryVisible은 메인 필드에만 영향을 미치므로, 해당 조건은 여기서 직접 사용하지 않고,
+    // 메모리 값 표시에 대한 색상은 템플릿에서 별도 처리하거나, 이 함수에 파라미터를 추가하여 구분할 수 있습니다.
+    // 현재는 일반적인 경우의 텍스트 색상을 반환합니다.
+    return panelNormalTextColor.value;
+  });
+
+  // 메모리 값 표시를 위한 텍스트 색상
+  const memoryDisplayColor = computed(() => {
+    // 메모리 표시 시에는 항상 settingsStore에서 정의한 "dark" 모드의 "normal" 텍스트 색상을 사용하거나,
+    // 혹은 현재 테마의 다크모드 일반 텍스트 색상을 사용합니다.
+    // 여기서는 getPanelColor를 활용하여 현재 테마의 다크모드 일반 텍스트 색상을 가져옵니다.
+    // settingsStore.isDarkMode()를 직접 호출하기보다, getPanelColor가 내부적으로 처리하도록 의존합니다.
+    // getPanelColor의 두 번째 인자가 'normal'일 때 다크모드면 normalDark를 반환합니다.
+    return panelNormalTextColor.value; // isDark가 true면 normalDark가 반환됨
+  });
+
+  const resultFieldBackgroundColor = computed(() => {
+    return needFieldTooltip.value ? panelWarningBackgroundColor.value : panelNormalBackgroundColor.value;
+  });
 
   // 감시자 설정
   watch(
@@ -655,6 +667,7 @@
 
   // 결과 패널 패딩 설정
   const resultPanelPadding = computed(() => calcStore.resultPanelPadding);
+  // const resultPanelPadding = computed(() => 12);
 </script>
 
 <template>
@@ -668,12 +681,18 @@
       :dark="false"
       role="textbox"
       :aria-label="t('ariaLabel.resultField', { type: isMainField ? t('ariaLabel.main') : t('ariaLabel.sub') })"
-      :bg-color="!needFieldTooltip ? resultBackgroundColors.normal : resultBackgroundColors.warning"
+      :bg-color="resultFieldBackgroundColor"
       :label-slot="isMainField"
       :stack-label="isMainField"
     >
       <template v-if="isMainField" #label>
-        <div v-auto-blur class="noselect" :class="getResultColor()" role="text" :aria-label="t('ariaLabel.expression')">
+        <div
+          v-auto-blur
+          class="noselect"
+          :style="{ color: getResultColor }"
+          role="text"
+          :aria-label="t('ariaLabel.expression')"
+        >
           {{ calculationExpression }}
         </div>
       </template>
@@ -682,18 +701,22 @@
           v-if="!isMemoryEmpty"
           v-auto-blur
           class="noselect full-height q-mt-xs q-pt-sm"
-          :class="getResultColor()"
           role="button"
           :aria-label="t('ariaLabel.memory')"
           @click="calcStore.showMemoryTemporarily()"
         >
-          <q-icon name="mdi-chip" role="img" :aria-label="t('ariaLabel.memoryIcon')" />
+          <q-icon
+            :color="memoryDisplayColor"
+            name="mdi-chip"
+            role="img"
+            :aria-label="t('ariaLabel.memoryIcon')"
+          />
         </div>
         <div
           v-if="operator != ''"
           v-auto-blur
           class="noselect full-height q-mt-xs q-pt-sm"
-          :class="getResultColor()"
+          :style="{ color: getResultColor }"
           role="text"
           :aria-label="t('ariaLabel.operator', { operator })"
         >
@@ -711,8 +734,12 @@
           "
           v-mutation.characterData
           class="self-center no-outline full-width full-height ellipsis text-right q-pt-xs noselect"
-          :class="[getResultColor()]"
-          :style="`padding-top: ${resultPanelPadding}px;`"
+          :class="[`text-${getResultColor}`]"
+          :style="
+            isMainField
+              ? `padding-top: ${resultPanelPadding}px; padding-bottom: ${Math.floor(resultPanelPadding / 2)}px;`
+              : ''
+          "
           role="text"
           :aria-label="t('ariaLabel.result', { type: isMainField ? t('ariaLabel.main') : t('ariaLabel.sub') })"
           @click="
@@ -736,7 +763,7 @@
           }}</span>
           <span
             :id="isMainField ? 'result' : 'subResult'"
-            :class="getResultColor()"
+            :style="{ color: isMainField && calcStore.isMemoryVisible ? memoryDisplayColor : getResultColor }"
             role="text"
             :aria-label="t('ariaLabel.value')"
           >
@@ -835,7 +862,9 @@
       right: -100%;
       text-align: right;
       font-size: 20px;
-      top: 10px;
+    }
+    :deep(.q-field__control) {
+      padding-top: 0px;
     }
   }
 </style>

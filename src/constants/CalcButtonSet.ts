@@ -8,6 +8,7 @@
 import { match } from 'ts-pattern';
 
 import type { ComposerTranslation } from 'vue-i18n';
+import type { ButtonType } from '../types/store';
 
 import { toBigNumber } from 'classes/CalculatorMath';
 import { Operator } from 'classes/Calculator';
@@ -86,7 +87,7 @@ export function createCalcButtonSet(t: ComposerTranslation) {
 
   // 버튼 타입 정의
   type CalculatorButtonDefinition = {
-    [id: string]: [label: string, color: string, keys: string[], action: () => void, isDisabled: boolean];
+    [id: string]: [label: string, color: ButtonType, keys: string[], action: () => void, isDisabled: boolean];
   };
 
   type CalculatorModeButtons = { [key in 'unit' | 'currency' | 'radix']: CalculatorButtonDefinition };

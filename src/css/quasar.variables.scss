@@ -1,3 +1,65 @@
+// // Quasar SCSS (& Sass) Variables
+// // --------------------------------------------------
+// // To customize the look and feel of this app, you can override
+// // the Sass/SCSS variables found in Quasar's source Sass/SCSS files.
+
+// // Check documentation for full list of Quasar variables
+
+// // Your own variables (that are declared here) and Quasar's own
+// // ones will be available out of the box in your .vue/.scss/.sass files
+
+// // It's highly recommended to change the default colors
+// // to match your app's branding.
+// // Tip: Use the "Theme Builder" on Quasar's documentation website.
+
+// // $primary   : #1976D2;
+// // $secondary : #26A69A;
+// // $accent    : #9C27B0;
+
+// // $dark      : #1D1D1D;
+
+// // $positive  : #21BA45;
+// // $negative  : #C10015;
+// // $info      : #31CCEC;
+// // $warning   : #F2C037;
+
+// @use 'sass:color';
+
+// // Light theme colors
+// $primary-light: #16743f;
+// $secondary-light: #4abf89;
+// $accent-light: #3fce97;
+// $positive-light: #1d8fb6;
+// $negative-light: #c71818;
+// $info-light: #34a9e0;
+// $warning-light: #d1a527;
+
+// // Dark theme colors (30% darker)
+// $primary: #16743f;
+// $secondary: #4abf89;
+// $accent: #3fce97;
+
+// $dark: #1d1d1d;
+// $dark-page: #1d1d1d;
+
+// $positive: #1d8fb6;
+// $negative: #c71818;
+// $info: #34a9e0;
+// $warning: #d1a527;
+
+// // Dark theme color adjustments
+// body.body--dark {
+//   --q-primary: #{color.adjust($primary, $lightness: -10%)};
+//   --q-secondary: #{color.adjust($secondary, $lightness: -10%)};
+//   --q-accent: #{color.adjust($accent, $lightness: -10%)};
+//   --q-positive: #{color.adjust($positive, $lightness: -10%)};
+//   --q-negative: #{color.adjust($negative, $lightness: -10%)};
+//   --q-info: #{color.adjust($info, $lightness: -10%)};
+//   --q-warning: #{color.adjust($warning, $lightness: -10%)};
+// }
+
+// src/css/quasar.variables.scss
+
 // Quasar SCSS (& Sass) Variables
 // --------------------------------------------------
 // To customize the look and feel of this app, you can override
@@ -12,48 +74,37 @@
 // to match your app's branding.
 // Tip: Use the "Theme Builder" on Quasar's documentation website.
 
-// $primary   : #1976D2;
-// $secondary : #26A69A;
-// $accent    : #9C27B0;
+// CSS 변수를 사용하여 Quasar 색상 변수 할당
+$primary   : var(--q-primary, #16743f); // 기본값 설정
+$secondary : var(--q-secondary, #4abf89);
+$accent    : var(--q-accent, #3fce97);
 
-// $dark      : #1D1D1D;
+$dark      : var(--q-dark, #1d1d1d); // 다크모드 배경색 등
+$dark-page : var(--q-dark, #1d1d1d); // 페이지 배경은 $dark와 동기화
 
-// $positive  : #21BA45;
-// $negative  : #C10015;
-// $info      : #31CCEC;
-// $warning   : #F2C037;
+$positive  : var(--q-positive, #1d8fb6);
+$negative  : var(--q-negative, #c71818);
+$info      : var(--q-info, #34a9e0);
+$warning   : var(--q-warning, #d1a527);
 
-@use 'sass:color';
+// Quasar는 body.body--dark 선택자를 통해 다크 모드 스타일을 적용합니다.
+// settingsStore에서 setCssVar를 사용하여 --q-primary 등을 설정하면
+// 아래의 body.body--dark 선택자 내의 조정은 필요 없어지거나,
+// 테마에 따라 다크 모드 색상을 미세 조정하는 용도로 사용할 수 있습니다.
 
-// Light theme colors
-$primary-light: #16743f;
-$secondary-light: #4abf89;
-$accent-light: #3fce97;
-$positive-light: #1d8fb6;
-$negative-light: #c71818;
-$info-light: #34a9e0;
-$warning-light: #d1a527;
+// 예시: 만약 테마의 primary 색상이 다크 모드에서 너무 밝다면 여기서 조정 가능
+// body.body--dark {
+//   --q-primary: #{color.adjust(var(--q-primary), $lightness: -10%)};
+//   --q-secondary: #{color.adjust(var(--q-secondary), $lightness: -10%)};
+//   // ... 기타 색상
+// }
 
-// Dark theme colors (30% darker)
-$primary: #16743f;
-$secondary: #4abf89;
-$accent: #3fce97;
+// 주석 처리 또는 삭제: 기존 Light/Dark theme colors 정의
+// $primary-light: #16743f;
+// ... (기존 light 색상 변수들)
 
-$dark: #1d1d1d;
-$dark-page: #1d1d1d;
-
-$positive: #1d8fb6;
-$negative: #c71818;
-$info: #34a9e0;
-$warning: #d1a527;
-
-// Dark theme color adjustments
-body.body--dark {
-  --q-primary: #{color.adjust($primary, $lightness: -10%)};
-  --q-secondary: #{color.adjust($secondary, $lightness: -10%)};
-  --q-accent: #{color.adjust($accent, $lightness: -10%)};
-  --q-positive: #{color.adjust($positive, $lightness: -10%)};
-  --q-negative: #{color.adjust($negative, $lightness: -10%)};
-  --q-info: #{color.adjust($info, $lightness: -10%)};
-  --q-warning: #{color.adjust($warning, $lightness: -10%)};
-}
+// 주석 처리 또는 삭제: Dark theme color adjustments
+// body.body--dark {
+//   --q-primary: #{color.adjust($primary, $lightness: -10%)};
+//   ...
+// }

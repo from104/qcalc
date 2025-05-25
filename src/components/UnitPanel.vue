@@ -17,7 +17,7 @@
   // 계산기 관련 타입과 클래스
   import { KeyBinding } from 'classes/KeyBinding';
   import { UnitConverter } from 'classes/UnitConverter';
-  
+
   // 스토어 import
   import { useSettingsStore } from 'stores/settingsStore';
   import { useUnitStore } from 'stores/unitStore';
@@ -107,6 +107,10 @@
       calcStore.calc.needsBufferReset = true;
     }
   };
+
+  // settingsStore에서 select 색상을 가져오는 computed 속성
+  const selectTextColor = computed(() => settingsStore.getSelectColor('text'));
+  const selectBackgroundColor = computed(() => settingsStore.getSelectColor('background'));
 </script>
 
 <template>
@@ -125,12 +129,15 @@
       map-options
       behavior="menu"
       class="col-3 q-pl-sm shadow-2 text-black"
-      :class="!settingsStore.isDarkMode() ? 'bg-blue-grey-2' : 'bg-blue-grey-6'"
-      :label-color="!settingsStore.isDarkMode() ? 'primary' : 'grey-1'"
+      :class="`bg-${selectBackgroundColor}`"
+      :label-color="selectTextColor"
       :popup-content-class="
-        [!settingsStore.isDarkMode() ? 'bg-blue-grey-2' : 'bg-blue-grey-6', 'scrollbar-custom', 'q-select-popup'].join(' ')
+        [`bg-${selectBackgroundColor}`, 'scrollbar-custom', 'q-select-popup'].join(' ')
       "
-      :options-selected-class="!settingsStore.isDarkMode() ? 'text-primary' : 'text-grey-1'"
+      :options-selected-class="`text-${selectTextColor}`"
+      :color="selectTextColor"
+      :bg-color="selectBackgroundColor"
+      :popup-content-style="{ backgroundColor: selectBackgroundColor, color: selectTextColor }"
     />
 
     <!-- 원본 방향 -->
@@ -150,12 +157,15 @@
       map-options
       behavior="menu"
       class="col-3 q-pl-sm shadow-2"
-      :class="!settingsStore.isDarkMode() ? 'bg-blue-grey-2' : 'bg-blue-grey-6'"
+      :class="`bg-${selectBackgroundColor}`"
       :popup-content-class="
-        [!settingsStore.isDarkMode() ? 'bg-blue-grey-2' : 'bg-blue-grey-6', 'scrollbar-custom', 'q-select-popup'].join(' ')
+        [`bg-${selectBackgroundColor}`, 'scrollbar-custom', 'q-select-popup'].join(' ')
       "
-      :options-selected-class="!settingsStore.isDarkMode() ? 'text-primary' : 'text-grey-1'"
-      :label-color="!settingsStore.isDarkMode() ? 'primary' : 'grey-1'"
+      :options-selected-class="`text-${selectTextColor}`"
+      :label-color="selectTextColor"
+      :color="selectTextColor"
+      :bg-color="selectBackgroundColor"
+      :popup-content-style="{ backgroundColor: selectBackgroundColor, color: selectTextColor }"
     >
       <template #option="scope">
         <q-item v-bind="scope.itemProps">
@@ -184,6 +194,7 @@
       class="col-1 q-mx-none q-px-sm"
       role="button"
       :aria-label="t('ariaLabel.swapUnits')"
+      :style="{ color: selectTextColor, backgroundColor: selectBackgroundColor }"
       @click="handleUnitSwap()"
     >
       <ToolTip :auto-hide="3000" :text="t('tooltipSwap')" />
@@ -203,12 +214,15 @@
       map-options
       behavior="menu"
       class="col-3 q-pl-sm shadow-2"
-      :class="!settingsStore.isDarkMode() ? 'bg-blue-grey-2' : 'bg-blue-grey-6'"
+      :class="`bg-${selectBackgroundColor}`"
       :popup-content-class="
-        [!settingsStore.isDarkMode() ? 'bg-blue-grey-2' : 'bg-blue-grey-6', 'scrollbar-custom', 'q-select-popup'].join(' ')
+        [`bg-${selectBackgroundColor}`, 'scrollbar-custom', 'q-select-popup'].join(' ')
       "
-      :options-selected-class="!settingsStore.isDarkMode() ? 'text-primary' : 'text-grey-1'"
-      :label-color="!settingsStore.isDarkMode() ? 'primary' : 'grey-1'"
+      :options-selected-class="`text-${selectTextColor}`"
+      :label-color="selectTextColor"
+      :color="selectTextColor"
+      :bg-color="selectBackgroundColor"
+      :popup-content-style="{ backgroundColor: selectBackgroundColor, color: selectTextColor }"
     >
       <template #option="scope">
         <q-item v-bind="scope.itemProps">
