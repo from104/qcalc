@@ -488,6 +488,34 @@ export const useSettingsStore = defineStore('settings', {
       return isDark ? currentThemePalette.select[type].dark : currentThemePalette.select[type].light;
     },
 
+    /**
+     * Quasar 색상 이름을 HEX 값으로 변환합니다.
+     * 오류 발생 또는 유효하지 않은 색상 이름인 경우 #000000을 반환합니다.
+     *
+     * @param colorName - 변환할 Quasar 색상 이름
+     * @returns HEX 색상 값 또는 #000000
+     */
+    getQuasarColorToHex(colorName: string): string {
+      if (!colorName || typeof colorName !== 'string') {
+        return '#000000';
+      }
+      try {
+        const hexColor = colors.getPaletteColor(colorName);
+        // getPaletteColor가 유효하지 않은 이름을 받으면 undefined를 반환하거나,
+        // 때로는 입력값을 그대로 반환할 수 있으므로, 반환값이 실제 hex 코드 형식인지 간단히 확인합니다.
+        // 더 정확한 hex 검증이 필요하면 정규식을 사용할 수 있습니다.
+        if (hexColor && typeof hexColor === 'string' && /^#([0-9A-Fa-f]{3}){1,2}$/.test(hexColor)) {
+          return hexColor;
+        } else {
+          console.warn(`Invalid color name or no hex value found for: ${colorName}. Returning #000000.`);
+          return '#000000';
+        }
+      } catch (error) {
+        console.error(`Error converting color name ${colorName} to hex: ${error}. Returning #000000.`);
+        return '#000000';
+      }
+    },
+
     setAlwaysOnTop(isAlwaysOnTop: boolean): void {
       this.alwaysOnTop = isAlwaysOnTop;
       window.electron.setAlwaysOnTop(this.alwaysOnTop);

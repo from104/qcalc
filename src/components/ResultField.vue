@@ -334,8 +334,45 @@
 
   // 메모리 값 계산된 속성
   const memoryValue = computed(() => {
-    const convertedNumber = radixStore.convertIfRadix(calc.memory.getNumber());
-    return calcStore.toFormattedNumber(convertedNumber, radixStore.sourceRadix);
+    if (isMainField) {
+      const convertedNumber = radixStore.convertIfRadix(calc.memory.getNumber());
+      return calcStore.toFormattedNumber(convertedNumber, radixStore.sourceRadix);
+    } else {
+      const rawMemoryNumber = calc.memory.getNumber();
+      if (!rawMemoryNumber) return ''; // 메모리가 비어있으면 빈 문자열 반환
+
+      switch (props.addon) {
+        case 'unit': {
+          const convertedNumber = UnitConverter.convert(
+            unitStore.selectedCategory,
+            toBigNumber(rawMemoryNumber), // 메모리 값을 변환 대상으로 사용
+            unitStore.sourceUnits[unitStore.selectedCategory] ?? '', // 또는 targetUnit에 맞춰야 할 수도 있음
+            unitStore.targetUnits[unitStore.selectedCategory] ?? '',
+          );
+          return calcStore.toFormattedNumber(convertedNumber);
+        }
+        case 'currency': {
+          const convertedNumber = currencyStore.currencyConverter
+            .convert(
+              toBigNumber(rawMemoryNumber), // 메모리 값을 변환 대상으로 사용
+              currencyStore.sourceCurrency, // 또는 targetCurrency에 맞춰야 할 수도 있음
+              currencyStore.targetCurrency,
+            )
+            .toFixed();
+          return calcStore.toFormattedNumber(convertedNumber);
+        }
+        case 'radix': {
+          const convertedNumber = radixStore.convertRadix(
+            radixStore.convertIfRadix(rawMemoryNumber), // 메모리 값을 변환 대상으로 사용
+            radixStore.sourceRadix, // 또는 targetRadix에 맞춰야 할 수도 있음
+            radixStore.targetRadix,
+          );
+          return calcStore.toFormattedNumber(convertedNumber, radixStore.targetRadix);
+        }
+        default:
+          return calcStore.toFormattedNumber(rawMemoryNumber); // 변환 없이 포맷팅만 적용
+      }
+    }
   });
 
   /**
@@ -374,35 +411,23 @@
 
   // 결과 색상 관련 computed 속성 (settingsStore 사용)
   const panelNormalTextColor = computed(() => settingsStore.getPanelColor('text', 'normal'));
+  const panelNormalTextColorAccent = computed(() => settingsStore.getPanelColor('text', 'normal', true));
   const panelWarningTextColor = computed(() => settingsStore.getPanelColor('text', 'warning'));
+  const panelWarningTextColorAccent = computed(() => settingsStore.getPanelColor('text', 'warning', true));
   const panelNormalBackgroundColor = computed(() => settingsStore.getPanelColor('background', 'normal'));
   const panelWarningBackgroundColor = computed(() => settingsStore.getPanelColor('background', 'warning'));
 
   // 결과 색상 선택 함수 (실제 색상 값을 반환하도록 수정)
-  const getResultColor = computed(() => {
-    // isMainField와 calcStore.isMemoryVisible 조건에 따라 일반 텍스트 또는 경고 텍스트 색상 반환
-    // needFieldTooltip 조건은 툴팁 표시 여부이므로, 텍스트 색상 결정에 직접 사용하기보다는
-    // 툴팁이 필요할 때 (텍스트가 넘칠 때) 경고색을 사용한다는 의미로 해석하여 적용합니다.
-    if (needFieldTooltip.value) {
-      return panelWarningTextColor.value; // 텍스트가 넘치면 경고색
-    }
-    // isMemoryVisible은 메인 필드에만 영향을 미치므로, 해당 조건은 여기서 직접 사용하지 않고,
-    // 메모리 값 표시에 대한 색상은 템플릿에서 별도 처리하거나, 이 함수에 파라미터를 추가하여 구분할 수 있습니다.
-    // 현재는 일반적인 경우의 텍스트 색상을 반환합니다.
-    return panelNormalTextColor.value;
+  const panelTextColor = computed(() => {
+    return needFieldTooltip.value ? panelWarningTextColor.value : panelNormalTextColor.value; // 텍스트가 넘치면 경고색
   });
 
   // 메모리 값 표시를 위한 텍스트 색상
-  const memoryDisplayColor = computed(() => {
-    // 메모리 표시 시에는 항상 settingsStore에서 정의한 "dark" 모드의 "normal" 텍스트 색상을 사용하거나,
-    // 혹은 현재 테마의 다크모드 일반 텍스트 색상을 사용합니다.
-    // 여기서는 getPanelColor를 활용하여 현재 테마의 다크모드 일반 텍스트 색상을 가져옵니다.
-    // settingsStore.isDarkMode()를 직접 호출하기보다, getPanelColor가 내부적으로 처리하도록 의존합니다.
-    // getPanelColor의 두 번째 인자가 'normal'일 때 다크모드면 normalDark를 반환합니다.
-    return panelNormalTextColor.value; // isDark가 true면 normalDark가 반환됨
+  const memoryTextColor = computed(() => {
+    return needFieldTooltip.value ? panelWarningTextColorAccent.value : panelNormalTextColorAccent.value;
   });
 
-  const resultFieldBackgroundColor = computed(() => {
+  const panelBackgroundColor = computed(() => {
     return needFieldTooltip.value ? panelWarningBackgroundColor.value : panelNormalBackgroundColor.value;
   });
 
@@ -453,25 +478,25 @@
       }, 200);
     }, 200);
 
-    // // 창이 포커스를 잃었을 때 메뉴를 닫기 위한 이벤트 리스너 등록
-    // window.addEventListener('blur', () => {
-    //   // 결과 패널 메뉴가 열려 있다면 닫음
-    //   if (showPanelMenu.value) {
-    //     showPanelMenu.value = false;
-    //   }
-    // });
+    // 창이 포커스를 잃었을 때 메뉴를 닫기 위한 이벤트 리스너 등록
+    window.addEventListener('blur', () => {
+      // 결과 패널 메뉴가 열려 있다면 닫음
+      if (showPanelMenu.value) {
+        showPanelMenu.value = false;
+      }
+    });
   });
 
   // 컴포넌트 언마운트 시 이벤트 리스너 제거
   onUnmounted(() => {
     // 화면 크기 변경 이벤트 리스너 제거
     window.removeEventListener('resize', () => checkNeedFieldTooltip());
-    // // blur 이벤트 리스너 제거
-    // window.removeEventListener('blur', () => {
-    //   if (showPanelMenu.value) {
-    //     showPanelMenu.value = false;
-    //   }
-    // });
+    // blur 이벤트 리스너 제거
+    window.removeEventListener('blur', () => {
+      if (showPanelMenu.value) {
+        showPanelMenu.value = false;
+      }
+    });
   });
 
   // 결과 복사, 숫자 복사
@@ -681,15 +706,15 @@
       :dark="false"
       role="textbox"
       :aria-label="t('ariaLabel.resultField', { type: isMainField ? t('ariaLabel.main') : t('ariaLabel.sub') })"
-      :bg-color="resultFieldBackgroundColor"
+      :bg-color="panelBackgroundColor"
       :label-slot="isMainField"
       :stack-label="isMainField"
     >
-      <template v-if="isMainField" #label>
+      <template v-if="isMainField && !calcStore.isMemoryVisible" #label>
         <div
           v-auto-blur
           class="noselect"
-          :style="{ color: getResultColor }"
+          :class="[`text-${panelTextColor}`]"
           role="text"
           :aria-label="t('ariaLabel.expression')"
         >
@@ -706,17 +731,17 @@
           @click="calcStore.showMemoryTemporarily()"
         >
           <q-icon
-            :color="memoryDisplayColor"
+            :color="isMainField && calcStore.isMemoryVisible ? memoryTextColor : panelTextColor"
             name="mdi-chip"
             role="img"
             :aria-label="t('ariaLabel.memoryIcon')"
           />
         </div>
         <div
-          v-if="operator != ''"
+          v-if="operator != '' && !calcStore.isMemoryVisible"
           v-auto-blur
           class="noselect full-height q-mt-xs q-pt-sm"
-          :style="{ color: getResultColor }"
+          :class="[`text-${isMainField && calcStore.isMemoryVisible ? memoryTextColor : panelTextColor}`]"
           role="text"
           :aria-label="t('ariaLabel.operator', { operator })"
         >
@@ -734,7 +759,7 @@
           "
           v-mutation.characterData
           class="self-center no-outline full-width full-height ellipsis text-right q-pt-xs noselect"
-          :class="[`text-${getResultColor}`]"
+          :class="[`text-${calcStore.isMemoryVisible ? memoryTextColor : panelTextColor}`]"
           :style="
             isMainField
               ? `padding-top: ${resultPanelPadding}px; padding-bottom: ${Math.floor(resultPanelPadding / 2)}px;`
@@ -763,11 +788,10 @@
           }}</span>
           <span
             :id="isMainField ? 'result' : 'subResult'"
-            :style="{ color: isMainField && calcStore.isMemoryVisible ? memoryDisplayColor : getResultColor }"
             role="text"
             :aria-label="t('ariaLabel.value')"
           >
-            {{ isMainField && calcStore.isMemoryVisible ? memoryValue : result }}
+            {{ calcStore.isMemoryVisible ? memoryValue : result }}
           </span>
           <span v-if="currentTab === 'unit'" id="unit" role="text" :aria-label="t('ariaLabel.unit')">{{ unit }}</span>
           <span
