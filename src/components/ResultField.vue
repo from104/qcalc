@@ -15,6 +15,11 @@
   import { Haptics, ImpactStyle } from 'capacitor/haptics';
   import { copyToClipboard } from 'quasar';
 
+  // Quasar 관련 설정
+  import { colors } from 'quasar';
+  // Quasar 인스턴스 및 색상 유틸리티 초기화
+  const { lighten } = colors;
+
   // i18n 설정
   import { useI18n } from 'vue-i18n';
   const { t } = useI18n();
@@ -693,6 +698,13 @@
   // 결과 패널 패딩 설정
   const resultPanelPadding = computed(() => calcStore.resultPanelPadding);
   // const resultPanelPadding = computed(() => 12);
+
+  // 메뉴 배경색
+  const menuBackgroundColor = computed(() => {
+    return settingsStore.isDarkMode()
+      ? lighten(settingsStore.getCurrentThemeColors.ui.dark, 10)
+      : lighten(settingsStore.getCurrentThemeColors.ui.primary, 90);
+  });
 </script>
 
 <template>
@@ -823,8 +835,10 @@
         <q-list
           dense
           class="noselect q-py-sm"
-          :class="settingsStore.isDarkMode() ? 'bg-grey-9' : 'bg-grey-3'"
           style="max-width: 200px"
+          :style="{
+            backgroundColor: menuBackgroundColor,
+          }"
           role="list"
           :dark="settingsStore.isDarkMode()"
         >

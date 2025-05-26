@@ -13,6 +13,9 @@ import { version } from '../../package.json';
 // 불변 속성 정의 함수
 import { defineImmutableProperty } from 'src/utils/GlobalHelpers';
 
+// 설정 스토어 import
+import { useSettingsStore } from 'src/stores/settingsStore';
+
 // 불변 속성 정의 함수
 // const defineImmutableProperty = <T>(obj: object, prop: string, value: T) => {
 //   Object.defineProperty(obj, prop, {
@@ -63,4 +66,8 @@ export default defineBoot(() => {
 
   // window.globalVars로 전역 변수 설정
   defineImmutableProperty(window, 'globalVars', globalVars);
+
+  // 설정 스토어 초기화 및 테마 설정
+  const settingsStore = useSettingsStore();
+  settingsStore.initializeTheme();
 });

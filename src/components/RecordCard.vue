@@ -393,6 +393,18 @@
   const openRecordMenu = (id: number) => {
     recordMenu[id] = true;
   };
+
+  // Quasar 관련 설정
+  import { colors } from 'quasar';
+  // Quasar 인스턴스 및 색상 유틸리티 초기화
+  const { lighten } = colors;
+
+  // 메뉴 배경색
+  const menuBackgroundColor = computed(() => {
+    return settingsStore.isDarkMode()
+      ? lighten(settingsStore.getCurrentThemeColors.ui.dark, 10)
+      : lighten(settingsStore.getCurrentThemeColors.ui.primary, 90);
+  });
 </script>
 
 <template>
@@ -546,12 +558,18 @@
                         auto-close
                         anchor="bottom left"
                         self="top left"
-                        @update:model-value="(val) => { recordMenu[record.id] = val; }"
+                        @update:model-value="
+                          (val) => {
+                            recordMenu[record.id] = val;
+                          }
+                        "
                       >
-                        <q-list 
+                        <q-list
                           dense
                           class="noselect q-py-sm"
-                          :class="settingsStore.isDarkMode() ? 'bg-grey-9' : 'bg-grey-3'"
+                          :style="{
+                            backgroundColor: menuBackgroundColor,
+                          }"
                           style="max-width: 200px"
                           role="list"
                           :dark="settingsStore.isDarkMode()"
