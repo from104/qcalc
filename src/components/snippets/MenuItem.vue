@@ -45,7 +45,6 @@
     v-close-popup
     clickable
     role="menuitem"
-    :class="settingsStore.isDarkMode() ? 'bg-grey-9' : 'bg-grey-3'"
     :aria-label="title"
     @click="(evt: Event) => action(evt)"
   >

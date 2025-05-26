@@ -443,6 +443,77 @@ export const useSettingsStore = defineStore('settings', {
       if (isDark && 'dark' in themeColors.ui) {
         setCssVar('dark', themeColors.ui.dark);
       }
+
+      // 스크롤바 색상 설정 (ui.primary 기반)
+      this.setScrollbarColors(themeColors.ui.primary, isDark);
+    },
+
+    /**
+     * 스크롤바 색상을 설정합니다.
+     * @param primaryColor - 기본 primary 색상
+     * @param isDarkValue - 다크 모드 활성화 여부
+     */
+    setScrollbarColors(primaryColor: string, isDarkValue: boolean): void {
+      try {
+        // 라이트 모드: primary 색상을 더 밝게 (투명도 적용)
+        // 다크 모드: primary 색상을 약간 밝게 (투명도 적용)
+        const scrollbarThumbColor = isDarkValue
+          ? colors.lighten(primaryColor, 20) // 다크 모드에서는 20% 밝게
+          : colors.lighten(primaryColor, -10); // 라이트 모드에서는 10% 어둡게
+
+        // 투명도를 적용한 스크롤바 색상 (rgba 형태로 변환)
+        const scrollbarThumbColorWithOpacity = this.hexToRgba(scrollbarThumbColor, isDarkValue ? 0.6 : 0.4);
+
+        // 호버 시 더 진한 색상
+        const scrollbarThumbHoverColor = isDarkValue
+          ? colors.lighten(primaryColor, 30)
+          : colors.lighten(primaryColor, -20);
+
+        const scrollbarThumbHoverColorWithOpacity = this.hexToRgba(scrollbarThumbHoverColor, isDarkValue ? 0.8 : 0.6);
+
+        // CSS 변수 설정
+        setCssVar('scrollbar-thumb-color', scrollbarThumbColorWithOpacity);
+        setCssVar('scrollbar-thumb-hover-color', scrollbarThumbHoverColorWithOpacity);
+        setCssVar('scrollbar-track-color', 'transparent');
+      } catch (error) {
+        console.error('스크롤바 색상 설정 중 오류 발생:', error);
+        // 기본값으로 폴백
+        setCssVar('scrollbar-thumb-color', isDarkValue ? 'rgba(159, 159, 159, 0.53)' : 'rgba(0, 0, 0, 0.3)');
+        setCssVar('scrollbar-thumb-hover-color', isDarkValue ? 'rgba(159, 159, 159, 0.7)' : 'rgba(0, 0, 0, 0.5)');
+        setCssVar('scrollbar-track-color', 'transparent');
+      }
+    },
+
+    /**
+     * HEX 색상을 RGBA로 변환합니다.
+     * @param hex - HEX 색상 코드 (#RRGGBB 또는 #RGB)
+     * @param alpha - 투명도 (0-1)
+     * @returns RGBA 색상 문자열
+     */
+    hexToRgba(hex: string, alpha: number): string {
+      try {
+        // # 제거
+        const cleanHex = hex.replace('#', '');
+
+        // 3자리 HEX를 6자리로 확장
+        const fullHex =
+          cleanHex.length === 3
+            ? cleanHex
+                .split('')
+                .map((char) => char + char)
+                .join('')
+            : cleanHex;
+
+        // RGB 값 추출
+        const r = parseInt(fullHex.substring(0, 2), 16);
+        const g = parseInt(fullHex.substring(2, 4), 16);
+        const b = parseInt(fullHex.substring(4, 6), 16);
+
+        return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+      } catch (error) {
+        console.error('HEX to RGBA 변환 중 오류 발생:', error);
+        return `rgba(128, 128, 128, ${alpha})`; // 기본 회색으로 폴백
+      }
     },
 
     /**
@@ -574,6 +645,31 @@ export const useSettingsStore = defineStore('settings', {
 
     toggleAutoUpdate(): void {
       this.setAutoUpdate(!this.autoUpdate);
+    },
+
+    /**
+     * 애플리케이션 초기화 시 테마와 다크모드를 설정합니다.
+     * 이 함수는 앱이 시작될 때 한 번 호출되어야 합니다.
+     */
+    initializeTheme(): void {
+      // 시스템 다크모드 변경 감지 리스너 등록
+      if (typeof window !== 'undefined' && window.matchMedia) {
+        const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+        const handleSystemThemeChange = (): void => {
+          if (this.darkMode === 'system') {
+            this.updateDarkModeAndTheme();
+          }
+        };
+
+        // 초기 설정
+        this.updateDarkModeAndTheme();
+
+        // 시스템 테마 변경 감지
+        mediaQuery.addEventListener('change', handleSystemThemeChange);
+      } else {
+        // 브라우저 환경이 아닌 경우 기본 설정만 적용
+        this.updateDarkModeAndTheme();
+      }
     },
   },
 

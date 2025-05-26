@@ -15,10 +15,8 @@
 
   /* Firefox specific styles */
   scrollbar-width: thin;
-  scrollbar-color: transparent transparent;
-  @media (prefers-color-scheme: dark) {
-    scrollbar-color: rgba(159, 159, 159, 0.53) transparent;
-  }
+  scrollbar-color: var(--q-scrollbar-thumb-color, transparent)
+    var(--q-scrollbar-track-color, transparent);
 
   /* WebKit specific styles */
   &::-webkit-scrollbar {
@@ -28,14 +26,29 @@
   }
 
   &::-webkit-scrollbar-thumb {
-    display: none;
+    background-color: var(--q-scrollbar-thumb-color, transparent);
+    border-radius: 2px;
+    transition: background-color 0.2s ease;
+
+    &:hover {
+      background-color: var(
+        --q-scrollbar-thumb-hover-color,
+        var(--q-scrollbar-thumb-color, transparent)
+      );
+    }
   }
 
   &::-webkit-scrollbar-track {
-    background-color: transparent;
-    @media (prefers-color-scheme: dark) {
+    background-color: var(--q-scrollbar-track-color, transparent);
+  }
+
+  /* 호버 시에만 스크롤바 표시 */
+  &:not(:hover) {
+    &::-webkit-scrollbar-thumb {
       background-color: transparent;
     }
+
+    scrollbar-color: transparent transparent;
   }
 }
 
