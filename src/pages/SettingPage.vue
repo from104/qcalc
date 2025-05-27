@@ -5,7 +5,7 @@
    *              이 페이지는 설정 기능을 수행하는 데 필요한 컴포넌트를 포함합니다.
    *              설정 기능을 수행하는 데 필요한 컴포넌트를 포함합니다.
    */
-  
+
   import SettingCard from 'components/SettingCard.vue';
 </script>
 
@@ -18,7 +18,7 @@
 </template>
 
 <style scoped>
-.full-height {
-  height: 100%;
-}
+  .full-height {
+    height: 100%;
+  }
 </style>

@@ -329,10 +329,7 @@
         behavior="mobile"
         @click="leftDrawerOpen = false"
       >
-        <q-card
-          
-          class="full-height menu-card"
-        >
+        <q-card class="full-height menu-card">
           <MenuPanel />
         </q-card>
       </q-drawer>
@@ -451,10 +448,7 @@
         behavior="mobile"
         @click="leftDrawerOpen = false"
       >
-        <q-card
-          :class="settingsStore.isDarkMode() ? 'bg-grey-9' : 'bg-grey-3'"
-          class="full-height menu-card"
-        >
+        <q-card :class="settingsStore.isDarkMode() ? 'bg-grey-9' : 'bg-grey-3'" class="full-height menu-card">
           <MenuPanel />
         </q-card>
       </q-drawer>
@@ -686,6 +680,10 @@
 
     .sub-header-separator {
       border-right: 3px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .sub-content {
+      background-color: var(--q-dark) !important;
     }
   }
 
