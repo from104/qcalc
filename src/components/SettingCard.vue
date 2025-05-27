@@ -88,6 +88,25 @@
   // settingsStore에서 select 색상을 가져오는 computed 속성
   const selectTextColor = computed(() => settingsStore.getSelectColor('text'));
   const selectBackgroundColor = computed(() => settingsStore.getSelectColor('background'));
+
+  /**
+   * 특정 테마의 primary 컬러를 반환하는 함수입니다.
+   * @param themeKey - 테마 키 (예: 'default', 'forest', 'ocean' 등)
+   * @returns 해당 테마의 primary 컬러 (HEX 형식)
+   */
+  const getThemePrimaryColor = (themeKey: ThemeType): string => {
+    return themes[themeKey]?.ui?.primary || themes.default.ui.primary;
+  };
+
+  /**
+   * 특정 테마의 라벨을 반환하는 함수입니다.
+   * @param themeKey - 테마 키 또는 테마 키 문자열
+   * @returns 해당 테마의 번역된 라벨
+   */
+  const getThemeLabel = (themeKey: ThemeType | string): string => {
+    const key = typeof themeKey === 'string' ? themeKey : themeKey;
+    return t(`themeName.${key}`, key);
+  };
 </script>
 
 <template>
@@ -180,7 +199,32 @@
           :color="selectTextColor"
           :bg-color="selectBackgroundColor"
           @update:model-value="onThemeChange"
-        />
+        >
+          <template #option="scope">
+            <q-item v-bind="scope.itemProps" class="theme-option-item">
+              <q-item-section>
+                <q-item-label>{{ scope.opt.label }}</q-item-label>
+              </q-item-section>
+              <q-item-section side>
+                <div
+                  class="theme-color-square"
+                  :class="{ 'theme-color-square--dark': settingsStore.isDarkMode() }"
+                  :style="{ backgroundColor: getThemePrimaryColor(scope.opt.value) }"
+                />
+              </q-item-section>
+            </q-item>
+          </template>
+          <template #selected-item="scope">
+            <div class="selected-theme-item">
+              <span>{{ scope.opt.label || getThemeLabel(scope.opt) }}</span>
+              <div
+                class="theme-color-square q-ml-sm"
+                :class="{ 'theme-color-square--dark': settingsStore.isDarkMode() }"
+                :style="{ backgroundColor: getThemePrimaryColor(scope.opt.value || scope.opt) }"
+              />
+            </div>
+          </template>
+        </q-select>
       </q-item>
 
       <q-separator spaced="md" role="separator" />
@@ -395,6 +439,33 @@
       min-height: $height !important;
       height: auto !important;
       padding-left: $left !important;
+    }
+  }
+
+  // 테마 컬러 사각형 스타일
+  .theme-color-square {
+    width: 16px;
+    height: 16px;
+    border-radius: 2px;
+    border: 1px solid rgba(0, 0, 0, 0.3); // 라이트 모드: 검은색 테두리
+    flex-shrink: 0;
+
+    // 다크 모드: 흰색 테두리
+    &--dark {
+      border-color: rgba(255, 255, 255, 0.5);
+    }
+  }
+
+  // 선택된 테마 아이템 스타일
+  .selected-theme-item {
+    display: flex;
+    align-items: center;
+  }
+
+  // 테마 옵션 아이템 스타일
+  .theme-option-item {
+    .q-item__section--side {
+      padding-left: 8px;
     }
   }
 </style>
