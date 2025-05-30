@@ -29,8 +29,9 @@
   import { useUnitStore } from 'src/stores/unitStore';
   import { useRadixStore } from 'src/stores/radixStore';
   import { useCurrencyStore } from 'src/stores/currencyStore';
-  import { useSettingsStore } from 'src/stores/settingsStore';
+  import { useSettingsStore } from 'stores/settingsStore';
   import { useUIStore } from 'src/stores/uiStore';
+  import { useThemesStore } from 'stores/themesStore';
 
   // 계산기 관련 타입과 클래스
   import { UnitConverter } from 'src/classes/UnitConverter';
@@ -47,6 +48,7 @@
   const radixStore = useRadixStore();
   const currencyStore = useCurrencyStore();
   const settingsStore = useSettingsStore();
+  const themesStore = useThemesStore();
   const uiStore = useUIStore();
 
   // 컴포넌트 import
@@ -414,13 +416,13 @@
     return '';
   });
 
-  // 결과 색상 관련 computed 속성 (settingsStore 사용)
-  const panelNormalTextColor = computed(() => settingsStore.getPanelColor('text', 'normal'));
-  const panelNormalTextColorAccent = computed(() => settingsStore.getPanelColor('text', 'normal', true));
-  const panelWarningTextColor = computed(() => settingsStore.getPanelColor('text', 'warning'));
-  const panelWarningTextColorAccent = computed(() => settingsStore.getPanelColor('text', 'warning', true));
-  const panelNormalBackgroundColor = computed(() => settingsStore.getPanelColor('background', 'normal'));
-  const panelWarningBackgroundColor = computed(() => settingsStore.getPanelColor('background', 'warning'));
+  // 결과 색상 관련 computed 속성 (themesStore 사용)
+  const panelNormalTextColor = computed(() => themesStore.getPanelColor('text', 'normal'));
+  const panelNormalTextColorAccent = computed(() => themesStore.getPanelColor('text', 'normal', true));
+  const panelWarningTextColor = computed(() => themesStore.getPanelColor('text', 'warning'));
+  const panelWarningTextColorAccent = computed(() => themesStore.getPanelColor('text', 'warning', true));
+  const panelNormalBackgroundColor = computed(() => themesStore.getPanelColor('background', 'normal'));
+  const panelWarningBackgroundColor = computed(() => themesStore.getPanelColor('background', 'warning'));
 
   // 결과 색상 선택 함수 (실제 색상 값을 반환하도록 수정)
   const panelTextColor = computed(() => {
@@ -701,9 +703,9 @@
 
   // 메뉴 배경색
   const menuBackgroundColor = computed(() => {
-    return settingsStore.isDarkMode()
-      ? lighten(settingsStore.getCurrentThemeColors.ui.dark, 10)
-      : lighten(settingsStore.getCurrentThemeColors.ui.primary, 90);
+    return themesStore.isDarkMode()
+      ? lighten(themesStore.getCurrentThemeColors.ui.dark, 10)
+      : lighten(themesStore.getCurrentThemeColors.ui.primary, 90);
   });
 </script>
 
@@ -798,11 +800,7 @@
           <span v-if="currentTab === 'currency'" id="symbol" role="text" :aria-label="t('ariaLabel.currencySymbol')">{{
             symbol
           }}</span>
-          <span
-            :id="isMainField ? 'result' : 'subResult'"
-            role="text"
-            :aria-label="t('ariaLabel.value')"
-          >
+          <span :id="isMainField ? 'result' : 'subResult'" role="text" :aria-label="t('ariaLabel.value')">
             {{ calcStore.isMemoryVisible ? memoryValue : result }}
           </span>
           <span v-if="currentTab === 'unit'" id="unit" role="text" :aria-label="t('ariaLabel.unit')">{{ unit }}</span>
@@ -840,7 +838,7 @@
             backgroundColor: menuBackgroundColor,
           }"
           role="list"
-          :dark="settingsStore.isDarkMode()"
+          :dark="themesStore.isDarkMode()"
         >
           <MenuItem :title="t('copyDisplayedResult')" :action="() => handleCopy()" :caption="displayedResult" />
           <MenuItem :title="t('copyOnlyNumber')" :action="() => handleCopy('number')" :caption="onlyNumber" />

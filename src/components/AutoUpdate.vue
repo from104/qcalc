@@ -6,7 +6,7 @@
    *              사용자에게 업데이트 진행 상황을 알리며 필요한 경우 재시작을 안내합니다.
    *              또한 개발 환경에서는 업데이트 테스트 기능을 제공합니다.
    */
-  
+
   import { ref, onMounted, onUnmounted } from 'vue';
   import { useI18n } from 'vue-i18n';
 
@@ -16,8 +16,10 @@
   const $g = window.globalVars;
 
   import { useSettingsStore } from 'stores/settingsStore';
+  import { useThemesStore } from 'stores/themesStore';
 
   const settingsStore = useSettingsStore();
+  const themesStore = useThemesStore();
 
   // i18n 설정
   const { t } = useI18n();
@@ -216,14 +218,14 @@
               flat
               :label="t('later')"
               color="primary"
-              :text-color="settingsStore.isDarkMode() ? 'blue-grey-2' : 'primary'"
+              :text-color="themesStore.isDarkMode() ? 'blue-grey-2' : 'primary'"
               class="q-mr-sm"
             />
             <q-btn
               flat
               :label="t('update')"
               color="primary"
-              :text-color="settingsStore.isDarkMode() ? 'blue-grey-2' : 'primary'"
+              :text-color="themesStore.isDarkMode() ? 'blue-grey-2' : 'primary'"
               @click="startUpdate"
             />
           </template>
@@ -233,14 +235,14 @@
               flat
               :label="t('later')"
               color="primary"
-              :text-color="settingsStore.isDarkMode() ? 'blue-grey-2' : 'primary'"
+              :text-color="themesStore.isDarkMode() ? 'blue-grey-2' : 'primary'"
               class="q-mr-sm"
             />
             <q-btn
               flat
               :label="t('installNow')"
               color="primary"
-              :text-color="settingsStore.isDarkMode() ? 'blue-grey-2' : 'primary'"
+              :text-color="themesStore.isDarkMode() ? 'blue-grey-2' : 'primary'"
               @click="installUpdate"
             />
           </template>
@@ -250,7 +252,7 @@
               flat
               :label="t('close')"
               color="primary"
-              :text-color="settingsStore.isDarkMode() ? 'blue-grey-2' : 'primary'"
+              :text-color="themesStore.isDarkMode() ? 'blue-grey-2' : 'primary'"
             />
           </template>
         </q-card-actions>

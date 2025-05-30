@@ -19,11 +19,13 @@
   const $g = window.globalVars;
 
   import { useSettingsStore } from 'stores/settingsStore';
+  import { useThemesStore } from 'stores/themesStore';
   import { useCalcStore } from 'src/stores/calcStore';
   import { useUIStore } from 'stores/uiStore';
   import { useRadixStore } from 'stores/radixStore';
 
   const settingsStore = useSettingsStore();
+  const themesStore = useThemesStore();
   const uiStore = useUIStore();
   const calcStore = useCalcStore();
   const radixStore = useRadixStore();
@@ -89,10 +91,10 @@
     displayButtonNotification(id);
   };
 
-  // settingsStore에서 버튼 색상을 가져오는 computed 속성
-  const importantButtonColor = computed(() => settingsStore.getButtonColor('important'));
-  const functionButtonColor = computed(() => settingsStore.getButtonColor('function'));
-  const normalButtonColor = computed(() => settingsStore.getButtonColor('normal'));
+  // themesStore에서 버튼 색상을 가져오는 computed 속성
+  const importantButtonColor = computed(() => themesStore.getButtonColor('important'));
+  const functionButtonColor = computed(() => themesStore.getButtonColor('function'));
+  const normalButtonColor = computed(() => themesStore.getButtonColor('normal'));
 
   const shiftButtonPressedColor = computed(() => lighten(importantButtonColor.value ?? '', -30));
 
@@ -461,7 +463,7 @@
           :model-value="tooltipTimers[id] ?? false"
           no-parent-event
           class="noselect"
-          :style="`background: ${settingsStore.getButtonColor(button.color as 'normal' | 'important' | 'function')}; border: 2px outset ${settingsStore.getButtonColor(button.color as 'normal' | 'important' | 'function')}; border-radius: 10px;`"
+          :style="`background: ${themesStore.getButtonColor(button.color as 'normal' | 'important' | 'function')}; border: 2px outset ${themesStore.getButtonColor(button.color as 'normal' | 'important' | 'function')}; border-radius: 10px;`"
           anchor="top middle"
           self="center middle"
           transition-show="jump-up"

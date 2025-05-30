@@ -25,14 +25,15 @@
   // === 스토어 임포트 및 설정 ===
   import { useUIStore } from 'stores/uiStore';
   import { useSettingsStore } from 'stores/settingsStore';
+  import { useThemesStore } from './stores/themesStore';
 
   const uiStore = useUIStore();
   const settingsStore = useSettingsStore();
+  const themesStore = useThemesStore();
 
   // === 전역 객체 및 상태 저장소 설정 ===
   const $g = window.globalVars;
-  
-  
+
   const route = useRoute();
   const { t } = useI18n();
 
@@ -56,9 +57,9 @@
    * 다크모드를 토글하고 현재 설정 상태를 사용자에게 알립니다.
    */
   const toggleDarkModeWithNotification = () => {
-    settingsStore.toggleDarkMode();
+    themesStore.toggleDarkMode();
     showMessage(
-      settingsStore.darkMode === 'system' ? t('darkMode.message.system') : t('darkMode.message.' + settingsStore.darkMode),
+      themesStore.darkMode === 'system' ? t('darkMode.message.system') : t('darkMode.message.' + themesStore.darkMode),
     );
   };
 
@@ -161,7 +162,7 @@
         orientation: 'portrait',
       });
     }
-    settingsStore.updateDarkModeAndTheme();
+    themesStore.updateDarkModeAndTheme();
   });
 
   onUnmounted(async () => {

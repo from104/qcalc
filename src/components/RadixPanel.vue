@@ -24,10 +24,12 @@
   import { useSettingsStore } from 'stores/settingsStore';
   import { useRadixStore } from 'stores/radixStore';
   import { useCalcStore } from 'src/stores/calcStore';
+  import { useThemesStore } from 'stores/themesStore';
 
   // 스토어 인스턴스 생성
   const uiStore = useUIStore();
   const settingsStore = useSettingsStore();
+  const themesStore = useThemesStore();
   const radixStore = useRadixStore();
   const calcStore = useCalcStore();
 
@@ -131,9 +133,9 @@
     calcStore.calc.needsBufferReset = true;
   };
 
-  // settingsStore에서 select 색상을 가져오는 computed 속성
-  const selectTextColor = computed(() => settingsStore.getSelectColor('text'));
-  const selectBackgroundColor = computed(() => settingsStore.getSelectColor('background'));
+  // themesStore에서 select 색상을 가져오는 computed 속성
+  const selectTextColor = computed(() => themesStore.getSelectColor('text', themesStore.isDarkMode()));
+  const selectBackgroundColor = computed(() => themesStore.getSelectColor('background', themesStore.isDarkMode()));
 </script>
 
 <template>

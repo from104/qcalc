@@ -21,11 +21,13 @@
   import { useCurrencyStore } from 'stores/currencyStore';
   import { useSettingsStore } from 'stores/settingsStore';
   import { useCalcStore } from 'src/stores/calcStore';
+  import { useThemesStore } from 'stores/themesStore';
 
   // 스토어 인스턴스 생성
   const uiStore = useUIStore();
   const currencyStore = useCurrencyStore();
   const settingsStore = useSettingsStore();
+  const themesStore = useThemesStore();
   const calcStore = useCalcStore();
 
   // 계산기 관련 타입과 클래스
@@ -183,10 +185,9 @@
     }
   };
 
-  // settingsStore에서 select 색상을 가져오는 computed 속성
-  const selectTextColor = computed(() => settingsStore.getSelectColor('text'));
-  const selectBackgroundColor = computed(() => settingsStore.getSelectColor('background'));
-
+  // themesStore에서 select 색상을 가져오는 computed 속성
+  const selectTextColor = computed(() => themesStore.getSelectColor('text', themesStore.isDarkMode()));
+  const selectBackgroundColor = computed(() => themesStore.getSelectColor('background', themesStore.isDarkMode()));
 </script>
 
 <template>
@@ -215,12 +216,9 @@
       :class="`bg-${selectBackgroundColor}`"
       :label-color="selectTextColor"
       :popup-content-class="
-        [
-          `bg-${selectBackgroundColor}`,
-          'scrollbar-custom',
-          'q-select-popup',
-          $g.isMobile ? 'popup-mobile' : '',
-        ].join(' ')
+        [`bg-${selectBackgroundColor}`, 'scrollbar-custom', 'q-select-popup', $g.isMobile ? 'popup-mobile' : ''].join(
+          ' ',
+        )
       "
       :options-selected-class="`text-${selectTextColor}`"
       @filter="sourceFilterFn"
@@ -282,12 +280,9 @@
       :class="`bg-${selectBackgroundColor}`"
       :label-color="selectTextColor"
       :popup-content-class="
-        [
-          `bg-${selectBackgroundColor}`,
-          'scrollbar-custom',
-          'q-select-popup',
-          $g.isMobile ? 'popup-mobile' : '',
-        ].join(' ')
+        [`bg-${selectBackgroundColor}`, 'scrollbar-custom', 'q-select-popup', $g.isMobile ? 'popup-mobile' : ''].join(
+          ' ',
+        )
       "
       :options-selected-class="`text-${selectTextColor}`"
       @filter="targetFilterFn"

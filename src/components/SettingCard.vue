@@ -20,7 +20,7 @@
   import { useUnitStore } from 'stores/unitStore';
   import { useRadixStore } from 'stores/radixStore';
   import { useCurrencyStore } from 'stores/currencyStore';
-  import { themes } from 'stores/settingsStore';
+  import { useThemesStore, themes, type ThemeType } from 'stores/themesStore';
 
   // 스토어 인스턴스 생성
   const uiStore = useUIStore();
@@ -28,6 +28,7 @@
   const unitStore = useUnitStore();
   const radixStore = useRadixStore();
   const currencyStore = useCurrencyStore();
+  const themesStore = useThemesStore();
 
   // i18n 설정
   import { useI18n } from 'vue-i18n';
@@ -81,14 +82,13 @@
    * 테마가 변경될 때 호출되는 함수입니다.
    * @param themeName - 선택된 테마 이름
    */
-  import type { ThemeType } from 'stores/settingsStore';
   const onThemeChange = (themeName: ThemeType) => {
-    settingsStore.setTheme(themeName);
+    themesStore.setTheme(themeName);
   };
 
-  // settingsStore에서 select 색상을 가져오는 computed 속성
-  const selectTextColor = computed(() => settingsStore.getSelectColor('text'));
-  const selectBackgroundColor = computed(() => settingsStore.getSelectColor('background'));
+  // themesStore에서 select 색상을 가져오는 computed 속성
+  const selectTextColor = computed(() => themesStore.getSelectColor('text', themesStore.isDarkMode()));
+  const selectBackgroundColor = computed(() => themesStore.getSelectColor('background', themesStore.isDarkMode()));
 
   /**
    * 특정 테마의 primary 컬러를 반환하는 함수입니다.
@@ -110,7 +110,7 @@
   };
 
   const primaryAccentColor = computed(() => {
-    return settingsStore.isDarkMode() ? 'accent' : 'primary';
+    return themesStore.isDarkMode() ? 'accent' : 'primary';
   });
 </script>
 
@@ -167,7 +167,7 @@
         <q-item-label class="self-center" role="text">{{ t('darkMode.title') }} (Alt-D)</q-item-label>
         <q-space />
         <q-select
-          v-model="settingsStore.darkMode"
+          v-model="themesStore.darkMode"
           :options="[
             { label: t('darkMode.light'), value: 'light' },
             { label: t('darkMode.dark'), value: 'dark' },
@@ -185,7 +185,7 @@
           :class="`bg-${selectBackgroundColor}`"
           :color="selectTextColor"
           :bg-color="selectBackgroundColor"
-          @update:model-value="settingsStore.setDarkMode"
+          @update:model-value="themesStore.setDarkMode"
         />
       </q-item>
 
@@ -194,7 +194,7 @@
         <q-item-label class="self-center" role="text">{{ t('colorTheme') }}</q-item-label>
         <q-space />
         <q-select
-          v-model="settingsStore.currentTheme"
+          v-model="themesStore.currentTheme"
           :options="themeOptions"
           dense
           options-dense
@@ -216,7 +216,7 @@
               <q-item-section side>
                 <div
                   class="theme-color-square"
-                  :class="{ 'theme-color-square--dark': settingsStore.isDarkMode() }"
+                  :class="{ 'theme-color-square--dark': themesStore.isDarkMode() }"
                   :style="{ backgroundColor: getThemePrimaryColor(scope.opt.value) }"
                 />
               </q-item-section>
@@ -227,7 +227,7 @@
               <span>{{ scope.opt.label || getThemeLabel(scope.opt) }}</span>
               <div
                 class="theme-color-square q-ml-sm"
-                :class="{ 'theme-color-square--dark': settingsStore.isDarkMode() }"
+                :class="{ 'theme-color-square--dark': themesStore.isDarkMode() }"
                 :style="{ backgroundColor: getThemePrimaryColor(scope.opt.value || scope.opt) }"
               />
             </div>
@@ -255,12 +255,7 @@
       <q-item class="q-mb-xs">
         <q-item-label class="self-center" role="text">{{ t('useGrouping') }} (,)</q-item-label>
         <q-space />
-        <q-toggle
-          v-model="settingsStore.useGrouping"
-          keep-color
-          :color="primaryAccentColor"
-          dense
-        />
+        <q-toggle v-model="settingsStore.useGrouping" keep-color :color="primaryAccentColor" dense />
       </q-item>
 
       <!-- 숫자 묶음 단위 -->
@@ -325,12 +320,7 @@
         <q-item class="q-mb-sm">
           <q-item-label class="self-center" role="text"> {{ t('showUnit') }} (Alt-\) </q-item-label>
           <q-space />
-          <q-toggle
-            v-model="unitStore.showUnit"
-            keep-color
-            :color="primaryAccentColor"
-            dense
-          />
+          <q-toggle v-model="unitStore.showUnit" keep-color :color="primaryAccentColor" dense />
         </q-item>
       </template>
 
@@ -385,7 +375,13 @@
       <q-item class="q-mb-sm">
         <q-item-label class="self-center" role="text">{{ t('useSystemLocale') }}</q-item-label>
         <q-space />
-        <q-toggle v-model="settingsStore.useSystemLocale" keep-color :color="primaryAccentColor" dense @click="setLanguage()" />
+        <q-toggle
+          v-model="settingsStore.useSystemLocale"
+          keep-color
+          :color="primaryAccentColor"
+          dense
+          @click="setLanguage()"
+        />
       </q-item>
 
       <!-- 언어 -->
