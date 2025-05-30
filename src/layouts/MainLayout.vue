@@ -424,7 +424,7 @@
 
         <!-- 서브 화면 컨텐츠 -->
         <template v-else>
-          <div class="col-12">
+          <div class="col-12 sub-content">
             <q-scroll-area class="sub-scroll-area" :class="{ 'hide-scrollbar': currentSubPage === 'record' }">
               <component
                 :is="SUB_PAGE_CONFIG[currentSubPage as keyof typeof SUB_PAGE_CONFIG]?.component"
