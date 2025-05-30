@@ -11,11 +11,7 @@ import type { CurrencyConverter } from '../classes/CurrencyConverter';
 import type { Radix } from '../classes/RadixConverter';
 import type { DefineStore } from 'pinia';
 import type { CalculationResult } from './calculator';
-
-/**
- * 다크모드 설정 타입
- */
-export type DarkModeType = 'system' | 'light' | 'dark';
+import type { DarkModeType } from '../constants/ThemesData';
 
 /**
  * 계산기 버튼 색상/종류 타입
