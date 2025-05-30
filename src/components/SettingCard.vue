@@ -20,7 +20,8 @@
   import { useUnitStore } from 'stores/unitStore';
   import { useRadixStore } from 'stores/radixStore';
   import { useCurrencyStore } from 'stores/currencyStore';
-  import { useThemesStore, themes, type ThemeType } from 'stores/themesStore';
+  import { useThemesStore } from 'stores/themesStore';
+  import { themes, type ThemeType } from 'src/constants/ThemesData';
 
   // 스토어 인스턴스 생성
   const uiStore = useUIStore();
