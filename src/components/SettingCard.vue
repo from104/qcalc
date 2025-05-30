@@ -28,6 +28,7 @@
   const unitStore = useUnitStore();
   const radixStore = useRadixStore();
   const currencyStore = useCurrencyStore();
+
   // i18n 설정
   import { useI18n } from 'vue-i18n';
   const { locale } = useI18n({ useScope: 'global' });
@@ -107,6 +108,10 @@
     const key = typeof themeKey === 'string' ? themeKey : themeKey;
     return t(`themeName.${key}`, key);
   };
+
+  const primaryAccentColor = computed(() => {
+    return settingsStore.isDarkMode() ? 'accent' : 'primary';
+  });
 </script>
 
 <template>
@@ -119,6 +124,7 @@
         <q-toggle
           v-model="settingsStore.alwaysOnTop"
           keep-color
+          :color="primaryAccentColor"
           dense
           role="switch"
           :aria-label="t('ariaLabel.alwaysOnTop')"
@@ -133,6 +139,7 @@
         <q-toggle
           v-model="settingsStore.initPanel"
           keep-color
+          :color="primaryAccentColor"
           dense
           role="switch"
           :aria-label="t('ariaLabel.initPanel')"
@@ -147,6 +154,7 @@
         <q-toggle
           v-model="settingsStore.hapticsMode"
           keep-color
+          :color="primaryAccentColor"
           dense
           role="switch"
           :aria-label="t('ariaLabel.hapticsMode')"
@@ -236,6 +244,7 @@
         <q-toggle
           v-model="settingsStore.showButtonAddedLabel"
           keep-color
+          :color="primaryAccentColor"
           dense
           role="switch"
           :aria-label="t('ariaLabel.showButtonAddedLabel')"
@@ -246,7 +255,12 @@
       <q-item class="q-mb-xs">
         <q-item-label class="self-center" role="text">{{ t('useGrouping') }} (,)</q-item-label>
         <q-space />
-        <q-toggle v-model="settingsStore.useGrouping" keep-color dense />
+        <q-toggle
+          v-model="settingsStore.useGrouping"
+          keep-color
+          :color="primaryAccentColor"
+          dense
+        />
       </q-item>
 
       <!-- 숫자 묶음 단위 -->
@@ -260,6 +274,7 @@
           :step="1"
           :disable="!settingsStore.useGrouping"
           dense
+          :color="primaryAccentColor"
           class="col-2 q-pr-sm q-pt-xs"
           marker-labels
         />
@@ -283,6 +298,7 @@
           :max="5"
           :step="1"
           :marker-labels="Object.keys(DECIMAL_PLACES)"
+          :color="primaryAccentColor"
           class="col-5 q-pr-sm"
           dense
           @update:model-value="(value) => settingsStore.setDecimalPlaces(Number(value))"
@@ -309,7 +325,12 @@
         <q-item class="q-mb-sm">
           <q-item-label class="self-center" role="text"> {{ t('showUnit') }} (Alt-\) </q-item-label>
           <q-space />
-          <q-toggle v-model="unitStore.showUnit" keep-color dense />
+          <q-toggle
+            v-model="unitStore.showUnit"
+            keep-color
+            :color="primaryAccentColor"
+            dense
+          />
         </q-item>
       </template>
 
@@ -320,7 +341,7 @@
         <q-item class="q-mb-sm">
           <q-item-label class="self-center" role="text"> {{ t('showSymbol') }} (Alt-\) </q-item-label>
           <q-space />
-          <q-toggle v-model="currencyStore.showSymbol" keep-color dense />
+          <q-toggle v-model="currencyStore.showSymbol" keep-color :color="primaryAccentColor" dense />
         </q-item>
       </template>
 
@@ -331,7 +352,7 @@
         <q-item class="q-mb-sm">
           <q-item-label class="self-center" role="text"> {{ t('showRadix') }} (Alt-\) </q-item-label>
           <q-space />
-          <q-toggle v-model="radixStore.showRadix" keep-color dense />
+          <q-toggle v-model="radixStore.showRadix" keep-color :color="primaryAccentColor" dense />
         </q-item>
 
         <!-- 진법 형식 -->
@@ -364,7 +385,7 @@
       <q-item class="q-mb-sm">
         <q-item-label class="self-center" role="text">{{ t('useSystemLocale') }}</q-item-label>
         <q-space />
-        <q-toggle v-model="settingsStore.useSystemLocale" keep-color dense @click="setLanguage()" />
+        <q-toggle v-model="settingsStore.useSystemLocale" keep-color :color="primaryAccentColor" dense @click="setLanguage()" />
       </q-item>
 
       <!-- 언어 -->
@@ -404,6 +425,7 @@
         <q-toggle
           v-model="settingsStore.autoUpdate"
           keep-color
+          :color="primaryAccentColor"
           dense
           role="switch"
           :aria-label="t('ariaLabel.autoUpdate')"

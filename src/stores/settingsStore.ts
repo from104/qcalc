@@ -61,7 +61,7 @@ export const themes: Record<ThemeType, ThemeColors> = {
     ui: {
       primary: '#16743f', // 기존 primary-light
       secondary: '#4abf89', // 기존 secondary-light
-      accent: '#3fce97', // 기존 accent-light
+      accent: '#3fce97', // primary를 30% 밝게: #16743f -> #3fce97
       positive: '#1d8fb6', // 기존 positive-light
       negative: '#c71818', // 기존 negative-light
       info: '#34a9e0', // 기존 info-light
@@ -100,7 +100,7 @@ export const themes: Record<ThemeType, ThemeColors> = {
     ui: {
       primary: '#355e3b',
       secondary: '#6b8e23',
-      accent: '#b7c59c',
+      accent: '#5a8a62', // primary를 30% 밝게: #355e3b -> #5a8a62
       positive: '#4e944f',
       negative: '#a0522d',
       info: '#7fb77e',
@@ -139,7 +139,7 @@ export const themes: Record<ThemeType, ThemeColors> = {
     ui: {
       primary: '#176087',
       secondary: '#4ecdc4',
-      accent: '#f7fff7',
+      accent: '#3d8bb5', // primary를 30% 밝게: #176087 -> #3d8bb5
       positive: '#1ca9c9',
       negative: '#ff6b6b',
       info: '#34a9e0',
@@ -178,7 +178,7 @@ export const themes: Record<ThemeType, ThemeColors> = {
     ui: {
       primary: '#A0522D',
       secondary: '#ffb562',
-      accent: '#ffe156',
+      accent: '#d07a54', // primary를 30% 밝게: #A0522D -> #d07a54
       positive: '#ff7f51',
       negative: '#a72608',
       info: '#fca311',
@@ -217,7 +217,7 @@ export const themes: Record<ThemeType, ThemeColors> = {
     ui: {
       primary: '#6a1b9a',
       secondary: '#ab47bc',
-      accent: '#ce93d8',
+      accent: '#9548c8', // primary를 30% 밝게: #6a1b9a -> #9548c8
       positive: '#4caf50',
       negative: '#f44336',
       info: '#2196f3',
@@ -256,7 +256,7 @@ export const themes: Record<ThemeType, ThemeColors> = {
     ui: {
       primary: '#546e7a',
       secondary: '#78909c',
-      accent: '#b0bec5',
+      accent: '#7a95a3', // primary를 30% 밝게: #546e7a -> #7a95a3
       positive: '#4caf50',
       negative: '#f44336',
       info: '#2196f3',
@@ -295,7 +295,7 @@ export const themes: Record<ThemeType, ThemeColors> = {
     ui: {
       primary: '#a52a2a',
       secondary: '#ffff00',
-      accent: '#00ffff',
+      accent: '#d55555', // primary를 30% 밝게: #a52a2a -> #d55555
       positive: '#00ff00',
       negative: '#ff0000',
       info: '#0000ff',

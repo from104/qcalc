@@ -100,7 +100,7 @@ $warning   : var(--q-warning, #d1a527);
 // }
 
 // 주석 처리 또는 삭제: 기존 Light/Dark theme colors 정의
-// $primary-light: #16743f;
+// $primary-light: var(--q-primary-light, #3da269);
 // ... (기존 light 색상 변수들)
 
 // 주석 처리 또는 삭제: Dark theme color adjustments
