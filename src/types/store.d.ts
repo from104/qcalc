@@ -114,27 +114,11 @@ export interface UIState {
   isSnapFirstRun: boolean;
 }
 
-// 추가: 테마 타입 및 색상 인터페이스 (settingsStore.ts와 동일하게)
-export type ThemeType = 'default' | 'forest' | 'ocean' | 'sunset';
-
-export interface ThemeColors {
-  primary: string;
-  secondary: string;
-  accent: string;
-  positive: string;
-  negative: string;
-  info: string;
-  warning: string;
-  dark: string;
-}
-
 /**
  * 설정 스토어 상태 인터페이스
  */
 export interface SettingsState {
-  darkMode: DarkModeType;
-  currentTheme: ThemeType; // 추가
-  lwaysOnTop: boolean;
+  alwaysOnTop: boolean;
   initPanel: boolean;
   showButtonAddedLabel: boolean;
   hapticsMode: boolean;
@@ -216,10 +200,6 @@ export interface UIActions {
  * 설정 스토어 액션 인터페이스
  */
 export interface SettingsActions {
-  setDarkMode(mode: DarkModeType): void;
-  updateDarkMode(): void;
-  toggleDarkMode(): void;
-  isDarkMode(): boolean;
   setAlwaysOnTop(isAlwaysOnTop: boolean): void;
   toggleAlwaysOnTop(): void;
   setInitPanel(isInitPanel: boolean): void;
@@ -234,8 +214,6 @@ export interface SettingsActions {
   decrementDecimalPlaces(): void;
   setAutoUpdate(value: boolean): void;
   toggleAutoUpdate(): void;
-  setTheme(themeName: ThemeType): void; // 추가
-  updateDarkModeAndTheme(): void; // 추가
 }
 
 /**
@@ -251,7 +229,6 @@ export type SettingsStore = DefineStore<
   SettingsState,
   {
     getDecimalPlaces: (state: SettingsState) => number;
-    getCurrentThemeColors: (state: SettingsState) => ThemeColors;
   },
   SettingsActions
->; // Getter 추가
+>;

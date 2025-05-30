@@ -20,11 +20,13 @@
 
   // 스토어 import
   import { useSettingsStore } from 'stores/settingsStore';
+  import { useThemesStore } from 'stores/themesStore';
   import { useUnitStore } from 'stores/unitStore';
   import { useCalcStore } from 'src/stores/calcStore';
 
   // 스토어 인스턴스 생성
   const settingsStore = useSettingsStore();
+  const themesStore = useThemesStore();
   const unitStore = useUnitStore();
   const calcStore = useCalcStore();
 
@@ -108,9 +110,9 @@
     }
   };
 
-  // settingsStore에서 select 색상을 가져오는 computed 속성
-  const selectTextColor = computed(() => settingsStore.getSelectColor('text'));
-  const selectBackgroundColor = computed(() => settingsStore.getSelectColor('background'));
+  // themesStore에서 select 색상을 가져오는 computed 속성
+  const selectTextColor = computed(() => themesStore.getSelectColor('text', themesStore.isDarkMode()));
+  const selectBackgroundColor = computed(() => themesStore.getSelectColor('background', themesStore.isDarkMode()));
 </script>
 
 <template>
@@ -131,9 +133,7 @@
       class="col-3 q-pl-sm shadow-2 text-black"
       :class="`bg-${selectBackgroundColor}`"
       :label-color="selectTextColor"
-      :popup-content-class="
-        [`bg-${selectBackgroundColor}`, 'scrollbar-custom', 'q-select-popup'].join(' ')
-      "
+      :popup-content-class="[`bg-${selectBackgroundColor}`, 'scrollbar-custom', 'q-select-popup'].join(' ')"
       :options-selected-class="`text-${selectTextColor}`"
       :color="selectTextColor"
       :bg-color="selectBackgroundColor"
@@ -158,9 +158,7 @@
       behavior="menu"
       class="col-3 q-pl-sm shadow-2"
       :class="`bg-${selectBackgroundColor}`"
-      :popup-content-class="
-        [`bg-${selectBackgroundColor}`, 'scrollbar-custom', 'q-select-popup'].join(' ')
-      "
+      :popup-content-class="[`bg-${selectBackgroundColor}`, 'scrollbar-custom', 'q-select-popup'].join(' ')"
       :options-selected-class="`text-${selectTextColor}`"
       :label-color="selectTextColor"
       :color="selectTextColor"
@@ -215,9 +213,7 @@
       behavior="menu"
       class="col-3 q-pl-sm shadow-2"
       :class="`bg-${selectBackgroundColor}`"
-      :popup-content-class="
-        [`bg-${selectBackgroundColor}`, 'scrollbar-custom', 'q-select-popup'].join(' ')
-      "
+      :popup-content-class="[`bg-${selectBackgroundColor}`, 'scrollbar-custom', 'q-select-popup'].join(' ')"
       :options-selected-class="`text-${selectTextColor}`"
       :label-color="selectTextColor"
       :color="selectTextColor"

@@ -45,10 +45,12 @@
   import { useCalcStore } from 'src/stores/calcStore';
   import { useUIStore } from 'stores/uiStore';
   import { useSettingsStore } from 'stores/settingsStore';
+  import { useThemesStore } from 'stores/themesStore';
 
   const calcStore = useCalcStore();
   const uiStore = useUIStore();
   const settingsStore = useSettingsStore();
+  const themesStore = useThemesStore();
 
   // === 전역 변수 설정 ===
   /**
@@ -270,11 +272,11 @@
     // 다크모드 설정
     const darkModeMediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
     darkModeMediaQuery.addEventListener('change', () => {
-      if (settingsStore.darkMode === 'system') {
-        settingsStore.updateDarkMode();
+      if (themesStore.darkMode === 'system') {
+        themesStore.updateDarkMode();
       }
     });
-    settingsStore.updateDarkMode();
+    themesStore.updateDarkMode();
 
     // 팁 다이얼로그 초기화
     uiStore.showTipsDialog = uiStore.showTips && !uiStore.isAppStarted;
@@ -324,12 +326,12 @@
         show-if-above
         elevated
         :width="250"
-        :dark="settingsStore.isDarkMode()"
+        :dark="themesStore.isDarkMode()"
         :swipe-only="$g.isMobile"
         behavior="mobile"
         @click="leftDrawerOpen = false"
       >
-        <q-card class="full-height menu-card">
+        <q-card :class="themesStore.isDarkMode() ? 'bg-grey-9' : 'bg-grey-3'" class="full-height menu-card">
           <MenuPanel />
         </q-card>
       </q-drawer>
@@ -443,12 +445,12 @@
         show-if-above
         elevated
         :width="250"
-        :dark="settingsStore.isDarkMode()"
+        :dark="themesStore.isDarkMode()"
         :swipe-only="$g.isMobile"
         behavior="mobile"
         @click="leftDrawerOpen = false"
       >
-        <q-card :class="settingsStore.isDarkMode() ? 'bg-grey-9' : 'bg-grey-3'" class="full-height menu-card">
+        <q-card :class="themesStore.isDarkMode() ? 'bg-grey-9' : 'bg-grey-3'" class="full-height menu-card">
           <MenuPanel />
         </q-card>
       </q-drawer>

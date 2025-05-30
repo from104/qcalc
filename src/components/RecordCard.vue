@@ -38,6 +38,7 @@
   // 스토어 import
   import { useUIStore } from 'stores/uiStore';
   import { useSettingsStore } from 'stores/settingsStore';
+  import { useThemesStore } from 'stores/themesStore';
   import { useCalcStore } from 'src/stores/calcStore';
   import { useCurrencyStore } from 'stores/currencyStore';
   import { useUnitStore } from 'stores/unitStore';
@@ -45,6 +46,7 @@
   // 스토어 인스턴스 생성
   const uiStore = useUIStore();
   const settingsStore = useSettingsStore();
+  const themesStore = useThemesStore();
   const calcStore = useCalcStore();
   const currencyStore = useCurrencyStore();
   const unitStore = useUnitStore();
@@ -401,9 +403,9 @@
 
   // 메뉴 배경색
   const menuBackgroundColor = computed(() => {
-    return settingsStore.isDarkMode()
-      ? lighten(settingsStore.getCurrentThemeColors.ui.dark, 10)
-      : lighten(settingsStore.getCurrentThemeColors.ui.primary, 90);
+    return themesStore.isDarkMode()
+      ? lighten(themesStore.getCurrentThemeColors.ui.dark, 10)
+      : lighten(themesStore.getCurrentThemeColors.ui.primary, 90);
   });
 </script>
 
@@ -544,7 +546,7 @@
                   <div class="col-6 text-left record-menu-btn">
                     <q-btn
                       class="q-px-xs q-py-none menu-btn"
-                      :class="settingsStore.darkMode ? 'body--dark' : 'body--light'"
+                      :class="themesStore.darkMode ? 'body--dark' : 'body--light'"
                       icon="more_vert"
                       size="sm"
                       flat
@@ -572,7 +574,7 @@
                           }"
                           style="max-width: 200px"
                           role="list"
-                          :dark="settingsStore.isDarkMode()"
+                          :dark="themesStore.isDarkMode()"
                         >
                           <MenuItem
                             v-if="record.memo"
@@ -618,7 +620,7 @@
                     <q-btn
                       v-if="$g.isDesktop"
                       class="q-px-xs menu-btn"
-                      :class="settingsStore.darkMode ? 'body--dark' : 'body--light'"
+                      :class="themesStore.darkMode ? 'body--dark' : 'body--light'"
                       icon="edit_note"
                       size="sm"
                       flat
@@ -629,7 +631,7 @@
                   <div class="col-6 text-right text-caption record-timestamp">
                     <HighlightText
                       class="self-center"
-                      :class="settingsStore.darkMode ? 'body--dark' : 'body--light'"
+                      :class="themesStore.darkMode ? 'body--dark' : 'body--light'"
                       :text="formatDateTime(record.timestamp)"
                       :search-term="uiStore.searchKeyword"
                     />
