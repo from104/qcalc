@@ -341,7 +341,7 @@
         <q-toolbar v-if="!isSubPage" v-auto-blur>
           <q-btn flat dense round class="q-mr-sm" icon="menu" aria-label="Menu" @click="toggleLeftDrawer">
             <ToolTip
-              :text-color="themesStore.getCurrentThemeColors.ui.primary"
+              :text-color="themesStore.getCurrentThemeColors.ui.dark"
               :bg-color="themesStore.getCurrentThemeColors.ui.warning"
               :text="t('tooltip.menu')"
             />
@@ -371,7 +371,7 @@
             @click="router.push('/record')"
           >
             <ToolTip
-              :text-color="themesStore.getCurrentThemeColors.ui.primary"
+              :text-color="themesStore.getCurrentThemeColors.ui.dark"
               :bg-color="themesStore.getCurrentThemeColors.ui.warning"
               :text="t('openRecordPage')"
             />
@@ -385,7 +385,7 @@
             @click="navigateToPath('/settings', route, router)"
           >
             <ToolTip
-              :text-color="themesStore.getCurrentThemeColors.ui.primary"
+              :text-color="themesStore.getCurrentThemeColors.ui.dark"
               :bg-color="themesStore.getCurrentThemeColors.ui.warning"
               :text="t('tooltip.settings')"
             />
@@ -407,7 +407,7 @@
             {{ SUB_PAGE_CONFIG[currentSubPage as keyof typeof SUB_PAGE_CONFIG]?.title }}
             <HelpIcon
               v-if="currentSubPage === 'record' && $g.isMobile"
-              :text-color="themesStore.getCurrentThemeColors.ui.primary"
+              :text-color="themesStore.getCurrentThemeColors.ui.dark"
               :bg-color="themesStore.getCurrentThemeColors.ui.warning"
               :text="t('tooltip.recordSwipeHelp')"
             />
@@ -427,7 +427,7 @@
             @click="button.action"
           >
             <ToolTip
-              :text-color="themesStore.getCurrentThemeColors.ui.primary"
+              :text-color="themesStore.getCurrentThemeColors.ui.dark"
               :bg-color="themesStore.getCurrentThemeColors.ui.warning"
               :text="button.tooltip as unknown as string"
             />
@@ -481,7 +481,7 @@
         <q-toolbar v-auto-blur class="col-6 calc-header">
           <q-btn flat dense round class="q-mr-sm" icon="menu" aria-label="Menu" @click="toggleLeftDrawer">
             <ToolTip
-              :text-color="themesStore.getCurrentThemeColors.ui.primary"
+              :text-color="themesStore.getCurrentThemeColors.ui.dark"
               :bg-color="themesStore.getCurrentThemeColors.ui.warning"
               :text="t('tooltip.menu')"
             />
@@ -526,7 +526,7 @@
                 {{ SUB_PAGE_CONFIG[currentSubPage]?.title }}
                 <HelpIcon
                   v-if="(currentSubPage === 'record' || currentSubPage === '') && $g.isMobile"
-                  :text-color="themesStore.getCurrentThemeColors.ui.primary"
+                  :text-color="themesStore.getCurrentThemeColors.ui.dark"
                   :bg-color="themesStore.getCurrentThemeColors.ui.warning"
                   :text="t('tooltip.recordSwipeHelp')"
                 />
@@ -544,7 +544,7 @@
                   @click="navigateToPath(button.path, route, router)"
                 >
                   <ToolTip
-                    :text-color="themesStore.getCurrentThemeColors.ui.primary"
+                    :text-color="themesStore.getCurrentThemeColors.ui.dark"
                     :bg-color="themesStore.getCurrentThemeColors.ui.warning"
                     :text="button.tooltip"
                   />
@@ -563,7 +563,7 @@
                   @click="button.action"
                 >
                   <ToolTip
-                    :text-color="themesStore.getCurrentThemeColors.ui.primary"
+                    :text-color="themesStore.getCurrentThemeColors.ui.dark"
                     :bg-color="themesStore.getCurrentThemeColors.ui.warning"
                     :text="button.tooltip as unknown as string"
                   />

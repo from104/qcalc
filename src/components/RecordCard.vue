@@ -527,7 +527,7 @@
                   />
                   <ToolTip
                     v-if="isShowMemoTooltip[record.id]"
-                    :text-color="themesStore.getCurrentThemeColors.ui.primary"
+                    :text-color="themesStore.getCurrentThemeColors.ui.dark"
                     :bg-color="themesStore.getCurrentThemeColors.ui.warning"
                     :delay="1000"
                     :text="record.memo"
@@ -542,7 +542,7 @@
                   />
                   <ToolTip
                     v-if="isShowResultTooltip[record.id]"
-                    :text-color="themesStore.getCurrentThemeColors.ui.primary"
+                    :text-color="themesStore.getCurrentThemeColors.ui.dark"
                     :bg-color="themesStore.getCurrentThemeColors.ui.warning"
                     :delay="1000"
                     :text="record.displayText"

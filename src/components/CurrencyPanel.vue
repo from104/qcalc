@@ -236,7 +236,7 @@
         </q-item>
       </template>
       <ToolTip
-        :text-color="themesStore.getCurrentThemeColors.ui.primary"
+        :text-color="themesStore.getCurrentThemeColors.ui.dark"
         :bg-color="themesStore.getCurrentThemeColors.ui.warning"
         :text="`${currencyDescriptions[currencyStore.sourceCurrency]}\n${currencyStore.sourceCurrency}`"
       />
@@ -256,8 +256,8 @@
       :aria-label="t('ariaLabel.swapCurrencies')"
       @click="handleCurrencySwap()"
     >
-      <ToolTip 
-        :text-color="themesStore.getCurrentThemeColors.ui.primary"
+      <ToolTip
+        :text-color="themesStore.getCurrentThemeColors.ui.dark"
         :bg-color="themesStore.getCurrentThemeColors.ui.warning"
         :auto-hide="3000"
         :text="t('tooltipSwap')"
@@ -306,8 +306,8 @@
           </q-item-section>
         </q-item>
       </template>
-      <ToolTip 
-        :text-color="themesStore.getCurrentThemeColors.ui.primary" 
+      <ToolTip
+        :text-color="themesStore.getCurrentThemeColors.ui.dark"
         :bg-color="themesStore.getCurrentThemeColors.ui.warning"
       >
         <div class="text-left" style="white-space: pre-wrap">

@@ -70,10 +70,18 @@ export const useCalcStore = defineStore('calc', {
     },
 
     showMemoryTemporarily(): void {
-      this.isMemoryVisible = true;
-      setTimeout(() => {
-        this.isMemoryVisible = false;
-      }, 2000);
+      let timer: NodeJS.Timeout | null = null;
+      if (this.isMemoryVisible) {
+        this.hideMemory();
+        if (timer) {
+          clearTimeout(timer);
+        }
+      } else {
+        this.isMemoryVisible = true;
+        timer = setTimeout(() => {
+          this.isMemoryVisible = false;
+        }, 3000);
+      }
     },
 
     onNeedButtonNotification(): void {

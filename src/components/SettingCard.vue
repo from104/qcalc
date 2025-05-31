@@ -279,7 +279,7 @@
       <!-- 소수점 자리수 -->
       <q-item class="q-mb-xs">
         <ToolTip
-          :text-color="themesStore.getCurrentThemeColors.ui.primary"
+          :text-color="themesStore.getCurrentThemeColors.ui.dark"
           :bg-color="themesStore.getCurrentThemeColors.ui.warning"
         >
           {{ t('decimalPlacesStat') }}:
@@ -420,7 +420,7 @@
         <q-item-label class="self-center" role="text">
           {{ t('autoUpdate') }}
           <HelpIcon
-            :text-color="themesStore.getCurrentThemeColors.ui.primary"
+            :text-color="themesStore.getCurrentThemeColors.ui.dark"
             :bg-color="themesStore.getCurrentThemeColors.ui.warning"
             :text="t('autoUpdateHelp')"
           />
