@@ -267,16 +267,36 @@
       : '';
   });
 
-  const displayedResult = computed(() => {
-    // 진법 접두사, 기호, 결과값, 단위를 순서대로 연결
-    const baseString = `${radixPrefix.value}${symbol.value}${result.value}${unit.value}`;
+  /**
+   * 표시될 결과 문자열을 생성하는 헬퍼 함수
+   * @param value - 표시할 값 (result 또는 memoryValue)
+   * @returns 포맷된 결과 문자열
+   * @description
+   * - 진법 접두사, 통화 기호, 값, 단위를 순서대로 연결
+   * - 진법 접미사 조건에 따라 접미사 추가
+   */
+  const formatDisplayResult = (value: string): string => {
+    // 기본 문자열 구성: 접두사 + 기호 + 값 + 단위
+    const baseString = `${radixPrefix.value}${symbol.value}${value}${unit.value}`;
 
-    // 진법 접미사 조건 확인
+    // 진법 접미사 표시 조건 확인
     const shouldShowSuffix = currentTab.value === 'radix' && radixStore.showRadix && radixStore.radixType === 'suffix';
 
-    // 진법 접미사 추가 여부에 따라 최종 문자열 반환
+    // 접미사 추가 여부에 따라 최종 문자열 반환
     return shouldShowSuffix ? `${baseString}(${radixSuffix.value})` : baseString;
-  });
+  };
+
+  /**
+   * 일반 결과값을 포함한 표시 문자열
+   * @returns 포맷된 결과 문자열
+   */
+  const displayedResult = computed(() => formatDisplayResult(result.value));
+
+  /**
+   * 메모리 값을 포함한 표시 문자열
+   * @returns 포맷된 메모리 결과 문자열
+   */
+  const displayedResultWithMemory = computed(() => formatDisplayResult(memoryValue.value));
 
   // 진법 모드에서 접두사/접미사를 포함한 결과 문자열 생성
   const getRadixResult = (number: string, isOnly = false) => {
@@ -814,9 +834,9 @@
           </span>
           <ToolTip
             v-if="needFieldTooltip"
-            :text-color="themesStore.getCurrentThemeColors.ui.primary"
+            :text-color="themesStore.getCurrentThemeColors.ui.dark"
             :bg-color="themesStore.getCurrentThemeColors.ui.warning"
-            :text="displayedResult"
+            :text="calcStore.isMemoryVisible ? displayedResultWithMemory : displayedResult"
           />
         </div>
       </template>

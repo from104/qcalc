@@ -207,8 +207,8 @@
       :style="{ color: selectTextColor, backgroundColor: selectBackgroundColor }"
       @click="handleRadixSwap"
     >
-      <ToolTip 
-        :text-color="themesStore.getCurrentThemeColors.ui.primary"
+      <ToolTip
+        :text-color="themesStore.getCurrentThemeColors.ui.dark"
         :bg-color="themesStore.getCurrentThemeColors.ui.warning"
         :auto-hide="3000"
         :text="t('tooltipSwap')"
