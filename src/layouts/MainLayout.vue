@@ -337,10 +337,14 @@
       </q-drawer>
 
       <q-header id="header" class="z-top noselect" elevated>
-        <!-- 메인 화면 헤더 -->
+        <!-- 좁은 화면 메인 헤더 -->
         <q-toolbar v-if="!isSubPage" v-auto-blur>
           <q-btn flat dense round class="q-mr-sm" icon="menu" aria-label="Menu" @click="toggleLeftDrawer">
-            <ToolTip :text="t('tooltip.menu')" />
+            <ToolTip
+              :text-color="themesStore.getCurrentThemeColors.ui.primary"
+              :bg-color="themesStore.getCurrentThemeColors.ui.warning"
+              :text="t('tooltip.menu')"
+            />
           </q-btn>
           <q-tabs
             v-model="uiStore.currentTab"
@@ -366,7 +370,11 @@
             :aria-label="t('ariaLabel.record')"
             @click="router.push('/record')"
           >
-            <ToolTip :text="t('openRecordPage')" />
+            <ToolTip
+              :text-color="themesStore.getCurrentThemeColors.ui.primary"
+              :bg-color="themesStore.getCurrentThemeColors.ui.warning"
+              :text="t('openRecordPage')"
+            />
           </q-btn>
           <q-btn
             v-if="!isWideWidth()"
@@ -376,11 +384,15 @@
             :aria-label="t('ariaLabel.settings')"
             @click="navigateToPath('/settings', route, router)"
           >
-            <ToolTip :text="t('tooltip.settings')" />
+            <ToolTip
+              :text-color="themesStore.getCurrentThemeColors.ui.primary"
+              :bg-color="themesStore.getCurrentThemeColors.ui.warning"
+              :text="t('tooltip.settings')"
+            />
           </q-btn>
         </q-toolbar>
 
-        <!-- 서브 화면 헤더 -->
+        <!-- 좁은 화면 서브 헤더 -->
         <q-toolbar v-else v-auto-blur class="q-px-sm">
           <q-btn
             flat
@@ -393,7 +405,12 @@
           />
           <q-toolbar-title class="text-subtitle1">
             {{ SUB_PAGE_CONFIG[currentSubPage as keyof typeof SUB_PAGE_CONFIG]?.title }}
-            <HelpIcon v-if="currentSubPage === 'record' && $g.isMobile" :text="t('tooltip.recordSwipeHelp')" />
+            <HelpIcon
+              v-if="currentSubPage === 'record' && $g.isMobile"
+              :text-color="themesStore.getCurrentThemeColors.ui.primary"
+              :bg-color="themesStore.getCurrentThemeColors.ui.warning"
+              :text="t('tooltip.recordSwipeHelp')"
+            />
           </q-toolbar-title>
           <q-space />
           <q-btn
@@ -409,7 +426,11 @@
             :disable="button.disabled as unknown as boolean"
             @click="button.action"
           >
-            <ToolTip :text="button.tooltip as unknown as string" />
+            <ToolTip
+              :text-color="themesStore.getCurrentThemeColors.ui.primary"
+              :bg-color="themesStore.getCurrentThemeColors.ui.warning"
+              :text="button.tooltip as unknown as string"
+            />
           </q-btn>
         </q-toolbar>
       </q-header>
@@ -456,10 +477,14 @@
       </q-drawer>
 
       <q-header id="header" class="z-top noselect row" elevated>
-        <!-- 계산기 영역 헤더 -->
+        <!-- 넓은 화면 계산기 영역 헤더 -->
         <q-toolbar v-auto-blur class="col-6 calc-header">
           <q-btn flat dense round class="q-mr-sm" icon="menu" aria-label="Menu" @click="toggleLeftDrawer">
-            <ToolTip :text="t('tooltip.menu')" />
+            <ToolTip
+              :text-color="themesStore.getCurrentThemeColors.ui.primary"
+              :bg-color="themesStore.getCurrentThemeColors.ui.warning"
+              :text="t('tooltip.menu')"
+            />
           </q-btn>
           <q-tabs
             v-model="uiStore.currentTab"
@@ -489,7 +514,7 @@
           </q-tabs>
         </q-toolbar>
 
-        <!-- 서브화면 영역 헤더 -->
+        <!-- 넓은 화면 서브 헤더 -->
         <q-toolbar v-auto-blur class="col-6 sub-header">
           <transition name="animate-sub-page">
             <div :key="currentSubPage" :data-page="currentSubPage" class="header-content full-width row items-center">
@@ -501,6 +526,8 @@
                 {{ SUB_PAGE_CONFIG[currentSubPage]?.title }}
                 <HelpIcon
                   v-if="(currentSubPage === 'record' || currentSubPage === '') && $g.isMobile"
+                  :text-color="themesStore.getCurrentThemeColors.ui.primary"
+                  :bg-color="themesStore.getCurrentThemeColors.ui.warning"
                   :text="t('tooltip.recordSwipeHelp')"
                 />
               </q-toolbar-title>
@@ -516,9 +543,12 @@
                   :aria-label="t('ariaLabel.subPageButton', { label: t(`message.${button.label}`) })"
                   @click="navigateToPath(button.path, route, router)"
                 >
-                  <ToolTip :text="button.tooltip" />
+                  <ToolTip
+                    :text-color="themesStore.getCurrentThemeColors.ui.primary"
+                    :bg-color="themesStore.getCurrentThemeColors.ui.warning"
+                    :text="button.tooltip"
+                  />
                 </q-btn>
-                <!-- <HelpIcon v-if="currentSubPage === 'record' && window.isMobile" :text="t('tooltip.recordSwipeHelp')" /> -->
                 <q-separator vertical class="sub-header-separator q-mx-sm" />
                 <q-btn
                   v-for="button in SUB_PAGE_CONFIG[currentSubPage]?.buttons"
@@ -532,7 +562,11 @@
                   :disable="button.disabled as unknown as boolean"
                   @click="button.action"
                 >
-                  <ToolTip :text="button.tooltip as unknown as string" />
+                  <ToolTip
+                    :text-color="themesStore.getCurrentThemeColors.ui.primary"
+                    :bg-color="themesStore.getCurrentThemeColors.ui.warning"
+                    :text="button.tooltip as unknown as string"
+                  />
                 </q-btn>
                 <q-btn
                   v-if="SUB_PAGE_CONFIG[currentSubPage]?.showClose"
@@ -552,7 +586,7 @@
       </q-header>
 
       <q-page-container class="row" style="padding-bottom: 0px">
-        <!-- 계산기 영역 -->
+        <!-- 넓은 화면 계산기 영역 -->
         <div class="col-6 calc-content" role="region" :aria-label="t('ariaLabel.calculatorSection')">
           <q-tab-panels
             v-model="uiStore.currentTab"
@@ -576,7 +610,7 @@
           </q-tab-panels>
         </div>
 
-        <!-- 서브화면 영역 -->
+        <!-- 넓은 화면 서브 영역 -->
         <div
           class="col-6 relative-position sub-content"
           role="complementary"

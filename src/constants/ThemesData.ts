@@ -54,19 +54,19 @@ export interface ThemeColors {
 export const themes: Record<ThemeType, ThemeColors> = {
   default: {
     ui: {
-      primary: '#16743f', // 기존 primary-light
-      secondary: '#4abf89', // 기존 secondary-light
-      accent: '#3fce97', // primary를 30% 밝게: #16743f -> #3fce97
-      positive: '#1d8fb6', // 기존 positive-light
-      negative: '#c71818', // 기존 negative-light
-      info: '#34a9e0', // 기존 info-light
-      warning: '#d1a527', // 기존 warning-light
-      dark: '#1d1d1d', // 기존 dark
+      primary: '#16743f', // #16743f
+      secondary: '#04b060', // #04b060
+      accent: '#3fce97', // #3fce97
+      positive: '#1d8fb6', // #1d8fb6
+      negative: '#c71818', // #c71818
+      info: '#34a9e0', // #34a9e0
+      warning: '#d1a527', // #d1a527
+      dark: '#1d1d1d', // #1d1d1d
     },
     button: {
-      important: '#cb9247',
-      function: '#1d8fb6',
-      normal: '#5e9e7d',
+      important: '#cb9247', // #cb9247
+      function: '#1d8fb6', // #1d8fb6
+      normal: '#5e9e7d', // #5e9e7d
     },
     panel: {
       text: {

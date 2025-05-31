@@ -235,11 +235,11 @@
           </q-item-section>
         </q-item>
       </template>
-      <ToolTip>
-        <div class="text-left" style="white-space: pre-wrap">
-          {{ `${currencyDescriptions[currencyStore.sourceCurrency]}\n${currencyStore.sourceCurrency}` }}
-        </div>
-      </ToolTip>
+      <ToolTip
+        :text-color="themesStore.getCurrentThemeColors.ui.primary"
+        :bg-color="themesStore.getCurrentThemeColors.ui.warning"
+        :text="`${currencyDescriptions[currencyStore.sourceCurrency]}\n${currencyStore.sourceCurrency}`"
+      />
     </q-select>
 
     <!-- 원본, 대상 통화 바꾸기 버튼 -->
@@ -256,7 +256,12 @@
       :aria-label="t('ariaLabel.swapCurrencies')"
       @click="handleCurrencySwap()"
     >
-      <ToolTip :auto-hide="3000" :text="t('tooltipSwap')" />
+      <ToolTip 
+        :text-color="themesStore.getCurrentThemeColors.ui.primary"
+        :bg-color="themesStore.getCurrentThemeColors.ui.warning"
+        :auto-hide="3000"
+        :text="t('tooltipSwap')"
+      />
     </q-btn>
 
     <!-- 대상 통화 -->
@@ -301,7 +306,10 @@
           </q-item-section>
         </q-item>
       </template>
-      <ToolTip>
+      <ToolTip 
+        :text-color="themesStore.getCurrentThemeColors.ui.primary" 
+        :bg-color="themesStore.getCurrentThemeColors.ui.warning"
+      >
         <div class="text-left" style="white-space: pre-wrap">
           {{
             `${currencyDescriptions[currencyStore.targetCurrency]}\n${currencyStore.targetCurrency}, ${currencyStore.currencyConverter.getRate(currencyStore.targetCurrency).toFixed(4)}`

@@ -812,9 +812,12 @@
           >
             {{ radixSuffix }}
           </span>
-          <ToolTip v-if="needFieldTooltip">
-            {{ displayedResult }}
-          </ToolTip>
+          <ToolTip
+            v-if="needFieldTooltip"
+            :text-color="themesStore.getCurrentThemeColors.ui.primary"
+            :bg-color="themesStore.getCurrentThemeColors.ui.warning"
+            :text="displayedResult"
+          />
         </div>
       </template>
       <q-menu

@@ -207,7 +207,12 @@
       :style="{ color: selectTextColor, backgroundColor: selectBackgroundColor }"
       @click="handleRadixSwap"
     >
-      <ToolTip :auto-hide="3000" :text="t('tooltipSwap')" />
+      <ToolTip 
+        :text-color="themesStore.getCurrentThemeColors.ui.primary"
+        :bg-color="themesStore.getCurrentThemeColors.ui.warning"
+        :auto-hide="3000"
+        :text="t('tooltipSwap')"
+      />
     </q-btn>
 
     <!-- 대상 진법 -->
