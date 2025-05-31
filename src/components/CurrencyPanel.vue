@@ -67,6 +67,11 @@
     currencyStore.currencyConverter.getAvailableItems().forEach((currency: string) => {
       currencyDescriptions[currency] = t(`currencyDesc.${currency}`);
     });
+
+    // 통화 옵션 목록도 업데이트
+    const newOptions = getSortedCurrencyOptions();
+    sourceCurrencyOptions.splice(0, sourceCurrencyOptions.length, ...newOptions);
+    targetCurrencyOptions.splice(0, targetCurrencyOptions.length, ...newOptions);
   });
 
   // 입력 포커스에 따른 키 바인딩 활성화/비활성화
@@ -112,32 +117,43 @@
     value: string;
     label: string;
     desc: string;
+    isFavorite: boolean;
     disable?: boolean;
   };
-
-  const currencyList = currencyStore.currencyConverter.getAvailableItems();
 
   // 통화 옵션 초기화
   /**
    * 통화 옵션을 생성하는 유틸리티 함수
    * @param currency - 통화 코드
-   * @param isSource - 출발 통화 여부
    * @returns 통화 옵션 객체
    */
   const createCurrencyOption = (currency: string) => ({
     value: currency,
     label: currency,
     desc: currencyDescriptions[currency] ?? '',
+    isFavorite: currencyStore.isFavorite(currency),
   });
 
+  // 정렬된 통화 목록 가져오기 (즐겨찾기가 상단에 위치)
+  const getSortedCurrencyOptions = (): CurrencyOptions[] => {
+    return currencyStore.getSortedCurrencies().map((currency: string) => createCurrencyOption(currency));
+  };
+
   // 출발 통화 옵션 목록
-  const sourceCurrencyOptions = reactive<CurrencyOptions[]>(
-    currencyList.map((currency: string) => createCurrencyOption(currency)),
-  );
+  const sourceCurrencyOptions = reactive<CurrencyOptions[]>(getSortedCurrencyOptions());
 
   // 도착 통화 옵션 목록
-  const targetCurrencyOptions = reactive<CurrencyOptions[]>(
-    currencyList.map((currency: string) => createCurrencyOption(currency)),
+  const targetCurrencyOptions = reactive<CurrencyOptions[]>(getSortedCurrencyOptions());
+
+  // 즐겨찾기 상태 변경 시 옵션 목록 업데이트
+  watch(
+    () => currencyStore.favoriteCurrencies,
+    () => {
+      const newOptions = getSortedCurrencyOptions();
+      sourceCurrencyOptions.splice(0, sourceCurrencyOptions.length, ...newOptions);
+      targetCurrencyOptions.splice(0, targetCurrencyOptions.length, ...newOptions);
+    },
+    { deep: true },
   );
 
   // 통화 옵션 업데이트
@@ -145,6 +161,17 @@
     () => currencyStore.sourceCurrency,
     () => currencyStore.currencyConverter.setBase(currencyStore.sourceCurrency),
   );
+
+  /**
+   * 즐겨찾기 토글 핸들러
+   * @param currency - 토글할 통화 코드
+   * @param event - 클릭 이벤트 (이벤트 전파 방지용)
+   */
+  const handleFavoriteToggle = (currency: string, event: Event) => {
+    event.stopPropagation();
+    event.preventDefault();
+    currencyStore.toggleFavorite(currency);
+  };
 
   // 통화 선택 필터 함수 생성
   const createFilterFn = (options: Ref<CurrencyOptions[]>, reactiveOptions: CurrencyOptions[]) => {
@@ -229,6 +256,19 @@
     >
       <template #option="scope">
         <q-item v-bind="scope.itemProps">
+          <q-item-section side>
+            <q-btn
+              :icon="scope.opt.isFavorite ? 'star' : 'star_border'"
+              flat
+              round
+              dense
+              size="md"
+              :color="scope.opt.isFavorite ? 'amber' : 'grey'"
+              :aria-label="scope.opt.isFavorite ? t('ariaLabel.removeFromFavorites') : t('ariaLabel.addToFavorites')"
+              class="q-pa-xs q-ma-none"
+              @click="handleFavoriteToggle(scope.opt.value, $event)"
+            />
+          </q-item-section>
           <q-item-section>
             <q-item-label caption>{{ currencyDescriptions[scope.opt.label] }}</q-item-label>
             <q-item-label>{{ scope.opt.label }}</q-item-label>
@@ -298,6 +338,19 @@
     >
       <template #option="scope">
         <q-item v-bind="scope.itemProps">
+          <q-item-section side>
+            <q-btn
+              :icon="scope.opt.isFavorite ? 'star' : 'star_border'"
+              flat
+              round
+              dense
+              size="md"
+              :color="scope.opt.isFavorite ? 'amber' : 'grey'"
+              :aria-label="scope.opt.isFavorite ? t('ariaLabel.removeFromFavorites') : t('ariaLabel.addToFavorites')"
+              class="q-pa-xs q-ma-none"
+              @click="handleFavoriteToggle(scope.opt.value, $event)"
+            />
+          </q-item-section>
           <q-item-section>
             <q-item-label caption>{{ currencyDescriptions[scope.opt.label] }}</q-item-label>
             <q-item-label>
