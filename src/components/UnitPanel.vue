@@ -36,23 +36,104 @@
   // 단위 초기화
   unitStore.initRecentUnits();
 
+  // 단위 옵션 타입 정의
+  type UnitOption = {
+    value: string;
+    label: string;
+    desc: string;
+    isFavorite: boolean;
+    disable?: boolean;
+  };
+
+  // 카테고리 옵션 타입 정의
+  type CategoryOption = {
+    value: string;
+    label: string;
+    isFavorite: boolean;
+  };
+
+  // 사용 가능한 단위 목록을 computed로 관리
+  const availableUnits = computed(() => UnitConverter.getUnitLists(unitStore.selectedCategory));
+
+  // 단위 옵션 초기화
+  /**
+   * 단위 옵션을 생성하는 유틸리티 함수
+   * @param unit - 단위 문자열
+   * @returns 단위 옵션 객체
+   */
+  const createUnitOption = (unit: string): UnitOption => ({
+    value: unit,
+    label: unit,
+    desc: UnitConverter.getUnitDesc(unitStore.selectedCategory, unit),
+    isFavorite: unitStore.isFavoriteUnit(unitStore.selectedCategory, unit),
+  });
+
+  // 카테고리 옵션을 생성하는 유틸리티 함수
+  const createCategoryOption = (category: string): CategoryOption => ({
+    value: category,
+    label: t(`categories.${category}`),
+    isFavorite: unitStore.isFavoriteCategory(category),
+  });
+
+  // 정렬된 카테고리 목록 가져오기 (즐겨찾기가 상단에 위치)
+  const getSortedCategoryOptions = (): CategoryOption[] => {
+    return unitStore.getSortedCategories().map((category: string) => createCategoryOption(category));
+  };
+
+  // 정렬된 단위 목록 가져오기 (즐겨찾기가 상단에 위치)
+  const getSortedUnitOptions = (): UnitOption[] => {
+    return unitStore.getSortedUnits(unitStore.selectedCategory).map((unit: string) => createUnitOption(unit));
+  };
+
   // 범주 이름을 현재 언어에 맞게 초기화
-  const categoryList = reactive(
-    UnitConverter.getCategories().map((category) => ({
-      value: category,
-      label: t(`categories.${category}`),
-    })),
+  const categoryList = reactive<CategoryOption[]>(getSortedCategoryOptions());
+
+  // 출발 단위 옵션 목록을 computed로 관리
+  const sourceUnitOptions = computed(() => getSortedUnitOptions());
+
+  // 도착 단위 옵션 목록을 computed로 관리
+  const targetUnitOptions = computed(() => getSortedUnitOptions());
+
+  // 즐겨찾기 상태 변경 시 옵션 목록 업데이트
+  watch(
+    () => [unitStore.favoriteCategories, unitStore.favoriteUnits],
+    () => {
+      const newCategoryOptions = getSortedCategoryOptions();
+      categoryList.splice(0, categoryList.length, ...newCategoryOptions);
+    },
+    { deep: true },
   );
 
   // 언어 변경 시 범주 이름 업데이트
   watch(
     () => settingsStore.locale,
     () => {
-      categoryList.forEach((category) => {
-        category.label = t(`categories.${category.value}`);
-      });
+      const newCategoryOptions = getSortedCategoryOptions();
+      categoryList.splice(0, categoryList.length, ...newCategoryOptions);
     },
   );
+
+  /**
+   * 카테고리 즐겨찾기 토글 핸들러
+   * @param category - 토글할 카테고리
+   * @param event - 클릭 이벤트 (이벤트 전파 방지용)
+   */
+  const handleCategoryFavoriteToggle = (category: string, event: Event) => {
+    event.stopPropagation();
+    event.preventDefault();
+    unitStore.toggleFavoriteCategory(category);
+  };
+
+  /**
+   * 단위 즐겨찾기 토글 핸들러
+   * @param unit - 토글할 단위
+   * @param event - 클릭 이벤트 (이벤트 전파 방지용)
+   */
+  const handleUnitFavoriteToggle = (unit: string, event: Event) => {
+    event.stopPropagation();
+    event.preventDefault();
+    unitStore.toggleFavoriteUnit(unitStore.selectedCategory, unit);
+  };
 
   // 키 바인딩 설정
   const keyBindingManager = new KeyBinding([
@@ -70,36 +151,6 @@
   onBeforeUnmount(() => {
     keyBindingManager.unsubscribe();
   });
-
-  // 단위 옵션 타입 정의
-  type UnitOption = {
-    value: string;
-    label: string;
-    desc: string;
-    disable?: boolean;
-  };
-
-  // 사용 가능한 단위 목록을 computed로 관리
-  const availableUnits = computed(() => UnitConverter.getUnitLists(unitStore.selectedCategory));
-
-  // 단위 옵션 초기화
-  /**
-   * 단위 옵션을 생성하는 유틸리티 함수
-   * @param unit - 단위 문자열
-   * @param isSource - 출발 단위 여부
-   * @returns 단위 옵션 객체
-   */
-  const createUnitOption = (unit: string): UnitOption => ({
-    value: unit,
-    label: unit,
-    desc: UnitConverter.getUnitDesc(unitStore.selectedCategory, unit),
-  });
-
-  // 출발 단위 옵션 목록을 computed로 관리
-  const sourceUnitOptions = computed(() => availableUnits.value.map((unit) => createUnitOption(unit)));
-
-  // 도착 단위 옵션 목록을 computed로 관리
-  const targetUnitOptions = computed(() => availableUnits.value.map((unit) => createUnitOption(unit)));
 
   const handleUnitSwap = () => {
     // 동일한 단위인 경우 변환하지 않음
@@ -138,7 +189,28 @@
       :color="selectTextColor"
       :bg-color="selectBackgroundColor"
       :popup-content-style="{ backgroundColor: selectBackgroundColor, color: selectTextColor }"
-    />
+    >
+      <template #option="scope">
+        <q-item v-bind="scope.itemProps">
+          <q-item-section side>
+            <q-btn
+              :icon="scope.opt.isFavorite ? 'star' : 'star_border'"
+              flat
+              round
+              dense
+              size="md"
+              :color="scope.opt.isFavorite ? 'amber' : 'grey'"
+              :aria-label="scope.opt.isFavorite ? t('ariaLabel.removeFromFavorites') : t('ariaLabel.addToFavorites')"
+              class="q-pa-xs q-ma-none"
+              @click="handleCategoryFavoriteToggle(scope.opt.value, $event)"
+            />
+          </q-item-section>
+          <q-item-section>
+            <q-item-label>{{ scope.opt.label }}</q-item-label>
+          </q-item-section>
+        </q-item>
+      </template>
+    </q-select>
 
     <!-- 원본 방향 -->
     <q-icon name="keyboard_double_arrow_up" class="col-1" role="img" :aria-label="t('ariaLabel.sourceDirection')" />
@@ -167,6 +239,19 @@
     >
       <template #option="scope">
         <q-item v-bind="scope.itemProps">
+          <q-item-section side>
+            <q-btn
+              :icon="scope.opt.isFavorite ? 'star' : 'star_border'"
+              flat
+              round
+              dense
+              size="md"
+              :color="scope.opt.isFavorite ? 'amber' : 'grey'"
+              :aria-label="scope.opt.isFavorite ? t('ariaLabel.removeFromFavorites') : t('ariaLabel.addToFavorites')"
+              class="q-pa-xs q-ma-none"
+              @click="handleUnitFavoriteToggle(scope.opt.value, $event)"
+            />
+          </q-item-section>
           <q-item-section>
             <q-item-label caption>
               {{ t(`unitDesc.${unitStore.selectedCategory}.${scope.opt.label}`) }}
@@ -229,6 +314,19 @@
     >
       <template #option="scope">
         <q-item v-bind="scope.itemProps">
+          <q-item-section side>
+            <q-btn
+              :icon="scope.opt.isFavorite ? 'star' : 'star_border'"
+              flat
+              round
+              dense
+              size="md"
+              :color="scope.opt.isFavorite ? 'amber' : 'grey'"
+              :aria-label="scope.opt.isFavorite ? t('ariaLabel.removeFromFavorites') : t('ariaLabel.addToFavorites')"
+              class="q-pa-xs q-ma-none"
+              @click="handleUnitFavoriteToggle(scope.opt.value, $event)"
+            />
+          </q-item-section>
           <q-item-section>
             <q-item-label caption>
               {{ t(`unitDesc.${unitStore.selectedCategory}.${scope.opt.label}`) }}

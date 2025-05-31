@@ -177,6 +177,8 @@ ko:
     sourceCurrency: '원본 통화 선택'
     targetCurrency: '대상 통화 선택'
     swapCurrencies: '원본과 대상 통화 바꾸기'
+    addToFavorites: '즐겨찾기에 추가'
+    removeFromFavorites: '즐겨찾기에서 제거'
 en:
   currency: 'Currency'
   currencyDesc:
@@ -357,3 +359,5 @@ en:
     sourceCurrency: 'Select source currency'
     targetCurrency: 'Select target currency'
     swapCurrencies: 'Swap source and target currencies'
+    addToFavorites: 'Add to favorites'
+    removeFromFavorites: 'Remove from favorites'

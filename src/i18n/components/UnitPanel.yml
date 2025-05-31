@@ -219,6 +219,8 @@ ko:
     sourceUnit: '원본 단위 선택'
     targetUnit: '대상 단위 선택'
     swapUnits: '원본과 대상 단위 바꾸기'
+    addToFavorites: '즐겨찾기에 추가'
+    removeFromFavorites: '즐겨찾기에서 제거'
 en:
   category: 'Category'
   categories:
@@ -440,3 +442,5 @@ en:
     sourceUnit: 'Select source unit'
     targetUnit: 'Select target unit'
     swapUnits: 'Swap source and target units'
+    addToFavorites: 'Add to favorites'
+    removeFromFavorites: 'Remove from favorites'
