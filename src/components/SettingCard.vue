@@ -278,7 +278,10 @@
 
       <!-- 소수점 자리수 -->
       <q-item class="q-mb-xs">
-        <ToolTip>
+        <ToolTip
+          :text-color="themesStore.getCurrentThemeColors.ui.primary"
+          :bg-color="themesStore.getCurrentThemeColors.ui.warning"
+        >
           {{ t('decimalPlacesStat') }}:
           {{
             settingsStore.decimalPlaces == -1
@@ -416,7 +419,11 @@
       <q-item v-if="$g.isElectron && !$g.isSnap" class="q-mb-sm">
         <q-item-label class="self-center" role="text">
           {{ t('autoUpdate') }}
-          <HelpIcon :text="t('autoUpdateHelp')" />
+          <HelpIcon
+            :text-color="themesStore.getCurrentThemeColors.ui.primary"
+            :bg-color="themesStore.getCurrentThemeColors.ui.warning"
+            :text="t('autoUpdateHelp')"
+          />
         </q-item-label>
         <q-space />
         <q-toggle

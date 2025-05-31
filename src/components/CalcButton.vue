@@ -472,8 +472,10 @@
         >
           {{ extendedFunctionSet[id]?.label ?? '' }}
         </q-tooltip>
-        <ToolTip>
-          {{
+        <ToolTip 
+          :text-color="themesStore.getCurrentThemeColors.ui.primary" 
+          :bg-color="themesStore.getCurrentThemeColors.ui.warning"
+          :text="
             calcStore.isShiftPressed
               ? (extendedFunctionSet[id]?.isDisabled ?? false)
                 ? t('disabledButton')
@@ -481,8 +483,8 @@
               : (activeButtonSet[id]?.isDisabled ?? false)
                 ? t('disabledButton')
                 : getTooltipsOfKeys(id, false)
-          }}
-        </ToolTip>
+          "
+        />        
       </q-btn>
     </div>
   </q-card-section>

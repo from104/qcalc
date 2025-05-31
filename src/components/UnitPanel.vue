@@ -175,9 +175,11 @@
           </q-item-section>
         </q-item>
       </template>
-      <ToolTip>
-        {{ t(`unitDesc.${unitStore.selectedCategory}.${unitStore.sourceUnits[unitStore.selectedCategory]}`) }}
-      </ToolTip>
+      <ToolTip
+        :text-color="themesStore.getCurrentThemeColors.ui.primary"
+        :bg-color="themesStore.getCurrentThemeColors.ui.warning"
+        :text="t(`unitDesc.${unitStore.selectedCategory}.${unitStore.sourceUnits[unitStore.selectedCategory]}`)"
+      />
     </q-select>
 
     <!-- 원본, 대상 단위 바꾸기 버튼 -->
@@ -195,7 +197,12 @@
       :style="{ color: selectTextColor, backgroundColor: selectBackgroundColor }"
       @click="handleUnitSwap()"
     >
-      <ToolTip :auto-hide="3000" :text="t('tooltipSwap')" />
+      <ToolTip
+        :text-color="themesStore.getCurrentThemeColors.ui.primary"
+        :bg-color="themesStore.getCurrentThemeColors.ui.warning"
+        :auto-hide="3000"
+        :text="t('tooltipSwap')"
+      />
     </q-btn>
 
     <!-- 대상 단위 -->
@@ -230,9 +237,11 @@
           </q-item-section>
         </q-item>
       </template>
-      <ToolTip>
-        {{ t(`unitDesc.${unitStore.selectedCategory}.${unitStore.targetUnits[unitStore.selectedCategory]}`) }}
-      </ToolTip>
+      <ToolTip
+        :text-color="themesStore.getCurrentThemeColors.ui.primary"
+        :bg-color="themesStore.getCurrentThemeColors.ui.warning"
+        :text="t(`unitDesc.${unitStore.selectedCategory}.${unitStore.targetUnits[unitStore.selectedCategory]}`)"
+      />
     </q-select>
 
     <!-- 대상 방향 -->

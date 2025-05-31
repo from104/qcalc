@@ -37,7 +37,6 @@
 
   // 스토어 import
   import { useUIStore } from 'stores/uiStore';
-  import { useSettingsStore } from 'stores/settingsStore';
   import { useThemesStore } from 'stores/themesStore';
   import { useCalcStore } from 'src/stores/calcStore';
   import { useCurrencyStore } from 'stores/currencyStore';
@@ -45,7 +44,6 @@
 
   // 스토어 인스턴스 생성
   const uiStore = useUIStore();
-  const settingsStore = useSettingsStore();
   const themesStore = useThemesStore();
   const calcStore = useCalcStore();
   const currencyStore = useCurrencyStore();
@@ -527,9 +525,13 @@
                     :search-term="uiStore.searchKeyword"
                     @show-tooltip="(isShow) => handleMemoTooltip(record.id, isShow)"
                   />
-                  <ToolTip v-if="isShowMemoTooltip[record.id]" :delay="1000">
-                    {{ record.memo }}
-                  </ToolTip>
+                  <ToolTip
+                    v-if="isShowMemoTooltip[record.id]"
+                    :text-color="themesStore.getCurrentThemeColors.ui.primary"
+                    :bg-color="themesStore.getCurrentThemeColors.ui.warning"
+                    :delay="1000"
+                    :text="record.memo"
+                  />
                 </q-item-label>
                 <q-item-label class="record-text">
                   <HighlightText
@@ -538,9 +540,13 @@
                     allow-line-break
                     @show-tooltip="(isShow) => handleResultTooltip(record.id, isShow)"
                   />
-                  <ToolTip v-if="isShowResultTooltip[record.id]" :delay="1000" line-break>
-                    {{ record.displayText }}
-                  </ToolTip>
+                  <ToolTip
+                    v-if="isShowResultTooltip[record.id]"
+                    :text-color="themesStore.getCurrentThemeColors.ui.primary"
+                    :bg-color="themesStore.getCurrentThemeColors.ui.warning"
+                    :delay="1000"
+                    :text="record.displayText"
+                  />
                 </q-item-label>
                 <q-item-label class="row justify-between q-pa-none q-ma-none">
                   <div class="col-6 text-left record-menu-btn">
