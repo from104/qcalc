@@ -93,19 +93,19 @@ export const themes: Record<ThemeType, ThemeColors> = {
   },
   forest: {
     ui: {
-      primary: '#355e3b',
-      secondary: '#6b8e23',
+      primary: '#355e3b', // #355e3b
+      secondary: '#6b8e23', // #6b8e23
       accent: '#5a8a62', // primary를 30% 밝게: #355e3b -> #5a8a62
-      positive: '#4e944f',
-      negative: '#a0522d',
-      info: '#7fb77e',
-      warning: '#e2c275',
-      dark: '#11160d',
+      positive: '#4e944f', // #4e944f
+      negative: '#a0522d', // #a0522d
+      info: '#7fb77e', // #7fb77e
+      warning: '#e2c275', // #e2c275
+      dark: '#11160d', // #11160d
     },
     button: {
-      important: '#355e3b',
-      function: '#4F8B50',
-      normal: '#69b36a',
+      important: '#355e3b', // #355e3b
+      function: '#4F8B50', // #4F8B50
+      normal: '#69b36a', // #69b36a
     },
     panel: {
       text: {
@@ -132,14 +132,14 @@ export const themes: Record<ThemeType, ThemeColors> = {
   },
   ocean: {
     ui: {
-      primary: '#176087',
-      secondary: '#4ecdc4',
+      primary: '#176087', // #176087
+      secondary: '#4ecdc4', // #4ecdc4
       accent: '#3d8bb5', // primary를 30% 밝게: #176087 -> #3d8bb5
-      positive: '#1ca9c9',
-      negative: '#ff6b6b',
-      info: '#34a9e0',
-      warning: '#ffe66d',
-      dark: '#0f1e21',
+      positive: '#1ca9c9', // #1ca9c9
+      negative: '#ff6b6b', // #ff6b6b
+      info: '#34a9e0', // #34a9e0
+      warning: '#ffe66d', // #ffe66d
+      dark: '#0f1e21', // #0f1e21
     },
     button: {
       important: '#0078b8', // #0078b8
@@ -171,14 +171,14 @@ export const themes: Record<ThemeType, ThemeColors> = {
   },
   autumn: {
     ui: {
-      primary: '#A0522D',
-      secondary: '#ffb562',
+      primary: '#A0522D', // #A0522D
+      secondary: '#ffb562', // #ffb562
       accent: '#d07a54', // primary를 30% 밝게: #A0522D -> #d07a54
-      positive: '#ff7f51',
-      negative: '#a72608',
-      info: '#fca311',
-      warning: '#f7b267',
-      dark: '#1d0f0f',
+      positive: '#ff7f51', // #ff7f51
+      negative: '#a72608', // #a72608
+      info: '#fca311', // #fca311
+      warning: '#f7b267', // #f7b267
+      dark: '#1d0f0f', // #1d0f0f
     },
     button: {
       important: '#754520', // #8a5226
@@ -210,19 +210,19 @@ export const themes: Record<ThemeType, ThemeColors> = {
   },
   amethyst: {
     ui: {
-      primary: '#6a1b9a',
-      secondary: '#ab47bc',
+      primary: '#6a1b9a', // #6a1b9a
+      secondary: '#ab47bc', // #ab47bc
       accent: '#9548c8', // primary를 30% 밝게: #6a1b9a -> #9548c8
-      positive: '#4caf50',
-      negative: '#f44336',
-      info: '#2196f3',
-      warning: '#ff9800',
-      dark: '#12051a',
+      positive: '#4caf50', // #4caf50
+      negative: '#f44336', // #f44336
+      info: '#2196f3', // #2196f3
+      warning: '#ff9800', // #ff9800
+      dark: '#12051a', // #12051a
     },
     button: {
-      important: '#6a1b9a',
-      function: '#8e24aa',
-      normal: '#ab47bc',
+      important: '#6a1b9a', // #6a1b9a
+      function: '#8e24aa', // #8e24aa
+      normal: '#ab47bc', // #ab47bc
     },
     panel: {
       text: {
@@ -249,19 +249,19 @@ export const themes: Record<ThemeType, ThemeColors> = {
   },
   slate: {
     ui: {
-      primary: '#546e7a',
-      secondary: '#78909c',
+      primary: '#546e7a', // #546e7a
+      secondary: '#78909c', // #78909c
       accent: '#7a95a3', // primary를 30% 밝게: #546e7a -> #7a95a3
-      positive: '#4caf50',
-      negative: '#f44336',
-      info: '#2196f3',
-      warning: '#ff9800',
-      dark: '#263238',
+      positive: '#4caf50', // #4caf50
+      negative: '#f44336', // #f44336
+      info: '#2196f3', // #2196f3
+      warning: '#ff9800', // #ff9800
+      dark: '#263238', // #263238
     },
     button: {
-      important: '#546e7a',
-      function: '#455a64',
-      normal: '#78909c',
+      important: '#546e7a', // #546e7a
+      function: '#455a64', // #455a64
+      normal: '#78909c', // #78909c
     },
     panel: {
       text: {
@@ -288,19 +288,19 @@ export const themes: Record<ThemeType, ThemeColors> = {
   },
   highcontrast: {
     ui: {
-      primary: '#a52a2a',
-      secondary: '#ffff00',
+      primary: '#a52a2a', // #a52a2a
+      secondary: '#ffff00', // #ffff00
       accent: '#d55555', // primary를 30% 밝게: #a52a2a -> #d55555
-      positive: '#00ff00',
-      negative: '#ff0000',
-      info: '#0000ff',
-      warning: '#ffa500',
-      dark: '#0f0f0f',
+      positive: '#00ff00', // #00ff00
+      negative: '#ff0000', // #ff0000
+      info: '#0000ff', // #0000ff
+      warning: '#ffa500', // #ffa500
+      dark: '#0f0f0f', // #0f0f0f
     },
     button: {
-      important: '#a52a2a', // 붉은 계열 색상 (갈색)
-      function: '#008080', // 50% 어둡게 조정된 시안색
-      normal: '#808000', // 노란색 계열 색상
+      important: '#a52a2a', // #a52a2a
+      function: '#008080', // #008080
+      normal: '#808000', // #808000
     },
     panel: {
       text: {
