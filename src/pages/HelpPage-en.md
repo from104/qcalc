@@ -12,13 +12,14 @@ QCalc is more than just a simple calculator - it's evolving into a modern produc
 - **Basic Operations**: Enter numbers 0-9, +, -, \*, / keys
 - **Advanced Functions**: Trigonometric functions (q, w, e), square (u), square root (i), constants (z: π, x: φ, c: e)
 - **Memory Functions**: Ctrl+Enter (MS), Ctrl+Backspace (MR), Ctrl+Delete (MC)
-- **Percentage Calculation**: 'number, /, number, %(k)' calculates percentage
-- **Apply Percentage**: 'number, \*, number, %(k)' applies percentage
+- **Percentage Calculation**: 'number, /, number, %(k or %)' calculates percentage
+- **Apply Percentage**: 'number, \*, number, %(k or %)' applies percentage
 
 #### Unit Converter
 
 - **How to Access**: Ctrl+2 or select the top tab
 - **Conversion Categories**: Over 15 categories including length, area, volume, weight, angle, etc.
+- **Favorites**: Set frequently used units as favorites for quick access
 - **Swap Units**: Use '\\' key to swap original/converted units
 - **Quick Conversion**: ×10/×100/×1000 (a/s/d), ÷10/÷100/÷1000 (z/x/c)
 - **Unit Symbol**: Toggle unit symbol display/hide with Alt+\\ key
@@ -27,6 +28,7 @@ QCalc is more than just a simple calculator - it's evolving into a modern produc
 
 - **How to Access**: Ctrl+3 or select the top tab
 - **Latest Exchange Rates**: Reflects real-time exchange rate information
+- **Favorites**: Set frequently used currencies as favorites for quick access
 - **Quick Calculation**: +5/+10/+100 (f/g/h), -5/-10/-100 (q/w/e)
 - **Swap Currencies**: Use '\\' key to swap original/converted currencies
 - **Currency Symbol**: Toggle currency symbol display/hide with Alt+\\ key
@@ -98,6 +100,7 @@ QCalc is more than just a simple calculator - it's evolving into a modern produc
 
 #### Screen Layout
 
+- **Theme System**: Choose from various color themes beyond dark/light mode (change in F3 Settings)
 - **Always on Top**: Toggle always-on-top with Alt+t key
 - **Resize Window**: Side panel auto-adjusts based on window size
 - **Reset Panel**: Toggle panel reset at startup with Alt+i key
@@ -123,7 +126,7 @@ QCalc is more than just a simple calculator - it's evolving into a modern produc
 | u           | Square (x²)               |
 | i           | Square root (√x)          |
 | j           | Change sign (±)           |
-| k           | Percentage (%)            |
+| k, %        | Percentage (%)            |
 | l           | Reciprocal (1/x)          |
 | '           | Activate shift mode       |
 
@@ -157,7 +160,7 @@ QCalc is more than just a simple calculator - it's evolving into a modern produc
 ### Unit/Currency Conversion Mode (Shift Mode)
 
 | Shortcut | Function                     |
-|----------|------------------------------|
+| -------- | ---------------------------- |
 | f,g,h    | ×2/×3/×5 or +5/+10/+100      |
 | q,w,e    | ÷2/÷3/÷5 or -5/-10/-100      |
 | a,s,d    | ×10/×100/×1000               |
@@ -168,7 +171,7 @@ QCalc is more than just a simple calculator - it's evolving into a modern produc
 ### Radix Converter Mode
 
 | Shortcut | Function                         |
-|----------|----------------------------------|
+| -------- | -------------------------------- |
 | r,t      | 1-bit shift (x<<1, x>>1)         |
 | u,i      | Left/right shift (x<<y, x>>y)    |
 | f,g      | 4-bit shift (x<<4, x>>4)         |
