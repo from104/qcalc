@@ -7,10 +7,26 @@
 export type DarkModeType = 'light' | 'dark' | 'system';
 
 // 테마 타입 정의
-export type ThemeType = 'default' | 'forest' | 'ocean' | 'autumn' | 'amethyst' | 'slate' | 'highcontrast';
+export type ThemeType =
+  | 'default'
+  | 'forest'
+  | 'ocean'
+  | 'autumn'
+  | 'amethyst'
+  | 'slate'
+  | 'highcontrast'
+  | 'azalea'
+  | 'sunflower';
+
+// 테마 이름 다국어 인터페이스 정의
+export interface ThemeName {
+  ko: string;
+  en: string;
+}
 
 // 테마 색상 인터페이스 정의
 export interface ThemeColors {
+  name: ThemeName;
   ui: {
     primary: string;
     secondary: string;
@@ -53,6 +69,10 @@ export interface ThemeColors {
 // 테마 팔레트 정의 (ThemeColors 인터페이스에 맞게 수정)
 export const themes: Record<ThemeType, ThemeColors> = {
   default: {
+    name: {
+      ko: '기본',
+      en: 'Default',
+    },
     ui: {
       primary: '#16743f', // #16743f
       secondary: '#04b060', // #04b060
@@ -91,7 +111,97 @@ export const themes: Record<ThemeType, ThemeColors> = {
       },
     },
   },
+  azalea: {
+    name: {
+      ko: '진달래',
+      en: 'Azalea',
+    },
+    ui: {
+      primary: '#c2185b', // #c2185b (진한 핑크)
+      secondary: '#f06292', // #f06292 (밝은 핑크)
+      accent: '#e91e63', // primary를 조금 밝게: #c2185b -> #e91e63
+      positive: '#4caf50', // #4caf50 (초록)
+      negative: '#f44336', // #f44336 (빨강)
+      info: '#2196f3', // #2196f3 (파랑)
+      warning: '#ff9800', // #ff9800 (주황)
+      dark: '#1a0612', // #1a0612 (진한 핑크 다크)
+    },
+    button: {
+      important: '#c2185b', // #c2185b
+      function: '#e91e63', // #e91e63
+      normal: '#f06292', // #f06292
+    },
+    panel: {
+      text: {
+        normal: 'pink-8',
+        warning: 'cyan-8',
+        normalAccent: 'pink-10',
+        warningAccent: 'cyan-10',
+      },
+      background: {
+        normal: 'pink-3',
+        warning: 'cyan-3',
+      },
+    },
+    select: {
+      text: {
+        light: 'pink-10',
+        dark: 'pink-1',
+      },
+      background: {
+        light: 'pink-2',
+        dark: 'pink-9',
+      },
+    },
+  },
+  autumn: {
+    name: {
+      ko: '가을',
+      en: 'Autumn',
+    },
+    ui: {
+      primary: '#A0522D', // #A0522D
+      secondary: '#ffb562', // #ffb562
+      accent: '#d07a54', // primary를 30% 밝게: #A0522D -> #d07a54
+      positive: '#ff7f51', // #ff7f51
+      negative: '#a72608', // #a72608
+      info: '#fca311', // #fca311
+      warning: '#f7b267', // #f7b267
+      dark: '#1d0f0f', // #1d0f0f
+    },
+    button: {
+      important: '#754520', // #8a5226
+      function: '#9c6d4a', // #b88157
+      normal: '#c68f63', // #e9a875
+    },
+    panel: {
+      text: {
+        normal: 'brown-7',
+        warning: 'blue-8',
+        normalAccent: 'brown-9',
+        warningAccent: 'blue-10',
+      },
+      background: {
+        normal: 'brown-3',
+        warning: 'blue-3',
+      },
+    },
+    select: {
+      text: {
+        light: 'brown-10',
+        dark: 'brown-1',
+      },
+      background: {
+        light: 'brown-2',
+        dark: 'brown-9',
+      },
+    },
+  },
   forest: {
+    name: {
+      ko: '숲',
+      en: 'Forest',
+    },
     ui: {
       primary: '#355e3b', // #355e3b
       secondary: '#6b8e23', // #6b8e23
@@ -131,6 +241,10 @@ export const themes: Record<ThemeType, ThemeColors> = {
     },
   },
   ocean: {
+    name: {
+      ko: '바다',
+      en: 'Ocean',
+    },
     ui: {
       primary: '#176087', // #176087
       secondary: '#4ecdc4', // #4ecdc4
@@ -169,46 +283,11 @@ export const themes: Record<ThemeType, ThemeColors> = {
       },
     },
   },
-  autumn: {
-    ui: {
-      primary: '#A0522D', // #A0522D
-      secondary: '#ffb562', // #ffb562
-      accent: '#d07a54', // primary를 30% 밝게: #A0522D -> #d07a54
-      positive: '#ff7f51', // #ff7f51
-      negative: '#a72608', // #a72608
-      info: '#fca311', // #fca311
-      warning: '#f7b267', // #f7b267
-      dark: '#1d0f0f', // #1d0f0f
-    },
-    button: {
-      important: '#754520', // #8a5226
-      function: '#9c6d4a', // #b88157
-      normal: '#c68f63', // #e9a875
-    },
-    panel: {
-      text: {
-        normal: 'brown-7',
-        warning: 'blue-8',
-        normalAccent: 'brown-9',
-        warningAccent: 'blue-10',
-      },
-      background: {
-        normal: 'brown-3',
-        warning: 'blue-3',
-      },
-    },
-    select: {
-      text: {
-        light: 'brown-10',
-        dark: 'brown-1',
-      },
-      background: {
-        light: 'brown-2',
-        dark: 'brown-9',
-      },
-    },
-  },
   amethyst: {
+    name: {
+      ko: '자수정',
+      en: 'Amethyst',
+    },
     ui: {
       primary: '#6a1b9a', // #6a1b9a
       secondary: '#ab47bc', // #ab47bc
@@ -248,6 +327,10 @@ export const themes: Record<ThemeType, ThemeColors> = {
     },
   },
   slate: {
+    name: {
+      ko: '잿빛',
+      en: 'Slate',
+    },
     ui: {
       primary: '#546e7a', // #546e7a
       secondary: '#78909c', // #78909c
@@ -287,6 +370,10 @@ export const themes: Record<ThemeType, ThemeColors> = {
     },
   },
   highcontrast: {
+    name: {
+      ko: '고대비',
+      en: 'High Contrast',
+    },
     ui: {
       primary: '#a52a2a', // #a52a2a
       secondary: '#ffff00', // #ffff00
