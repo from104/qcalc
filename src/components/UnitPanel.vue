@@ -52,9 +52,6 @@
     isFavorite: boolean;
   };
 
-  // 사용 가능한 단위 목록을 computed로 관리
-  const availableUnits = computed(() => UnitConverter.getUnitLists(unitStore.selectedCategory));
-
   // 단위 옵션 초기화
   /**
    * 단위 옵션을 생성하는 유틸리티 함수
@@ -191,24 +188,26 @@
       :popup-content-style="{ backgroundColor: selectBackgroundColor, color: selectTextColor }"
     >
       <template #option="scope">
-        <q-item v-bind="scope.itemProps">
-          <q-item-section side>
-            <q-btn
-              :icon="scope.opt.isFavorite ? 'star' : 'star_border'"
-              flat
-              round
-              dense
-              size="md"
-              :color="scope.opt.isFavorite ? 'amber' : 'grey'"
-              :aria-label="scope.opt.isFavorite ? t('ariaLabel.removeFromFavorites') : t('ariaLabel.addToFavorites')"
-              class="q-pa-xs q-ma-none"
-              @click="handleCategoryFavoriteToggle(scope.opt.value, $event)"
-            />
-          </q-item-section>
-          <q-item-section>
-            <q-item-label>{{ scope.opt.label }}</q-item-label>
-          </q-item-section>
-        </q-item>
+        <transition-group name="select-option-">
+          <q-item v-bind="scope.itemProps" :key="scope.opt.value" class="q-px-sm">
+            <q-item-section side class="q-pr-sm">
+              <q-btn
+                :icon="scope.opt.isFavorite ? 'star' : 'star_border'"
+                flat
+                round
+                dense
+                size="md"
+                :color="scope.opt.isFavorite ? (themesStore.isDarkMode() ? 'amber' : 'brown-4') : 'grey'"
+                :aria-label="scope.opt.isFavorite ? t('ariaLabel.removeFromFavorites') : t('ariaLabel.addToFavorites')"
+                class="q-pa-none q-ma-none"
+                @click="handleCategoryFavoriteToggle(scope.opt.value, $event)"
+              />
+            </q-item-section>
+            <q-item-section>
+              <q-item-label>{{ scope.opt.label }}</q-item-label>
+            </q-item-section>
+          </q-item>
+        </transition-group>
       </template>
     </q-select>
 
@@ -238,27 +237,29 @@
       :popup-content-style="{ backgroundColor: selectBackgroundColor, color: selectTextColor }"
     >
       <template #option="scope">
-        <q-item v-bind="scope.itemProps">
-          <q-item-section side>
-            <q-btn
-              :icon="scope.opt.isFavorite ? 'star' : 'star_border'"
-              flat
-              round
-              dense
-              size="md"
-              :color="scope.opt.isFavorite ? 'amber' : 'grey'"
-              :aria-label="scope.opt.isFavorite ? t('ariaLabel.removeFromFavorites') : t('ariaLabel.addToFavorites')"
-              class="q-pa-xs q-ma-none"
-              @click="handleUnitFavoriteToggle(scope.opt.value, $event)"
-            />
-          </q-item-section>
-          <q-item-section>
-            <q-item-label caption>
-              {{ t(`unitDesc.${unitStore.selectedCategory}.${scope.opt.label}`) }}
-            </q-item-label>
-            <q-item-label>{{ scope.opt.label }}</q-item-label>
-          </q-item-section>
-        </q-item>
+        <transition-group name="select-option-">
+          <q-item v-bind="scope.itemProps" :key="scope.opt.value" class="q-px-sm">
+            <q-item-section side class="q-pr-sm">
+              <q-btn
+                :icon="scope.opt.isFavorite ? 'star' : 'star_border'"
+                flat
+                round
+                dense
+                size="md"
+                :color="scope.opt.isFavorite ? (themesStore.isDarkMode() ? 'amber' : 'brown-4') : 'grey'"
+                :aria-label="scope.opt.isFavorite ? t('ariaLabel.removeFromFavorites') : t('ariaLabel.addToFavorites')"
+                class="q-pa-none q-ma-none"
+                @click="handleUnitFavoriteToggle(scope.opt.value, $event)"
+              />
+            </q-item-section>
+            <q-item-section>
+              <q-item-label caption>
+                {{ t(`unitDesc.${unitStore.selectedCategory}.${scope.opt.label}`) }}
+              </q-item-label>
+              <q-item-label>{{ scope.opt.label }}</q-item-label>
+            </q-item-section>
+          </q-item>
+        </transition-group>
       </template>
       <ToolTip
         :text-color="themesStore.getCurrentThemeColors.ui.dark"
@@ -313,27 +314,29 @@
       :popup-content-style="{ backgroundColor: selectBackgroundColor, color: selectTextColor }"
     >
       <template #option="scope">
-        <q-item v-bind="scope.itemProps">
-          <q-item-section side>
-            <q-btn
-              :icon="scope.opt.isFavorite ? 'star' : 'star_border'"
-              flat
-              round
-              dense
-              size="md"
-              :color="scope.opt.isFavorite ? 'amber' : 'grey'"
-              :aria-label="scope.opt.isFavorite ? t('ariaLabel.removeFromFavorites') : t('ariaLabel.addToFavorites')"
-              class="q-pa-xs q-ma-none"
-              @click="handleUnitFavoriteToggle(scope.opt.value, $event)"
-            />
-          </q-item-section>
-          <q-item-section>
-            <q-item-label caption>
-              {{ t(`unitDesc.${unitStore.selectedCategory}.${scope.opt.label}`) }}
-            </q-item-label>
-            <q-item-label>{{ scope.opt.label }}</q-item-label>
-          </q-item-section>
-        </q-item>
+        <transition-group name="select-option-">
+          <q-item v-bind="scope.itemProps" :key="scope.opt.value" class="q-px-sm">
+            <q-item-section side class="q-pr-sm">
+              <q-btn
+                :icon="scope.opt.isFavorite ? 'star' : 'star_border'"
+                flat
+                round
+                dense
+                size="md"
+                :color="scope.opt.isFavorite ? (themesStore.isDarkMode() ? 'amber' : 'brown-4') : 'grey'"
+                :aria-label="scope.opt.isFavorite ? t('ariaLabel.removeFromFavorites') : t('ariaLabel.addToFavorites')"
+                class="q-pa-none q-ma-none"
+                @click="handleUnitFavoriteToggle(scope.opt.value, $event)"
+              />
+            </q-item-section>
+            <q-item-section>
+              <q-item-label caption>
+                {{ t(`unitDesc.${unitStore.selectedCategory}.${scope.opt.label}`) }}
+              </q-item-label>
+              <q-item-label>{{ scope.opt.label }}</q-item-label>
+            </q-item-section>
+          </q-item>
+        </transition-group>
       </template>
       <ToolTip
         :text-color="themesStore.getCurrentThemeColors.ui.dark"
@@ -360,6 +363,41 @@
         border-top: 1px dotted rgba(255, 255, 255, 0.377);
         border-bottom: 1px dotted rgba(255, 255, 255, 0.377);
       }
+    }
+  }
+
+  .select-option--move,
+  .select-option--enter-active,
+  .select-option--leave-active {
+    transition: all 3s ease;
+  }
+
+  .select-option--leave-active {
+    position: absolute;
+  }
+
+  .select-option--enter-from,
+  .select-option--leave-to {
+    opacity: 0;
+    transform: translateY(100%);
+  }
+
+  // 옵션 목록 전체의 부드러운 재정렬 효과
+  .q-select-popup .q-item {
+    transition: all 0.3s ease;
+    will-change: transform, opacity;
+
+    // 호버 효과
+    &:hover {
+      background-color: rgba(var(--q-primary), 0.05);
+      transform: translateX(2px);
+    }
+  }
+
+  // 다크 모드에서 더 나은 시각적 피드백
+  @media (prefers-color-scheme: dark) {
+    .q-select-popup .q-item:hover {
+      background-color: rgba(255, 255, 255, 0.08);
     }
   }
 </style>
