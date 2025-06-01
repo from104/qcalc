@@ -73,10 +73,15 @@
 
   // 색상 테마 옵션을 계산합니다.
   const themeOptions = computed(() => {
-    return Object.keys(themes).map((themeKey) => ({
-      label: t(`themeName.${themeKey}`, themeKey),
-      value: themeKey,
-    }));
+    return Object.keys(themes).map((themeKey) => {
+      const currentLocale = locale.value as 'ko' | 'en';
+      const themeName =
+        themes[themeKey as ThemeType]?.name?.[currentLocale] || themes[themeKey as ThemeType]?.name?.en || themeKey;
+      return {
+        label: themeName,
+        value: themeKey,
+      };
+    });
   });
 
   /**
@@ -107,7 +112,8 @@
    */
   const getThemeLabel = (themeKey: ThemeType | string): string => {
     const key = typeof themeKey === 'string' ? themeKey : themeKey;
-    return t(`themeName.${key}`, key);
+    const currentLocale = locale.value as 'ko' | 'en';
+    return themes[key as ThemeType]?.name?.[currentLocale] || themes[key as ThemeType]?.name?.en || key;
   };
 
   const primaryAccentColor = computed(() => {
@@ -547,14 +553,6 @@ ko:
     language: '언어 설정'
     autoUpdate: '자동 업데이트 설정'
   colorTheme: '색상 테마'
-  themeName:
-    default: '기본'
-    forest: '숲'
-    ocean: '바다'
-    autumn: '가을'
-    amethyst: '자수정'
-    slate: '잿빛'
-    highcontrast: '고대비'
 en:
   alwaysOnTop: 'Always on top'
   alwaysOnTopOn: 'Always on top ON'
@@ -605,12 +603,4 @@ en:
     language: 'Language setting'
     autoUpdate: 'Auto update setting'
   colorTheme: 'Color Theme'
-  themeName:
-    default: 'Default'
-    forest: 'Forest'
-    ocean: 'Ocean'
-    autumn: 'Autumn'
-    amethyst: 'Amethyst'
-    slate: 'Slate'
-    highcontrast: 'High Contrast'
 </i18n>
