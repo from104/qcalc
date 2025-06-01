@@ -257,6 +257,8 @@
       calcStore.resultPanelPadding = 8;
     } else if ($g.isLinux) {
       calcStore.resultPanelPadding = 9;
+    } else if ($g.isCapacitor) {
+      calcStore.resultPanelPadding = 10;
     } else {
       calcStore.resultPanelPadding = 0;
     }
