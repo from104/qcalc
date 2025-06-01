@@ -69,9 +69,7 @@
     });
 
     // 통화 옵션 목록도 업데이트
-    const newOptions = getSortedCurrencyOptions();
-    sourceCurrencyOptions.splice(0, sourceCurrencyOptions.length, ...newOptions);
-    targetCurrencyOptions.splice(0, targetCurrencyOptions.length, ...newOptions);
+    updateCurrencyOptions();
   });
 
   // 입력 포커스에 따른 키 바인딩 활성화/비활성화
@@ -145,13 +143,20 @@
   // 도착 통화 옵션 목록
   const targetCurrencyOptions = reactive<CurrencyOptions[]>(getSortedCurrencyOptions());
 
+  /**
+   * 통화 옵션을 업데이트하는 함수
+   */
+  const updateCurrencyOptions = () => {
+    const newOptions = getSortedCurrencyOptions();
+    sourceCurrencyOptions.splice(0, sourceCurrencyOptions.length, ...newOptions);
+    targetCurrencyOptions.splice(0, targetCurrencyOptions.length, ...newOptions);
+  };
+
   // 즐겨찾기 상태 변경 시 옵션 목록 업데이트
   watch(
     () => currencyStore.favoriteCurrencies,
     () => {
-      const newOptions = getSortedCurrencyOptions();
-      sourceCurrencyOptions.splice(0, sourceCurrencyOptions.length, ...newOptions);
-      targetCurrencyOptions.splice(0, targetCurrencyOptions.length, ...newOptions);
+      updateCurrencyOptions();
     },
     { deep: true },
   );
@@ -167,10 +172,20 @@
    * @param currency - 토글할 통화 코드
    * @param event - 클릭 이벤트 (이벤트 전파 방지용)
    */
-  const handleFavoriteToggle = (currency: string, event: Event) => {
+  const handleFavoriteToggle = async (currency: string, event: Event) => {
     event.stopPropagation();
     event.preventDefault();
+
+    // 즐겨찾기 상태 토글
     currencyStore.toggleFavorite(currency);
+
+    // 접근성을 위한 시각적 피드백
+    const target = event.target as HTMLElement;
+    if (target) {
+      target.style.transform = 'scale(0.9)';
+      await new Promise((resolve) => setTimeout(resolve, 100));
+      target.style.transform = '';
+    }
   };
 
   // 통화 선택 필터 함수 생성
@@ -255,25 +270,27 @@
       @update:model-value="blurElement()"
     >
       <template #option="scope">
-        <q-item v-bind="scope.itemProps">
-          <q-item-section side>
-            <q-btn
-              :icon="scope.opt.isFavorite ? 'star' : 'star_border'"
-              flat
-              round
-              dense
-              size="md"
-              :color="scope.opt.isFavorite ? 'amber' : 'grey'"
-              :aria-label="scope.opt.isFavorite ? t('ariaLabel.removeFromFavorites') : t('ariaLabel.addToFavorites')"
-              class="q-pa-xs q-ma-none"
-              @click="handleFavoriteToggle(scope.opt.value, $event)"
-            />
-          </q-item-section>
-          <q-item-section>
-            <q-item-label caption>{{ currencyDescriptions[scope.opt.label] }}</q-item-label>
-            <q-item-label>{{ scope.opt.label }}</q-item-label>
-          </q-item-section>
-        </q-item>
+        <transition-group name="select-option-">
+          <q-item v-bind="scope.itemProps" :key="scope.opt.value" class="q-px-sm">
+            <q-item-section side class="q-pr-sm">
+              <q-btn
+                :icon="scope.opt.isFavorite ? 'star' : 'star_border'"
+                flat
+                round
+                dense
+                size="md"
+                :color="scope.opt.isFavorite ? (themesStore.isDarkMode() ? 'amber' : 'brown-4') : 'grey'"
+                :aria-label="scope.opt.isFavorite ? t('ariaLabel.removeFromFavorites') : t('ariaLabel.addToFavorites')"
+                class="q-pa-none q-ma-none"
+                @click="handleFavoriteToggle(scope.opt.value, $event)"
+              />
+            </q-item-section>
+            <q-item-section>
+              <q-item-label caption>{{ currencyDescriptions[scope.opt.label] }}</q-item-label>
+              <q-item-label>{{ scope.opt.label }}</q-item-label>
+            </q-item-section>
+          </q-item>
+        </transition-group>
       </template>
       <ToolTip
         :text-color="themesStore.getCurrentThemeColors.ui.dark"
@@ -337,27 +354,29 @@
       @blur="uiStore.setInputBlurred()"
     >
       <template #option="scope">
-        <q-item v-bind="scope.itemProps">
-          <q-item-section side>
-            <q-btn
-              :icon="scope.opt.isFavorite ? 'star' : 'star_border'"
-              flat
-              round
-              dense
-              size="md"
-              :color="scope.opt.isFavorite ? 'amber' : 'grey'"
-              :aria-label="scope.opt.isFavorite ? t('ariaLabel.removeFromFavorites') : t('ariaLabel.addToFavorites')"
-              class="q-pa-xs q-ma-none"
-              @click="handleFavoriteToggle(scope.opt.value, $event)"
-            />
-          </q-item-section>
-          <q-item-section>
-            <q-item-label caption>{{ currencyDescriptions[scope.opt.label] }}</q-item-label>
-            <q-item-label>
-              {{ `${scope.opt.label}, ${currencyStore.currencyConverter.getRate(scope.opt.label).toFixed(4)}` }}
-            </q-item-label>
-          </q-item-section>
-        </q-item>
+        <transition-group name="select-option-">
+          <q-item v-bind="scope.itemProps" :key="scope.opt.value" class="q-px-sm">
+            <q-item-section side class="q-pr-sm">
+              <q-btn
+                :icon="scope.opt.isFavorite ? 'star' : 'star_border'"
+                flat
+                round
+                dense
+                size="md"
+                :color="scope.opt.isFavorite ? (themesStore.isDarkMode() ? 'amber' : 'brown-4') : 'grey'"
+                :aria-label="scope.opt.isFavorite ? t('ariaLabel.removeFromFavorites') : t('ariaLabel.addToFavorites')"
+                class="q-pa-none q-ma-none"
+                @click="handleFavoriteToggle(scope.opt.value, $event)"
+              />
+            </q-item-section>
+            <q-item-section>
+              <q-item-label caption>{{ currencyDescriptions[scope.opt.label] }}</q-item-label>
+              <q-item-label>
+                {{ `${scope.opt.label}, ${currencyStore.currencyConverter.getRate(scope.opt.label).toFixed(4)}` }}
+              </q-item-label>
+            </q-item-section>
+          </q-item>
+        </transition-group>
       </template>
       <ToolTip
         :text-color="themesStore.getCurrentThemeColors.ui.dark"
@@ -395,6 +414,41 @@
   .popup-mobile {
     height: 100% !important;
     max-height: 180px !important;
+  }
+
+  .select-option--move,
+  .select-option--enter-active,
+  .select-option--leave-active {
+    transition: all 3s ease;
+  }
+
+  .select-option--leave-active {
+    position: absolute;
+  }
+
+  .select-option--enter-from,
+  .select-option--leave-to {
+    opacity: 0;
+    transform: translateY(100%);
+  }
+
+  // 옵션 목록 전체의 부드러운 재정렬 효과
+  .q-select-popup .q-item {
+    transition: all 0.3s ease;
+    will-change: transform, opacity;
+
+    // 호버 효과
+    &:hover {
+      background-color: rgba(var(--q-primary), 0.05);
+      transform: translateX(2px);
+    }
+  }
+
+  // 다크 모드에서 더 나은 시각적 피드백
+  @media (prefers-color-scheme: dark) {
+    .q-select-popup .q-item:hover {
+      background-color: rgba(255, 255, 255, 0.08);
+    }
   }
 </style>
 
