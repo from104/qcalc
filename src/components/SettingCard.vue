@@ -188,7 +188,7 @@
           map-options
           :label-color="selectTextColor"
           :options-selected-class="`text-${selectTextColor}`"
-          :popup-content-class="`bg-${selectBackgroundColor}`"
+          :popup-content-class="`bg-${selectBackgroundColor} noselect`"
           :class="`bg-${selectBackgroundColor}`"
           :color="selectTextColor"
           :bg-color="selectBackgroundColor"
@@ -209,7 +209,7 @@
           map-options
           :label-color="selectTextColor"
           :options-selected-class="`text-${selectTextColor}`"
-          :popup-content-class="`bg-${selectBackgroundColor}`"
+          :popup-content-class="`bg-${selectBackgroundColor} noselect`"
           :class="`bg-${selectBackgroundColor}`"
           :color="selectTextColor"
           :bg-color="selectBackgroundColor"
@@ -372,7 +372,7 @@
             :disable="!radixStore.showRadix"
             :label-color="selectTextColor"
             :options-selected-class="`text-${selectTextColor}`"
-            :popup-content-class="`bg-${selectBackgroundColor}`"
+            :popup-content-class="`bg-${selectBackgroundColor} noselect`"
             :class="`bg-${selectBackgroundColor}`"
             :color="selectTextColor"
           />
@@ -412,7 +412,7 @@
           options-dense
           :label-color="selectTextColor"
           :options-selected-class="`text-${selectTextColor}`"
-          :popup-content-class="`bg-${selectBackgroundColor}`"
+          :popup-content-class="`bg-${selectBackgroundColor} noselect`"
           :class="`bg-${selectBackgroundColor}`"
           :color="selectTextColor"
           @update:model-value="setLanguage()"
