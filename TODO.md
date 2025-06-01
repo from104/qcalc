@@ -3,7 +3,8 @@
 ## Todo
 
 - [ ] Ads function (monetization)
-- [ ] Theme function
+- [ ] User theme settings
+- [ ] Skin function
 - [ ] Mobile app implementation (capacitor:ios)
 
 ## In Progress
@@ -12,7 +13,7 @@
   - [x] Apply aria-label
   - [ ] Voice output of results
   - [ ] Voice control of calculator
-  - [ ] High contrast mode
+  - [x] High contrast mode
   - [x] Haptic mode
 
 ## Done
@@ -32,5 +33,7 @@
 - [x] Programmer's calculator
 - [x] Active layout for calculation history panel
 - [x] Search calculation result history
-- [x] Automatic updates (electron)
 - [x] Adjust layout scaling for large tablets
+- [x] Automatic updates (electron)
+- [x] Theme function
+- [x] Unit and currency item favorites

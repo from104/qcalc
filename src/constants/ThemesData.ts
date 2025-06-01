@@ -9,15 +9,14 @@ export type DarkModeType = 'light' | 'dark' | 'system';
 // 테마 타입 정의
 export type ThemeType =
   | 'default'
+  | 'azalea'
+  | 'autumn'
   | 'forest'
   | 'ocean'
-  | 'autumn'
   | 'amethyst'
   | 'slate'
-  | 'highcontrast'
-  | 'azalea'
-  | 'sunflower';
-
+  | 'highcontrast';
+  
 // 테마 이름 다국어 인터페이스 정의
 export interface ThemeName {
   ko: string;
