@@ -258,7 +258,7 @@
       :class="`bg-${selectBackgroundColor}`"
       :label-color="selectTextColor"
       :popup-content-class="
-        [`bg-${selectBackgroundColor}`, 'scrollbar-custom', 'q-select-popup', $g.isMobile ? 'popup-mobile' : ''].join(
+        [`bg-${selectBackgroundColor}`, 'scrollbar-custom', 'q-select-popup', $g.isMobile ? 'popup-mobile' : '', 'noselect'].join(
           ' ',
         )
       "
@@ -342,7 +342,7 @@
       :class="`bg-${selectBackgroundColor}`"
       :label-color="selectTextColor"
       :popup-content-class="
-        [`bg-${selectBackgroundColor}`, 'scrollbar-custom', 'q-select-popup', $g.isMobile ? 'popup-mobile' : ''].join(
+        [`bg-${selectBackgroundColor}`, 'scrollbar-custom', 'q-select-popup', $g.isMobile ? 'popup-mobile' : '', 'noselect'].join(
           ' ',
         )
       "
@@ -411,6 +411,7 @@
     }
   }
 
+  // 모바일 팝업 높이 조정
   .popup-mobile {
     height: 100% !important;
     max-height: 180px !important;
