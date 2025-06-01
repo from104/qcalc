@@ -333,7 +333,7 @@
         behavior="mobile"
         @click="leftDrawerOpen = false"
       >
-        <q-card :class="themesStore.isDarkMode() ? 'bg-grey-9' : 'bg-grey-3'" class="full-height menu-card">
+        <q-card class="full-height menu-card">
           <MenuPanel />
         </q-card>
       </q-drawer>
@@ -746,6 +746,11 @@
   // 새로 추가된 클래스
   .menu-card {
     padding-top: 55px;
+    background-color: var(--q-grey-3) !important;
+
+    .body--dark & {
+      background-color: var(--q-dark) !important;
+    }
   }
 
   .high-z-index {
