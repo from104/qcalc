@@ -27,6 +27,7 @@
   import ShowTips from 'components/ShowTips.vue';
 
   // === 화면 컴포넌트 임포트 ===
+  import AdBanner from 'components/AdBanner.vue'; // AdBanner 컴포넌트 임포트
   import CalcPage from 'pages/CalcPage.vue';
   import UnitPage from 'pages/UnitPage.vue';
   import CurrencyPage from 'pages/CurrencyPage.vue';
@@ -445,6 +446,7 @@
               <component :is="tab.component" />
             </q-tab-panel>
           </q-tab-panels>
+          <AdBanner /> <!-- MOVED HERE for narrow screen main content -->
         </template>
 
         <!-- 서브 화면 컨텐츠 -->
@@ -610,6 +612,7 @@
               <component :is="tab.component" />
             </q-tab-panel>
           </q-tab-panels>
+          <AdBanner /> <!-- MOVED HERE for wide screen main calc content -->
         </div>
 
         <!-- 넓은 화면 서브 영역 -->

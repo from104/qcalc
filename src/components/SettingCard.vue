@@ -21,6 +21,7 @@
   import { useRadixStore } from 'stores/radixStore';
   import { useCurrencyStore } from 'stores/currencyStore';
   import { useThemesStore } from 'stores/themesStore';
+  import { useAdmobStore } from 'src/stores/AdmobStore'; // Admob 스토어 추가
   import { themes, type ThemeType } from 'src/constants/ThemesData';
 
   // 스토어 인스턴스 생성
@@ -30,6 +31,18 @@
   const radixStore = useRadixStore();
   const currencyStore = useCurrencyStore();
   const themesStore = useThemesStore();
+  const admobStore = useAdmobStore(); // Admob 스토어 인스턴스
+
+  // 광고 표시 여부
+  const isAdVisible = computed(() => admobStore.isAdVisible);
+
+  // 광고 제거 구매 시작 함수
+  const initiateRemoveAdsPurchase = () => {
+    console.log('Attempting to initiate remove ads purchase...');
+    // 여기에 실제 구매 로직이 추가될 것입니다.
+    // 예: billingPlugin.purchase('remove_ads_product_id');
+    // 성공 시: admobStore.hideAds();
+  };
 
   // i18n 설정
   import { useI18n } from 'vue-i18n';
@@ -241,6 +254,20 @@
           </template>
         </q-select>
       </q-item>
+
+  <!-- 광고 제거 버튼 -->
+  <q-item v-if="$g.isCapacitor && isAdVisible" class="q-mb-md">
+    <q-item-label class="self-center" role="text">{{ t('removeAds.title') }}</q-item-label>
+    <q-space />
+    <q-btn
+      :color="primaryAccentColor"
+      :label="t('removeAds.buttonLabel')"
+      dense
+      @click="initiateRemoveAdsPurchase"
+      role="button"
+      :aria-label="t('removeAds.ariaLabel')"
+    />
+  </q-item>
 
       <q-separator spaced="md" role="separator" />
 
@@ -504,6 +531,10 @@
 
 <i18n>
 ko:
+  removeAds:
+    title: '광고 제거'
+    buttonLabel: '구매'
+    ariaLabel: '광고 제거 구매 버튼'
   alwaysOnTop: '항상 위'
   alwaysOnTopOn: '항상 위 켜짐'
   alwaysOnTopOff: '항상 위 꺼짐'
@@ -554,6 +585,10 @@ ko:
     autoUpdate: '자동 업데이트 설정'
   colorTheme: '색상 테마'
 en:
+  removeAds:
+    title: 'Remove Ads'
+    buttonLabel: 'Purchase'
+    ariaLabel: 'Purchase button to remove ads'
   alwaysOnTop: 'Always on top'
   alwaysOnTopOn: 'Always on top ON'
   alwaysOnTopOff: 'Always on top OFF'

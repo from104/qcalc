@@ -58,6 +58,76 @@ MY_JKS_KEY_ALIAS=key_alias
 MY_JKS_KEY_PASSWORD=key_password
 ```
 
+## 광고 기능 설정 (AdMob)
+
+QCalc는 Capacitor 모드에서 AdMob을 사용하여 광고를 표시할 수 있습니다. 다음은 광고 기능을 설정하고 테스트하기 위한 안내입니다.
+
+### 1. AdMob 계정 및 광고 단위 ID
+
+1.  [Google AdMob](https://admob.google.com/)에 가입하고 앱을 등록합니다.
+2.  앱에 대한 배너 광고 단위를 생성합니다.
+3.  생성된 광고 단위 ID(예: `ca-app-pub-XXXXXXXXXXXXXXXX/NNNNNNNNNN`)를 기록해둡니다.
+
+### 2. Capacitor AdMob 플러그인 설치 (예시)
+
+Capacitor에서 AdMob을 사용하려면 해당 플러그인을 설치해야 합니다. 예를 들어, 커뮤니티 플러그인 `capacitor-admob` 또는 `cordova-plugin-admob-free`와 같은 Cordova 플러그인을 사용할 수 있습니다. (실제 사용하는 플러그인 이름으로 대체해야 합니다.)
+
+```bash
+# 예시: capacitor-admob 플러그인 설치 (실제 플러그인으로 대체)
+npm install capacitor-admob
+npx cap sync
+```
+
+또는 Cordova 플러그인을 사용하는 경우:
+```bash
+npm install cordova-plugin-admob-free @awesome-cordova-plugins/admob-free
+npm install @capacitor/cordova-compatibility --save-dev # 필요한 경우
+npx cap sync
+```
+**참고:** 실제 프로젝트에 통합된 플러그인 이름과 설치 명령으로 위의 예시를 수정해야 합니다.
+
+### 3. Android 플랫폼 설정
+
+1.  `android/app/src/main/AndroidManifest.xml` 파일에 AdMob 앱 ID를 추가합니다.
+    ```xml
+    <manifest>
+        <application>
+            <!-- 기존 내용 -->
+            <meta-data
+                android:name="com.google.android.gms.ads.APPLICATION_ID"
+                android:value="ca-app-pub-XXXXXXXXXXXXXXXX~NNNNNNNNNN"/> <!-- 실제 AdMob 앱 ID로 대체 -->
+        </application>
+    </manifest>
+    ```
+    AdMob 앱 ID는 광고 단위 ID와 다릅니다. AdMob 콘솔에서 찾을 수 있습니다.
+
+2.  필요한 경우 `android/app/build.gradle` 파일에 AdMob 관련 의존성이 올바르게 추가되었는지 확인합니다. 플러그인 설치 시 자동으로 추가될 수 있습니다.
+
+### 4. 광고 컴포넌트 및 로직 통합
+
+-   광고 배너는 `src/components/AdBanner.vue` 컴포넌트에서 관리합니다.
+-   이 `AdBanner.vue` 컴포넌트는 설치된 AdMob 플러그인을 사용하여 배너 광고를 로드하고 표시하도록 구현되어야 합니다. 현재는 플레이스홀더가 표시됩니다.
+-   `AdBanner.vue`는 `src/stores/AdmobStore.ts`의 `isAdVisible` 상태와 Quasar의 플랫폼 감지(`$q.platform.is.capacitor`)를 사용하여 광고 표시 여부를 내부적으로 결정합니다.
+-   `AdBanner.vue` 컴포넌트는 메인 레이아웃 파일인 `src/layouts/MainLayout.vue`에 통합되어 앱 전체적으로 광고를 표시하거나 숨길 수 있도록 설정됩니다. 개별 페이지 컴포넌트에서 광고 로직을 처리할 필요가 없습니다.
+
+### 5. 인앱 구매 (광고 제거)
+
+-   광고 제거를 위한 인앱 구매 기능은 Google Play Console에서 관련 상품을 설정해야 합니다.
+-   Play Billing Library와 통신하기 위한 Capacitor 플러그인(예: `cordova-plugin-purchase`)을 통합해야 합니다.
+-   `src/components/SettingCard.vue`에 광고 제거 구매를 시작하는 UI가 있으며, `initiateRemoveAdsPurchase` 메소드에서 실제 구매 로직을 구현해야 합니다.
+-   구매 성공 시 `admobStore.hideAds()`를 호출하여 광고를 숨깁니다.
+
+### 6. 테스트
+
+-   실제 기기 또는 에뮬레이터에서 광고가 올바르게 표시되는지 테스트합니다.
+-   광고 제거 구매 흐름을 테스트합니다 (테스트 계정 및 라이선스 테스터 설정 필요).
+-   광고가 성공적으로 제거되는지 확인합니다.
+
+**주의:**
+-   개발 중에는 AdMob 테스트 광고 단위 ID를 사용하십시오.
+-   실제 광고 단위 ID는 프로덕션 빌드에만 사용해야 합니다.
+-   AdMob 및 Google Play 정책을 준수해야 합니다.
+
 ## 개발 모드 실행
 
 ### 데스크톱 앱 개발

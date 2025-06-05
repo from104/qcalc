@@ -47,3 +47,6 @@ declare module 'pinia' {
     myCustomProperty?: unknown; // 예시로 추가된 사용자 정의 속성
   }
 }
+
+// AdmobStore를 가져와서 내보냅니다.
+export * from './AdmobStore';
