@@ -252,17 +252,6 @@
     }
     locale.value = settingsStore.locale;
 
-    // OS별 UI 최적화
-    if ($g.isWindows) {
-      calcStore.resultPanelPadding = 8;
-    } else if ($g.isLinux) {
-      calcStore.resultPanelPadding = 9;
-    } else if ($g.isCapacitor) {
-      calcStore.resultPanelPadding = 10;
-    } else {
-      calcStore.resultPanelPadding = 0;
-    }
-
     // 초기 설정 적용
     if (settingsStore.initPanel && calcStore.calc) {
       calcStore.calc.reset();
