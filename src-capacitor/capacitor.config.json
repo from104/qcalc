@@ -3,7 +3,9 @@
   "appName": "Q Calc",
   "webDir": "www",
   "server": {
-    "androidScheme": "file"
+    "androidScheme": "file",
+    "url": "http://192.168.219.20:9500",
+    "cleartext": true
   },
   "plugins": {
     "SplashScreen": {

@@ -332,8 +332,11 @@
       let totalHeightToExclude = 0;
 
       // 1. MainLayout 헤더 높이 (고정값 50px)
-      if ($g.isCapacitor) {
+      if ($g.isAndroid && $g.apiLevel >= 35) {
         totalHeightToExclude += 24;
+        if (!$g.isGestureNavigation) {
+          totalHeightToExclude += 48;
+        }
       } else {
         totalHeightToExclude += 10;
       }
