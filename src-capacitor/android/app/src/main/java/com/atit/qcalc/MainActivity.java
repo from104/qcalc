@@ -75,35 +75,5 @@ public class MainActivity extends BridgeActivity {
 
     // 디바이스에 최적화된 텍스트 크기 설정
     settings.setTextZoom(deviceManager.getTextZoom());
-
-    // ===== 시스템 UI 설정 =====
-
-    // 태블릿인 경우 상태바와 네비게이션바를 명시적으로 표시
-    // 폰에서는 기본 설정 유지
-    if (deviceManager.isTablet()) {
-      showSystemUI();
-      Log.d("QCalc", "태블릿 디바이스 감지 - 상태바와 네비게이션바 표시 모드 활성화");
-    }
-  }
-
-  /**
-   * 상태바와 네비게이션바를 표시하여 일반적인 앱 형태로 보이도록 설정 태블릿에서 전체화면 모드가 아닌 상태로 유지
-   */
-  private void showSystemUI() {
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-      // API 30+ (Android 11+)에서는 WindowInsetsController 사용
-      getWindow().getInsetsController()
-          .show(android.view.WindowInsets.Type.statusBars() | android.view.WindowInsets.Type.navigationBars());
-    } else {
-      // API 30 미만에서는 기존 시스템 UI 플래그 사용
-      View decorView = getWindow().getDecorView();
-      decorView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_STABLE);
-    }
-
-    // 상태바와 네비게이션바 색상을 시스템 기본값으로 설정
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-      getWindow().setStatusBarColor(android.graphics.Color.TRANSPARENT);
-      getWindow().setNavigationBarColor(android.graphics.Color.TRANSPARENT);
-    }
   }
 }
