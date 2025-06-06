@@ -5,7 +5,7 @@
 
 import { defineStore } from 'pinia';
 import { setCssVar, colors, Dark, Platform } from 'quasar';
-import { StatusBar } from '@capacitor/status-bar';
+import { StatusBar, Style } from '@capacitor/status-bar';
 
 import type { ButtonType } from '../types/store';
 import { themes, type DarkModeType, type ThemeType, type ThemeColors } from '../constants/ThemesData';
@@ -110,6 +110,8 @@ export const useThemesStore = defineStore('themes', {
         try {
           // 상태바가 웹뷰와 겹치지 않게 설정
           await StatusBar.setOverlaysWebView({ overlay: false });
+          // 상태바 텍스트 색상 설정
+          await StatusBar.setStyle({ style: Style.Dark });
           // 상태바 배경색 설정
           await StatusBar.setBackgroundColor({ color });
           console.log('상태바 설정 완료:', { color, overlay: false });
@@ -151,7 +153,7 @@ export const useThemesStore = defineStore('themes', {
       this.setScrollbarColors(themeColors.ui.primary, isDark);
 
       // 상태바 배경색을 테마의 primary 색상으로 설정
-      this.setStatusBarColor(themeColors.ui.primary);
+      this.setStatusBarColor(themeColors.ui.dark);
     },
 
     /**

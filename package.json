@@ -41,6 +41,10 @@
     "./src/boot/*": "./src/boot/*.ts"
   },
   "dependencies": {
+    "@capacitor/app": "^7.0.1",
+    "@capacitor/haptics": "^7.0.1",
+    "@capacitor/screen-orientation": "^7.0.1",
+    "@capacitor/status-bar": "^7.0.1",
     "@everapi/freecurrencyapi-js": "^1.0.1",
     "@intlify/unplugin-vue-i18n": "^6.0.4",
     "@quasar/cli": "^2.4.1",
