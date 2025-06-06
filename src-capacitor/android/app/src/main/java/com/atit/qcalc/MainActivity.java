@@ -1,16 +1,13 @@
 package com.atit.qcalc;
 
-import com.getcapacitor.BridgeActivity;
-
 import android.annotation.SuppressLint;
+import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 import android.view.WindowManager;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
-import android.content.pm.ActivityInfo;
-import android.view.View;
-import android.os.Build;
-import android.util.Log;
+
+import com.getcapacitor.BridgeActivity;
 
 import plugins.ScreenOrientation.ScreenOrientationPlugin;
 
@@ -24,6 +21,11 @@ public class MainActivity extends BridgeActivity {
   @Override
   protected void onCreate(Bundle savedInstanceState) {
     // ===== 기본 설정 및 초기화 =====
+
+    // 액션바 숨기기 - 타이틀바 제거
+    if (getSupportActionBar() != null) {
+      getSupportActionBar().hide();
+    }
 
     // 화면 방향 제어를 위한 플러그인 등록
     // 특정 화면에서 방향 고정이 필요한 경우 사용

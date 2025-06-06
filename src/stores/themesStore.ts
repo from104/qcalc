@@ -4,7 +4,8 @@
  */
 
 import { defineStore } from 'pinia';
-import { setCssVar, colors, Dark } from 'quasar';
+import { setCssVar, colors, Dark, Platform } from 'quasar';
+import { StatusBar } from '@capacitor/status-bar';
 
 import type { ButtonType } from '../types/store';
 import { themes, type DarkModeType, type ThemeType, type ThemeColors } from '../constants/ThemesData';
@@ -101,6 +102,24 @@ export const useThemesStore = defineStore('themes', {
     },
 
     /**
+     * 상태바 배경색을 설정합니다.
+     * @param color - 설정할 색상 (HEX 형식)
+     */
+    async setStatusBarColor(color: string): Promise<void> {
+      if (Platform.is.capacitor) {
+        try {
+          // 상태바가 웹뷰와 겹치지 않게 설정
+          await StatusBar.setOverlaysWebView({ overlay: false });
+          // 상태바 배경색 설정
+          await StatusBar.setBackgroundColor({ color });
+          console.log('상태바 설정 완료:', { color, overlay: false });
+        } catch (error) {
+          console.error('상태바 설정 실패:', error);
+        }
+      }
+    },
+
+    /**
      * 테마 업데이트 함수
      * @param isDark - 다크 모드 활성화 여부
      */
@@ -130,6 +149,9 @@ export const useThemesStore = defineStore('themes', {
 
       // 스크롤바 색상 설정 (ui.primary 기반)
       this.setScrollbarColors(themeColors.ui.primary, isDark);
+
+      // 상태바 배경색을 테마의 primary 색상으로 설정
+      this.setStatusBarColor(themeColors.ui.primary);
     },
 
     /**
@@ -295,6 +317,13 @@ export const useThemesStore = defineStore('themes', {
       } else {
         // 브라우저 환경이 아닌 경우 기본 설정만 적용
         this.updateDarkModeAndTheme();
+      }
+
+      // Capacitor 환경에서 상태바 겹침 방지 설정
+      if (Platform.is.capacitor) {
+        StatusBar.setOverlaysWebView({ overlay: false }).catch((error) => {
+          console.error('상태바 겹침 방지 설정 실패:', error);
+        });
       }
     },
   },

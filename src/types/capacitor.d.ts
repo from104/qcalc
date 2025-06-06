@@ -2,7 +2,7 @@
  * @file capacitor.d.ts
  * @description 이 파일은 Capacitor와 Android 네이티브 기능과 관련된 타입과 인터페이스를 정의합니다.
  *              네이티브 기능을 JavaScript에서 호출할 수 있도록 디바이스 타입 확인,
- *              클립보드 접근 등의 기능에 대한 타입 정보를 제공합니다.
+ *              클립보드 접근, API 레벨 확인, 네비게이션바 상태 확인 등의 기능에 대한 타입 정보를 제공합니다.
  */
 
 /**
@@ -32,6 +32,24 @@ declare class AndroidInterface {
    * @returns 텍스트 줌 레벨
    */
   getTextZoom(): number;
+
+  /**
+   * 안드로이드 API 레벨을 가져옵니다.
+   * @returns API 레벨
+   */
+  getApiLevel(): number;
+
+  /**
+   * 네비게이션바의 높이를 픽셀 단위로 가져옵니다.
+   * @returns 네비게이션바 높이(픽셀)
+   */
+  getNavigationBarHeight(): number;
+
+  /**
+   * 제스처 네비게이션 사용 여부를 확인합니다.
+   * @returns 제스처 네비게이션 사용 여부
+   */
+  isGestureNavigation(): boolean;
 
   /**
    * 클립보드의 텍스트를 가져옵니다.

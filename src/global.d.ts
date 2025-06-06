@@ -36,9 +36,22 @@ declare global {
       readonly textZoom: number; // 텍스트 줌 레벨
 
       /**
+       * 안드로이드 시스템 정보
+       */
+      readonly apiLevel: number; // 안드로이드 API 레벨
+      readonly navigationBarHeight: number; // 네비게이션바 높이(픽셀)
+      readonly isGestureNavigation: boolean; // 제스처 네비게이션 사용 여부
+
+      /**
        * 버전 정보
        */
       readonly version: string;
+
+      /**
+       * 클립보드 기능
+       * @returns 클립보드의 텍스트 내용
+       */
+      readonly getFromClipboard: () => string;
     };
 
     /**

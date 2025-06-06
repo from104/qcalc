@@ -3,6 +3,8 @@
  * 제공 기능:
  * - 디바이스 타입 확인 (태블릿/폰/폴더블)
  * - 클립보드 내용 접근
+ * - API 레벨 확인
+ * - 네비게이션바 상태 확인
  */
 package com.atit.qcalc;
 
@@ -38,6 +40,21 @@ public class AndroidInterface {
   @JavascriptInterface
   public int getTextZoom() {
     return deviceManager.getTextZoom();
+  }
+
+  @JavascriptInterface
+  public int getApiLevel() {
+    return deviceManager.getApiLevel();
+  }
+
+  @JavascriptInterface
+  public int getNavigationBarHeight() {
+    return deviceManager.getNavigationBarHeight();
+  }
+
+  @JavascriptInterface
+  public boolean isGestureNavigation() {
+    return deviceManager.isGestureNavigation();
   }
 
   @JavascriptInterface
