@@ -52,8 +52,6 @@ export type DecimalPlacesType = keyof typeof DECIMAL_PLACES;
 export interface CalcState {
   calc: Calculator;
   isMemoryVisible: boolean;
-  resultPanelPadding: number;
-  paddingOnResult: number;
   isShiftPressed: boolean;
   isShiftLocked: boolean;
   needButtonNotification: boolean;

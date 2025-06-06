@@ -341,8 +341,8 @@ export const themes: Record<ThemeType, ThemeColors> = {
       dark: '#263238', // #263238
     },
     button: {
-      important: '#546e7a', // #546e7a
-      function: '#455a64', // #455a64
+      important: '#455a64', // #455a64
+      function: '#546e7a', // #546e7a
       normal: '#78909c', // #78909c
     },
     panel: {

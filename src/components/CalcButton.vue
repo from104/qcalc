@@ -307,11 +307,15 @@
   const handleResize = () => {
     screenWidth.value = isWideWidth() ? window.innerWidth / 2 : window.innerWidth;
     screenHeight.value = window.innerHeight;
+    // 화면 크기 변경 시 baseHeight 재계산
+    setTimeout(() => calculateDynamicBaseHeight(), 100);
   };
 
   // 컴포넌트 마운트 시 resize 이벤트 리스너 등록
   onMounted(() => {
     window.addEventListener('resize', handleResize);
+    // DOM이 완전히 렌더링된 후 baseHeight 계산
+    setTimeout(() => calculateDynamicBaseHeight(), 150);
   });
 
   // 컴포넌트 언마운트 시 resize 이벤트 리스너 제거
@@ -319,12 +323,103 @@
     window.removeEventListener('resize', handleResize);
   });
 
-  // 계산기 버튼 높이 설정
-  const baseHeight = ref('132px');
-  // const baseHeight = ref('272px');
-  if (['unit', 'currency', 'radix'].includes(props.type)) {
-    baseHeight.value = '230px';
-  }
+  /**
+   * 페이지 구조를 기반으로 동적 baseHeight를 계산하는 함수
+   * @description 각 페이지 타입별로 실제 DOM 요소들의 높이를 측정하여 정확한 baseHeight 계산
+   */
+  const calculateDynamicBaseHeight = () => {
+    try {
+      let totalHeightToExclude = 0;
+
+      // 1. MainLayout 헤더 높이 (고정값 50px)
+      if ($g.isCapacitor) {
+        totalHeightToExclude += 24;
+      } else {
+        totalHeightToExclude += 10;
+      }
+
+      // 2. 현재 활성화된 q-card 요소 찾기 (각 페이지의 컨테이너)
+      const currentCard = document.querySelector('.q-tab-panel--active q-card') as HTMLElement;
+
+      if (currentCard) {
+        // 3. q-card의 패딩 계산 (q-px-md q-pt-xs q-pb-md)
+        const cardStyles = window.getComputedStyle(currentCard);
+        const paddingTop = parseInt(cardStyles.paddingTop) || 4; // q-pt-xs
+        const paddingBottom = parseInt(cardStyles.paddingBottom) || 16; // q-pb-md
+        totalHeightToExclude += paddingTop + paddingBottom;
+
+        // 4. CalcButton을 제외한 모든 자식 요소들의 높이 합산
+        const cardChildren = Array.from(currentCard.children) as HTMLElement[];
+
+        for (const child of cardChildren) {
+          // CalcButton 컴포넌트가 포함된 q-card-section은 제외
+          if (!child.querySelector('.button') && !child.classList.contains('button')) {
+            const childHeight = child.offsetHeight;
+            totalHeightToExclude += childHeight;
+
+            if (process.env.DEV) {
+              console.log(`Child element height: ${childHeight}px`, child.className || child.tagName);
+            }
+          }
+        }
+      } else {
+        // q-card를 찾을 수 없는 경우 타입별 추정값 사용
+        if (props.type === 'calc') {
+          totalHeightToExclude += 100; // ResultField(main) 추정
+        } else {
+          totalHeightToExclude += 200; // ResultField(main) + Panel + ResultField(sub) 추정
+        }
+        totalHeightToExclude += 20; // 패딩 추정값
+      }
+
+      // 5. 최소 높이 보장 및 최종 값 설정
+      const calculatedHeight = Math.max(totalHeightToExclude, 120);
+      baseHeight.value = `${calculatedHeight}px`;
+
+      // 6. 개발 환경에서 디버깅 정보 출력
+      if (process.env.DEV) {
+        console.log(`🎯 CalcButton baseHeight calculated for type "${props.type}": ${baseHeight.value}`, {
+          screenHeight: screenHeight.value,
+          headerHeight: 50,
+          totalExcluded: totalHeightToExclude,
+          finalHeight: calculatedHeight,
+          cardFound: !!currentCard,
+        });
+      }
+    } catch (error) {
+      // 에러 발생 시 타입별 기본값 사용
+      console.warn('⚠️ Error calculating dynamic baseHeight, using fallback values:', error);
+      baseHeight.value =
+        props.type === 'calc' ? '130px' : ['unit', 'currency', 'radix'].includes(props.type) ? '220px' : '130px';
+    }
+  };
+
+  // 계산기 버튼 높이 설정 (초기값)
+  const baseHeight = ref('130px');
+
+  // props.type 변경 시 baseHeight 재계산
+  watch(
+    () => props.type,
+    () => {
+      setTimeout(() => calculateDynamicBaseHeight(), 100);
+    },
+  );
+
+  // 탭 변경 시 baseHeight 재계산 (DOM 업데이트 후)
+  watch(
+    () => uiStore.currentTab,
+    () => {
+      setTimeout(() => calculateDynamicBaseHeight(), 150);
+    },
+  );
+
+  // 화면 방향 변경이나 레이아웃 변경 감지
+  watch(
+    () => [screenWidth.value, screenHeight.value],
+    () => {
+      setTimeout(() => calculateDynamicBaseHeight(), 100);
+    },
+  );
 
   const displayDisabledButtonNotification = () => {
     showMessage(t('disabledButton'));

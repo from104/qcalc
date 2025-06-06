@@ -718,7 +718,29 @@
   });
 
   // 결과 패널 패딩 설정
-  const resultPanelPadding = computed(() => calcStore.resultPanelPadding);
+  // const resultPanelPadding = computed(() => calcStore.resultPanelPadding);
+  const panelPaddingBase = computed(() => {
+    if ($g.isWindows) {
+      return 14;
+    }
+    return 8;
+  });
+
+  const mainPanelPaddingTop = computed(() => {
+    return `${panelPaddingBase.value}px`;
+  });
+
+  const mainPanelPaddingBottom = computed(() => {
+    return `${Math.floor((panelPaddingBase.value - 4) / 2)}px`;
+  });
+
+  const subPanelPaddingTop = computed(() => {
+    return `${Math.floor(panelPaddingBase.value - 4)}px`;
+  });
+
+  const subPanelPaddingBottom = computed(() => {
+    return `${Math.floor((panelPaddingBase.value - 8) / 2)}px`;
+  });
   // const resultPanelPadding = computed(() => 12);
 
   // 메뉴 배경색
@@ -796,8 +818,8 @@
           :class="[`text-${calcStore.isMemoryVisible ? memoryTextColor : panelTextColor}`]"
           :style="
             isMainField
-              ? `padding-top: ${resultPanelPadding}px; padding-bottom: ${Math.floor(resultPanelPadding / 2)}px;`
-              : ''
+              ? `padding-top: ${mainPanelPaddingTop}; padding-bottom: ${mainPanelPaddingBottom};`
+              : `padding-top: ${subPanelPaddingTop}; padding-bottom: ${subPanelPaddingBottom};`
           "
           role="text"
           :aria-label="t('ariaLabel.result', { type: isMainField ? t('ariaLabel.main') : t('ariaLabel.sub') })"

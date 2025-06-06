@@ -20,8 +20,6 @@ const uiStore = useUIStore();
 interface CalcState {
   calc: Calculator;
   isMemoryVisible: boolean;
-  resultPanelPadding: number;
-  paddingOnResult: number;
   isShiftPressed: boolean;
   isShiftLocked: boolean;
   needButtonNotification: boolean;
@@ -31,8 +29,6 @@ export const useCalcStore = defineStore('calc', {
   state: (): CalcState => ({
     calc: new Calculator(),
     isMemoryVisible: false,
-    resultPanelPadding: 0,
-    paddingOnResult: 20,
     isShiftPressed: false,
     isShiftLocked: false,
     needButtonNotification: false,
