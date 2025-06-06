@@ -78,6 +78,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@capacitor/status-bar@npm:^7.0.1":
+  version: 7.0.1
+  resolution: "@capacitor/status-bar@npm:7.0.1"
+  peerDependencies:
+    "@capacitor/core": ">=7.0.0"
+  checksum: 10/b634f7b98f38fa411a928923a7898ad4b04a3cce0d669a1af2ac32800f4d6a7ae3a8712d92da8f4db1e556a3e704a3c2bab8436332ebbab91082d3551ba0202d
+  languageName: node
+  linkType: hard
+
 "@ionic/cli-framework-output@npm:^2.2.8":
   version: 2.2.8
   resolution: "@ionic/cli-framework-output@npm:2.2.8"
@@ -726,6 +735,7 @@ __metadata:
     "@capacitor/core": "npm:7.0.1"
     "@capacitor/haptics": "npm:7.0.0"
     "@capacitor/splash-screen": "npm:7.0.0"
+    "@capacitor/status-bar": "npm:^7.0.1"
   languageName: unknown
   linkType: soft
 

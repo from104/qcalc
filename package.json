@@ -41,11 +41,6 @@
     "./src/boot/*": "./src/boot/*.ts"
   },
   "dependencies": {
-    "@capacitor/android": "7.0.1",
-    "@capacitor/core": "7.0.1",
-    "@capacitor/device": "^7.0.0",
-    "@capacitor/screen-orientation": "^7.0.0",
-    "@capacitor/screen-reader": "^7.0.0",
     "@everapi/freecurrencyapi-js": "^1.0.1",
     "@intlify/unplugin-vue-i18n": "^6.0.4",
     "@quasar/cli": "^2.4.1",
@@ -71,7 +66,6 @@
     "vue-router": "4.5.0"
   },
   "devDependencies": {
-    "@capacitor/cli": "^7.0.1",
     "@eslint/js": "9.21.0",
     "@modyfi/vite-plugin-yaml": "1.1.0",
     "@quasar/app-vite": "2.1.1",
