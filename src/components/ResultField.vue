@@ -746,7 +746,7 @@
   // 메뉴 배경색
   const menuBackgroundColor = computed(() => {
     return themesStore.isDarkMode()
-      ? lighten(themesStore.getCurrentThemeColors.ui.dark, 10)
+      ? lighten(themesStore.getDarkColor(), 10)
       : lighten(themesStore.getCurrentThemeColors.ui.primary, 90);
   });
 </script>
@@ -856,7 +856,7 @@
           </span>
           <ToolTip
             v-if="needFieldTooltip"
-            :text-color="themesStore.getCurrentThemeColors.ui.dark"
+            :text-color="themesStore.getDarkColor()"
             :bg-color="themesStore.getCurrentThemeColors.ui.warning"
             :text="calcStore.isMemoryVisible ? displayedResultWithMemory : displayedResult"
           />

@@ -571,7 +571,7 @@
           {{ extendedFunctionSet[id]?.label ?? '' }}
         </q-tooltip>
         <ToolTip
-          :text-color="themesStore.getCurrentThemeColors.ui.dark"
+          :text-color="themesStore.getDarkColor()"
           :bg-color="themesStore.getCurrentThemeColors.ui.warning"
           :text="
             calcStore.isShiftPressed

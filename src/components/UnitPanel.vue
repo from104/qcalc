@@ -262,7 +262,7 @@
         </transition-group>
       </template>
       <ToolTip
-        :text-color="themesStore.getCurrentThemeColors.ui.dark"
+        :text-color="themesStore.getDarkColor()"
         :bg-color="themesStore.getCurrentThemeColors.ui.warning"
         :text="t(`unitDesc.${unitStore.selectedCategory}.${unitStore.sourceUnits[unitStore.selectedCategory]}`)"
       />
@@ -284,7 +284,7 @@
       @click="handleUnitSwap()"
     >
       <ToolTip
-        :text-color="themesStore.getCurrentThemeColors.ui.dark"
+        :text-color="themesStore.getDarkColor()"
         :bg-color="themesStore.getCurrentThemeColors.ui.warning"
         :auto-hide="3000"
         :text="t('tooltipSwap')"
@@ -339,7 +339,7 @@
         </transition-group>
       </template>
       <ToolTip
-        :text-color="themesStore.getCurrentThemeColors.ui.dark"
+        :text-color="themesStore.getDarkColor()"
         :bg-color="themesStore.getCurrentThemeColors.ui.warning"
         :text="t(`unitDesc.${unitStore.selectedCategory}.${unitStore.targetUnits[unitStore.selectedCategory]}`)"
       />

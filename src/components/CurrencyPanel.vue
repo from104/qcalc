@@ -293,7 +293,7 @@
         </transition-group>
       </template>
       <ToolTip
-        :text-color="themesStore.getCurrentThemeColors.ui.dark"
+        :text-color="themesStore.getDarkColor()"
         :bg-color="themesStore.getCurrentThemeColors.ui.warning"
         :text="`${currencyDescriptions[currencyStore.sourceCurrency]}\n${currencyStore.sourceCurrency}`"
       />
@@ -314,7 +314,7 @@
       @click="handleCurrencySwap()"
     >
       <ToolTip
-        :text-color="themesStore.getCurrentThemeColors.ui.dark"
+        :text-color="themesStore.getDarkColor()"
         :bg-color="themesStore.getCurrentThemeColors.ui.warning"
         :auto-hide="3000"
         :text="t('tooltipSwap')"
@@ -379,7 +379,7 @@
         </transition-group>
       </template>
       <ToolTip
-        :text-color="themesStore.getCurrentThemeColors.ui.dark"
+        :text-color="themesStore.getDarkColor()"
         :bg-color="themesStore.getCurrentThemeColors.ui.warning"
       >
         <div class="text-left" style="white-space: pre-wrap">

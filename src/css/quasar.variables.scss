@@ -75,17 +75,18 @@
 // Tip: Use the "Theme Builder" on Quasar's documentation website.
 
 // CSS 변수를 사용하여 Quasar 색상 변수 할당
-$primary   : var(--q-primary, #16743f); // 기본값 설정
-$secondary : var(--q-secondary, #4abf89);
-$accent    : var(--q-accent, #3fce97);
+// 기본 테마의 Quasar 컬러 이름에 해당하는 HEX 값으로 fallback 설정
+$primary: var(--q-primary, #2e7d32); // green-9 approximation
+$secondary: var(--q-secondary, #43a047); // green-6 approximation
+$accent: var(--q-accent, #7cb342); // light-green-5 approximation
 
-$dark      : var(--q-dark, #1d1d1d); // 다크모드 배경색 등
-$dark-page : var(--q-dark, #1d1d1d); // 페이지 배경은 $dark와 동기화
+$dark: var(--q-dark, #1d1d1d); // grey-10
+$dark-page: var(--q-dark, #1d1d1d); // 페이지 배경은 $dark와 동기화
 
-$positive  : var(--q-positive, #1d8fb6);
-$negative  : var(--q-negative, #c71818);
-$info      : var(--q-info, #34a9e0);
-$warning   : var(--q-warning, #d1a527);
+$positive: var(--q-positive, #0097a7); // cyan-7 approximation
+$negative: var(--q-negative, #c62828); // red-9 approximation
+$info: var(--q-info, #29b6f6); // light-blue-5 approximation
+$warning: var(--q-warning, #ffa000); // amber-7 approximation
 
 // Quasar는 body.body--dark 선택자를 통해 다크 모드 스타일을 적용합니다.
 // settingsStore에서 setCssVar를 사용하여 --q-primary 등을 설정하면
