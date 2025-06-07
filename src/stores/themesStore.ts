@@ -128,54 +128,62 @@ export const useThemesStore = defineStore('themes', {
     updateTheme(isDark: boolean = false): void {
       const themeColors: ThemeColors = this.getCurrentThemeColors;
 
+      // primary 색상을 기반으로 dark 색상을 90% 어둡게 계산
+      const primaryHexColor = this.getQuasarColorToHex(themeColors.ui.primary);
+      const darkHexColor = this.getDarkColor();
+
       /**
        * ThemeColors.ui 객체의 색상들을 CSS 변수('ui-primary', 'ui-secondary' 등)로 설정합니다.
        * @param uiColors - 테마의 UI 색상 객체 (ThemeColors['ui'])
        * @param isDarkValue - 다크 모드 활성화 여부
        */
-      function setUiVariables(uiColors: ThemeColors['ui'], isDarkValue: boolean): void {
+      const setUiVariables = (uiColors: ThemeColors['ui'], isDarkValue: boolean): void => {
         Object.entries(uiColors).forEach(([key, value]) => {
-          const finalColor = isDarkValue ? colors.lighten(value, -30) : value;
+          // Quasar 컬러 이름을 HEX로 변환 (colors.lighten은 HEX 값을 기대함)
+          const hexValue = this.getQuasarColorToHex(value);
+          const finalColor = isDarkValue ? colors.lighten(hexValue, -30) : hexValue;
           setCssVar(`${key}`, finalColor);
         });
-      }
+
+        // dark 색상을 동적으로 설정 (primary 기반으로 90% 어둡게)
+        setCssVar('dark', darkHexColor);
+      };
 
       // UI 관련 색상에 대해서만 CSS 변수를 설정합니다.
       setUiVariables(themeColors.ui, isDark);
 
-      // Quasar 다크 모드 기본 배경색 등을 위해 'dark' CSS 변수를 테마의 ui.dark 값으로 설정합니다.
-      // 이는 setUiVariables에서 설정된 'ui-dark'와는 별개로 Quasar에 의해 사용될 수 있습니다.
-      if (isDark && 'dark' in themeColors.ui) {
-        setCssVar('dark', themeColors.ui.dark);
+      // Quasar 다크 모드 기본 배경색을 위해 'dark' CSS 변수를 설정합니다.
+      if (isDark) {
+        setCssVar('dark', darkHexColor);
       }
 
       // 스크롤바 색상 설정 (ui.primary 기반)
-      this.setScrollbarColors(themeColors.ui.primary, isDark);
+      this.setScrollbarColors(primaryHexColor, isDark);
 
-      // 상태바 배경색을 테마의 primary 색상으로 설정
-      this.setStatusBarColor(themeColors.ui.dark);
+      // 상태바 배경색을 동적으로 계산된 dark 색상으로 설정
+      this.setStatusBarColor(darkHexColor);
     },
 
     /**
      * 스크롤바 색상을 설정합니다.
-     * @param primaryColor - 기본 primary 색상
+     * @param primaryHexColor - 기본 primary 색상 (HEX 형식)
      * @param isDarkValue - 다크 모드 활성화 여부
      */
-    setScrollbarColors(primaryColor: string, isDarkValue: boolean): void {
+    setScrollbarColors(primaryHexColor: string, isDarkValue: boolean): void {
       try {
         // 라이트 모드: primary 색상을 더 밝게 (투명도 적용)
         // 다크 모드: primary 색상을 약간 밝게 (투명도 적용)
         const scrollbarThumbColor = isDarkValue
-          ? colors.lighten(primaryColor, 20) // 다크 모드에서는 20% 밝게
-          : colors.lighten(primaryColor, -10); // 라이트 모드에서는 10% 어둡게
+          ? colors.lighten(primaryHexColor, 20) // 다크 모드에서는 20% 밝게
+          : colors.lighten(primaryHexColor, -10); // 라이트 모드에서는 10% 어둡게
 
         // 투명도를 적용한 스크롤바 색상 (rgba 형태로 변환)
         const scrollbarThumbColorWithOpacity = this.hexToRgba(scrollbarThumbColor, isDarkValue ? 0.6 : 0.4);
 
         // 호버 시 더 진한 색상
         const scrollbarThumbHoverColor = isDarkValue
-          ? colors.lighten(primaryColor, 30)
-          : colors.lighten(primaryColor, -20);
+          ? colors.lighten(primaryHexColor, 30)
+          : colors.lighten(primaryHexColor, -20);
 
         const scrollbarThumbHoverColorWithOpacity = this.hexToRgba(scrollbarThumbHoverColor, isDarkValue ? 0.8 : 0.6);
 
@@ -225,13 +233,24 @@ export const useThemesStore = defineStore('themes', {
     },
 
     /**
-     * 지정된 타입의 버튼 색상을 반환합니다.
+     * primary 색상을 기반으로 90% 어둡게 계산된 dark 색상을 반환합니다.
+     * @returns {string} HEX 색상 코드
+     */
+    getDarkColor(): string {
+      const themeColors = this.getCurrentThemeColors;
+      const primaryHexColor = this.getQuasarColorToHex(themeColors.ui.primary);
+      return colors.lighten(primaryHexColor, -90);
+    },
+
+    /**
+     * 지정된 타입의 버튼 색상을 HEX 형식으로 반환합니다.
      * @param type - 반환할 버튼의 타입 ('normal', 'important', 'function')
      * @returns {string} HEX 색상 코드
      */
     getButtonColor(type: ButtonType): string {
       const currentThemePalette = this.getCurrentThemeColors;
-      return currentThemePalette.button[type];
+      const quasarColorName = currentThemePalette.button[type];
+      return this.getQuasarColorToHex(quasarColorName);
     },
 
     /**

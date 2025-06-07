@@ -402,7 +402,7 @@
   // 메뉴 배경색
   const menuBackgroundColor = computed(() => {
     return themesStore.isDarkMode()
-      ? lighten(themesStore.getCurrentThemeColors.ui.dark, 10)
+      ? lighten(themesStore.getDarkColor(), 10)
       : lighten(themesStore.getCurrentThemeColors.ui.primary, 90);
   });
 </script>
@@ -527,7 +527,7 @@
                   />
                   <ToolTip
                     v-if="isShowMemoTooltip[record.id]"
-                    :text-color="themesStore.getCurrentThemeColors.ui.dark"
+                    :text-color="themesStore.getDarkColor()"
                     :bg-color="themesStore.getCurrentThemeColors.ui.warning"
                     :delay="1000"
                     :text="record.memo"
@@ -542,7 +542,7 @@
                   />
                   <ToolTip
                     v-if="isShowResultTooltip[record.id]"
-                    :text-color="themesStore.getCurrentThemeColors.ui.dark"
+                    :text-color="themesStore.getDarkColor()"
                     :bg-color="themesStore.getCurrentThemeColors.ui.warning"
                     :delay="1000"
                     :text="record.displayText"

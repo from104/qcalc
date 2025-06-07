@@ -7,23 +7,15 @@
 export type DarkModeType = 'light' | 'dark' | 'system';
 
 // 테마 타입 정의
-export type ThemeType =
-  | 'default'
-  | 'azalea'
-  | 'autumn'
-  | 'forest'
-  | 'ocean'
-  | 'amethyst'
-  | 'slate'
-  | 'highcontrast';
-  
+export type ThemeType = 'default' | 'azalea' | 'autumn' | 'forest' | 'ocean' | 'amethyst' | 'slate' | 'highcontrast';
+
 // 테마 이름 다국어 인터페이스 정의
 export interface ThemeName {
   ko: string;
   en: string;
 }
 
-// 테마 색상 인터페이스 정의
+// 테마 색상 인터페이스 정의 (dark 제거)
 export interface ThemeColors {
   name: ThemeName;
   ui: {
@@ -34,7 +26,7 @@ export interface ThemeColors {
     negative: string;
     info: string;
     warning: string;
-    dark: string; // 다크 모드 배경색 등
+    // dark는 primary 기반으로 90% 어둡게 동적 계산됨
   };
   button: {
     important: string;
@@ -65,7 +57,7 @@ export interface ThemeColors {
   };
 }
 
-// 테마 팔레트 정의 (ThemeColors 인터페이스에 맞게 수정)
+// 테마 팔레트 정의 (dark 속성 제거)
 export const themes: Record<ThemeType, ThemeColors> = {
   default: {
     name: {
@@ -73,19 +65,18 @@ export const themes: Record<ThemeType, ThemeColors> = {
       en: 'Default',
     },
     ui: {
-      primary: '#16743f', // #16743f
-      secondary: '#04b060', // #04b060
-      accent: '#3fce97', // #3fce97
-      positive: '#1d8fb6', // #1d8fb6
-      negative: '#c71818', // #c71818
-      info: '#34a9e0', // #34a9e0
-      warning: '#d1a527', // #d1a527
-      dark: '#1d1d1d', // #1d1d1d
+      primary: 'green-10', // #16743f
+      secondary: 'green-6', // #04b060
+      accent: 'light-green-5', // #3fce97
+      positive: 'cyan-7', // #1d8fb6
+      negative: 'red-9', // #c71818
+      info: 'light-blue-5', // #34a9e0
+      warning: 'amber-7', // #d1a527
     },
     button: {
-      important: '#cb9247', // #cb9247
-      function: '#1d8fb6', // #1d8fb6
-      normal: '#5e9e7d', // #5e9e7d
+      important: 'deep-orange-8', // #cb9247
+      function: 'cyan-8', // #1d8fb6
+      normal: 'green-8', // #5e9e7d
     },
     panel: {
       text: {
@@ -105,8 +96,8 @@ export const themes: Record<ThemeType, ThemeColors> = {
         dark: 'grey-1',
       },
       background: {
-        light: 'blue-grey-2',
-        dark: 'blue-grey-6',
+        light: 'green-2',
+        dark: 'green-8',
       },
     },
   },
@@ -116,19 +107,18 @@ export const themes: Record<ThemeType, ThemeColors> = {
       en: 'Azalea',
     },
     ui: {
-      primary: '#c2185b', // #c2185b (진한 핑크)
-      secondary: '#f06292', // #f06292 (밝은 핑크)
-      accent: '#e91e63', // primary를 조금 밝게: #c2185b -> #e91e63
-      positive: '#4caf50', // #4caf50 (초록)
-      negative: '#f44336', // #f44336 (빨강)
-      info: '#2196f3', // #2196f3 (파랑)
-      warning: '#ff9800', // #ff9800 (주황)
-      dark: '#1a0612', // #1a0612 (진한 핑크 다크)
+      primary: 'pink-8', // #c2185b
+      secondary: 'pink-4', // #f06292
+      accent: 'pink-6', // #e91e63
+      positive: 'green-6', // #4caf50
+      negative: 'red-6', // #f44336
+      info: 'blue-6', // #2196f3
+      warning: 'orange-6', // #ff9800
     },
     button: {
-      important: '#c2185b', // #c2185b
-      function: '#e91e63', // #e91e63
-      normal: '#f06292', // #f06292
+      important: 'pink-8', // #c2185b
+      function: 'pink-6', // #e91e63
+      normal: 'pink-4', // #f06292
     },
     panel: {
       text: {
@@ -138,8 +128,8 @@ export const themes: Record<ThemeType, ThemeColors> = {
         warningAccent: 'cyan-10',
       },
       background: {
-        normal: 'pink-3',
-        warning: 'cyan-3',
+        normal: 'pink-2',
+        warning: 'cyan-2',
       },
     },
     select: {
@@ -148,8 +138,8 @@ export const themes: Record<ThemeType, ThemeColors> = {
         dark: 'pink-1',
       },
       background: {
-        light: 'pink-2',
-        dark: 'pink-9',
+        light: 'pink-1',
+        dark: 'pink-7',
       },
     },
   },
@@ -159,19 +149,18 @@ export const themes: Record<ThemeType, ThemeColors> = {
       en: 'Autumn',
     },
     ui: {
-      primary: '#A0522D', // #A0522D
-      secondary: '#ffb562', // #ffb562
-      accent: '#d07a54', // primary를 30% 밝게: #A0522D -> #d07a54
-      positive: '#ff7f51', // #ff7f51
-      negative: '#a72608', // #a72608
-      info: '#fca311', // #fca311
-      warning: '#f7b267', // #f7b267
-      dark: '#1d0f0f', // #1d0f0f
+      primary: 'brown-7', // #A0522D
+      secondary: 'orange-4', // #ffb562
+      accent: 'brown-5', // #d07a54
+      positive: 'deep-orange-5', // #ff7f51
+      negative: 'red-10', // #a72608
+      info: 'amber-6', // #fca311
+      warning: 'amber-5', // #f7b267
     },
     button: {
-      important: '#754520', // #8a5226
-      function: '#9c6d4a', // #b88157
-      normal: '#c68f63', // #e9a875
+      important: 'brown-8', // #754520
+      function: 'brown-6', // #9c6d4a
+      normal: 'brown-4', // #c68f63
     },
     panel: {
       text: {
@@ -181,8 +170,8 @@ export const themes: Record<ThemeType, ThemeColors> = {
         warningAccent: 'blue-10',
       },
       background: {
-        normal: 'brown-3',
-        warning: 'blue-3',
+        normal: 'brown-2',
+        warning: 'blue-2',
       },
     },
     select: {
@@ -191,8 +180,8 @@ export const themes: Record<ThemeType, ThemeColors> = {
         dark: 'brown-1',
       },
       background: {
-        light: 'brown-2',
-        dark: 'brown-9',
+        light: 'brown-1',
+        dark: 'brown-7',
       },
     },
   },
@@ -202,19 +191,18 @@ export const themes: Record<ThemeType, ThemeColors> = {
       en: 'Forest',
     },
     ui: {
-      primary: '#355e3b', // #355e3b
-      secondary: '#6b8e23', // #6b8e23
-      accent: '#5a8a62', // primary를 30% 밝게: #355e3b -> #5a8a62
-      positive: '#4e944f', // #4e944f
-      negative: '#a0522d', // #a0522d
-      info: '#7fb77e', // #7fb77e
-      warning: '#e2c275', // #e2c275
-      dark: '#11160d', // #11160d
+      primary: 'green-9', // #355e3b
+      secondary: 'green-7', // #6b8e23
+      accent: 'green-7', // #5a8a62
+      positive: 'green-6', // #4e944f
+      negative: 'brown-7', // #a0522d
+      info: 'green-5', // #7fb77e
+      warning: 'amber-5', // #e2c275
     },
     button: {
-      important: '#355e3b', // #355e3b
-      function: '#4F8B50', // #4F8B50
-      normal: '#69b36a', // #69b36a
+      important: 'green-9', // #355e3b
+      function: 'green-7', // #4F8B50
+      normal: 'green-5', // #69b36a
     },
     panel: {
       text: {
@@ -224,8 +212,8 @@ export const themes: Record<ThemeType, ThemeColors> = {
         warningAccent: 'purple-10',
       },
       background: {
-        normal: 'green-3',
-        warning: 'purple-3',
+        normal: 'green-2',
+        warning: 'purple-2',
       },
     },
     select: {
@@ -234,8 +222,8 @@ export const themes: Record<ThemeType, ThemeColors> = {
         dark: 'grey-1',
       },
       background: {
-        light: 'green-2',
-        dark: 'green-9',
+        light: 'green-1',
+        dark: 'green-7',
       },
     },
   },
@@ -245,19 +233,18 @@ export const themes: Record<ThemeType, ThemeColors> = {
       en: 'Ocean',
     },
     ui: {
-      primary: '#176087', // #176087
-      secondary: '#4ecdc4', // #4ecdc4
-      accent: '#3d8bb5', // primary를 30% 밝게: #176087 -> #3d8bb5
-      positive: '#1ca9c9', // #1ca9c9
-      negative: '#ff6b6b', // #ff6b6b
-      info: '#34a9e0', // #34a9e0
-      warning: '#ffe66d', // #ffe66d
-      dark: '#0f1e21', // #0f1e21
+      primary: 'blue-8', // #176087
+      secondary: 'teal-4', // #4ecdc4
+      accent: 'blue-6', // #3d8bb5
+      positive: 'cyan-6', // #1ca9c9
+      negative: 'red-5', // #ff6b6b
+      info: 'light-blue-5', // #34a9e0
+      warning: 'yellow-4', // #ffe66d
     },
     button: {
-      important: '#0078b8', // #0078b8
-      function: '#3886ba', // #3886ba
-      normal: '#5ca6cd', // #5ca6cd
+      important: 'blue-8', // #0078b8
+      function: 'blue-6', // #3886ba
+      normal: 'blue-4', // #5ca6cd
     },
     panel: {
       text: {
@@ -267,8 +254,8 @@ export const themes: Record<ThemeType, ThemeColors> = {
         warningAccent: 'amber-10',
       },
       background: {
-        normal: 'light-blue-3',
-        warning: 'amber-3',
+        normal: 'light-blue-2',
+        warning: 'amber-2',
       },
     },
     select: {
@@ -277,8 +264,8 @@ export const themes: Record<ThemeType, ThemeColors> = {
         dark: 'light-blue-1',
       },
       background: {
-        light: 'light-blue-2',
-        dark: 'light-blue-9',
+        light: 'light-blue-1',
+        dark: 'light-blue-7',
       },
     },
   },
@@ -288,19 +275,18 @@ export const themes: Record<ThemeType, ThemeColors> = {
       en: 'Amethyst',
     },
     ui: {
-      primary: '#6a1b9a', // #6a1b9a
-      secondary: '#ab47bc', // #ab47bc
-      accent: '#9548c8', // primary를 30% 밝게: #6a1b9a -> #9548c8
-      positive: '#4caf50', // #4caf50
-      negative: '#f44336', // #f44336
-      info: '#2196f3', // #2196f3
-      warning: '#ff9800', // #ff9800
-      dark: '#12051a', // #12051a
+      primary: 'purple-8', // #6a1b9a
+      secondary: 'purple-5', // #ab47bc
+      accent: 'purple-6', // #9548c8
+      positive: 'green-6', // #4caf50
+      negative: 'red-6', // #f44336
+      info: 'blue-6', // #2196f3
+      warning: 'orange-6', // #ff9800
     },
     button: {
-      important: '#6a1b9a', // #6a1b9a
-      function: '#8e24aa', // #8e24aa
-      normal: '#ab47bc', // #ab47bc
+      important: 'purple-8', // #6a1b9a
+      function: 'purple-6', // #8e24aa
+      normal: 'purple-5', // #ab47bc
     },
     panel: {
       text: {
@@ -310,8 +296,8 @@ export const themes: Record<ThemeType, ThemeColors> = {
         warningAccent: 'yellow-10',
       },
       background: {
-        normal: 'deep-purple-3',
-        warning: 'yellow-3',
+        normal: 'deep-purple-2',
+        warning: 'yellow-2',
       },
     },
     select: {
@@ -320,8 +306,8 @@ export const themes: Record<ThemeType, ThemeColors> = {
         dark: 'deep-purple-1',
       },
       background: {
-        light: 'deep-purple-2',
-        dark: 'deep-purple-9',
+        light: 'deep-purple-1',
+        dark: 'deep-purple-7',
       },
     },
   },
@@ -331,19 +317,18 @@ export const themes: Record<ThemeType, ThemeColors> = {
       en: 'Slate',
     },
     ui: {
-      primary: '#546e7a', // #546e7a
-      secondary: '#78909c', // #78909c
-      accent: '#7a95a3', // primary를 30% 밝게: #546e7a -> #7a95a3
-      positive: '#4caf50', // #4caf50
-      negative: '#f44336', // #f44336
-      info: '#2196f3', // #2196f3
-      warning: '#ff9800', // #ff9800
-      dark: '#263238', // #263238
+      primary: 'blue-grey-7', // #546e7a
+      secondary: 'blue-grey-5', // #78909c
+      accent: 'blue-grey-5', // #7a95a3
+      positive: 'green-6', // #4caf50
+      negative: 'red-6', // #f44336
+      info: 'blue-6', // #2196f3
+      warning: 'orange-6', // #ff9800
     },
     button: {
-      important: '#455a64', // #455a64
-      function: '#546e7a', // #546e7a
-      normal: '#78909c', // #78909c
+      important: 'blue-grey-8', // #455a64
+      function: 'blue-grey-7', // #546e7a
+      normal: 'blue-grey-5', // #78909c
     },
     panel: {
       text: {
@@ -353,8 +338,8 @@ export const themes: Record<ThemeType, ThemeColors> = {
         warningAccent: 'brown-10',
       },
       background: {
-        normal: 'blue-grey-3',
-        warning: 'brown-3',
+        normal: 'blue-grey-2',
+        warning: 'brown-2',
       },
     },
     select: {
@@ -363,8 +348,8 @@ export const themes: Record<ThemeType, ThemeColors> = {
         dark: 'blue-grey-1',
       },
       background: {
-        light: 'blue-grey-2',
-        dark: 'blue-grey-8',
+        light: 'blue-grey-1',
+        dark: 'blue-grey-7',
       },
     },
   },
@@ -374,40 +359,39 @@ export const themes: Record<ThemeType, ThemeColors> = {
       en: 'High Contrast',
     },
     ui: {
-      primary: '#a52a2a', // #a52a2a
-      secondary: '#ffff00', // #ffff00
-      accent: '#d55555', // primary를 30% 밝게: #a52a2a -> #d55555
-      positive: '#00ff00', // #00ff00
-      negative: '#ff0000', // #ff0000
-      info: '#0000ff', // #0000ff
-      warning: '#ffa500', // #ffa500
-      dark: '#0f0f0f', // #0f0f0f
+      primary: 'red', // #a52a2a
+      secondary: 'yellow-8', // #ffff00
+      accent: 'red-7', // #d55555
+      positive: 'green-8', // #00ff00
+      negative: 'red', // #ff0000
+      info: 'blue', // #0000ff
+      warning: 'orange-5', // #ffa500
     },
     button: {
-      important: '#a52a2a', // #a52a2a
-      function: '#008080', // #008080
-      normal: '#808000', // #808000
+      important: 'orange-8', // #a52a2a
+      function: 'teal-7', // #008080
+      normal: 'purple-7', // #808000
     },
     panel: {
       text: {
-        normal: 'white',
-        warning: 'black',
-        normalAccent: 'grey-4',
-        warningAccent: 'black',
+        normal: 'grey-7',
+        warning: 'grey-9',
+        normalAccent: 'grey-10',
+        warningAccent: 'grey-7',
       },
       background: {
-        normal: 'black',
-        warning: 'yellow',
+        normal: 'yellow-2',
+        warning: 'purple-2',
       },
     },
     select: {
       text: {
-        light: 'black',
-        dark: 'white',
+        light: 'grey-10',
+        dark: 'grey-4',
       },
       background: {
-        light: 'grey-4',
-        dark: 'black',
+        light: 'red-2',
+        dark: 'red-6',
       },
     },
   },

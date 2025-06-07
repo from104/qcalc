@@ -97,12 +97,13 @@
   const selectBackgroundColor = computed(() => themesStore.getSelectColor('background', themesStore.isDarkMode()));
 
   /**
-   * 특정 테마의 primary 컬러를 반환하는 함수입니다.
+   * 특정 테마의 primary 컬러를 HEX 형식으로 반환하는 함수입니다.
    * @param themeKey - 테마 키 (예: 'default', 'forest', 'ocean' 등)
    * @returns 해당 테마의 primary 컬러 (HEX 형식)
    */
   const getThemePrimaryColor = (themeKey: ThemeType): string => {
-    return themes[themeKey]?.ui?.primary || themes.default.ui.primary;
+    const quasarColorName = themes[themeKey]?.ui?.primary || themes.default.ui.primary;
+    return themesStore.getQuasarColorToHex(quasarColorName);
   };
 
   /**
@@ -284,10 +285,7 @@
 
       <!-- 소수점 자리수 -->
       <q-item class="q-mb-xs">
-        <ToolTip
-          :text-color="themesStore.getCurrentThemeColors.ui.dark"
-          :bg-color="themesStore.getCurrentThemeColors.ui.warning"
-        >
+        <ToolTip :text-color="themesStore.getDarkColor()" :bg-color="themesStore.getCurrentThemeColors.ui.warning">
           {{ t('decimalPlacesStat') }}:
           {{
             settingsStore.decimalPlaces == -1
@@ -426,7 +424,7 @@
         <q-item-label class="self-center" role="text">
           {{ t('autoUpdate') }}
           <HelpIcon
-            :text-color="themesStore.getCurrentThemeColors.ui.dark"
+            :text-color="themesStore.getDarkColor()"
             :bg-color="themesStore.getCurrentThemeColors.ui.warning"
             :text="t('autoUpdateHelp')"
           />
