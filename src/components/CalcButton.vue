@@ -13,7 +13,7 @@
 
   import { createCalcButtonSet } from 'src/constants/CalcButtonSet';
   import { showError, showMessage } from 'src/utils/NotificationUtils';
-  import { clickButtonById, isWideWidth } from 'src/utils/GlobalHelpers';
+  import { clickButtonById, isWideWidth, logDev } from 'src/utils/GlobalHelpers';
 
   // 전역 window 객체에 접근하기 위한 상수 선언
   const $g = window.globalVars;
@@ -360,9 +360,7 @@
             const childHeight = child.offsetHeight;
             totalHeightToExclude += childHeight;
 
-            if (process.env.DEV) {
-              console.log(`Child element height: ${childHeight}px`, child.className || child.tagName);
-            }
+            logDev(`Child element height: ${childHeight}px`, child.className || child.tagName);
           }
         }
       } else {
@@ -380,15 +378,13 @@
       baseHeight.value = `${calculatedHeight}px`;
 
       // 6. 개발 환경에서 디버깅 정보 출력
-      if (process.env.DEV) {
-        console.log(`🎯 CalcButton baseHeight calculated for type "${props.type}": ${baseHeight.value}`, {
+        logDev(`🎯 CalcButton baseHeight calculated for type "${props.type}": ${baseHeight.value}`, {
           screenHeight: screenHeight.value,
           headerHeight: 50,
           totalExcluded: totalHeightToExclude,
           finalHeight: calculatedHeight,
-          cardFound: !!currentCard,
-        });
-      }
+        cardFound: !!currentCard,
+      });
     } catch (error) {
       // 에러 발생 시 타입별 기본값 사용
       console.warn('⚠️ Error calculating dynamic baseHeight, using fallback values:', error);
@@ -477,7 +473,7 @@
 
   const labelScalingFactor = computed(() => {
     if ($g.isCapacitor) {
-      // console.log('window.textZoom: ', window.textZoom);
+      logDev('window.textZoom: ', $g.textZoom);
       return $g.textZoom / 100;
     }
     // screenWidth ref를 사용하여 화면 너비 계산
