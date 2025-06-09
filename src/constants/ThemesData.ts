@@ -74,9 +74,9 @@ export const themes: Record<ThemeType, ThemeColors> = {
       warning: 'amber-7', // #d1a527
     },
     button: {
-      important: 'deep-orange-8', // #cb9247
-      function: 'cyan-8', // #1d8fb6
-      normal: 'green-8', // #5e9e7d
+      important: 'orange-8', // #cb9247
+      function: 'cyan-7', // #1d8fb6
+      normal: 'grey-6', // #5e9e7d
     },
     panel: {
       text: {

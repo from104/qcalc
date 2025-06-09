@@ -12,7 +12,7 @@
 
   // Vue 핵심 기능 및 컴포지션 API 가져오기
   import { ref, computed, onBeforeMount, onMounted, watch, onUnmounted, onBeforeUnmount } from 'vue';
-  import { Haptics, ImpactStyle } from 'capacitor/haptics';
+  import { Haptics, ImpactStyle } from '@capacitor/haptics';
   import { copyToClipboard } from 'quasar';
 
   // Quasar 관련 설정

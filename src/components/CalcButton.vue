@@ -43,7 +43,7 @@
   import { match } from 'ts-pattern';
 
   // 햅틱 피드백 관련
-  import { Haptics, ImpactStyle } from 'capacitor/haptics';
+  import { Haptics, ImpactStyle } from '@capacitor/haptics';
 
   // 키 바인딩 관련
   import { KeyBinding } from 'classes/KeyBinding';
@@ -91,12 +91,16 @@
     displayButtonNotification(id);
   };
 
-  // themesStore에서 버튼 색상을 가져오는 computed 속성
-  const importantButtonColor = computed(() => themesStore.getButtonColor('important'));
-  const functionButtonColor = computed(() => themesStore.getButtonColor('function'));
-  const normalButtonColor = computed(() => themesStore.getButtonColor('normal'));
+  const buttonColor = (color: string) => {
+    return themesStore.isDarkMode() ? lighten(color ?? '', -20) : color;
+  };
 
-  const shiftButtonPressedColor = computed(() => lighten(importantButtonColor.value ?? '', -30));
+  // themesStore에서 버튼 색상을 가져오는 computed 속성
+  const importantButtonColor = computed(() => buttonColor(themesStore.getButtonColor('important')));
+  const functionButtonColor = computed(() => buttonColor(themesStore.getButtonColor('function')));
+  const normalButtonColor = computed(() => buttonColor(themesStore.getButtonColor('normal')));
+
+  const shiftButtonPressedColor = computed(() => lighten(importantButtonColor.value, -30));
 
   // const i18n = useI18n();
   const { standardButtons, modeSpecificButtons, standardExtendedFunctions, modeSpecificExtendedFunctions } =
@@ -360,7 +364,9 @@
             const childHeight = child.offsetHeight;
             totalHeightToExclude += childHeight;
 
-            logDev(`Child element height: ${childHeight}px`, child.className || child.tagName);
+            if (process.env.DEV) {
+              console.log(`Child element height: ${childHeight}px`, child.className || child.tagName);
+            }
           }
         }
       } else {
@@ -383,8 +389,8 @@
           headerHeight: 50,
           totalExcluded: totalHeightToExclude,
           finalHeight: calculatedHeight,
-        cardFound: !!currentCard,
-      });
+          cardFound: !!currentCard,
+        });
     } catch (error) {
       // 에러 발생 시 타입별 기본값 사용
       console.warn('⚠️ Error calculating dynamic baseHeight, using fallback values:', error);
