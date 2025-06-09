@@ -12,8 +12,13 @@
 
   // Vue 핵심 기능 및 컴포지션 API 가져오기
   import { ref, computed, onBeforeMount, onMounted, watch, onUnmounted, onBeforeUnmount } from 'vue';
-  import { Haptics, ImpactStyle } from 'capacitor/haptics';
+  import { Haptics, ImpactStyle } from '@capacitor/haptics';
   import { copyToClipboard } from 'quasar';
+
+  // Quasar 관련 설정
+  import { colors } from 'quasar';
+  // Quasar 인스턴스 및 색상 유틸리티 초기화
+  const { lighten } = colors;
 
   // i18n 설정
   import { useI18n } from 'vue-i18n';
@@ -24,8 +29,9 @@
   import { useUnitStore } from 'src/stores/unitStore';
   import { useRadixStore } from 'src/stores/radixStore';
   import { useCurrencyStore } from 'src/stores/currencyStore';
-  import { useSettingsStore } from 'src/stores/settingsStore';
+  import { useSettingsStore } from 'stores/settingsStore';
   import { useUIStore } from 'src/stores/uiStore';
+  import { useThemesStore } from 'stores/themesStore';
 
   // 계산기 관련 타입과 클래스
   import { UnitConverter } from 'src/classes/UnitConverter';
@@ -42,6 +48,7 @@
   const radixStore = useRadixStore();
   const currencyStore = useCurrencyStore();
   const settingsStore = useSettingsStore();
+  const themesStore = useThemesStore();
   const uiStore = useUIStore();
 
   // 컴포넌트 import
@@ -260,16 +267,36 @@
       : '';
   });
 
-  const displayedResult = computed(() => {
-    // 진법 접두사, 기호, 결과값, 단위를 순서대로 연결
-    const baseString = `${radixPrefix.value}${symbol.value}${result.value}${unit.value}`;
+  /**
+   * 표시될 결과 문자열을 생성하는 헬퍼 함수
+   * @param value - 표시할 값 (result 또는 memoryValue)
+   * @returns 포맷된 결과 문자열
+   * @description
+   * - 진법 접두사, 통화 기호, 값, 단위를 순서대로 연결
+   * - 진법 접미사 조건에 따라 접미사 추가
+   */
+  const formatDisplayResult = (value: string): string => {
+    // 기본 문자열 구성: 접두사 + 기호 + 값 + 단위
+    const baseString = `${radixPrefix.value}${symbol.value}${value}${unit.value}`;
 
-    // 진법 접미사 조건 확인
+    // 진법 접미사 표시 조건 확인
     const shouldShowSuffix = currentTab.value === 'radix' && radixStore.showRadix && radixStore.radixType === 'suffix';
 
-    // 진법 접미사 추가 여부에 따라 최종 문자열 반환
+    // 접미사 추가 여부에 따라 최종 문자열 반환
     return shouldShowSuffix ? `${baseString}(${radixSuffix.value})` : baseString;
-  });
+  };
+
+  /**
+   * 일반 결과값을 포함한 표시 문자열
+   * @returns 포맷된 결과 문자열
+   */
+  const displayedResult = computed(() => formatDisplayResult(result.value));
+
+  /**
+   * 메모리 값을 포함한 표시 문자열
+   * @returns 포맷된 메모리 결과 문자열
+   */
+  const displayedResultWithMemory = computed(() => formatDisplayResult(memoryValue.value));
 
   // 진법 모드에서 접두사/접미사를 포함한 결과 문자열 생성
   const getRadixResult = (number: string, isOnly = false) => {
@@ -334,8 +361,45 @@
 
   // 메모리 값 계산된 속성
   const memoryValue = computed(() => {
-    const convertedNumber = radixStore.convertIfRadix(calc.memory.getNumber());
-    return calcStore.toFormattedNumber(convertedNumber, radixStore.sourceRadix);
+    if (isMainField) {
+      const convertedNumber = radixStore.convertIfRadix(calc.memory.getNumber());
+      return calcStore.toFormattedNumber(convertedNumber, radixStore.sourceRadix);
+    } else {
+      const rawMemoryNumber = calc.memory.getNumber();
+      if (!rawMemoryNumber) return ''; // 메모리가 비어있으면 빈 문자열 반환
+
+      switch (props.addon) {
+        case 'unit': {
+          const convertedNumber = UnitConverter.convert(
+            unitStore.selectedCategory,
+            toBigNumber(rawMemoryNumber), // 메모리 값을 변환 대상으로 사용
+            unitStore.sourceUnits[unitStore.selectedCategory] ?? '', // 또는 targetUnit에 맞춰야 할 수도 있음
+            unitStore.targetUnits[unitStore.selectedCategory] ?? '',
+          );
+          return calcStore.toFormattedNumber(convertedNumber);
+        }
+        case 'currency': {
+          const convertedNumber = currencyStore.currencyConverter
+            .convert(
+              toBigNumber(rawMemoryNumber), // 메모리 값을 변환 대상으로 사용
+              currencyStore.sourceCurrency, // 또는 targetCurrency에 맞춰야 할 수도 있음
+              currencyStore.targetCurrency,
+            )
+            .toFixed();
+          return calcStore.toFormattedNumber(convertedNumber);
+        }
+        case 'radix': {
+          const convertedNumber = radixStore.convertRadix(
+            radixStore.convertIfRadix(rawMemoryNumber), // 메모리 값을 변환 대상으로 사용
+            radixStore.sourceRadix, // 또는 targetRadix에 맞춰야 할 수도 있음
+            radixStore.targetRadix,
+          );
+          return calcStore.toFormattedNumber(convertedNumber, radixStore.targetRadix);
+        }
+        default:
+          return calcStore.toFormattedNumber(rawMemoryNumber); // 변환 없이 포맷팅만 적용
+      }
+    }
   });
 
   /**
@@ -372,27 +436,27 @@
     return '';
   });
 
-  // 결과 색상 정의
-  const resultColors = {
-    normal: 'text-light-green-8',
-    warning: 'text-deep-orange-5',
-    normalDark: 'text-light-green-10',
-    warningDark: 'text-deep-orange-8',
-  };
+  // 결과 색상 관련 computed 속성 (themesStore 사용)
+  const panelNormalTextColor = computed(() => themesStore.getPanelColor('text', 'normal'));
+  const panelNormalTextColorAccent = computed(() => themesStore.getPanelColor('text', 'normal', true));
+  const panelWarningTextColor = computed(() => themesStore.getPanelColor('text', 'warning'));
+  const panelWarningTextColorAccent = computed(() => themesStore.getPanelColor('text', 'warning', true));
+  const panelNormalBackgroundColor = computed(() => themesStore.getPanelColor('background', 'normal'));
+  const panelWarningBackgroundColor = computed(() => themesStore.getPanelColor('background', 'warning'));
 
-  // 결과 배경색 정의
-  const resultBackgroundColors = {
-    normal: 'light-green-3',
-    warning: 'deep-orange-2',
-  };
+  // 결과 색상 선택 함수 (실제 색상 값을 반환하도록 수정)
+  const panelTextColor = computed(() => {
+    return needFieldTooltip.value ? panelWarningTextColor.value : panelNormalTextColor.value; // 텍스트가 넘치면 경고색
+  });
 
-  // 결과 색상 선택 함수
-  const getResultColor = () => {
-    if (isMainField && calcStore.isMemoryVisible) {
-      return !needFieldTooltip.value ? resultColors.normalDark : resultColors.warningDark;
-    }
-    return !needFieldTooltip.value ? resultColors.normal : resultColors.warning;
-  };
+  // 메모리 값 표시를 위한 텍스트 색상
+  const memoryTextColor = computed(() => {
+    return needFieldTooltip.value ? panelWarningTextColorAccent.value : panelNormalTextColorAccent.value;
+  });
+
+  const panelBackgroundColor = computed(() => {
+    return needFieldTooltip.value ? panelWarningBackgroundColor.value : panelNormalBackgroundColor.value;
+  });
 
   // 감시자 설정
   watch(
@@ -441,25 +505,25 @@
       }, 200);
     }, 200);
 
-    // // 창이 포커스를 잃었을 때 메뉴를 닫기 위한 이벤트 리스너 등록
-    // window.addEventListener('blur', () => {
-    //   // 결과 패널 메뉴가 열려 있다면 닫음
-    //   if (showPanelMenu.value) {
-    //     showPanelMenu.value = false;
-    //   }
-    // });
+    // 창이 포커스를 잃었을 때 메뉴를 닫기 위한 이벤트 리스너 등록
+    window.addEventListener('blur', () => {
+      // 결과 패널 메뉴가 열려 있다면 닫음
+      if (showPanelMenu.value) {
+        showPanelMenu.value = false;
+      }
+    });
   });
 
   // 컴포넌트 언마운트 시 이벤트 리스너 제거
   onUnmounted(() => {
     // 화면 크기 변경 이벤트 리스너 제거
     window.removeEventListener('resize', () => checkNeedFieldTooltip());
-    // // blur 이벤트 리스너 제거
-    // window.removeEventListener('blur', () => {
-    //   if (showPanelMenu.value) {
-    //     showPanelMenu.value = false;
-    //   }
-    // });
+    // blur 이벤트 리스너 제거
+    window.removeEventListener('blur', () => {
+      if (showPanelMenu.value) {
+        showPanelMenu.value = false;
+      }
+    });
   });
 
   // 결과 복사, 숫자 복사
@@ -654,7 +718,37 @@
   });
 
   // 결과 패널 패딩 설정
-  const resultPanelPadding = computed(() => calcStore.resultPanelPadding);
+  // const resultPanelPadding = computed(() => calcStore.resultPanelPadding);
+  const panelPaddingBase = computed(() => {
+    if ($g.isWindows) {
+      return 14;
+    }
+    return 8;
+  });
+
+  const mainPanelPaddingTop = computed(() => {
+    return `${panelPaddingBase.value}px`;
+  });
+
+  const mainPanelPaddingBottom = computed(() => {
+    return `${Math.floor((panelPaddingBase.value - 4) / 2)}px`;
+  });
+
+  const subPanelPaddingTop = computed(() => {
+    return `${Math.floor(panelPaddingBase.value - 4)}px`;
+  });
+
+  const subPanelPaddingBottom = computed(() => {
+    return `${Math.floor((panelPaddingBase.value - 8) / 2)}px`;
+  });
+  // const resultPanelPadding = computed(() => 12);
+
+  // 메뉴 배경색
+  const menuBackgroundColor = computed(() => {
+    return themesStore.isDarkMode()
+      ? lighten(themesStore.getDarkColor(), 10)
+      : lighten(themesStore.getCurrentThemeColors.ui.primary, 90);
+  });
 </script>
 
 <template>
@@ -668,12 +762,18 @@
       :dark="false"
       role="textbox"
       :aria-label="t('ariaLabel.resultField', { type: isMainField ? t('ariaLabel.main') : t('ariaLabel.sub') })"
-      :bg-color="!needFieldTooltip ? resultBackgroundColors.normal : resultBackgroundColors.warning"
+      :bg-color="panelBackgroundColor"
       :label-slot="isMainField"
       :stack-label="isMainField"
     >
-      <template v-if="isMainField" #label>
-        <div v-auto-blur class="noselect" :class="getResultColor()" role="text" :aria-label="t('ariaLabel.expression')">
+      <template v-if="isMainField && !calcStore.isMemoryVisible" #label>
+        <div
+          v-auto-blur
+          class="noselect"
+          :class="[`text-${panelTextColor}`]"
+          role="text"
+          :aria-label="t('ariaLabel.expression')"
+        >
           {{ calculationExpression }}
         </div>
       </template>
@@ -682,18 +782,22 @@
           v-if="!isMemoryEmpty"
           v-auto-blur
           class="noselect full-height q-mt-xs q-pt-sm"
-          :class="getResultColor()"
           role="button"
           :aria-label="t('ariaLabel.memory')"
           @click="calcStore.showMemoryTemporarily()"
         >
-          <q-icon name="mdi-chip" role="img" :aria-label="t('ariaLabel.memoryIcon')" />
+          <q-icon
+            :color="isMainField && calcStore.isMemoryVisible ? memoryTextColor : panelTextColor"
+            name="mdi-chip"
+            role="img"
+            :aria-label="t('ariaLabel.memoryIcon')"
+          />
         </div>
         <div
-          v-if="operator != ''"
+          v-if="operator != '' && !calcStore.isMemoryVisible"
           v-auto-blur
           class="noselect full-height q-mt-xs q-pt-sm"
-          :class="getResultColor()"
+          :class="[`text-${isMainField && calcStore.isMemoryVisible ? memoryTextColor : panelTextColor}`]"
           role="text"
           :aria-label="t('ariaLabel.operator', { operator })"
         >
@@ -711,8 +815,12 @@
           "
           v-mutation.characterData
           class="self-center no-outline full-width full-height ellipsis text-right q-pt-xs noselect"
-          :class="[getResultColor()]"
-          :style="`padding-top: ${resultPanelPadding}px;`"
+          :class="[`text-${calcStore.isMemoryVisible ? memoryTextColor : panelTextColor}`]"
+          :style="
+            isMainField
+              ? `padding-top: ${mainPanelPaddingTop}; padding-bottom: ${mainPanelPaddingBottom};`
+              : `padding-top: ${subPanelPaddingTop}; padding-bottom: ${subPanelPaddingBottom};`
+          "
           role="text"
           :aria-label="t('ariaLabel.result', { type: isMainField ? t('ariaLabel.main') : t('ariaLabel.sub') })"
           @click="
@@ -734,13 +842,8 @@
           <span v-if="currentTab === 'currency'" id="symbol" role="text" :aria-label="t('ariaLabel.currencySymbol')">{{
             symbol
           }}</span>
-          <span
-            :id="isMainField ? 'result' : 'subResult'"
-            :class="getResultColor()"
-            role="text"
-            :aria-label="t('ariaLabel.value')"
-          >
-            {{ isMainField && calcStore.isMemoryVisible ? memoryValue : result }}
+          <span :id="isMainField ? 'result' : 'subResult'" role="text" :aria-label="t('ariaLabel.value')">
+            {{ calcStore.isMemoryVisible ? memoryValue : result }}
           </span>
           <span v-if="currentTab === 'unit'" id="unit" role="text" :aria-label="t('ariaLabel.unit')">{{ unit }}</span>
           <span
@@ -751,9 +854,12 @@
           >
             {{ radixSuffix }}
           </span>
-          <ToolTip v-if="needFieldTooltip">
-            {{ displayedResult }}
-          </ToolTip>
+          <ToolTip
+            v-if="needFieldTooltip"
+            :text-color="themesStore.getDarkColor()"
+            :bg-color="themesStore.getCurrentThemeColors.ui.warning"
+            :text="calcStore.isMemoryVisible ? displayedResultWithMemory : displayedResult"
+          />
         </div>
       </template>
       <q-menu
@@ -772,10 +878,12 @@
         <q-list
           dense
           class="noselect q-py-sm"
-          :class="settingsStore.isDarkMode() ? 'bg-grey-9' : 'bg-grey-3'"
           style="max-width: 200px"
+          :style="{
+            backgroundColor: menuBackgroundColor,
+          }"
           role="list"
-          :dark="settingsStore.isDarkMode()"
+          :dark="themesStore.isDarkMode()"
         >
           <MenuItem :title="t('copyDisplayedResult')" :action="() => handleCopy()" :caption="displayedResult" />
           <MenuItem :title="t('copyOnlyNumber')" :action="() => handleCopy('number')" :caption="onlyNumber" />
@@ -835,7 +943,9 @@
       right: -100%;
       text-align: right;
       font-size: 20px;
-      top: 10px;
+    }
+    :deep(.q-field__control) {
+      padding-top: 0px;
     }
   }
 </style>

@@ -8,7 +8,16 @@ QCalc is more than just a simple calculator - it's evolving into a modern produc
 
 The calculator alone appears when the window width is reduced.
 
-![Screenshot](https://github.com/from104/qcalc/raw/main/assets/screenshot_v0.11.3.png)
+![Screenshot](https://github.com/from104/qcalc/raw/main/assets/screenshot_v0.11.4.png)
+
+## Guide to Main Features
+
+- **4 Professional Calculators**: Standard calculator, unit converter, currency converter, and programmer calculator meet all your calculation needs
+- **High-precision Calculation Engine**: Supports accurate calculations up to 64 digits with advanced math functions like trigonometry, factorial, and powers
+- **Number Base & Bit Operations**: Converts between binary/octal/decimal/hexadecimal and supports professional bit operations (AND, OR, XOR, NOT) for programmers
+- **Smart User Experience**: Provides personalized environment with unit/currency favorites, various color themes, and calculation history notes
+- **Cross-platform Support**: Delivers consistent experience on Windows, Linux desktop and Android mobile with automatic update support
+- **Accessibility-focused Design**: Continuously improved for easy access by all users with keyboard shortcuts, haptic feedback, and adaptive layouts
 
 ## Guide to Main Features
 
@@ -27,6 +36,7 @@ The calculator alone appears when the window width is reduced.
 
 - **How to Access**: Ctrl+2 or select the top tab
 - **Conversion Categories**: Over 15 categories including length, area, volume, weight, angle, etc.
+- **Favorites**: Set frequently used units as favorites for quick access
 - **Swap Units**: Use '\\' key to swap original/converted units
 - **Quick Conversion**: ×10/×100/×1000 (a/s/d), ÷10/÷100/÷1000 (z/x/c)
 - **Unit Symbol**: Toggle unit symbol display/hide with Alt+\\ key
@@ -35,6 +45,7 @@ The calculator alone appears when the window width is reduced.
 
 - **How to Access**: Ctrl+3 or select the top tab
 - **Latest Exchange Rates**: Reflects real-time exchange rate information
+- **Favorites**: Set frequently used currencies as favorites for quick access
 - **Quick Calculation**: +5/+10/+100 (f/g/h), -5/-10/-100 (q/w/e)
 - **Swap Currencies**: Use '\\' key to swap original/converted currencies
 - **Currency Symbol**: Toggle currency symbol display/hide with Alt+\\ key
@@ -106,6 +117,7 @@ The calculator alone appears when the window width is reduced.
 
 #### Screen Layout
 
+- **Theme System**: Choose from various color themes beyond dark/light mode (change in F3 Settings)
 - **Always on Top**: Toggle always-on-top with Alt+t key
 - **Resize Window**: Side panel auto-adjusts based on window size
 - **Reset Panel**: Toggle panel reset at startup with Alt+i key
@@ -131,7 +143,7 @@ The calculator alone appears when the window width is reduced.
 | u           | Square (x²)               |
 | i           | Square root (√x)          |
 | j           | Change sign (±)           |
-| k           | Percentage (%)            |
+| k, %        | Percentage (%)            |
 | l           | Reciprocal (1/x)          |
 | '           | Activate shift mode       |
 
@@ -165,7 +177,7 @@ The calculator alone appears when the window width is reduced.
 ### Unit/Currency Conversion Mode (Shift Mode)
 
 | Shortcut | Function                     |
-|----------|------------------------------|
+| -------- | ---------------------------- |
 | f,g,h    | ×2/×3/×5 or +5/+10/+100      |
 | q,w,e    | ÷2/÷3/÷5 or -5/-10/-100      |
 | a,s,d    | ×10/×100/×1000               |
@@ -176,7 +188,7 @@ The calculator alone appears when the window width is reduced.
 ### Radix Converter Mode
 
 | Shortcut | Function                         |
-|----------|----------------------------------|
+| -------- | -------------------------------- |
 | r,t      | 1-bit shift (x<<1, x>>1)         |
 | u,i      | Left/right shift (x<<y, x>>y)    |
 | f,g      | 4-bit shift (x<<4, x>>4)         |

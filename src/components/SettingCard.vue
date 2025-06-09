@@ -20,13 +20,17 @@
   import { useUnitStore } from 'stores/unitStore';
   import { useRadixStore } from 'stores/radixStore';
   import { useCurrencyStore } from 'stores/currencyStore';
-  
+  import { useThemesStore } from 'stores/themesStore';
+  import { themes, type ThemeType } from 'src/constants/ThemesData';
+
   // 스토어 인스턴스 생성
   const uiStore = useUIStore();
   const settingsStore = useSettingsStore();
   const unitStore = useUnitStore();
   const radixStore = useRadixStore();
   const currencyStore = useCurrencyStore();
+  const themesStore = useThemesStore();
+
   // i18n 설정
   import { useI18n } from 'vue-i18n';
   const { locale } = useI18n({ useScope: 'global' });
@@ -66,6 +70,56 @@
       locale.value = settingsStore.userLocale;
     }
   };
+
+  // 색상 테마 옵션을 계산합니다.
+  const themeOptions = computed(() => {
+    return Object.keys(themes).map((themeKey) => {
+      const currentLocale = locale.value as 'ko' | 'en';
+      const themeName =
+        themes[themeKey as ThemeType]?.name?.[currentLocale] || themes[themeKey as ThemeType]?.name?.en || themeKey;
+      return {
+        label: themeName,
+        value: themeKey,
+      };
+    });
+  });
+
+  /**
+   * 테마가 변경될 때 호출되는 함수입니다.
+   * @param themeName - 선택된 테마 이름
+   */
+  const onThemeChange = (themeName: ThemeType) => {
+    themesStore.setTheme(themeName);
+  };
+
+  // themesStore에서 select 색상을 가져오는 computed 속성
+  const selectTextColor = computed(() => themesStore.getSelectColor('text', themesStore.isDarkMode()));
+  const selectBackgroundColor = computed(() => themesStore.getSelectColor('background', themesStore.isDarkMode()));
+
+  /**
+   * 특정 테마의 primary 컬러를 HEX 형식으로 반환하는 함수입니다.
+   * @param themeKey - 테마 키 (예: 'default', 'forest', 'ocean' 등)
+   * @returns 해당 테마의 primary 컬러 (HEX 형식)
+   */
+  const getThemePrimaryColor = (themeKey: ThemeType): string => {
+    const quasarColorName = themes[themeKey]?.ui?.primary || themes.default.ui.primary;
+    return themesStore.getQuasarColorToHex(quasarColorName);
+  };
+
+  /**
+   * 특정 테마의 라벨을 반환하는 함수입니다.
+   * @param themeKey - 테마 키 또는 테마 키 문자열
+   * @returns 해당 테마의 번역된 라벨
+   */
+  const getThemeLabel = (themeKey: ThemeType | string): string => {
+    const key = typeof themeKey === 'string' ? themeKey : themeKey;
+    const currentLocale = locale.value as 'ko' | 'en';
+    return themes[key as ThemeType]?.name?.[currentLocale] || themes[key as ThemeType]?.name?.en || key;
+  };
+
+  const primaryAccentColor = computed(() => {
+    return themesStore.isDarkMode() ? 'accent' : 'primary';
+  });
 </script>
 
 <template>
@@ -78,6 +132,7 @@
         <q-toggle
           v-model="settingsStore.alwaysOnTop"
           keep-color
+          :color="primaryAccentColor"
           dense
           role="switch"
           :aria-label="t('ariaLabel.alwaysOnTop')"
@@ -92,6 +147,7 @@
         <q-toggle
           v-model="settingsStore.initPanel"
           keep-color
+          :color="primaryAccentColor"
           dense
           role="switch"
           :aria-label="t('ariaLabel.initPanel')"
@@ -106,6 +162,7 @@
         <q-toggle
           v-model="settingsStore.hapticsMode"
           keep-color
+          :color="primaryAccentColor"
           dense
           role="switch"
           :aria-label="t('ariaLabel.hapticsMode')"
@@ -118,7 +175,7 @@
         <q-item-label class="self-center" role="text">{{ t('darkMode.title') }} (Alt-D)</q-item-label>
         <q-space />
         <q-select
-          v-model="settingsStore.darkMode"
+          v-model="themesStore.darkMode"
           :options="[
             { label: t('darkMode.light'), value: 'light' },
             { label: t('darkMode.dark'), value: 'dark' },
@@ -130,12 +187,60 @@
           options-dense
           emit-value
           map-options
-          :label-color="!settingsStore.isDarkMode() ? 'primary' : 'grey-1'"
-          :options-selected-class="!settingsStore.isDarkMode() ? 'text-primary' : 'text-grey-1'"
-          :popup-content-class="!settingsStore.isDarkMode() ? 'bg-blue-grey-2' : 'bg-blue-grey-6'"
-          :class="!settingsStore.isDarkMode() ? 'bg-blue-grey-2' : 'bg-blue-grey-6'"
-          @update:model-value="settingsStore.setDarkMode"
+          :label-color="selectTextColor"
+          :options-selected-class="`text-${selectTextColor}`"
+          :popup-content-class="`bg-${selectBackgroundColor} noselect`"
+          :class="`bg-${selectBackgroundColor}`"
+          :color="selectTextColor"
+          :bg-color="selectBackgroundColor"
+          @update:model-value="themesStore.setDarkMode"
         />
+      </q-item>
+
+      <!-- 색상 테마 선택 추가 -->
+      <q-item class="q-mb-md">
+        <q-item-label class="self-center" role="text">{{ t('colorTheme') }}</q-item-label>
+        <q-space />
+        <q-select
+          v-model="themesStore.currentTheme"
+          :options="themeOptions"
+          dense
+          options-dense
+          emit-value
+          map-options
+          :label-color="selectTextColor"
+          :options-selected-class="`text-${selectTextColor}`"
+          :popup-content-class="`bg-${selectBackgroundColor} noselect`"
+          :class="`bg-${selectBackgroundColor}`"
+          :color="selectTextColor"
+          :bg-color="selectBackgroundColor"
+          @update:model-value="onThemeChange"
+        >
+          <template #option="scope">
+            <q-item v-bind="scope.itemProps" class="theme-option-item">
+              <q-item-section>
+                <q-item-label>{{ scope.opt.label }}</q-item-label>
+              </q-item-section>
+              <q-item-section side>
+                <div
+                  class="theme-color-square"
+                  :class="{ 'theme-color-square--dark': themesStore.isDarkMode() }"
+                  :style="{ backgroundColor: getThemePrimaryColor(scope.opt.value) }"
+                />
+              </q-item-section>
+            </q-item>
+          </template>
+          <template #selected-item="scope">
+            <div class="selected-theme-item">
+              <span>{{ scope.opt.label || getThemeLabel(scope.opt) }}</span>
+              <div
+                class="theme-color-square q-ml-sm"
+                :class="{ 'theme-color-square--dark': themesStore.isDarkMode() }"
+                :style="{ backgroundColor: getThemePrimaryColor(scope.opt.value || scope.opt) }"
+              />
+            </div>
+          </template>
+        </q-select>
       </q-item>
 
       <q-separator spaced="md" role="separator" />
@@ -147,6 +252,7 @@
         <q-toggle
           v-model="settingsStore.showButtonAddedLabel"
           keep-color
+          :color="primaryAccentColor"
           dense
           role="switch"
           :aria-label="t('ariaLabel.showButtonAddedLabel')"
@@ -157,7 +263,7 @@
       <q-item class="q-mb-xs">
         <q-item-label class="self-center" role="text">{{ t('useGrouping') }} (,)</q-item-label>
         <q-space />
-        <q-toggle v-model="settingsStore.useGrouping" keep-color dense />
+        <q-toggle v-model="settingsStore.useGrouping" keep-color :color="primaryAccentColor" dense />
       </q-item>
 
       <!-- 숫자 묶음 단위 -->
@@ -171,6 +277,7 @@
           :step="1"
           :disable="!settingsStore.useGrouping"
           dense
+          :color="primaryAccentColor"
           class="col-2 q-pr-sm q-pt-xs"
           marker-labels
         />
@@ -178,7 +285,7 @@
 
       <!-- 소수점 자리수 -->
       <q-item class="q-mb-xs">
-        <ToolTip>
+        <ToolTip :text-color="themesStore.getDarkColor()" :bg-color="themesStore.getCurrentThemeColors.ui.warning">
           {{ t('decimalPlacesStat') }}:
           {{
             settingsStore.decimalPlaces == -1
@@ -194,6 +301,7 @@
           :max="5"
           :step="1"
           :marker-labels="Object.keys(DECIMAL_PLACES)"
+          :color="primaryAccentColor"
           class="col-5 q-pr-sm"
           dense
           @update:model-value="(value) => settingsStore.setDecimalPlaces(Number(value))"
@@ -220,7 +328,7 @@
         <q-item class="q-mb-sm">
           <q-item-label class="self-center" role="text"> {{ t('showUnit') }} (Alt-\) </q-item-label>
           <q-space />
-          <q-toggle v-model="unitStore.showUnit" keep-color dense />
+          <q-toggle v-model="unitStore.showUnit" keep-color :color="primaryAccentColor" dense />
         </q-item>
       </template>
 
@@ -231,7 +339,7 @@
         <q-item class="q-mb-sm">
           <q-item-label class="self-center" role="text"> {{ t('showSymbol') }} (Alt-\) </q-item-label>
           <q-space />
-          <q-toggle v-model="currencyStore.showSymbol" keep-color dense />
+          <q-toggle v-model="currencyStore.showSymbol" keep-color :color="primaryAccentColor" dense />
         </q-item>
       </template>
 
@@ -242,7 +350,7 @@
         <q-item class="q-mb-sm">
           <q-item-label class="self-center" role="text"> {{ t('showRadix') }} (Alt-\) </q-item-label>
           <q-space />
-          <q-toggle v-model="radixStore.showRadix" keep-color dense />
+          <q-toggle v-model="radixStore.showRadix" keep-color :color="primaryAccentColor" dense />
         </q-item>
 
         <!-- 진법 형식 -->
@@ -260,10 +368,11 @@
             map-options
             options-dense
             :disable="!radixStore.showRadix"
-            :label-color="!settingsStore.isDarkMode() ? 'primary' : 'grey-1'"
-            :options-selected-class="!settingsStore.isDarkMode() ? 'text-primary' : 'text-grey-1'"
-            :popup-content-class="!settingsStore.isDarkMode() ? 'bg-blue-grey-2' : 'bg-blue-grey-6'"
-            :class="!settingsStore.isDarkMode() ? 'bg-blue-grey-2' : 'bg-blue-grey-6'"
+            :label-color="selectTextColor"
+            :options-selected-class="`text-${selectTextColor}`"
+            :popup-content-class="`bg-${selectBackgroundColor} noselect`"
+            :class="`bg-${selectBackgroundColor}`"
+            :color="selectTextColor"
           />
         </q-item>
       </template>
@@ -274,7 +383,13 @@
       <q-item class="q-mb-sm">
         <q-item-label class="self-center" role="text">{{ t('useSystemLocale') }}</q-item-label>
         <q-space />
-        <q-toggle v-model="settingsStore.useSystemLocale" keep-color dense @click="setLanguage()" />
+        <q-toggle
+          v-model="settingsStore.useSystemLocale"
+          keep-color
+          :color="primaryAccentColor"
+          dense
+          @click="setLanguage()"
+        />
       </q-item>
 
       <!-- 언어 -->
@@ -293,10 +408,11 @@
           emit-value
           map-options
           options-dense
-          :label-color="!settingsStore.isDarkMode() ? 'primary' : 'grey-1'"
-          :options-selected-class="!settingsStore.isDarkMode() ? 'text-primary' : 'text-grey-1'"
-          :popup-content-class="!settingsStore.isDarkMode() ? 'bg-blue-grey-2' : 'bg-blue-grey-6'"
-          :class="!settingsStore.isDarkMode() ? 'bg-blue-grey-2' : 'bg-blue-grey-6'"
+          :label-color="selectTextColor"
+          :options-selected-class="`text-${selectTextColor}`"
+          :popup-content-class="`bg-${selectBackgroundColor} noselect`"
+          :class="`bg-${selectBackgroundColor}`"
+          :color="selectTextColor"
           @update:model-value="setLanguage()"
         />
       </q-item>
@@ -307,12 +423,17 @@
       <q-item v-if="$g.isElectron && !$g.isSnap" class="q-mb-sm">
         <q-item-label class="self-center" role="text">
           {{ t('autoUpdate') }}
-          <HelpIcon :text="t('autoUpdateHelp')" />
+          <HelpIcon
+            :text-color="themesStore.getDarkColor()"
+            :bg-color="themesStore.getCurrentThemeColors.ui.warning"
+            :text="t('autoUpdateHelp')"
+          />
         </q-item-label>
         <q-space />
         <q-toggle
           v-model="settingsStore.autoUpdate"
           keep-color
+          :color="primaryAccentColor"
           dense
           role="switch"
           :aria-label="t('ariaLabel.autoUpdate')"
@@ -348,6 +469,33 @@
       min-height: $height !important;
       height: auto !important;
       padding-left: $left !important;
+    }
+  }
+
+  // 테마 컬러 사각형 스타일
+  .theme-color-square {
+    width: 16px;
+    height: 16px;
+    border-radius: 2px;
+    border: 1px solid rgba(0, 0, 0, 0.3); // 라이트 모드: 검은색 테두리
+    flex-shrink: 0;
+
+    // 다크 모드: 흰색 테두리
+    &--dark {
+      border-color: rgba(255, 255, 255, 0.5);
+    }
+  }
+
+  // 선택된 테마 아이템 스타일
+  .selected-theme-item {
+    display: flex;
+    align-items: center;
+  }
+
+  // 테마 옵션 아이템 스타일
+  .theme-option-item {
+    .q-item__section--side {
+      padding-left: 8px;
     }
   }
 </style>
@@ -402,6 +550,7 @@ ko:
     useSystemLocale: '시스템 언어 사용 설정'
     language: '언어 설정'
     autoUpdate: '자동 업데이트 설정'
+  colorTheme: '색상 테마'
 en:
   alwaysOnTop: 'Always on top'
   alwaysOnTopOn: 'Always on top ON'
@@ -451,4 +600,5 @@ en:
     useSystemLocale: 'Use system locale setting'
     language: 'Language setting'
     autoUpdate: 'Auto update setting'
+  colorTheme: 'Color Theme'
 </i18n>

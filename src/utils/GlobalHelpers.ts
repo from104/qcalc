@@ -67,3 +67,10 @@ export const clickButtonById = (buttonId: string): void => {
     button.click();
   }
 };
+
+// 개발 모드에서만 콘솔 로그 출력
+export const logDev = (message: string, ...args: unknown[]): void => {
+  if (import.meta.env.DEV) {
+    console.log(message, ...args);
+  }
+};

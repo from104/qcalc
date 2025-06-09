@@ -24,10 +24,12 @@
   import { useSettingsStore } from 'stores/settingsStore';
   import { useRadixStore } from 'stores/radixStore';
   import { useCalcStore } from 'src/stores/calcStore';
+  import { useThemesStore } from 'stores/themesStore';
 
   // 스토어 인스턴스 생성
   const uiStore = useUIStore();
   const settingsStore = useSettingsStore();
+  const themesStore = useThemesStore();
   const radixStore = useRadixStore();
   const calcStore = useCalcStore();
 
@@ -130,6 +132,10 @@
     radixStore.swapRadixes();
     calcStore.calc.needsBufferReset = true;
   };
+
+  // themesStore에서 select 색상을 가져오는 computed 속성
+  const selectTextColor = computed(() => themesStore.getSelectColor('text', themesStore.isDarkMode()));
+  const selectBackgroundColor = computed(() => themesStore.getSelectColor('background', themesStore.isDarkMode()));
 </script>
 
 <template>
@@ -149,12 +155,13 @@
       behavior="menu"
       class="col-3 q-pa-none shadow-2"
       :label="t('radixLabel.wordSize')"
-      :label-color="!settingsStore.isDarkMode() ? 'primary' : 'grey-1'"
-      :class="!settingsStore.isDarkMode() ? 'bg-blue-grey-2' : 'bg-blue-grey-6'"
-      :popup-content-class="
-        [!settingsStore.isDarkMode() ? 'bg-blue-grey-2' : 'bg-blue-grey-6', 'scrollbar-custom', 'q-select-popup'].join(' ')
-      "
-      :options-selected-class="!settingsStore.isDarkMode() ? 'text-primary' : 'text-grey-1'"
+      :label-color="selectTextColor"
+      :class="`bg-${selectBackgroundColor}`"
+      :popup-content-class="[`bg-${selectBackgroundColor}`, 'scrollbar-custom', 'q-select-popup'].join(' ')"
+      :options-selected-class="`text-${selectTextColor}`"
+      :color="selectTextColor"
+      :bg-color="selectBackgroundColor"
+      :popup-content-style="{ backgroundColor: selectBackgroundColor, color: selectTextColor }"
       @update:model-value="() => (calcStore.calc.wordSize = radixStore.wordSize)"
     />
 
@@ -176,12 +183,13 @@
       behavior="menu"
       class="col-3 q-pl-xs-sm shadow-2"
       :label="t('radixLabel.main')"
-      :label-color="!settingsStore.isDarkMode() ? 'primary' : 'grey-1'"
-      :options-selected-class="!settingsStore.isDarkMode() ? 'text-primary' : 'text-grey-1'"
-      :popup-content-class="
-        [!settingsStore.isDarkMode() ? 'bg-blue-grey-2' : 'bg-blue-grey-6', 'scrollbar-custom', 'q-select-popup'].join(' ')
-      "
-      :class="!settingsStore.isDarkMode() ? 'bg-blue-grey-2' : 'bg-blue-grey-6'"
+      :label-color="selectTextColor"
+      :options-selected-class="`text-${selectTextColor}`"
+      :popup-content-class="[`bg-${selectBackgroundColor}`, 'scrollbar-custom', 'q-select-popup'].join(' ')"
+      :class="`bg-${selectBackgroundColor}`"
+      :color="selectTextColor"
+      :bg-color="selectBackgroundColor"
+      :popup-content-style="{ backgroundColor: selectBackgroundColor, color: selectTextColor }"
     />
 
     <!-- 원본, 대상 진법 바꾸기 버튼 -->
@@ -196,9 +204,15 @@
       class="col-1 q-mx-none q-px-sm blur"
       role="button"
       :aria-label="t('ariaLabel.swapRadix')"
+      :style="{ color: selectTextColor, backgroundColor: selectBackgroundColor }"
       @click="handleRadixSwap"
     >
-      <ToolTip :auto-hide="3000" :text="t('tooltipSwap')" />
+      <ToolTip
+        :text-color="themesStore.getDarkColor()"
+        :bg-color="themesStore.getCurrentThemeColors.ui.warning"
+        :auto-hide="3000"
+        :text="t('tooltipSwap')"
+      />
     </q-btn>
 
     <!-- 대상 진법 -->
@@ -216,12 +230,13 @@
       behavior="menu"
       class="col-3 q-pl-xs-sm shadow-2"
       :label="t('radixLabel.sub')"
-      :label-color="!settingsStore.isDarkMode() ? 'primary' : 'grey-1'"
-      :class="!settingsStore.isDarkMode() ? 'bg-blue-grey-2' : 'bg-blue-grey-6'"
-      :popup-content-class="
-        [!settingsStore.isDarkMode() ? 'bg-blue-grey-2' : 'bg-blue-grey-6', 'scrollbar-custom', 'q-select-popup'].join(' ')
-      "
-      :options-selected-class="!settingsStore.isDarkMode() ? 'text-primary' : 'text-grey-1'"
+      :label-color="selectTextColor"
+      :class="`bg-${selectBackgroundColor}`"
+      :popup-content-class="[`bg-${selectBackgroundColor}`, 'scrollbar-custom', 'q-select-popup'].join(' ')"
+      :options-selected-class="`text-${selectTextColor}`"
+      :color="selectTextColor"
+      :bg-color="selectBackgroundColor"
+      :popup-content-style="{ backgroundColor: selectBackgroundColor, color: selectTextColor }"
     />
 
     <!-- 대상 방향 -->
@@ -257,6 +272,7 @@
     }
   }
 </style>
+
 <i18n lang="yaml5">
   ko:
     tooltipSwap: 진법 바꾸기

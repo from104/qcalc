@@ -3,8 +3,18 @@
   "appName": "Q Calc",
   "webDir": "www",
   "server": {
-    "androidScheme": "file",
-    "url": "http://192.168.219.20:9500",
-    "cleartext": true
+    "androidScheme": "file"
+  },
+  "plugins": {
+    "SplashScreen": {
+      "launchShowDuration": 2000,
+      "splashFullScreen": false,
+      "splashImmersive": false,
+      "backgroundColor": "#ffffff"
+    },
+    "StatusBar": {
+      "style": "default",
+      "backgroundColor": "#ffffff"
+    }
   }
 }

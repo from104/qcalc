@@ -3,6 +3,7 @@ package com.atit.qcalc;
 import android.app.Activity;
 import android.content.res.Configuration;
 import android.os.Build;
+import android.provider.Settings;
 import android.util.DisplayMetrics;
 import android.util.Log;
 
@@ -15,11 +16,16 @@ public class DeviceManager {
   private boolean isFoldable = false;
   private boolean isPhone = false;
   private int textZoom = 100;
+  private int apiLevel = 0;
+  private int navigationBarHeight = 0;
+  private boolean isGestureNavigation = false;
 
   public DeviceManager(Activity activity) {
     this.activity = activity;
     detectDeviceType();
     calculateTextZoom();
+    detectApiLevel();
+    detectNavigationBarState();
   }
 
   /**
@@ -35,7 +41,6 @@ public class DeviceManager {
     float widthDp = metrics.widthPixels / metrics.density;
     float heightDp = metrics.heightPixels / metrics.density;
 
-    // 높이나 너비 중 작은 쪽이 660dp 이상이면 태블릿으로 판단
     boolean isTabletBySize = Math.min(widthDp, heightDp) >= 660;
 
     setTablet(isTabletByConfig || isTabletBySize);
@@ -47,6 +52,41 @@ public class DeviceManager {
 
     Log.d("QCalc", "디바이스 타입 감지: isTablet=" + this.isTablet + ", isPhone=" + this.isPhone + ", isFoldable="
         + this.isFoldable + ", model=" + Build.MODEL + ", width=" + widthDp + "dp, height=" + heightDp + "dp");
+  }
+
+  /**
+   * API 레벨을 감지하는 메서드
+   */
+  private void detectApiLevel() {
+    this.apiLevel = Build.VERSION.SDK_INT;
+    Log.d("QCalc", "API 레벨 감지: apiLevel=" + this.apiLevel);
+  }
+
+  /**
+   * 네비게이션바의 상태를 감지하는 메서드
+   */
+  private void detectNavigationBarState() {
+    // 네비게이션바 높이 감지
+    int resourceId = activity.getResources().getIdentifier("navigation_bar_height", "dimen", "android");
+    if (resourceId > 0) {
+      this.navigationBarHeight = activity.getResources().getDimensionPixelSize(resourceId);
+    }
+
+    // 제스처 네비게이션 확인 (API 29 이상)
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+      try {
+        int navigationMode = Settings.Secure.getInt(activity.getContentResolver(), "navigation_mode");
+        // 0: 3-button, 1: 2-button (Pixel-exclusive), 2: Gesture
+        this.isGestureNavigation = (navigationMode == 2);
+      } catch (Settings.SettingNotFoundException e) {
+        this.isGestureNavigation = false;
+        Log.e("QCalc", "네비게이션 모드 설정을 찾을 수 없습니다.", e);
+      }
+    } else {
+      this.isGestureNavigation = false;
+    }
+
+    Log.d("QCalc", "네비게이션바 상태 감지: height=" + this.navigationBarHeight + "px, gesture=" + this.isGestureNavigation);
   }
 
   /**
@@ -63,6 +103,8 @@ public class DeviceManager {
 
     this.textZoom = (int) Math.min(Math.max(100 * scaleFactor, 75), 125);
   }
+
+  // --- Getter/Setter 메서드 (기존과 동일) ---
 
   public boolean isTablet() {
     return isTablet;
@@ -91,5 +133,17 @@ public class DeviceManager {
   public int getTextZoom() {
     Log.d("QCalc", "textZoom: " + textZoom);
     return textZoom;
+  }
+
+  public int getApiLevel() {
+    return apiLevel;
+  }
+
+  public int getNavigationBarHeight() {
+    return navigationBarHeight;
+  }
+
+  public boolean isGestureNavigation() {
+    return isGestureNavigation;
   }
 }

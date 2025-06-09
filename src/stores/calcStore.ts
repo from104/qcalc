@@ -20,8 +20,6 @@ const uiStore = useUIStore();
 interface CalcState {
   calc: Calculator;
   isMemoryVisible: boolean;
-  resultPanelPadding: number;
-  paddingOnResult: number;
   isShiftPressed: boolean;
   isShiftLocked: boolean;
   needButtonNotification: boolean;
@@ -31,8 +29,6 @@ export const useCalcStore = defineStore('calc', {
   state: (): CalcState => ({
     calc: new Calculator(),
     isMemoryVisible: false,
-    resultPanelPadding: 0,
-    paddingOnResult: 20,
     isShiftPressed: false,
     isShiftLocked: false,
     needButtonNotification: false,
@@ -70,10 +66,18 @@ export const useCalcStore = defineStore('calc', {
     },
 
     showMemoryTemporarily(): void {
-      this.isMemoryVisible = true;
-      setTimeout(() => {
-        this.isMemoryVisible = false;
-      }, 2000);
+      let timer: NodeJS.Timeout | null = null;
+      if (this.isMemoryVisible) {
+        this.hideMemory();
+        if (timer) {
+          clearTimeout(timer);
+        }
+      } else {
+        this.isMemoryVisible = true;
+        timer = setTimeout(() => {
+          this.isMemoryVisible = false;
+        }, 3000);
+      }
     },
 
     onNeedButtonNotification(): void {

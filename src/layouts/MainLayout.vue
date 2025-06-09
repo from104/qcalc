@@ -45,10 +45,12 @@
   import { useCalcStore } from 'src/stores/calcStore';
   import { useUIStore } from 'stores/uiStore';
   import { useSettingsStore } from 'stores/settingsStore';
+  import { useThemesStore } from 'stores/themesStore';
 
   const calcStore = useCalcStore();
   const uiStore = useUIStore();
   const settingsStore = useSettingsStore();
+  const themesStore = useThemesStore();
 
   // === 전역 변수 설정 ===
   /**
@@ -250,15 +252,6 @@
     }
     locale.value = settingsStore.locale;
 
-    // OS별 UI 최적화
-    if ($g.isWindows) {
-      calcStore.resultPanelPadding = 8;
-    } else if ($g.isLinux) {
-      calcStore.resultPanelPadding = 3;
-    } else {
-      calcStore.resultPanelPadding = 0;
-    }
-
     // 초기 설정 적용
     if (settingsStore.initPanel && calcStore.calc) {
       calcStore.calc.reset();
@@ -270,11 +263,11 @@
     // 다크모드 설정
     const darkModeMediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
     darkModeMediaQuery.addEventListener('change', () => {
-      if (settingsStore.darkMode === 'system') {
-        settingsStore.updateDarkMode();
+      if (themesStore.darkMode === 'system') {
+        themesStore.updateDarkMode();
       }
     });
-    settingsStore.updateDarkMode();
+    themesStore.updateDarkMode();
 
     // 팁 다이얼로그 초기화
     uiStore.showTipsDialog = uiStore.showTips && !uiStore.isAppStarted;
@@ -324,24 +317,25 @@
         show-if-above
         elevated
         :width="250"
-        :dark="settingsStore.isDarkMode()"
+        :dark="themesStore.isDarkMode()"
         :swipe-only="$g.isMobile"
         behavior="mobile"
         @click="leftDrawerOpen = false"
       >
-        <q-card
-          :class="settingsStore.isDarkMode() ? 'bg-grey-9' : 'bg-grey-3'"
-          class="full-height menu-card"
-        >
+        <q-card class="full-height menu-card">
           <MenuPanel />
         </q-card>
       </q-drawer>
 
       <q-header id="header" class="z-top noselect" elevated>
-        <!-- 메인 화면 헤더 -->
-        <q-toolbar v-if="!isSubPage" v-auto-blur>
+        <!-- 좁은 화면 메인 헤더 -->
+        <q-toolbar v-if="!isSubPage" v-auto-blur :class="{ 'q-pt-md': $g.isAndroid && $g.apiLevel >= 35}">
           <q-btn flat dense round class="q-mr-sm" icon="menu" aria-label="Menu" @click="toggleLeftDrawer">
-            <ToolTip :text="t('tooltip.menu')" />
+            <ToolTip
+              :text-color="themesStore.getDarkColor()"
+              :bg-color="themesStore.getCurrentThemeColors.ui.warning"
+              :text="t('tooltip.menu')"
+            />
           </q-btn>
           <q-tabs
             v-model="uiStore.currentTab"
@@ -367,7 +361,11 @@
             :aria-label="t('ariaLabel.record')"
             @click="router.push('/record')"
           >
-            <ToolTip :text="t('openRecordPage')" />
+            <ToolTip
+              :text-color="themesStore.getDarkColor()"
+              :bg-color="themesStore.getCurrentThemeColors.ui.warning"
+              :text="t('openRecordPage')"
+            />
           </q-btn>
           <q-btn
             v-if="!isWideWidth()"
@@ -377,12 +375,16 @@
             :aria-label="t('ariaLabel.settings')"
             @click="navigateToPath('/settings', route, router)"
           >
-            <ToolTip :text="t('tooltip.settings')" />
+            <ToolTip
+              :text-color="themesStore.getDarkColor()"
+              :bg-color="themesStore.getCurrentThemeColors.ui.warning"
+              :text="t('tooltip.settings')"
+            />
           </q-btn>
         </q-toolbar>
 
-        <!-- 서브 화면 헤더 -->
-        <q-toolbar v-else v-auto-blur class="q-px-sm">
+        <!-- 좁은 화면 서브 헤더 -->
+        <q-toolbar v-else v-auto-blur class="q-px-sm" :class="{ 'q-pt-md': $g.isAndroid && $g.apiLevel >= 35 }">
           <q-btn
             flat
             dense
@@ -394,7 +396,12 @@
           />
           <q-toolbar-title class="text-subtitle1">
             {{ SUB_PAGE_CONFIG[currentSubPage as keyof typeof SUB_PAGE_CONFIG]?.title }}
-            <HelpIcon v-if="currentSubPage === 'record' && $g.isMobile" :text="t('tooltip.recordSwipeHelp')" />
+            <HelpIcon
+              v-if="currentSubPage === 'record' && $g.isMobile"
+              :text-color="themesStore.getDarkColor()"
+              :bg-color="themesStore.getCurrentThemeColors.ui.warning"
+              :text="t('tooltip.recordSwipeHelp')"
+            />
           </q-toolbar-title>
           <q-space />
           <q-btn
@@ -410,7 +417,11 @@
             :disable="button.disabled as unknown as boolean"
             @click="button.action"
           >
-            <ToolTip :text="button.tooltip as unknown as string" />
+            <ToolTip
+              :text-color="themesStore.getDarkColor()"
+              :bg-color="themesStore.getCurrentThemeColors.ui.warning"
+              :text="button.tooltip as unknown as string"
+            />
           </q-btn>
         </q-toolbar>
       </q-header>
@@ -427,7 +438,7 @@
 
         <!-- 서브 화면 컨텐츠 -->
         <template v-else>
-          <div class="col-12">
+          <div class="col-12 sub-content">
             <q-scroll-area class="sub-scroll-area" :class="{ 'hide-scrollbar': currentSubPage === 'record' }">
               <component
                 :is="SUB_PAGE_CONFIG[currentSubPage as keyof typeof SUB_PAGE_CONFIG]?.component"
@@ -446,24 +457,25 @@
         show-if-above
         elevated
         :width="250"
-        :dark="settingsStore.isDarkMode()"
+        :dark="themesStore.isDarkMode()"
         :swipe-only="$g.isMobile"
         behavior="mobile"
         @click="leftDrawerOpen = false"
       >
-        <q-card
-          :class="settingsStore.isDarkMode() ? 'bg-grey-9' : 'bg-grey-3'"
-          class="full-height menu-card"
-        >
+        <q-card :class="themesStore.isDarkMode() ? 'bg-grey-9' : 'bg-grey-3'" class="full-height menu-card">
           <MenuPanel />
         </q-card>
       </q-drawer>
 
       <q-header id="header" class="z-top noselect row" elevated>
-        <!-- 계산기 영역 헤더 -->
-        <q-toolbar v-auto-blur class="col-6 calc-header">
+        <!-- 넓은 화면 계산기 영역 헤더 -->
+        <q-toolbar v-auto-blur class="col-6 calc-header" :class="{ 'q-pt-md': $g.isAndroid && $g.apiLevel >= 35 }">
           <q-btn flat dense round class="q-mr-sm" icon="menu" aria-label="Menu" @click="toggleLeftDrawer">
-            <ToolTip :text="t('tooltip.menu')" />
+            <ToolTip
+              :text-color="themesStore.getDarkColor()"
+              :bg-color="themesStore.getCurrentThemeColors.ui.warning"
+              :text="t('tooltip.menu')"
+            />
           </q-btn>
           <q-tabs
             v-model="uiStore.currentTab"
@@ -493,8 +505,8 @@
           </q-tabs>
         </q-toolbar>
 
-        <!-- 서브화면 영역 헤더 -->
-        <q-toolbar v-auto-blur class="col-6 sub-header">
+        <!-- 넓은 화면 서브 헤더 -->
+        <q-toolbar v-auto-blur class="col-6 sub-header" :class="{ 'q-pt-md': $g.isAndroid && $g.apiLevel >= 35 }">
           <transition name="animate-sub-page">
             <div :key="currentSubPage" :data-page="currentSubPage" class="header-content full-width row items-center">
               <q-toolbar-title
@@ -505,6 +517,8 @@
                 {{ SUB_PAGE_CONFIG[currentSubPage]?.title }}
                 <HelpIcon
                   v-if="(currentSubPage === 'record' || currentSubPage === '') && $g.isMobile"
+                  :text-color="themesStore.getDarkColor()"
+                  :bg-color="themesStore.getCurrentThemeColors.ui.warning"
                   :text="t('tooltip.recordSwipeHelp')"
                 />
               </q-toolbar-title>
@@ -520,9 +534,12 @@
                   :aria-label="t('ariaLabel.subPageButton', { label: t(`message.${button.label}`) })"
                   @click="navigateToPath(button.path, route, router)"
                 >
-                  <ToolTip :text="button.tooltip" />
+                  <ToolTip
+                    :text-color="themesStore.getDarkColor()"
+                    :bg-color="themesStore.getCurrentThemeColors.ui.warning"
+                    :text="button.tooltip"
+                  />
                 </q-btn>
-                <!-- <HelpIcon v-if="currentSubPage === 'record' && window.isMobile" :text="t('tooltip.recordSwipeHelp')" /> -->
                 <q-separator vertical class="sub-header-separator q-mx-sm" />
                 <q-btn
                   v-for="button in SUB_PAGE_CONFIG[currentSubPage]?.buttons"
@@ -536,7 +553,11 @@
                   :disable="button.disabled as unknown as boolean"
                   @click="button.action"
                 >
-                  <ToolTip :text="button.tooltip as unknown as string" />
+                  <ToolTip
+                    :text-color="themesStore.getDarkColor()"
+                    :bg-color="themesStore.getCurrentThemeColors.ui.warning"
+                    :text="button.tooltip as unknown as string"
+                  />
                 </q-btn>
                 <q-btn
                   v-if="SUB_PAGE_CONFIG[currentSubPage]?.showClose"
@@ -556,7 +577,7 @@
       </q-header>
 
       <q-page-container class="row" style="padding-bottom: 0px">
-        <!-- 계산기 영역 -->
+        <!-- 넓은 화면 계산기 영역 -->
         <div class="col-6 calc-content" role="region" :aria-label="t('ariaLabel.calculatorSection')">
           <q-tab-panels
             v-model="uiStore.currentTab"
@@ -580,7 +601,7 @@
           </q-tab-panels>
         </div>
 
-        <!-- 서브화면 영역 -->
+        <!-- 넓은 화면 서브 영역 -->
         <div
           class="col-6 relative-position sub-content"
           role="complementary"
@@ -687,6 +708,10 @@
     .sub-header-separator {
       border-right: 3px solid rgba(255, 255, 255, 0.05);
     }
+
+    .sub-content {
+      background-color: var(--q-dark) !important;
+    }
   }
 
   .sub-header-separator {
@@ -710,6 +735,11 @@
   // 새로 추가된 클래스
   .menu-card {
     padding-top: 55px;
+    background-color: var(--q-grey-3) !important;
+
+    .body--dark & {
+      background-color: var(--q-dark) !important;
+    }
   }
 
   .high-z-index {

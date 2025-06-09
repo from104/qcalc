@@ -25,14 +25,15 @@
   // === 스토어 임포트 및 설정 ===
   import { useUIStore } from 'stores/uiStore';
   import { useSettingsStore } from 'stores/settingsStore';
+  import { useThemesStore } from './stores/themesStore';
 
   const uiStore = useUIStore();
   const settingsStore = useSettingsStore();
+  const themesStore = useThemesStore();
 
   // === 전역 객체 및 상태 저장소 설정 ===
   const $g = window.globalVars;
-  
-  
+
   const route = useRoute();
   const { t } = useI18n();
 
@@ -56,9 +57,9 @@
    * 다크모드를 토글하고 현재 설정 상태를 사용자에게 알립니다.
    */
   const toggleDarkModeWithNotification = () => {
-    settingsStore.toggleDarkMode();
+    themesStore.toggleDarkMode();
     showMessage(
-      settingsStore.darkMode === 'system' ? t('darkMode.message.system') : t('darkMode.message.' + settingsStore.darkMode),
+      themesStore.darkMode === 'system' ? t('darkMode.message.system') : t('darkMode.message.' + themesStore.darkMode),
     );
   };
 
@@ -161,6 +162,7 @@
         orientation: 'portrait',
       });
     }
+    themesStore.updateDarkModeAndTheme();
   });
 
   onUnmounted(async () => {
@@ -297,8 +299,22 @@ ko:
   targetToBeCopiedResult: '계산 결과를'
   targetToBeCopiedSelected: '선택한 내용을'
   copiedToClipboard: '{target} 클립보드에 복사했습니다.'
+  alwaysOnTopOn: '항상 위에 표시가 활성화되었습니다.'
+  alwaysOnTopOff: '항상 위에 표시가 비활성화되었습니다.'
+  darkMode:
+    message:
+      system: '다크모드를 시스템 설정에 따라 변경했습니다.'
+      light: '라이트 모드로 변경했습니다.'
+      dark: '다크 모드로 변경했습니다.'
 en:
   targetToBeCopiedResult: 'the calculation result'
   targetToBeCopiedSelected: 'the selected content'
   copiedToClipboard: 'Copied {target} to the clipboard.'
+  alwaysOnTopOn: 'Always on top has been enabled.'
+  alwaysOnTopOff: 'Always on top has been disabled.'
+  darkMode:
+    message:
+      system: 'Dark mode changed to follow system settings.'
+      light: 'Changed to light mode.'
+      dark: 'Changed to dark mode.'
 </i18n>

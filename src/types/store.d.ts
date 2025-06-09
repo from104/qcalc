@@ -13,9 +13,9 @@ import type { DefineStore } from 'pinia';
 import type { CalculationResult } from './calculator';
 
 /**
- * 다크모드 설정 타입
+ * 계산기 버튼 색상/종류 타입
  */
-export type DarkModeType = 'system' | 'light' | 'dark';
+export type ButtonType = 'normal' | 'important' | 'function';
 
 /**
  * 그룹핑 단위 설정 타입
@@ -52,8 +52,6 @@ export type DecimalPlacesType = keyof typeof DECIMAL_PLACES;
 export interface CalcState {
   calc: Calculator;
   isMemoryVisible: boolean;
-  resultPanelPadding: number;
-  paddingOnResult: number;
   isShiftPressed: boolean;
   isShiftLocked: boolean;
   needButtonNotification: boolean;
@@ -113,7 +111,6 @@ export interface UIState {
  * 설정 스토어 상태 인터페이스
  */
 export interface SettingsState {
-  darkMode: DarkModeType;
   alwaysOnTop: boolean;
   initPanel: boolean;
   showButtonAddedLabel: boolean;
@@ -196,10 +193,6 @@ export interface UIActions {
  * 설정 스토어 액션 인터페이스
  */
 export interface SettingsActions {
-  setDarkMode(mode: DarkModeType): void;
-  updateDarkMode(): void;
-  toggleDarkMode(): void;
-  isDarkMode(): boolean;
   setAlwaysOnTop(isAlwaysOnTop: boolean): void;
   toggleAlwaysOnTop(): void;
   setInitPanel(isInitPanel: boolean): void;
@@ -224,4 +217,11 @@ export type UnitStore = DefineStore<'unit', UnitState, Record<string, never>, Un
 export type CurrencyStore = DefineStore<'currency', CurrencyState, Record<string, never>, CurrencyActions>;
 export type RadixStore = DefineStore<'radix', RadixState, Record<string, never>, RadixActions>;
 export type UIStore = DefineStore<'ui', UIState, Record<string, never>, UIActions>;
-export type SettingsStore = DefineStore<'settings', SettingsState, Record<string, never>, SettingsActions>;
+export type SettingsStore = DefineStore<
+  'settings',
+  SettingsState,
+  {
+    getDecimalPlaces: (state: SettingsState) => number;
+  },
+  SettingsActions
+>;

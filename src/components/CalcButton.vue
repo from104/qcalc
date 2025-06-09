@@ -13,17 +13,19 @@
 
   import { createCalcButtonSet } from 'src/constants/CalcButtonSet';
   import { showError, showMessage } from 'src/utils/NotificationUtils';
-  import { clickButtonById, isWideWidth } from 'src/utils/GlobalHelpers';
+  import { clickButtonById, isWideWidth, logDev } from 'src/utils/GlobalHelpers';
 
   // 전역 window 객체에 접근하기 위한 상수 선언
   const $g = window.globalVars;
 
   import { useSettingsStore } from 'stores/settingsStore';
+  import { useThemesStore } from 'stores/themesStore';
   import { useCalcStore } from 'src/stores/calcStore';
   import { useUIStore } from 'stores/uiStore';
   import { useRadixStore } from 'stores/radixStore';
 
   const settingsStore = useSettingsStore();
+  const themesStore = useThemesStore();
   const uiStore = useUIStore();
   const calcStore = useCalcStore();
   const radixStore = useRadixStore();
@@ -41,7 +43,7 @@
   import { match } from 'ts-pattern';
 
   // 햅틱 피드백 관련
-  import { Haptics, ImpactStyle } from 'capacitor/haptics';
+  import { Haptics, ImpactStyle } from '@capacitor/haptics';
 
   // 키 바인딩 관련
   import { KeyBinding } from 'classes/KeyBinding';
@@ -89,14 +91,16 @@
     displayButtonNotification(id);
   };
 
-  // 버튼 색상 정의
-  const calculatorButtonColors: { [key: string]: string } = {
-    important: '#cb9247',
-    function: '#1d8fb6',
-    normal: '#5e9e7d',
+  const buttonColor = (color: string) => {
+    return themesStore.isDarkMode() ? lighten(color ?? '', -20) : color;
   };
 
-  const shiftButtonPressedColor = lighten(calculatorButtonColors.important ?? '', -30);
+  // themesStore에서 버튼 색상을 가져오는 computed 속성
+  const importantButtonColor = computed(() => buttonColor(themesStore.getButtonColor('important')));
+  const functionButtonColor = computed(() => buttonColor(themesStore.getButtonColor('function')));
+  const normalButtonColor = computed(() => buttonColor(themesStore.getButtonColor('normal')));
+
+  const shiftButtonPressedColor = computed(() => lighten(importantButtonColor.value, -30));
 
   // const i18n = useI18n();
   const { standardButtons, modeSpecificButtons, standardExtendedFunctions, modeSpecificExtendedFunctions } =
@@ -200,7 +204,7 @@
     }
     calcStore.offNeedButtonNotification();
   };
-  
+
   // 버튼 시프트 상태에 따른 기능 실행
   const handleClickBtn = (id: ButtonID) => {
     const isDisabled = calcStore.isShiftPressed
@@ -307,11 +311,15 @@
   const handleResize = () => {
     screenWidth.value = isWideWidth() ? window.innerWidth / 2 : window.innerWidth;
     screenHeight.value = window.innerHeight;
+    // 화면 크기 변경 시 baseHeight 재계산
+    setTimeout(() => calculateDynamicBaseHeight(), 100);
   };
 
   // 컴포넌트 마운트 시 resize 이벤트 리스너 등록
   onMounted(() => {
     window.addEventListener('resize', handleResize);
+    // DOM이 완전히 렌더링된 후 baseHeight 계산
+    setTimeout(() => calculateDynamicBaseHeight(), 150);
   });
 
   // 컴포넌트 언마운트 시 resize 이벤트 리스너 제거
@@ -319,12 +327,104 @@
     window.removeEventListener('resize', handleResize);
   });
 
-  // 계산기 버튼 높이 설정
-  const baseHeight = ref('136px');
-  // const baseHeight = ref('272px');
-  if (['unit', 'currency', 'radix'].includes(props.type)) {
-    baseHeight.value = '234px';
-  }
+  /**
+   * 페이지 구조를 기반으로 동적 baseHeight를 계산하는 함수
+   * @description 각 페이지 타입별로 실제 DOM 요소들의 높이를 측정하여 정확한 baseHeight 계산
+   */
+  const calculateDynamicBaseHeight = () => {
+    try {
+      let totalHeightToExclude = 0;
+
+      // 1. MainLayout 헤더 높이 (고정값 50px)
+      if ($g.isAndroid && $g.apiLevel >= 35) {
+        totalHeightToExclude += 24;
+        if (!$g.isGestureNavigation) {
+          totalHeightToExclude += 48;
+        }
+      } else {
+        totalHeightToExclude += 10;
+      }
+
+      // 2. 현재 활성화된 q-card 요소 찾기 (각 페이지의 컨테이너)
+      const currentCard = document.querySelector('.q-tab-panel--active q-card') as HTMLElement;
+
+      if (currentCard) {
+        // 3. q-card의 패딩 계산 (q-px-md q-pt-xs q-pb-md)
+        const cardStyles = window.getComputedStyle(currentCard);
+        const paddingTop = parseInt(cardStyles.paddingTop) || 4; // q-pt-xs
+        const paddingBottom = parseInt(cardStyles.paddingBottom) || 16; // q-pb-md
+        totalHeightToExclude += paddingTop + paddingBottom;
+
+        // 4. CalcButton을 제외한 모든 자식 요소들의 높이 합산
+        const cardChildren = Array.from(currentCard.children) as HTMLElement[];
+
+        for (const child of cardChildren) {
+          // CalcButton 컴포넌트가 포함된 q-card-section은 제외
+          if (!child.querySelector('.button') && !child.classList.contains('button')) {
+            const childHeight = child.offsetHeight;
+            totalHeightToExclude += childHeight;
+
+            if (process.env.DEV) {
+              console.log(`Child element height: ${childHeight}px`, child.className || child.tagName);
+            }
+          }
+        }
+      } else {
+        // q-card를 찾을 수 없는 경우 타입별 추정값 사용
+        if (props.type === 'calc') {
+          totalHeightToExclude += 100; // ResultField(main) 추정
+        } else {
+          totalHeightToExclude += 200; // ResultField(main) + Panel + ResultField(sub) 추정
+        }
+        totalHeightToExclude += 20; // 패딩 추정값
+      }
+
+      // 5. 최소 높이 보장 및 최종 값 설정
+      const calculatedHeight = Math.max(totalHeightToExclude, 120);
+      baseHeight.value = `${calculatedHeight}px`;
+
+      // 6. 개발 환경에서 디버깅 정보 출력
+        logDev(`🎯 CalcButton baseHeight calculated for type "${props.type}": ${baseHeight.value}`, {
+          screenHeight: screenHeight.value,
+          headerHeight: 50,
+          totalExcluded: totalHeightToExclude,
+          finalHeight: calculatedHeight,
+          cardFound: !!currentCard,
+        });
+    } catch (error) {
+      // 에러 발생 시 타입별 기본값 사용
+      console.warn('⚠️ Error calculating dynamic baseHeight, using fallback values:', error);
+      baseHeight.value =
+        props.type === 'calc' ? '130px' : ['unit', 'currency', 'radix'].includes(props.type) ? '220px' : '130px';
+    }
+  };
+
+  // 계산기 버튼 높이 설정 (초기값)
+  const baseHeight = ref('130px');
+
+  // props.type 변경 시 baseHeight 재계산
+  watch(
+    () => props.type,
+    () => {
+      setTimeout(() => calculateDynamicBaseHeight(), 100);
+    },
+  );
+
+  // 탭 변경 시 baseHeight 재계산 (DOM 업데이트 후)
+  watch(
+    () => uiStore.currentTab,
+    () => {
+      setTimeout(() => calculateDynamicBaseHeight(), 150);
+    },
+  );
+
+  // 화면 방향 변경이나 레이아웃 변경 감지
+  watch(
+    () => [screenWidth.value, screenHeight.value],
+    () => {
+      setTimeout(() => calculateDynamicBaseHeight(), 100);
+    },
+  );
 
   const displayDisabledButtonNotification = () => {
     showMessage(t('disabledButton'));
@@ -379,7 +479,7 @@
 
   const labelScalingFactor = computed(() => {
     if ($g.isCapacitor) {
-      // console.log('window.textZoom: ', window.textZoom);
+      logDev('window.textZoom: ', $g.textZoom);
       return $g.textZoom / 100;
     }
     // screenWidth ref를 사용하여 화면 너비 계산
@@ -463,7 +563,7 @@
           :model-value="tooltipTimers[id] ?? false"
           no-parent-event
           class="noselect"
-          :style="`background: ${calculatorButtonColors[button.color]}; border: 2px outset ${calculatorButtonColors[button.color]}; border-radius: 10px;`"
+          :style="`background: ${themesStore.getButtonColor(button.color as 'normal' | 'important' | 'function')}; border: 2px outset ${themesStore.getButtonColor(button.color as 'normal' | 'important' | 'function')}; border-radius: 10px;`"
           anchor="top middle"
           self="center middle"
           transition-show="jump-up"
@@ -472,8 +572,10 @@
         >
           {{ extendedFunctionSet[id]?.label ?? '' }}
         </q-tooltip>
-        <ToolTip>
-          {{
+        <ToolTip
+          :text-color="themesStore.getDarkColor()"
+          :bg-color="themesStore.getCurrentThemeColors.ui.warning"
+          :text="
             calcStore.isShiftPressed
               ? (extendedFunctionSet[id]?.isDisabled ?? false)
                 ? t('disabledButton')
@@ -481,8 +583,8 @@
               : (activeButtonSet[id]?.isDisabled ?? false)
                 ? t('disabledButton')
                 : getTooltipsOfKeys(id, false)
-          }}
-        </ToolTip>
+          "
+        />
       </q-btn>
     </div>
   </q-card-section>
@@ -529,15 +631,15 @@
   }
 
   .bg-btn-important {
-    background: v-bind('calculatorButtonColors.important') !important; // 아이콘의 밝은 녹색
+    background: v-bind(importantButtonColor) !important; // 아이콘의 밝은 녹색
   }
 
   .bg-btn-function {
-    background: v-bind('calculatorButtonColors.function') !important; // 아이콘의 밝은 파란색과 어울리게 조정
+    background: v-bind(functionButtonColor) !important; // 아이콘의 밝은 파란색과 어울리게 조정
   }
 
   .bg-btn-normal {
-    background: v-bind('calculatorButtonColors.normal') !important; // 어두운 색
+    background: v-bind(normalButtonColor) !important; // 어두운 색
   }
 
   .button-shift {

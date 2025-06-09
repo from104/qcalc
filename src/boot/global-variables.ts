@@ -46,19 +46,27 @@ export default defineBoot(() => {
     isFoldable: false,
     textZoom: 100,
 
+    // 안드로이드 시스템 정보
+    apiLevel: 0,
+    navigationBarHeight: 0,
+    isGestureNavigation: false,
+
     // 스냅 여부
     isSnap: window.electron?.isSnap ?? false,
 
     // 버전 정보
     version: version,
   };
-
+  
   // Capacitor 환경에서 자바스크립트 인터페이스 추가
   if (Platform.is.capacitor) {
     globalVars.isTablet = window.androidInterface?.isTablet() ?? false;
     globalVars.isPhone = window.androidInterface?.isPhone() ?? false;
     globalVars.isFoldable = window.androidInterface?.isFoldable() ?? false;
     globalVars.textZoom = window.androidInterface?.getTextZoom() ?? 100;
+    globalVars.apiLevel = window.androidInterface?.getApiLevel() ?? 0;
+    globalVars.navigationBarHeight = window.androidInterface?.getNavigationBarHeight() ?? 0;
+    globalVars.isGestureNavigation = window.androidInterface?.isGestureNavigation() ?? false;
   }
 
   // window.globalVars로 전역 변수 설정

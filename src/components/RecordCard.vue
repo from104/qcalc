@@ -37,14 +37,14 @@
 
   // 스토어 import
   import { useUIStore } from 'stores/uiStore';
-  import { useSettingsStore } from 'stores/settingsStore';
+  import { useThemesStore } from 'stores/themesStore';
   import { useCalcStore } from 'src/stores/calcStore';
   import { useCurrencyStore } from 'stores/currencyStore';
   import { useUnitStore } from 'stores/unitStore';
 
   // 스토어 인스턴스 생성
   const uiStore = useUIStore();
-  const settingsStore = useSettingsStore();
+  const themesStore = useThemesStore();
   const calcStore = useCalcStore();
   const currencyStore = useCurrencyStore();
   const unitStore = useUnitStore();
@@ -393,6 +393,18 @@
   const openRecordMenu = (id: number) => {
     recordMenu[id] = true;
   };
+
+  // Quasar 관련 설정
+  import { colors } from 'quasar';
+  // Quasar 인스턴스 및 색상 유틸리티 초기화
+  const { lighten } = colors;
+
+  // 메뉴 배경색
+  const menuBackgroundColor = computed(() => {
+    return themesStore.isDarkMode()
+      ? lighten(themesStore.getDarkColor(), 10)
+      : lighten(themesStore.getCurrentThemeColors.ui.primary, 90);
+  });
 </script>
 
 <template>
@@ -513,9 +525,13 @@
                     :search-term="uiStore.searchKeyword"
                     @show-tooltip="(isShow) => handleMemoTooltip(record.id, isShow)"
                   />
-                  <ToolTip v-if="isShowMemoTooltip[record.id]" :delay="1000">
-                    {{ record.memo }}
-                  </ToolTip>
+                  <ToolTip
+                    v-if="isShowMemoTooltip[record.id]"
+                    :text-color="themesStore.getDarkColor()"
+                    :bg-color="themesStore.getCurrentThemeColors.ui.warning"
+                    :delay="1000"
+                    :text="record.memo"
+                  />
                 </q-item-label>
                 <q-item-label class="record-text">
                   <HighlightText
@@ -524,15 +540,19 @@
                     allow-line-break
                     @show-tooltip="(isShow) => handleResultTooltip(record.id, isShow)"
                   />
-                  <ToolTip v-if="isShowResultTooltip[record.id]" :delay="1000" line-break>
-                    {{ record.displayText }}
-                  </ToolTip>
+                  <ToolTip
+                    v-if="isShowResultTooltip[record.id]"
+                    :text-color="themesStore.getDarkColor()"
+                    :bg-color="themesStore.getCurrentThemeColors.ui.warning"
+                    :delay="1000"
+                    :text="record.displayText"
+                  />
                 </q-item-label>
                 <q-item-label class="row justify-between q-pa-none q-ma-none">
                   <div class="col-6 text-left record-menu-btn">
                     <q-btn
                       class="q-px-xs q-py-none menu-btn"
-                      :class="settingsStore.darkMode ? 'body--dark' : 'body--light'"
+                      :class="themesStore.darkMode ? 'body--dark' : 'body--light'"
                       icon="more_vert"
                       size="sm"
                       flat
@@ -548,13 +568,15 @@
                         self="top left"
                         @update:model-value="(val) => { recordMenu[record.id] = val; }"
                       >
-                        <q-list 
+                        <q-list
                           dense
                           class="noselect q-py-sm"
-                          :class="settingsStore.isDarkMode() ? 'bg-grey-9' : 'bg-grey-3'"
+                          :style="{
+                            backgroundColor: menuBackgroundColor,
+                          }"
                           style="max-width: 200px"
                           role="list"
-                          :dark="settingsStore.isDarkMode()"
+                          :dark="themesStore.isDarkMode()"
                         >
                           <MenuItem
                             v-if="record.memo"
@@ -600,7 +622,7 @@
                     <q-btn
                       v-if="$g.isDesktop"
                       class="q-px-xs menu-btn"
-                      :class="settingsStore.darkMode ? 'body--dark' : 'body--light'"
+                      :class="themesStore.darkMode ? 'body--dark' : 'body--light'"
                       icon="edit_note"
                       size="sm"
                       flat
@@ -611,7 +633,7 @@
                   <div class="col-6 text-right text-caption record-timestamp">
                     <HighlightText
                       class="self-center"
-                      :class="settingsStore.darkMode ? 'body--dark' : 'body--light'"
+                      :class="themesStore.darkMode ? 'body--dark' : 'body--light'"
                       :text="formatDateTime(record.timestamp)"
                       :search-term="uiStore.searchKeyword"
                     />

@@ -15,11 +15,11 @@
 
   // 스토어 import
   import { useUIStore } from 'stores/uiStore';
-  import { useSettingsStore } from 'stores/settingsStore';
+  import { useThemesStore } from 'stores/themesStore';
 
   // 스토어 인스턴스 생성
   const uiStore = useUIStore();
-  const settingsStore = useSettingsStore();
+  const themesStore = useThemesStore();
 
   // tips 폴더 내의 모든 .md 파일을 동적으로 import
   const koTipModules = import.meta.glob('./tips/ko/*.md', { eager: true });
@@ -123,7 +123,7 @@
 
 <template>
   <q-dialog v-model="dialogVisible" role="dialog" :aria-label="t('dialogAriaLabel')">
-    <q-card class="tips-dialog" :class="{ 'bg-dark': settingsStore.darkMode }" role="article">
+    <q-card class="tips-dialog" :class="{ 'bg-dark': themesStore.darkMode }" role="article">
       <q-bar class="bg-primary text-white" role="banner">
         <q-space />
         <div class="text-subtitle1" role="heading" aria-level="1">{{ t('tipsTitle') }} ({{ pageText }})</div>
@@ -141,7 +141,7 @@
       <q-card-section
         v-touch-swipe.horizontal="swipeConfig"
         class="tips-content"
-        :class="{ 'bg-dark': settingsStore.darkMode }"
+        :class="{ 'bg-dark': themesStore.darkMode }"
         role="main"
         :aria-label="t('mainContentAriaLabel')"
       >
@@ -152,21 +152,21 @@
               no-linkify
               no-heading-anchor-links
               class="q-px-md q-pt-sm"
-              :class="{ 'text-white': settingsStore.darkMode }"
+              :class="{ 'text-white': themesStore.darkMode }"
             />
           </div>
         </transition>
       </q-card-section>
       <q-card-actions
         align="between"
-        :class="['q-px-md', settingsStore.darkMode ? 'bg-dark' : 'bg-white']"
+        :class="['q-px-md', themesStore.darkMode ? 'bg-dark' : 'bg-white']"
         role="group"
         :aria-label="t('navigationAriaLabel')"
       >
         <q-btn
           flat
           round
-          :color="settingsStore.darkMode ? 'white' : 'primary'"
+          :color="themesStore.darkMode ? 'white' : 'primary'"
           icon="chevron_left"
           :aria-label="t('prevTip')"
           role="button"
@@ -178,14 +178,14 @@
           v-model="uiStore.showTips"
           :label="t('showTipsOnStart')"
           dense
-          :class="settingsStore.darkMode ? 'text-white' : 'text-primary'"
+          :class="themesStore.darkMode ? 'text-white' : 'text-primary'"
           role="checkbox"
           :aria-label="t('showTipsOnStart')"
         />
         <q-btn
           flat
           round
-          :color="settingsStore.darkMode ? 'white' : 'primary'"
+          :color="themesStore.darkMode ? 'white' : 'primary'"
           icon="chevron_right"
           :aria-label="t('nextTip')"
           role="button"

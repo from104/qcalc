@@ -9,7 +9,7 @@
    */
 
   // Vue 핵심 기능 및 컴포지션 API 가져오기
-  import { ref, onMounted, onBeforeUnmount, reactive, watch } from 'vue';
+  import { ref, onMounted, onBeforeUnmount, reactive, watch, computed } from 'vue';
   import type { Ref } from 'vue';
 
   // i18n 설정
@@ -21,11 +21,13 @@
   import { useCurrencyStore } from 'stores/currencyStore';
   import { useSettingsStore } from 'stores/settingsStore';
   import { useCalcStore } from 'src/stores/calcStore';
+  import { useThemesStore } from 'stores/themesStore';
 
   // 스토어 인스턴스 생성
   const uiStore = useUIStore();
   const currencyStore = useCurrencyStore();
   const settingsStore = useSettingsStore();
+  const themesStore = useThemesStore();
   const calcStore = useCalcStore();
 
   // 계산기 관련 타입과 클래스
@@ -65,6 +67,9 @@
     currencyStore.currencyConverter.getAvailableItems().forEach((currency: string) => {
       currencyDescriptions[currency] = t(`currencyDesc.${currency}`);
     });
+
+    // 통화 옵션 목록도 업데이트
+    updateCurrencyOptions();
   });
 
   // 입력 포커스에 따른 키 바인딩 활성화/비활성화
@@ -110,32 +115,50 @@
     value: string;
     label: string;
     desc: string;
+    isFavorite: boolean;
     disable?: boolean;
   };
-
-  const currencyList = currencyStore.currencyConverter.getAvailableItems();
 
   // 통화 옵션 초기화
   /**
    * 통화 옵션을 생성하는 유틸리티 함수
    * @param currency - 통화 코드
-   * @param isSource - 출발 통화 여부
    * @returns 통화 옵션 객체
    */
   const createCurrencyOption = (currency: string) => ({
     value: currency,
     label: currency,
     desc: currencyDescriptions[currency] ?? '',
+    isFavorite: currencyStore.isFavorite(currency),
   });
 
+  // 정렬된 통화 목록 가져오기 (즐겨찾기가 상단에 위치)
+  const getSortedCurrencyOptions = (): CurrencyOptions[] => {
+    return currencyStore.getSortedCurrencies().map((currency: string) => createCurrencyOption(currency));
+  };
+
   // 출발 통화 옵션 목록
-  const sourceCurrencyOptions = reactive<CurrencyOptions[]>(
-    currencyList.map((currency: string) => createCurrencyOption(currency)),
-  );
+  const sourceCurrencyOptions = reactive<CurrencyOptions[]>(getSortedCurrencyOptions());
 
   // 도착 통화 옵션 목록
-  const targetCurrencyOptions = reactive<CurrencyOptions[]>(
-    currencyList.map((currency: string) => createCurrencyOption(currency)),
+  const targetCurrencyOptions = reactive<CurrencyOptions[]>(getSortedCurrencyOptions());
+
+  /**
+   * 통화 옵션을 업데이트하는 함수
+   */
+  const updateCurrencyOptions = () => {
+    const newOptions = getSortedCurrencyOptions();
+    sourceCurrencyOptions.splice(0, sourceCurrencyOptions.length, ...newOptions);
+    targetCurrencyOptions.splice(0, targetCurrencyOptions.length, ...newOptions);
+  };
+
+  // 즐겨찾기 상태 변경 시 옵션 목록 업데이트
+  watch(
+    () => currencyStore.favoriteCurrencies,
+    () => {
+      updateCurrencyOptions();
+    },
+    { deep: true },
   );
 
   // 통화 옵션 업데이트
@@ -143,6 +166,27 @@
     () => currencyStore.sourceCurrency,
     () => currencyStore.currencyConverter.setBase(currencyStore.sourceCurrency),
   );
+
+  /**
+   * 즐겨찾기 토글 핸들러
+   * @param currency - 토글할 통화 코드
+   * @param event - 클릭 이벤트 (이벤트 전파 방지용)
+   */
+  const handleFavoriteToggle = async (currency: string, event: Event) => {
+    event.stopPropagation();
+    event.preventDefault();
+
+    // 즐겨찾기 상태 토글
+    currencyStore.toggleFavorite(currency);
+
+    // 접근성을 위한 시각적 피드백
+    const target = event.target as HTMLElement;
+    if (target) {
+      target.style.transform = 'scale(0.9)';
+      await new Promise((resolve) => setTimeout(resolve, 100));
+      target.style.transform = '';
+    }
+  };
 
   // 통화 선택 필터 함수 생성
   const createFilterFn = (options: Ref<CurrencyOptions[]>, reactiveOptions: CurrencyOptions[]) => {
@@ -182,6 +226,10 @@
       calcStore.calc.needsBufferReset = true;
     }
   };
+
+  // themesStore에서 select 색상을 가져오는 computed 속성
+  const selectTextColor = computed(() => themesStore.getSelectColor('text', themesStore.isDarkMode()));
+  const selectBackgroundColor = computed(() => themesStore.getSelectColor('background', themesStore.isDarkMode()));
 </script>
 
 <template>
@@ -207,17 +255,14 @@
       hide-selected
       behavior="menu"
       class="col-4 q-pl-sm shadow-2"
-      :class="!settingsStore.isDarkMode() ? 'bg-blue-grey-2' : 'bg-blue-grey-6'"
-      :label-color="!settingsStore.isDarkMode() ? 'primary' : 'grey-1'"
+      :class="`bg-${selectBackgroundColor}`"
+      :label-color="selectTextColor"
       :popup-content-class="
-        [
-          !settingsStore.isDarkMode() ? 'bg-blue-grey-2' : 'bg-blue-grey-6',
-          'scrollbar-custom',
-          'q-select-popup',
-          $g.isMobile ? 'popup-mobile' : '',
-        ].join(' ')
+        [`bg-${selectBackgroundColor}`, 'scrollbar-custom', 'q-select-popup', $g.isMobile ? 'popup-mobile' : '', 'noselect'].join(
+          ' ',
+        )
       "
-      :options-selected-class="!settingsStore.isDarkMode() ? 'text-primary' : 'text-grey-1'"
+      :options-selected-class="`text-${selectTextColor}`"
       @filter="sourceFilterFn"
       @focus="uiStore.setInputFocused()"
       @blur="uiStore.setInputBlurred()"
@@ -225,18 +270,33 @@
       @update:model-value="blurElement()"
     >
       <template #option="scope">
-        <q-item v-bind="scope.itemProps">
-          <q-item-section>
-            <q-item-label caption>{{ currencyDescriptions[scope.opt.label] }}</q-item-label>
-            <q-item-label>{{ scope.opt.label }}</q-item-label>
-          </q-item-section>
-        </q-item>
+        <transition-group name="select-option-">
+          <q-item v-bind="scope.itemProps" :key="scope.opt.value" class="q-px-sm">
+            <q-item-section side class="q-pr-sm">
+              <q-btn
+                :icon="scope.opt.isFavorite ? 'star' : 'star_border'"
+                flat
+                round
+                dense
+                size="md"
+                :color="scope.opt.isFavorite ? (themesStore.isDarkMode() ? 'amber' : 'brown-4') : 'grey'"
+                :aria-label="scope.opt.isFavorite ? t('ariaLabel.removeFromFavorites') : t('ariaLabel.addToFavorites')"
+                class="q-pa-none q-ma-none"
+                @click="handleFavoriteToggle(scope.opt.value, $event)"
+              />
+            </q-item-section>
+            <q-item-section>
+              <q-item-label caption>{{ currencyDescriptions[scope.opt.label] }}</q-item-label>
+              <q-item-label>{{ scope.opt.label }}</q-item-label>
+            </q-item-section>
+          </q-item>
+        </transition-group>
       </template>
-      <ToolTip>
-        <div class="text-left" style="white-space: pre-wrap">
-          {{ `${currencyDescriptions[currencyStore.sourceCurrency]}\n${currencyStore.sourceCurrency}` }}
-        </div>
-      </ToolTip>
+      <ToolTip
+        :text-color="themesStore.getDarkColor()"
+        :bg-color="themesStore.getCurrentThemeColors.ui.warning"
+        :text="`${currencyDescriptions[currencyStore.sourceCurrency]}\n${currencyStore.sourceCurrency}`"
+      />
     </q-select>
 
     <!-- 원본, 대상 통화 바꾸기 버튼 -->
@@ -253,7 +313,12 @@
       :aria-label="t('ariaLabel.swapCurrencies')"
       @click="handleCurrencySwap()"
     >
-      <ToolTip :auto-hide="3000" :text="t('tooltipSwap')" />
+      <ToolTip
+        :text-color="themesStore.getDarkColor()"
+        :bg-color="themesStore.getCurrentThemeColors.ui.warning"
+        :auto-hide="3000"
+        :text="t('tooltipSwap')"
+      />
     </q-btn>
 
     <!-- 대상 통화 -->
@@ -274,17 +339,14 @@
       hide-selected
       behavior="menu"
       class="col-4 q-pl-sm shadow-2"
-      :class="!settingsStore.isDarkMode() ? 'bg-blue-grey-2' : 'bg-blue-grey-6'"
-      :label-color="!settingsStore.isDarkMode() ? 'primary' : 'grey-1'"
+      :class="`bg-${selectBackgroundColor}`"
+      :label-color="selectTextColor"
       :popup-content-class="
-        [
-          !settingsStore.isDarkMode() ? 'bg-blue-grey-2' : 'bg-blue-grey-6',
-          'scrollbar-custom',
-          'q-select-popup',
-          $g.isMobile ? 'popup-mobile' : '',
-        ].join(' ')
+        [`bg-${selectBackgroundColor}`, 'scrollbar-custom', 'q-select-popup', $g.isMobile ? 'popup-mobile' : '', 'noselect'].join(
+          ' ',
+        )
       "
-      :options-selected-class="!settingsStore.isDarkMode() ? 'text-primary' : 'text-grey-1'"
+      :options-selected-class="`text-${selectTextColor}`"
       @filter="targetFilterFn"
       @keyup.enter="blurElement()"
       @update:model-value="blurElement()"
@@ -292,16 +354,34 @@
       @blur="uiStore.setInputBlurred()"
     >
       <template #option="scope">
-        <q-item v-bind="scope.itemProps">
-          <q-item-section>
-            <q-item-label caption>{{ currencyDescriptions[scope.opt.label] }}</q-item-label>
-            <q-item-label>
-              {{ `${scope.opt.label}, ${currencyStore.currencyConverter.getRate(scope.opt.label).toFixed(4)}` }}
-            </q-item-label>
-          </q-item-section>
-        </q-item>
+        <transition-group name="select-option-">
+          <q-item v-bind="scope.itemProps" :key="scope.opt.value" class="q-px-sm">
+            <q-item-section side class="q-pr-sm">
+              <q-btn
+                :icon="scope.opt.isFavorite ? 'star' : 'star_border'"
+                flat
+                round
+                dense
+                size="md"
+                :color="scope.opt.isFavorite ? (themesStore.isDarkMode() ? 'amber' : 'brown-4') : 'grey'"
+                :aria-label="scope.opt.isFavorite ? t('ariaLabel.removeFromFavorites') : t('ariaLabel.addToFavorites')"
+                class="q-pa-none q-ma-none"
+                @click="handleFavoriteToggle(scope.opt.value, $event)"
+              />
+            </q-item-section>
+            <q-item-section>
+              <q-item-label caption>{{ currencyDescriptions[scope.opt.label] }}</q-item-label>
+              <q-item-label>
+                {{ `${scope.opt.label}, ${currencyStore.currencyConverter.getRate(scope.opt.label).toFixed(4)}` }}
+              </q-item-label>
+            </q-item-section>
+          </q-item>
+        </transition-group>
       </template>
-      <ToolTip>
+      <ToolTip
+        :text-color="themesStore.getDarkColor()"
+        :bg-color="themesStore.getCurrentThemeColors.ui.warning"
+      >
         <div class="text-left" style="white-space: pre-wrap">
           {{
             `${currencyDescriptions[currencyStore.targetCurrency]}\n${currencyStore.targetCurrency}, ${currencyStore.currencyConverter.getRate(currencyStore.targetCurrency).toFixed(4)}`
@@ -331,9 +411,45 @@
     }
   }
 
+  // 모바일 팝업 높이 조정
   .popup-mobile {
     height: 100% !important;
     max-height: 180px !important;
+  }
+
+  .select-option--move,
+  .select-option--enter-active,
+  .select-option--leave-active {
+    transition: all 3s ease;
+  }
+
+  .select-option--leave-active {
+    position: absolute;
+  }
+
+  .select-option--enter-from,
+  .select-option--leave-to {
+    opacity: 0;
+    transform: translateY(100%);
+  }
+
+  // 옵션 목록 전체의 부드러운 재정렬 효과
+  .q-select-popup .q-item {
+    transition: all 0.3s ease;
+    will-change: transform, opacity;
+
+    // 호버 효과
+    &:hover {
+      background-color: rgba(var(--q-primary), 0.05);
+      transform: translateX(2px);
+    }
+  }
+
+  // 다크 모드에서 더 나은 시각적 피드백
+  @media (prefers-color-scheme: dark) {
+    .q-select-popup .q-item:hover {
+      background-color: rgba(255, 255, 255, 0.08);
+    }
   }
 </style>
 
