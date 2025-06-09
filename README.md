@@ -10,6 +10,15 @@ The calculator alone appears when the window width is reduced.
 
 ![Screenshot](https://github.com/from104/qcalc/raw/main/assets/screenshot_v0.11.3.png)
 
+## Key Features
+
+- **4 Professional Calculators**: Standard calculator, unit converter, currency converter, and programmer calculator meet all your calculation needs
+- **High-precision Calculation Engine**: Supports accurate calculations up to 64 digits with advanced math functions like trigonometry, factorial, and powers
+- **Number Base & Bit Operations**: Converts between binary/octal/decimal/hexadecimal and supports professional bit operations (AND, OR, XOR, NOT) for programmers
+- **Smart User Experience**: Provides personalized environment with unit/currency favorites, various color themes, and calculation history notes
+- **Cross-platform Support**: Delivers consistent experience on Windows, Linux desktop and Android mobile with automatic update support
+- **Accessibility-focused Design**: Continuously improved for easy access by all users with keyboard shortcuts, haptic feedback, and adaptive layouts
+
 ## Guide to Main Features
 
 ### How to Use the 4 Calculators

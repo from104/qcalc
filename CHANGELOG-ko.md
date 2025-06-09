@@ -4,7 +4,7 @@
 
 형식은 [Keep a Changelog (korean)]를 기반으로 하며 이 프로젝트는 [Semantic Versioning (korean)]을 따릅니다.
 
-## [0.11.4] 2025-06-08
+## [0.11.4] 2025-06-10
 
 ### 추가됨
 

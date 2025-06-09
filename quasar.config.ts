@@ -77,7 +77,6 @@ export default defineConfig((/* ctx */) => {
         classes: join(__dirname, 'src/classes'),
         types: join(__dirname, 'src/types'),
         constants: join(__dirname, 'src/constants'),
-        capacitor: join(__dirname, 'src-capacitor/node_modules/@capacitor'),
       },
 
       // 대상 브라우저 및 Node 버전

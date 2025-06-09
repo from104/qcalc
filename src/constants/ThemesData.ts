@@ -7,7 +7,7 @@
 export type DarkModeType = 'light' | 'dark' | 'system';
 
 // 테마 타입 정의
-export type ThemeType = 'default' | 'azalea' | 'autumn' | 'forest' | 'ocean' | 'amethyst' | 'slate' | 'highcontrast';
+export type ThemeType = 'default' | 'azalea' | 'autumn' | 'forest' | 'ocean' | 'amethyst' | 'slate' | 'grey' | 'highcontrast';
 
 // 테마 이름 다국어 인터페이스 정의
 export interface ThemeName {
@@ -65,18 +65,18 @@ export const themes: Record<ThemeType, ThemeColors> = {
       en: 'Default',
     },
     ui: {
-      primary: 'green-10', // #16743f
-      secondary: 'green-6', // #04b060
-      accent: 'light-green-5', // #3fce97
-      positive: 'cyan-7', // #1d8fb6
-      negative: 'red-9', // #c71818
-      info: 'light-blue-5', // #34a9e0
-      warning: 'amber-7', // #d1a527
+      primary: 'green-10',
+      secondary: 'green-6',
+      accent: 'light-green-5',
+      positive: 'cyan-7',
+      negative: 'red-9',
+      info: 'light-blue-5',
+      warning: 'amber-7',
     },
     button: {
-      important: 'orange-8', // #cb9247
-      function: 'cyan-7', // #1d8fb6
-      normal: 'grey-6', // #5e9e7d
+      important: 'orange-8',
+      function: 'cyan-7',
+      normal: 'grey-6',
     },
     panel: {
       text: {
@@ -92,12 +92,12 @@ export const themes: Record<ThemeType, ThemeColors> = {
     },
     select: {
       text: {
-        light: 'primary',
+        light: 'grey-10',
         dark: 'grey-1',
       },
       background: {
-        light: 'green-2',
-        dark: 'green-8',
+        light: 'grey-4',
+        dark: 'grey-9',
       },
     },
   },
@@ -107,18 +107,18 @@ export const themes: Record<ThemeType, ThemeColors> = {
       en: 'Azalea',
     },
     ui: {
-      primary: 'pink-8', // #c2185b
-      secondary: 'pink-4', // #f06292
-      accent: 'pink-6', // #e91e63
-      positive: 'green-6', // #4caf50
-      negative: 'red-6', // #f44336
-      info: 'blue-6', // #2196f3
-      warning: 'orange-6', // #ff9800
+      primary: 'pink-8',
+      secondary: 'pink-4',
+      accent: 'pink-6',
+      positive: 'green-6',
+      negative: 'red-6',
+      info: 'blue-6',
+      warning: 'orange-6',
     },
     button: {
-      important: 'pink-8', // #c2185b
-      function: 'pink-6', // #e91e63
-      normal: 'pink-4', // #f06292
+      important: 'pink-8',
+      function: 'pink-6',
+      normal: 'pink-4',
     },
     panel: {
       text: {
@@ -139,7 +139,7 @@ export const themes: Record<ThemeType, ThemeColors> = {
       },
       background: {
         light: 'pink-1',
-        dark: 'pink-7',
+        dark: 'pink-9',
       },
     },
   },
@@ -149,18 +149,18 @@ export const themes: Record<ThemeType, ThemeColors> = {
       en: 'Autumn',
     },
     ui: {
-      primary: 'brown-7', // #A0522D
-      secondary: 'orange-4', // #ffb562
-      accent: 'brown-5', // #d07a54
-      positive: 'deep-orange-5', // #ff7f51
-      negative: 'red-10', // #a72608
-      info: 'amber-6', // #fca311
-      warning: 'amber-5', // #f7b267
+      primary: 'brown-7',
+      secondary: 'orange-4',
+      accent: 'brown-5',
+      positive: 'deep-orange-5',
+      negative: 'red-10',
+      info: 'amber-6',
+      warning: 'amber-5',
     },
     button: {
-      important: 'brown-8', // #754520
-      function: 'brown-6', // #9c6d4a
-      normal: 'brown-4', // #c68f63
+      important: 'brown-8',
+      function: 'brown-6',
+      normal: 'brown-4',
     },
     panel: {
       text: {
@@ -191,18 +191,18 @@ export const themes: Record<ThemeType, ThemeColors> = {
       en: 'Forest',
     },
     ui: {
-      primary: 'green-9', // #355e3b
-      secondary: 'green-7', // #6b8e23
-      accent: 'green-7', // #5a8a62
-      positive: 'green-6', // #4e944f
-      negative: 'brown-7', // #a0522d
-      info: 'green-5', // #7fb77e
-      warning: 'amber-5', // #e2c275
+      primary: 'green-9',
+      secondary: 'green-7',
+      accent: 'green-7',
+      positive: 'green-6',
+      negative: 'brown-7',
+      info: 'green-5',
+      warning: 'amber-5',
     },
     button: {
-      important: 'green-9', // #355e3b
-      function: 'green-7', // #4F8B50
-      normal: 'green-5', // #69b36a
+      important: 'green-9',
+      function: 'green-7',
+      normal: 'green-5',
     },
     panel: {
       text: {
@@ -223,7 +223,7 @@ export const themes: Record<ThemeType, ThemeColors> = {
       },
       background: {
         light: 'green-1',
-        dark: 'green-7',
+        dark: 'green-9',
       },
     },
   },
@@ -233,18 +233,18 @@ export const themes: Record<ThemeType, ThemeColors> = {
       en: 'Ocean',
     },
     ui: {
-      primary: 'blue-8', // #176087
-      secondary: 'teal-4', // #4ecdc4
-      accent: 'blue-6', // #3d8bb5
-      positive: 'cyan-6', // #1ca9c9
-      negative: 'red-5', // #ff6b6b
-      info: 'light-blue-5', // #34a9e0
-      warning: 'yellow-4', // #ffe66d
+      primary: 'blue-8',
+      secondary: 'teal-4',
+      accent: 'blue-6',
+      positive: 'cyan-6',
+      negative: 'red-5',
+      info: 'light-blue-5',
+      warning: 'yellow-4',
     },
     button: {
-      important: 'blue-8', // #0078b8
-      function: 'blue-6', // #3886ba
-      normal: 'blue-4', // #5ca6cd
+      important: 'blue-8',
+      function: 'blue-6',
+      normal: 'blue-4',
     },
     panel: {
       text: {
@@ -265,7 +265,7 @@ export const themes: Record<ThemeType, ThemeColors> = {
       },
       background: {
         light: 'light-blue-1',
-        dark: 'light-blue-7',
+        dark: 'light-blue-9',
       },
     },
   },
@@ -275,18 +275,18 @@ export const themes: Record<ThemeType, ThemeColors> = {
       en: 'Amethyst',
     },
     ui: {
-      primary: 'purple-8', // #6a1b9a
-      secondary: 'purple-5', // #ab47bc
-      accent: 'purple-6', // #9548c8
-      positive: 'green-6', // #4caf50
-      negative: 'red-6', // #f44336
-      info: 'blue-6', // #2196f3
-      warning: 'orange-6', // #ff9800
+      primary: 'purple-8',
+      secondary: 'purple-5',
+      accent: 'purple-6',
+      positive: 'green-6',
+      negative: 'red-6',
+      info: 'blue-6',
+      warning: 'orange-6',
     },
     button: {
-      important: 'purple-8', // #6a1b9a
-      function: 'purple-6', // #8e24aa
-      normal: 'purple-5', // #ab47bc
+      important: 'purple-8',
+      function: 'purple-6',
+      normal: 'purple-5',
     },
     panel: {
       text: {
@@ -307,7 +307,7 @@ export const themes: Record<ThemeType, ThemeColors> = {
       },
       background: {
         light: 'deep-purple-1',
-        dark: 'deep-purple-7',
+        dark: 'deep-purple-9',
       },
     },
   },
@@ -317,18 +317,18 @@ export const themes: Record<ThemeType, ThemeColors> = {
       en: 'Slate',
     },
     ui: {
-      primary: 'blue-grey-7', // #546e7a
-      secondary: 'blue-grey-5', // #78909c
-      accent: 'blue-grey-5', // #7a95a3
-      positive: 'green-6', // #4caf50
-      negative: 'red-6', // #f44336
-      info: 'blue-6', // #2196f3
-      warning: 'orange-6', // #ff9800
+      primary: 'blue-grey-7',
+      secondary: 'blue-grey-5',
+      accent: 'blue-grey-5',
+      positive: 'green-6',
+      negative: 'red-6',
+      info: 'blue-6',
+      warning: 'orange-6',
     },
     button: {
-      important: 'blue-grey-8', // #455a64
-      function: 'blue-grey-7', // #546e7a
-      normal: 'blue-grey-5', // #78909c
+      important: 'blue-grey-8',
+      function: 'blue-grey-7',
+      normal: 'blue-grey-5',
     },
     panel: {
       text: {
@@ -349,7 +349,49 @@ export const themes: Record<ThemeType, ThemeColors> = {
       },
       background: {
         light: 'blue-grey-1',
-        dark: 'blue-grey-7',
+        dark: 'blue-grey-9',
+      },
+    },
+  },
+  grey: {
+    name: {
+      ko: '회색',
+      en: 'Grey',
+    },
+    ui: {
+      primary: 'grey-9',
+      secondary: 'grey-7',
+      accent: 'grey-5',
+      positive: 'green-6',
+      negative: 'red-6',
+      info: 'blue-6',
+      warning: 'orange-6',
+    },
+    button: {
+      important: 'grey-8',
+      function: 'grey-7',
+      normal: 'grey-6',
+    },
+    panel: {
+      text: {
+        normal: 'grey-8',
+        warning: 'brown-8',
+        normalAccent: 'grey-10',
+        warningAccent: 'brown-10',
+      },
+      background: {
+        normal: 'grey-4',
+        warning: 'brown-2',
+      },
+    },
+    select: {
+      text: {
+        light: 'grey-10',
+        dark: 'grey-1',
+      },
+      background: {
+        light: 'grey-3',
+        dark: 'grey-9',
       },
     },
   },
@@ -359,18 +401,18 @@ export const themes: Record<ThemeType, ThemeColors> = {
       en: 'High Contrast',
     },
     ui: {
-      primary: 'red', // #a52a2a
-      secondary: 'yellow-8', // #ffff00
-      accent: 'red-7', // #d55555
-      positive: 'green-8', // #00ff00
-      negative: 'red', // #ff0000
-      info: 'blue', // #0000ff
-      warning: 'orange-5', // #ffa500
+      primary: 'red',
+      secondary: 'yellow-8',
+      accent: 'red-7',
+      positive: 'green-8',
+      negative: 'red',
+      info: 'blue',
+      warning: 'orange-5',
     },
     button: {
-      important: 'orange-8', // #a52a2a
-      function: 'teal-7', // #008080
-      normal: 'purple-7', // #808000
+      important: 'orange-8',
+      function: 'teal-7',
+      normal: 'purple-7',
     },
     panel: {
       text: {
