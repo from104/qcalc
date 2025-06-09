@@ -10,7 +10,7 @@ The calculator alone appears when the window width is reduced.
 
 ![Screenshot](https://github.com/from104/qcalc/raw/main/assets/screenshot_v0.11.4.png)
 
-## Key Features
+## Guide to Main Features
 
 - **4 Professional Calculators**: Standard calculator, unit converter, currency converter, and programmer calculator meet all your calculation needs
 - **High-precision Calculation Engine**: Supports accurate calculations up to 64 digits with advanced math functions like trigonometry, factorial, and powers
@@ -134,7 +134,7 @@ The calculator alone appears when the window width is reduced.
 ### Basic Calculator and Common Functions
 
 | Shortcut    | Function                  |
-| ----------- | ------------------------- |
+|-------------|---------------------------|
 | 0-9\.       | Enter numbers and decimal |
 | +, -, \*, / | Basic arithmetic          |
 | Enter, =    | Calculate result          |
@@ -150,7 +150,7 @@ The calculator alone appears when the window width is reduced.
 ### Advanced Math Functions (Shift Mode)
 
 | Shortcut | Function                    |
-| -------- | --------------------------- |
+|----------|-----------------------------|
 | r        | Power (xⁿ)                  |
 | t        | Root (ⁿ√x)                  |
 | f        | Power of 10 (10ⁿ)           |
@@ -165,7 +165,7 @@ The calculator alone appears when the window width is reduced.
 ### Memory Operations
 
 | Shortcut          | Function             |
-| ----------------- | -------------------- |
+|-------------------|----------------------|
 | C-Delete          | Memory clear (MC)    |
 | C-Backspace       | Memory recall (MR)   |
 | C-Enter, C-=      | Memory store (MS)    |
@@ -204,7 +204,7 @@ The calculator alone appears when the window width is reduced.
 ### Screen Navigation and UI Control
 
 | Shortcut  | Function               |
-| --------- | ---------------------- |
+|-----------|------------------------|
 | F1        | Help                   |
 | F2        | About                  |
 | F3        | Settings               |
@@ -218,7 +218,7 @@ The calculator alone appears when the window width is reduced.
 ### UI Settings
 
 | Shortcut | Function                     |
-| -------- | ---------------------------- |
+|----------|------------------------------|
 | A-t      | Toggle always on top         |
 | A-i      | Toggle init panel on startup |
 | A-d      | Toggle dark mode             |
@@ -231,7 +231,7 @@ The calculator alone appears when the window width is reduced.
 ### Clipboard Operations
 
 | Shortcut        | Function               |
-| --------------- | ---------------------- |
+|-----------------|------------------------|
 | C-c, C-Insert   | Copy main panel result |
 | SC-c, AC-Insert | Copy sub panel result  |
 | C-v, S-Insert   | Paste to main panel    |
@@ -240,7 +240,7 @@ The calculator alone appears when the window width is reduced.
 ### History Navigation
 
 | Shortcut        | Function             |
-| --------------- | -------------------- |
+|-----------------|----------------------|
 | ↑/↓             | Scroll 50px up/down  |
 | PageUp/PageDown | Scroll 400px up/down |
 | Home/End        | Scroll to top/bottom |

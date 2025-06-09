@@ -566,11 +566,7 @@
                         auto-close
                         anchor="bottom left"
                         self="top left"
-                        @update:model-value="
-                          (val) => {
-                            recordMenu[record.id] = val;
-                          }
-                        "
+                        @update:model-value="(val) => { recordMenu[record.id] = val; }"
                       >
                         <q-list
                           dense

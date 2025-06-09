@@ -2,7 +2,7 @@
 
 QCalc is more than just a simple calculator - it's evolving into a modern productivity tool. Built with the latest web technologies like Vue3 (Quasar v2), TypeScript, and Electron, this multi-purpose calculator is being developed into an app that's useful for real work, tasks, and learning. We're also focusing on accessibility so that users with disabilities can use it intuitively, and we're working hard to provide a helpful user experience on both desktop and mobile with a simple and clean UI.
 
-## Key Features
+## Guide to Main Features
 
 - **4 Professional Calculators**: Standard calculator, unit converter, currency converter, and programmer calculator meet all your calculation needs
 - **High-precision Calculation Engine**: Supports accurate calculations up to 64 digits with advanced math functions like trigonometry, factorial, and powers
