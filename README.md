@@ -8,7 +8,7 @@ QCalc is more than just a simple calculator - it's evolving into a modern produc
 
 The calculator alone appears when the window width is reduced.
 
-![Screenshot](https://github.com/from104/qcalc/raw/main/assets/screenshot_v0.11.3.png)
+![Screenshot](https://github.com/from104/qcalc/raw/main/assets/screenshot_v0.11.4.png)
 
 ## Key Features
 

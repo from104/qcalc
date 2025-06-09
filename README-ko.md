@@ -8,7 +8,7 @@ QCalc은 단순한 계산기를 넘어, 현대적인 생산성 도구로 진화�
 
 창의 폭을 줄이면 계산기만 나타납니다.
 
-![Screenshot](https://github.com/from104/qcalc/raw/main/assets/screenshot_v0.11.3-ko.png)
+![Screenshot](https://github.com/from104/qcalc/raw/main/assets/screenshot_v0.11.4-ko.png)
 
 ## 앱의 주요 특징
 
