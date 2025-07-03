@@ -36,7 +36,7 @@
   // 계산기 관련 타입과 클래스
   import { UnitConverter } from 'src/classes/UnitConverter';
   import { toBigNumber } from 'src/classes/CalculatorMath';
-  import { Radix } from 'src/classes/RadixConverter';
+  import { Radix } from 'src/utils/RadixConverter';
   import { useKeyBinding } from '../composables/useKeyBinding';
 
   // 전역 window 객체에 접근하기 위한 상수 선언

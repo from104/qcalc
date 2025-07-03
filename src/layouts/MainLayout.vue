@@ -348,9 +348,22 @@
             inline-label
             outside-arrows
             mobile-arrows
+            role="tablist"
+            :aria-label="t('ariaLabel.mainTabs')"
             @update:model-value="uiStore.setCurrentTab($event)"
           >
-            <q-tab v-for="tab in tabs" :key="tab.name" :label="tab.title" :name="tab.name" class="q-px-xs" dense />
+            <q-tab
+              v-for="tab in tabs"
+              :id="`tab-${tab.name}`"
+              :key="tab.name"
+              :label="tab.title"
+              :name="tab.name"
+              class="q-px-xs"
+              dense
+              role="tab"
+              :aria-selected="uiStore.currentTab === tab.name"
+              :aria-controls="`panel-${tab.name}`"
+            />
           </q-tabs>
           <q-space />
           <q-btn
@@ -429,8 +442,16 @@
       <q-page-container class="row no-padding-bottom">
         <!-- 메인 화면 컨텐츠 -->
         <template v-if="!isSubPage">
-          <q-tab-panels v-model="uiStore.currentTab" animated infinite :swipeable="$g.isMobile">
-            <q-tab-panel v-for="(tab, index) in tabs" :key="index" :name="tab.name">
+          <q-tab-panels v-model="uiStore.currentTab" animated infinite :swipeable="$g.isMobile" role="tabpanel" :aria-label="t('ariaLabel.calculatorContent')">
+            <q-tab-panel
+              v-for="(tab, index) in tabs"
+              :id="`panel-${tab.name}`"
+              :key="index"
+              :name="tab.name"
+              role="tabpanel"
+              :aria-label="t('ariaLabel.tabPanel', { name: tab.title })"
+              :aria-labelledby="`tab-${tab.name}`"
+            >
               <component :is="tab.component" />
             </q-tab-panel>
           </q-tab-panels>

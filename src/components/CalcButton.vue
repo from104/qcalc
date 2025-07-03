@@ -50,7 +50,7 @@
 import type { KeyBindings } from '../composables/useKeyBinding';
 
   // 진법 관련
-  import { Radix } from 'classes/RadixConverter';
+  import { Radix } from 'src/utils/RadixConverter';
 
   // 컴포넌트 import
   import ToolTip from 'src/components/snippets/ToolTip.vue';
@@ -291,7 +291,8 @@ import type { KeyBindings } from '../composables/useKeyBinding';
   });
 
   // 입력 포커스 상태에 따른 키 바인딩 관리
-      () => uiStore.inputFocused,
+  watch(
+    () => uiStore.inputFocused,
     (focused) => {
       if (focused) {
         unsubscribe();

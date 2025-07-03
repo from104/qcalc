@@ -17,7 +17,7 @@
 
   // 계산기 관련 타입과 클래스
   import { useKeyBinding } from '../composables/useKeyBinding';
-  import { Radix } from 'classes/RadixConverter';
+  import { Radix } from 'src/utils/RadixConverter';
 
   // 스토어 import
   import { useUIStore } from 'stores/uiStore';
@@ -48,19 +48,20 @@
   });
 
   // 키 바인딩 설정
-    useKeyBinding([
+  const { subscribe, unsubscribe } = useKeyBinding([
     [['\\'], () => document.getElementById('btn-swap-radix')?.click()],
     [['Alt+\\'], () => radixStore.toggleShowRadix()],
     [['Alt+Control+\\'], () => radixStore.setRadixType(radixStore.radixType == 'prefix' ? 'suffix' : 'prefix')],
   ]);
 
   // 입력 포커스에 따른 키 바인딩 활성화/비활성화
-      () => uiStore.inputFocused,
-    (newVal) => {
-      if (newVal) {
-        // No need to unsubscribe here, useKeyBinding handles it automatically
+  watch(
+    () => uiStore.inputFocused,
+    (focused) => {
+      if (focused) {
+        unsubscribe();
       } else {
-        // No need to subscribe here, useKeyBinding handles it automatically
+        subscribe();
       }
     },
   );

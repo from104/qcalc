@@ -41,7 +41,7 @@
   import { clickButtonById, blurElement } from 'src/utils/GlobalHelpers';
 
   // 키 바인딩 설정
-    useKeyBinding([
+  useKeyBinding([
     [['\\'], () => clickButtonById('btn-swap-currency')],
     [['Alt+\\'], () => currencyStore.toggleShowSymbol()],
   ]);
@@ -72,6 +72,9 @@
     updateCurrencyOptions();
   });
 
+  // 환율 업데이트 타이머 참조
+  let rateUpdateTimer: number | null = null;
+
   onMounted(() => {
     currencyStore.initRecentCurrencies();
 
@@ -91,7 +94,9 @@
 
   onBeforeUnmount(() => {
     uiStore.setInputBlurred();
-    clearInterval(rateUpdateTimer);
+    if (rateUpdateTimer) {
+      clearInterval(rateUpdateTimer);
+    }
   });
 
   // 통화 옵션 타입 정의
@@ -242,9 +247,13 @@
       :class="`bg-${selectBackgroundColor}`"
       :label-color="selectTextColor"
       :popup-content-class="
-        [`bg-${selectBackgroundColor}`, 'scrollbar-custom', 'q-select-popup', $g.isMobile ? 'popup-mobile' : '', 'noselect'].join(
-          ' ',
-        )
+        [
+          `bg-${selectBackgroundColor}`,
+          'scrollbar-custom',
+          'q-select-popup',
+          $g.isMobile ? 'popup-mobile' : '',
+          'noselect',
+        ].join(' ')
       "
       :options-selected-class="`text-${selectTextColor}`"
       @filter="sourceFilterFn"
@@ -326,9 +335,13 @@
       :class="`bg-${selectBackgroundColor}`"
       :label-color="selectTextColor"
       :popup-content-class="
-        [`bg-${selectBackgroundColor}`, 'scrollbar-custom', 'q-select-popup', $g.isMobile ? 'popup-mobile' : '', 'noselect'].join(
-          ' ',
-        )
+        [
+          `bg-${selectBackgroundColor}`,
+          'scrollbar-custom',
+          'q-select-popup',
+          $g.isMobile ? 'popup-mobile' : '',
+          'noselect',
+        ].join(' ')
       "
       :options-selected-class="`text-${selectTextColor}`"
       @filter="targetFilterFn"
@@ -362,10 +375,7 @@
           </q-item>
         </transition-group>
       </template>
-      <ToolTip
-        :text-color="themesStore.getDarkColor()"
-        :bg-color="themesStore.getCurrentThemeColors.ui.warning"
-      >
+      <ToolTip :text-color="themesStore.getDarkColor()" :bg-color="themesStore.getCurrentThemeColors.ui.warning">
         <div class="text-left" style="white-space: pre-wrap">
           {{
             `${currencyDescriptions[currencyStore.targetCurrency]}\n${currencyStore.targetCurrency}, ${currencyStore.currencyConverter.getRate(currencyStore.targetCurrency).toFixed(4)}`

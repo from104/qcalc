@@ -8,7 +8,7 @@
    */
 
   // Vue 핵심 기능 및 컴포지션 API 가져오기
-  import { onMounted, onBeforeUnmount, reactive, watch, computed } from 'vue';
+  import { reactive, watch, computed } from 'vue';
 
   // i18n 설정
   import { useI18n } from 'vue-i18n';
@@ -16,7 +16,7 @@
 
   // 계산기 관련 타입과 클래스
   import { useKeyBinding } from '../composables/useKeyBinding';
-  import { UnitConverter } from 'classes/UnitConverter';
+  import { UnitConverter } from 'src/classes/UnitConverter';
 
   // 스토어 import
   import { useSettingsStore } from 'stores/settingsStore';

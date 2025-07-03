@@ -111,7 +111,7 @@
   watch(
     () => uiStore.inputFocused,
     () => {
-            if (uiStore.inputFocused) {
+      if (uiStore.inputFocused) {
         unsubscribe();
       } else {
         subscribe();
