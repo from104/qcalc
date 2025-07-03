@@ -7,7 +7,7 @@ import { defineStore } from 'pinia';
 import { Calculator } from 'classes/Calculator';
 import { match } from 'ts-pattern';
 import { Operator } from 'classes/Calculator';
-import { Radix } from 'classes/RadixConverter';
+import { Radix } from '../utils/RadixConverter';
 import { numberGrouping, formatDecimalPlaces } from '../utils/NumberUtils';
 import { useSettingsStore } from './settingsStore';
 import { useRadixStore } from './radixStore';

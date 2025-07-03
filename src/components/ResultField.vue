@@ -37,7 +37,7 @@
   import { UnitConverter } from 'src/classes/UnitConverter';
   import { toBigNumber } from 'src/classes/CalculatorMath';
   import { Radix } from 'src/classes/RadixConverter';
-  import { KeyBinding } from 'src/classes/KeyBinding';
+  import { useKeyBinding } from '../composables/useKeyBinding';
 
   // 전역 window 객체에 접근하기 위한 상수 선언
   const $g = window.globalVars;
@@ -683,13 +683,13 @@
   };
 
   // 키 바인딩 설정
-  const keyBinding =
+    const { subscribe, unsubscribe } =
     props.field === 'main'
-      ? new KeyBinding([
+      ? useKeyBinding([
           [['Control+c', 'Control+Insert', 'Copy'], handleCopy],
           [['Control+v', 'Shift+Insert', 'Paste'], () => handlePaste('main')],
         ])
-      : new KeyBinding([
+      : useKeyBinding([
           [['Shift+Control+c', 'Alt+Control+Insert', 'Shift+Copy'], handleCopy],
           [['Shift+Control+v', 'Alt+Shift+Insert', 'Shift+Paste'], () => handlePaste('sub')],
         ]);
@@ -700,21 +700,21 @@
   watch(
     () => uiStore.inputFocused,
     () => {
-      if (uiStore.inputFocused) {
-        keyBinding.unsubscribe();
+            if (uiStore.inputFocused) {
+        unsubscribe();
       } else {
-        keyBinding.subscribe();
+        subscribe();
       }
     },
     { immediate: true },
   );
 
-  onMounted(() => {
-    keyBinding.subscribe();
+    onMounted(() => {
+    subscribe();
   });
 
   onBeforeUnmount(() => {
-    keyBinding.unsubscribe();
+    unsubscribe();
   });
 
   // 결과 패널 패딩 설정

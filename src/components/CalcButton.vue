@@ -46,8 +46,8 @@
   import { Haptics, ImpactStyle } from '@capacitor/haptics';
 
   // 키 바인딩 관련
-  import { KeyBinding } from 'classes/KeyBinding';
-  import type { KeyBindings } from 'classes/KeyBinding';
+  import { useKeyBinding } from '../composables/useKeyBinding';
+import type { KeyBindings } from '../composables/useKeyBinding';
 
   // 진법 관련
   import { Radix } from 'classes/RadixConverter';
@@ -278,26 +278,25 @@
 
   // 모든 키 바인딩 통합
   const keyBindings = [...keyBindingsPrimary, ...keyBindingsSecondary];
-  const keyBinding = new KeyBinding(keyBindings);
+  const { subscribe, unsubscribe } = useKeyBinding(keyBindings);
 
   // 컴포넌트 마운트 시 키 바인딩 활성화
   onMounted(() => {
-    keyBinding.subscribe();
+    subscribe();
   });
 
   // 컴포넌트 언마운트 전 키 바인딩 비활성화
   onBeforeUnmount(() => {
-    keyBinding.unsubscribe();
+    unsubscribe();
   });
 
   // 입력 포커스 상태에 따른 키 바인딩 관리
-  watch(
-    () => uiStore.inputFocused,
+      () => uiStore.inputFocused,
     (focused) => {
       if (focused) {
-        keyBinding.unsubscribe();
+        unsubscribe();
       } else {
-        keyBinding.subscribe();
+        subscribe();
       }
     },
     { immediate: true },

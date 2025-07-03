@@ -31,7 +31,7 @@
   const calcStore = useCalcStore();
 
   // 계산기 관련 타입과 클래스
-  import { KeyBinding } from 'classes/KeyBinding';
+  import { useKeyBinding } from '../composables/useKeyBinding';
 
   // 전역 변수 import
   const $g = window.globalVars;
@@ -41,7 +41,7 @@
   import { clickButtonById, blurElement } from 'src/utils/GlobalHelpers';
 
   // 키 바인딩 설정
-  const keyBinding = new KeyBinding([
+    useKeyBinding([
     [['\\'], () => clickButtonById('btn-swap-currency')],
     [['Alt+\\'], () => currencyStore.toggleShowSymbol()],
   ]);
@@ -72,23 +72,8 @@
     updateCurrencyOptions();
   });
 
-  // 입력 포커스에 따른 키 바인딩 활성화/비활성화
-  watch(
-    () => uiStore.inputFocused,
-    () => {
-      if (uiStore.inputFocused) {
-        keyBinding.unsubscribe();
-      } else {
-        keyBinding.subscribe();
-      }
-    },
-  );
-
-  let rateUpdateTimer: number | undefined;
-
   onMounted(() => {
     currencyStore.initRecentCurrencies();
-    keyBinding.subscribe();
 
     // 초기 환율 정보 업데이트
     (async () => {
@@ -105,7 +90,6 @@
   });
 
   onBeforeUnmount(() => {
-    keyBinding.unsubscribe();
     uiStore.setInputBlurred();
     clearInterval(rateUpdateTimer);
   });

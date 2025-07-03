@@ -15,7 +15,7 @@
   import { useRouter, useRoute } from 'vue-router';
   import { useI18n } from 'vue-i18n';
   import { useMeta } from 'quasar';
-  import { KeyBinding } from 'classes/KeyBinding';
+  import { useKeyBinding } from '../composables/useKeyBinding';
 
   import { navigateToPath } from '../utils/NavigationUtils';
   import { isWideWidth } from '../utils/GlobalHelpers';
@@ -216,7 +216,7 @@
   /**
    * 전역 키보드 단축키를 설정합니다.
    */
-  const keyBinding = new KeyBinding([
+    const { subscribe, unsubscribe } = useKeyBinding([
     [['Control+1'], () => uiStore.setCurrentTab('calc')],
     [['Control+2'], () => uiStore.setCurrentTab('unit')],
     [['Control+3'], () => uiStore.setCurrentTab('currency')],
@@ -235,8 +235,8 @@
   /**
    * 컴포넌트 마운트 시 초기화 작업을 수행합니다.
    */
-  onMounted(() => {
-    keyBinding.subscribe();
+    onMounted(() => {
+    subscribe();
 
     // 현재 서브화면 설정
     const validPages = ['help', 'about', 'settings'];
@@ -277,8 +277,8 @@
   /**
    * 컴포넌트 언마운트 시 정리 작업을 수행합니다.
    */
-  onBeforeUnmount(() => {
-    keyBinding.unsubscribe();
+    onBeforeUnmount(() => {
+    unsubscribe();
   });
 
   /**
@@ -288,10 +288,10 @@
   watch(
     () => uiStore.inputFocused,
     () => {
-      if (uiStore.inputFocused) {
-        keyBinding.unsubscribe();
+            if (uiStore.inputFocused) {
+        unsubscribe();
       } else {
-        keyBinding.subscribe();
+        subscribe();
       }
     },
     { immediate: true },

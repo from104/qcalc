@@ -12,8 +12,7 @@ import { checkError } from '../utils/ErrorUtils';
 
 import type { FactoryFunctionMap } from 'mathjs';
 
-import { convertRadix } from './RadixConverter';
-import { Radix } from './RadixConverter';
+import { convertRadix, Radix } from '../utils/RadixConverter';
 
 // MathJS 라이브러리 설정
 export const MathB = create(all as FactoryFunctionMap, {

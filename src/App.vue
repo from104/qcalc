@@ -18,7 +18,7 @@
   import SnapFirst from 'components/snippets/SnapFirst.vue';
 
   // === 유틸리티 클래스 임포트 ===
-  import { KeyBinding } from 'classes/KeyBinding';
+  import { useKeyBinding } from './composables/useKeyBinding';
   import { showMessage } from './utils/NotificationUtils';
   import { isWideWidth } from './utils/GlobalHelpers';
 
@@ -81,7 +81,7 @@
    * q: 앱 종료
    * 기타: 계산기 관련 기능
    */
-  const keyBinding = new KeyBinding([
+    const { subscribe, unsubscribe } = useKeyBinding([
     [['Alt+t'], toggleAlwaysOnTopWithNotification],
     [['Alt+i'], settingsStore.toggleInitPanel],
     [['Alt+d'], toggleDarkModeWithNotification],
@@ -111,10 +111,10 @@
   watch(
     () => uiStore.inputFocused,
     () => {
-      if (uiStore.inputFocused) {
-        keyBinding.unsubscribe();
+            if (uiStore.inputFocused) {
+        unsubscribe();
       } else {
-        keyBinding.subscribe();
+        subscribe();
       }
     },
     { immediate: true },

@@ -8,7 +8,7 @@
 
 import { match } from 'ts-pattern';
 
-import { RadixConverter, Radix } from './RadixConverter';
+import { Radix, convertRadix, isValidRadixNumber } from '../utils/RadixConverter';
 import { CalculatorMath } from './CalculatorMath';
 import { CalculatorRecord } from './CalculatorRecord';
 import { CalculatorMemory } from './CalculatorMemory';
@@ -72,7 +72,7 @@ export class Calculator {
   public readonly record!: CalculatorRecord;
   public readonly memory: CalculatorMemory;
   public readonly math: CalculatorMath = new CalculatorMath();
-  private radixConverter: RadixConverter = new RadixConverter();
+  
 
   // 게터/세터
 
@@ -162,11 +162,11 @@ export class Calculator {
 
   // 버퍼 및 숫자 관리 메서드
   private setBufferToCurrentNumber(): void {
-    this._currentNumber = this.radixConverter.convertRadix(this.inputBuffer, this.currentRadix as Radix, Radix.Decimal);
+        this._currentNumber = convertRadix(this.inputBuffer, this.currentRadix as Radix, Radix.Decimal);
   }
 
   private setCurrentNumberToBuffer(): void {
-    this._inputBuffer = this.radixConverter.convertRadix(
+        this._inputBuffer = convertRadix(
       this.currentNumber.toString(),
       Radix.Decimal,
       this.currentRadix as Radix,
@@ -317,7 +317,7 @@ export class Calculator {
   // 숫자 입력 관련 메서드
   public addDigit(digit: number | string): void {
     const digitString = typeof digit === 'string' ? digit.charAt(0) : Math.floor(digit).toString();
-    checkError(!this.radixConverter.isValidRadixNumber(digitString, this.currentRadix), 'error.invalid_digit');
+        checkError(!isValidRadixNumber(digitString, this.currentRadix), 'error.invalid_digit');
 
     if (this.inputBuffer === '0' || this._bufferReset) {
       this.inputBuffer = digitString;

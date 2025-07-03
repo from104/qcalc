@@ -16,7 +16,7 @@
   const { t } = useI18n();
 
   // 계산기 관련 타입과 클래스
-  import { KeyBinding } from 'classes/KeyBinding';
+  import { useKeyBinding } from '../composables/useKeyBinding';
   import { Radix } from 'classes/RadixConverter';
 
   // 스토어 import
@@ -48,32 +48,29 @@
   });
 
   // 키 바인딩 설정
-  const keyBinding = new KeyBinding([
+    useKeyBinding([
     [['\\'], () => document.getElementById('btn-swap-radix')?.click()],
     [['Alt+\\'], () => radixStore.toggleShowRadix()],
     [['Alt+Control+\\'], () => radixStore.setRadixType(radixStore.radixType == 'prefix' ? 'suffix' : 'prefix')],
   ]);
 
   // 입력 포커스에 따른 키 바인딩 활성화/비활성화
-  watch(
-    () => uiStore.inputFocused,
-    () => {
-      if (uiStore.inputFocused) {
-        keyBinding.unsubscribe();
+      () => uiStore.inputFocused,
+    (newVal) => {
+      if (newVal) {
+        // No need to unsubscribe here, useKeyBinding handles it automatically
       } else {
-        keyBinding.subscribe();
+        // No need to subscribe here, useKeyBinding handles it automatically
       }
     },
   );
 
-  onMounted(() => {
+    onMounted(() => {
     radixStore.initRecentRadix();
     calcStore.calc.wordSize = radixStore.wordSize;
-    keyBinding.subscribe();
   });
 
   onBeforeUnmount(() => {
-    keyBinding.unsubscribe();
     uiStore.setInputBlurred();
   });
 

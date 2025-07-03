@@ -27,7 +27,7 @@
   import { navigateToPath } from 'src/utils/NavigationUtils';
 
   // 계산기 관련 타입과 클래스
-  import { KeyBinding } from 'classes/KeyBinding';
+  import { useKeyBinding } from '../composables/useKeyBinding';
 
   // 알림 관련 유틸리티 함수
   import { showMessage, showError } from 'src/utils/NotificationUtils';
@@ -164,7 +164,7 @@
   };
 
   // 키 바인딩 설정
-  const keyBinding = new KeyBinding([
+    const { subscribe, unsubscribe } = useKeyBinding([
     [['Control+d'], () => openDeleteRecordConfirmDialog()],
     [['Control+f'], () => openSearchDialogByKey()],
     [['ArrowUp'], () => scrollToRecord(-50)],
@@ -179,18 +179,18 @@
   watch(
     () => uiStore.inputFocused,
     () => {
-      if (uiStore.inputFocused) {
-        keyBinding.unsubscribe();
+            if (uiStore.inputFocused) {
+        unsubscribe();
       } else {
-        keyBinding.subscribe();
+        subscribe();
       }
     },
     { immediate: true },
   );
 
   // 컴포넌트 마운트 시 키 바인딩 활성화
-  onMounted(() => {
-    keyBinding.subscribe();
+    onMounted(() => {
+    subscribe();
     setTimeout(() => {
       document.getElementById('record')?.scrollTo({ top: uiStore.recordLastScrollPosition });
       if (uiStore.isSearchOpen) {
@@ -201,8 +201,8 @@
   });
 
   // 컴포넌트 언마운트 시 키 바인딩 비활성화
-  onBeforeUnmount(() => {
-    keyBinding.unsubscribe();
+    onBeforeUnmount(() => {
+    unsubscribe();
     uiStore.recordLastScrollPosition = document.getElementById('record')?.scrollTop ?? 0;
 
     uiStore.isDeleteRecordConfirmOpen = false;

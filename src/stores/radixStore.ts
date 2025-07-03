@@ -4,7 +4,7 @@
  */
 
 import { defineStore } from 'pinia';
-import { Radix, RadixConverter } from 'classes/RadixConverter';
+import { Radix, convertRadix, isValidRadixNumber } from '../utils/RadixConverter';
 import { useUIStore } from './uiStore';
 
 const uiStore = useUIStore();
@@ -20,7 +20,7 @@ interface RadixState {
   radixType: 'prefix' | 'suffix';
 }
 
-const radixConverter = new RadixConverter();
+
 
 const RADIX_PREFIXES = ['0b', '0o', '0x', ''] as const;
 const RADIX_SUFFIXES = ['2', '8', '10', '16'] as const;
@@ -49,11 +49,11 @@ export const useRadixStore = defineStore('radix', {
     },
 
     convertRadix(value: string, fromRadix: Radix, toRadix: Radix): string {
-      return radixConverter.convertRadix(value, fromRadix, toRadix);
+      return convertRadix(value, fromRadix, toRadix);
     },
 
     validateRadixNumber(value: string, radix: Radix): boolean {
-      return radixConverter.isValidRadixNumber(value, radix);
+      return isValidRadixNumber(value, radix);
     },
 
     radixEnumToNumber(radix: Radix): number {
