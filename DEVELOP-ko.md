@@ -146,7 +146,30 @@ MY_JKS_KEY_PASSWORD=your_key_password
 
 프로젝트 루트에는 빌드 자동화를 위한 스크립트가 포함되어 있습니다:
 
+### 빌드 스크립트 사용법
+
+빌드 스크립트는 특정 플랫폼에 대한 빌드를 수행하기 위한 인수를 지원합니다. 인수를 제공하지 않으면 모든 플랫폼(Linux, Windows, Android)에 대한 빌드를 시도합니다.
+
+```bash
+# 모든 플랫폼 빌드 (기본값)
+./build.sh all
+build.bat all
+
+# Linux 빌드
+./build.sh linux
+
+# Windows 빌드
+./build.sh win
+build.bat win
+
+# Android 빌드
+./build.sh android
+build.bat android
+```
+
 ### Linux 사용자 (build.sh)
+
+`build.sh` 스크립트는 Linux 환경에서 사용됩니다. Windows 빌드를 위해서는 Wine이 설치되어 있어야 합니다.
 
 ```bash
 # 스크립트에 실행 권한 부여
@@ -156,10 +179,12 @@ chmod +x build.sh
 ./build.sh
 ```
 
-### Windows 사용자 (build.bat, 미완성)
+### Windows 사용자 (build.bat)
+
+`build.bat` 스크립트는 Windows 환경에서 사용됩니다.
 
 ```batch
-# 명령 프롬프트에서 실행
+:: 명령 프롬프트에서 실행
 build.bat
 ```
 
