@@ -1,15 +1,18 @@
 <script setup lang="ts">
   import { ref, reactive } from 'vue';
   import { useI18n } from 'vue-i18n';
+  import { useQuasar } from 'quasar';
   import { useThemesStore } from 'src/stores/themesStore';
   import { themes, type ThemeColors } from 'src/constants/ThemesData';
   import QuasarColorPicker from './snippets/QuasarColorPicker.vue';
 
   const { t } = useI18n();
   const themesStore = useThemesStore();
+  const $q = useQuasar();
 
   const dialog = ref(false);
   const isEditMode = ref(false);
+  const originalThemeName = ref('');
   const themeName = ref('');
   const themeColors = reactive<ThemeColors>(JSON.parse(JSON.stringify(themes.default)));
 
@@ -22,6 +25,7 @@
    */
   const open = (options: { isEdit: boolean; themeName: string; themeData: ThemeColors }) => {
     isEditMode.value = options.isEdit;
+    originalThemeName.value = options.isEdit ? options.themeName : '';
     themeName.value = options.themeName;
 
     // 반응성 문제와 저장소의 직접적인 변경을 피하기 위해 테마 데이터를 깊은 복사하여 사용합니다.
@@ -39,8 +43,46 @@
   };
 
   const saveTheme = () => {
-    themeColors.name = { ko: themeName.value, en: themeName.value };
-    themesStore.addUserTheme(themeName.value, JSON.parse(JSON.stringify(themeColors)));
+    const trimmedThemeName = themeName.value.trim();
+
+    if (!trimmedThemeName) {
+      $q.notify({
+        type: 'negative',
+        message: t('themeNameRequired'),
+      });
+      return;
+    }
+
+    // 이스케이프 문자 및 특수문자 유효성 검사
+    const invalidCharsRegex = /[\\/:*?"<>|]/;
+    if (invalidCharsRegex.test(trimmedThemeName)) {
+      $q.notify({
+        type: 'negative',
+        message: t('invalidThemeName'),
+      });
+      return;
+    }
+
+    // 테마 이름 중복 검사 (기본 테마 및 다른 사용자 테마)
+    const allThemeNames = [...Object.keys(themes), ...Object.keys(themesStore.userThemes)];
+    if (
+      trimmedThemeName !== originalThemeName.value && // 이름이 변경되었을 경우에만 중복 검사
+      allThemeNames.includes(trimmedThemeName)
+    ) {
+      $q.notify({
+        type: 'negative',
+        message: t('duplicateThemeName'),
+      });
+      return;
+    }
+
+    // 편집 모드이고 이름이 변경된 경우, 이전 테마를 삭제합니다.
+    if (isEditMode.value && trimmedThemeName !== originalThemeName.value) {
+      themesStore.removeUserTheme(originalThemeName.value);
+    }
+
+    themeColors.name = { ko: trimmedThemeName, en: trimmedThemeName };
+    themesStore.addUserTheme(trimmedThemeName, JSON.parse(JSON.stringify(themeColors)));
     dialog.value = false;
   };
 
@@ -60,7 +102,7 @@
         <q-input v-model="themeName" :label="t('themeName')" :readonly="isEditMode" />
 
         <div class="q-mt-md">
-          <div class="text-subtitle1">UI Colors</div>
+          <div class="text-subtitle1">{{ t('uiColors') }}</div>
           <div class="row q-gutter-sm">
             <QuasarColorPicker
               v-for="(color, key) in themeColors.ui"
@@ -73,7 +115,7 @@
         </div>
 
         <div class="q-mt-md">
-          <div class="text-subtitle1">Button Colors</div>
+          <div class="text-subtitle1">{{ t('buttonColors') }}</div>
           <div class="row q-gutter-sm">
             <QuasarColorPicker
               v-for="(color, key) in themeColors.button"
@@ -86,8 +128,8 @@
         </div>
 
         <div class="q-mt-md">
-          <div class="text-subtitle1">Panel Colors</div>
-          <div class="text-subtitle2">Text</div>
+          <div class="text-subtitle1">{{ t('panelColors') }}</div>
+          <div class="text-subtitle2">{{ t('text') }}</div>
           <div class="row q-gutter-sm">
             <QuasarColorPicker
               v-for="(color, key) in themeColors.panel.text"
@@ -97,7 +139,7 @@
               dense
             />
           </div>
-          <div class="text-subtitle2 q-mt-sm">Background</div>
+          <div class="text-subtitle2 q-mt-sm">{{ t('background') }}</div>
           <div class="row q-gutter-sm">
             <QuasarColorPicker
               v-for="(color, key) in themeColors.panel.background"
@@ -110,8 +152,8 @@
         </div>
 
         <div class="q-mt-md">
-          <div class="text-subtitle1">Select Colors</div>
-          <div class="text-subtitle2">Text</div>
+          <div class="text-subtitle1">{{ t('selectColors') }}</div>
+          <div class="text-subtitle2">{{ t('text') }}</div>
           <div class="row q-gutter-sm">
             <QuasarColorPicker
               v-for="(color, key) in themeColors.select.text"
@@ -121,7 +163,7 @@
               dense
             />
           </div>
-          <div class="text-subtitle2 q-mt-sm">Background</div>
+          <div class="text-subtitle2 q-mt-sm">{{ t('background') }}</div>
           <div class="row q-gutter-sm">
             <QuasarColorPicker
               v-for="(color, key) in themeColors.select.background"
@@ -148,9 +190,27 @@ ko:
   themeName: '테마 이름'
   cancel: '취소'
   save: '저장'
+  themeNameRequired: '테마 이름은 필수 항목입니다.'
+  invalidThemeName: '테마 이름에 특수문자(\\ / : * ? " < > |)를 사용할 수 없습니다.'
+  duplicateThemeName: '이미 사용 중인 테마 이름입니다.'
+  uiColors: 'UI 색상'
+  buttonColors: '버튼 색상'
+  panelColors: '패널 색상'
+  selectColors: '선택 색상'
+  text: '텍스트'
+  background: '배경'
 en:
   themeEditor: 'Theme Editor'
   themeName: 'Theme Name'
   cancel: 'Cancel'
   save: 'Save'
+  themeNameRequired: 'Theme name is required.'
+  invalidThemeName: 'Theme name cannot contain special characters (\\ / : * ? " < > |).'
+  duplicateThemeName: 'This theme name is already in use.'
+  uiColors: 'UI Colors'
+  buttonColors: 'Button Colors'
+  panelColors: 'Panel Colors'
+  selectColors: 'Select Colors'
+  text: 'Text'
+  background: 'Background'
 </i18n>

@@ -78,32 +78,29 @@
   };
 
   // 색상 테마 옵션을 계산합니다.
-  const defaultThemeOptions = computed(() => {
-    return Object.keys(themes).map((themeKey) => {
+  const themeOptions = computed(() => {
+    const defaultThemes = Object.keys(themes).map((themeKey) => {
       const currentLocale = locale.value as 'ko' | 'en';
       const themeName =
         themes[themeKey as ThemeType]?.name?.[currentLocale] || themes[themeKey as ThemeType]?.name?.en || themeKey;
       return {
         label: themeName,
         value: themeKey,
+        isUserTheme: false,
       };
     });
-  });
 
-  const userThemeOptions = computed(() => {
-    return Object.keys(themesStore.userThemes).map((themeKey) => ({
+    const userThemes = Object.keys(themesStore.userThemes).map((themeKey) => ({
       label: themeKey,
       value: themeKey,
       isUserTheme: true,
     }));
+
+    if (userThemes.length > 0) {
+      return [...defaultThemes, { isSeparator: true }, ...userThemes];
+    }
+    return defaultThemes;
   });
-
-  const isCurrentThemeUser = computed(() => Object.keys(themesStore.userThemes).includes(themesStore.currentTheme));
-
-  const displayDefaultTheme = ref(isCurrentThemeUser.value ? 'default' : themesStore.currentTheme);
-  const displayUserTheme = ref(
-    isCurrentThemeUser.value ? themesStore.currentTheme : Object.keys(themesStore.userThemes)[0] || null,
-  );
 
   /**
    * 테마가 변경될 때 호출되는 함수입니다.
@@ -139,12 +136,8 @@
       cancel: true,
       persistent: true,
     }).onOk(() => {
-      const wasCurrentlyDisplayed = displayUserTheme.value === themeName;
       themesStore.removeUserTheme(themeName);
-      if (wasCurrentlyDisplayed) {
-        // 방금 삭제된 테마가 표시되고 있었다면, 표시 값을 다른 유효한 값으로 변경합니다.
-        displayUserTheme.value = Object.keys(themesStore.userThemes)[0] || null;
-      }
+      themesStore.setTheme('default');
     });
   }
 
@@ -173,8 +166,9 @@
    * @param themeKey - 테마 키 (예: 'default', 'forest', 'ocean' 등)
    * @returns 해당 테마의 primary 컬러 (HEX 형식)
    */
-  const getThemePrimaryColor = (themeKey: ThemeType): string => {
-    const quasarColorName = themes[themeKey]?.ui?.primary || themes.default.ui.primary;
+  const getThemePrimaryColor = (themeKey: ThemeType | string): string => {
+    const theme = themesStore.userThemes[themeKey] || themes[themeKey as ThemeType];
+    const quasarColorName = theme?.ui?.primary || themes.default.ui.primary;
     return themesStore.getQuasarColorToHex(quasarColorName);
   };
 
@@ -194,32 +188,6 @@
 
   const primaryAccentColor = computed(() => {
     return themesStore.isDarkMode() ? 'accent' : 'primary';
-  });
-
-  /**
-   * 기본 Quasar 색상 이름(예: 'grey-4')을 받아 2단계 더 어둡거나 밝은 색상 이름을 반환합니다.
-   * 다크 모드에서는 더 밝게 (숫자를 낮춤), 라이트 모드에서는 더 어둡게 (숫자를 높임).
-   * @param baseColor - 기본 색상 이름.
-   * @returns 조정된 색상 이름.
-   */
-  const getDimmedColor = (baseColor: string): string => {
-    const parts = baseColor.split('-');
-    if (parts.length < 2) return baseColor;
-
-    const colorName = parts[0];
-    const shade = parseInt(parts[1] || '5', 10);
-    if (isNaN(shade)) return baseColor;
-
-    const newShade = themesStore.isDarkMode() ? Math.max(1, shade - 2) : Math.min(10, shade + 2);
-    return `${colorName}-${newShade}`;
-  };
-
-  const defaultThemeSelectBgColor = computed(() => {
-    return isCurrentThemeUser.value ? getDimmedColor(selectBackgroundColor.value) : selectBackgroundColor.value;
-  });
-
-  const userThemeSelectBgColor = computed(() => {
-    return !isCurrentThemeUser.value ? getDimmedColor(selectBackgroundColor.value) : selectBackgroundColor.value;
   });
 </script>
 
@@ -303,94 +271,49 @@
         <q-item-label class="self-center" role="text">{{ t('colorTheme') }}</q-item-label>
         <q-space />
         <q-select
-          v-model="displayDefaultTheme"
-          :options="defaultThemeOptions"
+          v-model="themesStore.currentTheme"
+          :options="themeOptions"
           dense
           options-dense
           emit-value
           map-options
           :label-color="selectTextColor"
           :options-selected-class="`text-${selectTextColor}`"
-          :popup-content-class="`bg-${defaultThemeSelectBgColor} noselect`"
-          :class="`bg-${defaultThemeSelectBgColor}`"
+          :popup-content-class="`bg-${selectBackgroundColor} noselect`"
+          :class="`bg-${selectBackgroundColor}`"
           :color="selectTextColor"
-          :bg-color="defaultThemeSelectBgColor"
+          :bg-color="selectBackgroundColor"
           @update:model-value="onThemeChange"
         >
           <template #option="scope">
-            <q-item v-bind="scope.itemProps" class="theme-option-item">
+            <q-separator v-if="scope.opt.isSeparator" />
+            <q-item v-else v-bind="scope.itemProps" class="theme-option-item">
               <q-item-section>
-                <q-item-label>{{ scope.opt.label }}</q-item-label>
-              </q-item-section>
-              <q-item-section side>
-                <div class="row items-center no-wrap">
-                  <div
-                    class="theme-color-square"
-                    :class="{ 'theme-color-square--dark': themesStore.isDarkMode() }"
-                    :style="{ backgroundColor: getThemePrimaryColor(scope.opt.value) }"
-                  />
-                </div>
-              </q-item-section>
-            </q-item>
-          </template>
-          <template #selected-item="scope">
-            <div class="selected-theme-item">
-              <span>{{ scope.opt.label || getThemeLabel(scope.opt) }}</span>
-              <div
-                class="theme-color-square q-ml-sm"
-                :class="{ 'theme-color-square--dark': themesStore.isDarkMode() }"
-                :style="{ backgroundColor: getThemePrimaryColor(scope.opt.value || scope.opt) }"
-              />
-            </div>
-          </template>
-        </q-select>
-      </q-item>
-
-      <!-- 내 테마 -->
-      <q-item v-if="userThemeOptions.length > 0" class="q-mb-md">
-        <q-item-label class="self-center" role="text">{{ t('myThemes') }}</q-item-label>
-        <q-space />
-        <q-select
-          v-model="displayUserTheme"
-          :options="userThemeOptions"
-          dense
-          options-dense
-          emit-value
-          map-options
-          :label-color="selectTextColor"
-          :options-selected-class="`text-${selectTextColor}`"
-          :popup-content-class="`bg-${userThemeSelectBgColor} noselect`"
-          :class="`bg-${userThemeSelectBgColor}`"
-          :color="selectTextColor"
-          :bg-color="userThemeSelectBgColor"
-          @update:model-value="onThemeChange"
-        >
-          <template #option="scope">
-            <q-item v-bind="scope.itemProps" class="theme-option-item">
-              <q-item-section>
-                <q-item-label>{{ scope.opt.label }}</q-item-label>
+                <q-item-label class="truncate-clip">{{ scope.opt.label }}</q-item-label>
               </q-item-section>
               <q-item-section side>
                 <div class="row items-center no-wrap">
                   <!-- 사용자 테마를 위한 수정 및 삭제 버튼 -->
-                  <q-btn
-                    flat
-                    dense
-                    round
-                    icon="edit"
-                    size="sm"
-                    class="q-mr-sm"
-                    @click.stop="editTheme(scope.opt.value)"
-                  />
-                  <q-btn
-                    flat
-                    dense
-                    round
-                    icon="delete"
-                    color="negative"
-                    size="sm"
-                    @click.stop="deleteTheme(scope.opt.value)"
-                  />
+                  <div v-if="scope.opt.isUserTheme">
+                    <q-btn
+                      flat
+                      dense
+                      round
+                      icon="edit"
+                      size="sm"
+                      class="q-mr-sm"
+                      @click.stop="editTheme(scope.opt.value)"
+                    />
+                    <q-btn
+                      flat
+                      dense
+                      round
+                      icon="delete"
+                      color="negative"
+                      size="sm"
+                      @click.stop="deleteTheme(scope.opt.value)"
+                    />
+                  </div>
                   <div
                     class="theme-color-square"
                     :class="{ 'theme-color-square--dark': themesStore.isDarkMode() }"
@@ -402,7 +325,7 @@
           </template>
           <template #selected-item="scope">
             <div class="selected-theme-item">
-              <span>{{ scope.opt.label || getThemeLabel(scope.opt) }}</span>
+              <span class="selected-label truncate-clip">{{ scope.opt.label || getThemeLabel(scope.opt) }}</span>
               <div
                 class="theme-color-square q-ml-sm"
                 :class="{ 'theme-color-square--dark': themesStore.isDarkMode() }"
@@ -666,6 +589,17 @@
   .selected-theme-item {
     display: flex;
     align-items: center;
+    width: 100%; // 너비를 최대로 설정
+    overflow: hidden; // 넘치는 부분 숨기기
+  }
+
+  .selected-label {
+    flex-grow: 1; // 가능한 많은 공간을 차지하도록 설정
+  }
+
+  .truncate-clip {
+    white-space: nowrap;
+    overflow: hidden;
   }
 
   // 테마 옵션 아이템 스타일

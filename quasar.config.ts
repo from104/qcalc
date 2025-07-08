@@ -121,7 +121,7 @@ export default defineConfig((/* ctx */) => {
     // Quasar 프레임워크 설정
     framework: {
       config: {},
-      plugins: ['Notify', 'Meta'],
+      plugins: ['Notify', 'Meta', 'Dialog'],
 
       /**
        * Auto import - how to detect components in your vue files
