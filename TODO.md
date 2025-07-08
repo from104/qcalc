@@ -3,7 +3,6 @@
 ## Todo
 
 - [ ] Ads function (monetization)
-- [ ] User theme settings
 - [ ] Skin function
 - [ ] Mobile app implementation (capacitor:ios)
 
@@ -37,3 +36,4 @@
 - [x] Automatic updates (electron)
 - [x] Theme function
 - [x] Unit and currency item favorites
+- [x] User theme settings

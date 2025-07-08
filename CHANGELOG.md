@@ -4,10 +4,21 @@ All notable changes to this project are recorded in this file.
 
 The format is based on [Keep a Changelog] and this project follows [Semantic Versioning].
 
+## [0.11.5] 2025-06-10
+
+### Added
+
+- **User Theme Customization**: Added the ability for users to create, edit, and delete their own themes.
+
+### Changed
+
+### Fixed
+
 ## [0.11.4] 2025-06-10
 
 ### Added
 
+- **User Theme Customization**: Added the ability for users to create, edit, and delete their own themes.
 - **Unit and Currency Calculator Favorites Feature**: Added the ability to set frequently used units or currencies as favorites for quick access.
 - **Extended Color Theme System**: Added the ability to choose from various color themes beyond dark/light mode, providing a personalized UI experience.
 
