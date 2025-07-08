@@ -1,6 +1,9 @@
 <script setup lang="ts">
   import { ref, computed, nextTick } from 'vue';
   import type { QCardSection } from 'quasar';
+  import { useI18n } from 'vue-i18n';
+
+  const { t } = useI18n();
 
   defineProps<{
     label?: string;
@@ -132,16 +135,16 @@
     </template>
 
     <template #append>
-      <q-icon name="colorize" class="cursor-pointer" @click="dialogVisible = true" />
+      <q-icon name="colorize" class="cursor-pointer" :aria-label="t('openColorPicker')" @click="dialogVisible = true" />
     </template>
   </q-input>
 
-  <q-dialog v-model="dialogVisible" @show="onDialogShow">
+  <q-dialog v-model="dialogVisible" aria-labelledby="colorPickerTitle" @show="onDialogShow">
     <q-card style="max-width: 350px">
       <q-card-section class="row items-center q-pb-none">
-        <div class="text-h6">{{ label }}</div>
+        <div id="colorPickerTitle" class="text-h6">{{ label }}</div>
         <q-space />
-        <q-btn v-close-popup icon="close" flat round dense />
+        <q-btn v-close-popup icon="close" flat round dense :aria-label="t('close')" />
       </q-card-section>
 
       <q-card-section
@@ -161,6 +164,8 @@
                 { focused: focusedColor.groupIndex === groupIndex && focusedColor.colorIndex === colorIndex },
                 `bg-${color}`,
               ]"
+              role="button"
+              :aria-label="colorIndex === 0 ? group.name : color"
               @click="selectColor(color)"
             >
               <q-tooltip :delay="500">
@@ -193,3 +198,12 @@
     transform: scale(1.2);
   }
 </style>
+
+<i18n>
+ko:
+  openColorPicker: '색상 선택기 열기'
+  close: '닫기'
+en:
+  openColorPicker: 'Open color picker'
+  close: 'Close'
+</i18n>

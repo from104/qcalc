@@ -92,10 +92,10 @@
 </script>
 
 <template>
-  <q-dialog v-model="dialog" persistent>
+  <q-dialog v-model="dialog" persistent aria-modal="true" aria-labelledby="themeEditorTitle">
     <q-card style="width: 700px; max-width: 80vw">
       <q-card-section>
-        <div class="text-h6">{{ t('themeEditor') }}</div>
+        <div id="themeEditorTitle" class="text-h6">{{ t('themeEditor') }}</div>
       </q-card-section>
 
       <q-card-section class="q-pt-none scroll" style="max-height: 60vh">

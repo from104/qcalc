@@ -283,6 +283,7 @@
           :class="`bg-${selectBackgroundColor}`"
           :color="selectTextColor"
           :bg-color="selectBackgroundColor"
+          :aria-label="t('ariaLabel.colorTheme')"
           @update:model-value="onThemeChange"
         >
           <template #option="scope">
@@ -302,6 +303,7 @@
                       icon="edit"
                       size="sm"
                       class="q-mr-sm"
+                      :aria-label="t('ariaLabel.editTheme', { themeName: scope.opt.label })"
                       @click.stop="editTheme(scope.opt.value)"
                     />
                     <q-btn
@@ -311,6 +313,7 @@
                       icon="delete"
                       color="negative"
                       size="sm"
+                      :aria-label="t('ariaLabel.deleteTheme', { themeName: scope.opt.label })"
                       @click.stop="deleteTheme(scope.opt.value)"
                     />
                   </div>
@@ -337,7 +340,14 @@
       </q-item>
 
       <q-item>
-        <q-btn flat dense :label="t('createNewTheme')" class="full-width" @click="createNewTheme" />
+        <q-btn
+          flat
+          dense
+          :label="t('createNewTheme')"
+          class="full-width"
+          :aria-label="t('ariaLabel.createNewTheme')"
+          @click="createNewTheme"
+        />
       </q-item>
 
       <ThemeEditor ref="themeEditor" />
@@ -658,6 +668,10 @@ ko:
     useSystemLocale: '시스템 언어 사용 설정'
     language: '언어 설정'
     autoUpdate: '자동 업데이트 설정'
+    colorTheme: '색상 테마'
+    editTheme: '{themeName} 테마 편집'
+    deleteTheme: '{themeName} 테마 삭제'
+    createNewTheme: '새 테마 만들기'
   colorTheme: '색상 테마'
   myThemes: '내 테마'
   apply: '적용'
@@ -712,6 +726,10 @@ en:
     useSystemLocale: 'Use system locale setting'
     language: 'Language setting'
     autoUpdate: 'Auto update setting'
+    colorTheme: 'Color Theme'
+    editTheme: 'Edit {themeName} theme'
+    deleteTheme: 'Delete {themeName} theme'
+    createNewTheme: 'Create a new theme'
   colorTheme: 'Color Theme'
   myThemes: 'My Themes'
   apply: 'Apply'
