@@ -11,14 +11,16 @@ import type { ButtonType } from '../types/store';
 import { themes, type DarkModeType, type ThemeType, type ThemeColors } from '../constants/ThemesData';
 
 interface ThemesState {
-  currentTheme: ThemeType;
+  currentTheme: ThemeType | string;
   darkMode: DarkModeType;
+  userThemes: Record<string, ThemeColors>;
 }
 
 export const useThemesStore = defineStore('themes', {
   state: (): ThemesState => ({
     currentTheme: 'default',
     darkMode: 'system',
+    userThemes: {},
   }),
 
   getters: {
@@ -26,7 +28,7 @@ export const useThemesStore = defineStore('themes', {
      * 현재 테마의 색상 객체를 반환하는 getter
      */
     getCurrentThemeColors: (state: ThemesState): ThemeColors => {
-      return themes[state.currentTheme] || themes.default;
+      return state.userThemes[state.currentTheme] || themes[state.currentTheme as ThemeType] || themes.default;
     },
   },
 
@@ -35,9 +37,21 @@ export const useThemesStore = defineStore('themes', {
      * 테마 설정 액션
      * @param themeName - 설정할 테마 이름
      */
-    setTheme(themeName: ThemeType): void {
-      if (themes[themeName]) {
+    setTheme(themeName: ThemeType | string): void {
+      if (themes[themeName as ThemeType] || this.userThemes[themeName]) {
         this.currentTheme = themeName;
+        this.updateTheme();
+      }
+    },
+
+    addUserTheme(themeName: string, themeColors: ThemeColors): void {
+      this.userThemes[themeName] = themeColors;
+    },
+
+    removeUserTheme(themeName: string): void {
+      delete this.userThemes[themeName];
+      if (this.currentTheme === themeName) {
+        this.currentTheme = 'default';
         this.updateTheme();
       }
     },

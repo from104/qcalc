@@ -10,6 +10,7 @@
 
   // Vue 핵심 기능 및 컴포지션 API 가져오기
   import { reactive, watch, ref, computed } from 'vue';
+  import { useQuasar } from 'quasar';
 
   // 전역 globalVars 객체에 접근하기 위한 상수 선언
   const $g = window.globalVars;
@@ -39,6 +40,11 @@
   // 컴포넌트 import
   import ToolTip from 'components/snippets/ToolTip.vue';
   import HelpIcon from 'components/snippets/HelpIcon.vue';
+  import ThemeEditor from './ThemeEditor.vue';
+
+  const themeEditor = ref<InstanceType<typeof ThemeEditor> | null>(null);
+
+  const $q = useQuasar();
 
   // 패키지 버전 정보
   import { version } from '../../package.json';
@@ -72,7 +78,7 @@
   };
 
   // 색상 테마 옵션을 계산합니다.
-  const themeOptions = computed(() => {
+  const defaultThemeOptions = computed(() => {
     return Object.keys(themes).map((themeKey) => {
       const currentLocale = locale.value as 'ko' | 'en';
       const themeName =
@@ -84,13 +90,79 @@
     });
   });
 
+  const userThemeOptions = computed(() => {
+    return Object.keys(themesStore.userThemes).map((themeKey) => ({
+      label: themeKey,
+      value: themeKey,
+      isUserTheme: true,
+    }));
+  });
+
+  const isCurrentThemeUser = computed(() => Object.keys(themesStore.userThemes).includes(themesStore.currentTheme));
+
+  const displayDefaultTheme = ref(isCurrentThemeUser.value ? 'default' : themesStore.currentTheme);
+  const displayUserTheme = ref(
+    isCurrentThemeUser.value ? themesStore.currentTheme : Object.keys(themesStore.userThemes)[0] || null,
+  );
+
   /**
    * 테마가 변경될 때 호출되는 함수입니다.
    * @param themeName - 선택된 테마 이름
    */
-  const onThemeChange = (themeName: ThemeType) => {
+  const onThemeChange = (themeName: ThemeType | string) => {
     themesStore.setTheme(themeName);
   };
+
+  /**
+   * 사용자 테마를 수정하기 위해 ThemeEditor를 엽니다.
+   * @param themeName - 수정할 테마의 이름
+   */
+  function editTheme(themeName: string) {
+    const themeData = themesStore.userThemes[themeName];
+    if (themeData && themeEditor.value) {
+      themeEditor.value.open({
+        isEdit: true,
+        themeName: themeName,
+        themeData: themeData,
+      });
+    }
+  }
+
+  /**
+   * 사용자 테마를 삭제합니다.
+   * @param themeName - 삭제할 테마의 이름
+   */
+  function deleteTheme(themeName: string) {
+    $q.dialog({
+      title: t('confirmDeleteTitle'),
+      message: t('confirmDeleteMessage', { themeName }),
+      cancel: true,
+      persistent: true,
+    }).onOk(() => {
+      const wasCurrentlyDisplayed = displayUserTheme.value === themeName;
+      themesStore.removeUserTheme(themeName);
+      if (wasCurrentlyDisplayed) {
+        // 방금 삭제된 테마가 표시되고 있었다면, 표시 값을 다른 유효한 값으로 변경합니다.
+        displayUserTheme.value = Object.keys(themesStore.userThemes)[0] || null;
+      }
+    });
+  }
+
+  /**
+   * 현재 테마를 기반으로 새 테마를 만듭니다.
+   */
+  function createNewTheme() {
+    const baseThemeKey = themesStore.currentTheme;
+    const baseTheme = themesStore.userThemes[baseThemeKey] || themes[baseThemeKey as ThemeType];
+
+    if (baseTheme && themeEditor.value) {
+      themeEditor.value.open({
+        isEdit: false,
+        themeName: '', // 새 테마를 위해 이름 비우기
+        themeData: baseTheme,
+      });
+    }
+  }
 
   // themesStore에서 select 색상을 가져오는 computed 속성
   const selectTextColor = computed(() => themesStore.getSelectColor('text', themesStore.isDarkMode()));
@@ -113,12 +185,41 @@
    */
   const getThemeLabel = (themeKey: ThemeType | string): string => {
     const key = typeof themeKey === 'string' ? themeKey : themeKey;
+    if (themesStore.userThemes[key]) {
+      return key;
+    }
     const currentLocale = locale.value as 'ko' | 'en';
     return themes[key as ThemeType]?.name?.[currentLocale] || themes[key as ThemeType]?.name?.en || key;
   };
 
   const primaryAccentColor = computed(() => {
     return themesStore.isDarkMode() ? 'accent' : 'primary';
+  });
+
+  /**
+   * 기본 Quasar 색상 이름(예: 'grey-4')을 받아 2단계 더 어둡거나 밝은 색상 이름을 반환합니다.
+   * 다크 모드에서는 더 밝게 (숫자를 낮춤), 라이트 모드에서는 더 어둡게 (숫자를 높임).
+   * @param baseColor - 기본 색상 이름.
+   * @returns 조정된 색상 이름.
+   */
+  const getDimmedColor = (baseColor: string): string => {
+    const parts = baseColor.split('-');
+    if (parts.length < 2) return baseColor;
+
+    const colorName = parts[0];
+    const shade = parseInt(parts[1] || '5', 10);
+    if (isNaN(shade)) return baseColor;
+
+    const newShade = themesStore.isDarkMode() ? Math.max(1, shade - 2) : Math.min(10, shade + 2);
+    return `${colorName}-${newShade}`;
+  };
+
+  const defaultThemeSelectBgColor = computed(() => {
+    return isCurrentThemeUser.value ? getDimmedColor(selectBackgroundColor.value) : selectBackgroundColor.value;
+  });
+
+  const userThemeSelectBgColor = computed(() => {
+    return !isCurrentThemeUser.value ? getDimmedColor(selectBackgroundColor.value) : selectBackgroundColor.value;
   });
 </script>
 
@@ -202,18 +303,18 @@
         <q-item-label class="self-center" role="text">{{ t('colorTheme') }}</q-item-label>
         <q-space />
         <q-select
-          v-model="themesStore.currentTheme"
-          :options="themeOptions"
+          v-model="displayDefaultTheme"
+          :options="defaultThemeOptions"
           dense
           options-dense
           emit-value
           map-options
           :label-color="selectTextColor"
           :options-selected-class="`text-${selectTextColor}`"
-          :popup-content-class="`bg-${selectBackgroundColor} noselect`"
-          :class="`bg-${selectBackgroundColor}`"
+          :popup-content-class="`bg-${defaultThemeSelectBgColor} noselect`"
+          :class="`bg-${defaultThemeSelectBgColor}`"
           :color="selectTextColor"
-          :bg-color="selectBackgroundColor"
+          :bg-color="defaultThemeSelectBgColor"
           @update:model-value="onThemeChange"
         >
           <template #option="scope">
@@ -222,11 +323,13 @@
                 <q-item-label>{{ scope.opt.label }}</q-item-label>
               </q-item-section>
               <q-item-section side>
-                <div
-                  class="theme-color-square"
-                  :class="{ 'theme-color-square--dark': themesStore.isDarkMode() }"
-                  :style="{ backgroundColor: getThemePrimaryColor(scope.opt.value) }"
-                />
+                <div class="row items-center no-wrap">
+                  <div
+                    class="theme-color-square"
+                    :class="{ 'theme-color-square--dark': themesStore.isDarkMode() }"
+                    :style="{ backgroundColor: getThemePrimaryColor(scope.opt.value) }"
+                  />
+                </div>
               </q-item-section>
             </q-item>
           </template>
@@ -242,6 +345,79 @@
           </template>
         </q-select>
       </q-item>
+
+      <!-- 내 테마 -->
+      <q-item v-if="userThemeOptions.length > 0" class="q-mb-md">
+        <q-item-label class="self-center" role="text">{{ t('myThemes') }}</q-item-label>
+        <q-space />
+        <q-select
+          v-model="displayUserTheme"
+          :options="userThemeOptions"
+          dense
+          options-dense
+          emit-value
+          map-options
+          :label-color="selectTextColor"
+          :options-selected-class="`text-${selectTextColor}`"
+          :popup-content-class="`bg-${userThemeSelectBgColor} noselect`"
+          :class="`bg-${userThemeSelectBgColor}`"
+          :color="selectTextColor"
+          :bg-color="userThemeSelectBgColor"
+          @update:model-value="onThemeChange"
+        >
+          <template #option="scope">
+            <q-item v-bind="scope.itemProps" class="theme-option-item">
+              <q-item-section>
+                <q-item-label>{{ scope.opt.label }}</q-item-label>
+              </q-item-section>
+              <q-item-section side>
+                <div class="row items-center no-wrap">
+                  <!-- 사용자 테마를 위한 수정 및 삭제 버튼 -->
+                  <q-btn
+                    flat
+                    dense
+                    round
+                    icon="edit"
+                    size="sm"
+                    class="q-mr-sm"
+                    @click.stop="editTheme(scope.opt.value)"
+                  />
+                  <q-btn
+                    flat
+                    dense
+                    round
+                    icon="delete"
+                    color="negative"
+                    size="sm"
+                    @click.stop="deleteTheme(scope.opt.value)"
+                  />
+                  <div
+                    class="theme-color-square"
+                    :class="{ 'theme-color-square--dark': themesStore.isDarkMode() }"
+                    :style="{ backgroundColor: getThemePrimaryColor(scope.opt.value) }"
+                  />
+                </div>
+              </q-item-section>
+            </q-item>
+          </template>
+          <template #selected-item="scope">
+            <div class="selected-theme-item">
+              <span>{{ scope.opt.label || getThemeLabel(scope.opt) }}</span>
+              <div
+                class="theme-color-square q-ml-sm"
+                :class="{ 'theme-color-square--dark': themesStore.isDarkMode() }"
+                :style="{ backgroundColor: getThemePrimaryColor(scope.opt.value || scope.opt) }"
+              />
+            </div>
+          </template>
+        </q-select>
+      </q-item>
+
+      <q-item>
+        <q-btn flat dense :label="t('createNewTheme')" class="full-width" @click="createNewTheme" />
+      </q-item>
+
+      <ThemeEditor ref="themeEditor" />
 
       <q-separator spaced="md" role="separator" />
 
@@ -527,8 +703,6 @@ ko:
   showSymbol: '기호 표시'
   showRadix: '진법 표시'
   radixType: '진법 형식'
-  prefix: '앞에'
-  suffix: '뒤에'
   useSystemLocale: '시스템 언어 사용'
   language: '언어'
   autoUpdate: '자동 업데이트'
@@ -551,6 +725,12 @@ ko:
     language: '언어 설정'
     autoUpdate: '자동 업데이트 설정'
   colorTheme: '색상 테마'
+  myThemes: '내 테마'
+  apply: '적용'
+  delete: '삭제'
+  createNewTheme: '새 테마 만들기'
+  confirmDeleteTitle: '테마 삭제 확인'
+  confirmDeleteMessage: '정말로 ''{themeName}'' 테마를 삭제하시겠습니까?'
 en:
   alwaysOnTop: 'Always on top'
   alwaysOnTopOn: 'Always on top ON'
@@ -577,8 +757,6 @@ en:
   showSymbol: 'Show symbol'
   showRadix: 'Show radix'
   radixType: 'Radix type'
-  prefix: 'Prefix'
-  suffix: 'Suffix'
   useSystemLocale: 'Use system locale'
   language: 'Language'
   autoUpdate: 'Auto update'
@@ -601,4 +779,10 @@ en:
     language: 'Language setting'
     autoUpdate: 'Auto update setting'
   colorTheme: 'Color Theme'
+  myThemes: 'My Themes'
+  apply: 'Apply'
+  delete: 'Delete'
+  createNewTheme: 'Create New Theme'
+  confirmDeleteTitle: 'Confirm Theme Deletion'
+  confirmDeleteMessage: 'Are you sure you want to delete the theme ''{themeName}''?'
 </i18n>
