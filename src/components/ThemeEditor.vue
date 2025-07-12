@@ -1,5 +1,5 @@
 <script setup lang="ts">
-  import { ref, reactive, computed } from 'vue';
+  import { ref, reactive, computed, watch } from 'vue';
   import { useI18n } from 'vue-i18n';
   import { useQuasar, colors } from 'quasar';
   import { useThemesStore } from 'src/stores/themesStore';
@@ -12,6 +12,9 @@
   }
 
   const dummySelectModel = ref('Option 1');
+  const swapSelectPreview = ref(false);
+  const panelPreviewStateIndex = ref(0);
+  let isCyclingPanel = false;
 
   const { t } = useI18n();
   const themesStore = useThemesStore();
@@ -52,6 +55,83 @@
   const getHexColor = (colorName: string): string => {
     return colors.getPaletteColor(colorName);
   };
+
+  const cyclePanelPreview = async () => {
+    if (isCyclingPanel) return;
+    isCyclingPanel = true;
+
+    const states = [1, 2, 3, 4, 0];
+    for (const state of states) {
+      panelPreviewStateIndex.value = state;
+      if (state !== 0) {
+        await new Promise((resolve) => setTimeout(resolve, 2000));
+      }
+    }
+
+    isCyclingPanel = false;
+  };
+
+  const panelPreviewStyle = computed(() => {
+    const state = panelPreviewStateIndex.value;
+    const { panel } = themeColors;
+    switch (state) {
+      case 1: // 강조용 글자색
+        return {
+          backgroundColor: getHexColor(panel.background.normal),
+          color: getHexColor(panel.text.normalAccent),
+        };
+      case 2: // 경고용 글자색
+        return {
+          backgroundColor: getHexColor(panel.background.warning),
+          color: getHexColor(panel.text.warning),
+        };
+      case 3: {
+        // 경고용 배경색
+        return {
+          backgroundColor: getHexColor(panel.background.warning),
+          color: getHexColor(panel.text.warningAccent),
+        };
+      }
+      default: // state 0 (default)
+        return {
+          backgroundColor: getHexColor(panel.background.normal),
+          color: getHexColor(panel.text.normal),
+        };
+    }
+  });
+
+  const swapPreview = () => {
+    swapSelectPreview.value = true;
+  };
+
+  watch(swapSelectPreview, (newValue) => {
+    if (newValue) {
+      setTimeout(() => {
+        swapSelectPreview.value = false;
+      }, 3000);
+    }
+  });
+
+  const selectPreviewStyle = computed(() => {
+    const isBaseDark = themesStore.isDarkMode();
+    const showOpposite = swapSelectPreview.value;
+
+    const displayDark = (isBaseDark && !showOpposite) || (!isBaseDark && showOpposite);
+
+    if (displayDark) {
+      return {
+        label: 'Dark',
+        bg: themeColors.select.background.dark,
+        text: themeColors.select.text.dark,
+      };
+    } else {
+      return {
+        label: 'Light',
+        bg: themeColors.select.background.light,
+        text: themeColors.select.text.light,
+      };
+    }
+  });
 
   const saveTheme = () => {
     const trimmedThemeName = themeName.value.trim();
@@ -120,11 +200,12 @@
               <div
                 class="preview-display q-mb-sm q-pa-xs rounded-borders text-right"
                 :style="{
-                  backgroundColor: getHexColor(themeColors.panel.background.normal),
-                  color: getHexColor(themeColors.panel.text.normal),
+                  ...panelPreviewStyle,
                   fontFamily: 'digital-7, monospace',
                   fontSize: '1.2em',
+                  cursor: 'pointer',
                 }"
+                @click="cyclePanelPreview"
               >
                 123,456.78
               </div>
@@ -182,23 +263,25 @@
               </div>
             </div>
 
-            <div class="text-caption text-bold q-mt-sm q-mb-xs">{{ t('selectColors') }}</div>
+            <div class="text-caption text-bold q-mt-sm q-mb-xs row items-center">
+              <span>{{ t('selectColors') }}</span>
+              <q-btn flat dense round icon="mdi-swap-vertical" size="sm" class="q-ml-sm" @click="swapPreview" />
+            </div>
             <q-select
               v-model="dummySelectModel"
               :options="['Option 1', 'Option 2']"
-              :label="t('selectColors')"
+              :label="selectPreviewStyle.label"
               dense
               options-dense
-              :bg-color="themeColors.select.background.light"
-              :label-color="themeColors.select.text.light"
-              :color="themeColors.select.text.light"
-              :popup-content-class="`bg-${themeColors.select.background.light} text-${themeColors.select.text.light}`"
+              :bg-color="selectPreviewStyle.bg"
+              :color="selectPreviewStyle.text"
+              :popup-content-class="`bg-${selectPreviewStyle.bg} text-${selectPreviewStyle.text}`"
               style="font-size: 0.8em"
             >
               <template #selected-item="scope">
                 <span
                   :style="{
-                    color: getHexColor(themeColors.select.text.light),
+                    color: getHexColor(selectPreviewStyle.text),
                     whiteSpace: 'nowrap',
                     overflow: 'hidden',
                     textOverflow: 'ellipsis',
@@ -215,7 +298,7 @@
       <q-separator />
 
       <q-card-section class="q-pt-none scroll scrollbar-custom" style="flex-grow: 1; min-height: 0">
-        <q-input v-model="themeName" :label="t('themeName')" :readonly="isEditMode" />
+        <q-input v-model="themeName" :label="t('themeName')" />
 
         <div class="q-mt-md">
           <div class="text-subtitle1">{{ t('uiColors') }}</div>
