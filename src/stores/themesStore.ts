@@ -330,6 +330,23 @@ export const useThemesStore = defineStore('themes', {
     },
 
     /**
+     * 배경색에 따라 대비가 높은 텍스트 색상(검정 또는 흰색)을 반환합니다.
+     * @param bgColor - 배경의 HEX 색상 코드
+     * @returns {string} '#000000' 또는 '#FFFFFF'
+     */
+    getTextColorByBackgroundColor(bgColor: string): string {
+      if (!bgColor || !/^#([0-9A-Fa-f]{3}){1,2}$/.test(bgColor)) {
+        return '#FFFFFF';
+      }
+      const hex = bgColor.substring(1);
+      const r = parseInt(hex.substring(0, 2), 16);
+      const g = parseInt(hex.substring(2, 4), 16);
+      const b = parseInt(hex.substring(4, 6), 16);
+      const luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+      return luminance > 0.6 ? '#000000' : '#FFFFFF';
+    },
+
+    /**
      * 애플리케이션 초기화 시 테마와 다크모드를 설정합니다.
      * 이 함수는 앱이 시작될 때 한 번 호출되어야 합니다.
      */

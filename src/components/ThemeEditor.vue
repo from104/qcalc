@@ -1,10 +1,17 @@
 <script setup lang="ts">
-  import { ref, reactive } from 'vue';
+  import { ref, reactive, computed } from 'vue';
   import { useI18n } from 'vue-i18n';
-  import { useQuasar } from 'quasar';
+  import { useQuasar, colors } from 'quasar';
   import { useThemesStore } from 'src/stores/themesStore';
   import { themes, type ThemeColors } from 'src/constants/ThemesData';
   import QuasarColorPicker from './snippets/QuasarColorPicker.vue';
+
+  interface PreviewButton {
+    label: string;
+    type: keyof ThemeColors['button'];
+  }
+
+  const dummySelectModel = ref('Option 1');
 
   const { t } = useI18n();
   const themesStore = useThemesStore();
@@ -40,6 +47,10 @@
     themeColors.name = { ko: options.themeName, en: options.themeName };
 
     dialog.value = true;
+  };
+
+  const getHexColor = (colorName: string): string => {
+    return colors.getPaletteColor(colorName);
   };
 
   const saveTheme = () => {
@@ -93,12 +104,117 @@
 
 <template>
   <q-dialog v-model="dialog" persistent aria-modal="true" aria-labelledby="themeEditorTitle">
-    <q-card style="width: 700px; max-width: 80vw">
-      <q-card-section>
-        <div id="themeEditorTitle" class="text-h6">{{ t('themeEditor') }}</div>
+    <q-card style="width: 300px; max-height: calc(100vh - 120px); display: flex; flex-direction: column">
+      <q-card-section class="q-py-xs">
+        <div id="themeEditorTitle" class="text-h6 q-my-xs">{{ t('themeEditor') }}</div>
       </q-card-section>
 
-      <q-card-section class="q-pt-none scroll" style="max-height: 60vh">
+      <q-separator />
+
+      <q-card-section class="q-py-sm">
+        <div class="row q-col-gutter-sm">
+          <!-- Left: Calculator Preview -->
+          <div class="col-5">
+            <div class="theme-preview-container rounded-borders" style="border: 1px solid #ccc; padding: 4px">
+              <!-- Display -->
+              <div
+                class="preview-display q-mb-sm q-pa-xs rounded-borders text-right"
+                :style="{
+                  backgroundColor: getHexColor(themeColors.panel.background.normal),
+                  color: getHexColor(themeColors.panel.text.normal),
+                  fontFamily: 'digital-7, monospace',
+                  fontSize: '1.2em',
+                }"
+              >
+                123,456.78
+              </div>
+
+              <!-- Buttons -->
+              <div
+                v-for="(row, rowIndex) in [
+                  [
+                    { label: '%', type: 'function' },
+                    { label: 'x', type: 'function' },
+                    { label: 'C', type: 'important' },
+                  ],
+                  [
+                    { label: '2', type: 'normal' },
+                    { label: '3', type: 'normal' },
+                    { label: '+', type: 'important' },
+                  ],
+                  [
+                    { label: '0', type: 'normal' },
+                    { label: '1', type: 'normal' },
+                    { label: '=', type: 'important' },
+                  ],
+                ] as PreviewButton[][]"
+                :key="rowIndex"
+                :class="['row', 'q-col-gutter-xs', { 'q-mt-xs': rowIndex > 0 }]"
+              >
+                <div v-for="btn in row" :key="btn.label" class="col-4">
+                  <div
+                    class="preview-button flex flex-center rounded-borders"
+                    :style="{
+                      backgroundColor: getHexColor(themeColors.button[btn.type]),
+                      color: themesStore.getTextColorByBackgroundColor(getHexColor(themeColors.button[btn.type])),
+                      height: '24px',
+                      fontSize: '0.8em',
+                    }"
+                  >
+                    {{ btn.label }}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Right: Color Palette Preview -->
+          <div class="col-7">
+            <div class="text-caption text-bold q-mb-xs">{{ t('uiColors') }}</div>
+            <div class="row q-gutter-xs">
+              <div v-for="(color, key) in themeColors.ui" :key="`ui-${key}`" class="col-auto">
+                <div
+                  :style="{ backgroundColor: getHexColor(color), width: '18px', height: '18px' }"
+                  class="rounded-borders cursor-pointer"
+                >
+                  <q-tooltip>{{ key }}</q-tooltip>
+                </div>
+              </div>
+            </div>
+
+            <div class="text-caption text-bold q-mt-sm q-mb-xs">{{ t('selectColors') }}</div>
+            <q-select
+              v-model="dummySelectModel"
+              :options="['Option 1', 'Option 2']"
+              :label="t('selectColors')"
+              dense
+              options-dense
+              :bg-color="themeColors.select.background.light"
+              :label-color="themeColors.select.text.light"
+              :color="themeColors.select.text.light"
+              :popup-content-class="`bg-${themeColors.select.background.light} text-${themeColors.select.text.light}`"
+              style="font-size: 0.8em"
+            >
+              <template #selected-item="scope">
+                <span
+                  :style="{
+                    color: getHexColor(themeColors.select.text.light),
+                    whiteSpace: 'nowrap',
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                  }"
+                >
+                  {{ scope.opt }}
+                </span>
+              </template>
+            </q-select>
+          </div>
+        </div>
+      </q-card-section>
+
+      <q-separator />
+
+      <q-card-section class="q-pt-none scroll scrollbar-custom" style="flex-grow: 1; min-height: 0">
         <q-input v-model="themeName" :label="t('themeName')" :readonly="isEditMode" />
 
         <div class="q-mt-md">
