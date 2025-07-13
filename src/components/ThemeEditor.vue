@@ -60,7 +60,7 @@
     if (isCyclingPanel) return;
     isCyclingPanel = true;
 
-    const states = [1, 2, 3, 4, 0];
+    const states = [1, 2, 3, 0];
     for (const state of states) {
       panelPreviewStateIndex.value = state;
       if (state !== 0) {
@@ -75,27 +75,25 @@
     const state = panelPreviewStateIndex.value;
     const { panel } = themeColors;
     switch (state) {
+      default: // 기본 배경색 (state 0)
+        return {
+          backgroundColor: getHexColor(panel.background.normal),
+          color: getHexColor(panel.text.normal),
+        };
       case 1: // 강조용 글자색
         return {
           backgroundColor: getHexColor(panel.background.normal),
           color: getHexColor(panel.text.normalAccent),
         };
-      case 2: // 경고용 글자색
+      case 2: // 경고용 배경색
         return {
           backgroundColor: getHexColor(panel.background.warning),
           color: getHexColor(panel.text.warning),
         };
-      case 3: {
-        // 경고용 배경색
+      case 3: // 경고용 강조 글자색
         return {
           backgroundColor: getHexColor(panel.background.warning),
           color: getHexColor(panel.text.warningAccent),
-        };
-      }
-      default: // state 0 (default)
-        return {
-          backgroundColor: getHexColor(panel.background.normal),
-          color: getHexColor(panel.text.normal),
         };
     }
   });
@@ -120,13 +118,13 @@
 
     if (displayDark) {
       return {
-        label: 'Dark',
+        label: t('dark'),
         bg: themeColors.select.background.dark,
         text: themeColors.select.text.dark,
       };
     } else {
       return {
-        label: 'Light',
+        label: t('light'),
         bg: themeColors.select.background.light,
         text: themeColors.select.text.light,
       };
@@ -184,7 +182,7 @@
 
 <template>
   <q-dialog v-model="dialog" persistent aria-modal="true" aria-labelledby="themeEditorTitle">
-    <q-card style="width: 300px; max-height: calc(100vh - 120px); display: flex; flex-direction: column">
+    <q-card style="width: 300px; max-height: calc(100vh - 120px); display: flex; flex-direction: column; top: 25px">
       <q-card-section class="q-py-xs">
         <div id="themeEditorTitle" class="text-h6 q-my-xs">{{ t('themeEditor') }}</div>
       </q-card-section>
@@ -198,11 +196,11 @@
             <div class="theme-preview-container rounded-borders" style="border: 1px solid #ccc; padding: 4px">
               <!-- Display -->
               <div
-                class="preview-display q-mb-sm q-pa-xs rounded-borders text-right"
+                class="preview-display q-mb-xs q-pa-xs rounded-borders text-right"
                 :style="{
                   ...panelPreviewStyle,
                   fontFamily: 'digital-7, monospace',
-                  fontSize: '1.2em',
+                  fontSize: '1.1em',
                   cursor: 'pointer',
                 }"
                 @click="cyclePanelPreview"
@@ -230,15 +228,15 @@
                   ],
                 ] as PreviewButton[][]"
                 :key="rowIndex"
-                :class="['row', 'q-col-gutter-xs', { 'q-mt-xs': rowIndex > 0 }]"
+                :class="['row', 'q-col-gutter-xs', { 'q-mt-none': rowIndex > 0 }]"
               >
                 <div v-for="btn in row" :key="btn.label" class="col-4">
                   <div
                     class="preview-button flex flex-center rounded-borders"
                     :style="{
-                      backgroundColor: getHexColor(themeColors.button[btn.type]),
-                      color: themesStore.getTextColorByBackgroundColor(getHexColor(themeColors.button[btn.type])),
-                      height: '24px',
+                      backgroundColor: themesStore.isDarkMode() ? colors.lighten(getHexColor(themeColors.button[btn.type]), -30) : getHexColor(themeColors.button[btn.type]),
+                      color: themesStore.getTextColorByBackgroundColor(themesStore.isDarkMode() ? colors.lighten(getHexColor(themeColors.button[btn.type]), -30) : getHexColor(themeColors.button[btn.type])),
+                      height: '22px',
                       fontSize: '0.8em',
                     }"
                   >
@@ -297,36 +295,13 @@
 
       <q-separator />
 
-      <q-card-section class="q-pt-none scroll scrollbar-custom" style="flex-grow: 1; min-height: 0">
+      <q-card-section
+        class="q-pt-none scroll scrollbar-custom"
+        style="flex-grow: 1; min-height: 0; align-items: flex-end"
+      >
         <q-input v-model="themeName" :label="t('themeName')" />
 
-        <div class="q-mt-md">
-          <div class="text-subtitle1">{{ t('uiColors') }}</div>
-          <div class="row q-gutter-sm">
-            <QuasarColorPicker
-              v-for="(color, key) in themeColors.ui"
-              :key="key"
-              v-model="themeColors.ui[key]"
-              :label="key"
-              dense
-            />
-          </div>
-        </div>
-
-        <div class="q-mt-md">
-          <div class="text-subtitle1">{{ t('buttonColors') }}</div>
-          <div class="row q-gutter-sm">
-            <QuasarColorPicker
-              v-for="(color, key) in themeColors.button"
-              :key="key"
-              v-model="themeColors.button[key]"
-              :label="key"
-              dense
-            />
-          </div>
-        </div>
-
-        <div class="q-mt-md">
+        <div class="q-mt-xs">
           <div class="text-subtitle1">{{ t('panelColors') }}</div>
           <div class="text-subtitle2">{{ t('text') }}</div>
           <div class="row q-gutter-sm">
@@ -348,36 +323,64 @@
               dense
             />
           </div>
+        </div>        
+
+        <div class="q-mt-md">
+          <div class="text-subtitle1">{{ t('buttonColors') }}</div>
+          <div class="row q-gutter-sm">
+            <div v-for="(color, key) in themeColors.button" :key="key" class="col-5">
+              <QuasarColorPicker v-model="themeColors.button[key]" :label="key" dense />
+            </div>
+          </div>
+        </div>
+
+        <div class="q-mt-md">
+          <div class="text-subtitle1">{{ t('uiColors') }}</div>
+          <div class="row q-gutter-sm">
+            <div v-for="(color, key) in themeColors.ui" :key="key" class="col-5">
+              <QuasarColorPicker v-model="themeColors.ui[key]" :label="key" dense />
+            </div>
+          </div>
         </div>
 
         <div class="q-mt-md">
           <div class="text-subtitle1">{{ t('selectColors') }}</div>
-          <div class="text-subtitle2">{{ t('text') }}</div>
+          <div class="text-subtitle2">{{ t('light') }}</div>
           <div class="row q-gutter-sm">
-            <QuasarColorPicker
-              v-for="(color, key) in themeColors.select.text"
-              :key="key"
-              v-model="themeColors.select.text[key]"
-              :label="key"
-              dense
-            />
+            <div class="col-5">
+              <QuasarColorPicker v-model="themeColors.select.text.light" :label="t('text')" dense />
+            </div>
+            <div class="col-5">
+              <QuasarColorPicker v-model="themeColors.select.background.light" :label="t('background')" dense />
+            </div>
           </div>
-          <div class="text-subtitle2 q-mt-sm">{{ t('background') }}</div>
+          <div class="text-subtitle2 q-mt-sm">{{ t('dark') }}</div>
           <div class="row q-gutter-sm">
-            <QuasarColorPicker
-              v-for="(color, key) in themeColors.select.background"
-              :key="key"
-              v-model="themeColors.select.background[key]"
-              :label="key"
-              dense
-            />
+            <div class="col-5">
+              <QuasarColorPicker v-model="themeColors.select.text.dark" :label="t('text')" dense />
+            </div>
+            <div class="col-5">
+              <QuasarColorPicker v-model="themeColors.select.background.dark" :label="t('background')" dense />
+            </div>
           </div>
         </div>
       </q-card-section>
 
       <q-card-actions align="right">
-        <q-btn v-close-popup flat :label="t('cancel')" color="primary" />
-        <q-btn flat :label="t('save')" color="primary" @click="saveTheme" />
+        <q-btn
+          v-close-popup
+          flat
+          :label="t('cancel')"
+          :bg-color="themesStore.isDarkMode() ? 'grey-9' : 'grey-1'"
+          :text-color="themesStore.isDarkMode() ? 'grey-1' : 'grey-9'"
+        />
+        <q-btn
+          flat
+          :label="t('save')"
+          :bg-color="themesStore.isDarkMode() ? 'grey-9' : 'grey-1'"
+          :text-color="themesStore.isDarkMode() ? 'grey-1' : 'grey-9'"
+          @click="saveTheme"
+        />
       </q-card-actions>
     </q-card>
   </q-dialog>
@@ -398,6 +401,8 @@ ko:
   selectColors: '선택 색상'
   text: '텍스트'
   background: '배경'
+  light: '라이트'
+  dark: '다크'
 en:
   themeEditor: 'Theme Editor'
   themeName: 'Theme Name'
@@ -412,4 +417,6 @@ en:
   selectColors: 'Select Colors'
   text: 'Text'
   background: 'Background'
+  light: 'Light'
+  dark: 'Dark'
 </i18n>

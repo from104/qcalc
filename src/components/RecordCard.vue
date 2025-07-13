@@ -523,7 +523,7 @@
                   <HighlightText
                     :text="record.memo"
                     :search-term="uiStore.searchKeyword"
-                    @show-tooltip="(isShow) => handleMemoTooltip(record.id, isShow)"
+                    @show-tooltip="(isShow: boolean) => handleMemoTooltip(record.id, isShow)"
                   />
                   <ToolTip
                     v-if="isShowMemoTooltip[record.id]"
@@ -538,7 +538,7 @@
                     :text="record.displayText"
                     :search-term="uiStore.searchKeyword"
                     allow-line-break
-                    @show-tooltip="(isShow) => handleResultTooltip(record.id, isShow)"
+                    @show-tooltip="(isShow: boolean) => handleResultTooltip(record.id, isShow)"
                   />
                   <ToolTip
                     v-if="isShowResultTooltip[record.id]"

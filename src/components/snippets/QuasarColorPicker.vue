@@ -130,12 +130,15 @@
 
 <template>
   <q-input v-model="model" :label="label" filled :dense="dense" readonly>
-    <template #prepend>
-      <div v-if="model" class="color-sample" :class="`bg-${model}`" />
-    </template>
-
     <template #append>
-      <q-icon name="colorize" class="cursor-pointer" :aria-label="t('openColorPicker')" @click="dialogVisible = true" />
+      <div
+        v-if="model"
+        class="color-sample cursor-pointer"
+        :class="`bg-${model}`"
+        :aria-label="t('openColorPicker')"
+        role="button"
+        @click="dialogVisible = true"
+      />
     </template>
   </q-input>
 
