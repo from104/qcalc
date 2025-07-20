@@ -5,6 +5,7 @@
   import { useThemesStore } from 'src/stores/themesStore';
   import { themes, type ThemeColors } from 'src/constants/ThemesData';
   import QuasarColorPicker from './snippets/QuasarColorPicker.vue';
+  import HelpIcon from './snippets/HelpIcon.vue';
 
   interface PreviewButton {
     label: string;
@@ -193,6 +194,14 @@
         <div class="row q-col-gutter-sm">
           <!-- Left: Calculator Preview -->
           <div class="col-5">
+            <div class="text-caption text-bold row items-center">
+              <span class="q-mr-xs">{{ t('preview') }}</span>
+              <HelpIcon
+                :text-color="themesStore.getDarkColor()"
+                :bg-color="themesStore.getCurrentThemeColors.ui.warning"
+                :text="t('panelPreviewHelp')"
+              />
+            </div>
             <div class="theme-preview-container rounded-borders" style="border: 1px solid #ccc; padding: 4px">
               <!-- Display -->
               <div
@@ -234,8 +243,14 @@
                   <div
                     class="preview-button flex flex-center rounded-borders"
                     :style="{
-                      backgroundColor: themesStore.isDarkMode() ? colors.lighten(getHexColor(themeColors.button[btn.type]), -30) : getHexColor(themeColors.button[btn.type]),
-                      color: themesStore.getTextColorByBackgroundColor(themesStore.isDarkMode() ? colors.lighten(getHexColor(themeColors.button[btn.type]), -30) : getHexColor(themeColors.button[btn.type])),
+                      backgroundColor: themesStore.isDarkMode()
+                        ? colors.lighten(getHexColor(themeColors.button[btn.type]), -30)
+                        : getHexColor(themeColors.button[btn.type]),
+                      color: themesStore.getTextColorByBackgroundColor(
+                        themesStore.isDarkMode()
+                          ? colors.lighten(getHexColor(themeColors.button[btn.type]), -30)
+                          : getHexColor(themeColors.button[btn.type]),
+                      ),
                       height: '22px',
                       fontSize: '0.8em',
                     }"
@@ -262,8 +277,13 @@
             </div>
 
             <div class="text-caption text-bold q-mt-sm q-mb-xs row items-center">
-              <span>{{ t('selectColors') }}</span>
-              <q-btn flat dense round icon="mdi-swap-vertical" size="sm" class="q-ml-sm" @click="swapPreview" />
+              <span class="q-mr-xs">{{ t('selectColors') }}</span>
+              <HelpIcon
+                :text-color="themesStore.getDarkColor()"
+                :bg-color="themesStore.getCurrentThemeColors.ui.warning"
+                :text="t('selectPreviewHelp')"
+              />
+              <q-btn flat dense round icon="mdi-swap-vertical" size="sm" class="q-ml-xs" @click="swapPreview" />
             </div>
             <q-select
               v-model="dummySelectModel"
@@ -323,7 +343,7 @@
               dense
             />
           </div>
-        </div>        
+        </div>
 
         <div class="q-mt-md">
           <div class="text-subtitle1">{{ t('buttonColors') }}</div>
@@ -403,6 +423,9 @@ ko:
   background: '배경'
   light: '라이트'
   dark: '다크'
+  preview: '미리보기'
+  panelPreviewHelp: '패널을 클릭하면 2초 간격으로 강조 및 경고 상태의 글자/배경색을 순차적으로 보여줍니다.'
+  selectPreviewHelp: '교체 아이콘을 클릭하면 3초 동안 Light/Dark 모드의 색상을 반대로 보여줍니다.'
 en:
   themeEditor: 'Theme Editor'
   themeName: 'Theme Name'
@@ -419,4 +442,7 @@ en:
   background: 'Background'
   light: 'Light'
   dark: 'Dark'
+  preview: 'Preview'
+  panelPreviewHelp: 'Click the panel to sequentially display accent and warning text/background colors at 2-second intervals.'
+  selectPreviewHelp: 'Click the swap icon to show inverted Light/Dark mode colors for 3 seconds.'
 </i18n>
