@@ -68,7 +68,7 @@
     "tinykeys": "^3.0.0",
     "ts-pattern": "^5.6.0",
     "vite-plugin-env-types": "^0.1.4",
-    "vue": "3.5.13",
+    "vue": "3.5.18",
     "vue-i18n": "11.1.1",
     "vue-router": "4.5.0"
   },
