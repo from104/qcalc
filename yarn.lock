@@ -72,9 +72,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@capacitor/android@npm:7.3.0":
-  version: 7.3.0
-  resolution: "@capacitor/android@npm:7.3.0"
+"@capacitor/android@npm:7.4.2":
+  version: 7.4.2
+  resolution: "@capacitor/android@npm:7.4.2"
   peerDependencies:
     "@capacitor/core": ^7.3.0
   checksum: 656257f061c5073d3a3e45b6d5e6b63ab078f77d57f2e10fcef16b768decaee44d616d7a11a9be51c8f048edeee3d057dfead68c100b7d4948be8e8961e68d7f
