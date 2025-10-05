@@ -23,6 +23,7 @@
   import { useCurrencyStore } from 'stores/currencyStore';
   import { useThemesStore } from 'stores/themesStore';
   import { themes, type ThemeType } from 'src/constants/ThemesData';
+  import { useSettingsManager } from 'src/composables/useSettingsManager';
 
   // 스토어 인스턴스 생성
   const uiStore = useUIStore();
@@ -43,8 +44,85 @@
   import ThemeEditor from './ThemeEditor.vue';
 
   const themeEditor = ref<InstanceType<typeof ThemeEditor> | null>(null);
+  const fileInput = ref<HTMLInputElement | null>(null);
 
   const $q = useQuasar();
+  const { gatherSettings, applySettings, resetSettings } = useSettingsManager();
+
+  // 설정 초기화 핸들러
+  const handleResetSettings = () => {
+    $q.dialog({
+      title: t('resetSettings.confirmTitle'),
+      message: t('resetSettings.confirmMessage'),
+      cancel: true,
+      persistent: true,
+    }).onOk(() => {
+      resetSettings();
+      $q.notify({ type: 'positive', message: t('resetSettings.success') });
+      // 설정을 완전히 적용하기 위해 페이지 새로고침
+      window.location.reload();
+    });
+  };
+
+  // 설정 내보내기 핸들러
+  const handleExportSettings = () => {
+    try {
+      const settings = gatherSettings();
+      const blob = new Blob([JSON.stringify(settings, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'qcalc-settings.json';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      $q.notify({ type: 'positive', message: t('exportSettings.success') });
+    } catch (error) {
+      console.error(error);
+      $q.notify({ type: 'negative', message: t('exportSettings.fail') });
+    }
+  };
+
+  // 설정 불러오기 버튼 클릭 핸들러
+  const handleImportClick = () => {
+    fileInput.value?.click();
+  };
+
+  // 파일 변경 핸들러 (설정 불러오기)
+  const handleFileChange = (event: Event) => {
+    const target = event.target as HTMLInputElement;
+    const file = target.files?.[0];
+    if (!file) return;
+
+    $q.dialog({
+      title: t('importSettings.confirmTitle'),
+      message: t('importSettings.confirmMessage'),
+      cancel: true,
+      persistent: true,
+    }).onOk(() => {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        try {
+          const content = e.target?.result as string;
+          const newSettings = JSON.parse(content);
+          if (applySettings(newSettings)) {
+            $q.notify({ type: 'positive', message: t('importSettings.success') });
+            window.location.reload();
+          } else {
+            throw new Error('Invalid settings format');
+          }
+        } catch (error) {
+          console.error(error);
+          $q.notify({ type: 'negative', message: t('importSettings.fail') });
+        }
+      };
+      reader.readAsText(file);
+    });
+
+    // 다음에 같은 파일을 선택해도 change 이벤트가 발생하도록 값 초기화
+    target.value = '';
+  };
 
   // 패키지 버전 정보
   import { version } from '../../package.json';
@@ -396,7 +474,7 @@
       <q-item class="q-mb-xs">
         <ToolTip :text-color="themesStore.getDarkColor()" :bg-color="themesStore.getCurrentThemeColors.ui.warning">
           {{ t('decimalPlacesStat') }}:
-          {{
+          {{ 
             settingsStore.decimalPlaces == -1
               ? t('noLimit')
               : `${DECIMAL_PLACES[settingsStore.decimalPlaces as keyof typeof DECIMAL_PLACES]} ${t('toNDecimalPlaces')}`
@@ -435,7 +513,7 @@
         <q-separator spaced="md" />
 
         <q-item class="q-mb-sm">
-          <q-item-label class="self-center" role="text"> {{ t('showUnit') }} (Alt-\) </q-item-label>
+          <q-item-label class="self-center" role="text"> {{ t('showUnit') }} (Alt-\\) </q-item-label>
           <q-space />
           <q-toggle v-model="unitStore.showUnit" keep-color :color="primaryAccentColor" dense />
         </q-item>
@@ -457,14 +535,14 @@
         <q-separator spaced="md" />
 
         <q-item class="q-mb-sm">
-          <q-item-label class="self-center" role="text"> {{ t('showRadix') }} (Alt-\) </q-item-label>
+          <q-item-label class="self-center" role="text"> {{ t('showRadix') }} (Alt-\\) </q-item-label>
           <q-space />
           <q-toggle v-model="radixStore.showRadix" keep-color :color="primaryAccentColor" dense />
         </q-item>
 
         <!-- 진법 형식 -->
         <q-item class="q-mb-md">
-          <q-item-label class="self-center" role="text"> {{ t('radixType') }} (Alt-Ctrl-\) </q-item-label>
+          <q-item-label class="self-center" role="text"> {{ t('radixType') }} (Alt-Ctrl-\\) </q-item-label>
           <q-space />
           <q-select
             v-model="radixStore.radixType"
@@ -549,6 +627,55 @@
           @click="settingsStore.setAutoUpdate(settingsStore.autoUpdate)"
         />
       </q-item>
+
+      <q-separator spaced="md" />
+
+      <!-- 설정 관리 -->
+      <q-item class="q-mb-sm">
+        <q-item-label class="q-pt-md">{{ t('settingsManagement') }}</q-item-label>
+      </q-item>
+      <q-item class="q-mb-sm">
+        <div class="full-width q-px-sm q-py-xs">
+          <q-btn-group spread class="full-width">
+            <q-btn
+              flat
+              dense
+              :label="t('reset')"
+              :color="selectTextColor"
+              :class="`bg-${selectBackgroundColor}`"
+              :aria-label="t('ariaLabel.resetSettings')"
+              @click="handleResetSettings"
+            />
+            <q-btn
+              flat
+              dense
+              :label="t('export')"
+              :color="selectTextColor"
+              :class="`bg-${selectBackgroundColor}`"
+              :aria-label="t('ariaLabel.exportSettings')"
+              @click="handleExportSettings"
+            />
+            <q-btn
+              flat
+              dense
+              :label="t('import')"
+              :color="selectTextColor"
+              :class="`bg-${selectBackgroundColor}`"
+              :aria-label="t('ariaLabel.importSettings')"
+              @click="handleImportClick"
+            />
+          </q-btn-group>
+          <input 
+            ref="fileInput" 
+            type="file" 
+            style="display: none"
+            accept=".json" 
+            :aria-label="t('ariaLabel.importSettings')"
+            @change="handleFileChange" 
+          />
+        </div>
+      </q-item>
+      <q-separator spaced="xl" />
 
       <!-- 버전 -->
       <q-item>
@@ -672,13 +799,37 @@ ko:
     editTheme: '{themeName} 테마 편집'
     deleteTheme: '{themeName} 테마 삭제'
     createNewTheme: '새 테마 만들기'
+    resetSettings: '설정 초기화'
+    exportSettings: '설정 내보내기'
+    importSettings: '설정 불러오기'
   colorTheme: '색상 테마'
   myThemes: '내 테마'
   apply: '적용'
   delete: '삭제'
   createNewTheme: '새 테마 만들기'
+  reset: '초기화'
+  export: '내보내기'
+  import: '불러오기'
+  settingsManagement: '설정 관리'
+  resetSettings:
+    title: '설정 초기화'
+    help: '모든 설정을 기본값으로 되돌립니다. 사용자 테마 등 모든 데이터가 삭제됩니다.'
+    confirmTitle: '설정 초기화 확인'
+    confirmMessage: '정말로 모든 설정을 초기화하시겠습니까? 이 작업은 되돌릴 수 없습니다.'
+    success: '설정이 성공적으로 초기화되었습니다.'
+  exportSettings:
+    title: '설정 내보내기'
+    help: '현재 모든 설정을 파일로 저장합니다.'
+    success: '설정을 성공적으로 내보냈습니다.'
+    fail: '설정 내보내기에 실패했습니다.'
+  importSettings:
+    title: '설정 불러오기'
+    confirmTitle: '설정 불러오기 확인'
+    confirmMessage: '현재 설정을 덮어쓰고 선택한 파일의 설정으로 교체하시겠습니까?'
+    success: '설정을 성공적으로 불러왔습니다.'
+    fail: '설정 불러오기에 실패했습니다. 파일이 손상되었거나 형식이 올바르지 않습니다.'
   confirmDeleteTitle: '테마 삭제 확인'
-  confirmDeleteMessage: '정말로 ''{themeName}'' 테마를 삭제하시겠습니까?'
+  confirmDeleteMessage: '정말로 \''{themeName}\'' 테마를 삭제하시겠습니까?'
 en:
   alwaysOnTop: 'Always on top'
   alwaysOnTopOn: 'Always on top ON'
@@ -730,11 +881,35 @@ en:
     editTheme: 'Edit {themeName} theme'
     deleteTheme: 'Delete {themeName} theme'
     createNewTheme: 'Create a new theme'
+    resetSettings: 'Reset settings'
+    exportSettings: 'Export settings'
+    importSettings: 'Import settings'
   colorTheme: 'Color Theme'
   myThemes: 'My Themes'
   apply: 'Apply'
   delete: 'Delete'
   createNewTheme: 'Create New Theme'
+  reset: 'Reset'
+  export: 'Export'
+  import: 'Import'
+  settingsManagement: 'Settings Management'
+  resetSettings:
+    title: 'Reset Settings'
+    help: 'Restores all settings to their default values. All data, including user themes, will be deleted.'
+    confirmTitle: 'Confirm Reset'
+    confirmMessage: 'Are you sure you want to reset all settings? This action cannot be undone.'
+    success: 'Settings have been successfully reset.'
+  exportSettings:
+    title: 'Export Settings'
+    help: 'Saves all current settings to a file.'
+    success: 'Settings have been successfully exported.'
+    fail: 'Failed to export settings.'
+  importSettings:
+    title: 'Import Settings'
+    confirmTitle: 'Confirm Import'
+    confirmMessage: 'Are you sure you want to overwrite current settings with the ones from the selected file?'
+    success: 'Settings have been successfully imported.'
+    fail: 'Failed to import settings. The file may be corrupt or in the wrong format.'
   confirmDeleteTitle: 'Confirm Theme Deletion'
-  confirmDeleteMessage: 'Are you sure you want to delete the theme ''{themeName}''?'
+  confirmDeleteMessage: 'Are you sure you want to delete the theme \''{themeName}\''?'
 </i18n>

@@ -14,7 +14,12 @@
   - [ ] Voice control of calculator
   - [x] High contrast mode
   - [x] Haptic mode
-
+- [ ] Settings related
+  - [X] Reset to default
+  - [X] Export to file
+  - [X] Import from file
+  - [ ] Sync to cloud
+  
 ## Done
 
 - [x] Add dark mode
