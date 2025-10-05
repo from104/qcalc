@@ -35,7 +35,18 @@ export function useSettingsManager() {
     for (const key in stores) {
       const storeKey = key as StoreKeys;
       const store = stores[storeKey]();
-      allSettings[storeKey] = store.$state;
+      const state = store.$state;
+
+      if (storeKey === 'calc') {
+        const calcState = { ...state };
+        if ('calc' in calcState && calcState.calc) {
+          const calcObj = calcState.calc as Record<string, unknown>;
+          delete calcObj.record;
+        }
+        allSettings[storeKey] = calcState;
+      } else {
+        allSettings[storeKey] = state;
+      }
     }
     return allSettings;
   };
@@ -51,7 +62,21 @@ export function useSettingsManager() {
         const storeKey = key as StoreKeys;
         if (stores[storeKey]) {
           const store = stores[storeKey]();
-          const settingsForStore = newSettings[key];
+          let settingsForStore = newSettings[key];
+
+          if (
+            storeKey === 'calc' &&
+            settingsForStore &&
+            typeof settingsForStore === 'object' &&
+            'calc' in settingsForStore
+          ) {
+            const calcSettings = { ...(settingsForStore as Record<string, unknown>) };
+            if ('calc' in calcSettings && calcSettings.calc) {
+              const calcObj = calcSettings.calc as Record<string, unknown>;
+              delete calcObj.record;
+            }
+            settingsForStore = calcSettings;
+          }
 
           // 타입 가드: 객체인지 확인
           if (settingsForStore && typeof settingsForStore === 'object' && !Array.isArray(settingsForStore)) {

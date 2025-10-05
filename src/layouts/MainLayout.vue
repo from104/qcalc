@@ -46,11 +46,29 @@
   import { useUIStore } from 'stores/uiStore';
   import { useSettingsStore } from 'stores/settingsStore';
   import { useThemesStore } from 'stores/themesStore';
+  import { useRecordManager } from 'src/composables/useRecordManager';
 
   const calcStore = useCalcStore();
   const uiStore = useUIStore();
   const settingsStore = useSettingsStore();
   const themesStore = useThemesStore();
+  const { clearRecords, exportRecordsToCSV, importRecordsFromCSV } = useRecordManager();
+
+  const recordFileInput = ref<HTMLInputElement | null>(null);
+
+  const handleRecordImportClick = () => {
+    recordFileInput.value?.click();
+  };
+
+  const handleRecordFileChange = (event: Event) => {
+    const target = event.target as HTMLInputElement;
+    const file = target.files?.[0];
+    if (!file) return;
+
+    importRecordsFromCSV(file);
+
+    target.value = '';
+  };
 
   // === 전역 변수 설정 ===
   /**
@@ -129,11 +147,21 @@
           tooltip: computed(() => t('tooltip.search')),
         },
         {
+          icon: 'file_download',
+          disabled: isRecordDisabled,
+          action: () => exportRecordsToCSV(),
+          tooltip: computed(() => t('tooltip.exportRecords')),
+        },
+        {
+          icon: 'file_upload',
+          disabled: computed(() => false),
+          action: () => handleRecordImportClick(),
+          tooltip: computed(() => t('tooltip.importRecords')),
+        },
+        {
           icon: 'delete_outline',
           disabled: isRecordDisabled,
-          action: () => {
-            uiStore.isDeleteRecordConfirmOpen = true;
-          },
+          action: () => clearRecords(),
           tooltip: computed(() => t('tooltip.deleteRecord')),
         },
       ],
@@ -648,6 +676,13 @@
     </q-layout>
 
     <ShowTips v-model="uiStore.showTipsDialog" />
+    <input 
+      ref="recordFileInput" 
+      type="file" 
+      style="display: none"
+      accept=".csv"
+      @change="handleRecordFileChange" 
+    />
   </div>
 </template>
 
@@ -785,6 +820,19 @@ ko:
   tooltipTips: '팁을 표시합니다.'
   openRecordPage: '클릭하면 기록 화면를 엽니다.'
   tooltipHelp: '도움말을 표시합니다.'
+  clearRecords:
+    confirmTitle: '계산 기록 초기화 확인'
+    confirmMessage: '정말로 모든 계산 기록을 초기화하시겠습니까? 이 작업은 되돌릴 수 없습니다.'
+    success: '계산 기록이 성공적으로 초기화되었습니다.'
+  exportRecords:
+    success: '계산 기록을 성공적으로 내보냈습니다.'
+    fail: '계산 기록 내보내기에 실패했습니다.'
+    noData: '내보낼 계산 기록이 없습니다.'
+  importRecords:
+    confirmTitle: '계산 기록 불러오기 확인'
+    confirmMessage: '현재 계산 기록을 덮어쓰고 선택한 파일의 기록으로 교체하시겠습니까?'
+    success: '계산 기록을 성공적으로 불러왔습니다.'
+    fail: '계산 기록 불러오기에 실패했습니다. 파일이 손상되었거나 형식이 올바르지 않습니다.'
   ariaLabel:
     delete_outline: '모든 기록 삭제'
     back: '이전 화면로 돌아가기'
@@ -808,6 +856,8 @@ ko:
     about: '정보'
     settings: '설정'
     deleteRecord: '모든 기록 삭제'
+    exportRecords: '기록 내보내기'
+    importRecords: '기록 불러오기'
     search: '검색'
     menu: '메뉴 열기'
     recordSwipeHelp: '기록 화면에서 왼쪽으로 스와이프하여 메모를 추가,수정하거나 오른쪽으로 스와이프하여 기록을 삭제할 수 있습니다.'
@@ -819,6 +869,19 @@ en:
   tooltipTips: 'Show tips.'
   openRecordPage: 'Click to open the record screen.'
   tooltipHelp: 'Show help.'
+  clearRecords:
+    confirmTitle: 'Confirm Clear Records'
+    confirmMessage: 'Are you sure you want to clear all calculation records? This action cannot be undone.'
+    success: 'Calculation records have been successfully cleared.'
+  exportRecords:
+    success: 'Calculation records have been successfully exported.'
+    fail: 'Failed to export calculation records.'
+    noData: 'There are no calculation records to export.'
+  importRecords:
+    confirmTitle: 'Confirm Import Records'
+    confirmMessage: 'Are you sure you want to overwrite current calculation records with the ones from the selected file?'
+    success: 'Calculation records have been successfully imported.'
+    fail: 'Failed to import calculation records. The file may be corrupt or in the wrong format.'
   ariaLabel:
     delete_outline: 'Delete all records'
     back: 'Go back to previous screen'
@@ -842,6 +905,8 @@ en:
     about: 'About'
     settings: 'Settings'
     deleteRecord: 'Delete all records'
+    exportRecords: 'Export records'
+    importRecords: 'Import records'
     search: 'Search'
     menu: 'Open menu'
     recordSwipeHelp: 'You can add, modify, or delete records by swiping left on the record screen, or by swiping right to delete the record.'

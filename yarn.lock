@@ -1831,6 +1831,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@types/papaparse@npm:^5.3.16":
+  version: 5.3.16
+  resolution: "@types/papaparse@npm:5.3.16"
+  dependencies:
+    "@types/node": "npm:*"
+  checksum: 10/5428bbd403cc870d50cdafc46162bbc02ae174aebdcc35738364e91f7eeea6d0197b3735d6ff0332404e05421e15f789461c1a60a8eee6269c3ce0b5d73fe6ab
+  languageName: node
+  linkType: hard
+
 "@types/plist@npm:^3.0.1":
   version: 3.0.5
   resolution: "@types/plist@npm:3.0.5"
@@ -8453,6 +8462,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"papaparse@npm:^5.5.3":
+  version: 5.5.3
+  resolution: "papaparse@npm:5.5.3"
+  checksum: 10/383e38f8ff910be48b684e7f47b84dbe5e67708669c13bb21f316a0591ef183ff670dfc7eb9f6d0a8b67e21a5b0e8934712cda96ff8fb678d6591e597d108bd1
+  languageName: node
+  linkType: hard
+
 "param-case@npm:^3.0.4":
   version: 3.0.4
   resolution: "param-case@npm:3.0.4"
@@ -8930,6 +8946,7 @@ __metadata:
     "@rushstack/eslint-patch": "npm:1.10.5"
     "@types/dompurify": "npm:3.0.5"
     "@types/node": "npm:24.6.2"
+    "@types/papaparse": "npm:^5.3.16"
     "@typescript-eslint/eslint-plugin": "npm:8.25.0"
     "@typescript-eslint/parser": "npm:8.25.0"
     "@vitejs/plugin-vue": "npm:6.0.1"
@@ -8950,6 +8967,7 @@ __metadata:
     eslint-plugin-vue: "npm:10.1.0"
     globals: "npm:16.0.0"
     mathjs: "npm:^14.4.0"
+    papaparse: "npm:^5.5.3"
     pinia: "npm:3.0.1"
     pinia-plugin-persistedstate: "npm:^4.3.0"
     postcss: "npm:8.5.2"

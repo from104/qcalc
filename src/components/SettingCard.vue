@@ -124,6 +124,7 @@
     target.value = '';
   };
 
+
   // 패키지 버전 정보
   import { version } from '../../package.json';
 
@@ -828,6 +829,19 @@ ko:
     confirmMessage: '현재 설정을 덮어쓰고 선택한 파일의 설정으로 교체하시겠습니까?'
     success: '설정을 성공적으로 불러왔습니다.'
     fail: '설정 불러오기에 실패했습니다. 파일이 손상되었거나 형식이 올바르지 않습니다.'
+  clearRecords:
+    confirmTitle: '계산 기록 초기화 확인'
+    confirmMessage: '정말로 모든 계산 기록을 초기화하시겠습니까? 이 작업은 되돌릴 수 없습니다.'
+    success: '계산 기록이 성공적으로 초기화되었습니다.'
+  exportRecords:
+    success: '계산 기록을 성공적으로 내보냈습니다.'
+    fail: '계산 기록 내보내기에 실패했습니다.'
+    noData: '내보낼 계산 기록이 없습니다.'
+  importRecords:
+    confirmTitle: '계산 기록 불러오기 확인'
+    confirmMessage: '현재 계산 기록을 덮어쓰고 선택한 파일의 기록으로 교체하시겠습니까?'
+    success: '계산 기록을 성공적으로 불러왔습니다.'
+    fail: '계산 기록 불러오기에 실패했습니다. 파일이 손상되었거나 형식이 올바르지 않습니다.'
   confirmDeleteTitle: '테마 삭제 확인'
   confirmDeleteMessage: '정말로 \''{themeName}\'' 테마를 삭제하시겠습니까?'
 en:
@@ -910,6 +924,19 @@ en:
     confirmMessage: 'Are you sure you want to overwrite current settings with the ones from the selected file?'
     success: 'Settings have been successfully imported.'
     fail: 'Failed to import settings. The file may be corrupt or in the wrong format.'
+  clearRecords:
+    confirmTitle: 'Confirm Clear Records'
+    confirmMessage: 'Are you sure you want to clear all calculation records? This action cannot be undone.'
+    success: 'Calculation records have been successfully cleared.'
+  exportRecords:
+    success: 'Calculation records have been successfully exported.'
+    fail: 'Failed to export calculation records.'
+    noData: 'There are no calculation records to export.'
+  importRecords:
+    confirmTitle: 'Confirm Import Records'
+    confirmMessage: 'Are you sure you want to overwrite current calculation records with the ones from the selected file?'
+    success: 'Calculation records have been successfully imported.'
+    fail: 'Failed to import calculation records. The file may be corrupt or in the wrong format.'
   confirmDeleteTitle: 'Confirm Theme Deletion'
   confirmDeleteMessage: 'Are you sure you want to delete the theme \''{themeName}\''?'
 </i18n>
