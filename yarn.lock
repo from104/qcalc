@@ -142,9 +142,6 @@ __metadata:
 "@capacitor/core@npm:7.3.0":
   version: 7.3.0
   resolution: "@capacitor/core@npm:7.3.0"
-"@capacitor/core@npm:7.3.0":
-  version: 7.3.0
-  resolution: "@capacitor/core@npm:7.3.0"
   dependencies:
     tslib: "npm:^2.1.0"
   checksum: 10/874c1c24359daf37bbc115998e14f0edc15f4e6efb180c95d38a159e5aaa3c0fc2a3c7383b30c98d1df19850a448920c3f71b851571ff1f3e58aab2b362eb913
