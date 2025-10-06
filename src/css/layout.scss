@@ -1,0 +1,92 @@
+.q-tab {
+  :deep(.q-tab__label) {
+    font-size: 16px;
+  }
+}
+
+.q-tab-panel {
+  padding: 0px;
+}
+
+.sub-page {
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  left: 0;
+  top: 0;
+}
+
+.animate-sub-page-enter-from[data-page='record'],
+.animate-sub-page-leave-to[data-page='record'] {
+  opacity: 0;
+}
+
+.animate-sub-page-enter-active[data-page='record'],
+.animate-sub-page-leave-active[data-page='record'] {
+  transition: opacity 0.3s ease;
+}
+
+.animate-sub-page-enter-active:not([data-page='record']) {
+  animation: slideFromRight 0.3s ease-out;
+}
+
+.animate-sub-page-leave-active:not([data-page='record']) {
+  animation: slideToRight 0.3s ease-out;
+}
+
+@keyframes slideFromRight {
+  from {
+    transform: translateX(100%);
+  }
+
+  to {
+    transform: translateX(0);
+  }
+}
+
+@keyframes slideToRight {
+  from {
+    transform: translateX(0);
+  }
+
+  to {
+    transform: translateX(100%);
+  }
+}
+
+.sub-scroll-area {
+  height: calc(100vh - 50px);
+}
+
+.hide-scrollbar {
+  :deep(.q-scrollarea__thumb) {
+    display: none !important;
+  }
+}
+
+.header-content {
+  position: absolute;
+}
+
+.menu-card {
+  padding-top: 55px;
+  background-color: var(--q-grey-3) !important;
+
+  .body--dark & {
+    background-color: var(--q-dark) !important;
+  }
+}
+
+.high-z-index {
+  z-index: 1000;
+}
+
+.no-padding-bottom {
+  padding-bottom: 0px;
+}
+
+.body--dark {
+  .sub-content {
+    background-color: var(--q-dark) !important;
+  }
+}

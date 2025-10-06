@@ -10,3 +10,8 @@ help: '도움말'
 about: '정보'
 version: '버전'
 willExitApp: '다시 뒤로가기를 누르면 앱을 종료합니다.'
+tabs:
+  calc: '기본'
+  unit: '단위'
+  currency: '환율'
+  radix: '진법'
