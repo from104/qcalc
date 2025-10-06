@@ -234,3 +234,5 @@
 <style lang="scss" scoped>
   @import '../css/layout.scss';
 </style>
+
+<i18n lang="yaml5" src="../i18n/components/Layout.yml" />

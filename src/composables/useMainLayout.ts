@@ -4,7 +4,6 @@
  */
 
 import { onBeforeUnmount, onMounted, reactive, shallowRef, watch, computed, ref } from 'vue';
-import type { ComputedRef } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
 import { useI18n } from 'vue-i18n';
 import { useMeta } from 'quasar';
@@ -31,11 +30,10 @@ import { useSettingsStore } from 'stores/settingsStore';
 import { useThemesStore } from 'stores/themesStore';
 import { useRecordManager } from './useRecordManager';
 
-export function useMainLayout() {
+export function useMainLayout(t: (key: string) => string) {
   const router = useRouter();
   const route = useRoute();
   const { locale } = useI18n({ useScope: 'global' });
-  const { t } = useI18n();
 
   const calcStore = useCalcStore();
   const uiStore = useUIStore();
@@ -65,10 +63,10 @@ export function useMainLayout() {
   useMeta(() => ({ title: title.value }));
 
   const tabs = reactive<Tab[]>([
-    { name: 'calc', title: computed(() => t('message.tabs.calc')), component: shallowRef(CalcPage) },
-    { name: 'unit', title: computed(() => t('message.tabs.unit')), component: shallowRef(UnitPage) },
-    { name: 'currency', title: computed(() => t('message.tabs.currency')), component: shallowRef(CurrencyPage) },
-    { name: 'radix', title: computed(() => t('message.tabs.radix')), component: shallowRef(RadixPage) },
+    { name: 'calc', title: computed(() => t('calc')), component: shallowRef(CalcPage) },
+    { name: 'unit', title: computed(() => t('unit')), component: shallowRef(UnitPage) },
+    { name: 'currency', title: computed(() => t('currency')), component: shallowRef(CurrencyPage) },
+    { name: 'radix', title: computed(() => t('radix')), component: shallowRef(RadixPage) },
   ]);
 
   const isRecordDisabled = computed(() => {
@@ -78,17 +76,17 @@ export function useMainLayout() {
   const SUB_PAGE_CONFIG = reactive<SubPageConfig>({
     help: {
       component: shallowRef(HelpPage),
-      title: computed(() => t('message.help')),
+      title: computed(() => t('help')),
       showClose: true,
     },
     about: {
       component: shallowRef(AboutPage),
-      title: computed(() => t('message.about')),
+      title: computed(() => t('about')),
       showClose: true,
     },
     record: {
       component: shallowRef(RecordPage),
-      title: computed(() => t('message.record')),
+      title: computed(() => t('record')),
       buttons: [
         {
           icon: 'search',
@@ -120,7 +118,7 @@ export function useMainLayout() {
     },
     settings: {
       component: shallowRef(SettingPage),
-      title: computed(() => t('message.settings')),
+      title: computed(() => t('settings')),
       showClose: true,
     },
   });

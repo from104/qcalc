@@ -10,8 +10,3 @@ help: 'Help'
 about: 'About'
 version: 'Version'
 willExitApp: 'Press back again to exit the app.'
-tabs:
-  calc: 'Basic'
-  unit: 'Unit'
-  currency: 'Currency'
-  radix: 'Radix'

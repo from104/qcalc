@@ -273,3 +273,5 @@
     padding-right: 16px; // q-pr-lg와 동일
   }
 </style>
+
+<i18n lang="yaml5" src="../i18n/components/Layout.yml" />

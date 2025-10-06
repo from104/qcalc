@@ -3,6 +3,10 @@
   import NarrowLayout from './NarrowLayout.vue';
   import WideLayout from './WideLayout.vue';
   import ShowTips from 'components/ShowTips.vue';
+  import { useI18n } from 'vue-i18n';
+
+  // Layout.yml의 메시지들을 가져와서 useMainLayout에 전달
+  const { t } = useI18n();
 
   const {
     router,
@@ -22,7 +26,7 @@
     toggleLeftDrawer,
     navigateToPath,
     SUB_PAGE_BUTTONS,
-  } = useMainLayout();
+  } = useMainLayout(t);
 
   const onNavigateToPath = (path: string) => {
     navigateToPath(path, route, router);
@@ -87,3 +91,5 @@
     height: 100%;
   }
 </style>
+
+<i18n lang="yaml5" src="../i18n/components/Layout.yml" />
