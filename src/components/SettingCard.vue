@@ -54,7 +54,14 @@
     $q.dialog({
       title: t('resetSettings.confirmTitle'),
       message: t('resetSettings.confirmMessage'),
-      cancel: true,
+      ok: {
+        label: t('message.yes'),
+        flat: true,
+      },
+      cancel: {
+        label: t('message.no'),
+        flat: true,
+      },
       persistent: true,
     }).onOk(() => {
       resetSettings();
@@ -98,7 +105,14 @@
     $q.dialog({
       title: t('importSettings.confirmTitle'),
       message: t('importSettings.confirmMessage'),
-      cancel: true,
+      ok: {
+        label: t('message.yes'),
+        flat: true,
+      },
+      cancel: {
+        label: t('message.no'),
+        flat: true,
+      },
       persistent: true,
     }).onOk(() => {
       const reader = new FileReader();
@@ -123,7 +137,6 @@
     // 다음에 같은 파일을 선택해도 change 이벤트가 발생하도록 값 초기화
     target.value = '';
   };
-
 
   // 패키지 버전 정보
   import { version } from '../../package.json';
@@ -212,7 +225,14 @@
     $q.dialog({
       title: t('confirmDeleteTitle'),
       message: t('confirmDeleteMessage', { themeName }),
-      cancel: true,
+      ok: {
+        label: t('yes'),
+        flat: true,
+      },
+      cancel: {
+        label: t('no'),
+        flat: true,
+      },
       persistent: true,
     }).onOk(() => {
       themesStore.removeUserTheme(themeName);
@@ -475,7 +495,7 @@
       <q-item class="q-mb-xs">
         <ToolTip :text-color="themesStore.getDarkColor()" :bg-color="themesStore.getCurrentThemeColors.ui.warning">
           {{ t('decimalPlacesStat') }}:
-          {{ 
+          {{
             settingsStore.decimalPlaces == -1
               ? t('noLimit')
               : `${DECIMAL_PLACES[settingsStore.decimalPlaces as keyof typeof DECIMAL_PLACES]} ${t('toNDecimalPlaces')}`
@@ -666,13 +686,13 @@
               @click="handleImportClick"
             />
           </q-btn-group>
-          <input 
-            ref="fileInput" 
-            type="file" 
+          <input
+            ref="fileInput"
+            type="file"
             style="display: none"
-            accept=".json" 
+            accept=".json"
             :aria-label="t('ariaLabel.importSettings')"
-            @change="handleFileChange" 
+            @change="handleFileChange"
           />
         </div>
       </q-item>
@@ -751,18 +771,12 @@
 <i18n>
 ko:
   alwaysOnTop: '항상 위'
-  alwaysOnTopOn: '항상 위 켜짐'
-  alwaysOnTopOff: '항상 위 꺼짐'
   initPanel: '시작 시 패널 초기화'
   darkMode:
     title: '다크 모드'
     light: '밝은'
     dark: '어두운'
     system: '시스템'
-    message:
-      system: '다크 모드를 시스템에 따릅니다.'
-      dark: '다크 모드를 켭니다.'
-      light: '다크 모드를 끕니다.'
   hapticsMode: '진동 모드'
   showButtonAddedLabel: '버튼 추가 라벨 표시'
   useGrouping: '숫자 묶음 표시'
@@ -804,60 +818,33 @@ ko:
     exportSettings: '설정 내보내기'
     importSettings: '설정 불러오기'
   colorTheme: '색상 테마'
-  myThemes: '내 테마'
-  apply: '적용'
-  delete: '삭제'
   createNewTheme: '새 테마 만들기'
   reset: '초기화'
   export: '내보내기'
   import: '불러오기'
   settingsManagement: '설정 관리'
   resetSettings:
-    title: '설정 초기화'
-    help: '모든 설정을 기본값으로 되돌립니다. 사용자 테마 등 모든 데이터가 삭제됩니다.'
     confirmTitle: '설정 초기화 확인'
     confirmMessage: '정말로 모든 설정을 초기화하시겠습니까? 이 작업은 되돌릴 수 없습니다.'
     success: '설정이 성공적으로 초기화되었습니다.'
   exportSettings:
-    title: '설정 내보내기'
-    help: '현재 모든 설정을 파일로 저장합니다.'
     success: '설정을 성공적으로 내보냈습니다.'
     fail: '설정 내보내기에 실패했습니다.'
   importSettings:
-    title: '설정 불러오기'
     confirmTitle: '설정 불러오기 확인'
     confirmMessage: '현재 설정을 덮어쓰고 선택한 파일의 설정으로 교체하시겠습니까?'
     success: '설정을 성공적으로 불러왔습니다.'
     fail: '설정 불러오기에 실패했습니다. 파일이 손상되었거나 형식이 올바르지 않습니다.'
-  clearRecords:
-    confirmTitle: '계산 기록 초기화 확인'
-    confirmMessage: '정말로 모든 계산 기록을 초기화하시겠습니까? 이 작업은 되돌릴 수 없습니다.'
-    success: '계산 기록이 성공적으로 초기화되었습니다.'
-  exportRecords:
-    success: '계산 기록을 성공적으로 내보냈습니다.'
-    fail: '계산 기록 내보내기에 실패했습니다.'
-    noData: '내보낼 계산 기록이 없습니다.'
-  importRecords:
-    confirmTitle: '계산 기록 불러오기 확인'
-    confirmMessage: '현재 계산 기록을 덮어쓰고 선택한 파일의 기록으로 교체하시겠습니까?'
-    success: '계산 기록을 성공적으로 불러왔습니다.'
-    fail: '계산 기록 불러오기에 실패했습니다. 파일이 손상되었거나 형식이 올바르지 않습니다.'
   confirmDeleteTitle: '테마 삭제 확인'
   confirmDeleteMessage: '정말로 \''{themeName}\'' 테마를 삭제하시겠습니까?'
 en:
   alwaysOnTop: 'Always on top'
-  alwaysOnTopOn: 'Always on top ON'
-  alwaysOnTopOff: 'Always on top OFF'
   initPanel: 'Init panel at startup'
   darkMode:
     title: 'Dark mode'
     light: 'Light'
     dark: 'Dark'
     system: 'System'
-    message:
-      system: 'Dark mode follows system.'
-      dark: 'Dark mode ON.'
-      light: 'Dark mode OFF.'
   hapticsMode: 'Haptics mode'
   showButtonAddedLabel: 'Show button added label'
   useGrouping: 'Use grouping'
@@ -899,44 +886,23 @@ en:
     exportSettings: 'Export settings'
     importSettings: 'Import settings'
   colorTheme: 'Color Theme'
-  myThemes: 'My Themes'
-  apply: 'Apply'
-  delete: 'Delete'
   createNewTheme: 'Create New Theme'
   reset: 'Reset'
   export: 'Export'
   import: 'Import'
   settingsManagement: 'Settings Management'
   resetSettings:
-    title: 'Reset Settings'
-    help: 'Restores all settings to their default values. All data, including user themes, will be deleted.'
     confirmTitle: 'Confirm Reset'
     confirmMessage: 'Are you sure you want to reset all settings? This action cannot be undone.'
     success: 'Settings have been successfully reset.'
   exportSettings:
-    title: 'Export Settings'
-    help: 'Saves all current settings to a file.'
     success: 'Settings have been successfully exported.'
     fail: 'Failed to export settings.'
   importSettings:
-    title: 'Import Settings'
     confirmTitle: 'Confirm Import'
     confirmMessage: 'Are you sure you want to overwrite current settings with the ones from the selected file?'
     success: 'Settings have been successfully imported.'
     fail: 'Failed to import settings. The file may be corrupt or in the wrong format.'
-  clearRecords:
-    confirmTitle: 'Confirm Clear Records'
-    confirmMessage: 'Are you sure you want to clear all calculation records? This action cannot be undone.'
-    success: 'Calculation records have been successfully cleared.'
-  exportRecords:
-    success: 'Calculation records have been successfully exported.'
-    fail: 'Failed to export calculation records.'
-    noData: 'There are no calculation records to export.'
-  importRecords:
-    confirmTitle: 'Confirm Import Records'
-    confirmMessage: 'Are you sure you want to overwrite current calculation records with the ones from the selected file?'
-    success: 'Calculation records have been successfully imported.'
-    fail: 'Failed to import calculation records. The file may be corrupt or in the wrong format.'
   confirmDeleteTitle: 'Confirm Theme Deletion'
   confirmDeleteMessage: 'Are you sure you want to delete the theme \''{themeName}\''?'
 </i18n>

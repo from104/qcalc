@@ -244,7 +244,7 @@
   /**
    * 전역 키보드 단축키를 설정합니다.
    */
-    const { subscribe, unsubscribe } = useKeyBinding([
+  const { subscribe, unsubscribe } = useKeyBinding([
     [['Control+1'], () => uiStore.setCurrentTab('calc')],
     [['Control+2'], () => uiStore.setCurrentTab('unit')],
     [['Control+3'], () => uiStore.setCurrentTab('currency')],
@@ -263,7 +263,7 @@
   /**
    * 컴포넌트 마운트 시 초기화 작업을 수행합니다.
    */
-    onMounted(() => {
+  onMounted(() => {
     subscribe();
 
     // 현재 서브화면 설정
@@ -305,7 +305,7 @@
   /**
    * 컴포넌트 언마운트 시 정리 작업을 수행합니다.
    */
-    onBeforeUnmount(() => {
+  onBeforeUnmount(() => {
     unsubscribe();
   });
 
@@ -316,7 +316,7 @@
   watch(
     () => uiStore.inputFocused,
     () => {
-            if (uiStore.inputFocused) {
+      if (uiStore.inputFocused) {
         unsubscribe();
       } else {
         subscribe();
@@ -357,7 +357,7 @@
 
       <q-header id="header" class="z-top noselect" elevated>
         <!-- 좁은 화면 메인 헤더 -->
-        <q-toolbar v-if="!isSubPage" v-auto-blur :class="{ 'q-pt-md': $g.isAndroid && $g.apiLevel >= 35}">
+        <q-toolbar v-if="!isSubPage" v-auto-blur :class="{ 'q-pt-md': $g.isAndroid && $g.apiLevel >= 35 }">
           <q-btn flat dense round class="q-mr-sm" icon="menu" aria-label="Menu" @click="toggleLeftDrawer">
             <ToolTip
               :text-color="themesStore.getDarkColor()"
@@ -470,7 +470,14 @@
       <q-page-container class="row no-padding-bottom">
         <!-- 메인 화면 컨텐츠 -->
         <template v-if="!isSubPage">
-          <q-tab-panels v-model="uiStore.currentTab" animated infinite :swipeable="$g.isMobile" role="tabpanel" :aria-label="t('ariaLabel.calculatorContent')">
+          <q-tab-panels
+            v-model="uiStore.currentTab"
+            animated
+            infinite
+            :swipeable="$g.isMobile"
+            role="tabpanel"
+            :aria-label="t('ariaLabel.calculatorContent')"
+          >
             <q-tab-panel
               v-for="(tab, index) in tabs"
               :id="`panel-${tab.name}`"
@@ -559,7 +566,7 @@
           <transition name="animate-sub-page">
             <div :key="currentSubPage" :data-page="currentSubPage" class="header-content full-width row items-center">
               <q-toolbar-title
-                class="text-subtitle1 col-4"
+                class="text-subtitle1 col-3"
                 role="heading"
                 :aria-label="t('ariaLabel.subPageTitle', { title: SUB_PAGE_CONFIG[currentSubPage]?.title })"
               >
@@ -571,9 +578,9 @@
                   :text="t('tooltip.recordSwipeHelp')"
                 />
               </q-toolbar-title>
-              <div class="col-8 row justify-end sub-header-buttons">
+              <div class="col-9 row justify-end sub-header-buttons">
                 <q-btn
-                  v-for="button in SUB_PAGE_BUTTONS"
+                  v-for="button in SUB_PAGE_BUTTONS.filter((btn) => btn.path !== route.path)"
                   :key="button.label"
                   dense
                   flat
@@ -593,6 +600,7 @@
                 <q-btn
                   v-for="button in SUB_PAGE_CONFIG[currentSubPage]?.buttons"
                   :key="button.icon"
+                  class="q-pl-none"
                   dense
                   flat
                   size="md"

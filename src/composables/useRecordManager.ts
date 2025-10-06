@@ -17,7 +17,14 @@ export function useRecordManager() {
     $q.dialog({
       title: t('clearRecords.confirmTitle'),
       message: t('clearRecords.confirmMessage'),
-      cancel: true,
+      ok: {
+        label: t('message.yes'),
+        flat: true,
+      },
+      cancel: {
+        label: t('message.no'),
+        flat: true,
+      },
       persistent: true,
     }).onOk(() => {
       calcStore.calc.record.clearRecords();
@@ -33,10 +40,12 @@ export function useRecordManager() {
         return;
       }
 
-      const dataToExport = records.map(record => ({
+      const dataToExport = records.map((record) => ({
         id: record.id,
         previousNumber: record.calculationResult.previousNumber,
-        operator: Array.isArray(record.calculationResult.operator) ? record.calculationResult.operator.join(',') : record.calculationResult.operator,
+        operator: Array.isArray(record.calculationResult.operator)
+          ? record.calculationResult.operator.join(',')
+          : record.calculationResult.operator,
         argumentNumber: record.calculationResult.argumentNumber,
         resultNumber: record.calculationResult.resultNumber,
         memo: record.memo,
@@ -64,7 +73,14 @@ export function useRecordManager() {
     $q.dialog({
       title: t('importRecords.confirmTitle'),
       message: t('importRecords.confirmMessage'),
-      cancel: true,
+      ok: {
+        label: t('message.yes'),
+        flat: true,
+      },
+      cancel: {
+        label: t('message.no'),
+        flat: true,
+      },
       persistent: true,
     }).onOk(() => {
       const reader = new FileReader();
@@ -74,36 +90,47 @@ export function useRecordManager() {
           Papa.parse(content, {
             header: true,
             complete: (results) => {
-              const newRecords = results.data as any[];
+              const newRecords = results.data as Record<string, unknown>[];
               if (newRecords.length > 0) {
                 calcStore.calc.record.clearRecords();
                 // The records are added in reverse order to maintain the original order
                 for (let i = newRecords.length - 1; i >= 0; i--) {
-                    const record = newRecords[i];
-                    const operator = record.operator.includes(',') ? record.operator.split(',') : record.operator;
-                    calcStore.calc.record.addRecord({
-                        previousNumber: record.previousNumber,
-                        operator: operator,
-                        argumentNumber: record.argumentNumber,
-                        resultNumber: record.resultNumber,
-                    });
+                  const record = newRecords[i];
+                  if (!record) continue;
+
+                  const operatorValue = record.operator;
+                  const operator =
+                    typeof operatorValue === 'string' && operatorValue.includes(',')
+                      ? operatorValue.split(',')
+                      : operatorValue;
+                  calcStore.calc.record.addRecord({
+                    previousNumber: String(record.previousNumber),
+                    operator: operator,
+                    argumentNumber: String(record.argumentNumber),
+                    resultNumber: String(record.resultNumber),
+                  });
                 }
                 // Manually set memo and timestamp as addRecord does not support them
                 const allRecords = calcStore.calc.record.getAllRecords();
                 for (let i = 0; i < newRecords.length; i++) {
-                    const newRecord = newRecords[i];
-                    const correspondingRecord = allRecords.find(r => r.calculationResult.resultNumber === newRecord.resultNumber && r.calculationResult.previousNumber === newRecord.previousNumber);
-                    if (correspondingRecord) {
-                        correspondingRecord.memo = newRecord.memo;
-                        correspondingRecord.timestamp = parseInt(newRecord.timestamp, 10);
-                    }
+                  const newRecord = newRecords[i];
+                  if (!newRecord) continue;
+                  const correspondingRecord = allRecords.find(
+                    (r) =>
+                      r.calculationResult.resultNumber === newRecord.resultNumber &&
+                      r.calculationResult.previousNumber === newRecord.previousNumber,
+                  );
+                  if (correspondingRecord) {
+                    correspondingRecord.memo = newRecord.memo as string;
+                    correspondingRecord.timestamp = parseInt(newRecord.timestamp as string, 10);
+                  }
                 }
 
                 $q.notify({ type: 'positive', message: t('importRecords.success') });
               } else {
-                 throw new Error('Invalid records format');
+                throw new Error('Invalid records format');
               }
-            }
+            },
           });
         } catch (error) {
           console.error(error);
