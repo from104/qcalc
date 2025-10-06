@@ -556,14 +556,14 @@
         <q-separator spaced="md" />
 
         <q-item class="q-mb-sm">
-          <q-item-label class="self-center" role="text"> {{ t('showRadix') }} (Alt-\\) </q-item-label>
+          <q-item-label class="self-center" role="text"> {{ t('showRadix') }} (Alt-\) </q-item-label>
           <q-space />
           <q-toggle v-model="radixStore.showRadix" keep-color :color="primaryAccentColor" dense />
         </q-item>
 
         <!-- 진법 형식 -->
         <q-item class="q-mb-md">
-          <q-item-label class="self-center" role="text"> {{ t('radixType') }} (Alt-Ctrl-\\) </q-item-label>
+          <q-item-label class="self-center" role="text"> {{ t('radixType') }} (Alt-Ctrl-\) </q-item-label>
           <q-space />
           <q-select
             v-model="radixStore.radixType"
