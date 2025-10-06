@@ -42,3 +42,4 @@
 - [x] Theme function
 - [x] Unit and currency item favorites
 - [x] User theme settings
+- [X] Export and import calculation history

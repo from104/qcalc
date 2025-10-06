@@ -35,7 +35,8 @@ QCalc is a cross-platform calculator application utilizing modern web technologi
 - Unit Converter
 - Currency Exchanger
 - Base Number Converter
-- Calculation History Management
+- Calculation History Management (including export/import)
+- Settings Management (reset, export, import)
 - Multi-language Support (Korean, English)
 - Dark Mode
 - Haptic Feedback (Mobile)
@@ -158,6 +159,7 @@ QCalc is a cross-platform calculator application utilizing modern web technologi
 - Swipe to delete/edit individual records
 - Copy calculation results
 - Reuse previous calculation results
+- Export/Import calculation history (CSV)
 - Future Plans
   - Calculation history search function
 
@@ -202,6 +204,7 @@ QCalc is a cross-platform calculator application utilizing modern web technologi
 - Maintain Decimal Place Settings
 - Maintain Thousand Separator Status
 - Panel Reset Option on Startup
+- Settings Export/Import (JSON)
 
 ## 3. Development Environment
 

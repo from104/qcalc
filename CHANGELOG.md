@@ -8,9 +8,9 @@ The format is based on [Keep a Changelog] and this project follows [Semantic Ver
 
 ### Added
 
+- **Settings Management**: Added the ability to reset, export, and import all settings.
+- **Calculation History Management**: Added the ability to export and import calculation history as a CSV file.
 - **User Theme Customization**: Added the ability for users to create, edit, and delete their own themes.
-
-### Changed
 
 ### Fixed
 
