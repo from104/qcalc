@@ -20,6 +20,7 @@ interface SettingsState {
   locale: string;
   userLocale: string;
   autoUpdate: boolean;
+  recordFontSize: number;
 }
 
 export const useSettingsStore = defineStore('settings', {
@@ -35,6 +36,7 @@ export const useSettingsStore = defineStore('settings', {
     locale: '',
     userLocale: '',
     autoUpdate: true,
+    recordFontSize: 1,
   }),
 
   getters: {
@@ -97,6 +99,14 @@ export const useSettingsStore = defineStore('settings', {
 
     toggleAutoUpdate(): void {
       this.setAutoUpdate(!this.autoUpdate);
+    },
+
+    incrementRecordFontSize(): void {
+      this.recordFontSize = Math.min(this.recordFontSize + 1, 2);
+    },
+
+    decrementRecordFontSize(): void {
+      this.recordFontSize = Math.max(this.recordFontSize - 1, 0);
     },
   },
 

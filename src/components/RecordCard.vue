@@ -41,6 +41,7 @@
   import { useCalcStore } from 'src/stores/calcStore';
   import { useCurrencyStore } from 'stores/currencyStore';
   import { useUnitStore } from 'stores/unitStore';
+  import { useSettingsStore } from 'src/stores/settingsStore';
 
   // 스토어 인스턴스 생성
   const uiStore = useUIStore();
@@ -48,6 +49,9 @@
   const calcStore = useCalcStore();
   const currencyStore = useCurrencyStore();
   const unitStore = useUnitStore();
+  const settingsStore = useSettingsStore();
+
+  const fabOpen = ref(false);
 
   // 컴포넌트 import
   import MenuItem from 'components/snippets/MenuItem.vue';
@@ -405,6 +409,12 @@
       ? lighten(themesStore.getDarkColor(), 10)
       : lighten(themesStore.getCurrentThemeColors.ui.primary, 90);
   });
+
+  const recordFontClass = computed(() => `record-font-size-${settingsStore.recordFontSize}`);
+
+  // themesStore에서 select 색상을 가져오는 computed 속성
+  const selectTextColor = computed(() => themesStore.getSelectColor('text', themesStore.isDarkMode()));
+  const selectBackgroundColor = computed(() => themesStore.getSelectColor('background', themesStore.isDarkMode()));
 </script>
 
 <template>
@@ -496,7 +506,7 @@
         </q-item-section>
       </q-item>
       <!-- 기록이 있을 경우 -->
-      <q-list v-else id="record-list" separator class="full-width q-pt-md" role="list">
+      <q-list v-else id="record-list" separator class="full-width q-pt-md" role="list" :class="recordFontClass">
         <transition-group name="record-list">
           <q-slide-item
             v-for="record in recordStrings"
@@ -645,6 +655,37 @@
         </transition-group>
       </q-list>
     </transition>
+
+    <div v-if="fabOpen" class="backdrop" @click="fabOpen = false"></div>
+    <q-page-sticky position="bottom-left" :offset="[18, 18]" style="z-index: 15">
+      <q-fab
+        v-model="fabOpen"
+        vertical-actions-align="center"
+        color="primary"
+        icon="format_size"
+        direction="up"
+        padding="sm"
+      >
+      <q-fab-action
+        icon="remove"
+        :disable="settingsStore.recordFontSize <= 0"
+        padding="xs"
+        :color="selectBackgroundColor"
+        :text-color="selectTextColor"
+        @click="settingsStore.decrementRecordFontSize"
+        @click.stop="fabOpen = true"
+      />
+      <q-fab-action
+        icon="add"
+        :disable="settingsStore.recordFontSize >= 2"
+        padding="xs"
+        :color="selectBackgroundColor"
+        :text-color="selectTextColor"
+        @click="settingsStore.incrementRecordFontSize "
+        @click.stop="fabOpen = true"
+      />
+      </q-fab>
+    </q-page-sticky>
   </q-card-section>
 
   <!-- 기록 전체 삭제 다이얼로그 -->
@@ -871,6 +912,37 @@
     margin-bottom: -12px;
     @include dark-mode-fg-colors;
   }
+
+  .record-font-size-0 .record-text {
+    font-size: 0.7rem;
+  }
+  .record-font-size-0 .memo-text {
+    font-size: 0.8rem;
+  }
+
+  .record-font-size-1 .record-text {
+    font-size: 0.8rem;
+  }
+  .record-font-size-1 .memo-text {
+    font-size: 0.9rem;
+  }
+
+  .record-font-size-2 .record-text {
+    font-size: 0.9rem;
+  }
+  .record-font-size-2 .memo-text {
+    font-size: 1rem;
+  }
+
+  .backdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    // background-color: rgba(0, 0, 0, 0.2);
+    z-index: 14;
+  }
 </style>
 
 <i18n>
@@ -893,6 +965,9 @@ ko:
   loadToSubPanel: '서브 패널에 불러오기'
   deleteResult: '결과 삭제'
   copyTime: '시간 복사'
+  fontSize:
+    increase: '글자 크게'
+    decrease: '글자 작게'
   ariaLabel:
     scrollToTop: '맨 위로 스크롤'
     editMemo: '메모 편집'
@@ -919,6 +994,9 @@ en:
   loadToSubPanel: 'Load to sub panel'
   deleteResult: 'Delete result'
   copyTime: 'Copy time'
+  fontSize:
+    increase: 'Increase font size'
+    decrease: 'Decrease font size'
   ariaLabel:
     scrollToTop: 'Scroll to top'
     editMemo: 'Edit memo'
