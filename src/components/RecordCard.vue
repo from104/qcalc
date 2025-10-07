@@ -131,6 +131,7 @@
   // 히스토리 스크롤 함수
   const scrollToRecord = (offset: number | 'top' | 'bottom') => {
     const recordElement = document.getElementById('record');
+    console.log(recordElement);
     if (!recordElement) return;
 
     const currentScroll = recordElement.scrollTop;
@@ -168,7 +169,7 @@
   };
 
   // 키 바인딩 설정
-    const { subscribe, unsubscribe } = useKeyBinding([
+  const { subscribe, unsubscribe } = useKeyBinding([
     [['Control+d'], () => openDeleteRecordConfirmDialog()],
     [['Control+f'], () => openSearchDialogByKey()],
     [['ArrowUp'], () => scrollToRecord(-50)],
@@ -183,7 +184,7 @@
   watch(
     () => uiStore.inputFocused,
     () => {
-            if (uiStore.inputFocused) {
+      if (uiStore.inputFocused) {
         unsubscribe();
       } else {
         subscribe();
@@ -193,7 +194,7 @@
   );
 
   // 컴포넌트 마운트 시 키 바인딩 활성화
-    onMounted(() => {
+  onMounted(() => {
     subscribe();
     setTimeout(() => {
       document.getElementById('record')?.scrollTo({ top: uiStore.recordLastScrollPosition });
@@ -205,7 +206,7 @@
   });
 
   // 컴포넌트 언마운트 시 키 바인딩 비활성화
-    onBeforeUnmount(() => {
+  onBeforeUnmount(() => {
     unsubscribe();
     uiStore.recordLastScrollPosition = document.getElementById('record')?.scrollTop ?? 0;
 
@@ -576,7 +577,11 @@
                         auto-close
                         anchor="bottom left"
                         self="top left"
-                        @update:model-value="(val) => { recordMenu[record.id] = val; }"
+                        @update:model-value="
+                          (val) => {
+                            recordMenu[record.id] = val;
+                          }
+                        "
                       >
                         <q-list
                           dense
@@ -666,24 +671,24 @@
         direction="up"
         padding="sm"
       >
-      <q-fab-action
-        icon="remove"
-        :disable="settingsStore.recordFontSize <= 0"
-        padding="xs"
-        :color="selectBackgroundColor"
-        :text-color="selectTextColor"
-        @click="settingsStore.decrementRecordFontSize"
-        @click.stop="fabOpen = true"
-      />
-      <q-fab-action
-        icon="add"
-        :disable="settingsStore.recordFontSize >= 2"
-        padding="xs"
-        :color="selectBackgroundColor"
-        :text-color="selectTextColor"
-        @click="settingsStore.incrementRecordFontSize "
-        @click.stop="fabOpen = true"
-      />
+        <q-fab-action
+          icon="remove"
+          :disable="settingsStore.recordFontSize <= 0"
+          padding="xs"
+          :color="selectBackgroundColor"
+          :text-color="selectTextColor"
+          @click="settingsStore.decrementRecordFontSize"
+          @click.stop="fabOpen = true"
+        />
+        <q-fab-action
+          icon="add"
+          :disable="settingsStore.recordFontSize >= 2"
+          padding="xs"
+          :color="selectBackgroundColor"
+          :text-color="selectTextColor"
+          @click="settingsStore.incrementRecordFontSize"
+          @click.stop="fabOpen = true"
+        />
       </q-fab>
     </q-page-sticky>
   </q-card-section>

@@ -68,6 +68,7 @@ The calculator alone appears when the window width is reduced.
 - **Scroll**: Move 50px with ↑/↓ keys, 400px with Page Up/Down
 - **Search/Delete**: Search with Ctrl+F, delete history with Ctrl+D
 - **Export/Import**: Export or import calculation history as a CSV file through the buttons in the header
+- **Font Size Control**: Adjust the font size in 3 steps with the buttons in the bottom left corner.
 - **Add Notes**: Add notes to individual records
 - **Left Swipe (Mobile)**: Add/edit notes
 - **Right Swipe (Mobile)**: Delete records

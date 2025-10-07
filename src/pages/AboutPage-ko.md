@@ -16,8 +16,13 @@ Copyright © 2022 Seo Kihyun. MIT License.
 
 ### 추가됨
 
+- **계산 기록 폰트 크기 조절**: 계산 기록의 폰트 크기를 3단계로 조절하는 기능 추가.
 - **설정 관리 기능**: 모든 설정을 초기화하거나, 파일로 내보내고 불러올 수 있는 기능이 추가됨.
 - **계산 기록 관리 기능**: 계산 기록을 CSV 파일로 내보내거나 불러올 수 있는 기능이 추가됨.
 - **사용자 테마 커스터마이징**: 사용자가 직접 테마를 만들고, 수정하고, 삭제할 수 있는 기능이 추가됨.
+
+### 변경됨
+
+- **MainLayout 리팩토링**: MainLayout.vue를 NarrowLayout.vue와 WideLayout.vue로 분리하고 useMainLayout.ts 컴포저블을 생성하여 공통 로직을 분리.
 
 이전 버전의 정보는 [이곳](https://github.com/from104/qcalc/blob/main/CHANGELOG-ko.md)에서 확인하세요.

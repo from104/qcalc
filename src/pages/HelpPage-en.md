@@ -19,20 +19,20 @@ QCalc is more than just a simple calculator - it's evolving into a modern produc
 #### Standard Calculator
 
 - **How to Access**: Ctrl+1 or select the top tab
-- **Basic Operations**: Enter numbers 0-9, +, -, \*, / keys
+- **Basic Operations**: Enter numbers 0-9, +, -, *, / keys
 - **Advanced Functions**: Trigonometric functions (q, w, e), square (u), square root (i), constants (z: π, x: φ, c: e)
 - **Memory Functions**: Ctrl+Enter (MS), Ctrl+Backspace (MR), Ctrl+Delete (MC)
-- **Percentage Calculation**: 'number, /, number, %(k or %)' calculates percentage
-- **Apply Percentage**: 'number, \*, number, %(k or %)' applies percentage
+- **Percentage Calculation**: 'number, /, number, %(k)' calculates percentage
+- **Apply Percentage**: 'number, *, number, %(k)' applies percentage
 
 #### Unit Converter
 
 - **How to Access**: Ctrl+2 or select the top tab
 - **Conversion Categories**: Over 15 categories including length, area, volume, weight, angle, etc.
 - **Favorites**: Set frequently used units as favorites for quick access
-- **Swap Units**: Use '\\' key to swap original/converted units
+- **Swap Units**: Use \ key to swap original/converted units
 - **Quick Conversion**: ×10/×100/×1000 (a/s/d), ÷10/÷100/÷1000 (z/x/c)
-- **Unit Symbol**: Toggle unit symbol display/hide with Alt+\\ key
+- **Unit Symbol**: Toggle unit symbol display/hide with Alt+\ key
 
 #### Currency Converter
 
@@ -40,17 +40,17 @@ QCalc is more than just a simple calculator - it's evolving into a modern produc
 - **Latest Exchange Rates**: Reflects real-time exchange rate information
 - **Favorites**: Set frequently used currencies as favorites for quick access
 - **Quick Calculation**: +5/+10/+100 (f/g/h), -5/-10/-100 (q/w/e)
-- **Swap Currencies**: Use '\\' key to swap original/converted currencies
-- **Currency Symbol**: Toggle currency symbol display/hide with Alt+\\ key
+- **Swap Currencies**: Use \ key to swap original/converted currencies
+- **Currency Symbol**: Toggle currency symbol display/hide with Alt+\ key
 
 #### Programmer Calculator
 
 - **How to Access**: Ctrl+4 or select the top tab
 - **Supported Radix**: Convert between binary, octal, decimal, and hexadecimal
 - **Hexadecimal Input**: Enter A-F using z, x, c, a, s, d keys
-- **Swap Radix**: Use '\\' key to swap original/converted radix
-- **Radix Symbol**: Toggle unit symbol display/hide with Alt+\\ key
-- **Symbol Position**: Toggle unit symbol position (front/back) with Alt+Ctrl+\\ key
+- **Swap Radix**: Use \ key to swap original/converted radix
+- **Radix Symbol**: Toggle unit symbol display/hide with Alt+\ key
+- **Symbol Position**: Toggle unit symbol position (front/back) with Alt+Ctrl+\ key
 
 ### How to Use Productivity Features
 
@@ -60,6 +60,7 @@ QCalc is more than just a simple calculator - it's evolving into a modern produc
 - **Scroll**: Move 50px with ↑/↓ keys, 400px with Page Up/Down
 - **Search/Delete**: Search with Ctrl+F, delete history with Ctrl+D
 - **Export/Import**: Export or import calculation history as a CSV file through the buttons in the header
+- **Font Size Control**: Adjust the font size in 3 steps with the buttons in the bottom left corner.
 - **Add Notes**: Add notes to individual records
 - **Left Swipe (Mobile)**: Add/edit notes
 - **Right Swipe (Mobile)**: Delete records
@@ -134,7 +135,7 @@ QCalc is more than just a simple calculator - it's evolving into a modern produc
 ### Basic Calculator and Common Functions
 
 | Shortcut    | Function                  |
-| ----------- | ------------------------- |
+|-------------|---------------------------|
 | 0-9\.       | Enter numbers and decimal |
 | +, -, \*, / | Basic arithmetic          |
 | Enter, =    | Calculate result          |
@@ -150,7 +151,7 @@ QCalc is more than just a simple calculator - it's evolving into a modern produc
 ### Advanced Math Functions (Shift Mode)
 
 | Shortcut | Function                    |
-| -------- | --------------------------- |
+|----------|-----------------------------|
 | r        | Power (xⁿ)                  |
 | t        | Root (ⁿ√x)                  |
 | f        | Power of 10 (10ⁿ)           |
@@ -165,7 +166,7 @@ QCalc is more than just a simple calculator - it's evolving into a modern produc
 ### Memory Operations
 
 | Shortcut          | Function             |
-| ----------------- | -------------------- |
+|-------------------|----------------------|
 | C-Delete          | Memory clear (MC)    |
 | C-Backspace       | Memory recall (MR)   |
 | C-Enter, C-=      | Memory store (MS)    |
@@ -177,7 +178,7 @@ QCalc is more than just a simple calculator - it's evolving into a modern produc
 ### Unit/Currency Conversion Mode (Shift Mode)
 
 | Shortcut | Function                     |
-| -------- | ---------------------------- |
+|----------|------------------------------|
 | f,g,h    | ×2/×3/×5 or +5/+10/+100      |
 | q,w,e    | ÷2/÷3/÷5 or -5/-10/-100      |
 | a,s,d    | ×10/×100/×1000               |
@@ -188,7 +189,7 @@ QCalc is more than just a simple calculator - it's evolving into a modern produc
 ### Radix Converter Mode
 
 | Shortcut | Function                         |
-| -------- | -------------------------------- |
+|----------|--------------------------------|
 | r,t      | 1-bit shift (x<<1, x>>1)         |
 | u,i      | Left/right shift (x<<y, x>>y)    |
 | f,g      | 4-bit shift (x<<4, x>>4)         |
@@ -204,7 +205,7 @@ QCalc is more than just a simple calculator - it's evolving into a modern produc
 ### Screen Navigation and UI Control
 
 | Shortcut  | Function               |
-| --------- | ---------------------- |
+|-----------|------------------------|
 | F1        | Help                   |
 | F2        | About                  |
 | F3        | Settings               |
@@ -218,7 +219,7 @@ QCalc is more than just a simple calculator - it's evolving into a modern produc
 ### UI Settings
 
 | Shortcut | Function                     |
-| -------- | ---------------------------- |
+|----------|------------------------------|
 | A-t      | Toggle always on top         |
 | A-i      | Toggle init panel on startup |
 | A-d      | Toggle dark mode             |
@@ -231,7 +232,7 @@ QCalc is more than just a simple calculator - it's evolving into a modern produc
 ### Clipboard Operations
 
 | Shortcut        | Function               |
-| --------------- | ---------------------- |
+|-----------------|------------------------|
 | C-c, C-Insert   | Copy main panel result |
 | SC-c, AC-Insert | Copy sub panel result  |
 | C-v, S-Insert   | Paste to main panel    |
@@ -240,7 +241,7 @@ QCalc is more than just a simple calculator - it's evolving into a modern produc
 ### History Navigation
 
 | Shortcut        | Function             |
-| --------------- | -------------------- |
+|-----------------|----------------------|
 | ↑/↓             | Scroll 50px up/down  |
 | PageUp/PageDown | Scroll 400px up/down |
 | Home/End        | Scroll to top/bottom |
