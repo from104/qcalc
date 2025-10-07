@@ -117,35 +117,34 @@
 
   // 계산 결과 창 스크롤 이벤트 핸들러
   const handleScroll = (evt: Event) => {
-    showScrollToTop.value = (evt.target as HTMLDivElement).scrollTop > 50;
-  };
-
-  // 계산 결과 창 스크롤 위치를 최상단으로 이동
-  const scrollToTop = () => {
-    document.getElementById('record')?.scrollTo({
-      top: 0,
-      behavior: 'smooth',
-    });
+    const scrollTop = (evt.target as HTMLDivElement).scrollTop;
+    showScrollToTop.value = scrollTop > 50;
   };
 
   // 히스토리 스크롤 함수
   const scrollToRecord = (offset: number | 'top' | 'bottom') => {
-    const recordElement = document.getElementById('record');
-    console.log(recordElement);
-    if (!recordElement) return;
+    const recordElement = document.getElementById('record-card');
+
+    if (!recordElement) {
+      // record 요소가 없을 때 경고를 출력합니다.
+      // 콘솔 로그 대신 예외를 던지지 않고 조용히 반환합니다.
+      return;
+    }
 
     const currentScroll = recordElement.scrollTop;
+    const scrollHeight = recordElement.scrollHeight;
+    const clientHeight = recordElement.clientHeight;
+    const maxScroll = scrollHeight - clientHeight;
+
     let targetScroll: number;
 
     if (offset === 'top') {
       targetScroll = 0;
     } else if (offset === 'bottom') {
-      targetScroll = recordElement.scrollHeight - recordElement.clientHeight;
+      targetScroll = maxScroll;
     } else {
-      targetScroll = Math.max(
-        0,
-        Math.min(currentScroll + offset, recordElement.scrollHeight - recordElement.clientHeight),
-      );
+      const calculatedScroll = currentScroll + offset;
+      targetScroll = Math.max(0, Math.min(calculatedScroll, maxScroll));
     }
 
     recordElement.scrollTo({
@@ -197,7 +196,7 @@
   onMounted(() => {
     subscribe();
     setTimeout(() => {
-      document.getElementById('record')?.scrollTo({ top: uiStore.recordLastScrollPosition });
+      document.getElementById('record-card')?.scrollTo({ top: uiStore.recordLastScrollPosition });
       if (uiStore.isSearchOpen) {
         uiStore.setInputFocused();
       }
@@ -208,7 +207,7 @@
   // 컴포넌트 언마운트 시 키 바인딩 비활성화
   onBeforeUnmount(() => {
     unsubscribe();
-    uiStore.recordLastScrollPosition = document.getElementById('record')?.scrollTop ?? 0;
+    uiStore.recordLastScrollPosition = document.getElementById('record-card')?.scrollTop ?? 0;
 
     uiStore.isDeleteRecordConfirmOpen = false;
   });
@@ -420,7 +419,7 @@
 
 <template>
   <q-card-section
-    id="record"
+    id="record-card"
     square
     class="full-width row justify-center items-start relative-position scrollbar-custom"
     :style="{
@@ -440,7 +439,7 @@
         :class="uiStore.isSearchOpen ? 'q-ma-xl' : 'q-ma-md'"
         style="z-index: 15"
         :aria-label="t('ariaLabel.scrollToTop')"
-        @click="scrollToTop"
+        @click="scrollToRecord('top')"
       />
     </transition>
 
@@ -755,7 +754,7 @@
 </template>
 
 <style scoped lang="scss">
-  #record {
+  #record-card {
     max-height: calc(100vh - v-bind('calculatedHeaderHeight'));
     overflow: auto;
     transition: padding-top 0.3s cubic-bezier(0.4, 0, 0.2, 1);
