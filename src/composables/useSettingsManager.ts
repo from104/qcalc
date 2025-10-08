@@ -27,7 +27,7 @@ type StoreKeys = keyof typeof stores;
 
 export function useSettingsManager() {
   const gatherSettings = (): Record<StoreKeys, unknown> => {
-    const settingsToExport: { [K in StoreKeys]?: (state: any) => any } = {
+    const settingsToExport: { [K in StoreKeys]?: (state: Record<string, unknown>) => Record<string, unknown> } = {
       settings: (state) => ({ ...state }),
       themes: (state) => ({ ...state }),
       calc: (state) => ({ isMemoryVisible: state.isMemoryVisible, isShiftLocked: state.isShiftLocked }),
