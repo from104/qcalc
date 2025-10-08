@@ -72,19 +72,46 @@
   };
 
   // 설정 내보내기 핸들러
-  const handleExportSettings = () => {
+  const handleExportSettings = async () => {
     try {
       const settings = gatherSettings();
       const blob = new Blob([JSON.stringify(settings, null, 2)], { type: 'application/json' });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = 'qcalc-settings.json';
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      URL.revokeObjectURL(url);
-      $q.notify({ type: 'positive', message: t('exportSettings.success') });
+
+      if (window.showSaveFilePicker) {
+        try {
+          const handle = await window.showSaveFilePicker({
+            suggestedName: 'qcalc-settings.json',
+            types: [
+              {
+                description: 'JSON Files',
+                accept: { 'application/json': ['.json'] },
+              },
+            ],
+          });
+          const writable = await handle.createWritable();
+          await writable.write(blob);
+          await writable.close();
+          $q.notify({ type: 'positive', message: t('exportSettings.success') });
+        } catch (error: any) {
+          if (error.name === 'AbortError') {
+            $q.notify({ type: 'info', message: t('exportSettings.cancelled') });
+          } else {
+            console.error(error);
+            $q.notify({ type: 'negative', message: t('exportSettings.fail') });
+          }
+        }
+      } else {
+        // Fallback for older browsers
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'qcalc-settings.json';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+        $q.notify({ type: 'positive', message: t('exportSettings.success') });
+      }
     } catch (error) {
       console.error(error);
       $q.notify({ type: 'negative', message: t('exportSettings.fail') });
@@ -832,6 +859,7 @@ ko:
   exportSettings:
     success: '설정을 성공적으로 내보냈습니다.'
     fail: '설정 내보내기에 실패했습니다.'
+    cancelled: '설정 내보내기를 취소했습니다.'
   importSettings:
     confirmTitle: '설정 불러오기 확인'
     confirmMessage: '현재 설정을 덮어쓰고 선택한 파일의 설정으로 교체하시겠습니까?'
@@ -902,6 +930,7 @@ en:
   exportSettings:
     success: 'Settings have been successfully exported.'
     fail: 'Failed to export settings.'
+    cancelled: 'Settings export cancelled.'
   importSettings:
     confirmTitle: 'Confirm Import'
     confirmMessage: 'Are you sure you want to overwrite current settings with the ones from the selected file?'
