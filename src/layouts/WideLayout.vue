@@ -1,8 +1,12 @@
 <script setup lang="ts">
-  import type { PropType } from 'vue';
   import { computed } from 'vue';
   import { useI18n } from 'vue-i18n';
-  import type { Tab, SubPageConfig, SubPageButton } from '../types/layout';
+  import { useRouter, useRoute } from 'vue-router';
+  import { useUIStore } from 'stores/uiStore';
+  import { useThemesStore } from 'stores/themesStore';
+  import { useMainLayout } from '../composables/useMainLayout';
+  import { useRecordManager } from '../composables/useRecordManager';
+  import { navigateToPath } from '../utils/NavigationUtils';
   import ToolTip from 'components/snippets/ToolTip.vue';
   import MenuPanel from 'components/MenuPanel.vue';
   import HelpIcon from 'components/snippets/HelpIcon.vue';
@@ -12,53 +16,20 @@
       type: Boolean,
       default: false,
     },
-    currentTab: {
-      type: String,
-      default: '',
-    },
-    tabs: {
-      type: Array as PropType<Tab[]>,
-      default: () => [],
-    },
-    subPageConfig: {
-      type: Object as PropType<SubPageConfig>,
-      default: () => ({}),
-    },
-    currentSubPage: {
-      type: String,
-      default: '',
-    },
-    subPageButtons: {
-      type: Array as PropType<SubPageButton[]>,
-      default: () => [],
-    },
-    themesStore: {
-      type: Object,
-      default: () => ({}),
-    },
-    uiStore: {
-      type: Object,
-      default: () => ({}),
-    },
-    g: {
-      type: Object,
-      default: () => ({}),
-    },
-    route: {
-      type: Object,
-      default: () => ({}),
-    },
   });
 
-  const emit = defineEmits([
-    'update:leftDrawerOpen',
-    'update:currentTab',
-    'toggleLeftDrawer',
-    'navigateToPath',
-    'switchSubPage',
-  ]);
+  const emit = defineEmits(['update:leftDrawerOpen', 'toggleLeftDrawer']);
 
   const { t } = useI18n();
+  const router = useRouter();
+  const route = useRoute();
+  const uiStore = useUIStore();
+  const themesStore = useThemesStore();
+  const $g = window.globalVars;
+
+  const recordManager = useRecordManager();
+  const { tabs, SUB_PAGE_CONFIG, SUB_PAGE_BUTTONS } = useMainLayout(t, recordManager);
+  const { recordFileInput, handleRecordFileChange } = recordManager;
 
   const localLeftDrawerOpen = computed({
     get: () => props.leftDrawerOpen,
@@ -66,9 +37,29 @@
   });
 
   const localCurrentTab = computed({
-    get: () => props.currentTab,
-    set: (value) => emit('update:currentTab', value),
+    get: () => uiStore.currentTab,
+    set: (value) => uiStore.setCurrentTab(value),
   });
+
+  // 서브 페이지 관련
+  const currentSubPage = computed(() => {
+    const validPages = ['help', 'about', 'settings'];
+    return validPages.includes(route.name as string) ? (route.name as string) : 'record';
+  });
+
+  const switchSubPage = async (pageName: string) => {
+    if (currentSubPage.value === pageName) return;
+
+    if (pageName !== 'record') {
+      router.push({ name: pageName });
+    } else {
+      router.back();
+    }
+  };
+
+  const onNavigateToPath = (path: string) => {
+    navigateToPath(path, route, router);
+  };
 </script>
 
 <template>
@@ -79,7 +70,7 @@
       elevated
       :width="250"
       :dark="themesStore.isDarkMode()"
-      :swipe-only="g.isMobile"
+      :swipe-only="$g.isMobile"
       behavior="mobile"
       @click="emit('update:leftDrawerOpen', false)"
     >
@@ -90,7 +81,7 @@
 
     <q-header id="header" class="z-top noselect row" elevated>
       <!-- 넓은 화면 계산기 영역 헤더 -->
-      <q-toolbar v-auto-blur class="col-6 calc-header" :class="{ 'q-pt-md': g.isAndroid && g.apiLevel >= 35 }">
+      <q-toolbar v-auto-blur class="col-6 calc-header" :class="{ 'q-pt-md': $g.isAndroid && $g.apiLevel >= 35 }">
         <q-btn flat dense round class="q-mr-sm" icon="menu" aria-label="Menu" @click="emit('toggleLeftDrawer')">
           <ToolTip
             :text-color="themesStore.getDarkColor()"
@@ -113,12 +104,14 @@
           <q-tab
             v-for="tab in tabs"
             :key="tab.name"
-            :label="typeof tab.title === 'string' ? tab.title : tab.title.value"
+            :label="typeof tab.title === 'string' ? tab.title : (tab.title as any).value"
             :name="tab.name"
             class="q-px-xs"
             dense
             role="tab"
-            :aria-label="t('ariaLabel.tab', { name: tab.title })"
+            :aria-label="
+              t('ariaLabel.tab', { name: typeof tab.title === 'string' ? tab.title : (tab.title as any).value })
+            "
             :aria-selected="localCurrentTab === tab.name"
             :aria-controls="`panel-${tab.name}`"
           />
@@ -126,17 +119,28 @@
       </q-toolbar>
 
       <!-- 넓은 화면 서브 헤더 -->
-      <q-toolbar v-auto-blur class="col-6 sub-header" :class="{ 'q-pt-md': g.isAndroid && g.apiLevel >= 35 }">
+      <q-toolbar v-auto-blur class="col-6 sub-header" :class="{ 'q-pt-md': $g.isAndroid && $g.apiLevel >= 35 }">
         <transition name="animate-sub-page">
           <div :key="currentSubPage" :data-page="currentSubPage" class="header-content full-width row items-center">
             <q-toolbar-title
               class="text-subtitle1 col-3"
               role="heading"
-              :aria-label="t('ariaLabel.subPageTitle', { title: subPageConfig[currentSubPage]?.title })"
+              :aria-label="
+                t('ariaLabel.subPageTitle', {
+                  title:
+                    typeof SUB_PAGE_CONFIG[currentSubPage]?.title === 'string'
+                      ? SUB_PAGE_CONFIG[currentSubPage]?.title
+                      : (SUB_PAGE_CONFIG[currentSubPage]?.title as any)?.value,
+                })
+              "
             >
-              {{ subPageConfig[currentSubPage]?.title }}
+              {{
+                typeof SUB_PAGE_CONFIG[currentSubPage]?.title === 'string'
+                  ? SUB_PAGE_CONFIG[currentSubPage]?.title
+                  : (SUB_PAGE_CONFIG[currentSubPage]?.title as any)?.value
+              }}
               <HelpIcon
-                v-if="(currentSubPage === 'record' || currentSubPage === '') && g.isMobile"
+                v-if="(currentSubPage === 'record' || currentSubPage === '') && $g.isMobile"
                 :text-color="themesStore.getDarkColor()"
                 :bg-color="themesStore.getCurrentThemeColors.ui.warning"
                 :text="t('tooltip.recordSwipeHelp')"
@@ -144,7 +148,7 @@
             </q-toolbar-title>
             <div class="col-9 row justify-end sub-header-buttons">
               <q-btn
-                v-for="button in subPageButtons.filter((btn) => btn.path !== route.path)"
+                v-for="button in SUB_PAGE_BUTTONS.filter((btn) => btn.path !== route.path)"
                 :key="button.label"
                 dense
                 flat
@@ -152,17 +156,17 @@
                 :icon="button.icon"
                 role="button"
                 :aria-label="t('ariaLabel.subPageButton', { label: t(`message.${button.label}`) })"
-                @click="emit('navigateToPath', button.path)"
+                @click="onNavigateToPath(button.path)"
               >
                 <ToolTip
                   :text-color="themesStore.getDarkColor()"
                   :bg-color="themesStore.getCurrentThemeColors.ui.warning"
-                  :text="typeof button.tooltip === 'string' ? button.tooltip : button.tooltip.value"
+                  :text="(button.tooltip as any).value"
                 />
               </q-btn>
               <q-separator vertical class="sub-header-separator q-mx-sm" />
               <q-btn
-                v-for="button in subPageConfig[currentSubPage]?.buttons"
+                v-for="button in SUB_PAGE_CONFIG[currentSubPage]?.buttons"
                 :key="button.icon"
                 class="q-pl-none"
                 dense
@@ -171,17 +175,17 @@
                 :icon="button.icon"
                 role="button"
                 :aria-label="t(`ariaLabel.${button.icon}`)"
-                :disable="typeof button.disabled === 'boolean' ? button.disabled : button.disabled.value"
+                :disable="(button.disabled as any).value"
                 @click="button.action"
               >
                 <ToolTip
                   :text-color="themesStore.getDarkColor()"
                   :bg-color="themesStore.getCurrentThemeColors.ui.warning"
-                  :text="typeof button.tooltip === 'string' ? button.tooltip : button.tooltip.value"
+                  :text="(button.tooltip as any).value"
                 />
               </q-btn>
               <q-btn
-                v-if="subPageConfig[currentSubPage]?.showClose"
+                v-if="SUB_PAGE_CONFIG[currentSubPage]?.showClose"
                 class="q-mx-none q-px-none"
                 flat
                 dense
@@ -189,7 +193,7 @@
                 icon="close"
                 role="button"
                 :aria-label="t('ariaLabel.closeSubPage')"
-                @click="emit('switchSubPage', 'record')"
+                @click="switchSubPage('record')"
               />
             </div>
           </div>
@@ -204,7 +208,7 @@
           v-model="localCurrentTab"
           animated
           infinite
-          :swipeable="g.isMobile"
+          :swipeable="$g.isMobile"
           role="tabpanel"
           :aria-label="t('ariaLabel.calculatorContent')"
         >
@@ -214,7 +218,9 @@
             :key="index"
             :name="tab.name"
             role="tabpanel"
-            :aria-label="t('ariaLabel.tabPanel', { name: tab.title })"
+            :aria-label="
+              t('ariaLabel.tabPanel', { name: typeof tab.title === 'string' ? tab.title : (tab.title as any).value })
+            "
             :aria-labelledby="`tab-${tab.name}`"
           >
             <component :is="tab.component" />
@@ -232,7 +238,7 @@
         >
           <transition name="animate-sub-page">
             <component
-              :is="subPageConfig[currentSubPage]?.component"
+              :is="SUB_PAGE_CONFIG[currentSubPage]?.component"
               :key="currentSubPage"
               :data-page="currentSubPage"
               class="sub-page"
@@ -241,6 +247,7 @@
         </q-scroll-area>
       </div>
     </q-page-container>
+    <input ref="recordFileInput" type="file" style="display: none" accept=".csv" @change="handleRecordFileChange" />
   </q-layout>
 </template>
 

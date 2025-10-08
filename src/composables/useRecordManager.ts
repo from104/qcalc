@@ -3,7 +3,9 @@
  * @description 계산 기록 관리를 위한 컴포저블
  */
 
+import { ref, computed } from 'vue';
 import { useCalcStore } from 'stores/calcStore';
+import { useUIStore } from 'stores/uiStore';
 import { useQuasar } from 'quasar';
 import { useI18n } from 'vue-i18n';
 import Papa from 'papaparse';
@@ -12,6 +14,40 @@ export function useRecordManager() {
   const $q = useQuasar();
   const { t } = useI18n();
   const calcStore = useCalcStore();
+  const uiStore = useUIStore();
+
+  /**
+   * 파일 입력 요소에 대한 참조
+   */
+  const recordFileInput = ref<HTMLInputElement | null>(null);
+
+  /**
+   * 레코드 버튼 비활성화 여부
+   */
+  const isRecordDisabled = computed(() => {
+    return calcStore.calc.record.getAllRecords().length === 0 || uiStore.isDeleteRecordConfirmOpen;
+  });
+
+  /**
+   * 레코드 파일 임포트 다이얼로그 열기
+   */
+  const handleRecordImportClick = () => {
+    recordFileInput.value?.click();
+  };
+
+  /**
+   * 레코드 파일 선택 핸들러
+   */
+  const handleRecordFileChange = (event: Event) => {
+    const target = event.target as HTMLInputElement;
+    const file = target.files?.[0];
+    if (!file) return;
+
+    importRecordsFromCSV(file);
+
+    // 파일 입력 초기화 (같은 파일을 다시 선택할 수 있도록)
+    target.value = '';
+  };
 
   const clearRecords = () => {
     $q.dialog({
@@ -142,6 +178,10 @@ export function useRecordManager() {
   };
 
   return {
+    recordFileInput,
+    isRecordDisabled,
+    handleRecordImportClick,
+    handleRecordFileChange,
     clearRecords,
     exportRecordsToCSV,
     importRecordsFromCSV,

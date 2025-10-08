@@ -1,87 +1,32 @@
 <script setup lang="ts">
   import { useMainLayout } from '../composables/useMainLayout';
+  import { useUIStore } from 'stores/uiStore';
+  import { isWideWidth } from '../utils/GlobalHelpers';
   import NarrowLayout from './NarrowLayout.vue';
   import WideLayout from './WideLayout.vue';
   import ShowTips from 'components/ShowTips.vue';
   import { useI18n } from 'vue-i18n';
+  import { computed } from 'vue';
 
   // Layout.yml의 메시지들을 가져와서 useMainLayout에 전달
   const { t } = useI18n();
 
-  const {
-    router,
-    route,
-    uiStore,
-    themesStore,
-    recordFileInput,
-    handleRecordFileChange,
-    $g,
-    tabs,
-    SUB_PAGE_CONFIG,
-    currentSubPage,
-    isWideLayout,
-    leftDrawerOpen,
-    switchSubPage,
-    isSubPage,
-    toggleLeftDrawer,
-    navigateToPath,
-    SUB_PAGE_BUTTONS,
-  } = useMainLayout(t);
+  const uiStore = useUIStore();
 
-  const onNavigateToPath = (path: string) => {
-    navigateToPath(path, route, router);
-  };
+  const { leftDrawerOpen, toggleLeftDrawer } = useMainLayout(t);
 
-  const onPushRoute = (path: string) => {
-    router.push(path);
-  };
-
-  const onBackRoute = () => {
-    router.back();
-  };
+  const isWideLayout = computed(() => isWideWidth());
 </script>
 
 <template>
   <div class="main-layout">
     <NarrowLayout
       v-if="!isWideLayout"
-      :left-drawer-open="leftDrawerOpen"
-      :is-sub-page="isSubPage"
-      :current-tab="uiStore.currentTab"
-      :tabs="tabs"
-      :sub-page-config="SUB_PAGE_CONFIG"
-      :current-sub-page="currentSubPage"
-      :themes-store="themesStore"
-      :ui-store="uiStore"
-      :g="$g"
-      @update:left-drawer-open="leftDrawerOpen = $event"
-      @update:current-tab="uiStore.setCurrentTab($event)"
+      v-model:left-drawer-open="leftDrawerOpen"
       @toggle-left-drawer="toggleLeftDrawer"
-      @navigate-to-path="onNavigateToPath"
-      @push-route="onPushRoute"
-      @back-route="onBackRoute"
     />
-    <WideLayout
-      v-else
-      :left-drawer-open="leftDrawerOpen"
-      :current-tab="uiStore.currentTab"
-      :tabs="tabs"
-      :sub-page-config="SUB_PAGE_CONFIG"
-      :current-sub-page="currentSubPage"
-      :sub-page-buttons="SUB_PAGE_BUTTONS"
-      :themes-store="themesStore"
-      :ui-store="uiStore"
-      :g="$g"
-      :route="route"
-      @update:left-drawer-open="leftDrawerOpen = $event"
-      @update:current-tab="uiStore.setCurrentTab($event)"
-      @toggle-left-drawer="toggleLeftDrawer"
-      @navigate-to-path="onNavigateToPath"
-      @switch-sub-page="switchSubPage"
-    />
-
+    <WideLayout v-else v-model:left-drawer-open="leftDrawerOpen" @toggle-left-drawer="toggleLeftDrawer" />
     <ShowTips v-model="uiStore.showTipsDialog" />
-    <input ref="recordFileInput" type="file" style="display: none" accept=".csv" @change="handleRecordFileChange" />
   </div>
 </template>
 

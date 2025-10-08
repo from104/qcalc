@@ -58,3 +58,6 @@ yarn-error.log*
 # repomix
 repomix-output.txt
 mainToHead.txt
+
+# Settings files
+qcalc-settings*.json
