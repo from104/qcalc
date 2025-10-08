@@ -42,8 +42,10 @@ export function useRecordManager() {
             },
           ],
         });
-        const file = await fileHandle.getFile();
-        importRecordsFromCSV(file);
+        if (fileHandle) {
+          const file = await fileHandle.getFile();
+          importRecordsFromCSV(file);
+        }
       } catch (error: unknown) {
         if (error instanceof Error && error.name === 'AbortError') {
           $q.notify({ type: 'info', message: t('importRecords.cancelled') });

@@ -130,8 +130,10 @@
             },
           ],
         });
-        const file = await fileHandle.getFile();
-        processSettingsFile(file);
+        if (fileHandle) {
+          const file = await fileHandle.getFile();
+          processSettingsFile(file);
+        }
       } catch (error: unknown) {
         if (error instanceof Error && error.name === 'AbortError') {
           $q.notify({ type: 'info', message: t('importSettings.cancelled') });
