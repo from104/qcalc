@@ -157,12 +157,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@capacitor/screen-orientation@npm:7.0.1":
-  version: 7.0.1
-  resolution: "@capacitor/screen-orientation@npm:7.0.1"
+"@capacitor/screen-orientation@npm:7.0.2":
+  version: 7.0.2
+  resolution: "@capacitor/screen-orientation@npm:7.0.2"
   peerDependencies:
     "@capacitor/core": ">=7.0.0"
-  checksum: 10/849f595bc21adad272074637309100d7558ea15487a4f221dc384d3ad7e881794b493ef3f6956184229a9a008eac5d59151150bd249d4c7b1ce3ab1c83327281
+  checksum: 10/b68795944d50783c6ef533ee165783f7f34111a25754d01ab5c7bd5ce77098f6571bf2edb1fed321f324cbb2ff99ba4717b9ec95fe8d7d8e5eb8fd3dc1c6a028
   languageName: node
   linkType: hard
 
@@ -8931,7 +8931,7 @@ __metadata:
     "@capacitor/cli": "npm:7.4.3"
     "@capacitor/core": "npm:7.3.0"
     "@capacitor/haptics": "npm:7.0.1"
-    "@capacitor/screen-orientation": "npm:7.0.1"
+    "@capacitor/screen-orientation": "npm:7.0.2"
     "@capacitor/status-bar": "npm:7.0.3"
     "@eslint/js": "npm:9.21.0"
     "@everapi/freecurrencyapi-js": "npm:^1.0.1"

@@ -17,7 +17,13 @@
     "url": "https://github.com/from104/qcalc/issues"
   },
   "homepage": "https://github.com/from104/qcalc#readme",
-  "keywords": ["calculator", "quasar", "vue", "electron", "typescript"],
+  "keywords": [
+    "calculator",
+    "quasar",
+    "vue",
+    "electron",
+    "typescript"
+  ],
   "type": "module",
   "scripts": {
     "postinstall": "quasar prepare",
@@ -40,7 +46,7 @@
     "@capacitor/cli": "7.4.3",
     "@capacitor/core": "7.3.0",
     "@capacitor/haptics": "7.0.1",
-    "@capacitor/screen-orientation": "7.0.1",
+    "@capacitor/screen-orientation": "7.0.2",
     "@capacitor/status-bar": "7.0.3",
     "@everapi/freecurrencyapi-js": "^1.0.1",
     "@intlify/unplugin-vue-i18n": "^6.0.8",
