@@ -18,6 +18,7 @@ ko:
     success: '계산 기록을 성공적으로 내보냈습니다.'
     fail: '계산 기록 내보내기에 실패했습니다.'
     noData: '내보낼 계산 기록이 없습니다.'
+    cancelled: '계산 기록 내보내기를 취소했습니다.'
   importRecords:
     confirmTitle: '계산 기록 불러오기 확인'
     confirmMessage: '현재 계산 기록을 덮어쓰고 선택한 파일의 기록으로 교체하시겠습니까?'
@@ -71,6 +72,7 @@ en:
     success: 'Calculation records have been successfully exported.'
     fail: 'Failed to export calculation records.'
     noData: 'There are no calculation records to export.'
+    cancelled: 'Records export cancelled.'
   importRecords:
     confirmTitle: 'Confirm Import Records'
     confirmMessage: 'Are you sure you want to overwrite current calculation records with the ones from the selected file?'
