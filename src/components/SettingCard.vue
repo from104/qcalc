@@ -119,16 +119,34 @@
   };
 
   // 설정 불러오기 버튼 클릭 핸들러
-  const handleImportClick = () => {
-    fileInput.value?.click();
+  const handleImportClick = async () => {
+    if (window.showOpenFilePicker) {
+      try {
+        const [fileHandle] = await window.showOpenFilePicker({
+          types: [
+            {
+              description: 'JSON Files',
+              accept: { 'application/json': ['.json'] },
+            },
+          ],
+        });
+        const file = await fileHandle.getFile();
+        processSettingsFile(file);
+      } catch (error: unknown) {
+        if (error instanceof Error && error.name === 'AbortError') {
+          $q.notify({ type: 'info', message: t('importSettings.cancelled') });
+        } else {
+          console.error(error);
+          $q.notify({ type: 'negative', message: t('importSettings.fail') });
+        }
+      }
+    } else {
+      fileInput.value?.click();
+    }
   };
 
-  // 파일 변경 핸들러 (설정 불러오기)
-  const handleFileChange = (event: Event) => {
-    const target = event.target as HTMLInputElement;
-    const file = target.files?.[0];
-    if (!file) return;
-
+  // 파일 처리 핸들러
+  const processSettingsFile = (file: File) => {
     $q.dialog({
       title: t('importSettings.confirmTitle'),
       message: t('importSettings.confirmMessage'),
@@ -160,6 +178,15 @@
       };
       reader.readAsText(file);
     });
+  };
+
+  // 파일 변경 핸들러 (설정 불러오기)
+  const handleFileChange = (event: Event) => {
+    const target = event.target as HTMLInputElement;
+    const file = target.files?.[0];
+    if (!file) return;
+
+    processSettingsFile(file);
 
     // 다음에 같은 파일을 선택해도 change 이벤트가 발생하도록 값 초기화
     target.value = '';
@@ -865,6 +892,7 @@ ko:
     confirmMessage: '현재 설정을 덮어쓰고 선택한 파일의 설정으로 교체하시겠습니까?'
     success: '설정을 성공적으로 불러왔습니다.'
     fail: '설정 불러오기에 실패했습니다. 파일이 손상되었거나 형식이 올바르지 않습니다.'
+    cancelled: '설정 불러오기를 취소했습니다.'
   confirmDeleteTitle: '테마 삭제 확인'
   confirmDeleteMessage: '정말로 \''{themeName}\'' 테마를 삭제하시겠습니까?'
 en:
@@ -936,6 +964,7 @@ en:
     confirmMessage: 'Are you sure you want to overwrite current settings with the ones from the selected file?'
     success: 'Settings have been successfully imported.'
     fail: 'Failed to import settings. The file may be corrupt or in the wrong format.'
+    cancelled: 'Settings import cancelled.'
   confirmDeleteTitle: 'Confirm Theme Deletion'
   confirmDeleteMessage: 'Are you sure you want to delete the theme \''{themeName}\''?'
 </i18n>

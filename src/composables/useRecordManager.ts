@@ -31,8 +31,30 @@ export function useRecordManager() {
   /**
    * 레코드 파일 임포트 다이얼로그 열기
    */
-  const handleRecordImportClick = () => {
-    recordFileInput.value?.click();
+  const handleRecordImportClick = async () => {
+    if (window.showOpenFilePicker) {
+      try {
+        const [fileHandle] = await window.showOpenFilePicker({
+          types: [
+            {
+              description: 'CSV Files',
+              accept: { 'text/csv': ['.csv'] },
+            },
+          ],
+        });
+        const file = await fileHandle.getFile();
+        importRecordsFromCSV(file);
+      } catch (error: unknown) {
+        if (error instanceof Error && error.name === 'AbortError') {
+          $q.notify({ type: 'info', message: t('importRecords.cancelled') });
+        } else {
+          console.error(error);
+          $q.notify({ type: 'negative', message: t('importRecords.fail') });
+        }
+      }
+    } else {
+      recordFileInput.value?.click();
+    }
   };
 
   /**

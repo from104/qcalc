@@ -24,6 +24,7 @@ ko:
     confirmMessage: '현재 계산 기록을 덮어쓰고 선택한 파일의 기록으로 교체하시겠습니까?'
     success: '계산 기록을 성공적으로 불러왔습니다.'
     fail: '계산 기록 불러오기에 실패했습니다. 파일이 손상되었거나 형식이 올바르지 않습니다.'
+    cancelled: '계산 기록 불러오기를 취소했습니다.'
   ariaLabel:
     delete_outline: '모든 기록 삭제'
     back: '이전 화면로 돌아가기'
@@ -78,6 +79,7 @@ en:
     confirmMessage: 'Are you sure you want to overwrite current calculation records with the ones from the selected file?'
     success: 'Calculation records have been successfully imported.'
     fail: 'Failed to import calculation records. The file may be corrupt or in the wrong format.'
+    cancelled: 'Records import cancelled.'
   ariaLabel:
     delete_outline: 'Delete all records'
     back: 'Go back to previous screen'
