@@ -10,11 +10,14 @@ import { useQuasar } from 'quasar';
 import { useI18n } from 'vue-i18n';
 import Papa from 'papaparse';
 
+import { Filesystem, Directory, Encoding } from '@capacitor/filesystem';
+
 export function useRecordManager() {
   const $q = useQuasar();
   const { t } = useI18n();
   const calcStore = useCalcStore();
   const uiStore = useUIStore();
+  const $g = window.globalVars;
 
   /**
    * 파일 입력 요소에 대한 참조
@@ -113,41 +116,59 @@ export function useRecordManager() {
       }));
 
       const csv = Papa.unparse(dataToExport);
-      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
 
-      if (window.showSaveFilePicker) {
+      if ($g.isCapacitor) {
         try {
-          const handle = await window.showSaveFilePicker({
-            suggestedName: 'qcalc-records.csv',
-            types: [
-              {
-                description: 'CSV Files',
-                accept: { 'text/csv': ['.csv'] },
-              },
-            ],
+          const result = await Filesystem.writeFile({
+            path: `qcalc-records-${Date.now()}.csv`,
+            data: csv,
+            directory: Directory.Documents,
+            encoding: Encoding.UTF8,
           });
-          const writable = await handle.createWritable();
-          await writable.write(blob);
-          await writable.close();
-          $q.notify({ type: 'positive', message: t('exportRecords.success') });
-        } catch (error: unknown) {
-          if (error instanceof Error && error.name === 'AbortError') {
-            $q.notify({ type: 'info', message: t('exportRecords.cancelled') });
-          } else {
-            console.error(error);
-            $q.notify({ type: 'negative', message: t('exportRecords.fail') });
-          }
+          $q.notify({
+            type: 'positive',
+            message: `${t('exportRecords.success')} ${t('message.fileSavedTo', { path: result.uri })}`,
+          });
+        } catch (error) {
+          console.error(error);
+          $q.notify({ type: 'negative', message: t('exportRecords.fail') });
         }
       } else {
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = 'qcalc-records.csv';
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        URL.revokeObjectURL(url);
-        $q.notify({ type: 'positive', message: t('exportRecords.success') });
+        const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+        if (window.showSaveFilePicker) {
+          try {
+            const handle = await window.showSaveFilePicker({
+              suggestedName: 'qcalc-records.csv',
+              types: [
+                {
+                  description: 'CSV Files',
+                  accept: { 'text/csv': ['.csv'] },
+                },
+              ],
+            });
+            const writable = await handle.createWritable();
+            await writable.write(blob);
+            await writable.close();
+            $q.notify({ type: 'positive', message: t('exportRecords.success') });
+          } catch (error: unknown) {
+            if (error instanceof Error && error.name === 'AbortError') {
+              $q.notify({ type: 'info', message: t('exportRecords.cancelled') });
+            } else {
+              console.error(error);
+              $q.notify({ type: 'negative', message: t('exportRecords.fail') });
+            }
+          }
+        } else {
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = 'qcalc-records.csv';
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
+          URL.revokeObjectURL(url);
+          $q.notify({ type: 'positive', message: t('exportRecords.success') });
+        }
       }
     } catch (error) {
       console.error(error);

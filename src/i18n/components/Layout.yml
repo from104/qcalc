@@ -7,6 +7,8 @@ ko:
   about: 정보
   record: 기록
   settings: 설정
+  message:
+    fileSavedTo: '(저장 경로: {path})'
   tooltipTips: '팁을 표시합니다.'
   openRecordPage: '클릭하면 기록 화면를 엽니다.'
   tooltipHelp: '도움말을 표시합니다.'
@@ -62,6 +64,8 @@ en:
   about: About
   record: Record
   settings: Settings
+  message:
+    fileSavedTo: '(Saved to: {path})'
   tooltipTips: 'Show tips.'
   openRecordPage: 'Click to open the record screen.'
   tooltipHelp: 'Show help.'

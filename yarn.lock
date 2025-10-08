@@ -148,6 +148,17 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@capacitor/filesystem@npm:7.1.4":
+  version: 7.1.4
+  resolution: "@capacitor/filesystem@npm:7.1.4"
+  dependencies:
+    "@capacitor/synapse": "npm:^1.0.3"
+  peerDependencies:
+    "@capacitor/core": ">=7.0.0"
+  checksum: 10/59346f1beee7f427cae98e9c3f623fbcd1823ffe44fea614aeb67f49c578a3aa9d9d12d0ed5a6735bcc460d808a7232f7133653e2b5c3188700ba1368859fb25
+  languageName: node
+  linkType: hard
+
 "@capacitor/haptics@npm:7.0.2":
   version: 7.0.2
   resolution: "@capacitor/haptics@npm:7.0.2"
@@ -172,6 +183,13 @@ __metadata:
   peerDependencies:
     "@capacitor/core": ">=7.0.0"
   checksum: 10/ecaea1fc8b1bd3709af4cb7d12d7434a6341731b80d60fcccfe3981cf2ff450edd9f212677447829df619d29528cb231ddb0f146b554f49a15381f2b2a86edd0
+  languageName: node
+  linkType: hard
+
+"@capacitor/synapse@npm:^1.0.3":
+  version: 1.0.4
+  resolution: "@capacitor/synapse@npm:1.0.4"
+  checksum: 10/1e7d4e4abb7ad0890e37544062523eb4ab1ec4478aaccd1d9d4550033ab67c126f50de622cfc202f0bad1c38aaee686505c248196873c81fa4175158214cafaa
   languageName: node
   linkType: hard
 
@@ -9408,6 +9426,7 @@ __metadata:
     "@capacitor/app": "npm:7.0.1"
     "@capacitor/cli": "npm:7.4.3"
     "@capacitor/core": "npm:7.4.3"
+    "@capacitor/filesystem": "npm:7.1.4"
     "@capacitor/haptics": "npm:7.0.2"
     "@capacitor/screen-orientation": "npm:7.0.2"
     "@capacitor/status-bar": "npm:7.0.3"
