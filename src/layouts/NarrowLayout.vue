@@ -191,7 +191,7 @@
           <ToolTip
             :text-color="themesStore.getDarkColor()"
             :bg-color="themesStore.getCurrentThemeColors.ui.warning"
-            :text="(button.tooltip as any).value"
+            :text="button.tooltip as any"
           />
         </q-btn>
       </q-toolbar>

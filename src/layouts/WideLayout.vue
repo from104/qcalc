@@ -161,7 +161,7 @@
                 <ToolTip
                   :text-color="themesStore.getDarkColor()"
                   :bg-color="themesStore.getCurrentThemeColors.ui.warning"
-                  :text="(button.tooltip as any).value"
+                  :text="button.tooltip as any"
                 />
               </q-btn>
               <q-separator vertical class="sub-header-separator q-mx-sm" />
@@ -181,7 +181,7 @@
                 <ToolTip
                   :text-color="themesStore.getDarkColor()"
                   :bg-color="themesStore.getCurrentThemeColors.ui.warning"
-                  :text="(button.tooltip as any).value"
+                  :text="button.tooltip as any"
                 />
               </q-btn>
               <q-btn
