@@ -19,8 +19,8 @@ The format is based on [Keep a Changelog] and this project follows [Semantic Ver
 
 ### Fixed
 
-- **Fixed record scroll bug**: Fixed a bug where the calculation history could not be scrolled with the mouse wheel or keyboard (PageUp/PageDown/Home/End).
-
+- **Calculation History Scroll Bug Fixed**: Fixed a bug where calculation history could not be scrolled using the floating icon or keyboard (Up/Down/PageUp/PageDown/Home/End).
+ 
 ## [0.11.4] 2025-06-10
 
 ### Added

@@ -245,3 +245,6 @@ QCalc is more than just a simple calculator - it's evolving into a modern produc
 | ↑/↓             | Scroll 50px up/down  |
 | PageUp/PageDown | Scroll 400px up/down |
 | Home/End        | Scroll to top/bottom |
+| C-f             | Search history       |
+| C-\[            | Decrease font size   |
+| C-\]            | Increase font size   |

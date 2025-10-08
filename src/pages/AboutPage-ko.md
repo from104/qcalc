@@ -25,4 +25,8 @@ Copyright © 2022 Seo Kihyun. MIT License.
 
 - **MainLayout 리팩토링**: MainLayout.vue를 NarrowLayout.vue와 WideLayout.vue로 분리하고 useMainLayout.ts 컴포저블을 생성하여 공통 로직을 분리.
 
+### 고쳐짐
+
+- **계산 기록 스크롤 버그 수정**: 플로팅 아이콘 또는 키보드(Up/Down/PageUp/PageDown/Home/End)로 계산 기록을 스크롤할 수 없었던 버그를 수정했습니다.
+
 이전 버전의 정보는 [이곳](https://github.com/from104/qcalc/blob/main/CHANGELOG-ko.md)에서 확인하세요.

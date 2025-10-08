@@ -253,6 +253,9 @@ The calculator alone appears when the window width is reduced.
 | ↑/↓             | Scroll 50px up/down  |
 | PageUp/PageDown | Scroll 400px up/down |
 | Home/End        | Scroll to top/bottom |
+| C-f             | Search history         |
+| C-\[            | Decrease font size     |
+| C-\]            | Increase font size     |
 
 ## Installation Guide
 

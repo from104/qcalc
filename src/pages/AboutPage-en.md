@@ -25,4 +25,8 @@ The format is based on [Keep a Changelog] and this project follows [Semantic Ver
 
 - **MainLayout Refactoring**: Refactored MainLayout.vue into NarrowLayout.vue and WideLayout.vue, and created useMainLayout.ts composable to separate common logic.
 
+### Fixed
+
+- **Calculation History Scroll Bug Fixed**: Fixed a bug where calculation history could not be scrolled using the floating icon or keyboard (Up/Down/PageUp/PageDown/Home/End).
+
 For information about previous versions, please check [here](https://github.com/from104/qcalc/blob/main/CHANGELOG.md).

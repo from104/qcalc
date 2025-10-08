@@ -153,10 +153,6 @@
     });
   };
 
-  const openDeleteRecordConfirmDialog = () => {
-    if (calcStore.calc.record.getAllRecords().length > 0) uiStore.isDeleteRecordConfirmOpen = true;
-  };
-
   const openSearchDialogByKey = () => {
     uiStore.isSearchOpen = !uiStore.isSearchOpen;
     if (uiStore.isSearchOpen) {
@@ -169,14 +165,15 @@
 
   // 키 바인딩 설정
   const { subscribe, unsubscribe } = useKeyBinding([
-    [['Control+d'], () => openDeleteRecordConfirmDialog()],
-    [['Control+f'], () => openSearchDialogByKey()],
     [['ArrowUp'], () => scrollToRecord(-50)],
     [['ArrowDown'], () => scrollToRecord(50)],
     [['PageUp'], () => scrollToRecord(-400)],
     [['PageDown'], () => scrollToRecord(400)],
     [['Home'], () => scrollToRecord('top')],
     [['End'], () => scrollToRecord('bottom')],
+    [['Control+f'], () => openSearchDialogByKey()],
+    [['Control+['], () => settingsStore.decrementRecordFontSize()],
+    [['Control+]'], () => settingsStore.incrementRecordFontSize()],
   ]);
 
   // 입력 포커스 상태에 따른 키 바인딩 활성화/비활성화
