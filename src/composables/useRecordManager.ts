@@ -96,6 +96,7 @@ export function useRecordManager() {
   };
 
   const exportRecordsToCSV = async () => {
+    console.log('exportRecordsToCSV called');
     try {
       const records = calcStore.calc.record.getAllRecords();
       if (records.length === 0) {
@@ -116,8 +117,10 @@ export function useRecordManager() {
       }));
 
       const csv = Papa.unparse(dataToExport);
+      console.log('CSV data created');
 
       if ($g.isCapacitor) {
+        console.log('Capacitor path selected');
         try {
           const result = await Filesystem.writeFile({
             path: `qcalc-records-${Date.now()}.csv`,
@@ -125,17 +128,20 @@ export function useRecordManager() {
             directory: Directory.Documents,
             encoding: Encoding.UTF8,
           });
+          console.log('File saved', result);
           $q.notify({
             type: 'positive',
             message: `${t('exportRecords.success')} ${t('message.fileSavedTo', { path: result.uri })}`,
           });
         } catch (error) {
-          console.error(error);
+          console.error('Capacitor writeFile error:', error);
           $q.notify({ type: 'negative', message: t('exportRecords.fail') });
         }
       } else {
+        console.log('Web path selected');
         const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
         if (window.showSaveFilePicker) {
+          console.log('showSaveFilePicker path selected');
           try {
             const handle = await window.showSaveFilePicker({
               suggestedName: 'qcalc-records.csv',
@@ -151,14 +157,15 @@ export function useRecordManager() {
             await writable.close();
             $q.notify({ type: 'positive', message: t('exportRecords.success') });
           } catch (error: unknown) {
+            console.error('showSaveFilePicker error:', error);
             if (error instanceof Error && error.name === 'AbortError') {
               $q.notify({ type: 'info', message: t('exportRecords.cancelled') });
             } else {
-              console.error(error);
               $q.notify({ type: 'negative', message: t('exportRecords.fail') });
             }
           }
         } else {
+          console.log('Fallback web path selected');
           const url = URL.createObjectURL(blob);
           const a = document.createElement('a');
           a.href = url;
@@ -171,7 +178,7 @@ export function useRecordManager() {
         }
       }
     } catch (error) {
-      console.error(error);
+      console.error('General export error:', error);
       $q.notify({ type: 'negative', message: t('exportRecords.fail') });
     }
   };
