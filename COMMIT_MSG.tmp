@@ -1,6 +1,0 @@
-refactor(layout): 레이아웃 및 기록 관리 로직 분리
-
-- `useRecordManager` 컴포저블을 새로 생성하여 계산 기록 관련 로직(가져오기, 내보내기, 삭제)을 캡슐화했습니다.
-- `useMainLayout` 컴포저블을 리팩토링하여 `useRecordManager`에 대한 의존성을 분리하고, 레이아웃 관련 로직에만 집중하도록 수정했습니다.
-- `MainLayout`, `NarrowLayout`, `WideLayout` 컴포넌트가 새로운 컴포저블 구조를 사용하도록 수정하여 props 전달을 줄이고 독립성을 높였습니다.
-- (settings) 설정 내보내기 시 불필요한 `radixList` 속성을 제외했습니다.
