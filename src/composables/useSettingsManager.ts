@@ -46,10 +46,11 @@ export function useSettingsManager() {
     for (const key in stores) {
       const storeKey = key as StoreKeys;
       const store = stores[storeKey]();
+      const stateAsRecord = store.$state as unknown as Record<string, unknown>; // Cast once
       if (settingsToExport[storeKey]) {
-        allSettings[storeKey] = settingsToExport[storeKey]!(store.$state);
+        allSettings[storeKey] = settingsToExport[storeKey]!(stateAsRecord);
       } else {
-        allSettings[storeKey] = store.$state;
+        allSettings[storeKey] = stateAsRecord;
       }
     }
     return allSettings;
