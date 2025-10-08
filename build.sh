@@ -130,9 +130,9 @@ build_linux() {
 
     echo "Linux build completed. Moving artifacts..."
     # AppImage 파일 이동
-    find dist/electron/Packaged -name "*.AppImage" -exec mv {} "$BUILD_DIR/QCalc-$VERSION-linux.AppImage" \\; || true
+    find dist/electron/Packaged -name "*.AppImage" -exec mv {} "$BUILD_DIR/QCalc-$VERSION-linux.AppImage" \; || true
     # snap 파일 이동
-    find dist/electron/Packaged -name "*.snap" -exec mv {} "$BUILD_DIR/QCalc-$VERSION-linux.snap" \\; || true
+    find dist/electron/Packaged -name "*.snap" -exec mv {} "$BUILD_DIR/QCalc-$VERSION-linux.snap" \; || true
     # latest-linux.yml 파일 복사
     if [ -f dist/electron/Packaged/latest-linux.yml ]; then
         cp dist/electron/Packaged/latest-linux.yml "$BUILD_DIR/latest-linux.yml"
@@ -170,7 +170,7 @@ build_android() {
         echo "Warning: Keystore file not found at $MY_JKS_KEY_FILE."
         echo "Android app will be unsigned. To sign, provide MY_JKS_KEY_FILE in .env or ensure the default path is correct."
         # 서명되지 않은 APK 이동 (있는 경우)
-        find src-capacitor/android/app/build/outputs/apk/debug -name "app-debug.apk" -exec cp {} "$BUILD_DIR/QCalc-$VERSION-android-debug.apk" \\; || true
+        find src-capacitor/android/app/build/outputs/apk/debug -name "app-debug.apk" -exec cp {} "$BUILD_DIR/QCalc-$VERSION-android-debug.apk" \; || true
     else
         echo "Building signed APK..."
         (cd src-capacitor/android && ./gradlew assembleRelease)
