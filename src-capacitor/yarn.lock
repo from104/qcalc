@@ -5,16 +5,16 @@ __metadata:
   version: 8
   cacheKey: 10
 
-"@capacitor/android@npm:7.3.0":
-  version: 7.3.0
-  resolution: "@capacitor/android@npm:7.3.0"
+"@capacitor/android@npm:7.4.3":
+  version: 7.4.3
+  resolution: "@capacitor/android@npm:7.4.3"
   peerDependencies:
-    "@capacitor/core": ^7.3.0
-  checksum: 10/656257f061c5073d3a3e45b6d5e6b63ab078f77d57f2e10fcef16b768decaee44d616d7a11a9be51c8f048edeee3d057dfead68c100b7d4948be8e8961e68d7f
+    "@capacitor/core": ^7.4.0
+  checksum: 10/e8fd15c424f6019a3233a0e13d0c5090c716c5304ec93ce9155f3b3c8dfddc98ae82028e395b40549fad910d342e70b168f6f0168b84f6079002101e50fbd30b
   languageName: node
   linkType: hard
 
-"@capacitor/app@npm:^7.0.1":
+"@capacitor/app@npm:7.0.1":
   version: 7.0.1
   resolution: "@capacitor/app@npm:7.0.1"
   peerDependencies:
@@ -23,9 +23,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@capacitor/cli@npm:7.3.0":
-  version: 7.3.0
-  resolution: "@capacitor/cli@npm:7.3.0"
+"@capacitor/cli@npm:7.4.3":
+  version: 7.4.3
+  resolution: "@capacitor/cli@npm:7.4.3"
   dependencies:
     "@ionic/cli-framework-output": "npm:^2.2.8"
     "@ionic/utils-subprocess": "npm:^3.0.1"
@@ -47,43 +47,43 @@ __metadata:
   bin:
     cap: bin/capacitor
     capacitor: bin/capacitor
-  checksum: 10/c30a972b26f226a40ab6508cacc53a6cd2877f2cc68345301efd7d921f248e1192fb7212d2e5b8a51f39f7a80f01359e83cf66ee2a13e2b47bdab55ea282599f
+  checksum: 10/b96080830036b4baaf906b31a174843dc3849797bea462bc7804efe522520140a80679a9ac16c02bd9d661797a61a42c6dc2421cb3b2ce904339d5c32e7d7c1e
   languageName: node
   linkType: hard
 
-"@capacitor/core@npm:^7.3.0":
-  version: 7.3.0
-  resolution: "@capacitor/core@npm:7.3.0"
+"@capacitor/core@npm:7.4.3":
+  version: 7.4.3
+  resolution: "@capacitor/core@npm:7.4.3"
   dependencies:
     tslib: "npm:^2.1.0"
-  checksum: 10/874c1c24359daf37bbc115998e14f0edc15f4e6efb180c95d38a159e5aaa3c0fc2a3c7383b30c98d1df19850a448920c3f71b851571ff1f3e58aab2b362eb913
+  checksum: 10/9915eb1f618dcd17e770aa6c9092680398cc8ba254284acd65175a28aa35cf6a32e79a6b0abdedb0ed45fc4a7b91d9e495cce53209bbc741a88c15147cfe5a3b
   languageName: node
   linkType: hard
 
-"@capacitor/haptics@npm:^7.0.1":
-  version: 7.0.1
-  resolution: "@capacitor/haptics@npm:7.0.1"
+"@capacitor/haptics@npm:7.0.2":
+  version: 7.0.2
+  resolution: "@capacitor/haptics@npm:7.0.2"
   peerDependencies:
     "@capacitor/core": ">=7.0.0"
-  checksum: 10/fdca811657067aa70cafcc91967f59850b042392d28fc66066e8418659f557d99ec02feb2bacd66c21fffca7e9c37dda61fb9bf8f2ba8826c4c6feae12cf20b3
+  checksum: 10/c239e10e4ddf9b2b2096e7f53b6a5a56ef48545773582941fec3e97b015016672b7fc2102f24b0dc66b348e1a16c0aa387faf2d3f12ba9afdbb74c71a4bef11e
   languageName: node
   linkType: hard
 
-"@capacitor/screen-orientation@npm:^7.0.1":
-  version: 7.0.1
-  resolution: "@capacitor/screen-orientation@npm:7.0.1"
+"@capacitor/screen-orientation@npm:7.0.2":
+  version: 7.0.2
+  resolution: "@capacitor/screen-orientation@npm:7.0.2"
   peerDependencies:
     "@capacitor/core": ">=7.0.0"
-  checksum: 10/849f595bc21adad272074637309100d7558ea15487a4f221dc384d3ad7e881794b493ef3f6956184229a9a008eac5d59151150bd249d4c7b1ce3ab1c83327281
+  checksum: 10/b68795944d50783c6ef533ee165783f7f34111a25754d01ab5c7bd5ce77098f6571bf2edb1fed321f324cbb2ff99ba4717b9ec95fe8d7d8e5eb8fd3dc1c6a028
   languageName: node
   linkType: hard
 
-"@capacitor/status-bar@npm:^7.0.1":
-  version: 7.0.1
-  resolution: "@capacitor/status-bar@npm:7.0.1"
+"@capacitor/status-bar@npm:7.0.3":
+  version: 7.0.3
+  resolution: "@capacitor/status-bar@npm:7.0.3"
   peerDependencies:
     "@capacitor/core": ">=7.0.0"
-  checksum: 10/b634f7b98f38fa411a928923a7898ad4b04a3cce0d669a1af2ac32800f4d6a7ae3a8712d92da8f4db1e556a3e704a3c2bab8436332ebbab91082d3551ba0202d
+  checksum: 10/ecaea1fc8b1bd3709af4cb7d12d7434a6341731b80d60fcccfe3981cf2ff450edd9f212677447829df619d29528cb231ddb0f146b554f49a15381f2b2a86edd0
   languageName: node
   linkType: hard
 
@@ -729,13 +729,13 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "qcalc@workspace:."
   dependencies:
-    "@capacitor/android": "npm:7.3.0"
-    "@capacitor/app": "npm:^7.0.1"
-    "@capacitor/cli": "npm:7.3.0"
-    "@capacitor/core": "npm:^7.3.0"
-    "@capacitor/haptics": "npm:^7.0.1"
-    "@capacitor/screen-orientation": "npm:^7.0.1"
-    "@capacitor/status-bar": "npm:^7.0.1"
+    "@capacitor/android": "npm:7.4.3"
+    "@capacitor/app": "npm:7.0.1"
+    "@capacitor/cli": "npm:7.4.3"
+    "@capacitor/core": "npm:7.4.3"
+    "@capacitor/haptics": "npm:7.0.2"
+    "@capacitor/screen-orientation": "npm:7.0.2"
+    "@capacitor/status-bar": "npm:7.0.3"
   languageName: unknown
   linkType: soft
 
