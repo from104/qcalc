@@ -148,12 +148,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@capacitor/haptics@npm:7.0.1":
-  version: 7.0.1
-  resolution: "@capacitor/haptics@npm:7.0.1"
+"@capacitor/haptics@npm:7.0.2":
+  version: 7.0.2
+  resolution: "@capacitor/haptics@npm:7.0.2"
   peerDependencies:
     "@capacitor/core": ">=7.0.0"
-  checksum: 10/fdca811657067aa70cafcc91967f59850b042392d28fc66066e8418659f557d99ec02feb2bacd66c21fffca7e9c37dda61fb9bf8f2ba8826c4c6feae12cf20b3
+  checksum: 10/c239e10e4ddf9b2b2096e7f53b6a5a56ef48545773582941fec3e97b015016672b7fc2102f24b0dc66b348e1a16c0aa387faf2d3f12ba9afdbb74c71a4bef11e
   languageName: node
   linkType: hard
 
@@ -8930,7 +8930,7 @@ __metadata:
     "@capacitor/app": "npm:7.0.1"
     "@capacitor/cli": "npm:7.4.3"
     "@capacitor/core": "npm:7.3.0"
-    "@capacitor/haptics": "npm:7.0.1"
+    "@capacitor/haptics": "npm:7.0.2"
     "@capacitor/screen-orientation": "npm:7.0.2"
     "@capacitor/status-bar": "npm:7.0.3"
     "@eslint/js": "npm:9.21.0"
