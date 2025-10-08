@@ -23,7 +23,7 @@ export interface SubPageButton {
   label: string;
   icon: string;
   path: string;
-  tooltip: ComputedRef<string> | string;
+  tooltip: ComputedRef<string>;
 }
 
 /**
