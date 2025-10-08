@@ -92,8 +92,8 @@
           await writable.write(blob);
           await writable.close();
           $q.notify({ type: 'positive', message: t('exportSettings.success') });
-        } catch (error: any) {
-          if (error.name === 'AbortError') {
+        } catch (error: unknown) {
+          if (error instanceof Error && error.name === 'AbortError') {
             $q.notify({ type: 'info', message: t('exportSettings.cancelled') });
           } else {
             console.error(error);
