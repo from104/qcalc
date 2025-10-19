@@ -315,6 +315,34 @@
     return headerElement ? headerElement.clientHeight + 'px' : '0px';
   });
 
+  /**
+   * Android 시스템 UI에 따른 하단 마진을 계산합니다.
+   * Android API 35 이상에서는 시스템 바 높이를 고려하여
+   * 제스처 네비게이션 여부에 따라 다른 마진을 적용합니다.
+   */
+  const calculatedBottomMargin = computed(() => {
+    let bottomMargin = 0;
+
+    // Android API level 35 이상: 시스템 바 높이 고려
+    if ($g.isAndroid && $g.apiLevel >= 35) {
+      // 제스처 네비게이션이 아닌 경우 네비게이션 바 높이 추가
+      if (!$g.isGestureNavigation) {
+        bottomMargin += 48;
+      }
+    } else {
+      // 기본 마진
+      bottomMargin += 10;
+    }
+
+    return bottomMargin;
+  });
+
+  /**
+   * FAB 버튼의 위치를 계산합니다.
+   * 하단 마진을 고려하여 [좌측 오프셋, 하단 오프셋] 배열을 반환합니다.
+   */
+  const fabOffset = computed(() => [18, 18 + calculatedBottomMargin.value]);
+
   // 날짜/시간 포맷 함수
   const formatDateTime = (timestamp: number): string => {
     const date = new Date(timestamp);
@@ -658,7 +686,7 @@
     </transition>
 
     <div v-if="fabOpen" class="backdrop" @click="fabOpen = false"></div>
-    <q-page-sticky position="bottom-left" :offset="[18, 18]" style="z-index: 15">
+    <q-page-sticky position="bottom-left" :offset="fabOffset" style="z-index: 15">
       <q-fab
         v-model="fabOpen"
         vertical-actions-align="center"

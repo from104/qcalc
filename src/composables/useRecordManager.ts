@@ -11,6 +11,7 @@ import { useI18n } from 'vue-i18n';
 import Papa from 'papaparse';
 
 import { Filesystem, Directory, Encoding } from '@capacitor/filesystem';
+import { Share } from '@capacitor/share';
 
 export function useRecordManager() {
   const $q = useQuasar();
@@ -120,22 +121,32 @@ export function useRecordManager() {
       console.log('CSV data created');
 
       if ($g.isCapacitor) {
-        console.log('Capacitor path selected');
+        console.log('Capacitor path selected for sharing');
         try {
+          // 1. Save the file to a temporary cache directory
           const result = await Filesystem.writeFile({
             path: `qcalc-records-${Date.now()}.csv`,
             data: csv,
-            directory: Directory.Documents,
+            directory: Directory.Cache, // Use Cache for temporary files
             encoding: Encoding.UTF8,
           });
-          console.log('File saved', result);
-          $q.notify({
-            type: 'positive',
-            message: `${t('exportRecords.success')} ${t('message.fileSavedTo', { path: result.uri })}`,
+          console.log('Temporary file written at', result.uri);
+
+          // 2. Use the Share plugin to share the file
+          await Share.share({
+            title: t('exportRecords.shareTitle'),
+            text: t('exportRecords.shareText'),
+            url: result.uri,
+            dialogTitle: t('exportRecords.shareDialogTitle'),
           });
-        } catch (error) {
-          console.error('Capacitor writeFile error:', error);
-          $q.notify({ type: 'negative', message: t('exportRecords.fail') });
+        } catch (error: unknown) {
+          // Handle potential user cancellation of the share sheet
+          if ((error as Error)?.message !== 'Share canceled') {
+            console.error('Capacitor file write or share error:', error);
+            $q.notify({ type: 'negative', message: t('exportRecords.fail') });
+          } else {
+            $q.notify({ type: 'info', message: t('exportRecords.cancelled') });
+          }
         }
       } else {
         console.log('Web path selected');

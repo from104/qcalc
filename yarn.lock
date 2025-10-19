@@ -177,6 +177,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@capacitor/share@npm:^7.0.2":
+  version: 7.0.2
+  resolution: "@capacitor/share@npm:7.0.2"
+  peerDependencies:
+    "@capacitor/core": ">=7.0.0"
+  checksum: 10/469e0bf118247a9cd0f73c0045164187647f2c7eb9e25dd795975d719d90d00b2d837cdf45a5873a9af19d4a00fa3e08dda4f05898c5f803b0cfc46d63df65bc
+  languageName: node
+  linkType: hard
+
 "@capacitor/status-bar@npm:7.0.3":
   version: 7.0.3
   resolution: "@capacitor/status-bar@npm:7.0.3"
@@ -9429,6 +9438,7 @@ __metadata:
     "@capacitor/filesystem": "npm:7.1.4"
     "@capacitor/haptics": "npm:7.0.2"
     "@capacitor/screen-orientation": "npm:7.0.2"
+    "@capacitor/share": "npm:^7.0.2"
     "@capacitor/status-bar": "npm:7.0.3"
     "@eslint/js": "npm:9.21.0"
     "@everapi/freecurrencyapi-js": "npm:^1.0.1"

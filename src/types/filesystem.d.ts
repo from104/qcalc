@@ -10,7 +10,7 @@ interface FileSystemFileHandle {
 }
 
 interface FileSystemWritableFileStream extends WritableStream {
-  write(data: any): Promise<void>;
+  write(data: Blob | BufferSource | string): Promise<void>;
   close(): Promise<void>;
 }
 
