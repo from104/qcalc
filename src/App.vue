@@ -8,10 +8,11 @@
    */
 
   // === 핵심 Vue 및 라우터 의존성 ===
-  import { ref, onBeforeMount, watch, computed, onUnmounted } from 'vue';
+  import { ref, onBeforeMount, watch, computed, onMounted, onUnmounted } from 'vue';
   import { useRoute } from 'vue-router';
   import { useI18n } from 'vue-i18n';
   import { ScreenOrientation } from '@capacitor/screen-orientation';
+  import { useQuasar } from 'quasar';
 
   // === 컴포넌트 임포트 ===
   import AutoUpdate from 'components/AutoUpdate.vue';
@@ -26,16 +27,23 @@
   import { useUIStore } from 'stores/uiStore';
   import { useSettingsStore } from 'stores/settingsStore';
   import { useThemesStore } from './stores/themesStore';
+  import { useUnitStore } from './stores/unitStore';
+  import { useCurrencyStore } from './stores/currencyStore';
+  import { useRadixStore } from './stores/radixStore';
 
   const uiStore = useUIStore();
   const settingsStore = useSettingsStore();
   const themesStore = useThemesStore();
+  const unitStore = useUnitStore();
+  const currencyStore = useCurrencyStore();
+  const radixStore = useRadixStore();
 
   // === 전역 객체 및 상태 저장소 설정 ===
   const $g = window.globalVars;
 
   const route = useRoute();
   const { t } = useI18n();
+  const $q = useQuasar();
 
   // === 상태 관리 ===
   const isFirstNavigation = ref(true);
@@ -103,6 +111,25 @@
     setTimeout(() => {
       isFirstNavigation.value = false;
     }, 100);
+  });
+
+  onMounted(() => {
+    const unitCorrected = unitStore.validateAndCorrectUnits();
+    const currencyCorrected = currencyStore.validateAndCorrectCurrencies();
+    const radixCorrected = radixStore.validateAndCorrectRadixSettings();
+
+    if (unitCorrected || currencyCorrected || radixCorrected) {
+      setTimeout(() => {
+        $q.notify({
+          message: t('persistedSettingsCorrected'),
+          color: 'info',
+          position: 'top',
+          icon: 'info',
+          timeout: 5000,
+          actions: [{ icon: 'close', color: 'white' }],
+        });
+      }, 2500);
+    }
   });
 
   /**

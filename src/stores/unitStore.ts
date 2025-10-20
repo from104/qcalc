@@ -81,6 +81,68 @@ export const useUnitStore = defineStore('unit', {
   },
 
   actions: {
+    validateAndCorrectUnits(): boolean {
+      let wasMutated = false;
+      const availableCategories = UnitConverter.getCategories();
+
+      // 1. selectedCategory 유효성 검사
+      if (!this.selectedCategory || !availableCategories.includes(this.selectedCategory)) {
+        this.selectedCategory = availableCategories[0] || '';
+        wasMutated = true;
+      }
+
+      // 2. sourceUnits 및 targetUnits 유효성 검사
+      for (const category in this.sourceUnits) {
+        if (!availableCategories.includes(category)) {
+          delete this.sourceUnits[category];
+          if (this.targetUnits[category]) {
+            delete this.targetUnits[category];
+          }
+          wasMutated = true;
+          continue;
+        }
+        const availableUnits = UnitConverter.getUnitLists(category) ?? [];
+        if (!this.sourceUnits[category] || !availableUnits.includes(this.sourceUnits[category])) {
+          this.sourceUnits[category] = availableUnits[0] || '';
+          wasMutated = true;
+        }
+        if (!this.targetUnits[category] || !availableUnits.includes(this.targetUnits[category])) {
+          this.targetUnits[category] = availableUnits[1] || availableUnits[0] || '';
+          wasMutated = true;
+        }
+      }
+
+      // 3. favoriteCategories 유효성 검사
+      const originalFavCategoryCount = this.favoriteCategories.length;
+      this.favoriteCategories = this.favoriteCategories.filter((cat) => availableCategories.includes(cat));
+      if (this.favoriteCategories.length !== originalFavCategoryCount) {
+        wasMutated = true;
+      }
+
+      // 4. favoriteUnits 유효성 검사
+      for (const category in this.favoriteUnits) {
+        if (!availableCategories.includes(category)) {
+          delete this.favoriteUnits[category];
+          wasMutated = true;
+          continue;
+        }
+        const originalFavUnitCount = this.favoriteUnits[category]?.length ?? 0;
+        const availableUnits = UnitConverter.getUnitLists(category) ?? [];
+        this.favoriteUnits[category] = (this.favoriteUnits[category] ?? []).filter((unit) =>
+          availableUnits.includes(unit),
+        );
+        if ((this.favoriteUnits[category]?.length ?? 0) !== originalFavUnitCount) {
+          wasMutated = true;
+        }
+        // 카테고리에 즐겨찾기된 단위가 없으면 해당 카테고리 제거
+        if ((this.favoriteUnits[category]?.length ?? 0) === 0) {
+          delete this.favoriteUnits[category];
+        }
+      }
+
+      return wasMutated;
+    },
+
     // 단위 변환 관련
     initRecentUnits(): void {
       // 최근 카테고리가 설정되지 않은 경우, 첫 번째 카테고리로 설정
@@ -91,7 +153,7 @@ export const useUnitStore = defineStore('unit', {
       // 변환 출발 단위가 설정되지 않은 경우, 각 카테고리의 첫 번째 단위로 설정
       if (Object.keys(this.sourceUnits).length === 0) {
         UnitConverter.getCategories().forEach((category) => {
-          const units = UnitConverter.getUnitLists(category);
+          const units = UnitConverter.getUnitLists(category) ?? [];
           this.sourceUnits[category] = units[0] ?? '';
         });
       }
@@ -99,7 +161,7 @@ export const useUnitStore = defineStore('unit', {
       // 변환 도착 단위가 설정되지 않은 경우, 각 카테고리의 두 번째 단위(없으면 첫 번째)로 설정
       if (Object.keys(this.targetUnits).length === 0) {
         UnitConverter.getCategories().forEach((category) => {
-          const units = UnitConverter.getUnitLists(category);
+          const units = UnitConverter.getUnitLists(category) ?? [];
           this.targetUnits[category] = units[1] || units[0] || '';
         });
       }

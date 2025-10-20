@@ -23,8 +23,6 @@ The format is based on [Keep a Changelog] and this project follows [Semantic Ver
 
 ### Changed
 
-- **MainLayout Refactoring**: Refactored MainLayout.vue into NarrowLayout.vue and WideLayout.vue, and created useMainLayout.ts composable to separate common logic.
-
 ### Fixed
 
 - **Calculation History Scroll Bug Fixed**: Fixed a bug where calculation history could not be scrolled using the floating icon or keyboard (Up/Down/PageUp/PageDown/Home/End).

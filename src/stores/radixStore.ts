@@ -7,7 +7,7 @@ import { defineStore } from 'pinia';
 import { Radix, convertRadix, isValidRadixNumber } from '../utils/RadixConverter';
 import { useUIStore } from './uiStore';
 
-const uiStore = useUIStore();
+// const uiStore = useUIStore();
 
 type WordSize = 8 | 16 | 32 | 64;
 
@@ -19,8 +19,6 @@ interface RadixState {
   showRadix: boolean;
   radixType: 'prefix' | 'suffix';
 }
-
-
 
 const RADIX_PREFIXES = ['0b', '0o', '0x', ''] as const;
 const RADIX_SUFFIXES = ['2', '8', '10', '16'] as const;
@@ -39,8 +37,38 @@ export const useRadixStore = defineStore('radix', {
   }),
 
   actions: {
+    validateAndCorrectRadixSettings(): boolean {
+      let wasMutated = false;
+      const availableRadixes = Object.values(Radix);
+      const availableWordSizes: WordSize[] = [8, 16, 32, 64];
+      const availableRadixTypes = ['prefix', 'suffix'];
+
+      // sourceRadix 유효성 검사
+      if (!this.sourceRadix || !availableRadixes.includes(this.sourceRadix)) {
+        this.sourceRadix = Radix.Decimal;
+        wasMutated = true;
+      }
+      // targetRadix 유효성 검사
+      if (!this.targetRadix || !availableRadixes.includes(this.targetRadix)) {
+        this.targetRadix = Radix.Hexadecimal;
+        wasMutated = true;
+      }
+      // wordSize 유효성 검사
+      if (!this.wordSize || !availableWordSizes.includes(this.wordSize)) {
+        this.wordSize = 32;
+        wasMutated = true;
+      }
+      // radixType 유효성 검사
+      if (!this.radixType || !availableRadixTypes.includes(this.radixType)) {
+        this.radixType = 'suffix';
+        wasMutated = true;
+      }
+      return wasMutated;
+    },
+
     // 진법 변환 관련
     convertIfRadix(value: string): string {
+      const uiStore = useUIStore();
       return this.convertRadix(
         value,
         Radix.Decimal,
@@ -113,3 +141,4 @@ export const useRadixStore = defineStore('radix', {
 
   persist: true,
 });
+

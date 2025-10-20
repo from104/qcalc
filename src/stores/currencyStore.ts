@@ -5,6 +5,7 @@
 
 import { defineStore } from 'pinia';
 import { CurrencyConverter } from 'classes/CurrencyConverter';
+import { currencyBaseData } from 'src/constants/CurrencyBaseData';
 
 interface CurrencyState {
   currencyConverter: CurrencyConverter;
@@ -51,6 +52,31 @@ export const useCurrencyStore = defineStore('currency', {
   },
 
   actions: {
+    validateAndCorrectCurrencies(): boolean {
+      let wasMutated = false;
+      const availableCodes = Object.keys(currencyBaseData);
+
+      // sourceCurrency 유효성 검사
+      if (!this.sourceCurrency || !availableCodes.includes(this.sourceCurrency)) {
+        this.sourceCurrency = 'USD';
+        wasMutated = true;
+      }
+      // targetCurrency 유효성 검사
+      if (!this.targetCurrency || !availableCodes.includes(this.targetCurrency)) {
+        this.targetCurrency = 'KRW';
+        wasMutated = true;
+      }
+      // favoriteCurrencies 유효성 검사
+      const originalCount = this.favoriteCurrencies.length;
+      this.favoriteCurrencies = this.favoriteCurrencies.filter((c) =>
+        availableCodes.includes(c),
+      );
+      if (this.favoriteCurrencies.length !== originalCount) {
+        wasMutated = true;
+      }
+      return wasMutated;
+    },
+
     // 통화 변환 관련
     initRecentCurrencies(): void {
       const availableCurrencies = this.currencyConverter.getAvailableItems();
