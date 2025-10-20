@@ -8,9 +8,9 @@ QCalc is more than just a simple calculator - it's evolving into a modern produc
 
 The calculator alone appears when the window width is reduced.
 
-![Screenshot](https://github.com/from104/qcalc/raw/main/assets/screenshot_v0.11.4.png)
+![Screenshot](https://github.com/from104/qcalc/raw/main/assets/screenshot_v0.11.5.png)
 
-## Guide to Main Features
+## Main Features of the App
 
 - **4 Professional Calculators**: Standard calculator, unit converter, currency converter, and programmer calculator meet all your calculation needs
 - **High-precision Calculation Engine**: Supports accurate calculations up to 64 digits with advanced math functions like trigonometry, factorial, and powers
@@ -253,9 +253,9 @@ The calculator alone appears when the window width is reduced.
 | ↑/↓             | Scroll 50px up/down  |
 | PageUp/PageDown | Scroll 400px up/down |
 | Home/End        | Scroll to top/bottom |
-| C-f             | Search history         |
-| C-\[            | Decrease font size     |
-| C-\]            | Increase font size     |
+| C-f             | Search history       |
+| C-\[            | Decrease font size   |
+| C-\]            | Increase font size   |
 
 ## Installation Guide
 
