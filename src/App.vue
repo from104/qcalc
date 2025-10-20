@@ -333,6 +333,7 @@
         system: '다크모드를 시스템 설정에 따라 변경했습니다.'
         light: '라이트 모드로 변경했습니다.'
         dark: '다크 모드로 변경했습니다.'
+    persistedSettingsCorrected: '일부 저장된 설정이 초기화되었습니다. 앱 업데이트로 인해 이전 설정이 더 이상 지원되지 않을 수 있습니다.'
   en:
     targetToBeCopiedResult: 'the calculation result'
     targetToBeCopiedSelected: 'the selected content'
@@ -344,4 +345,5 @@
         system: 'Dark mode changed to follow system settings.'
         light: 'Changed to light mode.'
         dark: 'Changed to dark mode.'
+    persistedSettingsCorrected: 'Some saved settings were reset. Previous settings may no longer be supported due to an app update.'        
 </i18n>
