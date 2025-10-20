@@ -247,7 +247,7 @@
         </q-scroll-area>
       </div>
     </q-page-container>
-    <input ref="recordFileInput" type="file" style="display: none" accept=".csv" @change="handleRecordFileChange" />
+    <input ref="recordFileInput" type="file" style="display: none" accept="text/csv,.csv" @change="handleRecordFileChange" />
   </q-layout>
 </template>
 
