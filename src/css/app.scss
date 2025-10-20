@@ -108,3 +108,7 @@ body {
     font-size: calc(100% * 350 / env(--device-width));
   }
 }
+
+.body--android .q-notification {
+  margin-bottom: var(--notify-bottom-margin, 0px);
+}

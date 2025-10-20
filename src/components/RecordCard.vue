@@ -24,6 +24,8 @@
   const router = useRouter();
   const route = useRoute() as RouteLocationNormalizedLoaded & { meta: RouteTransitionMeta };
 
+  // 네비게이션 관련 유틸리티 함수`
+  import { isWideWidth } from 'src/utils/GlobalHelpers';
   import { navigateToPath } from 'src/utils/NavigationUtils';
 
   // 계산기 관련 타입과 클래스
@@ -84,9 +86,6 @@
 
   // records 계산 속성 수정
   const records = computed(() => calcStore.calc.record.getAllRecords());
-
-  // 화면 너비가 특정 값보다 큰지 확인하는 함수
-  const isWideWidth = () => window.innerWidth > 768;
 
   // 계산 결과 메뉴의 열림 상태를 관리하는 반응형 객체
   const recordMenu = reactive(Object.fromEntries(records.value.map((h: Record) => [h.id, false])));
@@ -328,12 +327,18 @@
       // 제스처 네비게이션이 아닌 경우 네비게이션 바 높이 추가
       if (!$g.isGestureNavigation) {
         bottomMargin += 48;
+      } else {
+        if (isWideWidth()) {
+          bottomMargin += 24;
+        }
       }
     } else {
       // 기본 마진
       bottomMargin += 10;
     }
-
+    console.log('bottomMargin: ', bottomMargin);
+    console.log('isWideWidth: ', isWideWidth());
+    console.log('isGestureNavigation: ', $g.isGestureNavigation);
     return bottomMargin;
   });
 

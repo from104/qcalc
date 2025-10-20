@@ -121,33 +121,65 @@ export function useRecordManager() {
       console.log('CSV data created');
 
       if ($g.isCapacitor) {
-        console.log('Capacitor path selected for sharing');
-        try {
-          // 1. Save the file to a temporary cache directory
-          const result = await Filesystem.writeFile({
-            path: `qcalc-records-${Date.now()}.csv`,
-            data: csv,
-            directory: Directory.Cache, // Use Cache for temporary files
-            encoding: Encoding.UTF8,
+        $q.dialog({
+          title: t('exportRecords.exportMethodTitle'),
+          message: t('exportRecords.exportMethodMessage'),
+          ok: {
+            label: t('exportRecords.saveToDevice'),
+            flat: true,
+          },
+          cancel: {
+            label: t('exportRecords.shareFile'),
+            flat: true,
+          },
+          persistent: true,
+        })
+          .onOk(async () => {
+            // Save to Device logic
+            try {
+              const fileName = `qcalc-records-${Date.now()}.csv`;
+              await Filesystem.writeFile({
+                path: fileName,
+                data: csv,
+                directory: Directory.Documents,
+                encoding: Encoding.UTF8,
+              });
+              $q.notify({
+                type: 'positive',
+                message: t('exportRecords.successMobile', { fileName: fileName }),
+                caption: t('exportRecords.mobileSaveLocation'),
+                timeout: 10000,
+                actions: [{ icon: 'close', color: 'white' }],
+              });
+            } catch (e) {
+              console.error('Error saving file on Capacitor:', e);
+              $q.notify({ type: 'negative', message: t('exportRecords.fail') });
+            }
+          })
+          .onCancel(async () => {
+            // Share File logic
+            try {
+              const result = await Filesystem.writeFile({
+                path: `qcalc-records-${Date.now()}.csv`,
+                data: csv,
+                directory: Directory.Cache,
+                encoding: Encoding.UTF8,
+              });
+              await Share.share({
+                title: t('exportRecords.shareTitle'),
+                text: t('exportRecords.shareText'),
+                files: [result.uri],
+                dialogTitle: t('exportRecords.shareDialogTitle'),
+              });
+            } catch (error: unknown) {
+              if ((error as Error)?.message !== 'Share canceled') {
+                console.error('Capacitor file write or share error:', error);
+                $q.notify({ type: 'negative', message: t('exportRecords.fail') });
+              } else {
+                $q.notify({ type: 'info', message: t('exportRecords.cancelled') });
+              }
+            }
           });
-          console.log('Temporary file written at', result.uri);
-
-          // 2. Use the Share plugin to share the file
-          await Share.share({
-            title: t('exportRecords.shareTitle'),
-            text: t('exportRecords.shareText'),
-            url: result.uri,
-            dialogTitle: t('exportRecords.shareDialogTitle'),
-          });
-        } catch (error: unknown) {
-          // Handle potential user cancellation of the share sheet
-          if ((error as Error)?.message !== 'Share canceled') {
-            console.error('Capacitor file write or share error:', error);
-            $q.notify({ type: 'negative', message: t('exportRecords.fail') });
-          } else {
-            $q.notify({ type: 'info', message: t('exportRecords.cancelled') });
-          }
-        }
       } else {
         console.log('Web path selected');
         const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
