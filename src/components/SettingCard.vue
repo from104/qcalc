@@ -47,7 +47,7 @@
   const fileInput = ref<HTMLInputElement | null>(null);
 
   const $q = useQuasar();
-  const { gatherSettings, applySettings, resetSettings } = useSettingsManager();
+  const { applySettings, resetSettings, exportSettings } = useSettingsManager();
 
   // 설정 초기화 핸들러
   const handleResetSettings = () => {
@@ -69,53 +69,6 @@
       // 설정을 완전히 적용하기 위해 페이지 새로고침
       window.location.reload();
     });
-  };
-
-  // 설정 내보내기 핸들러
-  const handleExportSettings = async () => {
-    try {
-      const settings = gatherSettings();
-      const blob = new Blob([JSON.stringify(settings, null, 2)], { type: 'application/json' });
-
-      if (window.showSaveFilePicker) {
-        try {
-          const handle = await window.showSaveFilePicker({
-            suggestedName: 'qcalc-settings.json',
-            types: [
-              {
-                description: 'JSON Files',
-                accept: { 'application/json': ['.json'] },
-              },
-            ],
-          });
-          const writable = await handle.createWritable();
-          await writable.write(blob);
-          await writable.close();
-          $q.notify({ type: 'positive', message: t('exportSettings.success') });
-        } catch (error: unknown) {
-          if (error instanceof Error && error.name === 'AbortError') {
-            $q.notify({ type: 'info', message: t('exportSettings.cancelled') });
-          } else {
-            console.error(error);
-            $q.notify({ type: 'negative', message: t('exportSettings.fail') });
-          }
-        }
-      } else {
-        // Fallback for older browsers
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = 'qcalc-settings.json';
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        URL.revokeObjectURL(url);
-        $q.notify({ type: 'positive', message: t('exportSettings.success') });
-      }
-    } catch (error) {
-      console.error(error);
-      $q.notify({ type: 'negative', message: t('exportSettings.fail') });
-    }
   };
 
   // 설정 불러오기 버튼 클릭 핸들러
@@ -730,7 +683,7 @@
               :color="selectTextColor"
               :class="`bg-${selectBackgroundColor}`"
               :aria-label="t('ariaLabel.exportSettings')"
-              @click="handleExportSettings"
+              @click="exportSettings"
             />
             <q-btn
               flat
@@ -746,7 +699,7 @@
             ref="fileInput"
             type="file"
             style="display: none"
-            accept=".json"
+            accept="text/json,.json"
             :aria-label="t('ariaLabel.importSettings')"
             @change="handleFileChange"
           />
@@ -824,149 +777,167 @@
   }
 </style>
 
-<i18n>
-ko:
-  alwaysOnTop: '항상 위'
-  initPanel: '시작 시 패널 초기화'
-  darkMode:
-    title: '다크 모드'
-    light: '밝은'
-    dark: '어두운'
-    system: '시스템'
-  hapticsMode: '진동 모드'
-  showButtonAddedLabel: '버튼 추가 라벨 표시'
-  useGrouping: '숫자 묶음 표시'
-  groupingUnit: '숫자 묶음 단위'
-  decimalPlaces: '소수점'
-  decimalPlacesStat: '소수점 자리수'
-  noLimit: '제한 없음'
-  toNDecimalPlaces: '자리'
-  showUnit: '단위 표시'
-  showSymbol: '기호 표시'
-  showRadix: '진법 표시'
-  radixType: '진법 형식'
-  prefix: '숫자 앞에'
-  suffix: '숫자 뒤에'
-  useSystemLocale: '시스템 언어 사용'
-  language: '언어'
-  autoUpdate: '자동 업데이트'
-  autoUpdateHelp: '업데이트를 위해서는 설정에서 자동 업데이트를 활성화하고 앱을 재시작해야 합니다.'
-  ariaLabel:
-    settingsList: '설정 목록'
-    alwaysOnTop: '항상 위에 표시 설정'
-    initPanel: '시작 시 패널 초기화 설정'
-    hapticsMode: '진동 모드 설정'
-    darkMode: '다크 모드 설정'
-    showButtonAddedLabel: '버튼 추가 라벨 표시 설정'
-    useGrouping: '숫자 묶음 표시 설정'
-    groupingUnit: '숫자 묶음 단위 설정'
-    decimalPlaces: '소수점 자리수 설정'
-    showUnit: '단위 표시 설정'
-    showSymbol: '기호 표시 설정'
-    showRadix: '진법 표시 설정'
-    radixType: '진법 형식 설정'
-    useSystemLocale: '시스템 언어 사용 설정'
-    language: '언어 설정'
-    autoUpdate: '자동 업데이트 설정'
+<i18n lang="yaml">
+  ko:
+    alwaysOnTop: '항상 위'
+    initPanel: '시작 시 패널 초기화'
+    darkMode:
+      title: '다크 모드'
+      light: '밝은'
+      dark: '어두운'
+      system: '시스템'
+    hapticsMode: '진동 모드'
+    showButtonAddedLabel: '버튼 추가 라벨 표시'
+    useGrouping: '숫자 묶음 표시'
+    groupingUnit: '숫자 묶음 단위'
+    decimalPlaces: '소수점'
+    decimalPlacesStat: '소수점 자리수'
+    noLimit: '제한 없음'
+    toNDecimalPlaces: '자리'
+    showUnit: '단위 표시'
+    showSymbol: '기호 표시'
+    showRadix: '진법 표시'
+    radixType: '진법 형식'
+    prefix: '숫자 앞에'
+    suffix: '숫자 뒤에'
+    useSystemLocale: '시스템 언어 사용'
+    language: '언어'
+    autoUpdate: '자동 업데이트'
+    autoUpdateHelp: '업데이트를 위해서는 설정에서 자동 업데이트를 활성화하고 앱을 재시작해야 합니다.'
+    ariaLabel:
+      settingsList: '설정 목록'
+      alwaysOnTop: '항상 위에 표시 설정'
+      initPanel: '시작 시 패널 초기화 설정'
+      hapticsMode: '진동 모드 설정'
+      darkMode: '다크 모드 설정'
+      showButtonAddedLabel: '버튼 추가 라벨 표시 설정'
+      useGrouping: '숫자 묶음 표시 설정'
+      groupingUnit: '숫자 묶음 단위 설정'
+      decimalPlaces: '소수점 자리수 설정'
+      showUnit: '단위 표시 설정'
+      showSymbol: '기호 표시 설정'
+      showRadix: '진법 표시 설정'
+      radixType: '진법 형식 설정'
+      useSystemLocale: '시스템 언어 사용 설정'
+      language: '언어 설정'
+      autoUpdate: '자동 업데이트 설정'
+      colorTheme: '색상 테마'
+      editTheme: '{themeName} 테마 편집'
+      deleteTheme: '{themeName} 테마 삭제'
+      createNewTheme: '새 테마 만들기'
+      resetSettings: '설정 초기화'
+      exportSettings: '설정 내보내기'
+      importSettings: '설정 불러오기'
     colorTheme: '색상 테마'
-    editTheme: '{themeName} 테마 편집'
-    deleteTheme: '{themeName} 테마 삭제'
     createNewTheme: '새 테마 만들기'
-    resetSettings: '설정 초기화'
-    exportSettings: '설정 내보내기'
-    importSettings: '설정 불러오기'
-  colorTheme: '색상 테마'
-  createNewTheme: '새 테마 만들기'
-  reset: '초기화'
-  export: '내보내기'
-  import: '불러오기'
-  settingsManagement: '설정 관리'
-  resetSettings:
-    confirmTitle: '설정 초기화 확인'
-    confirmMessage: '정말로 모든 설정을 초기화하시겠습니까? 이 작업은 되돌릴 수 없습니다.'
-    success: '설정이 성공적으로 초기화되었습니다.'
-  exportSettings:
-    success: '설정을 성공적으로 내보냈습니다.'
-    fail: '설정 내보내기에 실패했습니다.'
-    cancelled: '설정 내보내기를 취소했습니다.'
-  importSettings:
-    confirmTitle: '설정 불러오기 확인'
-    confirmMessage: '현재 설정을 덮어쓰고 선택한 파일의 설정으로 교체하시겠습니까?'
-    success: '설정을 성공적으로 불러왔습니다.'
-    fail: '설정 불러오기에 실패했습니다. 파일이 손상되었거나 형식이 올바르지 않습니다.'
-    cancelled: '설정 불러오기를 취소했습니다.'
-  confirmDeleteTitle: '테마 삭제 확인'
-  confirmDeleteMessage: '정말로 \''{themeName}\'' 테마를 삭제하시겠습니까?'
-en:
-  alwaysOnTop: 'Always on top'
-  initPanel: 'Init panel at startup'
-  darkMode:
-    title: 'Dark mode'
-    light: 'Light'
-    dark: 'Dark'
-    system: 'System'
-  hapticsMode: 'Haptics mode'
-  showButtonAddedLabel: 'Show button added label'
-  useGrouping: 'Use grouping'
-  groupingUnit: 'Grouping unit'
-  decimalPlaces: 'Decimal'
-  decimalPlacesStat: 'Decimal places (stat)'
-  noLimit: 'No limit'
-  toNDecimalPlaces: 'decimal places'
-  showUnit: 'Show unit'
-  showSymbol: 'Show symbol'
-  showRadix: 'Show radix'
-  radixType: 'Radix type'
-  prefix: 'Prefix'
-  suffix: 'Suffix'
-  useSystemLocale: 'Use system locale'
-  language: 'Language'
-  autoUpdate: 'Auto update'
-  autoUpdateHelp: 'To apply the update, you need to enable automatic updates in the settings and restart the app.'
-  ariaLabel:
-    settingsList: 'Settings list'
-    alwaysOnTop: 'Always on top setting'
-    initPanel: 'Initialize panel at startup setting'
-    hapticsMode: 'Haptics mode setting'
-    darkMode: 'Dark mode setting'
-    showButtonAddedLabel: 'Show button added label setting'
-    useGrouping: 'Use grouping setting'
-    groupingUnit: 'Grouping unit setting'
-    decimalPlaces: 'Decimal places setting'
-    showUnit: 'Show unit setting'
-    showSymbol: 'Show symbol setting'
-    showRadix: 'Show radix setting'
-    radixType: 'Radix type setting'
-    useSystemLocale: 'Use system locale setting'
-    language: 'Language setting'
-    autoUpdate: 'Auto update setting'
+    reset: '초기화'
+    export: '내보내기'
+    import: '불러오기'
+    settingsManagement: '설정 관리'
+    resetSettings:
+      confirmTitle: '설정 초기화 확인'
+      confirmMessage: '정말로 모든 설정을 초기화하시겠습니까? 이 작업은 되돌릴 수 없습니다.'
+      success: '설정이 성공적으로 초기화되었습니다.'
+    exportSettings:
+      exportMethodTitle: '내보내기 방법'
+      exportMethodMessage: '설정을 어떻게 내보내시겠습니까?'
+      saveToDevice: '기기에 저장'
+      shareFile: '파일 공유'
+      successMobile: '설정이 {fileName}(으)로 내보내졌습니다.'
+      mobileSaveLocation: 'Documents 폴더에 저장되었습니다.'
+      fail: '설정 내보내기에 실패했습니다.'
+      shareTitle: 'QCalc 설정'
+      shareText: 'QCalc 설정 파일을 공유합니다.'
+      shareDialogTitle: '설정 공유'
+      cancelled: '설정 내보내기가 취소되었습니다.'
+      success: '설정을 성공적으로 내보냈습니다.'
+    importSettings:
+      confirmTitle: '설정 불러오기 확인'
+      confirmMessage: '현재 설정을 덮어쓰고 선택한 파일의 설정으로 교체하시겠습니까?'
+      success: '설정을 성공적으로 불러왔습니다.'
+      fail: '설정 불러오기에 실패했습니다. 파일이 손상되었거나 형식이 올바르지 않습니다.'
+      cancelled: '설정 불러오기를 취소했습니다.'
+    confirmDeleteTitle: '테마 삭제 확인'
+    confirmDeleteMessage: '정말로 \''{themeName}\'' 테마를 삭제하시겠습니까?'
+  en:
+    alwaysOnTop: 'Always on top'
+    initPanel: 'Init panel at startup'
+    darkMode:
+      title: 'Dark mode'
+      light: 'Light'
+      dark: 'Dark'
+      system: 'System'
+    hapticsMode: 'Haptics mode'
+    showButtonAddedLabel: 'Show button added label'
+    useGrouping: 'Use grouping'
+    groupingUnit: 'Grouping unit'
+    decimalPlaces: 'Decimal'
+    decimalPlacesStat: 'Decimal places (stat)'
+    noLimit: 'No limit'
+    toNDecimalPlaces: 'decimal places'
+    showUnit: 'Show unit'
+    showSymbol: 'Show symbol'
+    showRadix: 'Show radix'
+    radixType: 'Radix type'
+    prefix: 'Prefix'
+    suffix: 'Suffix'
+    useSystemLocale: 'Use system locale'
+    language: 'Language'
+    autoUpdate: 'Auto update'
+    autoUpdateHelp: 'To apply the update, you need to enable automatic updates in the settings and restart the app.'
+    ariaLabel:
+      settingsList: 'Settings list'
+      alwaysOnTop: 'Always on top setting'
+      initPanel: 'Initialize panel at startup setting'
+      hapticsMode: 'Haptics mode setting'
+      darkMode: 'Dark mode setting'
+      showButtonAddedLabel: 'Show button added label setting'
+      useGrouping: 'Use grouping setting'
+      groupingUnit: 'Grouping unit setting'
+      decimalPlaces: 'Decimal places setting'
+      showUnit: 'Show unit setting'
+      showSymbol: 'Show symbol setting'
+      showRadix: 'Show radix setting'
+      radixType: 'Radix type setting'
+      useSystemLocale: 'Use system locale setting'
+      language: 'Language setting'
+      autoUpdate: 'Auto update setting'
+      colorTheme: 'Color Theme'
+      editTheme: 'Edit {themeName} theme'
+      deleteTheme: 'Delete {themeName} theme'
+      createNewTheme: 'Create a new theme'
+      resetSettings: 'Reset settings'
+      exportSettings: 'Export settings'
+      importSettings: 'Import settings'
     colorTheme: 'Color Theme'
-    editTheme: 'Edit {themeName} theme'
-    deleteTheme: 'Delete {themeName} theme'
-    createNewTheme: 'Create a new theme'
-    resetSettings: 'Reset settings'
-    exportSettings: 'Export settings'
-    importSettings: 'Import settings'
-  colorTheme: 'Color Theme'
-  createNewTheme: 'Create New Theme'
-  reset: 'Reset'
-  export: 'Export'
-  import: 'Import'
-  settingsManagement: 'Settings Management'
-  resetSettings:
-    confirmTitle: 'Confirm Reset'
-    confirmMessage: 'Are you sure you want to reset all settings? This action cannot be undone.'
-    success: 'Settings have been successfully reset.'
-  exportSettings:
-    success: 'Settings have been successfully exported.'
-    fail: 'Failed to export settings.'
-    cancelled: 'Settings export cancelled.'
-  importSettings:
-    confirmTitle: 'Confirm Import'
-    confirmMessage: 'Are you sure you want to overwrite current settings with the ones from the selected file?'
-    success: 'Settings have been successfully imported.'
-    fail: 'Failed to import settings. The file may be corrupt or in the wrong format.'
-    cancelled: 'Settings import cancelled.'
-  confirmDeleteTitle: 'Confirm Theme Deletion'
-  confirmDeleteMessage: 'Are you sure you want to delete the theme \''{themeName}\''?'
+    createNewTheme: 'Create New Theme'
+    reset: 'Reset'
+    export: 'Export'
+    import: 'Import'
+    settingsManagement: 'Settings Management'
+    resetSettings:
+      confirmTitle: 'Confirm Reset'
+      confirmMessage: 'Are you sure you want to reset all settings? This action cannot be undone.'
+      success: 'Settings have been successfully reset.'
+    exportSettings:
+      exportMethodTitle: 'Export Method'
+      exportMethodMessage: 'How would you like to export the settings?'
+      saveToDevice: 'Save to Device'
+      shareFile: 'Share File'
+      successMobile: 'Settings exported to {fileName}.'
+      mobileSaveLocation: 'Saved in the Documents folder.'
+      fail: 'Failed to export settings.'
+      shareTitle: 'QCalc Settings'
+      shareText: 'Here are my QCalc settings.'
+      shareDialogTitle: 'Share Settings'
+      cancelled: 'Settings export cancelled.'
+      success: 'Settings have been successfully exported.'
+    importSettings:
+      confirmTitle: 'Confirm Import'
+      confirmMessage: 'Are you sure you want to overwrite current settings with the ones from the selected file?'
+      success: 'Settings have been successfully imported.'
+      fail: 'Failed to import settings. The file may be corrupt or in the wrong format.'
+      cancelled: 'Settings import cancelled.'
+    confirmDeleteTitle: 'Confirm Theme Deletion'
+    confirmDeleteMessage: 'Are you sure you want to delete the theme \''{themeName}\''?'
 </i18n>

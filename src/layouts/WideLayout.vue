@@ -281,4 +281,4 @@
   }
 </style>
 
-<i18n lang="yaml5" src="../i18n/components/Layout.yml" />
+<i18n lang="yaml" src="../i18n/components/Layout.yml" />

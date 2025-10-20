@@ -202,11 +202,11 @@
   }
 </style>
 
-<i18n>
-ko:
-  openColorPicker: '색상 선택기 열기'
-  close: '닫기'
-en:
-  openColorPicker: 'Open color picker'
-  close: 'Close'
+<i18n lang="yaml">
+  ko:
+    openColorPicker: '색상 선택기 열기'
+    close: '닫기'
+  en:
+    openColorPicker: 'Open color picker'
+    close: 'Close'
 </i18n>

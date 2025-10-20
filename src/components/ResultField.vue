@@ -950,7 +950,7 @@
   }
 </style>
 
-<i18n>
+<i18n lang="yaml">
   ko:
     copiedDisplayedResult: '표시된 결과가 복사되었습니다.<br><center>{result}</center>'
     copiedDisplayedResultSub: '보조 패널에 표시된 결과가 복사되었습니다.<br><center>{result}</center>'

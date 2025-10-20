@@ -270,41 +270,41 @@
   </template>
 </template>
 
-<i18n lang="yaml5">
+<i18n lang="yaml">
   ko:
-    title: 업데이트 알림
+    title: '업데이트 알림'
     newVersionMessage: '새로운 버전이 있습니다: v{version}.'
     newVersionAddedMessage: '업데이트를 위해서는 설정에서 자동 업데이트를 활성화하고 앱을 재시작해야 합니다.'
-    confirmUpdate: 업데이트를 진행하시겠습니까?
+    confirmUpdate: '업데이트를 진행하시겠습니까?'
     downloading: '다운로드 중... {percent}%'
-    downloadComplete: 업데이트가 다운로드되었습니다. 지금 설치하시겠습니까?
+    downloadComplete: '업데이트가 다운로드되었습니다. 지금 설치하시겠습니까?'
     error: '업데이트 중 오류가 발생했습니다.'
     errorMessage: '업데이트 중 오류가 발생했습니다: 콘솔을 확인해주세요.'
-    later: 나중에
-    update: 업데이트
-    installNow: 지금 설치
-    close: 닫기
-    testUpdate: 업데이트 테스트
-    restartTitle: 재시작 필요
-    restartMessage: 업데이트를 적용하려면 앱을 재시작해야 합니다.
-    restart: 재시작
-    updateSimulationComplete: 업데이트 시뮬레이션이 완료되었습니다.
+    later: '나중에'
+    update: '업데이트'
+    installNow: '지금 설치'
+    close: '닫기'
+    testUpdate: '업데이트 테스트'
+    restartTitle: '재시작 필요'
+    restartMessage: '업데이트를 적용하려면 앱을 재시작해야 합니다.'
+    restart: '재시작'
+    updateSimulationComplete: '업데이트 시뮬레이션이 완료되었습니다.'
   en:
-    title: Update Notification
+    title: 'Update Notification'
     newVersionMessage: 'New version available: v{version}.'
     newVersionAddedMessage: 'To apply the update, you need to enable automatic updates in the settings and restart the app.'
-    confirmUpdate: Would you like to proceed with the update?
+    confirmUpdate: 'Would you like to proceed with the update?'
     downloading: 'Downloading... {percent}%'
-    downloadComplete: Update has been downloaded. Would you like to install it now?
+    downloadComplete: 'Update has been downloaded. Would you like to install it now?'
     error: 'An error occurred during update:'
     errorMessage: 'An error occurred during update: Check the console.'
-    later: Later
-    update: Update
-    installNow: Install Now
-    close: Close
-    testUpdate: Test Update
-    restartTitle: Restart Required
-    restartMessage: The application needs to restart to apply the update.
-    restart: Restart
-    updateSimulationComplete: Update simulation complete.
+    later: 'Later'
+    update: 'Update'
+    installNow: 'Install Now'
+    close: 'Close'
+    testUpdate: 'Test Update'
+    restartTitle: 'Restart Required'
+    restartMessage: 'The application needs to restart to apply the update.'
+    restart: 'Restart'
+    updateSimulationComplete: 'Update simulation complete.'
 </i18n>
