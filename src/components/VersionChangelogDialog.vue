@@ -209,39 +209,42 @@ The format is based on [Keep a Changelog] and this project follows [Semantic Ver
 
 <template>
   <q-dialog v-model="showDialog" persistent>
-    <q-card style="min-width: 350px; max-width: 500px; margin-top: 25px">
-      <q-card-section>
+    <q-card class="changelog-dialog">
+      <q-card-section class="dialog-header">
         <div class="text-h6">{{ t('title') }}</div>
+        <div class="text-caption text-grey-7">{{ t('currentVersionMessage', { version: $g.version }) }}</div>
       </q-card-section>
 
-      <q-card-section class="q-pt-none">
+      <q-separator />
+
+      <q-card-section class="dialog-body">
         <div v-if="isLoading" class="text-center q-pa-md">
           <q-spinner color="primary" size="3em" />
-          <p class="q-mt-md">{{ t('loading') }}</p>
+          <p class="q-mt-md text-grey-7">{{ t('loading') }}</p>
         </div>
-        <div v-else>
-          <p class="text-weight-medium">{{ t('currentVersionMessage', { version: $g.version }) }}</p>
-          <q-separator class="q-my-md" />
-          <div class="changelog-content">
-            <q-markdown :src="changelogContent" no-linkify />
-          </div>
+        <div v-else class="changelog-content scrollbar-custom">
+          <q-markdown :src="changelogContent" no-linkify />
         </div>
       </q-card-section>
 
-      <q-card-actions align="right">
+      <q-separator />
+
+      <q-card-actions align="right" class="q-pa-md">
         <q-btn
           flat
           :label="t('viewOnGitHub')"
           color="primary"
           :text-color="themesStore.isDarkMode() ? 'blue-grey-2' : 'primary'"
           icon="open_in_new"
+          size="md"
           @click="openReleasePage"
         />
         <q-btn
-          flat
+          unelevated
           :label="t('confirm')"
           color="primary"
-          :text-color="themesStore.isDarkMode() ? 'blue-grey-2' : 'primary'"
+          :text-color="themesStore.isDarkMode() ? 'blue-grey-2' : 'white'"
+          size="md"
           @click="handleConfirm"
         />
       </q-card-actions>
@@ -254,43 +257,103 @@ The format is based on [Keep a Changelog] and this project follows [Semantic Ver
     class="fixed-bottom-left q-ma-md"
     color="secondary"
     icon="article"
+    round
     :aria-label="t('testChangelog')"
     @click="testShowChangelog"
   />
 </template>
 
 <style scoped lang="scss">
+  .changelog-dialog {
+    width: 90vw;
+    max-width: 500px;
+    max-height: 80vh;
+    display: flex;
+    flex-direction: column;
+
+    @media (max-width: 599px) {
+      width: 95vw;
+      max-width: none;
+    }
+  }
+
+  .dialog-header {
+    padding: 16px 20px 12px;
+    background: linear-gradient(135deg, var(--q-primary) 0%, rgba(var(--q-primary-rgb), 0.8) 100%);
+    color: white;
+
+    .text-h6 {
+      color: white;
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+
+    .text-caption {
+      color: rgba(255, 255, 255, 0.85);
+    }
+  }
+
+  .dialog-body {
+    flex: 1;
+    overflow: hidden;
+    padding: 0;
+    min-height: 200px;
+    max-height: calc(80vh - 180px);
+    display: flex;
+    flex-direction: column;
+  }
+
   .changelog-content {
-    max-height: 400px;
+    height: 100%;
     overflow-y: auto;
-    padding: 0 8px;
+    overflow-x: hidden;
+    padding: 16px 20px;
 
     :deep(h2) {
-      font-size: 1.25rem;
+      font-size: 1.15rem;
       font-weight: 600;
-      margin-top: 0;
-      margin-bottom: 0.75rem;
+      margin: 0 0 0.75rem 0;
     }
 
     :deep(h3) {
-      font-size: 1.1rem;
+      font-size: 1rem;
       font-weight: 600;
-      margin-top: 1rem;
-      margin-bottom: 0.5rem;
-      color: var(--q-primary);
+      margin: 1rem 0 0.5rem 0;
     }
 
     :deep(ul) {
-      margin-left: 1.5rem;
-      margin-bottom: 0.75rem;
+      margin: 0 0 0.75rem 1.25rem;
+      padding: 0;
     }
 
     :deep(li) {
-      margin-bottom: 0.25rem;
+      margin-bottom: 0.35rem;
+      line-height: 1.5;
     }
 
     :deep(p) {
       margin-bottom: 0.5rem;
+      line-height: 1.6;
+    }
+
+    :deep(strong) {
+      font-weight: 600;
+    }
+
+    @media (max-width: 599px) {
+      padding: 12px 16px;
+
+      :deep(h2) {
+        font-size: 1.05rem;
+      }
+
+      :deep(h3) {
+        font-size: 0.95rem;
+      }
+
+      :deep(li) {
+        font-size: 0.9rem;
+      }
     }
   }
 </style>
