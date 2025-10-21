@@ -16,7 +16,7 @@
 
   // === 컴포넌트 임포트 ===
   import AutoUpdate from 'components/AutoUpdate.vue';
-  import SnapFirst from 'components/snippets/SnapFirst.vue';
+  import SnapFirst from 'components/SnapFirst.vue';
   import VersionChangelogDialog from 'components/VersionChangelogDialog.vue';
 
   // === 유틸리티 클래스 임포트 ===
