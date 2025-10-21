@@ -93,10 +93,7 @@ export default defineConfig((/* ctx */) => {
         [
           '@intlify/unplugin-vue-i18n/vite',
           {
-            include: [
-              join(__dirname, 'src/i18n/messages/*.yml'),
-              join(__dirname, 'src/i18n/errors/*.yml'),
-            ],
+            include: [join(__dirname, 'src/i18n/messages/*.yml'), join(__dirname, 'src/i18n/errors/*.yml')],
             strictMessage: false,
             escapeHtml: false,
           },

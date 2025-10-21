@@ -16,6 +16,7 @@ interface UIState {
   isSearchOpen: boolean;
   searchKeyword: string;
   isSnapFirstRun: boolean;
+  snapLastSeenVersion: string;
 }
 
 export const useUIStore = defineStore('ui', {
@@ -30,6 +31,7 @@ export const useUIStore = defineStore('ui', {
     isSearchOpen: false,
     searchKeyword: '',
     isSnapFirstRun: false,
+    snapLastSeenVersion: '',
   }),
 
   actions: {
@@ -56,6 +58,12 @@ export const useUIStore = defineStore('ui', {
     // 전체 계산 결과 삭제 확인 다이얼로그 표시 여부
     setDeleteRecordConfirmOpen(value: boolean) {
       this.isDeleteRecordConfirmOpen = value;
+    },
+
+    // Snap 첫 실행 관련
+    updateSnapVersion(version: string): void {
+      this.snapLastSeenVersion = version;
+      this.isSnapFirstRun = false;
     },
   },
 
