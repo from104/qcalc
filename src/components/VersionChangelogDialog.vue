@@ -11,12 +11,11 @@
   import { ref, onMounted } from 'vue';
   import { useI18n } from 'vue-i18n';
   import axios from 'axios';
-
   import { useUIStore } from 'stores/uiStore';
-  import { useThemesStore } from 'stores/themesStore';
+  import { useDialogStyle } from 'src/composables/useDialogStyle';
 
   const uiStore = useUIStore();
-  const themesStore = useThemesStore();
+  const { getButtonTextColor } = useDialogStyle();
   const { t } = useI18n();
 
   // 전역 window 객체에 접근하기 위한 상수 선언
@@ -234,7 +233,7 @@ The format is based on [Keep a Changelog] and this project follows [Semantic Ver
           flat
           :label="t('viewOnGitHub')"
           color="primary"
-          :text-color="themesStore.isDarkMode() ? 'blue-grey-2' : 'primary'"
+          :text-color="getButtonTextColor()"
           icon="open_in_new"
           size="md"
           @click="openReleasePage"
@@ -243,7 +242,7 @@ The format is based on [Keep a Changelog] and this project follows [Semantic Ver
           unelevated
           :label="t('confirm')"
           color="primary"
-          :text-color="themesStore.isDarkMode() ? 'blue-grey-2' : 'white'"
+          :text-color="getButtonTextColor(true)"
           size="md"
           @click="handleConfirm"
         />
@@ -264,96 +263,35 @@ The format is based on [Keep a Changelog] and this project follows [Semantic Ver
 </template>
 
 <style scoped lang="scss">
+  @import '../css/dialog.scss';
+
   .changelog-dialog {
-    width: 90vw;
-    max-width: 500px;
-    max-height: 80vh;
-    display: flex;
-    flex-direction: column;
+    @extend .dialog-container;
+  }
+
+  .dialog-body {
+    padding: 0;
+    min-height: 200px;
+    max-height: calc(80vh - 180px);
 
     @media (max-width: 599px) {
-      width: 95vw;
-      max-width: none;
+      padding: 0;
     }
   }
 
   .dialog-header {
-    padding: 16px 20px 12px;
-    background: linear-gradient(135deg, var(--q-primary) 0%, rgba(var(--q-primary-rgb), 0.8) 100%);
-    color: white;
-
     .text-h6 {
-      color: white;
-      font-weight: 600;
       margin-bottom: 4px;
     }
-
-    .text-caption {
-      color: rgba(255, 255, 255, 0.85);
-    }
-  }
-
-  .dialog-body {
-    flex: 1;
-    overflow: hidden;
-    padding: 0;
-    min-height: 200px;
-    max-height: calc(80vh - 180px);
-    display: flex;
-    flex-direction: column;
   }
 
   .changelog-content {
+    @extend .scrollable-content;
     height: 100%;
-    overflow-y: auto;
-    overflow-x: hidden;
     padding: 16px 20px;
-
-    :deep(h2) {
-      font-size: 1.15rem;
-      font-weight: 600;
-      margin: 0 0 0.75rem 0;
-    }
-
-    :deep(h3) {
-      font-size: 1rem;
-      font-weight: 600;
-      margin: 1rem 0 0.5rem 0;
-    }
-
-    :deep(ul) {
-      margin: 0 0 0.75rem 1.25rem;
-      padding: 0;
-    }
-
-    :deep(li) {
-      margin-bottom: 0.35rem;
-      line-height: 1.5;
-    }
-
-    :deep(p) {
-      margin-bottom: 0.5rem;
-      line-height: 1.6;
-    }
-
-    :deep(strong) {
-      font-weight: 600;
-    }
 
     @media (max-width: 599px) {
       padding: 12px 16px;
-
-      :deep(h2) {
-        font-size: 1.05rem;
-      }
-
-      :deep(h3) {
-        font-size: 0.95rem;
-      }
-
-      :deep(li) {
-        font-size: 0.9rem;
-      }
     }
   }
 </style>

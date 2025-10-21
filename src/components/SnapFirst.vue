@@ -15,13 +15,12 @@
    */
 
   import { useI18n } from 'vue-i18n';
+  import { useUIStore } from 'stores/uiStore';
+  import { useDialogStyle } from 'src/composables/useDialogStyle';
 
   const $g = window.globalVars;
-
-  import { useUIStore } from 'stores/uiStore';
-
   const uiStore = useUIStore();
-
+  const { getButtonTextColor } = useDialogStyle();
   const { t } = useI18n();
 
   /**
@@ -48,20 +47,65 @@
 
 <template>
   <q-dialog v-if="$g.isSnap" v-model="uiStore.isSnapFirstRun" persistent>
-    <q-card style="min-width: 350px">
-      <q-card-section>
-        <div class="text-h6 text-center">{{ t('snapNoticeTitle') }}</div>
+    <q-card class="snap-dialog">
+      <q-card-section class="dialog-header">
+        <div class="text-h6">{{ t('snapNoticeTitle') }}</div>
       </q-card-section>
-      <q-card-section class="text-body2">
-        <div style="white-space: pre-line">{{ t('snapFirstRun') }}</div>
+
+      <q-separator />
+
+      <q-card-section class="dialog-body">
+        <div class="notice-content">{{ t('snapFirstRun') }}</div>
       </q-card-section>
-      <q-card-actions class="justify-center q-gutter-sm">
-        <q-btn :label="t('confirm')" color="primary" @click="handleConfirm" />
-        <q-btn :label="t('viewIssue')" flat @click="openGitHubIssue" />
+
+      <q-separator />
+
+      <q-card-actions align="right" class="q-pa-md">
+        <q-btn
+          flat
+          :label="t('viewIssue')"
+          color="primary"
+          :text-color="getButtonTextColor()"
+          icon="open_in_new"
+          size="md"
+          @click="openGitHubIssue"
+        />
+        <q-btn
+          unelevated
+          :label="t('confirm')"
+          color="primary"
+          :text-color="getButtonTextColor(true)"
+          size="md"
+          @click="handleConfirm"
+        />
       </q-card-actions>
     </q-card>
   </q-dialog>
 </template>
+
+<style scoped lang="scss">
+  @import '../css/dialog.scss';
+
+  .snap-dialog {
+    @extend .dialog-container;
+  }
+
+  .dialog-header {
+    .text-h6 {
+      text-align: center;
+    }
+  }
+
+  .notice-content {
+    white-space: pre-line;
+    line-height: 1.7;
+    font-size: 0.95rem;
+
+    @media (max-width: 599px) {
+      font-size: 0.9rem;
+    }
+  }
+</style>
 
 <i18n lang="yaml">
 ko:

@@ -1,0 +1,112 @@
+/**
+ * @file dialog.scss
+ * @description 다이얼로그 컴포넌트의 공통 스타일을 정의합니다.
+ *              VersionChangelogDialog, AutoUpdate, SnapFirst 등에서 사용됩니다.
+ */
+
+// 기본 다이얼로그 컨테이너 스타일
+.dialog-container {
+  width: 90vw;
+  max-width: 500px;
+  max-height: 80vh;
+  display: flex;
+  flex-direction: column;
+
+  @media (max-width: 599px) {
+    width: 95vw;
+    max-width: none;
+  }
+}
+
+// 다이얼로그 헤더 스타일
+.dialog-header {
+  padding: 16px 20px 12px;
+  background: linear-gradient(
+    135deg,
+    var(--q-primary) 0%,
+    rgba(var(--q-primary-rgb), 0.8) 100%
+  );
+  color: white;
+
+  .text-h6 {
+    color: white;
+    font-weight: 600;
+  }
+
+  .text-caption {
+    color: rgba(255, 255, 255, 0.85);
+  }
+}
+
+// 다이얼로그 본문 영역 스타일
+.dialog-body {
+  flex: 1;
+  overflow: hidden;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+
+  p {
+    margin-bottom: 0.75rem;
+    line-height: 1.6;
+  }
+
+  @media (max-width: 599px) {
+    padding: 16px;
+  }
+}
+
+// 스크롤 가능한 컨텐츠 영역 기본 스타일
+.scrollable-content {
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 12px;
+  border-radius: 4px;
+
+  :deep(h2) {
+    font-size: 1.15rem;
+    font-weight: 600;
+    margin: 0 0 0.75rem 0;
+  }
+
+  :deep(h3) {
+    font-size: 1rem;
+    font-weight: 600;
+    margin: 1rem 0 0.5rem 0;
+  }
+
+  :deep(ul) {
+    margin: 0 0 0.75rem 1.25rem;
+    padding: 0;
+  }
+
+  :deep(li) {
+    margin-bottom: 0.35rem;
+    line-height: 1.5;
+  }
+
+  :deep(p) {
+    margin-bottom: 0.5rem;
+    line-height: 1.6;
+  }
+
+  :deep(strong) {
+    font-weight: 600;
+  }
+
+  @media (max-width: 599px) {
+    padding: 8px;
+
+    :deep(h2) {
+      font-size: 1.05rem;
+    }
+
+    :deep(h3) {
+      font-size: 0.95rem;
+    }
+
+    :deep(li) {
+      font-size: 0.9rem;
+    }
+  }
+}
