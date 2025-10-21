@@ -336,9 +336,6 @@
       // 기본 마진
       bottomMargin += 10;
     }
-    console.log('bottomMargin: ', bottomMargin);
-    console.log('isWideWidth: ', isWideWidth());
-    console.log('isGestureNavigation: ', $g.isGestureNavigation);
     return bottomMargin;
   });
 
