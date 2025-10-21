@@ -17,6 +17,7 @@ interface UIState {
   searchKeyword: string;
   isSnapFirstRun: boolean;
   snapLastSeenVersion: string;
+  lastSeenChangelogVersion: string;
 }
 
 export const useUIStore = defineStore('ui', {
@@ -32,6 +33,7 @@ export const useUIStore = defineStore('ui', {
     searchKeyword: '',
     isSnapFirstRun: false,
     snapLastSeenVersion: '',
+    lastSeenChangelogVersion: '',
   }),
 
   actions: {
@@ -64,6 +66,11 @@ export const useUIStore = defineStore('ui', {
     updateSnapVersion(version: string): void {
       this.snapLastSeenVersion = version;
       this.isSnapFirstRun = false;
+    },
+
+    // Changelog 버전 관리
+    updateLastSeenChangelogVersion(version: string): void {
+      this.lastSeenChangelogVersion = version;
     },
   },
 

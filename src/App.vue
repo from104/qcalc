@@ -17,6 +17,7 @@
   // === 컴포넌트 임포트 ===
   import AutoUpdate from 'components/AutoUpdate.vue';
   import SnapFirst from 'components/snippets/SnapFirst.vue';
+  import VersionChangelogDialog from 'components/VersionChangelogDialog.vue';
 
   // === 유틸리티 클래스 임포트 ===
   import { useKeyBinding } from './composables/useKeyBinding';
@@ -89,7 +90,7 @@
    * q: 앱 종료
    * 기타: 계산기 관련 기능
    */
-    const { subscribe, unsubscribe } = useKeyBinding([
+  const { subscribe, unsubscribe } = useKeyBinding([
     [['Alt+t'], toggleAlwaysOnTopWithNotification],
     [['Alt+i'], settingsStore.toggleInitPanel],
     [['Alt+d'], toggleDarkModeWithNotification],
@@ -209,6 +210,7 @@
   </router-view>
   <AutoUpdate />
   <SnapFirst />
+  <VersionChangelogDialog />
 </template>
 
 <style scoped lang="scss">
@@ -322,28 +324,28 @@
 </style>
 
 <i18n lang="yaml">
-  ko:
-    targetToBeCopiedResult: '계산 결과를'
-    targetToBeCopiedSelected: '선택한 내용을'
-    copiedToClipboard: '{target} 클립보드에 복사했습니다.'
-    alwaysOnTopOn: '항상 위에 표시가 활성화되었습니다.'
-    alwaysOnTopOff: '항상 위에 표시가 비활성화되었습니다.'
-    darkMode:
-      message:
-        system: '다크모드를 시스템 설정에 따라 변경했습니다.'
-        light: '라이트 모드로 변경했습니다.'
-        dark: '다크 모드로 변경했습니다.'
-    persistedSettingsCorrected: '앱 업데이트로 인해 일부 저장된 설정이 초기화되었습니다.'
-  en:
-    targetToBeCopiedResult: 'the calculation result'
-    targetToBeCopiedSelected: 'the selected content'
-    copiedToClipboard: 'Copied {target} to the clipboard.'
-    alwaysOnTopOn: 'Always on top has been enabled.'
-    alwaysOnTopOff: 'Always on top has been disabled.'
-    darkMode:
-      message:
-        system: 'Dark mode changed to follow system settings.'
-        light: 'Changed to light mode.'
-        dark: 'Changed to dark mode.'
-    persistedSettingsCorrected: 'Some saved settings have been reset due to an app update.'
+ko:
+  targetToBeCopiedResult: '계산 결과를'
+  targetToBeCopiedSelected: '선택한 내용을'
+  copiedToClipboard: '{target} 클립보드에 복사했습니다.'
+  alwaysOnTopOn: '항상 위에 표시가 활성화되었습니다.'
+  alwaysOnTopOff: '항상 위에 표시가 비활성화되었습니다.'
+  darkMode:
+    message:
+      system: '다크모드를 시스템 설정에 따라 변경했습니다.'
+      light: '라이트 모드로 변경했습니다.'
+      dark: '다크 모드로 변경했습니다.'
+  persistedSettingsCorrected: '앱 업데이트로 인해 일부 저장된 설정이 초기화되었습니다.'
+en:
+  targetToBeCopiedResult: 'the calculation result'
+  targetToBeCopiedSelected: 'the selected content'
+  copiedToClipboard: 'Copied {target} to the clipboard.'
+  alwaysOnTopOn: 'Always on top has been enabled.'
+  alwaysOnTopOff: 'Always on top has been disabled.'
+  darkMode:
+    message:
+      system: 'Dark mode changed to follow system settings.'
+      light: 'Changed to light mode.'
+      dark: 'Changed to dark mode.'
+  persistedSettingsCorrected: 'Some saved settings have been reset due to an app update.'
 </i18n>
