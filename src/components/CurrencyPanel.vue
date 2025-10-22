@@ -31,7 +31,7 @@
   const calcStore = useCalcStore();
 
   // 계산기 관련 타입과 클래스
-  import { KeyBinding } from 'classes/KeyBinding';
+  import { useKeyBinding } from '../composables/useKeyBinding';
 
   // 전역 변수 import
   const $g = window.globalVars;
@@ -41,7 +41,7 @@
   import { clickButtonById, blurElement } from 'src/utils/GlobalHelpers';
 
   // 키 바인딩 설정
-  const keyBinding = new KeyBinding([
+  useKeyBinding([
     [['\\'], () => clickButtonById('btn-swap-currency')],
     [['Alt+\\'], () => currencyStore.toggleShowSymbol()],
   ]);
@@ -72,23 +72,11 @@
     updateCurrencyOptions();
   });
 
-  // 입력 포커스에 따른 키 바인딩 활성화/비활성화
-  watch(
-    () => uiStore.inputFocused,
-    () => {
-      if (uiStore.inputFocused) {
-        keyBinding.unsubscribe();
-      } else {
-        keyBinding.subscribe();
-      }
-    },
-  );
-
-  let rateUpdateTimer: number | undefined;
+  // 환율 업데이트 타이머 참조
+  let rateUpdateTimer: number | null = null;
 
   onMounted(() => {
     currencyStore.initRecentCurrencies();
-    keyBinding.subscribe();
 
     // 초기 환율 정보 업데이트
     (async () => {
@@ -105,9 +93,10 @@
   });
 
   onBeforeUnmount(() => {
-    keyBinding.unsubscribe();
     uiStore.setInputBlurred();
-    clearInterval(rateUpdateTimer);
+    if (rateUpdateTimer) {
+      clearInterval(rateUpdateTimer);
+    }
   });
 
   // 통화 옵션 타입 정의
@@ -258,9 +247,13 @@
       :class="`bg-${selectBackgroundColor}`"
       :label-color="selectTextColor"
       :popup-content-class="
-        [`bg-${selectBackgroundColor}`, 'scrollbar-custom', 'q-select-popup', $g.isMobile ? 'popup-mobile' : '', 'noselect'].join(
-          ' ',
-        )
+        [
+          `bg-${selectBackgroundColor}`,
+          'scrollbar-custom',
+          'q-select-popup',
+          $g.isMobile ? 'popup-mobile' : '',
+          'noselect',
+        ].join(' ')
       "
       :options-selected-class="`text-${selectTextColor}`"
       @filter="sourceFilterFn"
@@ -342,9 +335,13 @@
       :class="`bg-${selectBackgroundColor}`"
       :label-color="selectTextColor"
       :popup-content-class="
-        [`bg-${selectBackgroundColor}`, 'scrollbar-custom', 'q-select-popup', $g.isMobile ? 'popup-mobile' : '', 'noselect'].join(
-          ' ',
-        )
+        [
+          `bg-${selectBackgroundColor}`,
+          'scrollbar-custom',
+          'q-select-popup',
+          $g.isMobile ? 'popup-mobile' : '',
+          'noselect',
+        ].join(' ')
       "
       :options-selected-class="`text-${selectTextColor}`"
       @filter="targetFilterFn"
@@ -378,10 +375,7 @@
           </q-item>
         </transition-group>
       </template>
-      <ToolTip
-        :text-color="themesStore.getDarkColor()"
-        :bg-color="themesStore.getCurrentThemeColors.ui.warning"
-      >
+      <ToolTip :text-color="themesStore.getDarkColor()" :bg-color="themesStore.getCurrentThemeColors.ui.warning">
         <div class="text-left" style="white-space: pre-wrap">
           {{
             `${currencyDescriptions[currencyStore.targetCurrency]}\n${currencyStore.targetCurrency}, ${currencyStore.currencyConverter.getRate(currencyStore.targetCurrency).toFixed(4)}`
@@ -453,4 +447,4 @@
   }
 </style>
 
-<i18n lang="yaml5" src="../i18n/components/CurrencyPanel.yml" />
+<i18n lang="yaml" src="../i18n/components/CurrencyPanel.yml" />

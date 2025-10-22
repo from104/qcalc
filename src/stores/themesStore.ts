@@ -11,14 +11,16 @@ import type { ButtonType } from '../types/store';
 import { themes, type DarkModeType, type ThemeType, type ThemeColors } from '../constants/ThemesData';
 
 interface ThemesState {
-  currentTheme: ThemeType;
+  currentTheme: ThemeType | string;
   darkMode: DarkModeType;
+  userThemes: Record<string, ThemeColors>;
 }
 
 export const useThemesStore = defineStore('themes', {
   state: (): ThemesState => ({
     currentTheme: 'default',
     darkMode: 'system',
+    userThemes: {},
   }),
 
   getters: {
@@ -26,7 +28,7 @@ export const useThemesStore = defineStore('themes', {
      * 현재 테마의 색상 객체를 반환하는 getter
      */
     getCurrentThemeColors: (state: ThemesState): ThemeColors => {
-      return themes[state.currentTheme] || themes.default;
+      return state.userThemes[state.currentTheme] || themes[state.currentTheme as ThemeType] || themes.default;
     },
   },
 
@@ -35,9 +37,21 @@ export const useThemesStore = defineStore('themes', {
      * 테마 설정 액션
      * @param themeName - 설정할 테마 이름
      */
-    setTheme(themeName: ThemeType): void {
-      if (themes[themeName]) {
+    setTheme(themeName: ThemeType | string): void {
+      if (themes[themeName as ThemeType] || this.userThemes[themeName]) {
         this.currentTheme = themeName;
+        this.updateTheme();
+      }
+    },
+
+    addUserTheme(themeName: string, themeColors: ThemeColors): void {
+      this.userThemes[themeName] = themeColors;
+    },
+
+    removeUserTheme(themeName: string): void {
+      delete this.userThemes[themeName];
+      if (this.currentTheme === themeName) {
+        this.currentTheme = 'default';
         this.updateTheme();
       }
     },
@@ -313,6 +327,23 @@ export const useThemesStore = defineStore('themes', {
         console.error(`Error converting color name ${colorName} to hex: ${error}. Returning #000000.`);
         return '#000000';
       }
+    },
+
+    /**
+     * 배경색에 따라 대비가 높은 텍스트 색상(검정 또는 흰색)을 반환합니다.
+     * @param bgColor - 배경의 HEX 색상 코드
+     * @returns {string} '#000000' 또는 '#FFFFFF'
+     */
+    getTextColorByBackgroundColor(bgColor: string): string {
+      if (!bgColor || !/^#([0-9A-Fa-f]{3}){1,2}$/.test(bgColor)) {
+        return '#FFFFFF';
+      }
+      const hex = bgColor.substring(1);
+      const r = parseInt(hex.substring(0, 2), 16);
+      const g = parseInt(hex.substring(2, 4), 16);
+      const b = parseInt(hex.substring(4, 6), 16);
+      const luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+      return luminance > 0.65 ? '#000000' : '#FFFFFF';
     },
 
     /**

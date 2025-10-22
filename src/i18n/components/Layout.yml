@@ -1,0 +1,132 @@
+ko:
+  calc: 기본
+  unit: 단위
+  currency: 환율
+  radix: 진법
+  help: 도움말
+  about: 정보
+  record: 기록
+  settings: 설정
+  message:
+    fileSavedTo: '(저장 경로: {path})'
+  tooltipTips: '팁을 표시합니다.'
+  openRecordPage: '클릭하면 기록 화면를 엽니다.'
+  tooltipHelp: '도움말을 표시합니다.'
+  clearRecords:
+    confirmTitle: '계산 기록 초기화 확인'
+    confirmMessage: '정말로 모든 계산 기록을 초기화하시겠습니까? 이 작업은 되돌릴 수 없습니다.'
+    success: '계산 기록이 성공적으로 초기화되었습니다.'
+  exportRecords:
+    success: '계산 기록을 성공적으로 내보냈습니다.'
+    fail: '계산 기록 내보내기에 실패했습니다.'
+    noData: '내보낼 계산 기록이 없습니다.'
+    cancelled: '계산 기록 내보내기를 취소했습니다.'
+    shareTitle: 'qcalc 계산 기록'
+    shareText: 'qcalc 계산 기록을 확인하세요.'
+    shareDialogTitle: '기록 내보내기'
+    exportMethodTitle: '내보내기 방식 선택'
+    exportMethodMessage: '계산 기록을 기기에 저장하거나 다른 앱으로 공유할 수 있습니다.'
+    saveToDevice: '기기에 저장'
+    shareFile: '공유하기'
+    successMobile: '파일을 성공적으로 저장했습니다. ({fileName})'
+    mobileSaveLocation: 'Documents 폴더에서 파일을 찾을 수 있습니다.'
+  importRecords:
+    confirmTitle: '계산 기록 불러오기 확인'
+    confirmMessage: '현재 계산 기록을 덮어쓰고 선택한 파일의 기록으로 교체하시겠습니까?'
+    success: '계산 기록을 성공적으로 불러왔습니다.'
+    fail: '계산 기록 불러오기에 실패했습니다. 파일이 손상되었거나 형식이 올바르지 않습니다.'
+    cancelled: '계산 기록 불러오기를 취소했습니다.'
+  ariaLabel:
+    delete_outline: '모든 기록 삭제'
+    back: '이전 화면로 돌아가기'
+    backToRecord: '기록 화면로 돌아가기'
+    mainTabs: '메인 탭 목록'
+    tab: '{name} 탭'
+    subPageTitle: '{title} 화면'
+    subPageButton: '{label} 버튼'
+    closeSubPage: '서브화면 닫기'
+    calculatorSection: '계산기 영역'
+    calculatorContent: '계산기 컨텐츠'
+    tabPanel: '{name} 탭 패널'
+    subPageSection: '서브화면 영역'
+    subPageContent: '서브화면 컨텐츠'
+    tabSelected: '{name} 탭 선택됨'
+    tabUnselected: '{name} 탭 선택되지 않음'
+    record: '기록 화면 열기'
+    help: '도움말 보기'
+  tooltip:
+    help: '도움말'
+    about: '정보'
+    settings: '설정'
+    deleteRecord: '모든 기록 삭제'
+    exportRecords: '기록 내보내기'
+    importRecords: '기록 불러오기'
+    search: '검색'
+    menu: '메뉴 열기'
+    recordSwipeHelp: '기록 화면에서 왼쪽으로 스와이프하여 메모를 추가,수정하거나 오른쪽으로 스와이프하여 기록을 삭제할 수 있습니다.'
+en:
+  calc: Basic
+  unit: Unit
+  currency: Currency
+  radix: Radix
+  help: Help
+  about: About
+  record: Record
+  settings: Settings
+  message:
+    fileSavedTo: '(Saved to: {path})'
+  tooltipTips: 'Show tips.'
+  openRecordPage: 'Click to open the record screen.'
+  tooltipHelp: 'Show help.'
+  clearRecords:
+    confirmTitle: 'Confirm Clear Records'
+    confirmMessage: 'Are you sure you want to clear all calculation records? This action cannot be undone.'
+    success: 'Calculation records have been successfully cleared.'
+  exportRecords:
+    success: 'Calculation records have been successfully exported.'
+    fail: 'Failed to export calculation records.'
+    noData: 'There are no calculation records to export.'
+    cancelled: 'Records export cancelled.'
+    shareTitle: 'qcalc Calculation Records'
+    shareText: 'Check out my calculation records from qcalc.'
+    shareDialogTitle: 'Export Records'
+    exportMethodTitle: 'Choose Export Method'
+    exportMethodMessage: 'You can save the calculation records to the device or share them with other apps.'
+    saveToDevice: 'Save to Device'
+    shareFile: 'Share'
+    successMobile: 'File saved successfully. ({fileName})'
+    mobileSaveLocation: 'You can find the file in the Documents folder.'
+  importRecords:
+    confirmTitle: 'Confirm Import Records'
+    confirmMessage: 'Are you sure you want to overwrite current calculation records with the ones from the selected file?'
+    success: 'Calculation records have been successfully imported.'
+    fail: 'Failed to import calculation records. The file may be corrupt or in the wrong format.'
+    cancelled: 'Records import cancelled.'
+  ariaLabel:
+    delete_outline: 'Delete all records'
+    back: 'Go back to previous screen'
+    backToRecord: 'Return to record screen'
+    mainTabs: 'Main tab list'
+    tab: '{name} tab'
+    subPageTitle: '{title} screen'
+    subPageButton: '{label} button'
+    closeSubPage: 'Close sub screen'
+    calculatorSection: 'Calculator section'
+    calculatorContent: 'Calculator content'
+    tabPanel: '{name} tab panel'
+    subPageSection: 'Sub screen section'
+    subPageContent: 'Sub screen content'
+    tabSelected: '{name} tab selected'
+    tabUnselected: '{name} tab unselected'
+    record: 'Open record screen'
+    help: 'View help'
+  tooltip:
+    help: 'Help'
+    about: 'About'
+    settings: 'Settings'
+    deleteRecord: 'Delete all records'
+    exportRecords: 'Export records'
+    importRecords: 'Import records'
+    search: 'Search'
+    menu: 'Open menu'
+    recordSwipeHelp: 'You can add, modify, or delete records by swiping left on the record screen, or by swiping right to delete the record.'

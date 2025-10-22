@@ -146,7 +146,30 @@ These environment variables are used during the build process to sign the releas
 
 The project root contains scripts for automating builds:
 
+### Build Script Usage
+
+The build scripts support arguments to perform builds for specific platforms. If no argument is provided, they will attempt to build for all platforms (Linux, Windows, Android).
+
+```bash
+# Build all platforms (default)
+./build.sh all
+build.bat all
+
+# Build Linux
+./build.sh linux
+
+# Build Windows
+./build.sh win
+build.bat win
+
+# Build Android
+./build.sh android
+build.bat android
+```
+
 ### Linux users (build.sh)
+
+The `build.sh` script is used in Linux environments. Wine must be installed to build for Windows.
 
 ```bash
 # Grant the script execute permissions
@@ -156,10 +179,12 @@ chmod +x build.sh
 ./build.sh
 ```
 
-### Windows user (build.bat, incomplete)
+### Windows user (build.bat)
+
+The `build.bat` script is used in Windows environments.
 
 ```batch
-# Run from a command prompt
+:: Run from a command prompt
 build.bat
 ```
 

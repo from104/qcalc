@@ -6,7 +6,7 @@
  */
 
 import type { BigNumber as tBigNumber } from 'mathjs';
-import type { Radix } from 'classes/RadixConverter';
+import type { Radix } from '../utils/RadixConverter';
 
 declare global {
   type BigNumber = tBigNumber;

@@ -12,21 +12,19 @@ All notable changes to this project are recorded in this file.
 
 The format is based on [Keep a Changelog] and this project follows [Semantic Versioning].
 
-## [0.11.4] 2025-06-10
+## [0.11.5] 2025-10-07
 
 ### Added
 
-- **Unit and Currency Calculator Favorites Feature**: Added the ability to set frequently used units or currencies as favorites for quick access.
-- **Extended Color Theme System**: Added the ability to choose from various color themes beyond dark/light mode, providing a personalized UI experience.
+- **Calculation History Font Size Control**: Added a feature to adjust the font size of the calculation history in 3 steps.
+- **Settings Management**: Added the ability to reset, export, and import all settings.
+- **Calculation History Management**: Added the ability to export and import calculation history as a CSV file.
+- **User Theme Customization**: Added the ability for users to create, edit, and delete their own themes.
 
 ### Changed
 
-- **Help and Tips Document Update**: Updated help and tips documents including detailed usage and shortcut information for each calculator mode (Standard, Unit Conversion, Currency, Radix) and key functions.
-- **Changed the way to copy or paste panel content**: Instead of copying by clicking (touching) the panel or pasting by long-pressing, you now open a menu by clicking (touching) (or right-clicking) the panel and select the desired action from the menu.
-- **Percentage calculation shortcut expansion**: Added the `%` key as a shortcut for the percentage calculation function, in addition to the existing `k` key.
-
 ### Fixed
 
-- **Code structure and performance improvements**: Improved code maintainability and performance by separating theme-related logic into a separate store.
+- **Calculation History Scroll Bug Fixed**: Fixed a bug where calculation history could not be scrolled using the floating icon or keyboard (Up/Down/PageUp/PageDown/Home/End).
 
 For information about previous versions, please check [here](https://github.com/from104/qcalc/blob/main/CHANGELOG.md).

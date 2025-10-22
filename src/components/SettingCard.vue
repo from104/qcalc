@@ -10,6 +10,7 @@
 
   // Vue 핵심 기능 및 컴포지션 API 가져오기
   import { reactive, watch, ref, computed } from 'vue';
+  import { useQuasar } from 'quasar';
 
   // 전역 globalVars 객체에 접근하기 위한 상수 선언
   const $g = window.globalVars;
@@ -22,6 +23,7 @@
   import { useCurrencyStore } from 'stores/currencyStore';
   import { useThemesStore } from 'stores/themesStore';
   import { themes, type ThemeType } from 'src/constants/ThemesData';
+  import { useSettingsManager } from 'src/composables/useSettingsManager';
 
   // 스토어 인스턴스 생성
   const uiStore = useUIStore();
@@ -39,6 +41,111 @@
   // 컴포넌트 import
   import ToolTip from 'components/snippets/ToolTip.vue';
   import HelpIcon from 'components/snippets/HelpIcon.vue';
+  import ThemeEditor from './ThemeEditor.vue';
+
+  const themeEditor = ref<InstanceType<typeof ThemeEditor> | null>(null);
+  const fileInput = ref<HTMLInputElement | null>(null);
+
+  const $q = useQuasar();
+  const { applySettings, resetSettings, exportSettings } = useSettingsManager();
+
+  // 설정 초기화 핸들러
+  const handleResetSettings = () => {
+    $q.dialog({
+      title: t('resetSettings.confirmTitle'),
+      message: t('resetSettings.confirmMessage'),
+      ok: {
+        label: t('message.yes'),
+        flat: true,
+      },
+      cancel: {
+        label: t('message.no'),
+        flat: true,
+      },
+      persistent: true,
+    }).onOk(() => {
+      resetSettings();
+      $q.notify({ type: 'positive', message: t('resetSettings.success') });
+      // 설정을 완전히 적용하기 위해 페이지 새로고침
+      window.location.reload();
+    });
+  };
+
+  // 설정 불러오기 버튼 클릭 핸들러
+  const handleImportClick = async () => {
+    if (window.showOpenFilePicker) {
+      try {
+        const [fileHandle] = await window.showOpenFilePicker({
+          types: [
+            {
+              description: 'JSON Files',
+              accept: { 'application/json': ['.json'] },
+            },
+          ],
+        });
+        if (fileHandle) {
+          const file = await fileHandle.getFile();
+          processSettingsFile(file);
+        }
+      } catch (error: unknown) {
+        if (error instanceof Error && error.name === 'AbortError') {
+          $q.notify({ type: 'info', message: t('importSettings.cancelled') });
+        } else {
+          console.error(error);
+          $q.notify({ type: 'negative', message: t('importSettings.fail') });
+        }
+      }
+    } else {
+      fileInput.value?.click();
+    }
+  };
+
+  // 파일 처리 핸들러
+  const processSettingsFile = (file: File) => {
+    $q.dialog({
+      title: t('importSettings.confirmTitle'),
+      message: t('importSettings.confirmMessage'),
+      ok: {
+        label: t('message.yes'),
+        flat: true,
+      },
+      cancel: {
+        label: t('message.no'),
+        flat: true,
+      },
+      persistent: true,
+    }).onOk(() => {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        try {
+          const content = e.target?.result as string;
+          const newSettings = JSON.parse(content);
+          if (applySettings(newSettings)) {
+            $q.notify({ type: 'positive', message: t('importSettings.success') });
+            window.location.reload();
+          } else {
+            throw new Error('Invalid settings format');
+          }
+        } catch (error) {
+          console.error(error);
+          $q.notify({ type: 'negative', message: t('importSettings.fail') });
+        }
+      };
+      reader.readAsText(file);
+    });
+  };
+
+  // 파일 변경 핸들러 (설정 불러오기)
+  const handleFileChange = (event: Event) => {
+    const target = event.target as HTMLInputElement;
+    const file = target.files?.[0];
+    if (!file) return;
+
+    processSettingsFile(file);
+
+    // 다음에 같은 파일을 선택해도 change 이벤트가 발생하도록 값 초기화
+    target.value = '';
+  };
 
   // 패키지 버전 정보
   import { version } from '../../package.json';
@@ -73,24 +180,90 @@
 
   // 색상 테마 옵션을 계산합니다.
   const themeOptions = computed(() => {
-    return Object.keys(themes).map((themeKey) => {
+    const defaultThemes = Object.keys(themes).map((themeKey) => {
       const currentLocale = locale.value as 'ko' | 'en';
       const themeName =
         themes[themeKey as ThemeType]?.name?.[currentLocale] || themes[themeKey as ThemeType]?.name?.en || themeKey;
       return {
         label: themeName,
         value: themeKey,
+        isUserTheme: false,
       };
     });
+
+    const userThemes = Object.keys(themesStore.userThemes).map((themeKey) => ({
+      label: themeKey,
+      value: themeKey,
+      isUserTheme: true,
+    }));
+
+    if (userThemes.length > 0) {
+      return [...defaultThemes, { isSeparator: true }, ...userThemes];
+    }
+    return defaultThemes;
   });
 
   /**
    * 테마가 변경될 때 호출되는 함수입니다.
    * @param themeName - 선택된 테마 이름
    */
-  const onThemeChange = (themeName: ThemeType) => {
+  const onThemeChange = (themeName: ThemeType | string) => {
     themesStore.setTheme(themeName);
   };
+
+  /**
+   * 사용자 테마를 수정하기 위해 ThemeEditor를 엽니다.
+   * @param themeName - 수정할 테마의 이름
+   */
+  function editTheme(themeName: string) {
+    const themeData = themesStore.userThemes[themeName];
+    if (themeData && themeEditor.value) {
+      themeEditor.value.open({
+        isEdit: true,
+        themeName: themeName,
+        themeData: themeData,
+      });
+    }
+  }
+
+  /**
+   * 사용자 테마를 삭제합니다.
+   * @param themeName - 삭제할 테마의 이름
+   */
+  function deleteTheme(themeName: string) {
+    $q.dialog({
+      title: t('confirmDeleteTitle'),
+      message: t('confirmDeleteMessage', { themeName }),
+      ok: {
+        label: t('yes'),
+        flat: true,
+      },
+      cancel: {
+        label: t('no'),
+        flat: true,
+      },
+      persistent: true,
+    }).onOk(() => {
+      themesStore.removeUserTheme(themeName);
+      themesStore.setTheme('default');
+    });
+  }
+
+  /**
+   * 현재 테마를 기반으로 새 테마를 만듭니다.
+   */
+  function createNewTheme() {
+    const baseThemeKey = themesStore.currentTheme;
+    const baseTheme = themesStore.userThemes[baseThemeKey] || themes[baseThemeKey as ThemeType];
+
+    if (baseTheme && themeEditor.value) {
+      themeEditor.value.open({
+        isEdit: false,
+        themeName: '', // 새 테마를 위해 이름 비우기
+        themeData: baseTheme,
+      });
+    }
+  }
 
   // themesStore에서 select 색상을 가져오는 computed 속성
   const selectTextColor = computed(() => themesStore.getSelectColor('text', themesStore.isDarkMode()));
@@ -101,8 +274,9 @@
    * @param themeKey - 테마 키 (예: 'default', 'forest', 'ocean' 등)
    * @returns 해당 테마의 primary 컬러 (HEX 형식)
    */
-  const getThemePrimaryColor = (themeKey: ThemeType): string => {
-    const quasarColorName = themes[themeKey]?.ui?.primary || themes.default.ui.primary;
+  const getThemePrimaryColor = (themeKey: ThemeType | string): string => {
+    const theme = themesStore.userThemes[themeKey] || themes[themeKey as ThemeType];
+    const quasarColorName = theme?.ui?.primary || themes.default.ui.primary;
     return themesStore.getQuasarColorToHex(quasarColorName);
   };
 
@@ -113,6 +287,9 @@
    */
   const getThemeLabel = (themeKey: ThemeType | string): string => {
     const key = typeof themeKey === 'string' ? themeKey : themeKey;
+    if (themesStore.userThemes[key]) {
+      return key;
+    }
     const currentLocale = locale.value as 'ko' | 'en';
     return themes[key as ThemeType]?.name?.[currentLocale] || themes[key as ThemeType]?.name?.en || key;
   };
@@ -214,25 +391,52 @@
           :class="`bg-${selectBackgroundColor}`"
           :color="selectTextColor"
           :bg-color="selectBackgroundColor"
+          :aria-label="t('ariaLabel.colorTheme')"
           @update:model-value="onThemeChange"
         >
           <template #option="scope">
-            <q-item v-bind="scope.itemProps" class="theme-option-item">
+            <q-separator v-if="scope.opt.isSeparator" />
+            <q-item v-else v-bind="scope.itemProps" class="theme-option-item">
               <q-item-section>
-                <q-item-label>{{ scope.opt.label }}</q-item-label>
+                <q-item-label class="truncate-clip">{{ scope.opt.label }}</q-item-label>
               </q-item-section>
               <q-item-section side>
-                <div
-                  class="theme-color-square"
-                  :class="{ 'theme-color-square--dark': themesStore.isDarkMode() }"
-                  :style="{ backgroundColor: getThemePrimaryColor(scope.opt.value) }"
-                />
+                <div class="row items-center no-wrap">
+                  <!-- 사용자 테마를 위한 수정 및 삭제 버튼 -->
+                  <div v-if="scope.opt.isUserTheme">
+                    <q-btn
+                      flat
+                      dense
+                      round
+                      icon="edit"
+                      size="sm"
+                      class="q-mr-sm"
+                      :aria-label="t('ariaLabel.editTheme', { themeName: scope.opt.label })"
+                      @click.stop="editTheme(scope.opt.value)"
+                    />
+                    <q-btn
+                      flat
+                      dense
+                      round
+                      icon="delete"
+                      color="negative"
+                      size="sm"
+                      :aria-label="t('ariaLabel.deleteTheme', { themeName: scope.opt.label })"
+                      @click.stop="deleteTheme(scope.opt.value)"
+                    />
+                  </div>
+                  <div
+                    class="theme-color-square"
+                    :class="{ 'theme-color-square--dark': themesStore.isDarkMode() }"
+                    :style="{ backgroundColor: getThemePrimaryColor(scope.opt.value) }"
+                  />
+                </div>
               </q-item-section>
             </q-item>
           </template>
           <template #selected-item="scope">
             <div class="selected-theme-item">
-              <span>{{ scope.opt.label || getThemeLabel(scope.opt) }}</span>
+              <span class="selected-label truncate-clip">{{ scope.opt.label || getThemeLabel(scope.opt) }}</span>
               <div
                 class="theme-color-square q-ml-sm"
                 :class="{ 'theme-color-square--dark': themesStore.isDarkMode() }"
@@ -242,6 +446,21 @@
           </template>
         </q-select>
       </q-item>
+
+      <q-item>
+        <q-btn
+          flat
+          dense
+          :label="t('createNewTheme')"
+          class="full-width"
+          :color="selectTextColor"
+          :class="`bg-${selectBackgroundColor}`"
+          :aria-label="t('ariaLabel.createNewTheme')"
+          @click="createNewTheme"
+        />
+      </q-item>
+
+      <ThemeEditor ref="themeEditor" />
 
       <q-separator spaced="md" role="separator" />
 
@@ -326,7 +545,7 @@
         <q-separator spaced="md" />
 
         <q-item class="q-mb-sm">
-          <q-item-label class="self-center" role="text"> {{ t('showUnit') }} (Alt-\) </q-item-label>
+          <q-item-label class="self-center" role="text"> {{ t('showUnit') }} (Alt-\\) </q-item-label>
           <q-space />
           <q-toggle v-model="unitStore.showUnit" keep-color :color="primaryAccentColor" dense />
         </q-item>
@@ -441,6 +660,55 @@
         />
       </q-item>
 
+      <q-separator spaced="md" />
+
+      <!-- 설정 관리 -->
+      <q-item class="q-mb-sm">
+        <q-item-label class="q-pt-md">{{ t('settingsManagement') }}</q-item-label>
+      </q-item>
+      <q-item class="q-mb-sm">
+        <div class="full-width q-px-sm q-py-xs">
+          <q-btn-group spread class="full-width">
+            <q-btn
+              flat
+              dense
+              :label="t('reset')"
+              :color="selectTextColor"
+              :class="`bg-${selectBackgroundColor}`"
+              :aria-label="t('ariaLabel.resetSettings')"
+              @click="handleResetSettings"
+            />
+            <q-btn
+              flat
+              dense
+              :label="t('export')"
+              :color="selectTextColor"
+              :class="`bg-${selectBackgroundColor}`"
+              :aria-label="t('ariaLabel.exportSettings')"
+              @click="exportSettings"
+            />
+            <q-btn
+              flat
+              dense
+              :label="t('import')"
+              :color="selectTextColor"
+              :class="`bg-${selectBackgroundColor}`"
+              :aria-label="t('ariaLabel.importSettings')"
+              @click="handleImportClick"
+            />
+          </q-btn-group>
+          <input
+            ref="fileInput"
+            type="file"
+            style="display: none"
+            accept="text/json,.json"
+            :aria-label="t('ariaLabel.importSettings')"
+            @change="handleFileChange"
+          />
+        </div>
+      </q-item>
+      <q-separator spaced="xl" />
+
       <!-- 버전 -->
       <q-item>
         <q-item-label class="self-center">
@@ -490,6 +758,17 @@
   .selected-theme-item {
     display: flex;
     align-items: center;
+    width: 100%; // 너비를 최대로 설정
+    overflow: hidden; // 넘치는 부분 숨기기
+  }
+
+  .selected-label {
+    flex-grow: 1; // 가능한 많은 공간을 차지하도록 설정
+  }
+
+  .truncate-clip {
+    white-space: nowrap;
+    overflow: hidden;
   }
 
   // 테마 옵션 아이템 스타일
@@ -500,105 +779,167 @@
   }
 </style>
 
-<i18n>
-ko:
-  alwaysOnTop: '항상 위'
-  alwaysOnTopOn: '항상 위 켜짐'
-  alwaysOnTopOff: '항상 위 꺼짐'
-  initPanel: '시작 시 패널 초기화'
-  darkMode:
-    title: '다크 모드'
-    light: '밝은'
-    dark: '어두운'
-    system: '시스템'
-    message:
-      system: '다크 모드를 시스템에 따릅니다.'
-      dark: '다크 모드를 켭니다.'
-      light: '다크 모드를 끕니다.'
-  hapticsMode: '진동 모드'
-  showButtonAddedLabel: '버튼 추가 라벨 표시'
-  useGrouping: '숫자 묶음 표시'
-  groupingUnit: '숫자 묶음 단위'
-  decimalPlaces: '소수점'
-  decimalPlacesStat: '소수점 자리수'
-  noLimit: '제한 없음'
-  toNDecimalPlaces: '자리'
-  showUnit: '단위 표시'
-  showSymbol: '기호 표시'
-  showRadix: '진법 표시'
-  radixType: '진법 형식'
-  prefix: '앞에'
-  suffix: '뒤에'
-  useSystemLocale: '시스템 언어 사용'
-  language: '언어'
-  autoUpdate: '자동 업데이트'
-  autoUpdateHelp: '업데이트를 위해서는 설정에서 자동 업데이트를 활성화하고 앱을 재시작해야 합니다.'
-  ariaLabel:
-    settingsList: '설정 목록'
-    alwaysOnTop: '항상 위에 표시 설정'
-    initPanel: '시작 시 패널 초기화 설정'
-    hapticsMode: '진동 모드 설정'
-    darkMode: '다크 모드 설정'
-    showButtonAddedLabel: '버튼 추가 라벨 표시 설정'
-    useGrouping: '숫자 묶음 표시 설정'
-    groupingUnit: '숫자 묶음 단위 설정'
-    decimalPlaces: '소수점 자리수 설정'
-    showUnit: '단위 표시 설정'
-    showSymbol: '기호 표시 설정'
-    showRadix: '진법 표시 설정'
-    radixType: '진법 형식 설정'
-    useSystemLocale: '시스템 언어 사용 설정'
-    language: '언어 설정'
-    autoUpdate: '자동 업데이트 설정'
-  colorTheme: '색상 테마'
-en:
-  alwaysOnTop: 'Always on top'
-  alwaysOnTopOn: 'Always on top ON'
-  alwaysOnTopOff: 'Always on top OFF'
-  initPanel: 'Init panel at startup'
-  darkMode:
-    title: 'Dark mode'
-    light: 'Light'
-    dark: 'Dark'
-    system: 'System'
-    message:
-      system: 'Dark mode follows system.'
-      dark: 'Dark mode ON.'
-      light: 'Dark mode OFF.'
-  hapticsMode: 'Haptics mode'
-  showButtonAddedLabel: 'Show button added label'
-  useGrouping: 'Use grouping'
-  groupingUnit: 'Grouping unit'
-  decimalPlaces: 'Decimal'
-  decimalPlacesStat: 'Decimal places (stat)'
-  noLimit: 'No limit'
-  toNDecimalPlaces: 'decimal places'
-  showUnit: 'Show unit'
-  showSymbol: 'Show symbol'
-  showRadix: 'Show radix'
-  radixType: 'Radix type'
-  prefix: 'Prefix'
-  suffix: 'Suffix'
-  useSystemLocale: 'Use system locale'
-  language: 'Language'
-  autoUpdate: 'Auto update'
-  autoUpdateHelp: 'To apply the update, you need to enable automatic updates in the settings and restart the app.'
-  ariaLabel:
-    settingsList: 'Settings list'
-    alwaysOnTop: 'Always on top setting'
-    initPanel: 'Initialize panel at startup setting'
-    hapticsMode: 'Haptics mode setting'
-    darkMode: 'Dark mode setting'
-    showButtonAddedLabel: 'Show button added label setting'
-    useGrouping: 'Use grouping setting'
-    groupingUnit: 'Grouping unit setting'
-    decimalPlaces: 'Decimal places setting'
-    showUnit: 'Show unit setting'
-    showSymbol: 'Show symbol setting'
-    showRadix: 'Show radix setting'
-    radixType: 'Radix type setting'
-    useSystemLocale: 'Use system locale setting'
-    language: 'Language setting'
-    autoUpdate: 'Auto update setting'
-  colorTheme: 'Color Theme'
+<i18n lang="yaml">
+  ko:
+    alwaysOnTop: '항상 위'
+    initPanel: '시작 시 패널 초기화'
+    darkMode:
+      title: '다크 모드'
+      light: '밝은'
+      dark: '어두운'
+      system: '시스템'
+    hapticsMode: '진동 모드'
+    showButtonAddedLabel: '버튼 추가 라벨 표시'
+    useGrouping: '숫자 묶음 표시'
+    groupingUnit: '숫자 묶음 단위'
+    decimalPlaces: '소수점'
+    decimalPlacesStat: '소수점 자리수'
+    noLimit: '제한 없음'
+    toNDecimalPlaces: '자리'
+    showUnit: '단위 표시'
+    showSymbol: '기호 표시'
+    showRadix: '진법 표시'
+    radixType: '진법 형식'
+    prefix: '숫자 앞에'
+    suffix: '숫자 뒤에'
+    useSystemLocale: '시스템 언어 사용'
+    language: '언어'
+    autoUpdate: '자동 업데이트'
+    autoUpdateHelp: '업데이트를 위해서는 설정에서 자동 업데이트를 활성화하고 앱을 재시작해야 합니다.'
+    ariaLabel:
+      settingsList: '설정 목록'
+      alwaysOnTop: '항상 위에 표시 설정'
+      initPanel: '시작 시 패널 초기화 설정'
+      hapticsMode: '진동 모드 설정'
+      darkMode: '다크 모드 설정'
+      showButtonAddedLabel: '버튼 추가 라벨 표시 설정'
+      useGrouping: '숫자 묶음 표시 설정'
+      groupingUnit: '숫자 묶음 단위 설정'
+      decimalPlaces: '소수점 자리수 설정'
+      showUnit: '단위 표시 설정'
+      showSymbol: '기호 표시 설정'
+      showRadix: '진법 표시 설정'
+      radixType: '진법 형식 설정'
+      useSystemLocale: '시스템 언어 사용 설정'
+      language: '언어 설정'
+      autoUpdate: '자동 업데이트 설정'
+      colorTheme: '색상 테마'
+      editTheme: '{themeName} 테마 편집'
+      deleteTheme: '{themeName} 테마 삭제'
+      createNewTheme: '새 테마 만들기'
+      resetSettings: '설정 초기화'
+      exportSettings: '설정 내보내기'
+      importSettings: '설정 불러오기'
+    colorTheme: '색상 테마'
+    createNewTheme: '새 테마 만들기'
+    reset: '초기화'
+    export: '내보내기'
+    import: '불러오기'
+    settingsManagement: '설정 관리'
+    resetSettings:
+      confirmTitle: '설정 초기화 확인'
+      confirmMessage: '정말로 모든 설정을 초기화하시겠습니까? 이 작업은 되돌릴 수 없습니다.'
+      success: '설정이 성공적으로 초기화되었습니다.'
+    exportSettings:
+      exportMethodTitle: '내보내기 방법'
+      exportMethodMessage: '설정을 어떻게 내보내시겠습니까?'
+      saveToDevice: '기기에 저장'
+      shareFile: '파일 공유'
+      successMobile: '설정이 {fileName}(으)로 내보내졌습니다.'
+      mobileSaveLocation: 'Documents 폴더에 저장되었습니다.'
+      fail: '설정 내보내기에 실패했습니다.'
+      shareTitle: 'QCalc 설정'
+      shareText: 'QCalc 설정 파일을 공유합니다.'
+      shareDialogTitle: '설정 공유'
+      cancelled: '설정 내보내기가 취소되었습니다.'
+      success: '설정을 성공적으로 내보냈습니다.'
+    importSettings:
+      confirmTitle: '설정 불러오기 확인'
+      confirmMessage: '현재 설정을 덮어쓰고 선택한 파일의 설정으로 교체하시겠습니까?'
+      success: '설정을 성공적으로 불러왔습니다.'
+      fail: '설정 불러오기에 실패했습니다. 파일이 손상되었거나 형식이 올바르지 않습니다.'
+      cancelled: '설정 불러오기를 취소했습니다.'
+    confirmDeleteTitle: '테마 삭제 확인'
+    confirmDeleteMessage: '정말로 \''{themeName}\'' 테마를 삭제하시겠습니까?'
+  en:
+    alwaysOnTop: 'Always on top'
+    initPanel: 'Init panel at startup'
+    darkMode:
+      title: 'Dark mode'
+      light: 'Light'
+      dark: 'Dark'
+      system: 'System'
+    hapticsMode: 'Haptics mode'
+    showButtonAddedLabel: 'Show button added label'
+    useGrouping: 'Use grouping'
+    groupingUnit: 'Grouping unit'
+    decimalPlaces: 'Decimal'
+    decimalPlacesStat: 'Decimal places (stat)'
+    noLimit: 'No limit'
+    toNDecimalPlaces: 'decimal places'
+    showUnit: 'Show unit'
+    showSymbol: 'Show symbol'
+    showRadix: 'Show radix'
+    radixType: 'Radix type'
+    prefix: 'Prefix'
+    suffix: 'Suffix'
+    useSystemLocale: 'Use system locale'
+    language: 'Language'
+    autoUpdate: 'Auto update'
+    autoUpdateHelp: 'To apply the update, you need to enable automatic updates in the settings and restart the app.'
+    ariaLabel:
+      settingsList: 'Settings list'
+      alwaysOnTop: 'Always on top setting'
+      initPanel: 'Initialize panel at startup setting'
+      hapticsMode: 'Haptics mode setting'
+      darkMode: 'Dark mode setting'
+      showButtonAddedLabel: 'Show button added label setting'
+      useGrouping: 'Use grouping setting'
+      groupingUnit: 'Grouping unit setting'
+      decimalPlaces: 'Decimal places setting'
+      showUnit: 'Show unit setting'
+      showSymbol: 'Show symbol setting'
+      showRadix: 'Show radix setting'
+      radixType: 'Radix type setting'
+      useSystemLocale: 'Use system locale setting'
+      language: 'Language setting'
+      autoUpdate: 'Auto update setting'
+      colorTheme: 'Color Theme'
+      editTheme: 'Edit {themeName} theme'
+      deleteTheme: 'Delete {themeName} theme'
+      createNewTheme: 'Create a new theme'
+      resetSettings: 'Reset settings'
+      exportSettings: 'Export settings'
+      importSettings: 'Import settings'
+    colorTheme: 'Color Theme'
+    createNewTheme: 'Create New Theme'
+    reset: 'Reset'
+    export: 'Export'
+    import: 'Import'
+    settingsManagement: 'Settings Management'
+    resetSettings:
+      confirmTitle: 'Confirm Reset'
+      confirmMessage: 'Are you sure you want to reset all settings? This action cannot be undone.'
+      success: 'Settings have been successfully reset.'
+    exportSettings:
+      exportMethodTitle: 'Export Method'
+      exportMethodMessage: 'How would you like to export the settings?'
+      saveToDevice: 'Save to Device'
+      shareFile: 'Share File'
+      successMobile: 'Settings exported to {fileName}.'
+      mobileSaveLocation: 'Saved in the Documents folder.'
+      fail: 'Failed to export settings.'
+      shareTitle: 'QCalc Settings'
+      shareText: 'Here are my QCalc settings.'
+      shareDialogTitle: 'Share Settings'
+      cancelled: 'Settings export cancelled.'
+      success: 'Settings have been successfully exported.'
+    importSettings:
+      confirmTitle: 'Confirm Import'
+      confirmMessage: 'Are you sure you want to overwrite current settings with the ones from the selected file?'
+      success: 'Settings have been successfully imported.'
+      fail: 'Failed to import settings. The file may be corrupt or in the wrong format.'
+      cancelled: 'Settings import cancelled.'
+    confirmDeleteTitle: 'Confirm Theme Deletion'
+    confirmDeleteMessage: 'Are you sure you want to delete the theme \''{themeName}\''?'
 </i18n>

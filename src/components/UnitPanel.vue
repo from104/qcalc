@@ -8,15 +8,15 @@
    */
 
   // Vue 핵심 기능 및 컴포지션 API 가져오기
-  import { onMounted, onBeforeUnmount, reactive, watch, computed } from 'vue';
+  import { reactive, watch, computed } from 'vue';
 
   // i18n 설정
   import { useI18n } from 'vue-i18n';
   const { t } = useI18n();
 
   // 계산기 관련 타입과 클래스
-  import { KeyBinding } from 'classes/KeyBinding';
-  import { UnitConverter } from 'classes/UnitConverter';
+  import { useKeyBinding } from '../composables/useKeyBinding';
+  import { UnitConverter } from 'src/classes/UnitConverter';
 
   // 스토어 import
   import { useSettingsStore } from 'stores/settingsStore';
@@ -133,21 +133,12 @@
   };
 
   // 키 바인딩 설정
-  const keyBindingManager = new KeyBinding([
+    useKeyBinding([
     [['\\'], () => document.getElementById('btn-swap-unit')?.click()],
     [['Alt+\\'], () => unitStore.toggleShowUnit()],
   ]);
 
-  // 컴포넌트 마운트 시 실행
-  onMounted(() => {
-    unitStore.initRecentUnits();
-    keyBindingManager.subscribe();
-  });
-
-  // 컴포넌트 언마운트 전 실행
-  onBeforeUnmount(() => {
-    keyBindingManager.unsubscribe();
-  });
+  
 
   const handleUnitSwap = () => {
     // 동일한 단위인 경우 변환하지 않음
@@ -402,4 +393,4 @@
   }
 </style>
 
-<i18n lang="yaml5" src="../i18n/components/UnitPanel.yml" />
+<i18n lang="yaml" src="../i18n/components/UnitPanel.yml" />

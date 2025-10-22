@@ -3,7 +3,6 @@
 ## Todo
 
 - [ ] Ads function (monetization)
-- [ ] User theme settings
 - [ ] Skin function
 - [ ] Mobile app implementation (capacitor:ios)
 
@@ -15,7 +14,12 @@
   - [ ] Voice control of calculator
   - [x] High contrast mode
   - [x] Haptic mode
-
+- [ ] Settings related
+  - [X] Reset to default
+  - [X] Export to file
+  - [X] Import from file
+  - [ ] Sync to cloud
+  
 ## Done
 
 - [x] Add dark mode
@@ -37,3 +41,5 @@
 - [x] Automatic updates (electron)
 - [x] Theme function
 - [x] Unit and currency item favorites
+- [x] User theme settings
+- [X] Export and import calculation history

@@ -8,7 +8,7 @@
 
 import type { Calculator } from '../classes/Calculator';
 import type { CurrencyConverter } from '../classes/CurrencyConverter';
-import type { Radix } from '../classes/RadixConverter';
+import type { Radix } from '../utils/RadixConverter';
 import type { DefineStore } from 'pinia';
 import type { CalculationResult } from './calculator';
 

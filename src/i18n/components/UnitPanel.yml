@@ -84,7 +84,7 @@ ko:
       deg: '도'
       rad: '라디안'
       grad: '그라디안'
-      urad: '마이크로라디안'
+      'μrad': '마이크로라디안'
       amin: '분(각도)'
       asec: '초(각도)'
     temp:
@@ -307,7 +307,7 @@ en:
       deg: 'Degree'
       rad: 'Radian'
       grad: 'Gradian'
-      urad: 'MicroRadian'
+      'μrad': 'MicroRadian'
       amin: 'Minute (Angle)'
       asec: 'Second (Angle)'
     temp:

@@ -341,25 +341,25 @@
   }
 </style>
 
-<i18n>
-ko:
-  tipsTitle: '짧은 팁'
-  prevTip: '이전 팁'
-  nextTip: '다음 팁'
-  showTipsOnStart: '시작 시 팁 보이기'
-  closeTips: '팁 닫기'
-  tipContent: '팁 내용'
-  dialogAriaLabel: '도움말 다이얼로그'
-  mainContentAriaLabel: '팁 메인 콘텐츠'
-  navigationAriaLabel: '팁 네비게이션'
-en:
-  tipsTitle: 'Quick Tips'
-  prevTip: 'Previous tip'
-  nextTip: 'Next tip'
-  showTipsOnStart: 'Show tips on start'
-  closeTips: 'Close tips'
-  tipContent: 'Tip content'
-  dialogAriaLabel: 'Help dialog'
-  mainContentAriaLabel: 'Tip main content'
-  navigationAriaLabel: 'Tip navigation'
+<i18n lang="yaml">
+  ko:
+    tipsTitle: '짧은 팁'
+    prevTip: '이전 팁'
+    nextTip: '다음 팁'
+    showTipsOnStart: '시작 시 팁 보이기'
+    closeTips: '팁 닫기'
+    tipContent: '팁 내용'
+    dialogAriaLabel: '도움말 다이얼로그'
+    mainContentAriaLabel: '팁 메인 콘텐츠'
+    navigationAriaLabel: '팁 네비게이션'
+  en:
+    tipsTitle: 'Quick Tips'
+    prevTip: 'Previous tip'
+    nextTip: 'Next tip'
+    showTipsOnStart: 'Show tips on start'
+    closeTips: 'Close tips'
+    tipContent: 'Tip content'
+    dialogAriaLabel: 'Help dialog'
+    mainContentAriaLabel: 'Tip main content'
+    navigationAriaLabel: 'Tip navigation'
 </i18n>

@@ -46,11 +46,11 @@
   import { Haptics, ImpactStyle } from '@capacitor/haptics';
 
   // 키 바인딩 관련
-  import { KeyBinding } from 'classes/KeyBinding';
-  import type { KeyBindings } from 'classes/KeyBinding';
+  import { useKeyBinding } from '../composables/useKeyBinding';
+  import type { KeyBindings } from '../composables/useKeyBinding';
 
   // 진법 관련
-  import { Radix } from 'classes/RadixConverter';
+  import { Radix } from 'src/utils/RadixConverter';
 
   // 컴포넌트 import
   import ToolTip from 'src/components/snippets/ToolTip.vue';
@@ -95,12 +95,45 @@
     return themesStore.isDarkMode() ? lighten(color ?? '', -20) : color;
   };
 
-  // themesStore에서 버튼 색상을 가져오는 computed 속성
-  const importantButtonColor = computed(() => buttonColor(themesStore.getButtonColor('important')));
-  const functionButtonColor = computed(() => buttonColor(themesStore.getButtonColor('function')));
-  const normalButtonColor = computed(() => buttonColor(themesStore.getButtonColor('normal')));
+  // 버튼 색상 및 텍스트 색상을 계산하는 computed 속성
+  const importantButtonStyle = computed(() => {
+    const background = buttonColor(themesStore.getButtonColor('important'));
+    const textColor = themesStore.getTextColorByBackgroundColor(background);
+    return { background, textColor };
+  });
 
-  const shiftButtonPressedColor = computed(() => lighten(importantButtonColor.value, -30));
+  const functionButtonStyle = computed(() => {
+    const background = buttonColor(themesStore.getButtonColor('function'));
+    const textColor = themesStore.getTextColorByBackgroundColor(background);
+    return { background, textColor };
+  });
+
+  const normalButtonStyle = computed(() => {
+    const background = buttonColor(themesStore.getButtonColor('normal'));
+    const textColor = themesStore.getTextColorByBackgroundColor(background);
+    return { background, textColor };
+  });
+
+  const shiftButtonPressedStyle = computed(() => {
+    const background = lighten(importantButtonStyle.value.background, -30);
+    const textColor = themesStore.getTextColorByBackgroundColor(background);
+    return { background, textColor };
+  });
+
+  /**
+   * 버튼의 ID와 색상 유형에 따라 최종 스타일(배경색 및 텍스트 색상)을 반환합니다.
+   * @param id - 버튼의 고유 ID
+   * @param colorType - 버튼의 색상 유형 ('important', 'function', 'normal')
+   * @returns { background: string; textColor: string } - 최종 스타일 객체
+   */
+  const getFinalButtonStyle = (id: ButtonID, colorType: 'important' | 'function' | 'normal') => {
+    if (id === shiftButtonId.value && calcStore.isShiftPressed) {
+      return shiftButtonPressedStyle.value;
+    }
+    if (colorType === 'important') return importantButtonStyle.value;
+    if (colorType === 'function') return functionButtonStyle.value;
+    return normalButtonStyle.value;
+  };
 
   // const i18n = useI18n();
   const { standardButtons, modeSpecificButtons, standardExtendedFunctions, modeSpecificExtendedFunctions } =
@@ -278,16 +311,16 @@
 
   // 모든 키 바인딩 통합
   const keyBindings = [...keyBindingsPrimary, ...keyBindingsSecondary];
-  const keyBinding = new KeyBinding(keyBindings);
+  const { subscribe, unsubscribe } = useKeyBinding(keyBindings);
 
   // 컴포넌트 마운트 시 키 바인딩 활성화
   onMounted(() => {
-    keyBinding.subscribe();
+    subscribe();
   });
 
   // 컴포넌트 언마운트 전 키 바인딩 비활성화
   onBeforeUnmount(() => {
-    keyBinding.unsubscribe();
+    unsubscribe();
   });
 
   // 입력 포커스 상태에 따른 키 바인딩 관리
@@ -295,9 +328,9 @@
     () => uiStore.inputFocused,
     (focused) => {
       if (focused) {
-        keyBinding.unsubscribe();
+        unsubscribe();
       } else {
-        keyBinding.subscribe();
+        subscribe();
       }
     },
     { immediate: true },
@@ -384,13 +417,13 @@
       baseHeight.value = `${calculatedHeight}px`;
 
       // 6. 개발 환경에서 디버깅 정보 출력
-        logDev(`🎯 CalcButton baseHeight calculated for type "${props.type}": ${baseHeight.value}`, {
-          screenHeight: screenHeight.value,
-          headerHeight: 50,
-          totalExcluded: totalHeightToExclude,
-          finalHeight: calculatedHeight,
-          cardFound: !!currentCard,
-        });
+      logDev(`🎯 CalcButton baseHeight calculated for type "${props.type}": ${baseHeight.value}`, {
+        screenHeight: screenHeight.value,
+        headerHeight: 50,
+        totalExcluded: totalHeightToExclude,
+        finalHeight: calculatedHeight,
+        cardFound: !!currentCard,
+      });
     } catch (error) {
       // 에러 발생 시 타입별 기본값 사용
       console.warn('⚠️ Error calculating dynamic baseHeight, using fallback values:', error);
@@ -531,7 +564,6 @@
             : button.label.charAt(0) === '@'
               ? 'icon'
               : 'char',
-          id === shiftButtonId && calcStore.isShiftPressed ? 'button-shift' : '',
           calcStore.isShiftPressed &&
           !settingsStore.showButtonAddedLabel &&
           !(extendedFunctionSet[id]?.isDisabled ?? false)
@@ -540,10 +572,12 @@
               ? 'disabled-button'
               : '',
         ]"
-        :style="[
-          !settingsStore.showButtonAddedLabel || !(extendedFunctionSet[id]?.label ?? '') ? { paddingTop: '4px' } : {},
-        ]"
-        :color="`btn-${button.color}`"
+        :style="{
+          background: getFinalButtonStyle(id, button.color as 'important' | 'function' | 'normal').background,
+          color: getFinalButtonStyle(id, button.color as 'important' | 'function' | 'normal').textColor,
+          paddingTop:
+            !settingsStore.showButtonAddedLabel || !(extendedFunctionSet[id]?.label ?? '') ? '4px' : undefined,
+        }"
         :aria-label="getAriaLabel(id, button)"
         @click="() => (button.isDisabled ? displayDisabledButtonNotification() : handleClickBtn(id))"
         @touchstart="() => hapticFeedbackLight()"
@@ -618,7 +652,8 @@
     text-align: center;
     position: absolute;
     font-size: calc(((100vh - v-bind('baseHeight')) / 6 - 20px) * 0.25 * v-bind('labelSizeAdjustmentRatio'));
-    color: rgba(255, 255, 255, 0.7);
+    color: inherit;
+    opacity: 0.7;
     width: 100%; /* 가로 중앙 정렬을 위해 추가 */
   }
 
@@ -630,78 +665,60 @@
     top: -6%;
   }
 
-  .bg-btn-important {
-    background: v-bind(importantButtonColor) !important; // 아이콘의 밝은 녹색
-  }
-
-  .bg-btn-function {
-    background: v-bind(functionButtonColor) !important; // 아이콘의 밝은 파란색과 어울리게 조정
-  }
-
-  .bg-btn-normal {
-    background: v-bind(normalButtonColor) !important; // 어두운 색
-  }
-
-  .button-shift {
-    background: v-bind(shiftButtonPressedColor) !important;
-  }
-
   .disabled-button {
-    &:deep(.q-btn__content) {
-      color: rgba(255, 255, 255, 0.4) !important;
-    }
+    opacity: 0.6;
   }
 
   .disabled-button-added-label {
-    color: rgba(255, 255, 255, 0.3) !important;
+    opacity: 0.5 !important;
   }
 
   .shifted-button-added-label {
-    color: rgba(255, 255, 255, 0.85) !important;
+    opacity: 0.85 !important;
   }
 </style>
 
-<i18n>
-ko:
-  cannotDivideByZero: '0으로 나눌 수 없습니다.'
-  squareRootOfANegativeNumberIsNotAllowed: '음수의 제곱근은 허용되지 않습니다.'
-  factorialOfANegativeNumberIsNotAllowed: '음수의 팩토리얼은 허용되지 않습니다.'
-  bitOperationPreprocessingCompleted: '비트 연산을 위해 절대값 정수로 계산을 완료되었습니다.'
-  bitOperationPreprocessingReady: '비트 연산을 위해 절대값 정수로 계산을 준비하였습니다.'
-  memoryCleared: '메모리를 초기화했습니다.'
-  memoryRecalled: '메모리를 불러왔습니다.'
-  memorySaved: '메모리에 저장되었습니다.'
-  noMemoryToRecall: '불러올 메모리가 없습니다.'
-  disabledButton: '비활성화된 버튼'
-  ariaLabel:
-    backspace: '지우기'
-    plusMinus: '부호 바꾸기'
-    divide: '나누기'
-    multiply: '곱하기'
-    subtract: '빼기'
-    add: '더하기'
-    equals: '계산하기'
-    decimal: '소수점'
-    shift: '시프트'
-en:
-  cannotDivideByZero: 'Cannot divide by zero'
-  squareRootOfANegativeNumberIsNotAllowed: 'The square root of a negative number is not allowed.'
-  factorialOfANegativeNumberIsNotAllowed: 'The factorial of a negative number is not allowed.'
-  bitOperationPreprocessingCompleted: 'Bit operation preprocessing completed.'
-  bitOperationPreprocessingReady: 'Bit operation preprocessing ready.'
-  memoryCleared: 'Memory cleared.'
-  memoryRecalled: 'Memory recalled.'
-  memorySaved: 'Memory saved.'
-  noMemoryToRecall: 'No memory to recall.'
-  disabledButton: 'Disabled button'
-  ariaLabel:
-    backspace: 'Backspace'
-    plusMinus: 'Change sign'
-    divide: 'Divide'
-    multiply: 'Multiply' 
-    subtract: 'Subtract'
-    add: 'Add'
-    equals: 'Calculate'
-    decimal: 'Decimal point'
-    shift: 'Shift'
+<i18n lang="yaml">
+  ko:
+    cannotDivideByZero: '0으로 나눌 수 없습니다.'
+    squareRootOfANegativeNumberIsNotAllowed: '음수의 제곱근은 허용되지 않습니다.'
+    factorialOfANegativeNumberIsNotAllowed: '음수의 팩토리얼은 허용되지 않습니다.'
+    bitOperationPreprocessingCompleted: '비트 연산을 위해 절대값 정수로 계산을 완료되었습니다.'
+    bitOperationPreprocessingReady: '비트 연산을 위해 절대값 정수로 계산을 준비하였습니다.'
+    memoryCleared: '메모리를 초기화했습니다.'
+    memoryRecalled: '메모리를 불러왔습니다.'
+    memorySaved: '메모리에 저장되었습니다.'
+    noMemoryToRecall: '불러올 메모리가 없습니다.'
+    disabledButton: '비활성화된 버튼'
+    ariaLabel:
+      backspace: '지우기'
+      plusMinus: '부호 바꾸기'
+      divide: '나누기'
+      multiply: '곱하기'
+      subtract: '빼기'
+      add: '더하기'
+      equals: '계산하기'
+      decimal: '소수점'
+      shift: '시프트'
+  en:
+    cannotDivideByZero: 'Cannot divide by zero'
+    squareRootOfANegativeNumberIsNotAllowed: 'The square root of a negative number is not allowed.'
+    factorialOfANegativeNumberIsNotAllowed: 'The factorial of a negative number is not allowed.'
+    bitOperationPreprocessingCompleted: 'Bit operation preprocessing completed.'
+    bitOperationPreprocessingReady: 'Bit operation preprocessing ready.'
+    memoryCleared: 'Memory cleared.'
+    memoryRecalled: 'Memory recalled.'
+    memorySaved: 'Memory saved.'
+    noMemoryToRecall: 'No memory to recall.'
+    disabledButton: 'Disabled button'
+    ariaLabel:
+      backspace: 'Backspace'
+      plusMinus: 'Change sign'
+      divide: 'Divide'
+      multiply: 'Multiply' 
+      subtract: 'Subtract'
+      add: 'Add'
+      equals: 'Calculate'
+      decimal: 'Decimal point'
+      shift: 'Shift'
 </i18n>

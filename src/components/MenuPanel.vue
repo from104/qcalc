@@ -152,67 +152,67 @@
   </q-list>
 </template>
 
-<i18n>
-ko:
-  item:
-    calc:
-      title: '계산기'
-      caption: '계산기'
-    unit:
-      title: '단위 변환'
-      caption: '단위 변환기'
-    currency:
-      title: '통화 환전'
-      caption: '통화 환전기'
-    radix:
-      title: '진법 변환'
-      caption: '진법 변환기'
-    record:
-      title: '기록'
-      caption: '기록 화면'
-    settings:
-      title: '설정'
-      caption: '설정'
-    tips:
-      title: '팁'
-      caption: '팁 다이얼로그'
-    help:
-      title: '도움말'
-      caption: '기능과 사용법'
-    about:
-      title: '소개'
-      caption: '앱에 대한 소개'
-  ariaLabel:
-    menu: '메인 메뉴'
-en:
-  item:
-    calc:
-      title: 'Calculator'
-      caption: 'Calculator'
-    unit:
-      title: 'Unit Converter'
-      caption: 'Unit Converter'
-    currency:
-      title: 'Currency Converter'
-      caption: 'Currency Converter'
-    radix:
-      title: 'Radix Converter'
-      caption: 'Radix Converter'  
-    record:
-      title: 'Record'
-      caption: 'Record Screen'
-    settings:
-      title: 'Settings'
-      caption: 'Settings'
-    tips:
-      title: 'Tips'
-      caption: 'Tips dialog'
-    help:
-      title: 'Help'
-      caption: 'Features and Usage'
-    about:
-      title: 'About'
-      caption: 'About the app'
-  ariaLabel:
-    menu: 'Main menu'
+<i18n lang="yaml">
+  ko:
+    item:
+      calc:
+        title: '계산기'
+        caption: '계산기'
+      unit:
+        title: '단위 변환'
+        caption: '단위 변환기'
+      currency:
+        title: '통화 환전'
+        caption: '통화 환전기'
+      radix:
+        title: '진법 변환'
+        caption: '진법 변환기'
+      record:
+        title: '기록'
+        caption: '기록 화면'
+      settings:
+        title: '설정'
+        caption: '설정'
+      tips:
+        title: '팁'
+        caption: '팁 다이얼로그'
+      help:
+        title: '도움말'
+        caption: '기능과 사용법'
+      about:
+        title: '소개'
+        caption: '앱에 대한 소개'
+    ariaLabel:
+      menu: '메인 메뉴'
+  en:
+    item:
+      calc:
+        title: 'Calculator'
+        caption: 'Calculator'
+      unit:
+        title: 'Unit Converter'
+        caption: 'Unit Converter'
+      currency:
+        title: 'Currency Converter'
+        caption: 'Currency Converter'
+      radix:
+        title: 'Radix Converter'
+        caption: 'Radix Converter'  
+      record:
+        title: 'Record'
+        caption: 'Record Screen'
+      settings:
+        title: 'Settings'
+        caption: 'Settings'
+      tips:
+        title: 'Tips'
+        caption: 'Tips dialog'
+      help:
+        title: 'Help'
+        caption: 'Features and Usage'
+      about:
+        title: 'About'
+        caption: 'About the app'
+    ariaLabel:
+      menu: 'Main menu'
 </i18n>

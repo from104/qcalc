@@ -8,17 +8,19 @@
    */
 
   // === 핵심 Vue 및 라우터 의존성 ===
-  import { ref, onBeforeMount, watch, computed, onUnmounted } from 'vue';
+  import { ref, onBeforeMount, watch, computed, onMounted, onUnmounted } from 'vue';
   import { useRoute } from 'vue-router';
   import { useI18n } from 'vue-i18n';
   import { ScreenOrientation } from '@capacitor/screen-orientation';
+  import { useQuasar } from 'quasar';
 
   // === 컴포넌트 임포트 ===
   import AutoUpdate from 'components/AutoUpdate.vue';
-  import SnapFirst from 'components/snippets/SnapFirst.vue';
+  import SnapFirst from 'components/SnapFirst.vue';
+  import VersionChangelogDialog from 'components/VersionChangelogDialog.vue';
 
   // === 유틸리티 클래스 임포트 ===
-  import { KeyBinding } from 'classes/KeyBinding';
+  import { useKeyBinding } from './composables/useKeyBinding';
   import { showMessage } from './utils/NotificationUtils';
   import { isWideWidth } from './utils/GlobalHelpers';
 
@@ -26,16 +28,23 @@
   import { useUIStore } from 'stores/uiStore';
   import { useSettingsStore } from 'stores/settingsStore';
   import { useThemesStore } from './stores/themesStore';
+  import { useUnitStore } from './stores/unitStore';
+  import { useCurrencyStore } from './stores/currencyStore';
+  import { useRadixStore } from './stores/radixStore';
 
   const uiStore = useUIStore();
   const settingsStore = useSettingsStore();
   const themesStore = useThemesStore();
+  const unitStore = useUnitStore();
+  const currencyStore = useCurrencyStore();
+  const radixStore = useRadixStore();
 
   // === 전역 객체 및 상태 저장소 설정 ===
   const $g = window.globalVars;
 
   const route = useRoute();
   const { t } = useI18n();
+  const $q = useQuasar();
 
   // === 상태 관리 ===
   const isFirstNavigation = ref(true);
@@ -81,7 +90,7 @@
    * q: 앱 종료
    * 기타: 계산기 관련 기능
    */
-  const keyBinding = new KeyBinding([
+  const { subscribe, unsubscribe } = useKeyBinding([
     [['Alt+t'], toggleAlwaysOnTopWithNotification],
     [['Alt+i'], settingsStore.toggleInitPanel],
     [['Alt+d'], toggleDarkModeWithNotification],
@@ -105,6 +114,25 @@
     }, 100);
   });
 
+  onMounted(() => {
+    const unitCorrected = unitStore.validateAndCorrectUnits();
+    const currencyCorrected = currencyStore.validateAndCorrectCurrencies();
+    const radixCorrected = radixStore.validateAndCorrectRadixSettings();
+
+    if (unitCorrected || currencyCorrected || radixCorrected) {
+      setTimeout(() => {
+        $q.notify({
+          message: t('persistedSettingsCorrected'),
+          color: 'info',
+          position: 'top',
+          icon: 'info',
+          timeout: 7000,
+          actions: [{ icon: 'close', color: 'white' }],
+        });
+      }, 2500);
+    }
+  });
+
   /**
    * 입력 필드 포커스 상태에 따라 키 바인딩을 활성화/비활성화합니다.
    */
@@ -112,9 +140,9 @@
     () => uiStore.inputFocused,
     () => {
       if (uiStore.inputFocused) {
-        keyBinding.unsubscribe();
+        unsubscribe();
       } else {
-        keyBinding.subscribe();
+        subscribe();
       }
     },
     { immediate: true },
@@ -182,6 +210,7 @@
   </router-view>
   <AutoUpdate />
   <SnapFirst />
+  <VersionChangelogDialog />
 </template>
 
 <style scoped lang="scss">
@@ -294,7 +323,7 @@
   }
 </style>
 
-<i18n>
+<i18n lang="yaml">
 ko:
   targetToBeCopiedResult: '계산 결과를'
   targetToBeCopiedSelected: '선택한 내용을'
@@ -306,6 +335,7 @@ ko:
       system: '다크모드를 시스템 설정에 따라 변경했습니다.'
       light: '라이트 모드로 변경했습니다.'
       dark: '다크 모드로 변경했습니다.'
+  persistedSettingsCorrected: '앱 업데이트로 인해 일부 저장된 설정이 초기화되었습니다.'
 en:
   targetToBeCopiedResult: 'the calculation result'
   targetToBeCopiedSelected: 'the selected content'
@@ -317,4 +347,5 @@ en:
       system: 'Dark mode changed to follow system settings.'
       light: 'Changed to light mode.'
       dark: 'Changed to dark mode.'
+  persistedSettingsCorrected: 'Some saved settings have been reset due to an app update.'
 </i18n>

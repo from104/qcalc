@@ -24,10 +24,12 @@
   const router = useRouter();
   const route = useRoute() as RouteLocationNormalizedLoaded & { meta: RouteTransitionMeta };
 
+  // 네비게이션 관련 유틸리티 함수`
+  import { isWideWidth } from 'src/utils/GlobalHelpers';
   import { navigateToPath } from 'src/utils/NavigationUtils';
 
   // 계산기 관련 타입과 클래스
-  import { KeyBinding } from 'classes/KeyBinding';
+  import { useKeyBinding } from '../composables/useKeyBinding';
 
   // 알림 관련 유틸리티 함수
   import { showMessage, showError } from 'src/utils/NotificationUtils';
@@ -41,6 +43,7 @@
   import { useCalcStore } from 'src/stores/calcStore';
   import { useCurrencyStore } from 'stores/currencyStore';
   import { useUnitStore } from 'stores/unitStore';
+  import { useSettingsStore } from 'src/stores/settingsStore';
 
   // 스토어 인스턴스 생성
   const uiStore = useUIStore();
@@ -48,6 +51,9 @@
   const calcStore = useCalcStore();
   const currencyStore = useCurrencyStore();
   const unitStore = useUnitStore();
+  const settingsStore = useSettingsStore();
+
+  const fabOpen = ref(false);
 
   // 컴포넌트 import
   import MenuItem from 'components/snippets/MenuItem.vue';
@@ -81,9 +87,6 @@
   // records 계산 속성 수정
   const records = computed(() => calcStore.calc.record.getAllRecords());
 
-  // 화면 너비가 특정 값보다 큰지 확인하는 함수
-  const isWideWidth = () => window.innerWidth > 768;
-
   // 계산 결과 메뉴의 열림 상태를 관리하는 반응형 객체
   const recordMenu = reactive(Object.fromEntries(records.value.map((h: Record) => [h.id, false])));
 
@@ -113,44 +116,40 @@
 
   // 계산 결과 창 스크롤 이벤트 핸들러
   const handleScroll = (evt: Event) => {
-    showScrollToTop.value = (evt.target as HTMLDivElement).scrollTop > 50;
-  };
-
-  // 계산 결과 창 스크롤 위치를 최상단으로 이동
-  const scrollToTop = () => {
-    document.getElementById('record')?.scrollTo({
-      top: 0,
-      behavior: 'smooth',
-    });
+    const scrollTop = (evt.target as HTMLDivElement).scrollTop;
+    showScrollToTop.value = scrollTop > 50;
   };
 
   // 히스토리 스크롤 함수
   const scrollToRecord = (offset: number | 'top' | 'bottom') => {
-    const recordElement = document.getElementById('record');
-    if (!recordElement) return;
+    const recordElement = document.getElementById('record-card');
+
+    if (!recordElement) {
+      // record 요소가 없을 때 경고를 출력합니다.
+      // 콘솔 로그 대신 예외를 던지지 않고 조용히 반환합니다.
+      return;
+    }
 
     const currentScroll = recordElement.scrollTop;
+    const scrollHeight = recordElement.scrollHeight;
+    const clientHeight = recordElement.clientHeight;
+    const maxScroll = scrollHeight - clientHeight;
+
     let targetScroll: number;
 
     if (offset === 'top') {
       targetScroll = 0;
     } else if (offset === 'bottom') {
-      targetScroll = recordElement.scrollHeight - recordElement.clientHeight;
+      targetScroll = maxScroll;
     } else {
-      targetScroll = Math.max(
-        0,
-        Math.min(currentScroll + offset, recordElement.scrollHeight - recordElement.clientHeight),
-      );
+      const calculatedScroll = currentScroll + offset;
+      targetScroll = Math.max(0, Math.min(calculatedScroll, maxScroll));
     }
 
     recordElement.scrollTo({
       top: targetScroll,
       behavior: 'smooth',
     });
-  };
-
-  const openDeleteRecordConfirmDialog = () => {
-    if (calcStore.calc.record.getAllRecords().length > 0) uiStore.isDeleteRecordConfirmOpen = true;
   };
 
   const openSearchDialogByKey = () => {
@@ -164,15 +163,16 @@
   };
 
   // 키 바인딩 설정
-  const keyBinding = new KeyBinding([
-    [['Control+d'], () => openDeleteRecordConfirmDialog()],
-    [['Control+f'], () => openSearchDialogByKey()],
+  const { subscribe, unsubscribe } = useKeyBinding([
     [['ArrowUp'], () => scrollToRecord(-50)],
     [['ArrowDown'], () => scrollToRecord(50)],
     [['PageUp'], () => scrollToRecord(-400)],
     [['PageDown'], () => scrollToRecord(400)],
     [['Home'], () => scrollToRecord('top')],
     [['End'], () => scrollToRecord('bottom')],
+    [['Control+f'], () => openSearchDialogByKey()],
+    [['Control+['], () => settingsStore.decrementRecordFontSize()],
+    [['Control+]'], () => settingsStore.incrementRecordFontSize()],
   ]);
 
   // 입력 포커스 상태에 따른 키 바인딩 활성화/비활성화
@@ -180,9 +180,9 @@
     () => uiStore.inputFocused,
     () => {
       if (uiStore.inputFocused) {
-        keyBinding.unsubscribe();
+        unsubscribe();
       } else {
-        keyBinding.subscribe();
+        subscribe();
       }
     },
     { immediate: true },
@@ -190,9 +190,9 @@
 
   // 컴포넌트 마운트 시 키 바인딩 활성화
   onMounted(() => {
-    keyBinding.subscribe();
+    subscribe();
     setTimeout(() => {
-      document.getElementById('record')?.scrollTo({ top: uiStore.recordLastScrollPosition });
+      document.getElementById('record-card')?.scrollTo({ top: uiStore.recordLastScrollPosition });
       if (uiStore.isSearchOpen) {
         uiStore.setInputFocused();
       }
@@ -202,8 +202,8 @@
 
   // 컴포넌트 언마운트 시 키 바인딩 비활성화
   onBeforeUnmount(() => {
-    keyBinding.unsubscribe();
-    uiStore.recordLastScrollPosition = document.getElementById('record')?.scrollTop ?? 0;
+    unsubscribe();
+    uiStore.recordLastScrollPosition = document.getElementById('record-card')?.scrollTop ?? 0;
 
     uiStore.isDeleteRecordConfirmOpen = false;
   });
@@ -314,6 +314,37 @@
     return headerElement ? headerElement.clientHeight + 'px' : '0px';
   });
 
+  /**
+   * Android 시스템 UI에 따른 하단 마진을 계산합니다.
+   * Android API 35 이상에서는 시스템 바 높이를 고려하여
+   * 제스처 네비게이션 여부에 따라 다른 마진을 적용합니다.
+   */
+  const calculatedBottomMargin = computed(() => {
+    let bottomMargin = 0;
+
+    // Android API level 35 이상: 시스템 바 높이 고려
+    if ($g.isAndroid && $g.apiLevel >= 35) {
+      // 제스처 네비게이션이 아닌 경우 네비게이션 바 높이 추가
+      if (!$g.isGestureNavigation) {
+        bottomMargin += 48;
+      } else {
+        if (isWideWidth()) {
+          bottomMargin += 24;
+        }
+      }
+    } else {
+      // 기본 마진
+      bottomMargin += 10;
+    }
+    return bottomMargin;
+  });
+
+  /**
+   * FAB 버튼의 위치를 계산합니다.
+   * 하단 마진을 고려하여 [좌측 오프셋, 하단 오프셋] 배열을 반환합니다.
+   */
+  const fabOffset = computed(() => [18, 18 + calculatedBottomMargin.value]);
+
   // 날짜/시간 포맷 함수
   const formatDateTime = (timestamp: number): string => {
     const date = new Date(timestamp);
@@ -405,11 +436,17 @@
       ? lighten(themesStore.getDarkColor(), 10)
       : lighten(themesStore.getCurrentThemeColors.ui.primary, 90);
   });
+
+  const recordFontClass = computed(() => `record-font-size-${settingsStore.recordFontSize}`);
+
+  // themesStore에서 select 색상을 가져오는 computed 속성
+  const selectTextColor = computed(() => themesStore.getSelectColor('text', themesStore.isDarkMode()));
+  const selectBackgroundColor = computed(() => themesStore.getSelectColor('background', themesStore.isDarkMode()));
 </script>
 
 <template>
   <q-card-section
-    id="record"
+    id="record-card"
     square
     class="full-width row justify-center items-start relative-position scrollbar-custom"
     :style="{
@@ -429,7 +466,7 @@
         :class="uiStore.isSearchOpen ? 'q-ma-xl' : 'q-ma-md'"
         style="z-index: 15"
         :aria-label="t('ariaLabel.scrollToTop')"
-        @click="scrollToTop"
+        @click="scrollToRecord('top')"
       />
     </transition>
 
@@ -496,7 +533,7 @@
         </q-item-section>
       </q-item>
       <!-- 기록이 있을 경우 -->
-      <q-list v-else id="record-list" separator class="full-width q-pt-md" role="list">
+      <q-list v-else id="record-list" separator class="full-width q-pt-md" role="list" :class="recordFontClass">
         <transition-group name="record-list">
           <q-slide-item
             v-for="record in recordStrings"
@@ -523,7 +560,7 @@
                   <HighlightText
                     :text="record.memo"
                     :search-term="uiStore.searchKeyword"
-                    @show-tooltip="(isShow) => handleMemoTooltip(record.id, isShow)"
+                    @show-tooltip="(isShow: boolean) => handleMemoTooltip(record.id, isShow)"
                   />
                   <ToolTip
                     v-if="isShowMemoTooltip[record.id]"
@@ -538,7 +575,7 @@
                     :text="record.displayText"
                     :search-term="uiStore.searchKeyword"
                     allow-line-break
-                    @show-tooltip="(isShow) => handleResultTooltip(record.id, isShow)"
+                    @show-tooltip="(isShow: boolean) => handleResultTooltip(record.id, isShow)"
                   />
                   <ToolTip
                     v-if="isShowResultTooltip[record.id]"
@@ -566,7 +603,11 @@
                         auto-close
                         anchor="bottom left"
                         self="top left"
-                        @update:model-value="(val) => { recordMenu[record.id] = val; }"
+                        @update:model-value="
+                          (val) => {
+                            recordMenu[record.id] = val;
+                          }
+                        "
                       >
                         <q-list
                           dense
@@ -645,6 +686,37 @@
         </transition-group>
       </q-list>
     </transition>
+
+    <div v-if="fabOpen" class="backdrop" @click="fabOpen = false"></div>
+    <q-page-sticky position="bottom-left" :offset="fabOffset" style="z-index: 15">
+      <q-fab
+        v-model="fabOpen"
+        vertical-actions-align="center"
+        color="primary"
+        icon="format_size"
+        direction="up"
+        padding="sm"
+      >
+        <q-fab-action
+          icon="remove"
+          :disable="settingsStore.recordFontSize <= 0"
+          padding="xs"
+          :color="selectBackgroundColor"
+          :text-color="selectTextColor"
+          @click="settingsStore.decrementRecordFontSize"
+          @click.stop="fabOpen = true"
+        />
+        <q-fab-action
+          icon="add"
+          :disable="settingsStore.recordFontSize >= 2"
+          padding="xs"
+          :color="selectBackgroundColor"
+          :text-color="selectTextColor"
+          @click="settingsStore.incrementRecordFontSize"
+          @click.stop="fabOpen = true"
+        />
+      </q-fab>
+    </q-page-sticky>
   </q-card-section>
 
   <!-- 기록 전체 삭제 다이얼로그 -->
@@ -709,7 +781,7 @@
 </template>
 
 <style scoped lang="scss">
-  #record {
+  #record-card {
     max-height: calc(100vh - v-bind('calculatedHeaderHeight'));
     overflow: auto;
     transition: padding-top 0.3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -871,59 +943,96 @@
     margin-bottom: -12px;
     @include dark-mode-fg-colors;
   }
+
+  .record-font-size-0 .record-text {
+    font-size: 0.7rem;
+  }
+  .record-font-size-0 .memo-text {
+    font-size: 0.8rem;
+  }
+
+  .record-font-size-1 .record-text {
+    font-size: 0.8rem;
+  }
+  .record-font-size-1 .memo-text {
+    font-size: 0.9rem;
+  }
+
+  .record-font-size-2 .record-text {
+    font-size: 0.9rem;
+  }
+  .record-font-size-2 .memo-text {
+    font-size: 1rem;
+  }
+
+  .backdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    // background-color: rgba(0, 0, 0, 0.2);
+    z-index: 14;
+  }
 </style>
 
-<i18n>
-ko:
-  record: '계산 기록'
-  noRecord: '계산 기록이 없습니다.'
-  noSearchResult: '검색 결과가 없습니다.'
-  search: '검색'
-  doYouDeleteRecord: '모든 계산 기록을 지우겠어요?'
-  memo: '메모'
-  copySuccess: '클립보드에 복사되었습니다.'
-  copyFailure: '클립보드 복사에 실패했습니다.'
-  addMemo: '메모 추가'
-  editMemo: '메모 수정'
-  copyMemo: '메모 복사'
-  deleteMemo: '메모 삭제'
-  copyDisplayedResult: '표시된 결과 복사'
-  copyResultNumber: '결과 숫자 복사'
-  loadToMainPanel: '메인 패널에 불러오기'
-  loadToSubPanel: '서브 패널에 불러오기'
-  deleteResult: '결과 삭제'
-  copyTime: '시간 복사'
-  ariaLabel:
-    scrollToTop: '맨 위로 스크롤'
-    editMemo: '메모 편집'
-    deleteRecord: '기록 삭제'
-    searchInput: '검색'
-    dragHandle: '검색창 이동'
-    closeSearch: '검색창 닫기'
-en:
-  record: 'record'
-  noRecord: 'No record.'
-  noSearchResult: 'No search results.'
-  search: 'Search'
-  doYouDeleteRecord: 'Do you want to delete all record?'
-  memo: 'Memo'
-  copySuccess: 'Copied to clipboard.'
-  copyFailure: 'Failed to copy to clipboard.'
-  addMemo: 'Add memo'
-  editMemo: 'Edit memo'
-  copyMemo: 'Copy memo'
-  deleteMemo: 'Delete memo'    
-  copyDisplayedResult: 'Copy displayed result'
-  copyResultNumber: 'Copy result number'
-  loadToMainPanel: 'Load to main panel'
-  loadToSubPanel: 'Load to sub panel'
-  deleteResult: 'Delete result'
-  copyTime: 'Copy time'
-  ariaLabel:
-    scrollToTop: 'Scroll to top'
+<i18n lang="yaml">
+  ko:
+    record: '계산 기록'
+    noRecord: '계산 기록이 없습니다.'
+    noSearchResult: '검색 결과가 없습니다.'
+    search: '검색'
+    doYouDeleteRecord: '모든 계산 기록을 지우겠어요?'
+    memo: '메모'
+    copySuccess: '클립보드에 복사되었습니다.'
+    copyFailure: '클립보드 복사에 실패했습니다.'
+    addMemo: '메모 추가'
+    editMemo: '메모 수정'
+    copyMemo: '메모 복사'
+    deleteMemo: '메모 삭제'
+    copyDisplayedResult: '표시된 결과 복사'
+    copyResultNumber: '결과 숫자 복사'
+    loadToMainPanel: '메인 패널에 불러오기'
+    loadToSubPanel: '서브 패널에 불러오기'
+    deleteResult: '결과 삭제'
+    copyTime: '시간 복사'
+    fontSize:
+      increase: '글자 크게'
+      decrease: '글자 작게'
+    ariaLabel:
+      scrollToTop: '맨 위로 스크롤'
+      editMemo: '메모 편집'
+      deleteRecord: '기록 삭제'
+      searchInput: '검색'
+      dragHandle: '검색창 이동'
+      closeSearch: '검색창 닫기'
+  en:
+    record: 'record'
+    noRecord: 'No record.'
+    noSearchResult: 'No search results.'
+    search: 'Search'
+    doYouDeleteRecord: 'Do you want to delete all record?'
+    memo: 'Memo'
+    copySuccess: 'Copied to clipboard.'
+    copyFailure: 'Failed to copy to clipboard.'
+    addMemo: 'Add memo'
     editMemo: 'Edit memo'
-    deleteRecord: 'Delete record'
-    searchInput: 'Search'
-    dragHandle: 'Move search window'
-    closeSearch: 'Close search window'
+    copyMemo: 'Copy memo'
+    deleteMemo: 'Delete memo'    
+    copyDisplayedResult: 'Copy displayed result'
+    copyResultNumber: 'Copy result number'
+    loadToMainPanel: 'Load to main panel'
+    loadToSubPanel: 'Load to sub panel'
+    deleteResult: 'Delete result'
+    copyTime: 'Copy time'
+    fontSize:
+      increase: 'Increase font size'
+      decrease: 'Decrease font size'
+    ariaLabel:
+      scrollToTop: 'Scroll to top'
+      editMemo: 'Edit memo'
+      deleteRecord: 'Delete record'
+      searchInput: 'Search'
+      dragHandle: 'Move search window'
+      closeSearch: 'Close search window'
 </i18n>

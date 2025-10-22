@@ -76,7 +76,7 @@ export const unitBaseData: UnitBaseData = {
     l: { value: 0.001, desc: 'Liter' }, // 리터
     kl: { value: 1000, desc: 'Kiloliter' }, // 킬로리터
     gal: { value: 0.003785411784, desc: 'Gallon' }, // 갤런
-    to: { value: 0.0018, desc: 'Toe (Liter)' }, // 되
+    toe: { value: 0.0018, desc: 'Toe (Liter)' }, // 되
     mal: { value: 0.018, desc: 'Mal (Decaliter)' }, // 말
     seom: { value: 0.18, desc: 'Sŏm (Hectoliter)' }, // 섬
   },
@@ -97,11 +97,11 @@ export const unitBaseData: UnitBaseData = {
   angle: {
     // 각도
     deg: { value: 0.017453292519943295, desc: 'Degree' }, // 도
-    urad: { value: 0.000001, desc: 'Microradian' }, // 마이크로라디안
+    'μrad': { value: 0.000001, desc: 'Microradian' }, // 마이크로라디안
     grad: { value: 0.015707963267948967, desc: 'Gradian' }, // 그라디안
     rad: { value: 1, desc: 'Radian' }, // 라디안
-    arcm: { value: 0.0002908882086657216, desc: 'Minute of arc' }, // 분(각도)
-    arcs: { value: 0.00000484813681109536, desc: 'Second of arc' }, // 초(각도)
+    amin: { value: 0.0002908882086657216, desc: 'Minute of arc' }, // 분(각도)
+    asec: { value: 0.00000484813681109536, desc: 'Second of arc' }, // 초(각도)
   },
   temp: {
     // 온도

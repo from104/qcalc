@@ -1,0 +1,104 @@
+# QCalc Vue/TypeScript 스타일 가이드
+
+이 문서는 QCalc 프로젝트의 Vue.js 및 TypeScript 코드 스타일 규칙을 정의합니다. 일관성 있는 코드베이스를 유지하기 위해 모든 기여자는 이 규칙을 따라야 합니다.
+
+## 전역 스타일 (Global Style)
+
+- **들여쓰기**: 스페이스 2칸을 사용합니다. (EditorConfig: `indent_size = 2`)
+- **인용 부호**: 작은따옴표(''')를 사용합니다. (Prettier: `singleQuote: true`)
+- **세미콜론**: 문장 끝에 세미콜론을 사용하지 않습니다. (Prettier: `semi: false`)
+- **후행 쉼표**: ES5 호환 가능한 후행 쉼표를 사용합니다. (Prettier: `trailingComma: '''es5'''`)
+- **줄 바꿈**: 라인 피드(LF)를 사용합니다. (EditorConfig: `end_of_line = lf`)
+- **최대 줄 길이**: 120자로 제한합니다. (Prettier: `printWidth: 120`)
+
+## Vue.js 스타일 가이드
+
+- **컴포넌트 명명**: 컴포넌트 파일명은 `PascalCase`를 사용합니다. (예: `MyComponent.vue`)
+- **컴포넌트 구조**: Vue 단일 파일 컴포넌트 내에서 최상위 블록의 순서는 `<script>`, `<template>`, `<style>`, `<i18n>` 순서를 권장합니다.
+- **스크립트/스타일 들여쓰기**: `<script>`와 `<style>` 태그는 들여쓰기하지 않습니다. (Prettier: `vueIndentScriptAndStyle: false`)
+- **Props 명명**: `camelCase`를 사용합니다.
+- **Props 정의**: `defineProps`를 사용하고, 각 속성에 대해 `type`과 `required` 또는 `default`를 명시해야 합니다.
+
+  ```typescript
+  // Good
+  const props = defineProps({
+    message: {
+      type: String,
+      required: true,
+    },
+    // '''any''' 타입은 피하고 구체적인 타입을 명시합니다.
+    items: {
+      type: Array as PropType<Item[]>,
+      default: () => [],
+    },
+  });
+  ```
+
+- **v-for 디렉티브**: `v-for` 사용 시 항상 `:key`를 제공해야 합니다.
+
+  ```html
+  // Good
+  <div v-for="item in items" :key="item.id">
+    {{ item.name }}
+  </div>
+  ```
+
+## TypeScript 스타일 가이드
+
+- **타입 명명**: 인터페이스와 타입 별칭은 `PascalCase`를 사용합니다. (예: `interface UserProfile`, `type AuthStatus`)
+- **타입 명시**: 변수, 함수 매개변수, 반환 값에 타입을 명시적으로 선언합니다.
+
+  ```typescript
+  // Good
+  function getUser(userId: string): UserProfile {
+    // ...
+  }
+  ```
+
+- **`any` 타입 지양**: `any` 타입 사용을 최대한 피하고, 불가피할 경우 `unknown`을 우선적으로 고려합니다.
+- **인터페이스 vs 타입 별칭**: 객체의 형태를 정의할 때는 `interface`를, 유니언이나 제네릭 타입을 정의할 때는 `type`을 선호합니다.
+- **`const` 및 `let`**: 재할당이 필요 없는 변수는 `const`를 사용합니다.
+
+## 예시
+
+다음은 위 규칙을 준수한 Vue 컴포넌트 예시입니다.
+
+<script setup lang="ts">
+import { computed } from '''vue'''
+import { useI18n } from '''vue-i18n'''
+
+interface Props {
+  name: string
+}
+
+const props = defineProps<Props>()
+const { t } = useI18n()
+
+const greetingMessage = computed<string>(() => {
+  return `${t('''hello''')}, ${props.name}!`
+})
+</script>
+
+<template>
+  <div class="greeting-container">
+    <p>{{ greetingMessage }}</p>
+  </div>
+</template>
+
+<style scoped>
+.greeting-container {
+  padding: 10px;
+  border: 1px solid #ccc;
+}
+</style>
+
+<i18n>
+{
+  "en": {
+    "hello": "Hello"
+  },
+  "ko": {
+    "hello": "안녕하세요"
+  }
+}
+</i18n>

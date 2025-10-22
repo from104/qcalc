@@ -33,7 +33,7 @@ export default defineConfig((/* ctx */) => {
 
     // 앱 부트 파일 (/src/boot)
     // 부트 파일은 "main.js"의 일부입니다
-    boot: ['i18n', 'auto-blur', 'android', 'global-variables', 'themes'],
+    boot: ['i18n', 'auto-blur', 'global-variables', 'android', 'themes'],
 
     // CSS 파일
     css: ['app.scss'],
@@ -93,14 +93,13 @@ export default defineConfig((/* ctx */) => {
         [
           '@intlify/unplugin-vue-i18n/vite',
           {
-            defaultSFCLang: 'yaml5',
+            include: [join(__dirname, 'src/i18n/messages/*.yml'), join(__dirname, 'src/i18n/errors/*.yml')],
             strictMessage: false,
             escapeHtml: false,
           },
         ],
         // 타입스크립트 및 ESLint 검사 플러그인
         ['vite-plugin-checker', { vueTsc: true }, { server: false }],
-        ['@modyfi/vite-plugin-yaml'],
       ],
       typescript: {
         strict: true, // (recommended) enables strict settings for TypeScript
@@ -121,7 +120,7 @@ export default defineConfig((/* ctx */) => {
     // Quasar 프레임워크 설정
     framework: {
       config: {},
-      plugins: ['Notify', 'Meta'],
+      plugins: ['Notify', 'Meta', 'Dialog'],
 
       /**
        * Auto import - how to detect components in your vue files

@@ -16,8 +16,8 @@
   const { t } = useI18n();
 
   // 계산기 관련 타입과 클래스
-  import { KeyBinding } from 'classes/KeyBinding';
-  import { Radix } from 'classes/RadixConverter';
+  import { useKeyBinding } from '../composables/useKeyBinding';
+  import { Radix } from 'src/utils/RadixConverter';
 
   // 스토어 import
   import { useUIStore } from 'stores/uiStore';
@@ -48,7 +48,7 @@
   });
 
   // 키 바인딩 설정
-  const keyBinding = new KeyBinding([
+  const { subscribe, unsubscribe } = useKeyBinding([
     [['\\'], () => document.getElementById('btn-swap-radix')?.click()],
     [['Alt+\\'], () => radixStore.toggleShowRadix()],
     [['Alt+Control+\\'], () => radixStore.setRadixType(radixStore.radixType == 'prefix' ? 'suffix' : 'prefix')],
@@ -57,23 +57,21 @@
   // 입력 포커스에 따른 키 바인딩 활성화/비활성화
   watch(
     () => uiStore.inputFocused,
-    () => {
-      if (uiStore.inputFocused) {
-        keyBinding.unsubscribe();
+    (focused) => {
+      if (focused) {
+        unsubscribe();
       } else {
-        keyBinding.subscribe();
+        subscribe();
       }
     },
   );
 
-  onMounted(() => {
+    onMounted(() => {
     radixStore.initRecentRadix();
     calcStore.calc.wordSize = radixStore.wordSize;
-    keyBinding.subscribe();
   });
 
   onBeforeUnmount(() => {
-    keyBinding.unsubscribe();
     uiStore.setInputBlurred();
   });
 
@@ -273,18 +271,18 @@
   }
 </style>
 
-<i18n lang="yaml5">
+<i18n lang="yaml">
   ko:
-    tooltipSwap: 진법 바꾸기
+    tooltipSwap: '진법 바꾸기'
     radixLabel:
-      bin: 2진수
-      oct: 8진수
-      dec: 10진수
-      hex: 16진수
-      main: 변환 전
-      sub: 변환 후
-      wordSize: 워드크기
-    bit: 비트
+      bin: '2진수'
+      oct: '8진수'
+      dec: '10진수'
+      hex: '16진수'
+      main: '변환 전'
+      sub: '변환 후'
+      wordSize: '워드크기'
+    bit: '비트'
     ariaLabel:
       wordSize: '워드 크기 선택'
       sourceDirection: '원본 진법 방향'
@@ -293,15 +291,15 @@
       targetRadix: '대상 진법 선택'
       swapRadix: '원본과 대상 진법 바꾸기'
   en:
-    tooltipSwap: Swap Radix
+    tooltipSwap: 'Swap Radix'
     radixLabel:
-      bin: Binary
-      oct: Octal
-      dec: Decimal
-      hex: Hexadecimal
-      main: Before
-      sub: After
-      wordSize: Word Size
+      bin: 'Binary'
+      oct: 'Octal'
+      dec: 'Decimal'
+      hex: 'Hexadecimal'
+      main: 'Before'  
+      sub: 'After'
+      wordSize: 'Word Size'
     bit: Bit
     ariaLabel:
       wordSize: 'Select word size'

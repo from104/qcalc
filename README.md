@@ -8,16 +8,17 @@ QCalc is more than just a simple calculator - it's evolving into a modern produc
 
 The calculator alone appears when the window width is reduced.
 
-![Screenshot](https://github.com/from104/qcalc/raw/main/assets/screenshot_v0.11.4.png)
+![Screenshot](https://github.com/from104/qcalc/raw/main/assets/screenshot_v0.11.5.png)
 
-## Guide to Main Features
+## Main Features of the App
 
 - **4 Professional Calculators**: Standard calculator, unit converter, currency converter, and programmer calculator meet all your calculation needs
 - **High-precision Calculation Engine**: Supports accurate calculations up to 64 digits with advanced math functions like trigonometry, factorial, and powers
 - **Number Base & Bit Operations**: Converts between binary/octal/decimal/hexadecimal and supports professional bit operations (AND, OR, XOR, NOT) for programmers
-- **Smart User Experience**: Provides personalized environment with unit/currency favorites, various color themes, and calculation history notes
+- **Smart User Experience**: Provides personalized environment with unit/currency favorites, various color themes, and calculation history notes and export/import
 - **Cross-platform Support**: Delivers consistent experience on Windows, Linux desktop and Android mobile with automatic update support
 - **Accessibility-focused Design**: Continuously improved for easy access by all users with keyboard shortcuts, haptic feedback, and adaptive layouts
+- **Settings Management**: Export or import all settings to a file to maintain the same settings across different environments
 
 ## Guide to Main Features
 
@@ -66,9 +67,17 @@ The calculator alone appears when the window width is reduced.
 - **How to Access**: F4 key or side menu
 - **Scroll**: Move 50px with ↑/↓ keys, 400px with Page Up/Down
 - **Search/Delete**: Search with Ctrl+F, delete history with Ctrl+D
+- **Export/Import**: Export or import calculation history as a CSV file through the buttons in the header
+- **Font Size Control**: Adjust the font size in 3 steps with the buttons in the bottom left corner.
 - **Add Notes**: Add notes to individual records
 - **Left Swipe (Mobile)**: Add/edit notes
 - **Right Swipe (Mobile)**: Delete records
+
+#### Settings Management
+
+- **How to Access**: F3 key or side menu
+- **Reset**: Reset all settings to their default values
+- **Export/Import**: Save or load current settings as a JSON file to use the same settings in different environments
 
 #### Number Display Settings
 
@@ -244,6 +253,9 @@ The calculator alone appears when the window width is reduced.
 | ↑/↓             | Scroll 50px up/down  |
 | PageUp/PageDown | Scroll 400px up/down |
 | Home/End        | Scroll to top/bottom |
+| C-f             | Search history       |
+| C-\[            | Decrease font size   |
+| C-\]            | Increase font size   |
 
 ## Installation Guide
 

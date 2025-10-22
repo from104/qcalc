@@ -50,11 +50,11 @@
   </q-item>
 </template>
 
-<i18n>
-ko:
-  ariaLabel:
-    icon: '{name} 메뉴 아이콘'
-en:
-  ariaLabel:
-    icon: '{name} menu icon'
+<i18n lang="yaml">
+  ko:
+    ariaLabel:
+      icon: '{name} 메뉴 아이콘'
+  en:
+    ariaLabel:
+      icon: '{name} menu icon'
 </i18n>
