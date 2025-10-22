@@ -214,7 +214,7 @@
                 }"
                 @click="cyclePanelPreview"
               >
-                123,456.78
+                1,234.56
               </div>
 
               <!-- Buttons -->

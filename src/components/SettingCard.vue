@@ -453,6 +453,8 @@
           dense
           :label="t('createNewTheme')"
           class="full-width"
+          :color="selectTextColor"
+          :class="`bg-${selectBackgroundColor}`"
           :aria-label="t('ariaLabel.createNewTheme')"
           @click="createNewTheme"
         />
