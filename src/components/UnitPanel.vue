@@ -138,8 +138,10 @@
     [['Alt+\\'], () => unitStore.toggleShowUnit()],
   ]);
 
-  
-
+  /**
+   * 출발 단위와 도착 단위를 교환하고, 변환된 값을 현재 숫자에 반영합니다.
+   * 동일한 단위인 경우에는 아무 작업도 수행하지 않습니다.
+   */
   const handleUnitSwap = () => {
     // 동일한 단위인 경우 변환하지 않음
     if (unitStore.sourceUnits[unitStore.selectedCategory] !== unitStore.targetUnits[unitStore.selectedCategory]) {
@@ -347,7 +349,7 @@
   </q-card-section>
 </template>
 
-<style lang="scss">
+<style lang="scss" scoped>
   .q-select-popup {
     .q-item {
       @media (prefers-color-scheme: dark) {

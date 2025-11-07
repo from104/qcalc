@@ -83,24 +83,25 @@
   const needFieldTooltip = ref(false);
 
   /**
-   * 필드 툴팁 표시 여부를 결정하는 함수
-   *
-   * @description
-   * - 필드 요소의 너비가 스크롤 너비보다 작은 경우 툴팁 표시 필요
+   * 필드 내용이 넘칠 경우 툴팁을 표시할지 여부를 결정합니다.
    */
   const checkNeedFieldTooltip = () => {
-    if (!fieldElement.value) return false;
+    if (!fieldElement.value) return;
     needFieldTooltip.value = fieldElement.value.offsetWidth < fieldElement.value.scrollWidth;
-    return true;
   };
 
-  // 햅틱 피드백 함수
+  /**
+   * 가벼운 햅틱 피드백을 트리거합니다.
+   */
   const hapticFeedbackLight = async () => {
     if ($g.isCapacitor && settingsStore.hapticsMode) {
       await Haptics.impact({ style: ImpactStyle.Light });
     }
   };
 
+  /**
+   * 중간 강도의 햅틱 피드백을 트리거합니다.
+   */
   const hapticFeedbackMedium = async () => {
     if ($g.isCapacitor && settingsStore.hapticsMode) {
       await Haptics.impact({ style: ImpactStyle.Medium });
@@ -108,11 +109,8 @@
   };
 
   /**
-   * 단위 변환 결과를 계산하는 함수
-   *
-   * @returns 단위 변환된 결과 문자열 또는 빈 문자열
-   * @description
-   * - 현재 카테고리의 시작 단위에서 목표 단위로 변환
+   * 현재 숫자를 다른 단위로 변환합니다.
+   * @returns 단위 변환 결과 문자열
    */
   const getConvertedUnitNumber = () => {
     const convertedNumber = UnitConverter.convert(
@@ -121,94 +119,55 @@
       unitStore.sourceUnits[unitStore.selectedCategory] ?? '',
       unitStore.targetUnits[unitStore.selectedCategory] ?? '',
     );
-
-    // 단위 변환 결과 저장
     unitStore.convertedUnitNumber = convertedNumber;
-
-    // 단위 변환 결과 반환
     return convertedNumber;
   };
 
   /**
-   * 통화 변환 결과를 계산하는 함수
-   *
-   * @returns 통화 변환된 결과 문자열 또는 빈 문자열
-   * @description
-   * - 현재 숫자를 시작 통화에서 목표 통화로 변환
+   * 현재 숫자를 다른 통화로 변환합니다.
+   * @returns 통화 변환 결과 문자열
    */
   const getConvertedCurrencyNumber = () => {
-    const currentNumber = toBigNumber(calc.currentNumber);
-    const fromCurrency = currencyStore.sourceCurrency;
-    const toCurrency = currencyStore.targetCurrency;
-
-    const convertedNumber = currencyStore.currencyConverter.convert(currentNumber, fromCurrency, toCurrency).toFixed();
-
-    // 통화 변환 결과 저장
+    const convertedNumber = currencyStore.currencyConverter
+      .convert(toBigNumber(calc.currentNumber), currencyStore.sourceCurrency, currencyStore.targetCurrency)
+      .toFixed();
     currencyStore.convertedCurrencyNumber = convertedNumber;
-
-    // 통화 변환 결과 반환
     return convertedNumber;
   };
 
   /**
-   * 진법 변환 결과를 계산하는 함수
-   *
-   * @returns 진법 변환된 결과 문자열 또는 빈 문자열
-   * @description
-   * - 현재 버퍼의 값을 메인 진법에서 서브 진법으로 변환
+   * 현재 숫자를 다른 진법으로 변환합니다.
+   * @returns 진법 변환 결과 문자열
    */
   const getConvertedRadixNumber = () => {
-    const convertedNumber = radixStore.convertRadix(calc.inputBuffer, radixStore.sourceRadix, radixStore.targetRadix);
-
-    // console.log('convertedNumber', convertedNumber);
-    // 진법 변환 결과 반환
-    return convertedNumber;
+    return radixStore.convertRadix(calc.inputBuffer, radixStore.sourceRadix, radixStore.targetRadix);
   };
 
   /**
-   * 결과 문자열을 생성하는 함수
-   *
-   * @returns 계산 결과 문자열
-   * @description
-   * - 메인 필드인 경우: 현재 버퍼값을 포맷팅하여 반환
-   * - 서브 필드인 경우: 각 애드온(단위/통화/진법)에 따라 변환된 결과를 반환
+   * 현재 필드에 표시될 계산 결과를 계산합니다.
+   * 메인 필드는 현재 입력 버퍼를, 서브 필드는 변환된 결과를 표시합니다.
    */
   const result = computed(() => {
-    // 메인 필드인 경우
     if (isMainField) {
       const inputBuffer = calc.inputBuffer;
-
       const formattedNumber = calcStore.toFormattedNumber(inputBuffer, radixStore.sourceRadix);
-
-      // 소수점 자릿수 설정이 -2이고 소수점이 있는 경우
       const hasSpecialDecimalPlaces = settingsStore.decimalPlaces === -1 && inputBuffer.includes('.');
-
-      const result =
-        hasSpecialDecimalPlaces && !calc.needsBufferReset
-          ? `${formattedNumber.split('.')[0]}.${inputBuffer.split('.')[1]}`
-          : formattedNumber;
-
-      return result;
+      return hasSpecialDecimalPlaces && !calc.needsBufferReset
+        ? `${formattedNumber.split('.')[0]}.${inputBuffer.split('.')[1]}`
+        : formattedNumber;
     } else {
-      // 서브 필드인 경우 애드온 타입에 따라 처리
       switch (props.addon) {
         case 'unit':
           unitStore.initRecentUnits();
           return calcStore.toFormattedNumber(getConvertedUnitNumber());
-
         case 'currency':
           currencyStore.initRecentCurrencies();
           return calcStore.toFormattedNumber(getConvertedCurrencyNumber());
-
         case 'radix': {
           radixStore.initRecentRadix();
-
           const convertedNumber = getConvertedRadixNumber();
-
-          const formattedNumber = calcStore.toFormattedNumber(convertedNumber, radixStore.targetRadix);
-          return formattedNumber;
+          return calcStore.toFormattedNumber(convertedNumber, radixStore.targetRadix);
         }
-
         default:
           return '';
       }
@@ -216,42 +175,29 @@
   });
 
   /**
-   * 통화 기호를 표시하는 계산된 속성
-   *
-   * @returns 통화 기호 문자열
-   * @description
-   * - 통화 기호 표시 설정이 켜져있고 통화 애드온인 경우에만 기호 표시
-   * - 메인 필드면 시작 통화의 기호를, 서브 필드면 대상 통화의 기호를 반환
+   * 현재 통화 기호를 반환합니다.
    */
   const symbol = computed(() => {
-    // 통화 기호 표시가 비활성화된 경우 빈 문자열 반환
     if (props.addon !== 'currency' || !currencyStore.showSymbol) {
       return '';
     }
-
-    // 현재 필드에 따른 통화 코드의 기호 반환
     const currencyCode = isMainField ? currencyStore.sourceCurrency : currencyStore.targetCurrency;
     return currencyStore.currencyConverter.getSymbol(currencyCode);
   });
 
   /**
-   * 단위 표시를 위한 계산된 속성
-   * 단위 표시 설정이 켜져있고 단위 애드온인 경우에만 단위를 표시
+   * 현재 단위 기호를 반환합니다.
    */
   const unit = computed(() => {
-    const shouldShowUnit = props.addon === 'unit' && unitStore.showUnit;
-    if (!shouldShowUnit) return '';
-
+    if (props.addon !== 'unit' || !unitStore.showUnit) return '';
     const selectedUnit = isMainField
       ? unitStore.sourceUnits[unitStore.selectedCategory]
       : unitStore.targetUnits[unitStore.selectedCategory];
-
     return ` ${selectedUnit}`;
   });
 
   /**
-   * 진법 표시를 위한 계산된 속성
-   * 현재 탭이 radix일 경우에만 진법을 표시
+   * 현재 진법 접두사를 반환합니다.
    */
   const radixPrefix = computed(() => {
     const radix = isMainField ? radixStore.sourceRadix : radixStore.targetRadix;
@@ -260,6 +206,9 @@
       : '';
   });
 
+  /**
+   * 현재 진법 접미사를 반환합니다.
+   */
   const radixSuffix = computed(() => {
     const radix = isMainField ? radixStore.sourceRadix : radixStore.targetRadix;
     return currentTab.value === 'radix' && radixStore.showRadix && radixStore.radixType === 'suffix'
@@ -268,37 +217,32 @@
   });
 
   /**
-   * 표시될 결과 문자열을 생성하는 헬퍼 함수
-   * @param value - 표시할 값 (result 또는 memoryValue)
-   * @returns 포맷된 결과 문자열
-   * @description
-   * - 진법 접두사, 통화 기호, 값, 단위를 순서대로 연결
-   * - 진법 접미사 조건에 따라 접미사 추가
+   * 기호, 단위, 진법 표시를 포함하여 표시될 최종 결과 문자열을 포맷합니다.
+   * @param value - 포맷할 숫자 값
+   * @returns 포맷된 전체 결과 문자열
    */
   const formatDisplayResult = (value: string): string => {
-    // 기본 문자열 구성: 접두사 + 기호 + 값 + 단위
     const baseString = `${radixPrefix.value}${symbol.value}${value}${unit.value}`;
-
-    // 진법 접미사 표시 조건 확인
     const shouldShowSuffix = currentTab.value === 'radix' && radixStore.showRadix && radixStore.radixType === 'suffix';
-
-    // 접미사 추가 여부에 따라 최종 문자열 반환
     return shouldShowSuffix ? `${baseString}(${radixSuffix.value})` : baseString;
   };
 
   /**
-   * 일반 결과값을 포함한 표시 문자열
-   * @returns 포맷된 결과 문자열
+   * 현재 계산 결과를 기반으로 포맷된 표시 문자열입니다.
    */
   const displayedResult = computed(() => formatDisplayResult(result.value));
 
   /**
-   * 메모리 값을 포함한 표시 문자열
-   * @returns 포맷된 메모리 결과 문자열
+   * 메모리 값을 기반으로 포맷된 표시 문자열입니다.
    */
   const displayedResultWithMemory = computed(() => formatDisplayResult(memoryValue.value));
 
-  // 진법 모드에서 접두사/접미사를 포함한 결과 문자열 생성
+  /**
+   * 진법 표시(접두사/접미사)를 포함한 숫자 문자열을 반환합니다.
+   * @param number - 포맷할 숫자 문자열
+   * @param isOnly - 접미사 괄호를 생략할지 여부
+   * @returns 포맷된 진법 결과 문자열
+   */
   const getRadixResult = (number: string, isOnly = false) => {
     const prefix = radixPrefix.value;
     const suffix = radixSuffix.value;
@@ -307,11 +251,9 @@
   };
 
   /**
-   * 숫자만 표시하기 위한 계산된 속성
-   * 필드와 애드온 타입에 따라 적절한 숫자를 반환
+   * 변환 및 포맷팅되지 않은 순수 숫자 값을 반환합니다.
    */
   const onlyNumber = computed(() => {
-    // 메인 필드 처리
     if (props.field === 'main') {
       if (props.addon === 'radix') {
         const convertedNumber = radixStore.convertRadix(calc.currentNumber, Radix.Decimal, radixStore.sourceRadix);
@@ -320,21 +262,20 @@
       return calc.currentNumber;
     }
 
-    // 서브 필드 처리
     const converters = {
       unit: getConvertedUnitNumber,
       currency: getConvertedCurrencyNumber,
       radix: getConvertedRadixNumber,
     };
-
     const converter = converters[props.addon as keyof typeof converters];
     const result = converter?.() || '';
 
-    // 진법 모드인 경우 접두사/접미사 추가
     return props.addon === 'radix' ? getRadixResult(result, true) : result;
   });
 
-  // 연산자 문자열 계산된 속성
+  /**
+   * 현재 활성화된 연산자 기호를 반환합니다.
+   */
   const operator = computed(() => calc.getOperatorString());
 
   // 연산자 아이콘 매핑
@@ -356,131 +297,100 @@
     bitXnor: 'mdi-chevron-up-box-outline',
   };
 
-  // 메모리 초기화 여부 계산된 속성
+  /**
+   * 메모리가 비어있는지 여부를 나타냅니다.
+   */
   const isMemoryEmpty = computed(() => calc.memory.isEmpty);
 
-  // 메모리 값 계산된 속성
+  /**
+   * 현재 필드에 표시될 메모리 값을 계산합니다.
+   */
   const memoryValue = computed(() => {
+    const rawMemoryNumber = calc.memory.getNumber();
+    if (!rawMemoryNumber) return '';
+
     if (isMainField) {
-      const convertedNumber = radixStore.convertIfRadix(calc.memory.getNumber());
+      const convertedNumber = radixStore.convertIfRadix(rawMemoryNumber);
       return calcStore.toFormattedNumber(convertedNumber, radixStore.sourceRadix);
     } else {
-      const rawMemoryNumber = calc.memory.getNumber();
-      if (!rawMemoryNumber) return ''; // 메모리가 비어있으면 빈 문자열 반환
-
       switch (props.addon) {
         case 'unit': {
           const convertedNumber = UnitConverter.convert(
             unitStore.selectedCategory,
-            toBigNumber(rawMemoryNumber), // 메모리 값을 변환 대상으로 사용
-            unitStore.sourceUnits[unitStore.selectedCategory] ?? '', // 또는 targetUnit에 맞춰야 할 수도 있음
+            toBigNumber(rawMemoryNumber),
+            unitStore.sourceUnits[unitStore.selectedCategory] ?? '',
             unitStore.targetUnits[unitStore.selectedCategory] ?? '',
           );
           return calcStore.toFormattedNumber(convertedNumber);
         }
         case 'currency': {
           const convertedNumber = currencyStore.currencyConverter
-            .convert(
-              toBigNumber(rawMemoryNumber), // 메모리 값을 변환 대상으로 사용
-              currencyStore.sourceCurrency, // 또는 targetCurrency에 맞춰야 할 수도 있음
-              currencyStore.targetCurrency,
-            )
+            .convert(toBigNumber(rawMemoryNumber), currencyStore.sourceCurrency, currencyStore.targetCurrency)
             .toFixed();
           return calcStore.toFormattedNumber(convertedNumber);
         }
         case 'radix': {
           const convertedNumber = radixStore.convertRadix(
-            radixStore.convertIfRadix(rawMemoryNumber), // 메모리 값을 변환 대상으로 사용
-            radixStore.sourceRadix, // 또는 targetRadix에 맞춰야 할 수도 있음
+            radixStore.convertIfRadix(rawMemoryNumber),
+            radixStore.sourceRadix,
             radixStore.targetRadix,
           );
           return calcStore.toFormattedNumber(convertedNumber, radixStore.targetRadix);
         }
         default:
-          return calcStore.toFormattedNumber(rawMemoryNumber); // 변환 없이 포맷팅만 적용
+          return calcStore.toFormattedNumber(rawMemoryNumber);
       }
     }
   });
 
   /**
-   * 계산 인자나 계산 결과에 대한 식을 문자열로 생성하는 함수
-   *
-   * @returns 이전 결과 문자열
-   * - 마지막 계산 기록이 있고 초기화가 필요한 경우: 기록의 좌측 부분 + "="
-   * - 연산자가 있고 초기화가 필요없는 경우: 이전 숫자를 포맷팅한 문자열
-   * - 그 외의 경우: 빈 문자열
+   * 현재 계산 표현식을 반환합니다 (예: "1 + 2 =").
    */
   const calculationExpression = computed(() => {
-    // 마지막 계산 기록 가져오기
     const lastRecord = calcRecord.getCount() > 0 ? calcRecord.getAllRecords()[0] : null;
-
-    // 초기화 필요 여부와 연산자 존재 여부 확인
     const needsReset = calc.needsBufferReset;
     const hasOperator = operator.value !== '';
-
-    // 마지막 계산 기록이 있고 초기화가 필요한 경우
     const isLastRecordValid =
-      lastRecord !== null && needsReset && calc.currentNumber === lastRecord?.calculationResult.resultNumber;
+      lastRecord && needsReset && calc.currentNumber === lastRecord.calculationResult.resultNumber;
 
     if (isLastRecordValid) {
       return `${calcStore.getLeftSideInRecord(lastRecord.calculationResult)} =`;
     }
 
-    // 연산자가 있고 초기화가 필요없는 경우
     if (hasOperator && !needsReset) {
       const radix = currentTab.value === 'radix' ? radixStore.sourceRadix : Radix.Decimal;
-      const convrtedPreviousNumber = calcStore.toFormattedNumber(radixStore.convertIfRadix(calc.previousNumber), radix);
-      return currentTab.value === 'radix' ? getRadixResult(convrtedPreviousNumber) : convrtedPreviousNumber;
+      const convertedPreviousNumber = calcStore.toFormattedNumber(radixStore.convertIfRadix(calc.previousNumber), radix);
+      return currentTab.value === 'radix' ? getRadixResult(convertedPreviousNumber) : convertedPreviousNumber;
     }
 
     return '';
   });
 
-  // 결과 색상 관련 computed 속성 (themesStore 사용)
-  const panelNormalTextColor = computed(() => themesStore.getPanelColor('text', 'normal'));
-  const panelNormalTextColorAccent = computed(() => themesStore.getPanelColor('text', 'normal', true));
-  const panelWarningTextColor = computed(() => themesStore.getPanelColor('text', 'warning'));
-  const panelWarningTextColorAccent = computed(() => themesStore.getPanelColor('text', 'warning', true));
-  const panelNormalBackgroundColor = computed(() => themesStore.getPanelColor('background', 'normal'));
-  const panelWarningBackgroundColor = computed(() => themesStore.getPanelColor('background', 'warning'));
+  // UI 색상
+  const panelTextColor = computed(() =>
+    themesStore.getPanelColor('text', needFieldTooltip.value ? 'warning' : 'normal'),
+  );
+  const memoryTextColor = computed(() =>
+    themesStore.getPanelColor('text', needFieldTooltip.value ? 'warning' : 'normal', true),
+  );
+  const panelBackgroundColor = computed(() =>
+    themesStore.getPanelColor('background', needFieldTooltip.value ? 'warning' : 'normal'),
+  );
 
-  // 결과 색상 선택 함수 (실제 색상 값을 반환하도록 수정)
-  const panelTextColor = computed(() => {
-    return needFieldTooltip.value ? panelWarningTextColor.value : panelNormalTextColor.value; // 텍스트가 넘치면 경고색
-  });
-
-  // 메모리 값 표시를 위한 텍스트 색상
-  const memoryTextColor = computed(() => {
-    return needFieldTooltip.value ? panelWarningTextColorAccent.value : panelNormalTextColorAccent.value;
-  });
-
-  const panelBackgroundColor = computed(() => {
-    return needFieldTooltip.value ? panelWarningBackgroundColor.value : panelNormalBackgroundColor.value;
-  });
-
-  // 감시자 설정
+  // 현재 탭 변경 감시
   watch(
     () => currentTab.value,
-    () => {
-      // UI 업데이트
-      if (currentTab.value === 'radix') {
-        calc.currentRadix = radixStore.sourceRadix;
-      } else {
-        calc.currentRadix = Radix.Decimal;
-      }
+    (newTab) => {
+      calc.currentRadix = newTab === 'radix' ? radixStore.sourceRadix : Radix.Decimal;
     },
     { immediate: true },
   );
 
-  // 컴포넌트 마운트 전 이벤트 리스너 등록
-  onBeforeMount(() => {
-    window.addEventListener('resize', () => checkNeedFieldTooltip());
-  });
-
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   let tooltipInterval: NodeJS.Timeout;
 
-  // 현재 탭에 따른 상태 스왑 함수
+  /**
+   * 현재 활성화된 탭(단위, 통화, 진법)의 상태를 스왑합니다.
+   */
   const swapCurrentTabState = () => {
     switch (currentTab.value) {
       case 'unit':
@@ -495,8 +405,15 @@
     }
   };
 
-  // 컴포넌트 마운트 후 초기 설정
+  const handleBlur = () => {
+    if (showPanelMenu.value) {
+      showPanelMenu.value = false;
+    }
+  };
+
+  // 컴포넌트 라이프사이클 훅
   onMounted(() => {
+    // 초기 툴팁 상태 확인
     tooltipInterval = setTimeout(() => {
       swapCurrentTabState();
       setTimeout(() => {
@@ -505,202 +422,156 @@
       }, 200);
     }, 200);
 
-    // 창이 포커스를 잃었을 때 메뉴를 닫기 위한 이벤트 리스너 등록
-    window.addEventListener('blur', () => {
-      // 결과 패널 메뉴가 열려 있다면 닫음
-      if (showPanelMenu.value) {
-        showPanelMenu.value = false;
-      }
-    });
+    // 이벤트 리스너 등록
+    window.addEventListener('resize', checkNeedFieldTooltip);
+    window.addEventListener('blur', handleBlur);
   });
 
-  // 컴포넌트 언마운트 시 이벤트 리스너 제거
   onUnmounted(() => {
-    // 화면 크기 변경 이벤트 리스너 제거
-    window.removeEventListener('resize', () => checkNeedFieldTooltip());
-    // blur 이벤트 리스너 제거
-    window.removeEventListener('blur', () => {
-      if (showPanelMenu.value) {
-        showPanelMenu.value = false;
-      }
-    });
+    // 이벤트 리스너 및 타이머 정리
+    window.removeEventListener('resize', checkNeedFieldTooltip);
+    window.removeEventListener('blur', handleBlur);
+    clearTimeout(tooltipInterval);
   });
 
-  // 결과 복사, 숫자 복사
+  /**
+   * 결과를 클립보드에 복사합니다.
+   * @param isOnlyNumber - 'number'인 경우 숫자만 복사, 'result'인 경우 표시된 전체 결과 복사
+   */
   const handleCopy = (isOnlyNumber: 'number' | 'result' = 'result') => {
-    // 햅틱 피드백
     hapticFeedbackLight();
+    const valueToCopy = isOnlyNumber === 'number' ? onlyNumber.value : displayedResult.value;
+    const messageKey =
+      isOnlyNumber === 'number'
+        ? props.field === 'main'
+          ? 'copiedOnlyNumber'
+          : 'copiedOnlyNumberSub'
+        : props.field === 'main'
+          ? 'copiedDisplayedResult'
+          : 'copiedDisplayedResultSub';
 
-    // 이미 복사 중인 경우 숫자 복사
-    if (isOnlyNumber === 'number') {
-      copyToClipboard(onlyNumber.value)
-        .then(() => {
-          showMessage(
-            t(props.field === 'main' ? 'copiedOnlyNumber' : 'copiedOnlyNumberSub', { result: onlyNumber.value }),
-          );
-        })
-        .catch(() => {
-          showError(t('failedToPasteFromClipboard'));
-        });
-    } else {
-      // 결과 복사
-      copyToClipboard(displayedResult.value)
-        .then(() => {
-          showMessage(
-            t(props.field === 'main' ? 'copiedDisplayedResult' : 'copiedDisplayedResultSub', {
-              result: displayedResult.value,
-            }),
-          );
-        })
-        .catch(() => {
-          showError(t('failedToPasteFromClipboard'));
-        });
-    }
+    copyToClipboard(valueToCopy)
+      .then(() => showMessage(t(messageKey, { result: valueToCopy })))
+      .catch(() => showError(t('failedToPasteFromClipboard')));
   };
 
-  // 붙여넣을 수 있는 숫자 계산
   const numberToPaste = ref('');
-
-  // 결과 패널 메뉴 표시 여부
   const showPanelMenu = ref(false);
 
-  // 클립보드에서 텍스트 가져오기 함수
+  /**
+   * 클립보드에서 텍스트를 가져옵니다.
+   * @returns 클립보드의 텍스트
+   */
   const getClipboardText = async (): Promise<string> => {
     try {
-      let clipboardText = '';
-      if ($g.isCapacitor) {
-        clipboardText = (await window.androidInterface?.getFromClipboard()) ?? '';
-      } else {
-        clipboardText = await navigator.clipboard.readText();
-      }
-      return clipboardText;
+      return $g.isCapacitor
+        ? (await window.androidInterface?.getFromClipboard()) ?? ''
+        : await navigator.clipboard.readText();
     } catch (error) {
-      console.error('Failed to get clipboard content:', error);
+      console.error('클립보드 내용을 가져오는 데 실패했습니다:', error);
       return '';
     }
   };
 
-  // 클립보드에서 값 가져오기
+  /**
+   * 메뉴가 열릴 때 클립보드에서 붙여넣을 수 있는 숫자를 업데이트합니다.
+   */
   const updateClipboardValue = async () => {
     const clipboardText = await getClipboardText();
     if (currentTab.value === 'radix') {
-      if (props.field === 'main') {
-        numberToPaste.value = calc.filterNumberCharacters(clipboardText, radixStore.sourceRadix);
-      } else {
-        numberToPaste.value = calc.filterNumberCharacters(clipboardText, radixStore.targetRadix);
-      }
+      const radix = props.field === 'main' ? radixStore.sourceRadix : radixStore.targetRadix;
+      numberToPaste.value = calc.filterNumberCharacters(clipboardText, radix);
     } else {
       numberToPaste.value = calc.filterNumberCharacters(clipboardText);
     }
   };
 
-  // 메뉴가 열릴 때 클립보드 값 업데이트
-  watch(
-    () => showPanelMenu.value,
-    async (newVal) => {
-      if (newVal) {
-        await updateClipboardValue();
-      }
-    },
-  );
+  // 메뉴 열림/닫힘 감시
+  watch(showPanelMenu, async (isOpen) => {
+    if (isOpen) {
+      await updateClipboardValue();
+    }
+  });
 
-  // 클립보드 붙여넣기 처리
+  /**
+   * 클립보드의 내용을 결과 필드에 붙여넣습니다.
+   * @param target - 붙여넣기 대상 필드 ('main' 또는 'sub')
+   */
   const handlePaste = async (target: 'main' | 'sub' = 'main'): Promise<void> => {
-    // 클립보드 읽기 시도
     try {
       const clipboardText = await getClipboardText();
-
-      // 클립보드가 비어있거나 붙여넣을 수 없는 데이터가 포함되어 있는 경우
       if (!clipboardText) {
         showError(t('clipboardIsEmptyOrContainsDataThatCannotBePasted.'));
         return;
       }
-
-      // 햅틱 피드백
       hapticFeedbackMedium();
 
-      // 보조 필드 처리
-      if (target === 'sub') {
-        if (currentTab.value === 'unit') {
-          // 단위 탭 스왑
+      const pasteLogic = {
+        unit: () => {
           unitStore.swapUnits();
-          // 버퍼에 붙여넣기
           calc.pasteToBuffer(clipboardText);
-          // 현재 숫자 변환
           calc.currentNumber = UnitConverter.convert(
             unitStore.selectedCategory,
             toBigNumber(calc.currentNumber),
             unitStore.sourceUnits[unitStore.selectedCategory] ?? '',
             unitStore.targetUnits[unitStore.selectedCategory] ?? '',
           );
-          // 단위 탭 스왑
           unitStore.swapUnits();
-        } else if (currentTab.value === 'currency') {
-          // 통화 탭 스왑
+        },
+        currency: () => {
           currencyStore.swapCurrencies();
-          // 버퍼에 붙여넣기
           calc.pasteToBuffer(clipboardText);
-          // 현재 숫자 변환
           calc.currentNumber = currencyStore.currencyConverter
             .convert(toBigNumber(calc.currentNumber), currencyStore.sourceCurrency, currencyStore.targetCurrency)
             .toString();
-          // 통화 탭 스왑
           currencyStore.swapCurrencies();
-        } else if (currentTab.value === 'radix') {
-          // 진법 탭 스왑
+        },
+        radix: () => {
           radixStore.swapRadixes();
-          // 버퍼에 붙여넣기
           setTimeout(() => {
             calc.pasteToBuffer(clipboardText.replace(/\((?:2|8|10|16)\)/g, ''));
-            // 진법 탭 스왑
             radixStore.swapRadixes();
           }, 10);
-        }
+        },
+      };
+
+      if (target === 'sub' && currentTab.value in pasteLogic) {
+        pasteLogic[currentTab.value as 'unit' | 'currency' | 'radix']();
         showMessage(t('pastedFromClipboardToSubPanel'));
       } else {
         if (currentTab.value === 'radix') {
-          // 진법 탭 스왑
-          radixStore.swapRadixes();
-          // 버퍼에 붙여넣기
-          setTimeout(() => {
-            calc.pasteToBuffer(clipboardText.replace(/\((?:2|8|10|16)\)/g, ''));
-            // 진법 탭 스왑
-            radixStore.swapRadixes();
-          }, 10);
+          setTimeout(() => calc.pasteToBuffer(clipboardText.replace(/\((?:2|8|10|16)\)/g, '')), 10);
         } else {
-          // 버퍼에 붙여넣기
           calc.pasteToBuffer(clipboardText);
         }
-
-        // 클립보드 붙여넣기 메시지 표시
         showMessage(t('pastedFromClipboard'));
       }
     } catch (error) {
-      // 클립보드 붙여넣기 실패 메시지 표시
-      console.error('Failed to paste from clipboard:', error);
+      console.error('클립보드 붙여넣기 실패:', error);
       showError(t('failedToPasteFromClipboard'));
     }
   };
 
-  // 키 바인딩 설정
-    const { subscribe, unsubscribe } =
+  /**
+   * @description
+   * 현재 필드(메인/서브)에 따라 복사/붙여넣기 키 바인딩을 설정합니다.
+   * `uiStore.inputFocused` 상태에 따라 키 바인딩을 동적으로 활성화/비활성화합니다.
+   */
+  const { subscribe, unsubscribe } =
     props.field === 'main'
       ? useKeyBinding([
-          [['Control+c', 'Control+Insert', 'Copy'], handleCopy],
+          [['Control+c', 'Control+Insert', 'Copy'], () => handleCopy()],
           [['Control+v', 'Shift+Insert', 'Paste'], () => handlePaste('main')],
         ])
       : useKeyBinding([
-          [['Shift+Control+c', 'Alt+Control+Insert', 'Shift+Copy'], handleCopy],
+          [['Shift+Control+c', 'Alt+Control+Insert', 'Shift+Copy'], () => handleCopy()],
           [['Shift+Control+v', 'Alt+Shift+Insert', 'Shift+Paste'], () => handlePaste('sub')],
         ]);
 
-  /**
-   * 입력 필드 포커스 상태에 따라 키 바인딩을 활성화/비활성화합니다.
-   */
   watch(
     () => uiStore.inputFocused,
-    () => {
-            if (uiStore.inputFocused) {
+    (isFocused) => {
+      if (isFocused) {
         unsubscribe();
       } else {
         subscribe();
@@ -709,16 +580,6 @@
     { immediate: true },
   );
 
-    onMounted(() => {
-    subscribe();
-  });
-
-  onBeforeUnmount(() => {
-    unsubscribe();
-  });
-
-  // 결과 패널 패딩 설정
-  // const resultPanelPadding = computed(() => calcStore.resultPanelPadding);
   const panelPaddingBase = computed(() => {
     if ($g.isWindows) {
       return 14;

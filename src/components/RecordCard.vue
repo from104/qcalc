@@ -188,7 +188,9 @@
     { immediate: true },
   );
 
-  // 컴포넌트 마운트 시 키 바인딩 활성화
+  /**
+   * 컴포넌트 마운트 시 스크롤 위치 복원 및 키 바인딩 활성화
+   */
   onMounted(() => {
     subscribe();
     setTimeout(() => {
@@ -200,34 +202,44 @@
     showScrollToTop.value = false;
   });
 
-  // 컴포넌트 언마운트 시 키 바인딩 비활성화
+  /**
+   * 컴포넌트 언마운트 전 스크롤 위치 저장 및 키 바인딩 비활성화
+   */
   onBeforeUnmount(() => {
     unsubscribe();
     uiStore.recordLastScrollPosition = document.getElementById('record-card')?.scrollTop ?? 0;
-
     uiStore.isDeleteRecordConfirmOpen = false;
   });
 
-  // 메모 편집 관련 상태 변수
+  // 메모 편집 상태
   const showMemoDialog = ref(false);
   const memoText = ref('');
   const memoSlideDirection = ref('');
   let selectedMemoId = 0;
 
-  // 메모 다이얼로그 열기 함수
+  /**
+   * 메모 편집 다이얼로그를 엽니다.
+   * @param id - 편집할 메모의 레코드 ID
+   */
   const openMemoDialog = (id: number) => {
     selectedMemoId = id;
     memoText.value = (calcStore.calc.record.getMemo(id) as string) || '';
     showMemoDialog.value = true;
   };
 
-  // 슬라이드 왼쪽 동작 핸들러
-  const slideToOpenMemoDialog = (reset: QSlideEvent['reset'], id: number) => {
+  /**
+   * 슬라이드 제스처로 메모 편집 다이얼로그를 엽니다.
+   * @param reset - 슬라이드 상태를 리셋하는 함수
+   * @param id - 편집할 메모의 레코드 ID
+   */
+  const slideToOpenMemoDialog = (reset: () => void, id: number) => {
     openMemoDialog(id);
     setTimeout(reset, 500);
   };
 
-  // 메모 편집 확인 함수
+  /**
+   * 메모를 저장하고 다이얼로그를 닫습니다.
+   */
   const saveMemo = () => {
     calcStore.calc.record.setMemo(selectedMemoId, memoText.value);
     memoSlideDirection.value = 'slide-right';
@@ -236,7 +248,9 @@
     selectedMemoId = 0;
   };
 
-  // 메모 편집 취소 함수
+  /**
+   * 메모 편집을 취소하고 다이얼로그를 닫습니다.
+   */
   const cancelMemo = () => {
     memoSlideDirection.value = 'slide-left';
     showMemoDialog.value = false;
@@ -244,7 +258,11 @@
     selectedMemoId = 0;
   };
 
-  // 히스토리 항목 복사 함수
+  /**
+   * 지정된 유형의 레코드 항목을 클립보드에 복사합니다.
+   * @param id - 복사할 레코드의 ID
+   * @param copyType - 복사할 내용의 유형
+   */
   const copyRecordItem = async (
     id: number,
     copyType: 'formattedNumber' | 'onlyNumber' | 'memo' | 'time',
@@ -269,7 +287,10 @@
     }
   };
 
-  // 메인 결과로 이동 함수
+  /**
+   * 레코드 항목을 메인 패널로 불러옵니다.
+   * @param id - 불러올 레코드의 ID
+   */
   const loadToMainPanel = (id: number) => {
     const record = calcStore.calc.record.getRecordById(id);
     calcStore.calc.currentNumber = record.calculationResult.resultNumber;
@@ -277,6 +298,10 @@
     if (!isWideWidth()) navigateToPath('/', route, router);
   };
 
+  /**
+   * 레코드 항목을 서브 패널로 불러옵니다.
+   * @param id - 불러올 레코드의 ID
+   */
   const loadToSubPanel = (id: number) => {
     const record = calcStore.calc.record.getRecordById(id);
     if (uiStore.currentTab === 'unit') {
@@ -303,37 +328,34 @@
     if (!isWideWidth()) navigateToPath('/', route, router);
   };
 
-  // 히스토리 항목 삭제 함수
+  /**
+   * 지정된 ID의 레코드 항목을 삭제합니다.
+   * @param id - 삭제할 레코드의 ID
+   */
   const deleteRecordItem = (id: number) => {
     calcStore.calc.record.deleteRecord(id);
   };
 
-  // 헤더의 높이를 동적으로 계산하는 computed 속성입니다.
+  /**
+   * 헤더의 동적 높이를 계산합니다.
+   */
   const calculatedHeaderHeight = computed(() => {
     const headerElement = document.getElementById('header');
-    return headerElement ? headerElement.clientHeight + 'px' : '0px';
+    return headerElement ? `${headerElement.clientHeight}px` : '0px';
   });
 
   /**
    * Android 시스템 UI에 따른 하단 마진을 계산합니다.
-   * Android API 35 이상에서는 시스템 바 높이를 고려하여
-   * 제스처 네비게이션 여부에 따라 다른 마진을 적용합니다.
    */
   const calculatedBottomMargin = computed(() => {
     let bottomMargin = 0;
-
-    // Android API level 35 이상: 시스템 바 높이 고려
     if ($g.isAndroid && $g.apiLevel >= 35) {
-      // 제스처 네비게이션이 아닌 경우 네비게이션 바 높이 추가
       if (!$g.isGestureNavigation) {
         bottomMargin += 48;
-      } else {
-        if (isWideWidth()) {
-          bottomMargin += 24;
-        }
+      } else if (isWideWidth()) {
+        bottomMargin += 24;
       }
     } else {
-      // 기본 마진
       bottomMargin += 10;
     }
     return bottomMargin;
@@ -341,105 +363,69 @@
 
   /**
    * FAB 버튼의 위치를 계산합니다.
-   * 하단 마진을 고려하여 [좌측 오프셋, 하단 오프셋] 배열을 반환합니다.
    */
   const fabOffset = computed(() => [18, 18 + calculatedBottomMargin.value]);
 
-  // 날짜/시간 포맷 함수
+  /**
+   * 타임스탬프를 'YYYY-MM-DD HH:mm:ss.ms' 형식의 문자열로 변환합니다.
+   * @param timestamp - 변환할 타임스탬프
+   * @returns 포맷된 날짜/시간 문자열
+   */
   const formatDateTime = (timestamp: number): string => {
     const date = new Date(timestamp);
-    const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, '0');
-    const day = String(date.getDate()).padStart(2, '0');
-    const hours = String(date.getHours()).padStart(2, '0');
-    const minutes = String(date.getMinutes()).padStart(2, '0');
-    const seconds = String(date.getSeconds()).padStart(2, '0');
-    const milliseconds = String(date.getMilliseconds()).padStart(3, '0');
-
-    return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}.${milliseconds}`;
+    return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')} ${String(date.getHours()).padStart(2, '0')}:${String(date.getMinutes()).padStart(2, '0')}:${String(date.getSeconds()).padStart(2, '0')}.${String(date.getMilliseconds()).padStart(3, '0')}`;
   };
 
+  /**
+   * 표시할 레코드 목록을 필터링하고 포맷합니다.
+   */
   const recordStrings = computed<RecordString[]>(() => {
-    // 기본 레코드 문자열 생성
-    const strings = records.value.map((record: Record) => {
-      const displayText = [
-        calcStore.getLeftSideInRecord(record.calculationResult, true),
-        '\n= ',
-        calcStore.getRightSideInRecord(record.calculationResult),
-      ].join('');
+    const strings = records.value.map((record: Record) => ({
+      id: record.id as number,
+      memo: record.memo as string,
+      timestamp: record.timestamp,
+      displayText: `${calcStore.getLeftSideInRecord(record.calculationResult, true)}\n= ${calcStore.getRightSideInRecord(record.calculationResult)}`,
+      origResult: record.calculationResult,
+    }));
 
-      return {
-        id: record.id as number,
-        memo: record.memo as string,
-        timestamp: record.timestamp,
-        displayText,
-        origResult: record.calculationResult,
-      };
-    });
-
-    // 검색이 활성화되지 않은 경우 전체 결과 반환
-    if (!uiStore.isSearchOpen) return strings;
-
-    // 검색어가 없는 경우 전체 결과 반환
     const searchTerm = uiStore.searchKeyword.trim().toLowerCase();
-    if (!searchTerm) return strings;
+    if (!uiStore.isSearchOpen || !searchTerm) return strings;
 
-    // 검색어로 필터링
-    return strings.filter((record: RecordString) => {
-      const memoMatch = record.memo?.toLowerCase().includes(searchTerm);
-      const displayTextMatch = record.displayText.toLowerCase().includes(searchTerm);
-      const timeMatch = formatDateTime(record.timestamp).toLowerCase().includes(searchTerm);
-      return memoMatch || displayTextMatch || timeMatch;
-    });
+    return strings.filter(
+      (record: RecordString) =>
+        record.memo?.toLowerCase().includes(searchTerm) ||
+        record.displayText.toLowerCase().includes(searchTerm) ||
+        formatDateTime(record.timestamp).toLowerCase().includes(searchTerm),
+    );
   });
 
-  // 검색바 높이를 저장하는 ref 추가
-  const searchBarHeight = ref(50); // 기본 높이 50px
+  // 검색 바와 상단 여백
+  const searchBarHeight = ref(50);
+  const calculatedTopMargin = computed(() => (uiStore.isSearchOpen ? `${searchBarHeight.value}px` : '0px'));
 
-  // 계산된 상단 여백 추가
-  const calculatedTopMargin = computed(() => {
-    return uiStore.isSearchOpen ? `${searchBarHeight.value}px` : '0px';
-  });
-
-  interface QSlideEvent {
-    reset: () => void;
-  }
-
-  // 툴크 상태를 위한 인터페이스 정의
-  interface TooltipState {
-    [key: number]: boolean | null;
-  }
-
+  // 툴팁 상태 관리
   const isShowResultTooltip = reactive<TooltipState>({});
-  const handleResultTooltip = (id: number, isShow: boolean) => {
-    isShowResultTooltip[id] = isShow;
-  };
+  const handleResultTooltip = (id: number, isShow: boolean) => (isShowResultTooltip[id] = isShow);
 
   const isShowMemoTooltip = reactive<TooltipState>({});
-  const handleMemoTooltip = (id: number, isShow: boolean) => {
-    isShowMemoTooltip[id] = isShow;
-  };
+  const handleMemoTooltip = (id: number, isShow: boolean) => (isShowMemoTooltip[id] = isShow);
 
-  // 메뉴 상태 관리를 위한 함수 추가
-  const openRecordMenu = (id: number) => {
-    recordMenu[id] = true;
-  };
+  /**
+   * 레코드 메뉴를 엽니다.
+   * @param id - 메뉴를 열 레코드의 ID
+   */
+  const openRecordMenu = (id: number) => (recordMenu[id] = true);
 
-  // Quasar 관련 설정
-  import { colors } from 'quasar';
-  // Quasar 인스턴스 및 색상 유틸리티 초기화
+  // Quasar 색상 유틸리티
   const { lighten } = colors;
 
-  // 메뉴 배경색
-  const menuBackgroundColor = computed(() => {
-    return themesStore.isDarkMode()
+  // UI 색상
+  const menuBackgroundColor = computed(() =>
+    themesStore.isDarkMode()
       ? lighten(themesStore.getDarkColor(), 10)
-      : lighten(themesStore.getCurrentThemeColors.ui.primary, 90);
-  });
-
+      : lighten(themesStore.getCurrentThemeColors.ui.primary, 90),
+  );
   const recordFontClass = computed(() => `record-font-size-${settingsStore.recordFontSize}`);
-
-  // themesStore에서 select 색상을 가져오는 computed 속성
   const selectTextColor = computed(() => themesStore.getSelectColor('text', themesStore.isDarkMode()));
   const selectBackgroundColor = computed(() => themesStore.getSelectColor('background', themesStore.isDarkMode()));
 </script>
@@ -449,12 +435,10 @@
     id="record-card"
     square
     class="full-width row justify-center items-start relative-position scrollbar-custom"
-    :style="{
-      paddingTop: calculatedTopMargin,
-    }"
+    :style="{ paddingTop: calculatedTopMargin }"
     @scroll="handleScroll"
   >
-    <!-- 맨 위로 스크롤 하는 아이콘 -->
+    <!-- 스크롤 투 탑 버튼 -->
     <transition name="slide-fade">
       <q-btn
         v-if="showScrollToTop"
@@ -470,15 +454,9 @@
       />
     </transition>
 
-    <!---검색 바 -->
+    <!-- 검색 바 -->
     <transition name="search-bar">
-      <q-bar
-        v-if="uiStore.isSearchOpen"
-        class="search-bar"
-        :class="{
-          'input-focused': uiStore.inputFocused,
-        }"
-      >
+      <q-bar v-if="uiStore.isSearchOpen" class="search-bar">
         <q-input
           v-model="uiStore.searchKeyword"
           :placeholder="t('search')"
@@ -492,12 +470,7 @@
           @focus="uiStore.setInputFocused"
           @blur="uiStore.setInputBlurred"
           @keyup.enter="$event.target.blur()"
-          @keyup.escape="
-            () => {
-              uiStore.isSearchOpen = false;
-              uiStore.setInputBlurred();
-            }
-          "
+          @keyup.escape="uiStore.isSearchOpen = false"
         >
           <template #append>
             <q-btn
@@ -508,12 +481,7 @@
               icon="close"
               style="top: -3px"
               :aria-label="t('ariaLabel.closeSearch')"
-              @click="
-                () => {
-                  uiStore.isSearchOpen = false;
-                  uiStore.setInputBlurred();
-                }
-              "
+              @click="uiStore.isSearchOpen = false"
             />
           </template>
         </q-input>
@@ -522,17 +490,15 @@
 
     <!-- 기록 목록 -->
     <transition name="slide-fade" mode="out-in">
-      <!-- 기록이 없는 경우 -->
-      <q-item v-if="recordStrings.length == 0" class="text-center q-pt-xl noselect">
-        <q-item-section role="listitem">
+      <q-item v-if="recordStrings.length === 0" class="text-center q-pt-xl noselect">
+        <q-item-section>
           <q-item-label>
             <span class="text-h6">{{
-              uiStore.isSearchOpen && uiStore.searchKeyword.trim() !== '' ? t('noSearchResult') : t('noRecord')
+              uiStore.isSearchOpen && uiStore.searchKeyword.trim() ? t('noSearchResult') : t('noRecord')
             }}</span>
           </q-item-label>
         </q-item-section>
       </q-item>
-      <!-- 기록이 있을 경우 -->
       <q-list v-else id="record-list" separator class="full-width q-pt-md" role="list" :class="recordFontClass">
         <transition-group name="record-list">
           <q-slide-item
@@ -540,27 +506,22 @@
             :key="record.id"
             left-color="negative"
             right-color="positive"
-            role="listitem"
-            @left="deleteRecordItem(record.id as number)"
-            @right="(event: QSlideEvent) => slideToOpenMemoDialog(event.reset, record.id)"
+            @left="deleteRecordItem(record.id)"
+            @right="(event) => slideToOpenMemoDialog(event.reset, record.id)"
           >
             <template v-if="$g.isMobile" #left>
-              <q-icon name="delete_outline" :aria-label="t('ariaLabel.deleteRecord')" role="button" />
+              <q-icon name="delete_outline" :aria-label="t('ariaLabel.deleteRecord')" />
             </template>
             <template v-if="$g.isMobile" #right>
-              <q-icon name="edit_note" :aria-label="t('ariaLabel.editMemo')" role="button" />
+              <q-icon name="edit_note" :aria-label="t('ariaLabel.editMemo')" />
             </template>
-            <q-item
-              v-touch-hold.mouse="() => (recordMenu[record.id as number] = true)"
-              class="text-right q-pa-sm record-item"
-              role="listitem"
-            >
+            <q-item v-touch-hold.mouse="() => openRecordMenu(record.id)" class="text-right q-pa-sm record-item">
               <q-item-section class="q-mr-none q-px-none">
                 <q-item-label v-if="record.memo" class="memo-text">
                   <HighlightText
                     :text="record.memo"
                     :search-term="uiStore.searchKeyword"
-                    @show-tooltip="(isShow: boolean) => handleMemoTooltip(record.id, isShow)"
+                    @show-tooltip="(isShow) => handleMemoTooltip(record.id, isShow)"
                   />
                   <ToolTip
                     v-if="isShowMemoTooltip[record.id]"
@@ -575,7 +536,7 @@
                     :text="record.displayText"
                     :search-term="uiStore.searchKeyword"
                     allow-line-break
-                    @show-tooltip="(isShow: boolean) => handleResultTooltip(record.id, isShow)"
+                    @show-tooltip="(isShow) => handleResultTooltip(record.id, isShow)"
                   />
                   <ToolTip
                     v-if="isShowResultTooltip[record.id]"
@@ -594,68 +555,57 @@
                       size="sm"
                       flat
                       rounded
-                      @click="() => $g.isDesktop && openRecordMenu(record.id as number)"
+                      @click="() => $g.isDesktop && openRecordMenu(record.id)"
                     >
                       <q-menu
-                        :model-value="recordMenu[record.id] ?? false"
+                        v-model="recordMenu[record.id]"
                         class="shadow-6"
                         :context-menu="$g.isDesktop"
                         auto-close
                         anchor="bottom left"
                         self="top left"
-                        @update:model-value="
-                          (val) => {
-                            recordMenu[record.id] = val;
-                          }
-                        "
                       >
                         <q-list
                           dense
                           class="noselect q-py-sm"
-                          :style="{
-                            backgroundColor: menuBackgroundColor,
-                          }"
+                          :style="{ backgroundColor: menuBackgroundColor }"
                           style="max-width: 200px"
-                          role="list"
                           :dark="themesStore.isDarkMode()"
                         >
                           <MenuItem
                             v-if="record.memo"
                             :title="t('copyMemo')"
-                            :action="() => copyRecordItem(record.id as number, 'memo')"
+                            :action="() => copyRecordItem(record.id, 'memo')"
                           />
                           <MenuItem v-if="record.memo" separator />
                           <MenuItem
                             :title="t('copyDisplayedResult')"
-                            :action="() => copyRecordItem(record.id as number, 'formattedNumber')"
+                            :action="() => copyRecordItem(record.id, 'formattedNumber')"
                             :caption="calcStore.getRightSideInRecord(record.origResult)"
                           />
                           <MenuItem
                             :title="t('copyResultNumber')"
-                            :action="() => copyRecordItem(record.id as number, 'onlyNumber')"
+                            :action="() => copyRecordItem(record.id, 'onlyNumber')"
                             :caption="record.origResult.resultNumber"
                           />
                           <MenuItem separator />
                           <MenuItem
                             :title="t('copyTime')"
-                            :action="() => copyRecordItem(record.id as number, 'time')"
+                            :action="() => copyRecordItem(record.id, 'time')"
                             :caption="formatDateTime(record.timestamp)"
                           />
                           <MenuItem separator />
+                          <MenuItem :title="t('loadToMainPanel')" :action="() => loadToMainPanel(record.id)" />
                           <MenuItem
-                            :title="t('loadToMainPanel')"
-                            :action="() => loadToMainPanel(record.id as number)"
-                          />
-                          <MenuItem
-                            v-if="uiStore.currentTab === 'unit' || uiStore.currentTab === 'currency'"
+                            v-if="['unit', 'currency'].includes(uiStore.currentTab)"
                             :title="t('loadToSubPanel')"
-                            :action="() => loadToSubPanel(record.id as number)"
+                            :action="() => loadToSubPanel(record.id)"
                           />
                           <MenuItem v-if="$g.isDesktop" separator />
                           <MenuItem
                             v-if="$g.isDesktop"
                             :title="t('deleteResult')"
-                            :action="() => deleteRecordItem(record.id as number)"
+                            :action="() => deleteRecordItem(record.id)"
                           />
                         </q-list>
                       </q-menu>
@@ -668,7 +618,7 @@
                       size="sm"
                       flat
                       rounded
-                      @click="() => openMemoDialog(record.id as number)"
+                      @click="() => openMemoDialog(record.id)"
                     />
                   </div>
                   <div class="col-6 text-right text-caption record-timestamp">
@@ -687,7 +637,7 @@
       </q-list>
     </transition>
 
-    <div v-if="fabOpen" class="backdrop" @click="fabOpen = false"></div>
+    <div v-if="fabOpen" class="backdrop" @click="fabOpen = false" />
     <q-page-sticky position="bottom-left" :offset="fabOffset" style="z-index: 15">
       <q-fab
         v-model="fabOpen"
@@ -719,15 +669,10 @@
     </q-page-sticky>
   </q-card-section>
 
-  <!-- 기록 전체 삭제 다이얼로그 -->
-  <q-dialog
-    v-model="uiStore.isDeleteRecordConfirmOpen"
-    transition-show="scale"
-    transition-hide="scale"
-    style="z-index: 15"
-  >
+  <!-- 전체 삭제 확인 다이얼로그 -->
+  <q-dialog v-model="uiStore.isDeleteRecordConfirmOpen" transition-show="scale" transition-hide="scale" style="z-index: 15">
     <q-card class="noselect text-center text-white bg-negative" style="width: 240px">
-      <q-card-section>{{ t('doYouDeleteRecord') }} </q-card-section>
+      <q-card-section>{{ t('doYouDeleteRecord') }}</q-card-section>
       <q-card-actions align="center" class="text-negative bg-white">
         <q-btn v-close-popup flat :label="t('message.no')" autofocus />
         <q-btn v-close-popup flat :label="t('message.yes')" @click="calcStore.calc.record.clearRecords()" />
@@ -735,7 +680,7 @@
     </q-card>
   </q-dialog>
 
-  <!-- 기록의 메모 수정 다이얼로그 -->
+  <!-- 메모 수정 다이얼로그 -->
   <q-dialog
     v-model="showMemoDialog"
     persistent
@@ -746,7 +691,7 @@
     @hide="uiStore.setInputBlurred"
   >
     <q-card class="noselect text-center" style="width: 250px">
-      <q-bar v-auto-blur dark class="full-width justify-between nnoselect text-body1 text-white bg-primary">
+      <q-bar dark class="full-width justify-between text-body1 text-white bg-primary">
         <q-btn dense flat icon="replay" size="sm" @click="cancelMemo" />
         <div>{{ t('memo') }}</div>
         <q-btn dense flat icon="check" size="sm" @click="saveMemo" />
@@ -762,18 +707,8 @@
           color="primary"
           @focus="uiStore.setInputFocused"
           @blur="uiStore.setInputBlurred"
-          @keyup.enter="
-            () => {
-              uiStore.setInputBlurred;
-              saveMemo();
-            }
-          "
-          @keyup.escape="
-            () => {
-              uiStore.setInputBlurred;
-              cancelMemo();
-            }
-          "
+          @keyup.enter="saveMemo"
+          @keyup.escape="cancelMemo"
         />
       </q-card-section>
     </q-card>
@@ -806,11 +741,7 @@
     transition: all 0.3s ease-out;
   }
 
-  .slide-fade-enter-from {
-    opacity: 0;
-    transform: translateY(-100%);
-  }
-
+  .slide-fade-enter-from,
   .slide-fade-leave-to {
     opacity: 0;
     transform: translateY(-100%);
@@ -971,12 +902,9 @@
     left: 0;
     width: 100%;
     height: 100%;
-    // background-color: rgba(0, 0, 0, 0.2);
     z-index: 14;
   }
-</style>
-
-<i18n lang="yaml">
+</style><i18n lang="yaml">
   ko:
     record: '계산 기록'
     noRecord: '계산 기록이 없습니다.'

@@ -30,7 +30,9 @@
   const updateError = ref<UpdateError | null>(null);
 
   /**
-   * 업데이트 상태를 처리하는 함수입니다.
+   * 업데이트 상태를 처리합니다.
+   * @param status - 업데이트 상태 ('available', 'progress', 'downloaded', 'error').
+   * @param info - 업데이트 관련 정보 (버전, 진행률, 오류 등).
    */
   const handleUpdateStatus = (
     status: UpdateStatusInfo['status'],
@@ -75,7 +77,7 @@
   };
 
   /**
-   * 업데이트를 시작하는 함수입니다.
+   * 업데이트를 시작합니다.
    */
   const startUpdate = () => {
     if ($g.isDev) {
@@ -101,7 +103,7 @@
   };
 
   /**
-   * 업데이트를 설치하는 함수입니다.
+   * 업데이트를 설치합니다.
    */
   const installUpdate = () => {
     if ($g.isDev) {
@@ -149,7 +151,7 @@
   };
 
   /**
-   * 테스트 업데이트를 시작하는 함수입니다.
+   * 테스트 업데이트를 시작합니다.
    */
   const testUpdate = () => {
     if ($g.isDev) {

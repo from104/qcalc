@@ -1,13 +1,10 @@
 <script setup lang="ts">
   /**
    * @file VersionChangelogDialog.vue
-   * @description 이 파일은 snap 패키지와 안드로이드 플랫폼에서 최신 버전 체크 및
-   *              CHANGELOG 표시를 관리하는 Vue 컴포넌트입니다.
-   *              GitHub API를 사용하여 최신 버전 정보를 가져오고,
-   *              사용자가 최신 버전을 사용 중일 때 최초 실행 시 변경 사항을 안내합니다.
-   *              개발 모드에서는 가상의 정보를 사용하여 테스트 가능합니다.
+   * @description snap 패키지와 안드로이드 플랫폼에서 최신 버전 확인 및 변경사항(CHANGELOG)을 표시하는 다이얼로그 컴포넌트입니다.
+   *              GitHub API를 통해 최신 버전 정보를 가져오고, 사용자가 최신 버전을 사용할 때 앱 최초 실행 시 변경사항을 안내합니다.
+   *              개발 모드에서는 테스트를 위해 가상의 데이터를 사용합니다.
    */
-
   import { ref, onMounted } from 'vue';
   import { useI18n } from 'vue-i18n';
   import axios from 'axios';
@@ -262,6 +259,23 @@ The format is based on [Keep a Changelog] and this project follows [Semantic Ver
   />
 </template>
 
+<i18n lang="yaml">
+ko:
+  title: '새 버전 변경사항'
+  currentVersionMessage: '현재 버전: v{version}'
+  loading: '버전 정보를 확인하는 중...'
+  viewOnGitHub: 'GitHub에서 보기'
+  confirm: '확인'
+  testChangelog: 'CHANGELOG 테스트'
+en:
+  title: "What's New"
+  currentVersionMessage: 'Current version: v{version}'
+  loading: 'Checking version information...'
+  viewOnGitHub: 'View on GitHub'
+  confirm: 'OK'
+  testChangelog: 'Test Changelog'
+</i18n>
+
 <style scoped lang="scss">
   @import '../css/dialog.scss';
 
@@ -295,20 +309,3 @@ The format is based on [Keep a Changelog] and this project follows [Semantic Ver
     }
   }
 </style>
-
-<i18n lang="yaml">
-ko:
-  title: '새 버전 변경사항'
-  currentVersionMessage: '현재 버전: v{version}'
-  loading: '버전 정보를 확인하는 중...'
-  viewOnGitHub: 'GitHub에서 보기'
-  confirm: '확인'
-  testChangelog: 'CHANGELOG 테스트'
-en:
-  title: "What's New"
-  currentVersionMessage: 'Current version: v{version}'
-  loading: 'Checking version information...'
-  viewOnGitHub: 'View on GitHub'
-  confirm: 'OK'
-  testChangelog: 'Test Changelog'
-</i18n>

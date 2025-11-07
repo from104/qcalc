@@ -108,9 +108,8 @@
     disable?: boolean;
   };
 
-  // 통화 옵션 초기화
   /**
-   * 통화 옵션을 생성하는 유틸리티 함수
+   * 통화 옵션 객체를 생성합니다.
    * @param currency - 통화 코드
    * @returns 통화 옵션 객체
    */
@@ -121,19 +120,20 @@
     isFavorite: currencyStore.isFavorite(currency),
   });
 
-  // 정렬된 통화 목록 가져오기 (즐겨찾기가 상단에 위치)
+  /**
+   * 정렬된 통화 옵션 목록을 반환합니다 (즐겨찾기 우선).
+   * @returns 정렬된 통화 옵션 배열
+   */
   const getSortedCurrencyOptions = (): CurrencyOptions[] => {
-    return currencyStore.getSortedCurrencies().map((currency: string) => createCurrencyOption(currency));
+    return currencyStore.getSortedCurrencies().map(createCurrencyOption);
   };
 
-  // 출발 통화 옵션 목록
+  // 통화 옵션 목록
   const sourceCurrencyOptions = reactive<CurrencyOptions[]>(getSortedCurrencyOptions());
-
-  // 도착 통화 옵션 목록
   const targetCurrencyOptions = reactive<CurrencyOptions[]>(getSortedCurrencyOptions());
 
   /**
-   * 통화 옵션을 업데이트하는 함수
+   * 통화 옵션 목록을 업데이트합니다.
    */
   const updateCurrencyOptions = () => {
     const newOptions = getSortedCurrencyOptions();
@@ -141,34 +141,25 @@
     targetCurrencyOptions.splice(0, targetCurrencyOptions.length, ...newOptions);
   };
 
-  // 즐겨찾기 상태 변경 시 옵션 목록 업데이트
-  watch(
-    () => currencyStore.favoriteCurrencies,
-    () => {
-      updateCurrencyOptions();
-    },
-    { deep: true },
-  );
-
-  // 통화 옵션 업데이트
+  // 즐겨찾기 또는 베이스 통화 변경 시 옵션 목록 업데이트
+  watch(() => currencyStore.favoriteCurrencies, updateCurrencyOptions, { deep: true });
   watch(
     () => currencyStore.sourceCurrency,
     () => currencyStore.currencyConverter.setBase(currencyStore.sourceCurrency),
   );
 
   /**
-   * 즐겨찾기 토글 핸들러
+   * 즐겨찾기 상태를 토글합니다.
    * @param currency - 토글할 통화 코드
-   * @param event - 클릭 이벤트 (이벤트 전파 방지용)
+   * @param event - 이벤트 객체 (전파 방지)
    */
   const handleFavoriteToggle = async (currency: string, event: Event) => {
     event.stopPropagation();
     event.preventDefault();
 
-    // 즐겨찾기 상태 토글
     currencyStore.toggleFavorite(currency);
 
-    // 접근성을 위한 시각적 피드백
+    // 시각적 피드백
     const target = event.target as HTMLElement;
     if (target) {
       target.style.transform = 'scale(0.9)';
@@ -177,56 +168,58 @@
     }
   };
 
-  // 통화 선택 필터 함수 생성
+  /**
+   * 통화 선택을 위한 필터 함수를 생성합니다.
+   * @param options - 필터링된 옵션을 담을 ref
+   * @param reactiveOptions - 원본 옵션 배열
+   * @returns 필터 함수
+   */
   const createFilterFn = (options: Ref<CurrencyOptions[]>, reactiveOptions: CurrencyOptions[]) => {
-    return (val: string, update: (fn: () => void) => void, abort: () => void) => {
-      if (val.length < 1) {
+    return (val: string, update: (fn: () => void) => void) => {
+      if (val === '') {
         update(() => {
           options.value = reactiveOptions;
         });
-        abort();
         return;
       }
-
       const searchTerm = val.toLowerCase();
       update(() => {
-        options.value = reactiveOptions.filter((v) => {
-          const labelMatch = v.label.toLowerCase().indexOf(searchTerm) > -1;
-          const descMatch = v.desc.toLowerCase().indexOf(searchTerm) > -1;
-          return labelMatch || descMatch;
-        });
+        options.value = reactiveOptions.filter(
+          (v) => v.label.toLowerCase().includes(searchTerm) || v.desc.toLowerCase().includes(searchTerm),
+        );
       });
     };
   };
 
-  // 'From' 통화 필터 설정
+  // 필터링된 통화 옵션
   const filteredSourceCurrencyOptions = ref<CurrencyOptions[]>(sourceCurrencyOptions);
   const sourceFilterFn = createFilterFn(filteredSourceCurrencyOptions, sourceCurrencyOptions);
 
-  // 'To' 통화 필터 설정
   const filteredTargetCurrencyOptions = ref<CurrencyOptions[]>(targetCurrencyOptions);
   const targetFilterFn = createFilterFn(filteredTargetCurrencyOptions, targetCurrencyOptions);
 
+  /**
+   * 출발 통화와 도착 통화를 교환합니다.
+   */
   const handleCurrencySwap = () => {
     if (currencyStore.sourceCurrency !== currencyStore.targetCurrency) {
-      // 첫 번째 변환 수행
       currencyStore.swapCurrencies();
       calcStore.calc.currentNumber = currencyStore.convertedCurrencyNumber;
       calcStore.calc.needsBufferReset = true;
     }
   };
 
-  // themesStore에서 select 색상을 가져오는 computed 속성
+  // 테마에 따른 select 색상
   const selectTextColor = computed(() => themesStore.getSelectColor('text', themesStore.isDarkMode()));
   const selectBackgroundColor = computed(() => themesStore.getSelectColor('background', themesStore.isDarkMode()));
 </script>
 
 <template>
   <q-card-section class="row q-px-sm q-pt-none q-pb-sm">
-    <!-- 원본 방향 -->
+    <!-- From (출발) -->
     <q-icon name="keyboard_double_arrow_up" class="col-1" role="img" :aria-label="t('ariaLabel.sourceDirection')" />
 
-    <!-- 원본 통화 -->
+    <!-- From 통화 선택 -->
     <q-select
       v-model="currencyStore.sourceCurrency"
       :options="filteredSourceCurrencyOptions"
@@ -292,7 +285,7 @@
       />
     </q-select>
 
-    <!-- 원본, 대상 통화 바꾸기 버튼 -->
+    <!-- 통화 스왑 버튼 -->
     <q-btn
       id="btn-swap-currency"
       v-auto-blur
@@ -314,7 +307,7 @@
       />
     </q-btn>
 
-    <!-- 대상 통화 -->
+    <!-- To 통화 선택 -->
     <q-select
       v-model="currencyStore.targetCurrency"
       :options="filteredTargetCurrencyOptions"
@@ -384,7 +377,7 @@
       </ToolTip>
     </q-select>
 
-    <!-- 대상 방향 -->
+    <!-- To (도착) -->
     <q-icon
       name="keyboard_double_arrow_down"
       size="xs"
@@ -395,7 +388,7 @@
   </q-card-section>
 </template>
 
-<style lang="scss">
+<style scoped lang="scss">
   .q-select-popup {
     .q-item {
       @media (prefers-color-scheme: dark) {
@@ -405,7 +398,7 @@
     }
   }
 
-  // 모바일 팝업 높이 조정
+  /* 모바일 팝업 높이 조정 */
   .popup-mobile {
     height: 100% !important;
     max-height: 180px !important;
@@ -427,19 +420,17 @@
     transform: translateY(100%);
   }
 
-  // 옵션 목록 전체의 부드러운 재정렬 효과
+  /* 옵션 목록 재정렬 효과 */
   .q-select-popup .q-item {
     transition: all 0.3s ease;
     will-change: transform, opacity;
 
-    // 호버 효과
     &:hover {
       background-color: rgba(var(--q-primary), 0.05);
       transform: translateX(2px);
     }
   }
 
-  // 다크 모드에서 더 나은 시각적 피드백
   @media (prefers-color-scheme: dark) {
     .q-select-popup .q-item:hover {
       background-color: rgba(255, 255, 255, 0.08);

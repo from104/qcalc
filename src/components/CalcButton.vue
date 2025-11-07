@@ -61,41 +61,53 @@
   // 스토어에서 필요한 메서드 추출
   const { calc } = calcStore;
 
-  // 햅틱 피드백 함수
+  /**
+   * 가벼운 햅틱 피드백을 실행합니다.
+   */
   const hapticFeedbackLight = async () => {
     if ($g.isCapacitor && settingsStore.hapticsMode) {
       await Haptics.impact({ style: ImpactStyle.Light });
     }
   };
 
+  /**
+   * 중간 강도의 햅틱 피드백을 실행합니다.
+   */
   const hapticFeedbackMedium = async () => {
     if ($g.isCapacitor && settingsStore.hapticsMode) {
       await Haptics.impact({ style: ImpactStyle.Medium });
     }
   };
 
-  // 에러 처리 함수
+  /**
+   * 에러 핸들링과 함께 버튼 액션을 실행합니다.
+   * @param action - 실행할 함수
+   * @param id - 버튼의 고유 ID
+   */
   const executeActionWithErrorHandling = (action: () => void, id: ButtonID) => {
     try {
       action();
     } catch (e: unknown) {
       if (e instanceof Error) {
-        // 에러 메시지가 이미 i18n 처리된 경우 그대로 표시
-        showError(e.message);
+        showError(e.message); // 이미 번역된 에러 메시지
       } else {
-        // 알 수 없는 에러의 경우 기본 에러 메시지 표시
-        showError(t('error.unknown'));
+        showError(t('error.unknown')); // 일반적인 에러 메시지
       }
       return;
     }
     displayButtonNotification(id);
   };
 
+  /**
+   * 현재 테마에 맞는 버튼 색상을 반환합니다.
+   * @param color - 기본 색상
+   * @returns 테마가 적용된 색상
+   */
   const buttonColor = (color: string) => {
     return themesStore.isDarkMode() ? lighten(color ?? '', -20) : color;
   };
 
-  // 버튼 색상 및 텍스트 색상을 계산하는 computed 속성
+  // 버튼 스타일을 위한 computed 속성
   const importantButtonStyle = computed(() => {
     const background = buttonColor(themesStore.getButtonColor('important'));
     const textColor = themesStore.getTextColorByBackgroundColor(background);
@@ -121,10 +133,10 @@
   });
 
   /**
-   * 버튼의 ID와 색상 유형에 따라 최종 스타일(배경색 및 텍스트 색상)을 반환합니다.
-   * @param id - 버튼의 고유 ID
-   * @param colorType - 버튼의 색상 유형 ('important', 'function', 'normal')
-   * @returns { background: string; textColor: string } - 최종 스타일 객체
+   * 버튼의 최종 스타일(배경색, 텍스트 색상)을 결정합니다.
+   * @param id - 버튼 ID
+   * @param colorType - 버튼 색상 유형 ('important', 'function', 'normal')
+   * @returns 최종 버튼 스타일 객체
    */
   const getFinalButtonStyle = (id: ButtonID, colorType: 'important' | 'function' | 'normal') => {
     if (id === shiftButtonId.value && calcStore.isShiftPressed) {
@@ -135,11 +147,10 @@
     return normalButtonStyle.value;
   };
 
-  // const i18n = useI18n();
   const { standardButtons, modeSpecificButtons, standardExtendedFunctions, modeSpecificExtendedFunctions } =
     createCalcButtonSet(t);
 
-  // mainRadix의 변경을 감지하는 computed 속성 추가
+  // 현재 진법의 기수를 반환하는 computed 속성
   const currentRadixBase = computed(() => {
     const radixKey = radixStore.sourceRadix as Radix;
     return (
@@ -149,7 +160,11 @@
     );
   });
 
-  // isButtonDisabledForBase 함수를 computed 속성 사용하도록 수정
+  /**
+   * 현재 진법에 따라 버튼을 비활성화할지 여부를 결정합니다.
+   * @param label - 버튼의 레이블
+   * @returns 비활성화 여부
+   */
   const isButtonDisabledForCurrentBase = (label: string) => {
     if (props.type !== 'radix') return false;
 
@@ -159,7 +174,11 @@
     return Number(radixStore.convertRadix(value, Radix.Hexadecimal, Radix.Decimal)) >= currentRadixBase.value;
   };
 
-  // 버튼 변환 함수 추출
+  /**
+   * 버튼 정의 객체를 변환합니다.
+   * @param buttons - 변환할 버튼 정의
+   * @returns 변환된 버튼 객체
+   */
   const transformButtonDefinitions = (buttons: CalculatorButtonDefinition) => {
     return Object.fromEntries(
       Object.entries(buttons).map(([id, [label, color, keys, action, isDisabled]]) => [
@@ -169,17 +188,20 @@
     );
   };
 
-  // activeButtonSet을 computed로 변경
+  // 현재 활성화된 버튼 세트를 반환하는 computed 속성
   const activeButtonSet = computed(() => {
     const modeSpecificButtonsForType = modeSpecificButtons[props.type as keyof typeof modeSpecificButtons] ?? {};
-
     return {
       ...transformButtonDefinitions(standardButtons),
       ...transformButtonDefinitions(modeSpecificButtonsForType),
     };
   });
 
-  // 추가 버튼 기능 변환 함수
+  /**
+   * 확장 기능 버튼 정의를 변환합니다.
+   * @param buttons - 변환할 확장 기능 버튼 정의
+   * @returns 변환된 버튼 객체
+   */
   const transformExtendedFunctions = (buttons: ExtendedButtonFunction) => {
     return Object.fromEntries(
       Object.entries(buttons).map(([id, [label, shortcutKeys, action, isDisabled]]) => [
@@ -189,27 +211,32 @@
     );
   };
 
-  // extendedFunctionSet을 computed로 변경
+  // 현재 확장 기능 세트를 반환하는 computed 속성
   const extendedFunctionSet = computed(() => {
     const categoryButtons =
       modeSpecificExtendedFunctions[props.type as keyof typeof modeSpecificExtendedFunctions] ?? {};
-
-    return { ...transformExtendedFunctions(standardExtendedFunctions), ...transformExtendedFunctions(categoryButtons) };
+    return {
+      ...transformExtendedFunctions(standardExtendedFunctions),
+      ...transformExtendedFunctions(categoryButtons),
+    };
   });
 
   type ButtonID = keyof typeof standardExtendedFunctions;
 
-  // 시프트 버튼의 ID 찾기
+  // 시프트 버튼의 ID를 찾는 computed 속성
   const shiftButtonId = computed(() =>
     Object.keys(extendedFunctionSet.value).find((key) => extendedFunctionSet.value[key]?.label === ''),
   );
 
-  // 추가 기능 툴팁 표시를 위한 타이머 상태 객체
+  // 툴팁 타이머 상태
   const tooltipTimers: { [id: string]: boolean } = reactive(
     Object.fromEntries(Object.keys(activeButtonSet.value).map((id) => [id, false])),
   );
 
-  // 추가 기능 툴팁 표시 함수
+  /**
+   * 버튼 액션에 대한 툴팁을 표시합니다.
+   * @param id - 툴팁을 표시할 버튼의 ID
+   */
   const displayActionTooltip = (id: ButtonID) => {
     if (
       tooltipTimers[id] ||
@@ -223,7 +250,10 @@
     }, 1000);
   };
 
-  // 버튼 클릭 시 알림 표시 함수
+  /**
+   * 특정 버튼 클릭에 대한 알림을 표시합니다 (예: 메모리).
+   * @param id - 알림을 발생시킨 버튼의 ID
+   */
   const displayButtonNotification = (id: ButtonID) => {
     if (!calcStore.needButtonNotification) return;
 
@@ -238,11 +268,14 @@
     calcStore.offNeedButtonNotification();
   };
 
-  // 버튼 시프트 상태에 따른 기능 실행
+  /**
+   * 버튼 클릭 이벤트를 처리합니다.
+   * @param id - 클릭된 버튼의 ID
+   */
   const handleClickBtn = (id: ButtonID) => {
     const isDisabled = calcStore.isShiftPressed
-      ? (extendedFunctionSet.value[id]?.isDisabled ?? false)
-      : (activeButtonSet.value[id]?.isDisabled ?? false);
+      ? extendedFunctionSet.value[id]?.isDisabled ?? false
+      : activeButtonSet.value[id]?.isDisabled ?? false;
     const action = calcStore.isShiftPressed ? extendedFunctionSet.value[id]?.action : activeButtonSet.value[id]?.action;
 
     if (isDisabled) {
@@ -258,7 +291,10 @@
     }
   };
 
-  // 버튼 길게 누르기 기능
+  /**
+   * 버튼 길게 누르기 이벤트를 처리합니다.
+   * @param id - 길게 누른 버튼의 ID
+   */
   const handleLongPress = (id: ButtonID) => {
     hapticFeedbackMedium();
     const buttonFunctions = calcStore.isShiftPressed ? activeButtonSet.value : extendedFunctionSet.value;
@@ -279,7 +315,11 @@
     }
   };
 
-  // 키 입력에 따른 버튼 클릭 함수
+  /**
+   * 키 입력에 따라 버튼 클릭을 트리거합니다.
+   * @param id - 트리거할 버튼의 ID
+   * @param isShift - 시프트 키가 눌렸는지 여부
+   */
   const triggerButtonClickByKey = (id: ButtonID, isShift: boolean) => {
     if (isShift) {
       calcStore.toggleShiftLock();
@@ -291,13 +331,12 @@
     }
   };
 
-  // 주요 키 바인딩 설정
+  // 키 바인딩 설정
   const keyBindingsPrimary: KeyBindings = Object.entries(activeButtonSet.value).map(([id, button]) => [
     button.shortcutKeys,
     () => triggerButtonClickByKey(id, false),
   ]);
 
-  // 보조 키 바인딩 설정
   const keyBindingsSecondary: KeyBindings = Object.entries(extendedFunctionSet.value).map(([id, button]) => [
     button.shortcutKeys,
     () => {
@@ -309,21 +348,14 @@
     },
   ]);
 
-  // 모든 키 바인딩 통합
   const keyBindings = [...keyBindingsPrimary, ...keyBindingsSecondary];
   const { subscribe, unsubscribe } = useKeyBinding(keyBindings);
 
-  // 컴포넌트 마운트 시 키 바인딩 활성화
-  onMounted(() => {
-    subscribe();
-  });
+  // 컴포넌트 라이프사이클에 따른 키 바인딩 관리
+  onMounted(() => subscribe());
+  onBeforeUnmount(() => unsubscribe());
 
-  // 컴포넌트 언마운트 전 키 바인딩 비활성화
-  onBeforeUnmount(() => {
-    unsubscribe();
-  });
-
-  // 입력 포커스 상태에 따른 키 바인딩 관리
+  // 입력 필드 포커스 상태에 따른 키 바인딩 활성화/비활성화
   watch(
     () => uiStore.inputFocused,
     (focused) => {
@@ -336,39 +368,38 @@
     { immediate: true },
   );
 
-  // resize 이벤트를 처리하기 위한 ref 생성
+  // 화면 크기 변화 감지를 위한 ref
   const screenWidth = ref(isWideWidth() ? window.innerWidth / 2 : window.innerWidth);
   const screenHeight = ref(window.innerHeight);
 
-  // resize 이벤트 핸들러
+  /**
+   * 창 크기 변경 이벤트를 처리합니다.
+   */
   const handleResize = () => {
     screenWidth.value = isWideWidth() ? window.innerWidth / 2 : window.innerWidth;
     screenHeight.value = window.innerHeight;
-    // 화면 크기 변경 시 baseHeight 재계산
     setTimeout(() => calculateDynamicBaseHeight(), 100);
   };
 
-  // 컴포넌트 마운트 시 resize 이벤트 리스너 등록
+  // 컴포넌트 라이프사이클에 따른 이벤트 리스너 관리
   onMounted(() => {
     window.addEventListener('resize', handleResize);
-    // DOM이 완전히 렌더링된 후 baseHeight 계산
     setTimeout(() => calculateDynamicBaseHeight(), 150);
   });
 
-  // 컴포넌트 언마운트 시 resize 이벤트 리스너 제거
   onBeforeUnmount(() => {
     window.removeEventListener('resize', handleResize);
   });
 
   /**
-   * 페이지 구조를 기반으로 동적 baseHeight를 계산하는 함수
-   * @description 각 페이지 타입별로 실제 DOM 요소들의 높이를 측정하여 정확한 baseHeight 계산
+   * 버튼 영역의 동적 높이를 계산하여 `baseHeight`를 설정합니다.
+   * @description DOM 요소의 실제 높이를 측정하여 버튼 높이를 동적으로 조절합니다.
    */
   const calculateDynamicBaseHeight = () => {
     try {
       let totalHeightToExclude = 0;
 
-      // 1. MainLayout 헤더 높이 (고정값 50px)
+      // 1. 시스템 UI 및 헤더 높이
       if ($g.isAndroid && $g.apiLevel >= 35) {
         totalHeightToExclude += 24;
         if (!$g.isGestureNavigation) {
@@ -378,37 +409,26 @@
         totalHeightToExclude += 10;
       }
 
-      // 2. 현재 활성화된 q-card 요소 찾기 (각 페이지의 컨테이너)
+      // 2. 현재 탭의 컨테이너 카드 요소
       const currentCard = document.querySelector('.q-tab-panel--active q-card') as HTMLElement;
 
       if (currentCard) {
-        // 3. q-card의 패딩 계산 (q-px-md q-pt-xs q-pb-md)
+        // 3. 카드 패딩
         const cardStyles = window.getComputedStyle(currentCard);
-        const paddingTop = parseInt(cardStyles.paddingTop) || 4; // q-pt-xs
-        const paddingBottom = parseInt(cardStyles.paddingBottom) || 16; // q-pb-md
+        const paddingTop = parseInt(cardStyles.paddingTop) || 4;
+        const paddingBottom = parseInt(cardStyles.paddingBottom) || 16;
         totalHeightToExclude += paddingTop + paddingBottom;
 
-        // 4. CalcButton을 제외한 모든 자식 요소들의 높이 합산
+        // 4. 버튼 영역을 제외한 다른 자식 요소들의 높이
         const cardChildren = Array.from(currentCard.children) as HTMLElement[];
-
         for (const child of cardChildren) {
-          // CalcButton 컴포넌트가 포함된 q-card-section은 제외
           if (!child.querySelector('.button') && !child.classList.contains('button')) {
-            const childHeight = child.offsetHeight;
-            totalHeightToExclude += childHeight;
-
-            if (process.env.DEV) {
-              console.log(`Child element height: ${childHeight}px`, child.className || child.tagName);
-            }
+            totalHeightToExclude += child.offsetHeight;
           }
         }
       } else {
-        // q-card를 찾을 수 없는 경우 타입별 추정값 사용
-        if (props.type === 'calc') {
-          totalHeightToExclude += 100; // ResultField(main) 추정
-        } else {
-          totalHeightToExclude += 200; // ResultField(main) + Panel + ResultField(sub) 추정
-        }
+        // 카드를 찾지 못한 경우의 폴백
+        totalHeightToExclude += props.type === 'calc' ? 100 : 200;
         totalHeightToExclude += 20; // 패딩 추정값
       }
 
@@ -416,53 +436,34 @@
       const calculatedHeight = Math.max(totalHeightToExclude, 120);
       baseHeight.value = `${calculatedHeight}px`;
 
-      // 6. 개발 환경에서 디버깅 정보 출력
-      logDev(`🎯 CalcButton baseHeight calculated for type "${props.type}": ${baseHeight.value}`, {
-        screenHeight: screenHeight.value,
-        headerHeight: 50,
-        totalExcluded: totalHeightToExclude,
-        finalHeight: calculatedHeight,
-        cardFound: !!currentCard,
-      });
+      logDev(`🎯 baseHeight calculated for "${props.type}": ${baseHeight.value}`);
     } catch (error) {
-      // 에러 발생 시 타입별 기본값 사용
-      console.warn('⚠️ Error calculating dynamic baseHeight, using fallback values:', error);
+      console.warn('⚠️ 동적 높이 계산 오류, 폴백 값 사용:', error);
       baseHeight.value =
         props.type === 'calc' ? '130px' : ['unit', 'currency', 'radix'].includes(props.type) ? '220px' : '130px';
     }
   };
 
-  // 계산기 버튼 높이 설정 (초기값)
   const baseHeight = ref('130px');
 
-  // props.type 변경 시 baseHeight 재계산
-  watch(
-    () => props.type,
-    () => {
-      setTimeout(() => calculateDynamicBaseHeight(), 100);
-    },
-  );
+  // props.type 또는 현재 탭 변경 시 높이 재계산
+  watch(() => props.type, () => setTimeout(() => calculateDynamicBaseHeight(), 100));
+  watch(() => uiStore.currentTab, () => setTimeout(() => calculateDynamicBaseHeight(), 150));
+  watch(() => [screenWidth.value, screenHeight.value], () => setTimeout(() => calculateDynamicBaseHeight(), 100));
 
-  // 탭 변경 시 baseHeight 재계산 (DOM 업데이트 후)
-  watch(
-    () => uiStore.currentTab,
-    () => {
-      setTimeout(() => calculateDynamicBaseHeight(), 150);
-    },
-  );
-
-  // 화면 방향 변경이나 레이아웃 변경 감지
-  watch(
-    () => [screenWidth.value, screenHeight.value],
-    () => {
-      setTimeout(() => calculateDynamicBaseHeight(), 100);
-    },
-  );
-
+  /**
+   * 비활성화된 버튼 클릭 시 알림을 표시합니다.
+   */
   const displayDisabledButtonNotification = () => {
     showMessage(t('disabledButton'));
   };
 
+  /**
+   * 버튼의 단축키에 대한 툴팁 문자열을 생성합니다.
+   * @param btnId - 버튼 ID
+   * @param isShift - 시프트 상태 여부
+   * @returns 단축키 툴팁 문자열
+   */
   const getTooltipsOfKeys = (btnId: ButtonID, isShift: boolean) => {
     const buttonFunctions = isShift ? extendedFunctionSet.value : activeButtonSet.value;
     const shortcutKeys = buttonFunctions[btnId]?.shortcutKeys ?? [];
@@ -473,28 +474,22 @@
         const parts = key.split('+');
         const modifiers = parts
           .slice(0, -1)
-          .map((part) => {
-            if (part === 'Shift') return 'S';
-            if (part === 'Control') return 'C';
-            if (part === 'Alt') return 'A';
-            return part;
-          })
+          .map((part) => ({ Shift: 'S', Control: 'C', Alt: 'A' }[part] || part))
           .join('');
-
         const lastPart = parts[parts.length - 1]?.replace('Digit', '').replace('Numpad', 'N') ?? '';
         return modifiers + (modifiers ? '-' : '') + lastPart;
       })
       .join(', ');
   };
 
-  // const baseWidth = computed(() => {
-  //   return $s.isWideWidth() ? '50vw' : '100vw';
-  // });
-
-  // 버튼의 aria-label 설정
+  /**
+   * 버튼의 ARIA 레이블을 생성합니다.
+   * @param id - 버튼 ID
+   * @param button - 버튼 객체
+   * @returns ARIA 레이블 문자열
+   */
   const getAriaLabel = (id: ButtonID, button: { label: string }) => {
     if (button.label.charAt(0) === '@') {
-      // 아이콘 버튼의 경우 아이콘 이름에 따라 적절한 레이블 반환
       return match(button.label.slice(1))
         .with('mdi-backspace', () => t('ariaLabel.backspace'))
         .with('mdi-plus-minus-variant', () => t('ariaLabel.plusMinus'))
@@ -510,6 +505,7 @@
     return button.label;
   };
 
+  // 폰트 크기 조정을 위한 스케일링 팩터
   const labelScalingFactor = computed(() => {
     if ($g.isCapacitor) {
       logDev('window.textZoom: ', $g.textZoom);

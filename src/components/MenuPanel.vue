@@ -122,7 +122,9 @@
     },
   ]);
 
-  // 언어 변경 시 메뉴 아이템 텍스트 업데이트 함수
+  /**
+   * 현재 설정된 언어(locale)에 맞게 메뉴 아이템의 텍스트를 업데이트합니다.
+   */
   const updateLocale = () => {
     items.forEach((item) => {
       if (!item.separator) {

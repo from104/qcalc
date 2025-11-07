@@ -41,32 +41,40 @@
 
   // 언어 변경 시 비트 표시 업데이트
   watch([() => settingsStore.locale], () => {
-    wordSizeOptions.values.forEach((option, index) => {
+    wordSizeOptions.forEach((option, index) => {
       const value = index === 0 ? '∞' : option.value.toString();
       option.label = `${value} ${t('bit')}`;
     });
   });
 
   // 키 바인딩 설정
-  const { subscribe, unsubscribe } = useKeyBinding([
+  useKeyBinding([
     [['\\'], () => document.getElementById('btn-swap-radix')?.click()],
     [['Alt+\\'], () => radixStore.toggleShowRadix()],
     [['Alt+Control+\\'], () => radixStore.setRadixType(radixStore.radixType == 'prefix' ? 'suffix' : 'prefix')],
   ]);
 
-  // 입력 포커스에 따른 키 바인딩 활성화/비활성화
+  // 입력 필드 포커스 시 단축키 비활성화
   watch(
-    () => uiStore.inputFocused,
-    (focused) => {
-      if (focused) {
-        unsubscribe();
+    () => uiStore.isInputFocused,
+    (isFocused) => {
+      if (isFocused) {
+        useKeyBinding.destroy();
       } else {
-        subscribe();
+        // 포커스가 해제되면 다시 키 바인딩 설정
+        useKeyBinding([
+          [['\\'], () => document.getElementById('btn-swap-radix')?.click()],
+          [['Alt+\\'], () => radixStore.toggleShowRadix()],
+          [
+            ['Alt+Control+\\'],
+            () => radixStore.setRadixType(radixStore.radixType == 'prefix' ? 'suffix' : 'prefix'),
+          ],
+        ]);
       }
     },
   );
 
-    onMounted(() => {
+  onMounted(() => {
     radixStore.initRecentRadix();
     calcStore.calc.wordSize = radixStore.wordSize;
   });
@@ -75,63 +83,43 @@
     uiStore.setInputBlurred();
   });
 
-  // 워드사이즈 옵션 타입 정의
-  type WordSizeOption = {
-    value: number;
-    label: string;
-  };
-
-  // 워드사이즈 옵션 초기화
-  const wordSizeOptions = reactive({
-    values: [0, 4, 8, 16, 32, 64].map((value) => ({
+  /**
+   * @type {Array<{value: number, label: string}>}
+   * @description 워드 크기 선택 옵션 목록
+   */
+  const wordSizeOptions = reactive(
+    [0, 4, 8, 16, 32, 64].map((value) => ({
       value,
-      label: `${value || '∞'}${t('bit')}`,
+      label: `${value || '∞'} ${t('bit')}`,
     })),
-  } as { values: WordSizeOption[] });
+  );
 
-  // RadixOption 인터페이스 수정
-  interface RadixOption {
-    value: Radix;
-    label: ComputedRef<string>;
-  }
-
-  interface ReactiveRadixOptionList {
-    values: RadixOption[];
-  }
-
-  const radixList = Object.values(Radix);
-
-  // 진법 옵션 초기화 시 computed 사용
-  const createRadixOptions = () =>
-    radixList.map((radix) => ({
+  /**
+   * @type {ComputedRef<Array<{value: Radix, label: string}>>}
+   * @description 진법 선택 옵션 목록
+   */
+  const radixOptions = computed(() =>
+    Object.values(Radix).map((radix) => ({
       value: radix,
-      label: computed(() => t(`radixLabel.${radix}`)),
-    }));
+      label: t(`radixLabel.${radix}`),
+    })),
+  );
 
-  const sourceRadixOptions = reactive<ReactiveRadixOptionList>({
-    values: createRadixOptions(),
-  });
-
-  const targetRadixOptions = reactive<ReactiveRadixOptionList>({
-    values: createRadixOptions(),
-  });
-
+  // 현재 진법 변경 시 계산기 상태 업데이트
   watch(
     () => radixStore.sourceRadix,
     () => (calcStore.calc.currentRadix = radixStore.sourceRadix),
   );
 
-  // 단순화된 컴퓨티드 속성
-  const sourceSelectOptions = computed(() => sourceRadixOptions.values);
-
-  const targetSelectOptions = computed(() => targetRadixOptions.values);
-
+  /**
+   * 출발지와 목적지 진법을 교환합니다.
+   */
   const handleRadixSwap = () => {
     radixStore.swapRadixes();
     calcStore.calc.needsBufferReset = true;
   };
 
-  // themesStore에서 select 색상을 가져오는 computed 속성
+  // 테마에 따른 UI 색상
   const selectTextColor = computed(() => themesStore.getSelectColor('text', themesStore.isDarkMode()));
   const selectBackgroundColor = computed(() => themesStore.getSelectColor('background', themesStore.isDarkMode()));
 </script>

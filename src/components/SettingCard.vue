@@ -16,21 +16,13 @@
   const $g = window.globalVars;
 
   // 스토어 import
-  import { useUIStore } from 'stores/uiStore';
   import { useSettingsStore } from 'stores/settingsStore';
-  import { useUnitStore } from 'stores/unitStore';
-  import { useRadixStore } from 'stores/radixStore';
-  import { useCurrencyStore } from 'stores/currencyStore';
   import { useThemesStore } from 'stores/themesStore';
   import { themes, type ThemeType } from 'src/constants/ThemesData';
   import { useSettingsManager } from 'src/composables/useSettingsManager';
 
   // 스토어 인스턴스 생성
-  const uiStore = useUIStore();
   const settingsStore = useSettingsStore();
-  const unitStore = useUnitStore();
-  const radixStore = useRadixStore();
-  const currencyStore = useCurrencyStore();
   const themesStore = useThemesStore();
 
   // i18n 설정
@@ -49,48 +41,38 @@
   const $q = useQuasar();
   const { applySettings, resetSettings, exportSettings } = useSettingsManager();
 
-  // 설정 초기화 핸들러
+  /**
+   * 모든 설정을 기본값으로 초기화합니다.
+   * 사용자에게 확인 대화상자를 표시한 후 초기화를 진행합니다.
+   */
   const handleResetSettings = () => {
     $q.dialog({
       title: t('resetSettings.confirmTitle'),
       message: t('resetSettings.confirmMessage'),
-      ok: {
-        label: t('message.yes'),
-        flat: true,
-      },
-      cancel: {
-        label: t('message.no'),
-        flat: true,
-      },
+      ok: { label: t('message.yes'), flat: true },
+      cancel: { label: t('message.no'), flat: true },
       persistent: true,
     }).onOk(() => {
       resetSettings();
       $q.notify({ type: 'positive', message: t('resetSettings.success') });
-      // 설정을 완전히 적용하기 위해 페이지 새로고침
       window.location.reload();
     });
   };
 
-  // 설정 불러오기 버튼 클릭 핸들러
+  /**
+   * 설정 파일 가져오기 프로세스를 시작합니다.
+   * File System Access API를 우선 사용하고, 지원되지 않을 경우 input file을 사용합니다.
+   */
   const handleImportClick = async () => {
     if (window.showOpenFilePicker) {
       try {
         const [fileHandle] = await window.showOpenFilePicker({
-          types: [
-            {
-              description: 'JSON Files',
-              accept: { 'application/json': ['.json'] },
-            },
-          ],
+          types: [{ description: 'JSON Files', accept: { 'application/json': ['.json'] } }],
         });
-        if (fileHandle) {
-          const file = await fileHandle.getFile();
-          processSettingsFile(file);
-        }
+        const file = await fileHandle.getFile();
+        processSettingsFile(file);
       } catch (error: unknown) {
-        if (error instanceof Error && error.name === 'AbortError') {
-          $q.notify({ type: 'info', message: t('importSettings.cancelled') });
-        } else {
+        if (error instanceof Error && error.name !== 'AbortError') {
           console.error(error);
           $q.notify({ type: 'negative', message: t('importSettings.fail') });
         }
@@ -100,19 +82,16 @@
     }
   };
 
-  // 파일 처리 핸들러
+  /**
+   * 선택된 설정 파일을 읽고 적용합니다.
+   * @param file - 사용자가 선택한 설정 파일 (.json)
+   */
   const processSettingsFile = (file: File) => {
     $q.dialog({
       title: t('importSettings.confirmTitle'),
       message: t('importSettings.confirmMessage'),
-      ok: {
-        label: t('message.yes'),
-        flat: true,
-      },
-      cancel: {
-        label: t('message.no'),
-        flat: true,
-      },
+      ok: { label: t('message.yes'), flat: true },
+      cancel: { label: t('message.no'), flat: true },
       persistent: true,
     }).onOk(() => {
       const reader = new FileReader();
@@ -135,16 +114,17 @@
     });
   };
 
-  // 파일 변경 핸들러 (설정 불러오기)
+  /**
+   * 파일 입력(input) 변경 이벤트를 처리합니다.
+   * @param event - 파일 입력 요소의 변경 이벤트
+   */
   const handleFileChange = (event: Event) => {
     const target = event.target as HTMLInputElement;
     const file = target.files?.[0];
-    if (!file) return;
-
-    processSettingsFile(file);
-
-    // 다음에 같은 파일을 선택해도 change 이벤트가 발생하도록 값 초기화
-    target.value = '';
+    if (file) {
+      processSettingsFile(file);
+      target.value = ''; // 동일 파일 재선택을 위해 초기화
+    }
   };
 
   // 패키지 버전 정보
@@ -153,126 +133,99 @@
   // 소수점 자리수 설정 값
   import { DECIMAL_PLACES } from 'src/types/store.d';
 
-  // const isDev = import.meta.env.DEV;
-
-  // 언어 옵션 정의
+  // 언어 옵션
   const languageOptions = reactive([
     { value: 'ko', label: computed(() => t('message.ko')) },
     { value: 'en', label: computed(() => t('message.en')) },
   ]);
 
-  // 시스템 로케일 사용 여부와 사용자 로케일이 변경될 때마다 언어 옵션 라벨을 업데이트합니다.
+  // 시스템 로케일 감시 및 적용
   watch([() => settingsStore.useSystemLocale, () => settingsStore.userLocale], () => {
     settingsStore.locale = locale.value as string;
   });
 
-  // 시스템 로케일을 참조로 저장합니다.
   const systemLocale = ref(navigator.language.substring(0, 2));
 
-  // 로케일을 설정하는 함수입니다.
+  /**
+   * 시스템 언어 설정 또는 사용자 선택에 따라 애플리케이션 언어를 설정합니다.
+   */
   const setLanguage = () => {
-    if (settingsStore.useSystemLocale) {
-      locale.value = systemLocale.value;
-    } else {
-      locale.value = settingsStore.userLocale;
-    }
+    locale.value = settingsStore.useSystemLocale ? systemLocale.value : settingsStore.userLocale;
   };
 
-  // 색상 테마 옵션을 계산합니다.
+  /**
+   * 사용 가능한 색상 테마 목록을 생성합니다 (기본 테마 + 사용자 정의 테마).
+   */
   const themeOptions = computed(() => {
-    const defaultThemes = Object.keys(themes).map((themeKey) => {
-      const currentLocale = locale.value as 'ko' | 'en';
-      const themeName =
-        themes[themeKey as ThemeType]?.name?.[currentLocale] || themes[themeKey as ThemeType]?.name?.en || themeKey;
-      return {
-        label: themeName,
-        value: themeKey,
-        isUserTheme: false,
-      };
-    });
-
+    const currentLocale = locale.value as 'ko' | 'en';
+    const defaultThemes = Object.keys(themes).map((themeKey) => ({
+      label: themes[themeKey as ThemeType]?.name?.[currentLocale] || themes[themeKey as ThemeType]?.name?.en || themeKey,
+      value: themeKey,
+      isUserTheme: false,
+    }));
     const userThemes = Object.keys(themesStore.userThemes).map((themeKey) => ({
       label: themeKey,
       value: themeKey,
       isUserTheme: true,
     }));
-
-    if (userThemes.length > 0) {
-      return [...defaultThemes, { isSeparator: true }, ...userThemes];
-    }
-    return defaultThemes;
+    return userThemes.length > 0 ? [...defaultThemes, { isSeparator: true }, ...userThemes] : defaultThemes;
   });
 
   /**
-   * 테마가 변경될 때 호출되는 함수입니다.
-   * @param themeName - 선택된 테마 이름
+   * 색상 테마가 변경될 때 호출됩니다.
+   * @param themeName - 새로 선택된 테마의 이름
    */
   const onThemeChange = (themeName: ThemeType | string) => {
     themesStore.setTheme(themeName);
   };
 
   /**
-   * 사용자 테마를 수정하기 위해 ThemeEditor를 엽니다.
+   * 사용자 정의 테마를 수정하기 위해 ThemeEditor를 엽니다.
    * @param themeName - 수정할 테마의 이름
    */
-  function editTheme(themeName: string) {
+  const editTheme = (themeName: string) => {
     const themeData = themesStore.userThemes[themeName];
     if (themeData && themeEditor.value) {
-      themeEditor.value.open({
-        isEdit: true,
-        themeName: themeName,
-        themeData: themeData,
-      });
+      themeEditor.value.open({ isEdit: true, themeName, themeData });
     }
-  }
+  };
 
   /**
-   * 사용자 테마를 삭제합니다.
+   * 사용자 정의 테마를 삭제합니다.
    * @param themeName - 삭제할 테마의 이름
    */
-  function deleteTheme(themeName: string) {
+  const deleteTheme = (themeName: string) => {
     $q.dialog({
       title: t('confirmDeleteTitle'),
       message: t('confirmDeleteMessage', { themeName }),
-      ok: {
-        label: t('yes'),
-        flat: true,
-      },
-      cancel: {
-        label: t('no'),
-        flat: true,
-      },
+      ok: { label: t('yes'), flat: true },
+      cancel: { label: t('no'), flat: true },
       persistent: true,
     }).onOk(() => {
       themesStore.removeUserTheme(themeName);
       themesStore.setTheme('default');
     });
-  }
+  };
 
   /**
-   * 현재 테마를 기반으로 새 테마를 만듭니다.
+   * 현재 테마를 기반으로 새 사용자 정의 테마를 생성합니다.
    */
-  function createNewTheme() {
+  const createNewTheme = () => {
     const baseThemeKey = themesStore.currentTheme;
     const baseTheme = themesStore.userThemes[baseThemeKey] || themes[baseThemeKey as ThemeType];
-
     if (baseTheme && themeEditor.value) {
-      themeEditor.value.open({
-        isEdit: false,
-        themeName: '', // 새 테마를 위해 이름 비우기
-        themeData: baseTheme,
-      });
+      themeEditor.value.open({ isEdit: false, themeName: '', themeData: baseTheme });
     }
-  }
+  };
 
-  // themesStore에서 select 색상을 가져오는 computed 속성
+  // UI 색상
   const selectTextColor = computed(() => themesStore.getSelectColor('text', themesStore.isDarkMode()));
   const selectBackgroundColor = computed(() => themesStore.getSelectColor('background', themesStore.isDarkMode()));
 
   /**
-   * 특정 테마의 primary 컬러를 HEX 형식으로 반환하는 함수입니다.
-   * @param themeKey - 테마 키 (예: 'default', 'forest', 'ocean' 등)
-   * @returns 해당 테마의 primary 컬러 (HEX 형식)
+   * 지정된 테마의 기본(primary) 색상을 HEX 코드로 반환합니다.
+   * @param themeKey - 색상을 가져올 테마의 키
+   * @returns HEX 색상 코드 문자열
    */
   const getThemePrimaryColor = (themeKey: ThemeType | string): string => {
     const theme = themesStore.userThemes[themeKey] || themes[themeKey as ThemeType];
@@ -281,22 +234,20 @@
   };
 
   /**
-   * 특정 테마의 라벨을 반환하는 함수입니다.
-   * @param themeKey - 테마 키 또는 테마 키 문자열
-   * @returns 해당 테마의 번역된 라벨
+   * 지정된 테마의 현지화된 라벨을 반환합니다.
+   * @param themeKey - 라벨을 가져올 테마의 키
+   * @returns 현지화된 테마 라벨 문자열
    */
   const getThemeLabel = (themeKey: ThemeType | string): string => {
-    const key = typeof themeKey === 'string' ? themeKey : themeKey;
+    const key = themeKey as ThemeType;
     if (themesStore.userThemes[key]) {
       return key;
     }
     const currentLocale = locale.value as 'ko' | 'en';
-    return themes[key as ThemeType]?.name?.[currentLocale] || themes[key as ThemeType]?.name?.en || key;
+    return themes[key]?.name?.[currentLocale] || themes[key]?.name?.en || key;
   };
 
-  const primaryAccentColor = computed(() => {
-    return themesStore.isDarkMode() ? 'accent' : 'primary';
-  });
+  const primaryAccentColor = computed(() => (themesStore.isDarkMode() ? 'accent' : 'primary'));
 </script>
 
 <template>

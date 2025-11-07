@@ -104,15 +104,11 @@
     leaveToClass: '',
   }));
 
-  // 스와이프 설정
-  const swipeConfig = (details: {
-    evt?: Event;
-    touch?: boolean;
-    mouse?: boolean;
-    direction?: 'up' | 'right' | 'down' | 'left';
-    duration?: number;
-    distance?: { x?: number; y?: number };
-  }) => {
+  /**
+   * 수평 스와이프 이벤트를 처리하여 이전 또는 다음 팁으로 이동합니다.
+   * @param details - 스와이프 이벤트의 상세 정보 (방향, 거리 등)
+   */
+  const swipeConfig = (details: { direction: 'left' | 'right' }) => {
     if (details.direction === 'left') {
       nextTip();
     } else if (details.direction === 'right') {
