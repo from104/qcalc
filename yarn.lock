@@ -40,7 +40,10 @@ __metadata:
   version: 7.27.1
   resolution: "@babel/helper-validator-identifier@npm:7.27.1"
   checksum: 75041904d21bdc0cd3b07a8ac90b11d64cd3c881e89cb936fa80edd734bf23c35e6bd1312611e8574c4eab1f3af0f63e8a5894f4699e9cfdf70c06fcf4252320
+<<<<<<< HEAD
 >>>>>>> 01200f59 (fix: upgrade @capacitor/cli from 7.4.3 to 7.4.4)
+=======
+>>>>>>> 65f3d625 (fix: upgrade @capacitor/core from 7.4.3 to 7.4.4)
   languageName: node
   linkType: hard
 
@@ -52,10 +55,14 @@ __metadata:
   bin:
     parser: ./bin/babel-parser.js
 <<<<<<< HEAD
+<<<<<<< HEAD
   checksum: 10/8d9bfb437af6c97a7f6351840b9ac06b4529ba79d6d3def24d6c2996ab38ff7f1f9d301e868ca84a93a3050fadb3d09dbc5105b24634cd281671ac11eebe8df7
 =======
   checksum: f54c46213ef180b149f6a17ea765bf40acc1aebe2009f594e2a283aec69a190c6dda1fdf24c61a258dbeb903abb8ffb7a28f1a378f8ab5d333846ce7b7e23bf1
 >>>>>>> 01200f59 (fix: upgrade @capacitor/cli from 7.4.3 to 7.4.4)
+=======
+  checksum: f54c46213ef180b149f6a17ea765bf40acc1aebe2009f594e2a283aec69a190c6dda1fdf24c61a258dbeb903abb8ffb7a28f1a378f8ab5d333846ce7b7e23bf1
+>>>>>>> 65f3d625 (fix: upgrade @capacitor/core from 7.4.3 to 7.4.4)
   languageName: node
   linkType: hard
 
@@ -77,7 +84,10 @@ __metadata:
 =======
     "@babel/helper-validator-identifier": "npm:^7.27.1"
   checksum: db50bf257aafa5d845ad16dae0587f57d596e4be4cbb233ea539976a4c461f9fbcc0bf3d37adae3f8ce5dcb4001462aa608f3558161258b585f6ce6ce21a2e45
+<<<<<<< HEAD
 >>>>>>> 01200f59 (fix: upgrade @capacitor/cli from 7.4.3 to 7.4.4)
+=======
+>>>>>>> 65f3d625 (fix: upgrade @capacitor/core from 7.4.3 to 7.4.4)
   languageName: node
   linkType: hard
 
@@ -90,7 +100,10 @@ __metadata:
   version: 2.9.0
   resolution: "@bufbuild/protobuf@npm:2.9.0"
   checksum: e101934daca12921c354ee7110eb636bf06c2943a9cb9e05bc365f8b8af2eb4c9421eafa9e20e800248b5df2c869fb7b68d324b134c47765d41528cc72ca032a
+<<<<<<< HEAD
 >>>>>>> 01200f59 (fix: upgrade @capacitor/cli from 7.4.3 to 7.4.4)
+=======
+>>>>>>> 65f3d625 (fix: upgrade @capacitor/core from 7.4.3 to 7.4.4)
   languageName: node
   linkType: hard
 
@@ -100,10 +113,14 @@ __metadata:
   peerDependencies:
     "@capacitor/core": ^7.4.0
 <<<<<<< HEAD
+<<<<<<< HEAD
   checksum: 10/d26c558a5cc0599786f032030a75c1f121104dfc302ba305806fa5741bf5f572835ffd6c0c2fd6024f6a7763c749e77b7616bd655b7e452d1e567edae4c9eff3
 =======
   checksum: e8fd15c424f6019a3233a0e13d0c5090c716c5304ec93ce9155f3b3c8dfddc98ae82028e395b40549fad910d342e70b168f6f0168b84f6079002101e50fbd30b
 >>>>>>> 01200f59 (fix: upgrade @capacitor/cli from 7.4.3 to 7.4.4)
+=======
+  checksum: e8fd15c424f6019a3233a0e13d0c5090c716c5304ec93ce9155f3b3c8dfddc98ae82028e395b40549fad910d342e70b168f6f0168b84f6079002101e50fbd30b
+>>>>>>> 65f3d625 (fix: upgrade @capacitor/core from 7.4.3 to 7.4.4)
   languageName: node
   linkType: hard
 
@@ -141,10 +158,14 @@ __metadata:
     cap: bin/capacitor
     capacitor: bin/capacitor
 <<<<<<< HEAD
+<<<<<<< HEAD
   checksum: 10/59490993a6bb216911217f5cdb80e888a2662b2cc75ed8a860a7bf3568f460970eb6c88f2e68349c217f8779faf37991115e8c887bbbf5995edae1cadf22b7ca
 =======
   checksum: 8/b21d405669db48e926ce26037b0d4ab746b7801379a99089033a6a80499428aa4857164e9fdad1f8a62fdcf3e9c049a4495ef157fb1a7cf9fbb57689dda75c22
 >>>>>>> 01200f59 (fix: upgrade @capacitor/cli from 7.4.3 to 7.4.4)
+=======
+  checksum: b96080830036b4baaf906b31a174843dc3849797bea462bc7804efe522520140a80679a9ac16c02bd9d661797a61a42c6dc2421cb3b2ce904339d5c32e7d7c1e
+>>>>>>> 65f3d625 (fix: upgrade @capacitor/core from 7.4.3 to 7.4.4)
   languageName: node
   linkType: hard
 
@@ -152,12 +173,17 @@ __metadata:
   version: 7.4.4
   resolution: "@capacitor/core@npm:7.4.4"
   dependencies:
+<<<<<<< HEAD
     tslib: "npm:^2.1.0"
 <<<<<<< HEAD
   checksum: 10/956b82d016663a7fdac5de5577104b4bedc845948492156fcfb847b1da9d376fde6db159e27eeac45cc4bbd4e29e8e06b29766d95441b0775faea9b696365606
 =======
   checksum: 9915eb1f618dcd17e770aa6c9092680398cc8ba254284acd65175a28aa35cf6a32e79a6b0abdedb0ed45fc4a7b91d9e495cce53209bbc741a88c15147cfe5a3b
 >>>>>>> 01200f59 (fix: upgrade @capacitor/cli from 7.4.3 to 7.4.4)
+=======
+    tslib: ^2.1.0
+  checksum: 8/499bb64758f3b517832025a077092d5142e31558ba01809a36a03f84164112c10c6ee67d5efc66706d7f70aa3199810b32f041b9b96e227acf492e07a047363c
+>>>>>>> 65f3d625 (fix: upgrade @capacitor/core from 7.4.3 to 7.4.4)
   languageName: node
   linkType: hard
 
@@ -196,10 +222,14 @@ __metadata:
   peerDependencies:
     "@capacitor/core": ">=7.0.0"
 <<<<<<< HEAD
+<<<<<<< HEAD
   checksum: 10/fe1c4b08c3937fd617c7cd9fbe5c5c1051c523433039ddd25abfa6cba02dba1b59c5da6199dcd33f4ac3b6dbb554b316d4c4e73caabf57a287789f0138cab302
 =======
   checksum: 469e0bf118247a9cd0f73c0045164187647f2c7eb9e25dd795975d719d90d00b2d837cdf45a5873a9af19d4a00fa3e08dda4f05898c5f803b0cfc46d63df65bc
 >>>>>>> 01200f59 (fix: upgrade @capacitor/cli from 7.4.3 to 7.4.4)
+=======
+  checksum: 469e0bf118247a9cd0f73c0045164187647f2c7eb9e25dd795975d719d90d00b2d837cdf45a5873a9af19d4a00fa3e08dda4f05898c5f803b0cfc46d63df65bc
+>>>>>>> 65f3d625 (fix: upgrade @capacitor/core from 7.4.3 to 7.4.4)
   languageName: node
   linkType: hard
 
@@ -704,7 +734,10 @@ __metadata:
   version: 4.12.1
   resolution: "@eslint-community/regexpp@npm:4.12.1"
   checksum: c08f1dd7dd18fbb60bdd0d85820656d1374dd898af9be7f82cb00451313402a22d5e30569c150315b4385907cdbca78c22389b2a72ab78883b3173be317620cc
+<<<<<<< HEAD
 >>>>>>> 01200f59 (fix: upgrade @capacitor/cli from 7.4.3 to 7.4.4)
+=======
+>>>>>>> 65f3d625 (fix: upgrade @capacitor/core from 7.4.3 to 7.4.4)
   languageName: node
   linkType: hard
 
@@ -751,10 +784,14 @@ __metadata:
     minimatch: "npm:^3.1.2"
     strip-json-comments: "npm:^3.1.1"
 <<<<<<< HEAD
+<<<<<<< HEAD
   checksum: 10/b586a364ff15ce1b68993aefc051ca330b1fece15fb5baf4a708d00113f9a14895cffd84a5f24c5a97bd4b4321130ab2314f90aa462a250f6b859c2da2cba1f3
 =======
   checksum: cc240addbab3c5fceaa65b2c8d5d4fd77ddbbf472c2f74f0270b9d33263dc9116840b6099c46b64c9680301146250439b044ed79278a1bcc557da412a4e3c1bb
 >>>>>>> 01200f59 (fix: upgrade @capacitor/cli from 7.4.3 to 7.4.4)
+=======
+  checksum: cc240addbab3c5fceaa65b2c8d5d4fd77ddbbf472c2f74f0270b9d33263dc9116840b6099c46b64c9680301146250439b044ed79278a1bcc557da412a4e3c1bb
+>>>>>>> 65f3d625 (fix: upgrade @capacitor/core from 7.4.3 to 7.4.4)
   languageName: node
   linkType: hard
 
@@ -839,10 +876,14 @@ __metadata:
     "@types/node":
       optional: true
 <<<<<<< HEAD
+<<<<<<< HEAD
   checksum: 10/c95d7237a885b32031715089f92820525731d4d3c2bd7afdb826307dc296cc2b39e7a644b0bb265441963348cca42e7785feb29c3aaf18fd2b63131769bf6587
 =======
   checksum: d0c5c73249b8153f4cf872c4fba01c57a7653142a4cad496f17ed03ef3769330a4b3c519b68d70af69d4bb33003d2599b66b2242be85411c0b027ff383619666
 >>>>>>> 01200f59 (fix: upgrade @capacitor/cli from 7.4.3 to 7.4.4)
+=======
+  checksum: d0c5c73249b8153f4cf872c4fba01c57a7653142a4cad496f17ed03ef3769330a4b3c519b68d70af69d4bb33003d2599b66b2242be85411c0b027ff383619666
+>>>>>>> 65f3d625 (fix: upgrade @capacitor/core from 7.4.3 to 7.4.4)
   languageName: node
   linkType: hard
 
@@ -855,7 +896,10 @@ __metadata:
   version: 1.0.14
   resolution: "@inquirer/figures@npm:1.0.14"
   checksum: 39df361eb607cea5a020d457e25f9c6aee3a1de8975c6295a4b3bfe86ba7e7f7bfbefa6a52b145b1790f2690e5c8f10eb822e5bc764aff7ba00a6cd24eec5a25
+<<<<<<< HEAD
 >>>>>>> 01200f59 (fix: upgrade @capacitor/cli from 7.4.3 to 7.4.4)
+=======
+>>>>>>> 65f3d625 (fix: upgrade @capacitor/core from 7.4.3 to 7.4.4)
   languageName: node
   linkType: hard
 
@@ -918,6 +962,7 @@ __metadata:
     "@intlify/shared": "npm:11.1.12"
     source-map-js: "npm:^1.0.2"
   checksum: c659045d7f3c39906098c797dca3821b63b73306c7e28bec9299f17d5f272cbe4ae222475c1650287e8f460439b70b8cfe816d6d23b1c9def5a3e1ea21ef5c29
+<<<<<<< HEAD
   languageName: node
   linkType: hard
 
@@ -928,6 +973,8 @@ __metadata:
     "@intlify/shared": "npm:11.2.2"
     source-map-js: "npm:^1.0.2"
   checksum: 10/ffa1ee37f87e397ca2d59cd6b3382d057cad804501f2c8482ddbeadc2669dfd621d65aee640d1638fbe3802f8815518d962b5c5f42c3b533ee0bf8b317d42143
+=======
+>>>>>>> 65f3d625 (fix: upgrade @capacitor/core from 7.4.3 to 7.4.4)
   languageName: node
   linkType: hard
 
@@ -942,6 +989,7 @@ __metadata:
   version: 11.1.12
   resolution: "@intlify/shared@npm:11.1.12"
   checksum: 121fdef6a1f020c1bd5a838ad9d406b87b3b3455f8ad00ffb59f06c2fee70d0ce0b94d9552fb130e543b33e98a1a5e268583795e2e351e55408031da59c5d515
+<<<<<<< HEAD
   languageName: node
   linkType: hard
 
@@ -949,6 +997,8 @@ __metadata:
   version: 11.2.2
   resolution: "@intlify/shared@npm:11.2.2"
   checksum: 10/d0b91472fc8ecd96509c25633f9cc51c2a009221a3cdd183e8e41a78a00c70ae3095fc8b5c1323dd1a8b3214172433e38946389f6c3a89f61fbaa12a6b950d7d
+=======
+>>>>>>> 65f3d625 (fix: upgrade @capacitor/core from 7.4.3 to 7.4.4)
   languageName: node
   linkType: hard
 
@@ -1272,6 +1322,7 @@ __metadata:
     lru-cache: "npm:^10.0.1"
     socks-proxy-agent: "npm:^8.0.3"
   checksum: 775c9a7eb1f88c195dfb3bce70c31d0fe2a12b28b754e25c08a3edb4bc4816bfedb7ac64ef1e730579d078ca19dacf11630e99f8f3c3e0fd7b23caa5fd6d30a6
+<<<<<<< HEAD
   languageName: node
   linkType: hard
 
@@ -1285,6 +1336,8 @@ __metadata:
     lru-cache: "npm:^11.2.1"
     socks-proxy-agent: "npm:^8.0.3"
   checksum: 10/1a81573becc60515031accc696e6405e9b894e65c12b98ef4aeee03b5617c41948633159dbf6caf5dde5b47367eeb749bdc7b7dfb21960930a9060a935c6f636
+=======
+>>>>>>> 65f3d625 (fix: upgrade @capacitor/core from 7.4.3 to 7.4.4)
   languageName: node
   linkType: hard
 
@@ -1294,6 +1347,7 @@ __metadata:
   dependencies:
     semver: "npm:^7.3.5"
   checksum: 405c4490e1ff11cf299775449a3c254a366a4b1ffc79d87159b0ee7d5558ac9f6a2f8c0735fd6ff3873cef014cb1a44a5f9127cb6a1b2dbc408718cca9365b5a
+<<<<<<< HEAD
   languageName: node
   linkType: hard
 
@@ -1303,6 +1357,8 @@ __metadata:
   dependencies:
     semver: "npm:^7.3.5"
   checksum: 10/4935c7719d17830d0f9fa46c50be17b2a3c945cec61760f6d0909bce47677c42e1810ca673305890f9e84f008ec4d8e841182f371e42100a8159d15f22249208
+=======
+>>>>>>> 65f3d625 (fix: upgrade @capacitor/core from 7.4.3 to 7.4.4)
   languageName: node
   linkType: hard
 
@@ -1660,6 +1716,7 @@ __metadata:
   version: 1.0.0-beta.29
   resolution: "@rolldown/pluginutils@npm:1.0.0-beta.29"
   checksum: 146ba978fbc26ad0baf52e359bd3bc04f37721b9a293b555b60e265d481b3ce34b58fbf6175af4672de04936ac9b919192bdba9f0095bb10aef6424a2cec96f0
+<<<<<<< HEAD
   languageName: node
   linkType: hard
 
@@ -1667,6 +1724,8 @@ __metadata:
   version: 1.0.0-beta.53
   resolution: "@rolldown/pluginutils@npm:1.0.0-beta.53"
   checksum: 10/09dab7cbff3143838310a003ea5e453b219b27d00f34a88efe4c0c4d2540f16d95b770db2be111a424d51947dc3a3598798124e3f3622a99337f7a7c3f6913b2
+=======
+>>>>>>> 65f3d625 (fix: upgrade @capacitor/core from 7.4.3 to 7.4.4)
   languageName: node
   linkType: hard
 
@@ -2010,6 +2069,7 @@ __metadata:
     "@types/range-parser": "npm:*"
     "@types/send": "npm:*"
   checksum: a87830df965fb52eec6390accdba918a6f33f3d6cb96853be2cc2f74829a0bc09a29bddd9699127dbc17a170c7eebbe1294a9db9843b5a34dbc768f9ee844c01
+<<<<<<< HEAD
   languageName: node
   linkType: hard
 
@@ -2022,6 +2082,8 @@ __metadata:
     "@types/range-parser": "npm:*"
     "@types/send": "npm:*"
   checksum: 10/c0b5b7ebc15b222f51e5705da2b8a5180335bf70927cc83c065784331aa9291984db1bfa4a14f5ba31b538dcb543561d9280046051fa4c9b7256eb971293e735
+=======
+>>>>>>> 65f3d625 (fix: upgrade @capacitor/core from 7.4.3 to 7.4.4)
   languageName: node
   linkType: hard
 
@@ -2039,7 +2101,10 @@ __metadata:
     "@types/qs": "npm:*"
     "@types/serve-static": "npm:*"
   checksum: 9497634fc341ff4ac966ec0c529ded03bdacd2c3dae164f10a060ff250c66591b873aedce92d0239869cf3d05615ae9bcad584c7349fe68780242f6fef010c62
+<<<<<<< HEAD
 >>>>>>> 01200f59 (fix: upgrade @capacitor/cli from 7.4.3 to 7.4.4)
+=======
+>>>>>>> 65f3d625 (fix: upgrade @capacitor/core from 7.4.3 to 7.4.4)
   languageName: node
   linkType: hard
 
@@ -2056,7 +2121,10 @@ __metadata:
 =======
     "@types/serve-static": "npm:*"
   checksum: cf4d540bbd90801cdc79a46107b8873404698a7fd0c3e8dd42989d52d3bd7f5b8768672e54c20835e41e27349c319bb47a404ad14c0f8db0e9d055ba1cb8a05b
+<<<<<<< HEAD
 >>>>>>> 01200f59 (fix: upgrade @capacitor/cli from 7.4.3 to 7.4.4)
+=======
+>>>>>>> 65f3d625 (fix: upgrade @capacitor/core from 7.4.3 to 7.4.4)
   languageName: node
   linkType: hard
 
@@ -2121,10 +2189,14 @@ __metadata:
   dependencies:
     "@types/node": "npm:*"
 <<<<<<< HEAD
+<<<<<<< HEAD
   checksum: 10/893e46e12be576baa471cf2fc13a4f0e413eaf30a5850de8fdbea3040e138ad4171234c59b986cf7137ff20a1582b254bf0c44cfd715d5ed772e1ab94dd75cd1
 =======
   checksum: a054ac8f5301acfcfdcec3a775f52dc371180bbe60037906534312f10cceb3799b4a16e46c56c22f9925d078e11dcda1723c38f1ddd124be8169a4cccca69c8c
 >>>>>>> 01200f59 (fix: upgrade @capacitor/cli from 7.4.3 to 7.4.4)
+=======
+  checksum: a054ac8f5301acfcfdcec3a775f52dc371180bbe60037906534312f10cceb3799b4a16e46c56c22f9925d078e11dcda1723c38f1ddd124be8169a4cccca69c8c
+>>>>>>> 65f3d625 (fix: upgrade @capacitor/core from 7.4.3 to 7.4.4)
   languageName: node
   linkType: hard
 
@@ -2184,7 +2256,10 @@ __metadata:
 =======
     undici-types: "npm:~6.21.0"
   checksum: 16d03f30df7851eea4f31d9a2470a53b24dc7d3909ed1782e2538e3aafe398451da17b83d6f730dfdcd0a843ccdbe841176ecfbde6bdb51963e8d11f58a10ade
+<<<<<<< HEAD
 >>>>>>> 01200f59 (fix: upgrade @capacitor/cli from 7.4.3 to 7.4.4)
+=======
+>>>>>>> 65f3d625 (fix: upgrade @capacitor/core from 7.4.3 to 7.4.4)
   languageName: node
   linkType: hard
 
@@ -2203,10 +2278,14 @@ __metadata:
   dependencies:
     undici-types: "npm:~6.21.0"
 <<<<<<< HEAD
+<<<<<<< HEAD
   checksum: 10/a36bdbbf3c3e25bd75454f295b01c72729128a7ab38e99b75dba5fad2ff44fb96179462197345381a086c85de462c10d994fe32868c9a07d42b852566a2e63a7
 =======
   checksum: 4a356321c7759dfafb5c1bce4a9731044c7c447c32f02fda1b0798438bef77dea47673b3e71f0ac028206b741754a1f19b3acd89d517d18bd56064352cf67741
 >>>>>>> 01200f59 (fix: upgrade @capacitor/cli from 7.4.3 to 7.4.4)
+=======
+  checksum: 4a356321c7759dfafb5c1bce4a9731044c7c447c32f02fda1b0798438bef77dea47673b3e71f0ac028206b741754a1f19b3acd89d517d18bd56064352cf67741
+>>>>>>> 65f3d625 (fix: upgrade @capacitor/core from 7.4.3 to 7.4.4)
   languageName: node
   linkType: hard
 
@@ -2216,10 +2295,14 @@ __metadata:
   dependencies:
     undici-types: "npm:~6.21.0"
 <<<<<<< HEAD
+<<<<<<< HEAD
   checksum: 10/ffee06ce6d741fde98a40bc65a57394ed2283c521f57f9143d2356513181162bd4108809be6902a861d098b35e35569f61f14c64d3032e48a0289b74f917669a
 =======
   checksum: 787049231bf4655d57e6deb7e7be46da6b476f29f8184b470e49ce7db45acfd0ad106b67c4f4b09b77f205c83b6b0a0b3d6a69ba17c28a155d3ec4a608eb332d
 >>>>>>> 01200f59 (fix: upgrade @capacitor/cli from 7.4.3 to 7.4.4)
+=======
+  checksum: 787049231bf4655d57e6deb7e7be46da6b476f29f8184b470e49ce7db45acfd0ad106b67c4f4b09b77f205c83b6b0a0b3d6a69ba17c28a155d3ec4a608eb332d
+>>>>>>> 65f3d625 (fix: upgrade @capacitor/core from 7.4.3 to 7.4.4)
   languageName: node
   linkType: hard
 
@@ -2229,10 +2312,14 @@ __metadata:
   dependencies:
     "@types/node": "npm:*"
 <<<<<<< HEAD
+<<<<<<< HEAD
   checksum: 10/35c38d8c789a0512465665fa6472e8eda7a20413227aafc25b55955a0ced8a061dfbeb0c75658393ebe61670cb95064cc3753ce1a0bac93a12c53ff569d15170
 =======
   checksum: 5428bbd403cc870d50cdafc46162bbc02ae174aebdcc35738364e91f7eeea6d0197b3735d6ff0332404e05421e15f789461c1a60a8eee6269c3ce0b5d73fe6ab
 >>>>>>> 01200f59 (fix: upgrade @capacitor/cli from 7.4.3 to 7.4.4)
+=======
+  checksum: 5428bbd403cc870d50cdafc46162bbc02ae174aebdcc35738364e91f7eeea6d0197b3735d6ff0332404e05421e15f789461c1a60a8eee6269c3ce0b5d73fe6ab
+>>>>>>> 65f3d625 (fix: upgrade @capacitor/core from 7.4.3 to 7.4.4)
   languageName: node
   linkType: hard
 
@@ -2275,10 +2362,14 @@ __metadata:
   dependencies:
     "@types/node": "npm:*"
 <<<<<<< HEAD
+<<<<<<< HEAD
   checksum: 10/81ef5790037ba1d2d458392e4241501f0f8b4838cc8797e169e179e099410e12069ec68e8dbd39211cb097c4a9b1ff1682dbcea897ab4ce21dad93438b862d27
 =======
   checksum: 11b4a178902deae8743e92a12ce0821200c285a75fade3b44ca5ee66f65997cd9ce86006622f0a1adaef8fa5272ac06bf464fab34089e36dca8e57197ff32544
 >>>>>>> 01200f59 (fix: upgrade @capacitor/cli from 7.4.3 to 7.4.4)
+=======
+  checksum: 11b4a178902deae8743e92a12ce0821200c285a75fade3b44ca5ee66f65997cd9ce86006622f0a1adaef8fa5272ac06bf464fab34089e36dca8e57197ff32544
+>>>>>>> 65f3d625 (fix: upgrade @capacitor/core from 7.4.3 to 7.4.4)
   languageName: node
   linkType: hard
 
@@ -2289,10 +2380,14 @@ __metadata:
     "@types/mime": "npm:^1"
     "@types/node": "npm:*"
 <<<<<<< HEAD
+<<<<<<< HEAD
   checksum: 10/4948ab32ab84a81a0073f8243dd48ee766bc80608d5391060360afd1249f83c08a7476f142669ac0b0b8831c89d909a88bcb392d1b39ee48b276a91b50f3d8d1
 =======
   checksum: b68ae8f9ba9328a4f276cd010914ed43b96371fbf34c7aa08a9111bff36661810bb14b96647e4a92e319dbd2689dc107fb0f9194ec3fa9335c162dc134026240
 >>>>>>> 01200f59 (fix: upgrade @capacitor/cli from 7.4.3 to 7.4.4)
+=======
+  checksum: b68ae8f9ba9328a4f276cd010914ed43b96371fbf34c7aa08a9111bff36661810bb14b96647e4a92e319dbd2689dc107fb0f9194ec3fa9335c162dc134026240
+>>>>>>> 65f3d625 (fix: upgrade @capacitor/core from 7.4.3 to 7.4.4)
   languageName: node
   linkType: hard
 
@@ -2303,6 +2398,7 @@ __metadata:
     "@types/http-errors": "npm:*"
     "@types/node": "npm:*"
     "@types/send": "npm:<1"
+<<<<<<< HEAD
 <<<<<<< HEAD
   checksum: 10/d9be72487540b9598e7d77260d533f241eb2e5db5181bb885ef2d6bc4592dad1c9e8c0e27f465d59478b2faf90edd2d535e834f20fbd9dd3c0928d43dc486404
   languageName: node
@@ -2318,6 +2414,9 @@ __metadata:
 =======
   checksum: 5b7a24c1e5fb474ae539165451dae4e3e85e104d9935562de9c5f0c6b2557395aefe6fdbaf094178ea94d58fd9f26e9605a51ccaf101655fcda18971840c06ad
 >>>>>>> 01200f59 (fix: upgrade @capacitor/cli from 7.4.3 to 7.4.4)
+=======
+  checksum: 5b7a24c1e5fb474ae539165451dae4e3e85e104d9935562de9c5f0c6b2557395aefe6fdbaf094178ea94d58fd9f26e9605a51ccaf101655fcda18971840c06ad
+>>>>>>> 65f3d625 (fix: upgrade @capacitor/core from 7.4.3 to 7.4.4)
   languageName: node
   linkType: hard
 
@@ -2389,10 +2488,14 @@ __metadata:
     eslint: ^8.57.0 || ^9.0.0
     typescript: ">=4.8.4 <6.0.0"
 <<<<<<< HEAD
+<<<<<<< HEAD
   checksum: 10/e35e7857c9e88aa075307c1775ebf009956cd226e8f76df9144799b32120274fd4470408777e60b84bdedc675cf863f108abda5fb6f9be61d06d0316bf427b57
 =======
   checksum: 9fd8c279584e11c7dcfcac6dddc4dde8719f8fe79349f5a2d0473ffcee198dd543a5311b24c601228ae03cc1a47b29118261bcf45f7f697c8ba1e4289fda4096
 >>>>>>> 01200f59 (fix: upgrade @capacitor/cli from 7.4.3 to 7.4.4)
+=======
+  checksum: 9fd8c279584e11c7dcfcac6dddc4dde8719f8fe79349f5a2d0473ffcee198dd543a5311b24c601228ae03cc1a47b29118261bcf45f7f697c8ba1e4289fda4096
+>>>>>>> 65f3d625 (fix: upgrade @capacitor/core from 7.4.3 to 7.4.4)
   languageName: node
   linkType: hard
 
@@ -2425,10 +2528,14 @@ __metadata:
     eslint: ^8.57.0 || ^9.0.0
     typescript: ">=4.8.4 <6.0.0"
 <<<<<<< HEAD
+<<<<<<< HEAD
   checksum: 10/4c3a1011f9122def7b184cdbbc93f2be4167adda787085edb9cee9493957625b0611c0000b8e6d9c6003a0ad2945f2e7db56b31649f03e4c58a59c4d310234b6
 =======
   checksum: 4edcb49bb001e9a0e72155c4181f941be00c603bf277c283d4185dca528e9642da927032e8d2671c444ca1904c7f51743029b4b48c12e94d39df2dac49d7d3ff
 >>>>>>> 01200f59 (fix: upgrade @capacitor/cli from 7.4.3 to 7.4.4)
+=======
+  checksum: 4edcb49bb001e9a0e72155c4181f941be00c603bf277c283d4185dca528e9642da927032e8d2671c444ca1904c7f51743029b4b48c12e94d39df2dac49d7d3ff
+>>>>>>> 65f3d625 (fix: upgrade @capacitor/core from 7.4.3 to 7.4.4)
   languageName: node
   linkType: hard
 
@@ -2442,10 +2549,14 @@ __metadata:
   peerDependencies:
     typescript: ">=4.8.4 <6.0.0"
 <<<<<<< HEAD
+<<<<<<< HEAD
   checksum: 10/d503d270bf62750d96caafa1635297b4be35176361f6f27b30f25ca5b476145d74c914da3ec8f5fc88ee646aa2d809becbe509a81650fd2b2a74179956371329
 =======
   checksum: d63cbb88524be85ba626c4969bdec1cd5c1ab64b6ebdd565a45698e700efb764f192db1cdc3322f4d63d3acd8d0a36e2685b89bdfa2edf50fda3c2d0cb6efdd7
 >>>>>>> 01200f59 (fix: upgrade @capacitor/cli from 7.4.3 to 7.4.4)
+=======
+  checksum: d63cbb88524be85ba626c4969bdec1cd5c1ab64b6ebdd565a45698e700efb764f192db1cdc3322f4d63d3acd8d0a36e2685b89bdfa2edf50fda3c2d0cb6efdd7
+>>>>>>> 65f3d625 (fix: upgrade @capacitor/core from 7.4.3 to 7.4.4)
   languageName: node
   linkType: hard
 
@@ -2471,7 +2582,10 @@ __metadata:
     "@typescript-eslint/types": "npm:8.46.1"
     "@typescript-eslint/visitor-keys": "npm:8.46.1"
   checksum: 3d73812087a17be84184cc68143d4dca7602b8cd4bf5ad334e541d4b3acf5c65c58935369dcf66ab81b38014fe0c6bc57ac2f655fdd69b3e24161a827b86bd34
+<<<<<<< HEAD
 >>>>>>> 01200f59 (fix: upgrade @capacitor/cli from 7.4.3 to 7.4.4)
+=======
+>>>>>>> 65f3d625 (fix: upgrade @capacitor/core from 7.4.3 to 7.4.4)
   languageName: node
   linkType: hard
 
@@ -2481,10 +2595,14 @@ __metadata:
   peerDependencies:
     typescript: ">=4.8.4 <6.0.0"
 <<<<<<< HEAD
+<<<<<<< HEAD
   checksum: 10/d43caece5c42db7561bcd49c0d3d829abd3ba8faf2d20eb57c60ddd0248afe6df76a5f1f11ec9d6b84153e0bb9e4f92929d6fd83789b520bc64fc51a69b68ba2
 =======
   checksum: f033d68a53f62c7cc4c09e5697dd9b7fa34a3c3e79133e0b14ca582821869b77e81d3942b91535f6ef789ffaaad31eef1e1ace20518e7de0935a55a16120fae7
 >>>>>>> 01200f59 (fix: upgrade @capacitor/cli from 7.4.3 to 7.4.4)
+=======
+  checksum: f033d68a53f62c7cc4c09e5697dd9b7fa34a3c3e79133e0b14ca582821869b77e81d3942b91535f6ef789ffaaad31eef1e1ace20518e7de0935a55a16120fae7
+>>>>>>> 65f3d625 (fix: upgrade @capacitor/core from 7.4.3 to 7.4.4)
   languageName: node
   linkType: hard
 
@@ -2516,10 +2634,14 @@ __metadata:
     eslint: ^8.57.0 || ^9.0.0
     typescript: ">=4.8.4 <6.0.0"
 <<<<<<< HEAD
+<<<<<<< HEAD
   checksum: 10/60ea2500f8dcf1093ec49ffaa3063fb207c482f8fd88b8cde737e10aa67cf2bd49e5052623a6f4b4f7e1569c282b8eadb44ed3f34074ed56c1bd50167d00f61a
 =======
   checksum: db989c1f55624b34da24eaf0dc230ee696a1f2a614ea95a8dd3b8635ad47d748140be2345ed7afcee844dfabd41129f5a8ca583b1a4d6ecc7d581f89c5e508e2
 >>>>>>> 01200f59 (fix: upgrade @capacitor/cli from 7.4.3 to 7.4.4)
+=======
+  checksum: db989c1f55624b34da24eaf0dc230ee696a1f2a614ea95a8dd3b8635ad47d748140be2345ed7afcee844dfabd41129f5a8ca583b1a4d6ecc7d581f89c5e508e2
+>>>>>>> 65f3d625 (fix: upgrade @capacitor/core from 7.4.3 to 7.4.4)
   languageName: node
   linkType: hard
 
@@ -2540,7 +2662,10 @@ __metadata:
   version: 8.46.1
   resolution: "@typescript-eslint/types@npm:8.46.1"
   checksum: d162ddf6d77d8c9bdfca942da5de5fb4ba80efa740b14077482b5a71282f1d05e1b1dd393ae810eb2923ca9c845bd26b4a9d2dbf25d43dd5d9cb6e20c2a1db46
+<<<<<<< HEAD
 >>>>>>> 01200f59 (fix: upgrade @capacitor/cli from 7.4.3 to 7.4.4)
+=======
+>>>>>>> 65f3d625 (fix: upgrade @capacitor/core from 7.4.3 to 7.4.4)
   languageName: node
   linkType: hard
 
@@ -2578,10 +2703,14 @@ __metadata:
   peerDependencies:
     typescript: ">=4.8.4 <6.0.0"
 <<<<<<< HEAD
+<<<<<<< HEAD
   checksum: 10/824df4f062f8d3c512bc6eb70b4cc84cd72329f312c8c10628d66771efc74b2d5e2f2096a52438e0decc231fedf81ade9f07fe8cfb3b19325750256ea61c11c0
 =======
   checksum: af068a14d6d0b4849e9f0e52b7ddcd24c266f099528c7b62ff2bebebc0fb82d07439bf6dc565b27cf2fed0af0aaae618aae220676d0fb041c93ec2a8163f0da1
 >>>>>>> 01200f59 (fix: upgrade @capacitor/cli from 7.4.3 to 7.4.4)
+=======
+  checksum: af068a14d6d0b4849e9f0e52b7ddcd24c266f099528c7b62ff2bebebc0fb82d07439bf6dc565b27cf2fed0af0aaae618aae220676d0fb041c93ec2a8163f0da1
+>>>>>>> 65f3d625 (fix: upgrade @capacitor/core from 7.4.3 to 7.4.4)
   languageName: node
   linkType: hard
 
@@ -2612,10 +2741,14 @@ __metadata:
     eslint: ^8.57.0 || ^9.0.0
     typescript: ">=4.8.4 <6.0.0"
 <<<<<<< HEAD
+<<<<<<< HEAD
   checksum: 10/796899c1b7d7559734d50a64bf1f78a7e10325f66af10749410e037e299c9bce583cc04a3c957819edadbfd5726d643dc44ca3d6b4767d99aebeb0e8ed657d53
 =======
   checksum: a8fed8aebd34a559c5abd780649edd6be632531e4930b19642f0fdc862b77bff463ef200e8ced48ba489c3fceee7443b6735c87b918b97b98e95e842cd8a38b5
 >>>>>>> 01200f59 (fix: upgrade @capacitor/cli from 7.4.3 to 7.4.4)
+=======
+  checksum: a8fed8aebd34a559c5abd780649edd6be632531e4930b19642f0fdc862b77bff463ef200e8ced48ba489c3fceee7443b6735c87b918b97b98e95e842cd8a38b5
+>>>>>>> 65f3d625 (fix: upgrade @capacitor/core from 7.4.3 to 7.4.4)
   languageName: node
   linkType: hard
 
@@ -2636,10 +2769,14 @@ __metadata:
     "@typescript-eslint/types": "npm:8.50.0"
     eslint-visitor-keys: "npm:^4.2.1"
 <<<<<<< HEAD
+<<<<<<< HEAD
   checksum: 10/45703f0899a5627dabb22d7fbc83d1d771e8238bf8ffe712dfaf255140ba248a019829824396420e239737cde897723971d62c48d321aa59e5aae9f186ff87cd
 =======
   checksum: eed1c5ce08d2743bd2ec95a33f2118a67596b1b9fa5bf6a3d84ed09ca66e09af3cc91ef3e302c2222e5882e13576340532b586030b3652ce046eb218cd4508b7
 >>>>>>> 01200f59 (fix: upgrade @capacitor/cli from 7.4.3 to 7.4.4)
+=======
+  checksum: eed1c5ce08d2743bd2ec95a33f2118a67596b1b9fa5bf6a3d84ed09ca66e09af3cc91ef3e302c2222e5882e13576340532b586030b3652ce046eb218cd4508b7
+>>>>>>> 65f3d625 (fix: upgrade @capacitor/core from 7.4.3 to 7.4.4)
   languageName: node
   linkType: hard
 
@@ -2652,6 +2789,7 @@ __metadata:
     vite: ^5.0.0 || ^6.0.0 || ^7.0.0
     vue: ^3.2.25
   checksum: e5214b86a0ab3aa6713176d89f1f3e79ed2ae39f7ebc3b5222984229e8edeb21fa840416e337625306fa37365aa6570f6cffdccb2a0d0ed3ba8285048dcb3d76
+<<<<<<< HEAD
   languageName: node
   linkType: hard
 
@@ -2664,6 +2802,8 @@ __metadata:
     vite: ^5.0.0 || ^6.0.0 || ^7.0.0 || ^8.0.0-0
     vue: ^3.2.25
   checksum: 10/8cfece8ed0c6452faeda15d8ada398f6717b9adc357d56e2ed39f6150796a889b0a943d8b88cdaf779e54f1d7eb5160ae4b445184b747a6c99405173fd34f6e3
+=======
+>>>>>>> 65f3d625 (fix: upgrade @capacitor/core from 7.4.3 to 7.4.4)
   languageName: node
   linkType: hard
 
@@ -2727,6 +2867,7 @@ __metadata:
     "@vue/compiler-core": "npm:3.5.22"
     "@vue/shared": "npm:3.5.22"
   checksum: 32c22faa8d0167541b6590c0610adde2f733debe9f58271b39695ec2dc3ab149b34a2066b72c8ddb53f3722b731ef02556af40a998b4059048b4879e64710b77
+<<<<<<< HEAD
   languageName: node
   linkType: hard
 
@@ -2737,6 +2878,8 @@ __metadata:
     "@vue/compiler-core": "npm:3.5.25"
     "@vue/shared": "npm:3.5.25"
   checksum: 10/aa04f8c87e5f3333375e546fb8dd77e5afba159965ba8f3c8b8216b95f2202bb08acdf014185ac81afdbf69c31c56cefda85a40a14233355ea1ac63aa9f146c2
+=======
+>>>>>>> 65f3d625 (fix: upgrade @capacitor/core from 7.4.3 to 7.4.4)
   languageName: node
   linkType: hard
 
@@ -2754,6 +2897,7 @@ __metadata:
     postcss: "npm:^8.5.6"
     source-map-js: "npm:^1.2.1"
   checksum: 490cc5b604c3de9de46784c9b49b35bc49e5d7884b24d180d7b3719fec903d5348d6a6b73087c77c786b648d706d16ae9a16cf937d2a98d821bd3c1c2000afc3
+<<<<<<< HEAD
   languageName: node
   linkType: hard
 
@@ -2771,6 +2915,8 @@ __metadata:
     postcss: "npm:^8.5.6"
     source-map-js: "npm:^1.2.1"
   checksum: 10/08bafc59929ba1841a94bd9e2cdd22d494a8db34d6fa1c00e66cb6ae437e3567387da778551ea3424b8aca6e2ddc0e17202288d473ea0c0554448da4ac8eafd6
+=======
+>>>>>>> 65f3d625 (fix: upgrade @capacitor/core from 7.4.3 to 7.4.4)
   languageName: node
   linkType: hard
 
@@ -2781,6 +2927,7 @@ __metadata:
     "@vue/compiler-dom": "npm:3.5.22"
     "@vue/shared": "npm:3.5.22"
   checksum: 78a0b687736861e5e97623a91a329252613ce9b69097371650efe5cfbee5ab22e34b165b68affa6e717b1f7d43c8990df93e1d1136c482fdd85a739137db81e4
+<<<<<<< HEAD
   languageName: node
   linkType: hard
 
@@ -2791,6 +2938,8 @@ __metadata:
     "@vue/compiler-dom": "npm:3.5.25"
     "@vue/shared": "npm:3.5.25"
   checksum: 10/9a485194747ebf38232453173d84eb3f69e59e378d6e81fba61f4999d72226ecc496c1cdbafc3b977786add9f7cab27e40e2a456089f6edbf2164b416375b43f
+=======
+>>>>>>> 65f3d625 (fix: upgrade @capacitor/core from 7.4.3 to 7.4.4)
   languageName: node
   linkType: hard
 
@@ -2811,7 +2960,10 @@ __metadata:
 =======
     "@vue/devtools-kit": "npm:^7.7.7"
   checksum: 065dc99b61fd80c0c30420ebafb569dc3a49ee7a4f91dd970e0f8634029cf436312926cb25e4812765f1b428f16aff9d8bce14bde52969703cf309cc008a67ba
+<<<<<<< HEAD
 >>>>>>> 01200f59 (fix: upgrade @capacitor/cli from 7.4.3 to 7.4.4)
+=======
+>>>>>>> 65f3d625 (fix: upgrade @capacitor/core from 7.4.3 to 7.4.4)
   languageName: node
   linkType: hard
 
@@ -2828,10 +2980,14 @@ __metadata:
   peerDependencies:
     vue: ^3.0.0
 <<<<<<< HEAD
+<<<<<<< HEAD
   checksum: 10/8ef72aae2780d184df20b147358f0c8b0036d18c1ffe4419f8d6c779e58e4bc0554c1bd4083701a192ea065be04e1697226f764681550772ba3af7c823f68ee7
 =======
   checksum: 4cfc6d41eb8c432b9e7903dce90af898cddef58f31f03f887d2783078892094f3bf8d225bdb67c200dca19452aef93af5d34be7ecad83f985fa7dc907b6ef7bd
 >>>>>>> 01200f59 (fix: upgrade @capacitor/cli from 7.4.3 to 7.4.4)
+=======
+  checksum: 4cfc6d41eb8c432b9e7903dce90af898cddef58f31f03f887d2783078892094f3bf8d225bdb67c200dca19452aef93af5d34be7ecad83f985fa7dc907b6ef7bd
+>>>>>>> 65f3d625 (fix: upgrade @capacitor/core from 7.4.3 to 7.4.4)
   languageName: node
   linkType: hard
 
@@ -2848,10 +3004,14 @@ __metadata:
     socket.io: "npm:^4.8.1"
     socket.io-client: "npm:^4.8.1"
 <<<<<<< HEAD
+<<<<<<< HEAD
   checksum: 10/a0823381d952762c30191fdce5341cd9068a0fa146e81f10d6760fd8df42e20c8a91c00af992a0ef3532fb73f97743f597bbf49b4d8aa7df2213a7a7a2fd9920
 =======
   checksum: f548838d03a72923bd142d499ea623e3db16a44b823379b039c668a1a9b70863e87b5a74cc280a27a2248557b38358ac66030548fe379387335699e36836efb9
 >>>>>>> 01200f59 (fix: upgrade @capacitor/cli from 7.4.3 to 7.4.4)
+=======
+  checksum: f548838d03a72923bd142d499ea623e3db16a44b823379b039c668a1a9b70863e87b5a74cc280a27a2248557b38358ac66030548fe379387335699e36836efb9
+>>>>>>> 65f3d625 (fix: upgrade @capacitor/core from 7.4.3 to 7.4.4)
   languageName: node
   linkType: hard
 
@@ -2867,10 +3027,14 @@ __metadata:
     speakingurl: "npm:^14.0.1"
     superjson: "npm:^2.2.2"
 <<<<<<< HEAD
+<<<<<<< HEAD
   checksum: 10/d2fb4360464cda8bda06808bd537252de457be1bfecff20e88ea9136f76455d8e3fbfe58c9392c1fad4033e7eb5a9d4b09a9fc951ab98682ef4bc2fa2e26ebc8
 =======
   checksum: 3dbd2413fdbf3b15bcebdfb7d031930e04a676f6b1cd3e46850547666cf9691d87862cd2286640ec7f1f565807909f65a9f3443564dfabe13e6829f6bb81d1fd
 >>>>>>> 01200f59 (fix: upgrade @capacitor/cli from 7.4.3 to 7.4.4)
+=======
+  checksum: 3dbd2413fdbf3b15bcebdfb7d031930e04a676f6b1cd3e46850547666cf9691d87862cd2286640ec7f1f565807909f65a9f3443564dfabe13e6829f6bb81d1fd
+>>>>>>> 65f3d625 (fix: upgrade @capacitor/core from 7.4.3 to 7.4.4)
   languageName: node
   linkType: hard
 
@@ -2886,10 +3050,14 @@ __metadata:
     speakingurl: "npm:^14.0.1"
     superjson: "npm:^2.2.2"
 <<<<<<< HEAD
+<<<<<<< HEAD
   checksum: 10/c0f6d4c3945fd88f4aa08d8ec1a49aee4e518a575c01f0c592146d64fad0a6f013d4d7e1f5d32291d9a35ef958baa0b1d274dda4ea3cfe8b5c496cf0f19c6eea
 =======
   checksum: 1a0a0702de1f80b6f5342df0da2e8b9dbd14224494c4097b7156b6123e1f3535de9efc0d06a2575907b25caad6118e08fefd8ec054cf3a36bac1accccba87759
 >>>>>>> 01200f59 (fix: upgrade @capacitor/cli from 7.4.3 to 7.4.4)
+=======
+  checksum: 1a0a0702de1f80b6f5342df0da2e8b9dbd14224494c4097b7156b6123e1f3535de9efc0d06a2575907b25caad6118e08fefd8ec054cf3a36bac1accccba87759
+>>>>>>> 65f3d625 (fix: upgrade @capacitor/core from 7.4.3 to 7.4.4)
   languageName: node
   linkType: hard
 
@@ -2899,10 +3067,14 @@ __metadata:
   dependencies:
     rfdc: "npm:^1.4.1"
 <<<<<<< HEAD
+<<<<<<< HEAD
   checksum: 10/0d722ce0cb6d70036adcf3b6a7a235dcc7f170bde64ace49e9f7b714d8d8ab72a9cefbefdefa05c8a3d5df4b1e08e00a2d9aa5e65b9de723f907bed3f255ba8a
 =======
   checksum: 53be6fe6f518667d8c3bddbdc83f7ffa7f966b8202aa5c405718717008c8a9cbe3b0939d9bf7c5d8e9577e1968ebf597a343457cfe6848abf2b4e237653ef887
 >>>>>>> 01200f59 (fix: upgrade @capacitor/cli from 7.4.3 to 7.4.4)
+=======
+  checksum: 53be6fe6f518667d8c3bddbdc83f7ffa7f966b8202aa5c405718717008c8a9cbe3b0939d9bf7c5d8e9577e1968ebf597a343457cfe6848abf2b4e237653ef887
+>>>>>>> 65f3d625 (fix: upgrade @capacitor/core from 7.4.3 to 7.4.4)
   languageName: node
   linkType: hard
 
@@ -2912,10 +3084,14 @@ __metadata:
   dependencies:
     rfdc: "npm:^1.4.1"
 <<<<<<< HEAD
+<<<<<<< HEAD
   checksum: 10/bd91bb9946c12bb6bc16030669b6b3458ad0d0ca653ac8f5e88a0bb33b19ae74cd207ad04bf16d72fdb4792b24b596e1513c891c8db16b2fe6c6c82f63d67380
 =======
   checksum: 44ec00af847e1d4226401bb137ca71cf156644ad8041f55f141ddd10bcbdd71920d4e40e3d7108a6baeba7b197f6406598f39c3ec7f3266e8a185918f4eef61a
 >>>>>>> 01200f59 (fix: upgrade @capacitor/cli from 7.4.3 to 7.4.4)
+=======
+  checksum: 44ec00af847e1d4226401bb137ca71cf156644ad8041f55f141ddd10bcbdd71920d4e40e3d7108a6baeba7b197f6406598f39c3ec7f3266e8a185918f4eef61a
+>>>>>>> 65f3d625 (fix: upgrade @capacitor/core from 7.4.3 to 7.4.4)
   languageName: node
   linkType: hard
 
@@ -2989,6 +3165,7 @@ __metadata:
   dependencies:
     "@vue/shared": "npm:3.5.22"
   checksum: 7c440253f417831f9dba5d1570fa504ba08a4a1fcb248f82af175db70cc5f7d7ccf4e6b8717cc2b68d962e39b6a1acccec6758763e5214539f2c09f9a65b87f2
+<<<<<<< HEAD
   languageName: node
   linkType: hard
 
@@ -2998,6 +3175,8 @@ __metadata:
   dependencies:
     "@vue/shared": "npm:3.5.25"
   checksum: 10/50d5cb1f4e0619fd77393a307b59cc1ba682e89a5052acb1703d33cb521ddc97702b8539fc1c7ebcc9ff38a145dccd469e7187bb7337dacb85c53329e72ea7df
+=======
+>>>>>>> 65f3d625 (fix: upgrade @capacitor/core from 7.4.3 to 7.4.4)
   languageName: node
   linkType: hard
 
@@ -3008,6 +3187,7 @@ __metadata:
     "@vue/reactivity": "npm:3.5.22"
     "@vue/shared": "npm:3.5.22"
   checksum: fefe58ca27eb65988abbf39237599df8690474800b9ad525ba8928594b06e44abbdf4ac0cb0f6a3579af69c8b77e84e2cd628ae6f6f21935aa6366e3b280abd1
+<<<<<<< HEAD
   languageName: node
   linkType: hard
 
@@ -3018,6 +3198,8 @@ __metadata:
     "@vue/reactivity": "npm:3.5.25"
     "@vue/shared": "npm:3.5.25"
   checksum: 10/4491495fdbf2bc24e73aefbba6756ecf22d42bf5a611c1a84418328e724af3b1ae2a2083e7347a0215db8ebe9a07920286cafc1e66d3c56baa133091046df816
+=======
+>>>>>>> 65f3d625 (fix: upgrade @capacitor/core from 7.4.3 to 7.4.4)
   languageName: node
   linkType: hard
 
@@ -3030,6 +3212,7 @@ __metadata:
     "@vue/shared": "npm:3.5.22"
     csstype: "npm:^3.1.3"
   checksum: b4e7422c6daa6320425d7d87613ceffd993fb72db71663ecd6f189d9dee38a6aa2eb0438e2535cceb198b5e1127d59583bfd94dfaeb03bec4f7ac0fb33d9df22
+<<<<<<< HEAD
   languageName: node
   linkType: hard
 
@@ -3042,6 +3225,8 @@ __metadata:
     "@vue/shared": "npm:3.5.25"
     csstype: "npm:^3.1.3"
   checksum: 10/07eb65bff96c3bb9cab9f4b52896d804a2fe811d8056d3dc1ea1b8b751d0b72f5b9f6eeac65ce16dc0f593c633f6c31f54bc61698d83e3b888dbb7832a1807b3
+=======
+>>>>>>> 65f3d625 (fix: upgrade @capacitor/core from 7.4.3 to 7.4.4)
   languageName: node
   linkType: hard
 
@@ -3073,6 +3258,7 @@ __metadata:
   version: 3.5.22
   resolution: "@vue/shared@npm:3.5.22"
   checksum: 8dac35e4ed992da493db8a7430e7c1a09aae1029771e3e7fd3cf2ec64a039f989baef52a47c2864041b01f3de822518c55954bc1c1f2de69690d28761197467d
+<<<<<<< HEAD
   languageName: node
   linkType: hard
 
@@ -3080,6 +3266,8 @@ __metadata:
   version: 3.5.25
   resolution: "@vue/shared@npm:3.5.25"
   checksum: 10/8f5102be5e8dec105df6409e048549c7887bd09a23b4253e26bf14ddcafa9648783785c2334d243c6b54fbbfc297ce5c254c6646a7ef2b42899e3784155be277
+=======
+>>>>>>> 65f3d625 (fix: upgrade @capacitor/core from 7.4.3 to 7.4.4)
   languageName: node
   linkType: hard
 
@@ -3094,6 +3282,7 @@ __metadata:
   version: 3.0.1
   resolution: "abbrev@npm:3.0.1"
   checksum: ebd2c149dda6f543b66ce3779ea612151bb3aa9d0824f169773ee9876f1ca5a4e0adbcccc7eed048c04da7998e1825e2aa76fcca92d9e67dea50ac2b0a58dc2e
+<<<<<<< HEAD
   languageName: node
   linkType: hard
 
@@ -3101,6 +3290,8 @@ __metadata:
   version: 4.0.0
   resolution: "abbrev@npm:4.0.0"
   checksum: 10/e2f0c6a6708ad738b3e8f50233f4800de31ad41a6cdc50e0cbe51b76fed69fd0213516d92c15ce1a9985fca71a14606a9be22bf00f8475a58987b9bfb671c582
+=======
+>>>>>>> 65f3d625 (fix: upgrade @capacitor/core from 7.4.3 to 7.4.4)
   languageName: node
   linkType: hard
 
@@ -3178,7 +3369,10 @@ __metadata:
   version: 3.0.1
   resolution: "alien-signals@npm:3.0.1"
   checksum: f142f97d6cea56d0ac99ede8f455835cce7aa7ed7988624e67e8660e9e8514ad04472e9e7864e4509ea6322d47f7f02a5c16d37d0a4761bd8fa5cb6cd0662139
+<<<<<<< HEAD
 >>>>>>> 01200f59 (fix: upgrade @capacitor/cli from 7.4.3 to 7.4.4)
+=======
+>>>>>>> 65f3d625 (fix: upgrade @capacitor/core from 7.4.3 to 7.4.4)
   languageName: node
   linkType: hard
 
@@ -3502,10 +3696,14 @@ __metadata:
     form-data: "npm:^4.0.4"
     proxy-from-env: "npm:^1.1.0"
 <<<<<<< HEAD
+<<<<<<< HEAD
   checksum: 10/8046c15f3ffb5d5d45ce33074f69a9226d4c4312b205307d8a8f0d38bd549fdec7612b307a092b82d7af51d8f3a211ae27589f56a65643655acd01c6ee9bfdac
 =======
   checksum: 886a79770594eaad76493fecf90344b567bd956240609b5dcd09bd0afe8d3e6f1ad6d3257a93a483b6192b409d4b673d9515a34619e3e3ed1b2c0ec2a83b20ba
 >>>>>>> 01200f59 (fix: upgrade @capacitor/cli from 7.4.3 to 7.4.4)
+=======
+  checksum: 886a79770594eaad76493fecf90344b567bd956240609b5dcd09bd0afe8d3e6f1ad6d3257a93a483b6192b409d4b673d9515a34619e3e3ed1b2c0ec2a83b20ba
+>>>>>>> 65f3d625 (fix: upgrade @capacitor/core from 7.4.3 to 7.4.4)
   languageName: node
   linkType: hard
 
@@ -3537,10 +3735,14 @@ __metadata:
     bare-abort-controller:
       optional: true
 <<<<<<< HEAD
+<<<<<<< HEAD
   checksum: 10/f31848ea2f5627c3a50aadfc17e518a602629f7a6671da1352975cc6c8a520441fcc9d93c0a21f8f95de65b1a5133fcd5f766d312f3d5a326dde4fe7d2fc575f
 =======
   checksum: 3b3330593daa5bcbae9d62696cc6b77883c99f551412bd03cc7aee6ff5e5a8ea1a442069642b3c45c3dcdadbb732028f173ea2aaf9d418a19df3262b681bf9b6
 >>>>>>> 01200f59 (fix: upgrade @capacitor/cli from 7.4.3 to 7.4.4)
+=======
+  checksum: 3b3330593daa5bcbae9d62696cc6b77883c99f551412bd03cc7aee6ff5e5a8ea1a442069642b3c45c3dcdadbb732028f173ea2aaf9d418a19df3262b681bf9b6
+>>>>>>> 65f3d625 (fix: upgrade @capacitor/core from 7.4.3 to 7.4.4)
   languageName: node
   linkType: hard
 
@@ -3564,10 +3766,14 @@ __metadata:
   bin:
     baseline-browser-mapping: dist/cli.js
 <<<<<<< HEAD
+<<<<<<< HEAD
   checksum: 10/1c9cf2fb0cc008ba86d5f1bd1f1a771d6f508dbd6124d173549c650734d6d305eba49622e8bc0160beea9ecafcd2f5f104ffdc92f4a815a4926b74a2d7a6d986
 =======
   checksum: 073e2548e0036e96f49644b94ba15e30ad273c5b2c314102c7b1473cd65c33878347e49185a4fc38fb1742957132c894f1229de1006924135f9e90c434601d1f
 >>>>>>> 01200f59 (fix: upgrade @capacitor/cli from 7.4.3 to 7.4.4)
+=======
+  checksum: 073e2548e0036e96f49644b94ba15e30ad273c5b2c314102c7b1473cd65c33878347e49185a4fc38fb1742957132c894f1229de1006924135f9e90c434601d1f
+>>>>>>> 65f3d625 (fix: upgrade @capacitor/core from 7.4.3 to 7.4.4)
   languageName: node
   linkType: hard
 
@@ -3601,7 +3807,10 @@ __metadata:
   version: 2.6.1
   resolution: "birpc@npm:2.6.1"
   checksum: 1600aa0f8688cc63ecc4650021dcda274d116384848a0daa58d55aa4b56eb382d382b7309b24d32a1ef16ef1a05d403e32492a6b702a445472adf9fe86649f9f
+<<<<<<< HEAD
 >>>>>>> 01200f59 (fix: upgrade @capacitor/cli from 7.4.3 to 7.4.4)
+=======
+>>>>>>> 65f3d625 (fix: upgrade @capacitor/core from 7.4.3 to 7.4.4)
   languageName: node
   linkType: hard
 
@@ -3637,7 +3846,10 @@ __metadata:
 =======
     unpipe: "npm:1.0.0"
   checksum: 8723e3d7a672eb50854327453bed85ac48d045f4958e81e7d470c56bf111f835b97e5b73ae9f6393d0011cc9e252771f46fd281bbabc57d33d3986edf1e6aeca
+<<<<<<< HEAD
 >>>>>>> 01200f59 (fix: upgrade @capacitor/cli from 7.4.3 to 7.4.4)
+=======
+>>>>>>> 65f3d625 (fix: upgrade @capacitor/core from 7.4.3 to 7.4.4)
   languageName: node
   linkType: hard
 
@@ -3729,10 +3941,14 @@ __metadata:
   bin:
     browserslist: cli.js
 <<<<<<< HEAD
+<<<<<<< HEAD
   checksum: 10/64f2a97de4bce8473c0e5ae0af8d76d1ead07a5b05fc6bc87b848678bb9c3a91ae787b27aa98cdd33fc00779607e6c156000bed58fefb9cf8e4c5a183b994cdb
 =======
   checksum: 49add06fd753a2514d84c75a7de8d9fb3d70be675e53b72981d87f0c0ff40d8a8cd0bd92f77400381704be0bf1c9c5c65aef95d03843d69475ff55188aa12124
 >>>>>>> 01200f59 (fix: upgrade @capacitor/cli from 7.4.3 to 7.4.4)
+=======
+  checksum: 49add06fd753a2514d84c75a7de8d9fb3d70be675e53b72981d87f0c0ff40d8a8cd0bd92f77400381704be0bf1c9c5c65aef95d03843d69475ff55188aa12124
+>>>>>>> 65f3d625 (fix: upgrade @capacitor/core from 7.4.3 to 7.4.4)
   languageName: node
   linkType: hard
 
@@ -3861,6 +4077,7 @@ __metadata:
     tar: "npm:^7.4.3"
     unique-filename: "npm:^4.0.0"
   checksum: ea026b27b13656330c2bbaa462a88181dcaa0435c1c2e705db89b31d9bdf7126049d6d0445ba746dca21454a0cfdf1d6f47fd39d34c8c8435296b30bc5738a13
+<<<<<<< HEAD
   languageName: node
   linkType: hard
 
@@ -3880,6 +4097,8 @@ __metadata:
     ssri: "npm:^13.0.0"
     unique-filename: "npm:^5.0.0"
   checksum: 10/388a0169970df9d051da30437f93f81b7e91efb570ad0ff2b8fde33279fbe726c1bc8e8e2b9c05053ffb4f563854c73db395e8712e3b62347a1bc4f7fb8899ff
+=======
+>>>>>>> 65f3d625 (fix: upgrade @capacitor/core from 7.4.3 to 7.4.4)
   languageName: node
   linkType: hard
 
@@ -3993,7 +4212,10 @@ __metadata:
   version: 1.0.30001751
   resolution: "caniuse-lite@npm:1.0.30001751"
   checksum: 608f7e1248b7023020382c7dbb0ef389693b3fc98193c3ccea2d44126306d6ac905a5061cf9e62bf640535a86e7a98e563b34c02f909296cfe228f41627a4dc7
+<<<<<<< HEAD
 >>>>>>> 01200f59 (fix: upgrade @capacitor/cli from 7.4.3 to 7.4.4)
+=======
+>>>>>>> 65f3d625 (fix: upgrade @capacitor/core from 7.4.3 to 7.4.4)
   languageName: node
   linkType: hard
 
@@ -4024,7 +4246,10 @@ __metadata:
   version: 2.1.0
   resolution: "chardet@npm:2.1.0"
   checksum: 8085fd8e5b1234fafacb279b4dab84dc127f512f953441daf09fc71ade70106af0dff28e86bfda00bab0de61fb475fa9003c87f82cbad3da02a4f299bfd427da
+<<<<<<< HEAD
 >>>>>>> 01200f59 (fix: upgrade @capacitor/cli from 7.4.3 to 7.4.4)
+=======
+>>>>>>> 65f3d625 (fix: upgrade @capacitor/core from 7.4.3 to 7.4.4)
   languageName: node
   linkType: hard
 
@@ -4261,7 +4486,10 @@ __metadata:
   version: 2.4.2
   resolution: "complex.js@npm:2.4.2"
   checksum: 089257e0f09b3c9f52b4f7e009abb762a924d820fe01002da61bf9a3cee28c364a77de4d26ba8623c4fac017feb6856797da0713f8c165f795914be0c9e0b127
+<<<<<<< HEAD
 >>>>>>> 01200f59 (fix: upgrade @capacitor/cli from 7.4.3 to 7.4.4)
+=======
+>>>>>>> 65f3d625 (fix: upgrade @capacitor/core from 7.4.3 to 7.4.4)
   languageName: node
   linkType: hard
 
@@ -4411,7 +4639,10 @@ __metadata:
 =======
     is-what: "npm:^4.1.8"
   checksum: 4c41385a94a1cff6352a954f9b1c05b6bb1b70713a2d31f4c7b188ae7187ce00ddcc9c09bd58d24cd35b67fc6dd84df5954c0be86ea10700ff74e677db3cb09c
+<<<<<<< HEAD
 >>>>>>> 01200f59 (fix: upgrade @capacitor/cli from 7.4.3 to 7.4.4)
+=======
+>>>>>>> 65f3d625 (fix: upgrade @capacitor/core from 7.4.3 to 7.4.4)
   languageName: node
   linkType: hard
 
@@ -4514,7 +4745,10 @@ __metadata:
   version: 3.1.3
   resolution: "csstype@npm:3.1.3"
   checksum: f593cce41ff5ade23f44e77521e3a1bcc2c64107041e1bf6c3c32adc5187d0d60983292fda326154d20b01079e24931aa5b08e4467cc488b60bb1e7f6d478ade
+<<<<<<< HEAD
 >>>>>>> 01200f59 (fix: upgrade @capacitor/cli from 7.4.3 to 7.4.4)
+=======
+>>>>>>> 65f3d625 (fix: upgrade @capacitor/core from 7.4.3 to 7.4.4)
   languageName: node
   linkType: hard
 
@@ -4661,7 +4895,10 @@ __metadata:
   version: 5.0.0
   resolution: "default-browser-id@npm:5.0.0"
   checksum: 185bfaecec2c75fa423544af722a3469b20704c8d1942794a86e4364fe7d9e8e9f63241a5b769d61c8151993bc65833a5b959026fa1ccea343b3db0a33aa6deb
+<<<<<<< HEAD
 >>>>>>> 01200f59 (fix: upgrade @capacitor/cli from 7.4.3 to 7.4.4)
+=======
+>>>>>>> 65f3d625 (fix: upgrade @capacitor/core from 7.4.3 to 7.4.4)
   languageName: node
   linkType: hard
 
@@ -4684,10 +4921,14 @@ __metadata:
     bundle-name: "npm:^4.1.0"
     default-browser-id: "npm:^5.0.0"
 <<<<<<< HEAD
+<<<<<<< HEAD
   checksum: 10/cac0222ca5c9a3387d25337228689652ab33679a6566995c7194a75af7e554e91ec9ac92a70bfaa8e8089eae9f466ae99267bb38601282aade89b200f50a765c
 =======
   checksum: afab7eff7b7f5f7a94d9114d1ec67273d3fbc539edf8c0f80019879d53aa71e867303c6f6d7cffeb10a6f3cfb59d4f963dba3f9c96830b4540cc7339a1bf9840
 >>>>>>> 01200f59 (fix: upgrade @capacitor/cli from 7.4.3 to 7.4.4)
+=======
+  checksum: afab7eff7b7f5f7a94d9114d1ec67273d3fbc539edf8c0f80019879d53aa71e867303c6f6d7cffeb10a6f3cfb59d4f963dba3f9c96830b4540cc7339a1bf9840
+>>>>>>> 65f3d625 (fix: upgrade @capacitor/core from 7.4.3 to 7.4.4)
   languageName: node
   linkType: hard
 
@@ -4864,10 +5105,14 @@ __metadata:
     "@types/trusted-types":
       optional: true
 <<<<<<< HEAD
+<<<<<<< HEAD
   checksum: 10/f71cca489e628591165d16e8cf4fa4f0d3e2ee48db4d73e9d2c5bedc6f915c92f9e9f101f8c4ba790bec0cdffe7f4e1747f5e31c69dc53ce7ae20a81ff6b0022
 =======
   checksum: d8782b10a0454344476936c91038d06c9450b3e3ada2ceb8f722525e6b54e64d847939b9f35bf385facd4139f0a2eaf7f5553efce351f8e9295620570875f002
 >>>>>>> 01200f59 (fix: upgrade @capacitor/cli from 7.4.3 to 7.4.4)
+=======
+  checksum: d8782b10a0454344476936c91038d06c9450b3e3ada2ceb8f722525e6b54e64d847939b9f35bf385facd4139f0a2eaf7f5553efce351f8e9295620570875f002
+>>>>>>> 65f3d625 (fix: upgrade @capacitor/core from 7.4.3 to 7.4.4)
   languageName: node
   linkType: hard
 
@@ -4924,7 +5169,10 @@ __metadata:
   version: 16.5.0
   resolution: "dotenv@npm:16.5.0"
   checksum: e68a16834f1a41cc2dfb01563bc150668ad675e6cd09191211467b5c0806b6ecd6ec438e021aa8e01cd0e72d2b70ef4302bec7cc0fe15b6955f85230b62dc8a9
+<<<<<<< HEAD
 >>>>>>> 01200f59 (fix: upgrade @capacitor/cli from 7.4.3 to 7.4.4)
+=======
+>>>>>>> 65f3d625 (fix: upgrade @capacitor/core from 7.4.3 to 7.4.4)
   languageName: node
   linkType: hard
 
@@ -5011,7 +5259,10 @@ __metadata:
   version: 1.5.237
   resolution: "electron-to-chromium@npm:1.5.237"
   checksum: d21837cfc70038f547d8bf2328e5139f5e4143e365d64633fca568772dd68ceac2cf0d802f0d16921e6df925efb3527f2ba664dbcfa7ddd75e21465d2b0d4a6c
+<<<<<<< HEAD
 >>>>>>> 01200f59 (fix: upgrade @capacitor/cli from 7.4.3 to 7.4.4)
+=======
+>>>>>>> 65f3d625 (fix: upgrade @capacitor/core from 7.4.3 to 7.4.4)
   languageName: node
   linkType: hard
 
@@ -5249,10 +5500,14 @@ __metadata:
     unbox-primitive: "npm:^1.1.0"
     which-typed-array: "npm:^1.1.19"
 <<<<<<< HEAD
+<<<<<<< HEAD
   checksum: 10/c84cb69ebae36781309a3ed70ff40b4767a921d3b3518060fac4e08f14ede04491b68e9f318aedf186e349d4af4a40f5d0e4111e46513800e8368551fd09de8c
 =======
   checksum: 64e07a886f7439cf5ccfc100f9716e6173e10af6071a50a5031afbdde474a3dbc9619d5965da54e55f8908746a9134a46be02af8c732d574b7b81ed3124e2daf
 >>>>>>> 01200f59 (fix: upgrade @capacitor/cli from 7.4.3 to 7.4.4)
+=======
+  checksum: 64e07a886f7439cf5ccfc100f9716e6173e10af6071a50a5031afbdde474a3dbc9619d5965da54e55f8908746a9134a46be02af8c732d574b7b81ed3124e2daf
+>>>>>>> 65f3d625 (fix: upgrade @capacitor/core from 7.4.3 to 7.4.4)
   languageName: node
   linkType: hard
 
@@ -5599,10 +5854,14 @@ __metadata:
   bin:
     esbuild: bin/esbuild
 <<<<<<< HEAD
+<<<<<<< HEAD
   checksum: 10/bc9c03d64e96a0632a926662c9d29decafb13a40e5c91790f632f02939bc568edc9abe0ee5d8055085a2819a00139eb12e223cfb8126dbf89bbc569f125d91fd
 =======
   checksum: 287dfc7909d169501be9daa55973ae9398bd69c7114dfc0b682eef04c22f5c33fdba934398af0f36ed5aab1366ee4be25062235d6a1bff4b74fa3d185e208e56
 >>>>>>> 01200f59 (fix: upgrade @capacitor/cli from 7.4.3 to 7.4.4)
+=======
+  checksum: 287dfc7909d169501be9daa55973ae9398bd69c7114dfc0b682eef04c22f5c33fdba934398af0f36ed5aab1366ee4be25062235d6a1bff4b74fa3d185e208e56
+>>>>>>> 65f3d625 (fix: upgrade @capacitor/core from 7.4.3 to 7.4.4)
   languageName: node
   linkType: hard
 
@@ -6028,10 +6287,14 @@ __metadata:
     utils-merge: "npm:1.0.1"
     vary: "npm:~1.1.2"
 <<<<<<< HEAD
+<<<<<<< HEAD
   checksum: 10/f33c1bd0c7d36e2a1f18de9cdc176469d32f68e20258d2941b8d296ab9a4fd9011872c246391bf87714f009fac5114c832ec5ac65cbee39421f1258801eb8470
 =======
   checksum: 34571c442fc8c9f2c4b442d2faa10ea1175cf8559237fc6a278f5ce6254a8ffdbeb9a15d99f77c1a9f2926ab183e3b7ba560e3261f1ad4149799e3412ab66bd1
 >>>>>>> 01200f59 (fix: upgrade @capacitor/cli from 7.4.3 to 7.4.4)
+=======
+  checksum: 34571c442fc8c9f2c4b442d2faa10ea1175cf8559237fc6a278f5ce6254a8ffdbeb9a15d99f77c1a9f2926ab183e3b7ba560e3261f1ad4149799e3412ab66bd1
+>>>>>>> 65f3d625 (fix: upgrade @capacitor/core from 7.4.3 to 7.4.4)
   languageName: node
   linkType: hard
 
@@ -6176,10 +6439,14 @@ __metadata:
     statuses: "npm:~2.0.2"
     unpipe: "npm:~1.0.0"
 <<<<<<< HEAD
+<<<<<<< HEAD
   checksum: 10/6cb4f9f80eaeb5a0fac4fdbd27a65d39271f040a0034df16556d896bfd855fd42f09da886781b3102117ea8fceba97b903c1f8b08df1fb5740576d5e0f481eed
 =======
   checksum: 4babe72969b7373b5842bc9f75c3a641a4d0f8eb53af6b89fa714d4460ce03fb92b28de751d12ba415e96e7e02870c436d67412120555e2b382640535697305b
 >>>>>>> 01200f59 (fix: upgrade @capacitor/cli from 7.4.3 to 7.4.4)
+=======
+  checksum: 4babe72969b7373b5842bc9f75c3a641a4d0f8eb53af6b89fa714d4460ce03fb92b28de751d12ba415e96e7e02870c436d67412120555e2b382640535697305b
+>>>>>>> 65f3d625 (fix: upgrade @capacitor/core from 7.4.3 to 7.4.4)
   languageName: node
   linkType: hard
 
@@ -6265,10 +6532,14 @@ __metadata:
     hasown: "npm:^2.0.2"
     mime-types: "npm:^2.1.12"
 <<<<<<< HEAD
+<<<<<<< HEAD
   checksum: 10/52ecd6e927c8c4e215e68a7ad5e0f7c1031397439672fd9741654b4a94722c4182e74cc815b225dcb5be3f4180f36428f67c6dd39eaa98af0dcfdd26c00c19cd
 =======
   checksum: a4b62e21932f48702bc468cc26fb276d186e6b07b557e3dd7cc455872bdbb82db7db066844a64ad3cf40eaf3a753c830538183570462d3649fdfd705601cbcfb
 >>>>>>> 01200f59 (fix: upgrade @capacitor/cli from 7.4.3 to 7.4.4)
+=======
+  checksum: a4b62e21932f48702bc468cc26fb276d186e6b07b557e3dd7cc455872bdbb82db7db066844a64ad3cf40eaf3a753c830538183570462d3649fdfd705601cbcfb
+>>>>>>> 65f3d625 (fix: upgrade @capacitor/core from 7.4.3 to 7.4.4)
   languageName: node
   linkType: hard
 
@@ -6504,10 +6775,14 @@ __metadata:
   dependencies:
     resolve-pkg-maps: "npm:^1.0.0"
 <<<<<<< HEAD
+<<<<<<< HEAD
   checksum: 10/3603c6da30e312636e4c20461e779114c9126601d1eca70ee4e36e3e3c00e3c21892d2d920027333afa2cc9e20998a436b14abe03a53cde40742581cb0e9ceb2
 =======
   checksum: 1bce6263de6da11c747e804aad1d2d2c1cd893ea4b34a135c3bc1da94f7a8a29d4b23c47e73fd0b1b812650ad48956db5415430f56d7c73670a337a5c4fe4559
 >>>>>>> 01200f59 (fix: upgrade @capacitor/cli from 7.4.3 to 7.4.4)
+=======
+  checksum: 1bce6263de6da11c747e804aad1d2d2c1cd893ea4b34a135c3bc1da94f7a8a29d4b23c47e73fd0b1b812650ad48956db5415430f56d7c73670a337a5c4fe4559
+>>>>>>> 65f3d625 (fix: upgrade @capacitor/core from 7.4.3 to 7.4.4)
   languageName: node
   linkType: hard
 
@@ -6542,10 +6817,14 @@ __metadata:
   bin:
     glob: dist/esm/bin.mjs
 <<<<<<< HEAD
+<<<<<<< HEAD
   checksum: 10/ab3bccfefcc0afaedbd1f480cd0c4a2c0e322eb3f0aa7ceaa31b3f00b825069f17cf0f1fc8b6f256795074b903f37c0ade37ddda6a176aa57f1c2bbfe7240653
 =======
   checksum: 698dfe11828b7efd0514cd11e573eaed26b2dff611f0400907281ce3eab0c1e56143ef9b35adc7c77ecc71fba74717b510c7c223d34ca8a98ec81777b293d4ac
 >>>>>>> 01200f59 (fix: upgrade @capacitor/cli from 7.4.3 to 7.4.4)
+=======
+  checksum: 698dfe11828b7efd0514cd11e573eaed26b2dff611f0400907281ce3eab0c1e56143ef9b35adc7c77ecc71fba74717b510c7c223d34ca8a98ec81777b293d4ac
+>>>>>>> 65f3d625 (fix: upgrade @capacitor/core from 7.4.3 to 7.4.4)
   languageName: node
   linkType: hard
 
@@ -6562,7 +6841,10 @@ __metadata:
   bin:
     glob: dist/esm/bin.mjs
   checksum: 2ae536c1360c0266b523b2bfa6aadc10144a8b7e08869b088e37ac3c27cd30774f82e4bfb291cde796776e878f9e13200c7ff44010eb7054e00f46f649397893
+<<<<<<< HEAD
 >>>>>>> 01200f59 (fix: upgrade @capacitor/cli from 7.4.3 to 7.4.4)
+=======
+>>>>>>> 65f3d625 (fix: upgrade @capacitor/core from 7.4.3 to 7.4.4)
   languageName: node
   linkType: hard
 
@@ -6832,7 +7114,10 @@ __metadata:
     statuses: "npm:2.0.1"
     toidentifier: "npm:1.0.1"
   checksum: 0e7f76ee8ff8a33e58a3281a469815b893c41357378f408be8f6d4aa7d1efafb0da064625518e7078381b6a92325949b119dc38fcb30bdbc4e3a35f78c44c439
+<<<<<<< HEAD
 >>>>>>> 01200f59 (fix: upgrade @capacitor/cli from 7.4.3 to 7.4.4)
+=======
+>>>>>>> 65f3d625 (fix: upgrade @capacitor/core from 7.4.3 to 7.4.4)
   languageName: node
   linkType: hard
 
@@ -6956,6 +7241,7 @@ __metadata:
   dependencies:
     safer-buffer: "npm:>= 2.1.2 < 3.0.0"
 <<<<<<< HEAD
+<<<<<<< HEAD
   checksum: 10/bf9bfa10132b591d7b43cc2cc6700cd72d848b7943c3f38db05527d04c224eb44d1d92101f76d25eac7fabc67cb918320b93808b0be47e45cf7257df0a5ec54c
   languageName: node
   linkType: hard
@@ -6969,6 +7255,9 @@ __metadata:
 =======
   checksum: 5bfc897fedfb7e29991ae5ef1c061ed4f864005f8c6d61ef34aba6a3885c04bd207b278c0642b041383aeac2d11645b4319d0ca7b863b0be4be0cde1c9238ca7
 >>>>>>> 01200f59 (fix: upgrade @capacitor/cli from 7.4.3 to 7.4.4)
+=======
+  checksum: 5bfc897fedfb7e29991ae5ef1c061ed4f864005f8c6d61ef34aba6a3885c04bd207b278c0642b041383aeac2d11645b4319d0ca7b863b0be4be0cde1c9238ca7
+>>>>>>> 65f3d625 (fix: upgrade @capacitor/core from 7.4.3 to 7.4.4)
   languageName: node
   linkType: hard
 
@@ -7102,7 +7391,10 @@ __metadata:
   version: 10.0.1
   resolution: "ip-address@npm:10.0.1"
   checksum: 09731acda32cd8e14c46830c137e7e5940f47b36d63ffb87c737331270287d631cf25aa95570907a67d3f919fdb25f4470c404eda21e62f22e0a55927f4dd0fb
+<<<<<<< HEAD
 >>>>>>> 01200f59 (fix: upgrade @capacitor/cli from 7.4.3 to 7.4.4)
+=======
+>>>>>>> 65f3d625 (fix: upgrade @capacitor/core from 7.4.3 to 7.4.4)
   languageName: node
   linkType: hard
 
@@ -7501,7 +7793,10 @@ __metadata:
   version: 4.1.16
   resolution: "is-what@npm:4.1.16"
   checksum: f6400634bae77be6903365dc53817292e1c4d8db1b467515d0c842505b8388ee8e558326d5e6952cb2a9d74116eca2af0c6adb8aa7e9d5c845a130ce9328bf13
+<<<<<<< HEAD
 >>>>>>> 01200f59 (fix: upgrade @capacitor/cli from 7.4.3 to 7.4.4)
+=======
+>>>>>>> 65f3d625 (fix: upgrade @capacitor/core from 7.4.3 to 7.4.4)
   languageName: node
   linkType: hard
 
@@ -7560,7 +7855,10 @@ __metadata:
   version: 5.0.6
   resolution: "isbinaryfile@npm:5.0.6"
   checksum: d7338c6e0796b7d4d73284824984f2255529168ce7f5eeb31d6c86d956528a44fe9eb2e91a1a5f27e7d8092d9d0c383e1e20c285dff41e85a672f3fca71e0f41
+<<<<<<< HEAD
 >>>>>>> 01200f59 (fix: upgrade @capacitor/cli from 7.4.3 to 7.4.4)
+=======
+>>>>>>> 65f3d625 (fix: upgrade @capacitor/core from 7.4.3 to 7.4.4)
   languageName: node
   linkType: hard
 
@@ -7666,6 +7964,7 @@ __metadata:
   bin:
     js-yaml: bin/js-yaml.js
 <<<<<<< HEAD
+<<<<<<< HEAD
   checksum: 10/172e0b6007b0bf0fc8d2469c94424f7dd765c64a047d2b790831fecef2204a4054eabf4d911eb73ab8c9a3256ab8ba1ee8d655b789bf24bf059c772acc2075a1
   languageName: node
   linkType: hard
@@ -7681,6 +7980,9 @@ __metadata:
 =======
   checksum: 9e22d80b4d0105b9899135365f746d47466ed53ef4223c529b3c0f7a39907743fdbd3c4379f94f1106f02755b5e90b2faaf84801a891135544e1ea475d1a1379
 >>>>>>> 01200f59 (fix: upgrade @capacitor/cli from 7.4.3 to 7.4.4)
+=======
+  checksum: 9e22d80b4d0105b9899135365f746d47466ed53ef4223c529b3c0f7a39907743fdbd3c4379f94f1106f02755b5e90b2faaf84801a891135544e1ea475d1a1379
+>>>>>>> 65f3d625 (fix: upgrade @capacitor/core from 7.4.3 to 7.4.4)
   languageName: node
   linkType: hard
 
@@ -7741,10 +8043,14 @@ __metadata:
     espree: "npm:^9.0.0"
     semver: "npm:^7.3.5"
 <<<<<<< HEAD
+<<<<<<< HEAD
   checksum: 10/4010e0724c78b6ff9c6576cf3c96b6352c43b5e5cbb4e364c44ec1983fd111c0a1673622bfe225345eafbafca04e9151aade417e3e4d94c84cf0938189def974
 =======
   checksum: b728fcad68a82c734f23bf1fe1694eb970d597e752b605649b0c83d98783911a6a184ede77e170059bc3efe4e43625289a39a6a518433b0466ac45c06cee3246
 >>>>>>> 01200f59 (fix: upgrade @capacitor/cli from 7.4.3 to 7.4.4)
+=======
+  checksum: b728fcad68a82c734f23bf1fe1694eb970d597e752b605649b0c83d98783911a6a184ede77e170059bc3efe4e43625289a39a6a518433b0466ac45c06cee3246
+>>>>>>> 65f3d625 (fix: upgrade @capacitor/core from 7.4.3 to 7.4.4)
   languageName: node
   linkType: hard
 
@@ -7962,7 +8268,10 @@ __metadata:
   version: 11.2.2
   resolution: "lru-cache@npm:11.2.2"
   checksum: fa7919fbf068a739f79a1ad461eb273514da7246cebb9dca68e3cd7ba19e3839e7e2aaecd9b72867e08038561eeb96941189e89b3d4091c75ced4f56c71c80db
+<<<<<<< HEAD
 >>>>>>> 01200f59 (fix: upgrade @capacitor/cli from 7.4.3 to 7.4.4)
+=======
+>>>>>>> 65f3d625 (fix: upgrade @capacitor/core from 7.4.3 to 7.4.4)
   languageName: node
   linkType: hard
 
@@ -7981,10 +8290,14 @@ __metadata:
   dependencies:
     "@jridgewell/sourcemap-codec": "npm:^1.5.5"
 <<<<<<< HEAD
+<<<<<<< HEAD
   checksum: 10/57d5691f41ed40d962d8bd300148114f53db67fadbff336207db10a99f2bdf4a1be9cac3a68ee85dba575912ee1d4402e4396408196ec2d3afd043b076156221
 =======
   checksum: 5045467fad59ddfba6ccfb00fde6edbc0f841089f0da07d844cf513c73de289bbbf933bde16168cba2c9ef38d75ac68e1617a5ce74aae16d6f39285bda1d51c4
 >>>>>>> 01200f59 (fix: upgrade @capacitor/cli from 7.4.3 to 7.4.4)
+=======
+  checksum: 5045467fad59ddfba6ccfb00fde6edbc0f841089f0da07d844cf513c73de289bbbf933bde16168cba2c9ef38d75ac68e1617a5ce74aae16d6f39285bda1d51c4
+>>>>>>> 65f3d625 (fix: upgrade @capacitor/core from 7.4.3 to 7.4.4)
   languageName: node
   linkType: hard
 
@@ -8004,6 +8317,7 @@ __metadata:
     promise-retry: "npm:^2.0.1"
     ssri: "npm:^12.0.0"
   checksum: fce0385840b6d86b735053dfe941edc2dd6468fda80fe74da1eeff10cbd82a75760f406194f2bc2fa85b99545b2bc1f84c08ddf994b21830775ba2d1a87e8bdf
+<<<<<<< HEAD
   languageName: node
   linkType: hard
 
@@ -8023,6 +8337,8 @@ __metadata:
     promise-retry: "npm:^2.0.1"
     ssri: "npm:^13.0.0"
   checksum: 10/78da4fc1df83cb596e2bae25aa0653b8a9c6cbdd6674a104894e03be3acfcd08c70b78f06ef6407fbd6b173f6a60672480d78641e693d05eb71c09c13ee35278
+=======
+>>>>>>> 65f3d625 (fix: upgrade @capacitor/core from 7.4.3 to 7.4.4)
   languageName: node
   linkType: hard
 
@@ -8297,10 +8613,14 @@ __metadata:
   dependencies:
     "@isaacs/brace-expansion": "npm:^5.0.0"
 <<<<<<< HEAD
+<<<<<<< HEAD
   checksum: 10/110f38921ea527022e90f7a5f43721838ac740d0a0c26881c03b57c261354fb9a0430e40b2c56dfcea2ef3c773768f27210d1106f1f2be19cde3eea93f26f45e
 =======
   checksum: d5b8b2538b367f2cfd4aeef27539fddeee58d1efb692102b848e4a968a09780a302c530eb5aacfa8c57f7299155fb4b4e85219ad82664dcef5c66f657111d9b8
 >>>>>>> 01200f59 (fix: upgrade @capacitor/cli from 7.4.3 to 7.4.4)
+=======
+  checksum: d5b8b2538b367f2cfd4aeef27539fddeee58d1efb692102b848e4a968a09780a302c530eb5aacfa8c57f7299155fb4b4e85219ad82664dcef5c66f657111d9b8
+>>>>>>> 65f3d625 (fix: upgrade @capacitor/core from 7.4.3 to 7.4.4)
   languageName: node
   linkType: hard
 
@@ -8359,6 +8679,7 @@ __metadata:
     encoding:
       optional: true
   checksum: 7ddfebdbb87d9866e7b5f7eead5a9e3d9d507992af932a11d275551f60006cf7d9178e66d586dbb910894f3e3458d27c0ddf93c76e94d49d0a54a541ddc1263d
+<<<<<<< HEAD
   languageName: node
   linkType: hard
 
@@ -8374,6 +8695,8 @@ __metadata:
     encoding:
       optional: true
   checksum: 10/4fb7dca630a64e6970a8211dade505bfe260d0b8d60beb348dcdfb95fe35ef91d977b29963929c9017ae0805686aa3f413107dc6bc5deac9b9e26b0b41c3b86c
+=======
+>>>>>>> 65f3d625 (fix: upgrade @capacitor/core from 7.4.3 to 7.4.4)
   languageName: node
   linkType: hard
 
@@ -8596,10 +8919,14 @@ __metadata:
   dependencies:
     semver: "npm:^7.6.3"
 <<<<<<< HEAD
+<<<<<<< HEAD
   checksum: 10/08c59e0cb22f08e696bcc47652447cd36501b7893aa07eeb84ab9c354d75ecc70272a455e352bb9ced793290d47976c110986b7c075d5b38eff6de7fd99a651e
 =======
   checksum: 6c01f7541b3b6a3df1495664129c5a9e3e38ff7d37da74be91f0cab48176327fe9d6c93ecb9d66650b431972ae926bd75d952d2b312eb1ff69dd79e7fc3b53c6
 >>>>>>> 01200f59 (fix: upgrade @capacitor/cli from 7.4.3 to 7.4.4)
+=======
+  checksum: 6c01f7541b3b6a3df1495664129c5a9e3e38ff7d37da74be91f0cab48176327fe9d6c93ecb9d66650b431972ae926bd75d952d2b312eb1ff69dd79e7fc3b53c6
+>>>>>>> 65f3d625 (fix: upgrade @capacitor/core from 7.4.3 to 7.4.4)
   languageName: node
   linkType: hard
 
@@ -8639,7 +8966,10 @@ __metadata:
   version: 1.3.1
   resolution: "node-forge@npm:1.3.1"
   checksum: 05bab6868633bf9ad4c3b1dd50ec501c22ffd69f556cdf169a00998ca1d03e8107a6032ba013852f202035372021b845603aeccd7dfcb58cdb7430013b3daa8d
+<<<<<<< HEAD
 >>>>>>> 01200f59 (fix: upgrade @capacitor/cli from 7.4.3 to 7.4.4)
+=======
+>>>>>>> 65f3d625 (fix: upgrade @capacitor/core from 7.4.3 to 7.4.4)
   languageName: node
   linkType: hard
 
@@ -8680,10 +9010,14 @@ __metadata:
   bin:
     node-gyp: bin/node-gyp.js
 <<<<<<< HEAD
+<<<<<<< HEAD
   checksum: 10/d93079236cef1dd7fa4df683708d8708ad255c55865f6656664c8959e4d3963d908ac48e8f9f341705432e979dbbf502a40d68d65a17fe35956a5a05ba6c1cb4
 =======
   checksum: 806fd8e3adc9157e17bf0d4a2c899cf6b98a0bbe9f453f630094ce791866271f6cddcaf2133e6513715d934fcba2014d287c7053d5d7934937b3a34d5a3d84ad
 >>>>>>> 01200f59 (fix: upgrade @capacitor/cli from 7.4.3 to 7.4.4)
+=======
+  checksum: 806fd8e3adc9157e17bf0d4a2c899cf6b98a0bbe9f453f630094ce791866271f6cddcaf2133e6513715d934fcba2014d287c7053d5d7934937b3a34d5a3d84ad
+>>>>>>> 65f3d625 (fix: upgrade @capacitor/core from 7.4.3 to 7.4.4)
   languageName: node
   linkType: hard
 
@@ -8710,7 +9044,10 @@ __metadata:
   version: 2.0.25
   resolution: "node-releases@npm:2.0.25"
   checksum: f2d01bf94c4c629c38495329ed132fce87e0072fa36af7333a4a2071c89bdd6573bc267abeda152bd401247c261b4cf4554b8b70e306ce584c93dd6f63c7a202
+<<<<<<< HEAD
 >>>>>>> 01200f59 (fix: upgrade @capacitor/cli from 7.4.3 to 7.4.4)
+=======
+>>>>>>> 65f3d625 (fix: upgrade @capacitor/core from 7.4.3 to 7.4.4)
   languageName: node
   linkType: hard
 
@@ -8722,6 +9059,7 @@ __metadata:
   bin:
     nopt: bin/nopt.js
   checksum: 26ab456c51a96f02a9e5aa8d1b80ef3219f2070f3f3528a040e32fb735b1e651e17bdf0f1476988d3a46d498f35c65ed662d122f340d38ce4a7e71dd7b20c4bc
+<<<<<<< HEAD
   languageName: node
   linkType: hard
 
@@ -8733,6 +9071,8 @@ __metadata:
   bin:
     nopt: bin/nopt.js
   checksum: 10/56a1ccd2ad711fb5115918e2c96828703cddbe12ba2c3bd00591758f6fa30e6f47dd905c59dbfcf9b773f3a293b45996609fb6789ae29d6bfcc3cf3a6f7d9fda
+=======
+>>>>>>> 65f3d625 (fix: upgrade @capacitor/core from 7.4.3 to 7.4.4)
   languageName: node
   linkType: hard
 
@@ -9032,7 +9372,10 @@ __metadata:
   version: 7.0.3
   resolution: "p-map@npm:7.0.3"
   checksum: 2ef48ccfc6dd387253d71bf502604f7893ed62090b2c9d73387f10006c342606b05233da0e4f29388227b61eb5aeface6197e166520c465c234552eeab2fe633
+<<<<<<< HEAD
 >>>>>>> 01200f59 (fix: upgrade @capacitor/cli from 7.4.3 to 7.4.4)
+=======
+>>>>>>> 65f3d625 (fix: upgrade @capacitor/core from 7.4.3 to 7.4.4)
   languageName: node
   linkType: hard
 
@@ -9157,10 +9500,14 @@ __metadata:
     lru-cache: "npm:^11.0.0"
     minipass: "npm:^7.1.2"
 <<<<<<< HEAD
+<<<<<<< HEAD
   checksum: 10/1e9c74e9ccf94d7c16056a5cb2dba9fa23eec1bc221ab15c44765486b9b9975b4cd9a4d55da15b96eadf67d5202e9a2f1cec9023fbb35fe7d9ccd0ff1891f88b
 =======
   checksum: 285ae0c2d6c34ae91dc1d5378ede21981c9a2f6de1ea9ca5a88b5a270ce9763b83dbadc7a324d512211d8d36b0c540427d3d0817030849d97a60fa840a2c59ec
 >>>>>>> 01200f59 (fix: upgrade @capacitor/cli from 7.4.3 to 7.4.4)
+=======
+  checksum: 285ae0c2d6c34ae91dc1d5378ede21981c9a2f6de1ea9ca5a88b5a270ce9763b83dbadc7a324d512211d8d36b0c540427d3d0817030849d97a60fa840a2c59ec
+>>>>>>> 65f3d625 (fix: upgrade @capacitor/core from 7.4.3 to 7.4.4)
   languageName: node
   linkType: hard
 
@@ -9244,10 +9591,14 @@ __metadata:
     pinia:
       optional: true
 <<<<<<< HEAD
+<<<<<<< HEAD
   checksum: 10/f8935418f1c7ef2921c3935ca66bc2be8f53e993d2756fb30a4ba9ba9b9cd5c416e412c17dd7cb7dceaf7249eb590676fc70f9ac6b35d12577a353d80b72ed28
 =======
   checksum: c6932c45362c199063c06c28c416b17b63d119fcd59bc0077a82082048dcc46012feff3ee4995881ac6663de6af9240ffa8ea55f7411845b9b4f8c3a82ce53ae
 >>>>>>> 01200f59 (fix: upgrade @capacitor/cli from 7.4.3 to 7.4.4)
+=======
+  checksum: c6932c45362c199063c06c28c416b17b63d119fcd59bc0077a82082048dcc46012feff3ee4995881ac6663de6af9240ffa8ea55f7411845b9b4f8c3a82ce53ae
+>>>>>>> 65f3d625 (fix: upgrade @capacitor/core from 7.4.3 to 7.4.4)
   languageName: node
   linkType: hard
 
@@ -9370,6 +9721,7 @@ __metadata:
   version: 5.0.0
   resolution: "proc-log@npm:5.0.0"
   checksum: 35610bdb0177d3ab5d35f8827a429fb1dc2518d9e639f2151ac9007f01a061c30e0c635a970c9b00c39102216160f6ec54b62377c92fac3b7bfc2ad4b98d195c
+<<<<<<< HEAD
   languageName: node
   linkType: hard
 
@@ -9377,6 +9729,8 @@ __metadata:
   version: 6.1.0
   resolution: "proc-log@npm:6.1.0"
   checksum: 10/9033f30f168ed5a0991b773d0c50ff88384c4738e9a0a67d341de36bf7293771eed648ab6a0562f62276da12fde91f3bbfc75ffff6e71ad49aafd74fc646be66
+=======
+>>>>>>> 65f3d625 (fix: upgrade @capacitor/core from 7.4.3 to 7.4.4)
   languageName: node
   linkType: hard
 
@@ -9483,6 +9837,7 @@ __metadata:
   resolution: "qcalc@workspace:."
   dependencies:
 <<<<<<< HEAD
+<<<<<<< HEAD
     "@capacitor/android": "npm:7.4.4"
     "@capacitor/app": "npm:7.1.0"
     "@capacitor/cli": "npm:7.4.4"
@@ -9551,6 +9906,12 @@ __metadata:
     "@capacitor/app": 7.1.0
     "@capacitor/cli": 7.4.4
     "@capacitor/core": 7.4.3
+=======
+    "@capacitor/android": 7.4.3
+    "@capacitor/app": 7.1.0
+    "@capacitor/cli": 7.4.3
+    "@capacitor/core": 7.4.4
+>>>>>>> 65f3d625 (fix: upgrade @capacitor/core from 7.4.3 to 7.4.4)
     "@capacitor/filesystem": 7.1.4
     "@capacitor/haptics": 7.0.2
     "@capacitor/screen-orientation": 7.0.2
@@ -9610,7 +9971,10 @@ __metadata:
     vue-i18n: 11.1.12
     vue-router: 4.6.3
     vue-tsc: 3.1.0
+<<<<<<< HEAD
 >>>>>>> 01200f59 (fix: upgrade @capacitor/cli from 7.4.3 to 7.4.4)
+=======
+>>>>>>> 65f3d625 (fix: upgrade @capacitor/core from 7.4.3 to 7.4.4)
   languageName: unknown
   linkType: soft
 
@@ -9624,7 +9988,10 @@ __metadata:
 =======
     side-channel: "npm:^1.0.6"
   checksum: f548b376e685553d12e461409f0d6e5c59ec7c7d76f308e2a888fd9db3e0c5e89902bedd0754db3a9038eda5f27da2331a6f019c8517dc5e0a16b3c9a6e9cef8
+<<<<<<< HEAD
 >>>>>>> 01200f59 (fix: upgrade @capacitor/cli from 7.4.3 to 7.4.4)
+=======
+>>>>>>> 65f3d625 (fix: upgrade @capacitor/core from 7.4.3 to 7.4.4)
   languageName: node
   linkType: hard
 
@@ -9688,7 +10055,10 @@ __metadata:
     iconv-lite: "npm:0.4.24"
     unpipe: "npm:1.0.0"
   checksum: 863b5171e140546a4d99f349b720abac4410338e23df5e409cfcc3752538c9caf947ce382c89129ba976f71894bd38b5806c774edac35ebf168d02aa1ac11a95
+<<<<<<< HEAD
 >>>>>>> 01200f59 (fix: upgrade @capacitor/cli from 7.4.3 to 7.4.4)
+=======
+>>>>>>> 65f3d625 (fix: upgrade @capacitor/core from 7.4.3 to 7.4.4)
   languageName: node
   linkType: hard
 
@@ -9902,6 +10272,7 @@ __metadata:
   bin:
     resolve: bin/resolve
 <<<<<<< HEAD
+<<<<<<< HEAD
   checksum: 10/e1b2e738884a08de03f97ee71494335eba8c2b0feb1de9ae065e82c48997f349f77a2b10e8817e147cf610bfabc4b1cb7891ee8eaf5bf80d4ad514a34c4fab0a
   languageName: node
   linkType: hard
@@ -9918,6 +10289,15 @@ __metadata:
   version: 1.22.10
   resolution: "resolve@patch:resolve@npm%3A1.22.10#~builtin<compat/resolve>::version=1.22.10&hash=c3c19d"
 >>>>>>> 01200f59 (fix: upgrade @capacitor/cli from 7.4.3 to 7.4.4)
+=======
+  checksum: 0a398b44da5c05e6e421d70108822c327675febb880eebe905587628de401854c61d5df02866ff34fc4cb1173a51c9f0e84a94702738df3611a62e2acdc68181
+  languageName: node
+  linkType: hard
+
+"resolve@patch:resolve@npm%3A^1.22.4#~builtin<compat/resolve>":
+  version: 1.22.10
+  resolution: "resolve@patch:resolve@npm%3A1.22.10#~builtin<compat/resolve>::version=1.22.10&hash=c3c19d"
+>>>>>>> 65f3d625 (fix: upgrade @capacitor/core from 7.4.3 to 7.4.4)
   dependencies:
     is-core-module: "npm:^2.16.1"
     path-parse: "npm:^1.0.7"
@@ -9925,10 +10305,14 @@ __metadata:
   bin:
     resolve: bin/resolve
 <<<<<<< HEAD
+<<<<<<< HEAD
   checksum: 10/fd342cad25e52cd6f4f3d1716e189717f2522bfd6641109fe7aa372f32b5714a296ed7c238ddbe7ebb0c1ddfe0b7f71c9984171024c97cf1b2073e3e40ff71a8
 =======
   checksum: 8/8aac1e4e4628bd00bf4b94b23de137dd3fe44097a8d528fd66db74484be929936e20c696e1a3edf4488f37e14180b73df6f600992baea3e089e8674291f16c9d
 >>>>>>> 01200f59 (fix: upgrade @capacitor/cli from 7.4.3 to 7.4.4)
+=======
+  checksum: 8/8aac1e4e4628bd00bf4b94b23de137dd3fe44097a8d528fd66db74484be929936e20c696e1a3edf4488f37e14180b73df6f600992baea3e089e8674291f16c9d
+>>>>>>> 65f3d625 (fix: upgrade @capacitor/core from 7.4.3 to 7.4.4)
   languageName: node
   linkType: hard
 
@@ -9990,10 +10374,14 @@ __metadata:
   bin:
     rimraf: dist/esm/bin.mjs
 <<<<<<< HEAD
+<<<<<<< HEAD
   checksum: 10/add8e566fe903f59d7b55c6c2382320c48302778640d1951baf247b3b451af496c2dee7195c204a8c646fd6327feadd1f5b61ce68c1362d4898075a726d83cc6
 =======
   checksum: 0eb7edf08aa39017496c99ba675552dda11a20811ba78f8232da2ba945308c91e9cd673f95998b1a8202bc7436d33390831d23ea38ae52751038d56373ad99e2
 >>>>>>> 01200f59 (fix: upgrade @capacitor/cli from 7.4.3 to 7.4.4)
+=======
+  checksum: 0eb7edf08aa39017496c99ba675552dda11a20811ba78f8232da2ba945308c91e9cd673f95998b1a8202bc7436d33390831d23ea38ae52751038d56373ad99e2
+>>>>>>> 65f3d625 (fix: upgrade @capacitor/core from 7.4.3 to 7.4.4)
   languageName: node
   linkType: hard
 
@@ -10111,10 +10499,14 @@ __metadata:
   bin:
     rollup: dist/bin/rollup
 <<<<<<< HEAD
+<<<<<<< HEAD
   checksum: 10/95a9186f6110c3b5428b1048f5766c8a98fbcd5b994e27234ae9be20cc9a81d5c856858c648213ac2bec13d2b5f47396aeba2b3643937b4abc8865f64ddac66b
 =======
   checksum: e29ef8b386cb33709073c5e466fa9dfda2ecd29b3143ff30badff56acef5004de94fba14668aee9f0163c009a731dfe040b9daea2c67102f39634c13fc06a14f
 >>>>>>> 01200f59 (fix: upgrade @capacitor/cli from 7.4.3 to 7.4.4)
+=======
+  checksum: e29ef8b386cb33709073c5e466fa9dfda2ecd29b3143ff30badff56acef5004de94fba14668aee9f0163c009a731dfe040b9daea2c67102f39634c13fc06a14f
+>>>>>>> 65f3d625 (fix: upgrade @capacitor/core from 7.4.3 to 7.4.4)
   languageName: node
   linkType: hard
 
@@ -10433,10 +10825,14 @@ __metadata:
   bin:
     sass: dist/bin/sass.js
 <<<<<<< HEAD
+<<<<<<< HEAD
   checksum: 10/bda3efd610dcce25076ef01d7e45c7deacb7216694ed2e185de2877d619516d2a9ca194d6960b04c4ff841db3f8cc368c72f4e0ebd279f6856253a8773398004
 =======
   checksum: 1f5c6fe5e0533d54472f1b17af964e3e4361bf51e6fe4d1fea784c3f26e56d53fa570ef696ae7bf0d38a2197ac242fe450b5b0c22c1f99c8f43bec6bb0fee242
 >>>>>>> 01200f59 (fix: upgrade @capacitor/cli from 7.4.3 to 7.4.4)
+=======
+  checksum: 1f5c6fe5e0533d54472f1b17af964e3e4361bf51e6fe4d1fea784c3f26e56d53fa570ef696ae7bf0d38a2197ac242fe450b5b0c22c1f99c8f43bec6bb0fee242
+>>>>>>> 65f3d625 (fix: upgrade @capacitor/core from 7.4.3 to 7.4.4)
   languageName: node
   linkType: hard
 
@@ -10454,6 +10850,7 @@ __metadata:
   bin:
     sass: sass.js
   checksum: 2fc0dcafdf3050f4131650a00ddd772790af1dc3e31a97c6533f323efabddce81bd139a920f13a88af80d630a255f51ee91067a7478364b2a13fcc6f5f7e8308
+<<<<<<< HEAD
   languageName: node
   linkType: hard
 
@@ -10471,6 +10868,8 @@ __metadata:
   bin:
     sass: sass.js
   checksum: 10/f740cc373c0760eb7cd04989a508381123708c0c3b0bb7d3df9a20900345b24f47c36103d41ef875fa7d99c7f7960a3190a078a695701d0c749d4c29302b7d91
+=======
+>>>>>>> 65f3d625 (fix: upgrade @capacitor/core from 7.4.3 to 7.4.4)
   languageName: node
   linkType: hard
 
@@ -10490,7 +10889,10 @@ __metadata:
   version: 1.4.1
   resolution: "sax@npm:1.4.1"
   checksum: b1c784b545019187b53a0c28edb4f6314951c971e2963a69739c6ce222bfbc767e54d320e689352daba79b7d5e06d22b5d7113b99336219d6e93718e2f99d335
+<<<<<<< HEAD
 >>>>>>> 01200f59 (fix: upgrade @capacitor/cli from 7.4.3 to 7.4.4)
+=======
+>>>>>>> 65f3d625 (fix: upgrade @capacitor/core from 7.4.3 to 7.4.4)
   languageName: node
   linkType: hard
 
@@ -10596,7 +10998,10 @@ __metadata:
 =======
     statuses: "npm:2.0.1"
   checksum: 1f6064dea0ae4cbe4878437aedc9270c33f2a6650a77b56a16b62d057527f2766d96ee282997dd53ec0339082f2aad935bc7d989b46b48c82fc610800dc3a1d0
+<<<<<<< HEAD
 >>>>>>> 01200f59 (fix: upgrade @capacitor/cli from 7.4.3 to 7.4.4)
+=======
+>>>>>>> 65f3d625 (fix: upgrade @capacitor/core from 7.4.3 to 7.4.4)
   languageName: node
   linkType: hard
 
@@ -10631,7 +11036,10 @@ __metadata:
 =======
     send: "npm:0.19.0"
   checksum: 7fa9d9c68090f6289976b34fc13c50ac8cd7f16ae6bce08d16459300f7fc61fbc2d7ebfa02884c073ec9d6ab9e7e704c89561882bbe338e99fcacb2912fde737
+<<<<<<< HEAD
 >>>>>>> 01200f59 (fix: upgrade @capacitor/cli from 7.4.3 to 7.4.4)
+=======
+>>>>>>> 65f3d625 (fix: upgrade @capacitor/core from 7.4.3 to 7.4.4)
   languageName: node
   linkType: hard
 
@@ -10944,6 +11352,7 @@ __metadata:
   dependencies:
     minipass: "npm:^7.0.3"
   checksum: 7024c1a6e39b3f18aa8f1c8290e884fe91b0f9ca5a6c6d410544daad54de0ba664db879afe16412e187c6c292fd60b937f047ee44292e5c2af2dcc6d8e1a9b48
+<<<<<<< HEAD
   languageName: node
   linkType: hard
 
@@ -10953,6 +11362,8 @@ __metadata:
   dependencies:
     minipass: "npm:^7.0.3"
   checksum: 10/fd59bfedf0659c1b83f6e15459162da021f08ec0f5834dd9163296f8b77ee82f9656aa1d415c3d3848484293e0e6aefdd482e863e52ddb53d520bb73da1eeec1
+=======
+>>>>>>> 65f3d625 (fix: upgrade @capacitor/core from 7.4.3 to 7.4.4)
   languageName: node
   linkType: hard
 
@@ -10980,7 +11391,10 @@ __metadata:
   version: 2.0.1
   resolution: "statuses@npm:2.0.1"
   checksum: 18c7623fdb8f646fb213ca4051be4df7efb3484d4ab662937ca6fbef7ced9b9e12842709872eb3020cc3504b93bde88935c9f6417489627a7786f24f8031cbcb
+<<<<<<< HEAD
 >>>>>>> 01200f59 (fix: upgrade @capacitor/cli from 7.4.3 to 7.4.4)
+=======
+>>>>>>> 65f3d625 (fix: upgrade @capacitor/core from 7.4.3 to 7.4.4)
   languageName: node
   linkType: hard
 
@@ -11146,7 +11560,10 @@ __metadata:
 =======
     copy-anything: "npm:^3.0.2"
   checksum: 6fdc709db4f69d586a18379948e0ade8268c851c791701fea960e29cea12672d7561b4ca89c4049c2e787eb1cec08a51df51d357aa6852078bc0d71d7e17b401
+<<<<<<< HEAD
 >>>>>>> 01200f59 (fix: upgrade @capacitor/cli from 7.4.3 to 7.4.4)
+=======
+>>>>>>> 65f3d625 (fix: upgrade @capacitor/core from 7.4.3 to 7.4.4)
   languageName: node
   linkType: hard
 
@@ -11235,10 +11652,14 @@ __metadata:
     minizlib: "npm:^3.1.0"
     yallist: "npm:^5.0.0"
 <<<<<<< HEAD
+<<<<<<< HEAD
   checksum: 10/dbad9c9a07863cd1bdf8801d563b3280aa7dd0f4a6cead779ff7516d148dc80b4c04639ba732d47f91f04002f57e8c3c6573a717d649daecaac74ce71daa7ad3
 =======
   checksum: 4848cd2fa2fcaf0734cf54e14bc685056eb43a74d7cc7f954c3ac88fea88c85d95b1d7896619f91aab6f2234c5eec731c18aaa201a78fcf86985bdc824ed7a00
 >>>>>>> 01200f59 (fix: upgrade @capacitor/cli from 7.4.3 to 7.4.4)
+=======
+  checksum: 4848cd2fa2fcaf0734cf54e14bc685056eb43a74d7cc7f954c3ac88fea88c85d95b1d7896619f91aab6f2234c5eec731c18aaa201a78fcf86985bdc824ed7a00
+>>>>>>> 65f3d625 (fix: upgrade @capacitor/core from 7.4.3 to 7.4.4)
   languageName: node
   linkType: hard
 
@@ -11263,10 +11684,14 @@ __metadata:
   bin:
     terser: bin/terser
 <<<<<<< HEAD
+<<<<<<< HEAD
   checksum: 10/516ece205b7db778c4eddb287a556423cb776b7ca591b06270e558a76aa2d57c8d71d9c3c4410b276d3426beb03516fff7d96ff8b517e10730a72908810c6e33
 =======
   checksum: e094a905016b00dd665a71f47311826618ea67f2d9f5aec37834114f9d27ed0de47e18a4b3bc2421b274bbf3028ac2b082e2d20f0e3b9f24d912ea126c9da4bf
 >>>>>>> 01200f59 (fix: upgrade @capacitor/cli from 7.4.3 to 7.4.4)
+=======
+  checksum: e094a905016b00dd665a71f47311826618ea67f2d9f5aec37834114f9d27ed0de47e18a4b3bc2421b274bbf3028ac2b082e2d20f0e3b9f24d912ea126c9da4bf
+>>>>>>> 65f3d625 (fix: upgrade @capacitor/core from 7.4.3 to 7.4.4)
   languageName: node
   linkType: hard
 
@@ -11578,7 +12003,10 @@ __metadata:
   version: 4.2.1
   resolution: "typed-function@npm:4.2.1"
   checksum: 2218d6e4a56c414c2d9c1e3cf2f0d26d6a8848d3e875cbd0eec5a791c25c4ee182cb488a6077b45b110334de7bd7f44fb049feac9e5216bef3172c22acbbf501
+<<<<<<< HEAD
 >>>>>>> 01200f59 (fix: upgrade @capacitor/cli from 7.4.3 to 7.4.4)
+=======
+>>>>>>> 65f3d625 (fix: upgrade @capacitor/core from 7.4.3 to 7.4.4)
   languageName: node
   linkType: hard
 
@@ -11603,10 +12031,14 @@ __metadata:
     eslint: ^8.57.0 || ^9.0.0
     typescript: ">=4.8.4 <6.0.0"
 <<<<<<< HEAD
+<<<<<<< HEAD
   checksum: 10/85708f0a930c8992e8f70e4e143aabf3a2b9bd981a323a7f6e7ea405f2456f6d1af182264f877ff1fa00db68768fe935f668f4346173a2fbd6d828d7113d8653
 =======
   checksum: ba6914cc4006390908de9e3de295c2f7110461175a818608d198e2d1529e726c32d778fe9e224ea30464ba2c4a43c05f534d2dbc5aabf297354a2aa49a2e1cd6
 >>>>>>> 01200f59 (fix: upgrade @capacitor/cli from 7.4.3 to 7.4.4)
+=======
+  checksum: ba6914cc4006390908de9e3de295c2f7110461175a818608d198e2d1529e726c32d778fe9e224ea30464ba2c4a43c05f534d2dbc5aabf297354a2aa49a2e1cd6
+>>>>>>> 65f3d625 (fix: upgrade @capacitor/core from 7.4.3 to 7.4.4)
   languageName: node
   linkType: hard
 
@@ -11674,6 +12106,7 @@ __metadata:
   version: 7.13.0
   resolution: "undici-types@npm:7.13.0"
   checksum: 1088ad68dd57981aa6eced5b3f5d74129ac619fbe558b30cb584d6096d32b084ae30d7cdc480d622226e6ffc8d31e01ac30215816439a0d784e0fe64db873b0f
+<<<<<<< HEAD
   languageName: node
   linkType: hard
 
@@ -11681,6 +12114,8 @@ __metadata:
   version: 7.16.0
   resolution: "undici-types@npm:7.16.0"
   checksum: 10/db43439f69c2d94cc29f75cbfe9de86df87061d6b0c577ebe9bb3255f49b22c50162a7d7eb413b0458b6510b8ca299ac7cff38c3a29fbd31af9f504bcf7fbc0d
+=======
+>>>>>>> 65f3d625 (fix: upgrade @capacitor/core from 7.4.3 to 7.4.4)
   languageName: node
   linkType: hard
 
@@ -11697,6 +12132,7 @@ __metadata:
   dependencies:
     unique-slug: "npm:^5.0.0"
   checksum: 6a62094fcac286b9ec39edbd1f8f64ff92383baa430af303dfed1ffda5e47a08a6b316408554abfddd9730c78b6106bef4ca4d02c1231a735ddd56ced77573df
+<<<<<<< HEAD
   languageName: node
   linkType: hard
 
@@ -11706,6 +12142,8 @@ __metadata:
   dependencies:
     unique-slug: "npm:^6.0.0"
   checksum: 10/a5f67085caef74bdd2a6869a200ed5d68d171f5cc38435a836b5fd12cce4e4eb55e6a190298035c325053a5687ed7a3c96f0a91e82215fd14729769d9ac57d9b
+=======
+>>>>>>> 65f3d625 (fix: upgrade @capacitor/core from 7.4.3 to 7.4.4)
   languageName: node
   linkType: hard
 
@@ -11715,6 +12153,7 @@ __metadata:
   dependencies:
     imurmurhash: "npm:^0.1.4"
   checksum: beafdf3d6f44990e0a5ce560f8f881b4ee811be70b6ba0db25298c31c8cf525ed963572b48cd03be1c1349084f9e339be4241666d7cf1ebdad20598d3c652b27
+<<<<<<< HEAD
   languageName: node
   linkType: hard
 
@@ -11724,6 +12163,8 @@ __metadata:
   dependencies:
     imurmurhash: "npm:^0.1.4"
   checksum: 10/b78ed9d5b01ff465f80975f17387750ed3639909ac487fa82c4ae4326759f6de87c2131c0c39eca4c68cf06c537a8d104fba1dfc8a30308f99bc505345e1eba3
+=======
+>>>>>>> 65f3d625 (fix: upgrade @capacitor/core from 7.4.3 to 7.4.4)
   languageName: node
   linkType: hard
 
@@ -11773,10 +12214,14 @@ __metadata:
     picomatch: "npm:^4.0.3"
     webpack-virtual-modules: "npm:^0.6.2"
 <<<<<<< HEAD
+<<<<<<< HEAD
   checksum: 10/7b4adbfaac8894e8491c452c0b67c612b57e103761e842d9013ebea89a4ae92a78df4ec0aa30e5e3eaaefd47dd287973d5a662271624b7346a15d9236d257f9d
 =======
   checksum: 3d6d5bbc670311d78cad1a24b6961695c6c7ea7c9bc4558895693b388a635a5d1f16900b7b825f5962a5d1cb045f4e748f105058fdbb00d2f321ceaa9719da44
 >>>>>>> 01200f59 (fix: upgrade @capacitor/cli from 7.4.3 to 7.4.4)
+=======
+  checksum: 3d6d5bbc670311d78cad1a24b6961695c6c7ea7c9bc4558895693b388a635a5d1f16900b7b825f5962a5d1cb045f4e748f105058fdbb00d2f321ceaa9719da44
+>>>>>>> 65f3d625 (fix: upgrade @capacitor/core from 7.4.3 to 7.4.4)
   languageName: node
   linkType: hard
 
@@ -11798,10 +12243,14 @@ __metadata:
   bin:
     update-browserslist-db: cli.js
 <<<<<<< HEAD
+<<<<<<< HEAD
   checksum: 10/059f774300efb4b084a49293143c511f3ae946d40397b5c30914e900cd5691a12b8e61b41dd54ed73d3b56c8204165a0333107dd784ccf8f8c81790bcc423175
 =======
   checksum: 87af2776054ffb9194cf95e0201547d041f72ee44ce54b144da110e65ea7ca01379367407ba21de5c9edd52c74d95395366790de67f3eb4cc4afa0fe4424e76f
 >>>>>>> 01200f59 (fix: upgrade @capacitor/cli from 7.4.3 to 7.4.4)
+=======
+  checksum: 87af2776054ffb9194cf95e0201547d041f72ee44ce54b144da110e65ea7ca01379367407ba21de5c9edd52c74d95395366790de67f3eb4cc4afa0fe4424e76f
+>>>>>>> 65f3d625 (fix: upgrade @capacitor/core from 7.4.3 to 7.4.4)
   languageName: node
   linkType: hard
 
@@ -12090,6 +12539,7 @@ __metadata:
     typescript:
       optional: true
   checksum: 43b9f37561bace22b946b37e90a1e7cbe7f3d555321e41b2b3d94fcdc8b80b7cfba855573a9dc65421d37eea662873651dcbd1a532e6cd12c4f4b47da0ccbc53
+<<<<<<< HEAD
   languageName: node
   linkType: hard
 
@@ -12108,6 +12558,8 @@ __metadata:
     typescript:
       optional: true
   checksum: 10/3c3ec68747f31d52095365f37e548c8d7488ccd0d6a9ea0aabf2d619e6f62b9c0673766411b3574c1229e08640349f1eb6eab1f7766e269c8f221d1de5d1f06d
+=======
+>>>>>>> 65f3d625 (fix: upgrade @capacitor/core from 7.4.3 to 7.4.4)
   languageName: node
   linkType: hard
 
@@ -12229,6 +12681,7 @@ __metadata:
   bin:
     node-which: bin/which.js
   checksum: 6ec99e89ba32c7e748b8a3144e64bfc74aa63e2b2eacbb61a0060ad0b961eb1a632b08fb1de067ed59b002cec3e21de18299216ebf2325ef0f78e0f121e14e90
+<<<<<<< HEAD
   languageName: node
   linkType: hard
 
@@ -12240,6 +12693,8 @@ __metadata:
   bin:
     node-which: bin/which.js
   checksum: 10/df19b2cd8aac94b333fa29b42e8e371a21e634a742a3b156716f7752a5afe1d73fb5d8bce9b89326f453d96879e8fe626eb421e0117eb1a3ce9fd8c97f6b7db9
+=======
+>>>>>>> 65f3d625 (fix: upgrade @capacitor/core from 7.4.3 to 7.4.4)
   languageName: node
   linkType: hard
 
@@ -12400,10 +12855,14 @@ __metadata:
     eslint-visitor-keys: "npm:^3.0.0"
     yaml: "npm:^2.0.0"
 <<<<<<< HEAD
+<<<<<<< HEAD
   checksum: 10/1f0b14b5dce719a4570c68dd5610078a2bfaf5ff45f872ecac27cbd49760d081ffc8e9a536bb37928e8ded71d2eb69a29150fd79262b2ac0a1058684cdfd02d6
 =======
   checksum: ef2cecd5b97e14e8022fccddbd56f624033e1a101723f0acf2bfd78be7bc6f68b654be2acbed803b13692ec8ab650261c067051a7411978778f8af1d44cd8b4f
 >>>>>>> 01200f59 (fix: upgrade @capacitor/cli from 7.4.3 to 7.4.4)
+=======
+  checksum: ef2cecd5b97e14e8022fccddbd56f624033e1a101723f0acf2bfd78be7bc6f68b654be2acbed803b13692ec8ab650261c067051a7411978778f8af1d44cd8b4f
+>>>>>>> 65f3d625 (fix: upgrade @capacitor/core from 7.4.3 to 7.4.4)
   languageName: node
   linkType: hard
 
@@ -12413,10 +12872,14 @@ __metadata:
   bin:
     yaml: bin.mjs
 <<<<<<< HEAD
+<<<<<<< HEAD
   checksum: 10/4eab0074da6bc5a5bffd25b9b359cf7061b771b95d1b3b571852098380db3b1b8f96e0f1f354b56cc7216aa97cea25163377ccbc33a2e9ce00316fe8d02f4539
 =======
   checksum: eae07b3947d405012672ec17ce27348aea7d1fa0534143355d24a43a58f5e05652157ea2182c4fe0604f0540be71f99f1173f9d61018379404507790dff17665
 >>>>>>> 01200f59 (fix: upgrade @capacitor/cli from 7.4.3 to 7.4.4)
+=======
+  checksum: eae07b3947d405012672ec17ce27348aea7d1fa0534143355d24a43a58f5e05652157ea2182c4fe0604f0540be71f99f1173f9d61018379404507790dff17665
+>>>>>>> 65f3d625 (fix: upgrade @capacitor/core from 7.4.3 to 7.4.4)
   languageName: node
   linkType: hard
 
