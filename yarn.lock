@@ -4373,13 +4373,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"deep-pick-omit@npm:^1.2.1":
-  version: 1.2.1
-  resolution: "deep-pick-omit@npm:1.2.1"
-  checksum: 10/8d701fb0d1d4eef94338cf1103c9fe641bfd46344636d6f646f305648b3a16ed5b39df1609ebab383dac77337b8e0a2b51873a757b6063582f9abc853df7c03f
-  languageName: node
-  linkType: hard
-
 "default-browser-id@npm:^3.0.0":
   version: 3.0.0
   resolution: "default-browser-id@npm:3.0.0"
@@ -8663,13 +8656,11 @@ __metadata:
   languageName: node
   linkType: hard
 
-"pinia-plugin-persistedstate@npm:4.5.0":
-  version: 4.5.0
-  resolution: "pinia-plugin-persistedstate@npm:4.5.0"
+"pinia-plugin-persistedstate@npm:4.7.1":
+  version: 4.7.1
+  resolution: "pinia-plugin-persistedstate@npm:4.7.1"
   dependencies:
-    deep-pick-omit: "npm:^1.2.1"
     defu: "npm:^6.1.4"
-    destr: "npm:^2.0.5"
   peerDependencies:
     "@nuxt/kit": ">=3.0.0"
     "@pinia/nuxt": ">=0.10.0"
@@ -8681,7 +8672,7 @@ __metadata:
       optional: true
     pinia:
       optional: true
-  checksum: 10/c6932c45362c199063c06c28c416b17b63d119fcd59bc0077a82082048dcc46012feff3ee4995881ac6663de6af9240ffa8ea55f7411845b9b4f8c3a82ce53ae
+  checksum: 10/f8935418f1c7ef2921c3935ca66bc2be8f53e993d2756fb30a4ba9ba9b9cd5c416e412c17dd7cb7dceaf7249eb590676fc70f9ac6b35d12577a353d80b72ed28
   languageName: node
   linkType: hard
 
@@ -8961,7 +8952,7 @@ __metadata:
     mathjs: "npm:15.0.0"
     papaparse: "npm:^5.5.3"
     pinia: "npm:3.0.3"
-    pinia-plugin-persistedstate: "npm:4.5.0"
+    pinia-plugin-persistedstate: "npm:4.7.1"
     postcss: "npm:8.5.2"
     prettier: "npm:3.5.2"
     quasar: "npm:2.18.5"
