@@ -66,7 +66,7 @@
     "mathjs": "15.0.0",
     "papaparse": "^5.5.3",
     "pinia": "3.0.3",
-    "pinia-plugin-persistedstate": "4.5.0",
+    "pinia-plugin-persistedstate": "4.7.1",
     "quasar": "2.18.5",
     "tinykeys": "^3.0.0",
     "ts-pattern": "5.8.0",
