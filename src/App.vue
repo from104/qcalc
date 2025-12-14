@@ -220,6 +220,7 @@
 </template>
 
 <style scoped lang="scss">
+
   // === 공통 트랜지션 스타일 ===
   %transition-base {
     position: absolute;
@@ -242,10 +243,12 @@
   .slide-back-enter-from {
     transform: translateX(-100%);
   }
+
   .slide-back-enter-to,
   .slide-back-leave-from {
     transform: translateX(0);
   }
+
   .slide-back-leave-to {
     transform: translateX(100%);
   }

@@ -25,7 +25,11 @@
       v-model:left-drawer-open="leftDrawerOpen"
       @toggle-left-drawer="toggleLeftDrawer"
     />
-    <WideLayout v-else v-model:left-drawer-open="leftDrawerOpen" @toggle-left-drawer="toggleLeftDrawer" />
+    <WideLayout
+      v-else
+      v-model:left-drawer-open="leftDrawerOpen"
+      @toggle-left-drawer="toggleLeftDrawer"
+    />
     <ShowTips v-model="uiStore.showTipsDialog" />
   </div>
 </template>
