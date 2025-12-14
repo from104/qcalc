@@ -4,6 +4,16 @@ All notable changes to this project are recorded in this file.
 
 The format is based on [Keep a Changelog] and this project follows [Semantic Versioning].
 
+## [0.11.6] 2025-12-00
+
+### Added
+
+### Changed
+
+### Fixed
+
+- **Wide Layout Sub-page Transition Bug Fixed**: Fixed an issue where the transition effect for sub-pages (right section) in wide layout did not work properly.
+
 ## [0.11.5] 2025-10-07
 
 ### Added
