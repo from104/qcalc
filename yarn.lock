@@ -77,7 +77,11 @@ __metadata:
   resolution: "@capacitor/android@npm:7.4.4"
   peerDependencies:
     "@capacitor/core": ^7.4.0
+<<<<<<< HEAD
   checksum: 8/48d46cd90b3404e5797c998ef371e2690f5bb196350e73221d1e18c2806b3a7332a8d271979bf61472de8c9f5a3e9fa13a07899f40ec20afc38abb08a4c9b405
+=======
+  checksum: e8fd15c424f6019a3233a0e13d0c5090c716c5304ec93ce9155f3b3c8dfddc98ae82028e395b40549fad910d342e70b168f6f0168b84f6079002101e50fbd30b
+>>>>>>> 01200f59 (fix: upgrade @capacitor/cli from 7.4.3 to 7.4.4)
   languageName: node
   linkType: hard
 
@@ -94,31 +98,35 @@ __metadata:
   version: 7.4.4
   resolution: "@capacitor/cli@npm:7.4.4"
   dependencies:
-    "@ionic/cli-framework-output": "npm:^2.2.8"
-    "@ionic/utils-subprocess": "npm:^3.0.1"
-    "@ionic/utils-terminal": "npm:^2.3.5"
-    commander: "npm:^12.1.0"
-    debug: "npm:^4.4.0"
-    env-paths: "npm:^2.2.0"
-    fs-extra: "npm:^11.2.0"
-    kleur: "npm:^4.1.5"
-    native-run: "npm:^2.0.1"
-    open: "npm:^8.4.0"
-    plist: "npm:^3.1.0"
-    prompts: "npm:^2.4.2"
-    rimraf: "npm:^6.0.1"
-    semver: "npm:^7.6.3"
-    tar: "npm:^6.1.11"
-    tslib: "npm:^2.8.1"
-    xml2js: "npm:^0.6.2"
+    "@ionic/cli-framework-output": ^2.2.8
+    "@ionic/utils-subprocess": ^3.0.1
+    "@ionic/utils-terminal": ^2.3.5
+    commander: ^12.1.0
+    debug: ^4.4.0
+    env-paths: ^2.2.0
+    fs-extra: ^11.2.0
+    kleur: ^4.1.5
+    native-run: ^2.0.1
+    open: ^8.4.0
+    plist: ^3.1.0
+    prompts: ^2.4.2
+    rimraf: ^6.0.1
+    semver: ^7.6.3
+    tar: ^6.1.11
+    tslib: ^2.8.1
+    xml2js: ^0.6.2
   bin:
     cap: bin/capacitor
     capacitor: bin/capacitor
+<<<<<<< HEAD
 <<<<<<< HEAD
   checksum: 10/59490993a6bb216911217f5cdb80e888a2662b2cc75ed8a860a7bf3568f460970eb6c88f2e68349c217f8779faf37991115e8c887bbbf5995edae1cadf22b7ca
 =======
   checksum: b96080830036b4baaf906b31a174843dc3849797bea462bc7804efe522520140a80679a9ac16c02bd9d661797a61a42c6dc2421cb3b2ce904339d5c32e7d7c1e
 >>>>>>> 0cf49fe1 (fix: upgrade @capacitor/android from 7.4.3 to 7.4.4)
+=======
+  checksum: 8/b21d405669db48e926ce26037b0d4ab746b7801379a99089033a6a80499428aa4857164e9fdad1f8a62fdcf3e9c049a4495ef157fb1a7cf9fbb57689dda75c22
+>>>>>>> 01200f59 (fix: upgrade @capacitor/cli from 7.4.3 to 7.4.4)
   languageName: node
   linkType: hard
 
@@ -128,10 +136,14 @@ __metadata:
   dependencies:
     tslib: "npm:^2.1.0"
 <<<<<<< HEAD
+<<<<<<< HEAD
   checksum: 10/956b82d016663a7fdac5de5577104b4bedc845948492156fcfb847b1da9d376fde6db159e27eeac45cc4bbd4e29e8e06b29766d95441b0775faea9b696365606
 =======
   checksum: 9915eb1f618dcd17e770aa6c9092680398cc8ba254284acd65175a28aa35cf6a32e79a6b0abdedb0ed45fc4a7b91d9e495cce53209bbc741a88c15147cfe5a3b
 >>>>>>> 0cf49fe1 (fix: upgrade @capacitor/android from 7.4.3 to 7.4.4)
+=======
+  checksum: 9915eb1f618dcd17e770aa6c9092680398cc8ba254284acd65175a28aa35cf6a32e79a6b0abdedb0ed45fc4a7b91d9e495cce53209bbc741a88c15147cfe5a3b
+>>>>>>> 01200f59 (fix: upgrade @capacitor/cli from 7.4.3 to 7.4.4)
   languageName: node
   linkType: hard
 
@@ -8948,6 +8960,7 @@ __metadata:
   resolution: "qcalc@workspace:."
   dependencies:
 <<<<<<< HEAD
+<<<<<<< HEAD
     "@capacitor/android": "npm:7.4.3"
     "@capacitor/app": "npm:7.1.0"
     "@capacitor/cli": "npm:7.4.4"
@@ -9015,6 +9028,11 @@ __metadata:
     "@capacitor/android": 7.4.4
     "@capacitor/app": 7.1.0
     "@capacitor/cli": 7.4.3
+=======
+    "@capacitor/android": 7.4.3
+    "@capacitor/app": 7.1.0
+    "@capacitor/cli": 7.4.4
+>>>>>>> 01200f59 (fix: upgrade @capacitor/cli from 7.4.3 to 7.4.4)
     "@capacitor/core": 7.4.3
     "@capacitor/filesystem": 7.1.4
     "@capacitor/haptics": 7.0.2
@@ -9075,7 +9093,10 @@ __metadata:
     vue-i18n: 11.1.12
     vue-router: 4.6.3
     vue-tsc: 3.1.0
+<<<<<<< HEAD
 >>>>>>> 0cf49fe1 (fix: upgrade @capacitor/android from 7.4.3 to 7.4.4)
+=======
+>>>>>>> 01200f59 (fix: upgrade @capacitor/cli from 7.4.3 to 7.4.4)
   languageName: unknown
   linkType: soft
 
