@@ -90,9 +90,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@capacitor/cli@npm:7.4.3":
-  version: 7.4.3
-  resolution: "@capacitor/cli@npm:7.4.3"
+"@capacitor/cli@npm:7.4.4":
+  version: 7.4.4
+  resolution: "@capacitor/cli@npm:7.4.4"
   dependencies:
     "@ionic/cli-framework-output": "npm:^2.2.8"
     "@ionic/utils-subprocess": "npm:^3.0.1"
@@ -114,16 +114,16 @@ __metadata:
   bin:
     cap: bin/capacitor
     capacitor: bin/capacitor
-  checksum: 10/b96080830036b4baaf906b31a174843dc3849797bea462bc7804efe522520140a80679a9ac16c02bd9d661797a61a42c6dc2421cb3b2ce904339d5c32e7d7c1e
+  checksum: 10/59490993a6bb216911217f5cdb80e888a2662b2cc75ed8a860a7bf3568f460970eb6c88f2e68349c217f8779faf37991115e8c887bbbf5995edae1cadf22b7ca
   languageName: node
   linkType: hard
 
-"@capacitor/core@npm:7.4.3":
-  version: 7.4.3
-  resolution: "@capacitor/core@npm:7.4.3"
+"@capacitor/core@npm:7.4.4":
+  version: 7.4.4
+  resolution: "@capacitor/core@npm:7.4.4"
   dependencies:
     tslib: "npm:^2.1.0"
-  checksum: 10/9915eb1f618dcd17e770aa6c9092680398cc8ba254284acd65175a28aa35cf6a32e79a6b0abdedb0ed45fc4a7b91d9e495cce53209bbc741a88c15147cfe5a3b
+  checksum: 10/956b82d016663a7fdac5de5577104b4bedc845948492156fcfb847b1da9d376fde6db159e27eeac45cc4bbd4e29e8e06b29766d95441b0775faea9b696365606
   languageName: node
   linkType: hard
 
@@ -8941,8 +8941,8 @@ __metadata:
   dependencies:
     "@capacitor/android": "npm:7.4.3"
     "@capacitor/app": "npm:7.1.0"
-    "@capacitor/cli": "npm:7.4.3"
-    "@capacitor/core": "npm:7.4.3"
+    "@capacitor/cli": "npm:7.4.4"
+    "@capacitor/core": "npm:7.4.4"
     "@capacitor/filesystem": "npm:7.1.4"
     "@capacitor/haptics": "npm:7.0.2"
     "@capacitor/screen-orientation": "npm:7.0.2"

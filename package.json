@@ -17,13 +17,7 @@
     "url": "https://github.com/from104/qcalc/issues"
   },
   "homepage": "https://github.com/from104/qcalc#readme",
-  "keywords": [
-    "calculator",
-    "quasar",
-    "vue",
-    "electron",
-    "typescript"
-  ],
+  "keywords": ["calculator", "quasar", "vue", "electron", "typescript"],
   "type": "module",
   "scripts": {
     "postinstall": "quasar prepare",
@@ -43,13 +37,8 @@
   "dependencies": {
     "@capacitor/android": "7.4.3",
     "@capacitor/app": "7.1.0",
-<<<<<<< HEAD
-    "@capacitor/cli": "7.4.3",
-    "@capacitor/core": "7.4.3",
-=======
     "@capacitor/cli": "7.4.4",
     "@capacitor/core": "7.4.4",
->>>>>>> 93e7ff51 (chore: update .gitignore and package.json)
     "@capacitor/filesystem": "7.1.4",
     "@capacitor/haptics": "7.0.2",
     "@capacitor/screen-orientation": "7.0.2",
