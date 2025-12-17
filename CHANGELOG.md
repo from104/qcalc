@@ -8,6 +8,8 @@ The format is based on [Keep a Changelog] and this project follows [Semantic Ver
 
 ### Added
 
+- **Number Format Per Calculator Feature**: Added ability to use independent number format settings (number grouping, grouping unit, decimal places) for each calculator (basic, unit, currency, radix). Toggle with Alt+n shortcut key.
+
 ### Changed
 
 ### Fixed
@@ -28,7 +30,7 @@ The format is based on [Keep a Changelog] and this project follows [Semantic Ver
 ### Fixed
 
 - **Calculation History Scroll Bug Fixed**: Fixed a bug where calculation history could not be scrolled using the floating icon or keyboard (Up/Down/PageUp/PageDown/Home/End).
- 
+
 ## [0.11.4] 2025-06-10
 
 ### Added

@@ -81,6 +81,7 @@ The calculator alone appears when the window width is reduced.
 
 #### Number Display Settings
 
+- **Apply Number Format Per Calculator**: Toggle with Alt+n key
 - **Show/Hide Separator**: Toggle with , key
 - **Set Grouping Unit**: Change between 3/4 digits with Alt+, key
 - **Decimal Places**: Adjust with [, ] keys (unlimited~16 digits)
@@ -131,6 +132,7 @@ The calculator alone appears when the window width is reduced.
 - **Resize Window**: Side panel auto-adjusts based on window size
 - **Reset Panel**: Toggle panel reset at startup with Alt+i key
 - **(De)activate Dark Mode**: Switch dark mode with Alt+d key
+- **Apply Number Format Per Calculator**: Toggle number format per calculator with Alt+n key
 
 #### Mobile Support
 
@@ -143,7 +145,7 @@ The calculator alone appears when the window width is reduced.
 ### Basic Calculator and Common Functions
 
 | Shortcut    | Function                  |
-|-------------|---------------------------|
+| ----------- | ------------------------- |
 | 0-9\.       | Enter numbers and decimal |
 | +, -, \*, / | Basic arithmetic          |
 | Enter, =    | Calculate result          |
@@ -159,7 +161,7 @@ The calculator alone appears when the window width is reduced.
 ### Advanced Math Functions (Shift Mode)
 
 | Shortcut | Function                    |
-|----------|-----------------------------|
+| -------- | --------------------------- |
 | r        | Power (xⁿ)                  |
 | t        | Root (ⁿ√x)                  |
 | f        | Power of 10 (10ⁿ)           |
@@ -174,7 +176,7 @@ The calculator alone appears when the window width is reduced.
 ### Memory Operations
 
 | Shortcut          | Function             |
-|-------------------|----------------------|
+| ----------------- | -------------------- |
 | C-Delete          | Memory clear (MC)    |
 | C-Backspace       | Memory recall (MR)   |
 | C-Enter, C-=      | Memory store (MS)    |
@@ -213,7 +215,7 @@ The calculator alone appears when the window width is reduced.
 ### Screen Navigation and UI Control
 
 | Shortcut  | Function               |
-|-----------|------------------------|
+| --------- | ---------------------- |
 | F1        | Help                   |
 | F2        | About                  |
 | F3        | Settings               |
@@ -227,7 +229,7 @@ The calculator alone appears when the window width is reduced.
 ### UI Settings
 
 | Shortcut | Function                     |
-|----------|------------------------------|
+| -------- | ---------------------------- |
 | A-t      | Toggle always on top         |
 | A-i      | Toggle init panel on startup |
 | A-d      | Toggle dark mode             |
@@ -240,7 +242,7 @@ The calculator alone appears when the window width is reduced.
 ### Clipboard Operations
 
 | Shortcut        | Function               |
-|-----------------|------------------------|
+| --------------- | ---------------------- |
 | C-c, C-Insert   | Copy main panel result |
 | SC-c, AC-Insert | Copy sub panel result  |
 | C-v, S-Insert   | Paste to main panel    |
@@ -249,7 +251,7 @@ The calculator alone appears when the window width is reduced.
 ### History Navigation
 
 | Shortcut        | Function             |
-|-----------------|----------------------|
+| --------------- | -------------------- |
 | ↑/↓             | Scroll 50px up/down  |
 | PageUp/PageDown | Scroll 400px up/down |
 | Home/End        | Scroll to top/bottom |

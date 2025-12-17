@@ -86,6 +86,7 @@
    * Alt+i: 초기화 패널 토글
    * Alt+d: 다크모드 토글
    * Alt+p: 햅틱 모드 토글
+   * Alt+n: 숫자 형식 계산기별 적용 토글
    * F1-F4: 각종 페이지 이동
    * q: 앱 종료
    * 기타: 계산기 관련 기능
@@ -95,9 +96,10 @@
     [['Alt+i'], settingsStore.toggleInitPanel],
     [['Alt+d'], toggleDarkModeWithNotification],
     [['Alt+p'], settingsStore.toggleHapticsMode],
+    [['Alt+n'], settingsStore.toggleNumberFormatPerCalculator],
     [[';'], settingsStore.toggleButtonAddedLabel],
     [[','], settingsStore.toggleUseGrouping],
-    [['Alt+,'], () => settingsStore.setGroupingUnit(settingsStore.groupingUnit === 3 ? 4 : 3)],
+    [['Alt+,'], () => settingsStore.toggleGroupingUnit()],
     [['['], settingsStore.decrementDecimalPlaces],
     [[']'], settingsStore.incrementDecimalPlaces],
     [['q'], quitApp],

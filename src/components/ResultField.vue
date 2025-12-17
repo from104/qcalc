@@ -180,8 +180,8 @@
 
       const formattedNumber = calcStore.toFormattedNumber(inputBuffer, radixStore.sourceRadix);
 
-      // 소수점 자릿수 설정이 -2이고 소수점이 있는 경우
-      const hasSpecialDecimalPlaces = settingsStore.decimalPlaces === -1 && inputBuffer.includes('.');
+      // 소수점 자릿수 설정이 -1이고 소수점이 있는 경우
+      const hasSpecialDecimalPlaces = Number(settingsStore.getCurrentDecimalPlaces) === -1 && inputBuffer.includes('.');
 
       const result =
         hasSpecialDecimalPlaces && !calc.needsBufferReset
@@ -683,16 +683,16 @@
   };
 
   // 키 바인딩 설정
-    const { subscribe, unsubscribe } =
+  const { subscribe, unsubscribe } =
     props.field === 'main'
       ? useKeyBinding([
-          [['Control+c', 'Control+Insert', 'Copy'], handleCopy],
-          [['Control+v', 'Shift+Insert', 'Paste'], () => handlePaste('main')],
-        ])
+        [['Control+c', 'Control+Insert', 'Copy'], handleCopy],
+        [['Control+v', 'Shift+Insert', 'Paste'], () => handlePaste('main')],
+      ])
       : useKeyBinding([
-          [['Shift+Control+c', 'Alt+Control+Insert', 'Shift+Copy'], handleCopy],
-          [['Shift+Control+v', 'Alt+Shift+Insert', 'Shift+Paste'], () => handlePaste('sub')],
-        ]);
+        [['Shift+Control+c', 'Alt+Control+Insert', 'Shift+Copy'], handleCopy],
+        [['Shift+Control+v', 'Alt+Shift+Insert', 'Shift+Paste'], () => handlePaste('sub')],
+      ]);
 
   /**
    * 입력 필드 포커스 상태에 따라 키 바인딩을 활성화/비활성화합니다.
@@ -700,7 +700,7 @@
   watch(
     () => uiStore.inputFocused,
     () => {
-            if (uiStore.inputFocused) {
+      if (uiStore.inputFocused) {
         unsubscribe();
       } else {
         subscribe();
@@ -709,7 +709,7 @@
     { immediate: true },
   );
 
-    onMounted(() => {
+  onMounted(() => {
     subscribe();
   });
 
@@ -807,20 +807,18 @@
       <template #control>
         <div
           :id="fieldID"
-          v-mutation="
-            () => {
-              checkNeedFieldTooltip();
-              return true;
-            }
-          "
+          v-mutation="() => {
+            checkNeedFieldTooltip();
+            return true;
+          }
+            "
           v-mutation.characterData
           class="self-center no-outline full-width full-height ellipsis text-right q-pt-xs noselect"
           :class="[`text-${calcStore.isMemoryVisible ? memoryTextColor : panelTextColor}`]"
-          :style="
-            isMainField
-              ? `padding-top: ${mainPanelPaddingTop}; padding-bottom: ${mainPanelPaddingBottom};`
-              : `padding-top: ${subPanelPaddingTop}; padding-bottom: ${subPanelPaddingBottom};`
-          "
+          :style="isMainField
+            ? `padding-top: ${mainPanelPaddingTop}; padding-bottom: ${mainPanelPaddingBottom};`
+            : `padding-top: ${subPanelPaddingTop}; padding-bottom: ${subPanelPaddingBottom};`
+            "
           role="text"
           :aria-label="t('ariaLabel.result', { type: isMainField ? t('ariaLabel.main') : t('ariaLabel.sub') })"
           @click="
@@ -927,9 +925,12 @@
     margin-left: 1px;
     position: relative;
     bottom: -3px;
-    min-width: 2ch; /* 2글자 폭 확보 */
-    display: inline-block; /* 폭 설정을 위해 필요 */
-    text-align: left; /* 왼쪽 정렬 (선택사항) */
+    min-width: 2ch;
+    /* 2글자 폭 확보 */
+    display: inline-block;
+    /* 폭 설정을 위해 필요 */
+    text-align: left;
+    /* 왼쪽 정렬 (선택사항) */
   }
 
   // 메인 필드의 결과 영역 커서를 기본 커서로 설정
@@ -944,6 +945,7 @@
       text-align: right;
       font-size: 20px;
     }
+
     :deep(.q-field__control) {
       padding-top: 0px;
     }

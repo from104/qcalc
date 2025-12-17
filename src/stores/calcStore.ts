@@ -92,13 +92,16 @@ export const useCalcStore = defineStore('calc', {
     toFormattedNumber(value: string, radix: Radix = Radix.Decimal): string {
       if (!value) return '';
 
+      const currentSettings = settingsStore.getCurrentFormatSettings;
       const formattedValue = formatDecimalPlaces(
         value,
         settingsStore.getDecimalPlaces,
         radixStore.radixEnumToNumber(uiStore.currentTab === 'radix' ? radix : Radix.Decimal),
       );
 
-      return settingsStore.useGrouping ? numberGrouping(formattedValue, settingsStore.groupingUnit) : formattedValue;
+      return currentSettings.useGrouping
+        ? numberGrouping(formattedValue, currentSettings.groupingUnit)
+        : formattedValue;
     },
 
     // 계산 기록 관련

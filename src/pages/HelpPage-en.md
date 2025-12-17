@@ -19,11 +19,11 @@ QCalc is more than just a simple calculator - it's evolving into a modern produc
 #### Standard Calculator
 
 - **How to Access**: Ctrl+1 or select the top tab
-- **Basic Operations**: Enter numbers 0-9, +, -, *, / keys
+- **Basic Operations**: Enter numbers 0-9, +, -, \*, / keys
 - **Advanced Functions**: Trigonometric functions (q, w, e), square (u), square root (i), constants (z: π, x: φ, c: e)
 - **Memory Functions**: Ctrl+Enter (MS), Ctrl+Backspace (MR), Ctrl+Delete (MC)
 - **Percentage Calculation**: 'number, /, number, %(k)' calculates percentage
-- **Apply Percentage**: 'number, *, number, %(k)' applies percentage
+- **Apply Percentage**: 'number, \*, number, %(k)' applies percentage
 
 #### Unit Converter
 
@@ -73,6 +73,7 @@ QCalc is more than just a simple calculator - it's evolving into a modern produc
 
 #### Number Display Settings
 
+- **Apply Number Format Per Calculator**: Toggle with Alt+n key
 - **Show/Hide Separator**: Toggle with , key
 - **Set Grouping Unit**: Change between 3/4 digits with Alt+, key
 - **Decimal Places**: Adjust with [, ] keys (unlimited~16 digits)
@@ -123,6 +124,7 @@ QCalc is more than just a simple calculator - it's evolving into a modern produc
 - **Resize Window**: Side panel auto-adjusts based on window size
 - **Reset Panel**: Toggle panel reset at startup with Alt+i key
 - **(De)activate Dark Mode**: Switch dark mode with Alt+d key
+- **Apply Number Format Per Calculator**: Toggle number format per calculator with Alt+n key
 
 #### Mobile Support
 
@@ -135,7 +137,7 @@ QCalc is more than just a simple calculator - it's evolving into a modern produc
 ### Basic Calculator and Common Functions
 
 | Shortcut    | Function                  |
-|-------------|---------------------------|
+| ----------- | ------------------------- |
 | 0-9\.       | Enter numbers and decimal |
 | +, -, \*, / | Basic arithmetic          |
 | Enter, =    | Calculate result          |
@@ -151,7 +153,7 @@ QCalc is more than just a simple calculator - it's evolving into a modern produc
 ### Advanced Math Functions (Shift Mode)
 
 | Shortcut | Function                    |
-|----------|-----------------------------|
+| -------- | --------------------------- |
 | r        | Power (xⁿ)                  |
 | t        | Root (ⁿ√x)                  |
 | f        | Power of 10 (10ⁿ)           |
@@ -166,7 +168,7 @@ QCalc is more than just a simple calculator - it's evolving into a modern produc
 ### Memory Operations
 
 | Shortcut          | Function             |
-|-------------------|----------------------|
+| ----------------- | -------------------- |
 | C-Delete          | Memory clear (MC)    |
 | C-Backspace       | Memory recall (MR)   |
 | C-Enter, C-=      | Memory store (MS)    |
@@ -178,7 +180,7 @@ QCalc is more than just a simple calculator - it's evolving into a modern produc
 ### Unit/Currency Conversion Mode (Shift Mode)
 
 | Shortcut | Function                     |
-|----------|------------------------------|
+| -------- | ---------------------------- |
 | f,g,h    | ×2/×3/×5 or +5/+10/+100      |
 | q,w,e    | ÷2/÷3/÷5 or -5/-10/-100      |
 | a,s,d    | ×10/×100/×1000               |
@@ -189,7 +191,7 @@ QCalc is more than just a simple calculator - it's evolving into a modern produc
 ### Radix Converter Mode
 
 | Shortcut | Function                         |
-|----------|--------------------------------|
+| -------- | -------------------------------- |
 | r,t      | 1-bit shift (x<<1, x>>1)         |
 | u,i      | Left/right shift (x<<y, x>>y)    |
 | f,g      | 4-bit shift (x<<4, x>>4)         |
@@ -205,7 +207,7 @@ QCalc is more than just a simple calculator - it's evolving into a modern produc
 ### Screen Navigation and UI Control
 
 | Shortcut  | Function               |
-|-----------|------------------------|
+| --------- | ---------------------- |
 | F1        | Help                   |
 | F2        | About                  |
 | F3        | Settings               |
@@ -218,21 +220,22 @@ QCalc is more than just a simple calculator - it's evolving into a modern produc
 
 ### UI Settings
 
-| Shortcut | Function                     |
-|----------|------------------------------|
-| A-t      | Toggle always on top         |
-| A-i      | Toggle init panel on startup |
-| A-d      | Toggle dark mode             |
-| A-p      | Toggle haptic mode           |
-| ,        | Toggle number grouping       |
-| A-,      | Change grouping unit (3/4)   |
-| [, ]     | Adjust decimal places (∞~16) |
-| q        | Quit application             |
+| Shortcut | Function                            |
+| -------- | ----------------------------------- |
+| A-t      | Toggle always on top                |
+| A-i      | Toggle init panel on startup        |
+| A-d      | Toggle dark mode                    |
+| A-p      | Toggle haptic mode                  |
+| A-n      | Toggle number format per calculator |
+| ,        | Toggle number grouping              |
+| A-,      | Change grouping unit (3/4)          |
+| [, ]     | Adjust decimal places (∞~16)        |
+| q        | Quit application                    |
 
 ### Clipboard Operations
 
 | Shortcut        | Function               |
-|-----------------|------------------------|
+| --------------- | ---------------------- |
 | C-c, C-Insert   | Copy main panel result |
 | SC-c, AC-Insert | Copy sub panel result  |
 | C-v, S-Insert   | Paste to main panel    |
@@ -241,7 +244,7 @@ QCalc is more than just a simple calculator - it's evolving into a modern produc
 ### History Navigation
 
 | Shortcut        | Function             |
-|-----------------|----------------------|
+| --------------- | -------------------- |
 | ↑/↓             | Scroll 50px up/down  |
 | PageUp/PageDown | Scroll 400px up/down |
 | Home/End        | Scroll to top/bottom |
