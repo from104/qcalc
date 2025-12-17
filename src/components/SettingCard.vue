@@ -347,6 +347,8 @@
         />
       </q-item>
 
+      <q-separator spaced="md" role="separator" />
+
       <!-- 다크 모드 -->
       <q-item class="q-mb-md">
         <q-item-label class="self-center" role="text">{{ t('darkMode.title') }} (Alt-D)</q-item-label>
@@ -374,7 +376,7 @@
         />
       </q-item>
 
-      <!-- 색상 테마 선택 추가 -->
+      <!-- 색상 테마 선택 -->
       <q-item class="q-mb-md">
         <q-item-label class="self-center" role="text">{{ t('colorTheme') }}</q-item-label>
         <q-space />
@@ -447,6 +449,7 @@
         </q-select>
       </q-item>
 
+      <!-- 새 테마 만들기 버튼 -->
       <q-item>
         <q-btn
           flat
@@ -460,23 +463,10 @@
         />
       </q-item>
 
+      <!-- 테마 편집기 -->
       <ThemeEditor ref="themeEditor" />
 
       <q-separator spaced="md" role="separator" />
-
-      <!-- 버튼 추가 라벨 표시 -->
-      <q-item class="q-mb-sm">
-        <q-item-label class="self-center" role="text">{{ t('showButtonAddedLabel') }} (;)</q-item-label>
-        <q-space />
-        <q-toggle
-          v-model="settingsStore.showButtonAddedLabel"
-          keep-color
-          :color="primaryAccentColor"
-          dense
-          role="switch"
-          :aria-label="t('ariaLabel.showButtonAddedLabel')"
-        />
-      </q-item>
 
       <!-- 숫자 묶음 표시 -->
       <q-item class="q-mb-xs">
@@ -542,7 +532,7 @@
 
       <!-- 단위 표시 -->
       <template v-if="uiStore.currentTab == 'unit'">
-        <q-separator spaced="md" />
+        <q-separator spaced="md" role="separator" />
 
         <q-item class="q-mb-sm">
           <q-item-label class="self-center" role="text"> {{ t('showUnit') }} (Alt-\\) </q-item-label>
@@ -553,7 +543,7 @@
 
       <!-- 기호 표시 -->
       <template v-else-if="uiStore.currentTab == 'currency'">
-        <q-separator spaced="md" />
+        <q-separator spaced="md" role="separator" />
 
         <q-item class="q-mb-sm">
           <q-item-label class="self-center" role="text"> {{ t('showSymbol') }} (Alt-\) </q-item-label>
@@ -564,7 +554,7 @@
 
       <!-- 진법 표시 -->
       <template v-else-if="uiStore.currentTab == 'radix'">
-        <q-separator spaced="md" />
+        <q-separator spaced="md" role="separator" />
 
         <q-item class="q-mb-sm">
           <q-item-label class="self-center" role="text"> {{ t('showRadix') }} (Alt-\) </q-item-label>
@@ -596,7 +586,23 @@
         </q-item>
       </template>
 
-      <q-separator spaced="md" />
+      <q-separator spaced="md" role="separator" />
+
+      <!-- 버튼 추가 라벨 표시 -->
+      <q-item class="q-mb-sm">
+        <q-item-label class="self-center" role="text">{{ t('showButtonAddedLabel') }} (;)</q-item-label>
+        <q-space />
+        <q-toggle
+          v-model="settingsStore.showButtonAddedLabel"
+          keep-color
+          :color="primaryAccentColor"
+          dense
+          role="switch"
+          :aria-label="t('ariaLabel.showButtonAddedLabel')"
+        />
+      </q-item>
+      
+      <q-separator spaced="md" role="separator" />
 
       <!-- 시스템 언어 사용 -->
       <q-item class="q-mb-sm">
@@ -636,7 +642,7 @@
         />
       </q-item>
 
-      <q-separator spaced="md" />
+      <q-separator spaced="md" role="separator" />
 
       <!-- 자동 업데이트 설정 -->
       <q-item v-if="$g.isElectron && !$g.isSnap" class="q-mb-sm">
@@ -660,7 +666,7 @@
         />
       </q-item>
 
-      <q-separator spaced="md" />
+      <q-separator spaced="md" role="separator" />
 
       <!-- 설정 관리 -->
       <q-item class="q-mb-sm">
@@ -707,7 +713,8 @@
           />
         </div>
       </q-item>
-      <q-separator spaced="xl" />
+      
+      <q-separator spaced="xl" role="separator" />
 
       <!-- 버전 -->
       <q-item>
