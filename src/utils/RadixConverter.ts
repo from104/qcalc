@@ -1,4 +1,3 @@
-
 /**
  * @file RadixConverter.ts
  * @description 이 파일은 진법 변환 관련 유틸리티 함수들을 제공합니다.
@@ -48,17 +47,17 @@ export function getRadixItemDescription(item: string): string {
 }
 
 export function isValidRadixNumber(number: string, radix: Radix): boolean {
-    const patterns = {
-      [Radix.Binary]: /^-?[01]+(\.[01]*)?$/,
-      [Radix.Octal]: /^-?[0-7]+(\.[0-7]*)?$/,
-      [Radix.Decimal]: /^-?\d+(\.\d*)?$/,
-      [Radix.Hexadecimal]: /^-?[0-9A-Fa-f]+(\.[0-9A-Fa-f]*)?$/,
-    };
+  const patterns = {
+    [Radix.Binary]: /^-?[01]+(\.[01]*)?$/,
+    [Radix.Octal]: /^-?[0-7]+(\.[0-7]*)?$/,
+    [Radix.Decimal]: /^-?\d+(\.\d*)?$/,
+    [Radix.Hexadecimal]: /^-?[0-9A-Fa-f]+(\.[0-9A-Fa-f]*)?$/,
+  };
 
-    const result = patterns[radix].test(number);
+  const result = patterns[radix].test(number);
 
-    checkError(!result, 'error.radix.invalid_radix', { radix: radix, number: number });
-    return result;
+  checkError(!result, 'error.radix.invalid_radix', { radix: radix, number: number });
+  return result;
 }
 
 export function isValidBinary(value: string): boolean {
@@ -85,13 +84,40 @@ function convertFractionToRadix(fraction: math.BigNumber, radix: Radix): string 
   for (let precision = 0; precision < maxPrecision && !MathB.equal(remainingFraction, 0); precision++) {
     remainingFraction = MathB.multiply(remainingFraction, radixValue) as math.BigNumber;
     const integerPart = MathB.floor(remainingFraction);
-    const digitStr =
-      radix === Radix.Hexadecimal ? hexDigits[Number(integerPart.toFixed())] : integerPart.toString();
+    const digitStr = radix === Radix.Hexadecimal ? hexDigits[Number(integerPart.toFixed())] : integerPart.toString();
     result += digitStr;
     remainingFraction = MathB.subtract(remainingFraction, integerPart);
   }
 
   return result;
+}
+
+/**
+ * BigNumber를 안전하게 정수 문자열로 변환합니다.
+ * 과학적 표기법을 방지하기 위해 toFixed(0)를 사용합니다.
+ * @param value - 변환할 BigNumber
+ * @returns 정수 문자열 (과학적 표기법 없음)
+ */
+function safeIntegerToString(value: math.BigNumber): string {
+  try {
+    // toFixed(0)를 사용하여 소수점 없이 정수 문자열로 변환
+    // 이렇게 하면 과학적 표기법이 사용되지 않습니다
+    return value.toFixed(0);
+  } catch (error) {
+    // toFixed가 실패하는 경우 (예: 무한대), toString() 사용
+    const str = value.toString();
+    // 과학적 표기법이 포함된 경우 처리
+    if (str.includes('e') || str.includes('E')) {
+      // 과학적 표기법을 일반 숫자로 변환 시도
+      const num = Number(str);
+      if (isFinite(num)) {
+        return Math.floor(num).toString();
+      }
+      // 변환 실패 시 에러 발생
+      throw new Error(`Cannot convert ${str} to integer string`);
+    }
+    return str;
+  }
 }
 
 function convertDecimalToRadix(decimal: string | BigNumber, radix: Radix): string {
@@ -104,7 +130,9 @@ function convertDecimalToRadix(decimal: string | BigNumber, radix: Radix): strin
   const integerPartValue = MathB.floor(absoluteValue);
   const fractionPartValue = MathB.subtract(absoluteValue, integerPartValue);
 
-  const integerPart = BigInt(integerPartValue.toString()).toString(radixMap[radix]).toUpperCase();
+  // BigInt 변환 전에 안전하게 정수 문자열로 변환
+  const integerStr = safeIntegerToString(integerPartValue);
+  const integerPart = BigInt(integerStr).toString(radixMap[radix]).toUpperCase();
 
   if (MathB.equal(fractionPartValue, 0)) {
     return isNegative ? `-${integerPart}` : integerPart;
@@ -116,19 +144,19 @@ function convertDecimalToRadix(decimal: string | BigNumber, radix: Radix): strin
 }
 
 function convertFractionFromRadix(fractionPart: string, radix: Radix): math.BigNumber {
-    const radixValue = radixMap[radix];
-    const digits = radix === Radix.Hexadecimal ? fractionPart.toUpperCase() : fractionPart;
+  const radixValue = radixMap[radix];
+  const digits = radix === Radix.Hexadecimal ? fractionPart.toUpperCase() : fractionPart;
 
-    return digits
-      .split('')
-      .reduce<BigNumber>((accumulator: BigNumber, currentDigit: string, position: number): BigNumber => {
-        const digitValue = parseInt(currentDigit, radixValue);
-        const weightedValue = MathB.divide(
-          toBigNumber(digitValue),
-          MathB.pow(toBigNumber(radixValue), position + 1),
-        ) as BigNumber;
-        return MathB.add(accumulator, weightedValue);
-      }, toBigNumber(0));
+  return digits
+    .split('')
+    .reduce<BigNumber>((accumulator: BigNumber, currentDigit: string, position: number): BigNumber => {
+      const digitValue = parseInt(currentDigit, radixValue);
+      const weightedValue = MathB.divide(
+        toBigNumber(digitValue),
+        MathB.pow(toBigNumber(radixValue), position + 1),
+      ) as BigNumber;
+      return MathB.add(accumulator, weightedValue);
+    }, toBigNumber(0));
 }
 
 function convertRadixToDecimal(value: string, radix: Radix): string {
@@ -143,19 +171,59 @@ function convertRadixToDecimal(value: string, radix: Radix): string {
   const isNegative = value.startsWith('-');
   const absValue = isNegative ? value.slice(1) : value;
   const [integerPart, fractionPart = ''] = absValue.split('.');
-  const radixPrefix = match(radix)
-    .with(Radix.Binary, () => '0b')
-    .with(Radix.Octal, () => '0o')
-    .with(Radix.Hexadecimal, () => '0x')
-    .exhaustive();
 
-  let result = toBigNumber(integerPart ? BigInt(radixPrefix + integerPart).toString() : '0');
+  // BigInt 변환을 안전하게 처리
+  let integerDecimalStr = '0';
+  if (integerPart) {
+    try {
+      // 진법에 따른 접두사 결정
+      const radixPrefix = match(radix)
+        .with(Radix.Binary, () => '0b')
+        .with(Radix.Octal, () => '0o')
+        .with(Radix.Hexadecimal, () => '0x')
+        .exhaustive();
+      integerDecimalStr = BigInt(radixPrefix + integerPart).toString();
+    } catch (error) {
+      // BigInt 변환 실패 시 (매우 큰 숫자 등) 직접 변환 알고리즘 사용
+      integerDecimalStr = convertIntegerPartFromRadix(integerPart, radix);
+    }
+  }
+  let result = toBigNumber(integerDecimalStr);
 
   if (fractionPart) {
     result = MathB.add(result, convertFractionFromRadix(fractionPart, radix));
   }
 
   return (isNegative ? '-' : '') + result.toString() + (isOnlyFraction ? '.' : '');
+}
+
+/**
+ * 진법에서 10진수로 정수 부분을 직접 변환합니다.
+ * BigInt 변환이 실패하는 매우 큰 숫자에 대한 대안입니다.
+ * @param integerPart - 변환할 정수 부분 문자열
+ * @param radix - 원본 진법
+ * @returns 10진수 문자열
+ */
+function convertIntegerPartFromRadix(integerPart: string, radix: Radix): string {
+  if (!integerPart || integerPart === '0') {
+    return '0';
+  }
+
+  const radixValue = radixMap[radix];
+  const digits = radix === Radix.Hexadecimal ? integerPart.toUpperCase() : integerPart;
+
+  // 각 자릿수를 10진수로 변환하고 가중치를 곱하여 합산
+  let result = toBigNumber(0);
+  for (let i = 0; i < digits.length; i++) {
+    const digit = digits[digits.length - 1 - i]; // 오른쪽부터 처리
+    if (!digit) continue; // 안전성 체크
+    const digitValue = parseInt(digit, radixValue);
+    if (isNaN(digitValue)) continue; // 유효하지 않은 자릿수 건너뛰기
+    const power = MathB.pow(toBigNumber(radixValue), i);
+    result = MathB.add(result, MathB.multiply(toBigNumber(digitValue), power)) as math.BigNumber;
+  }
+
+  return result.toFixed(0);
 }
 
 function convertFromDecimal(decimal: string, toRadix: Radix): string {
