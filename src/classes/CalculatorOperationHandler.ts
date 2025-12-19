@@ -6,8 +6,6 @@
 
 import { match } from 'ts-pattern';
 
-import type { Radix } from '../utils/RadixConverter';
-import type { WordSize } from '../types/calculator';
 import { Operator } from './Calculator';
 import type { CalculatorMath } from './CalculatorMath';
 import { toBigNumber } from './CalculatorMath';

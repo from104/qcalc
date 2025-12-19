@@ -103,7 +103,7 @@ function safeIntegerToString(value: math.BigNumber): string {
     // toFixed(0)를 사용하여 소수점 없이 정수 문자열로 변환
     // 이렇게 하면 과학적 표기법이 사용되지 않습니다
     return value.toFixed(0);
-  } catch (error) {
+  } catch {
     // toFixed가 실패하는 경우 (예: 무한대), toString() 사용
     const str = value.toString();
     // 과학적 표기법이 포함된 경우 처리
@@ -183,7 +183,7 @@ function convertRadixToDecimal(value: string, radix: Radix): string {
         .with(Radix.Hexadecimal, () => '0x')
         .exhaustive();
       integerDecimalStr = BigInt(radixPrefix + integerPart).toString();
-    } catch (error) {
+    } catch {
       // BigInt 변환 실패 시 (매우 큰 숫자 등) 직접 변환 알고리즘 사용
       integerDecimalStr = convertIntegerPartFromRadix(integerPart, radix);
     }
