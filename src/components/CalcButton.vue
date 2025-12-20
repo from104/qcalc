@@ -9,7 +9,7 @@
    */
 
   // Vue 핵심 기능 및 컴포지션 API 가져오기
-  import { onMounted, onBeforeUnmount, ref, watch, reactive, computed } from 'vue';
+  import { onMounted, onBeforeUnmount, ref, watch, reactive, computed, nextTick } from 'vue';
 
   import { createCalcButtonSet } from 'src/constants/CalcButtonSet';
   import { showError, showMessage } from 'src/utils/NotificationUtils';
@@ -345,14 +345,15 @@
     screenWidth.value = isWideWidth() ? window.innerWidth / 2 : window.innerWidth;
     screenHeight.value = window.innerHeight;
     // 화면 크기 변경 시 baseHeight 재계산
-    setTimeout(() => calculateDynamicBaseHeight(), 100);
+    requestAnimationFrame(() => calculateDynamicBaseHeight());
   };
 
   // 컴포넌트 마운트 시 resize 이벤트 리스너 등록
-  onMounted(() => {
+  onMounted(async () => {
     window.addEventListener('resize', handleResize);
     // DOM이 완전히 렌더링된 후 baseHeight 계산
-    setTimeout(() => calculateDynamicBaseHeight(), 150);
+    await nextTick();
+    requestAnimationFrame(() => calculateDynamicBaseHeight());
   });
 
   // 컴포넌트 언마운트 시 resize 이벤트 리스너 제거
@@ -433,29 +434,37 @@
   };
 
   // 계산기 버튼 높이 설정 (초기값)
-  const baseHeight = ref('130px');
+  const getInitialBaseHeight = () => {
+    // 패널이 있는 경우(unit, currency, radix)와 없는 경우(calc)를 구분하여 초기값 설정
+    return props.type === 'calc' ? '130px' : '220px';
+  };
+  const baseHeight = ref(getInitialBaseHeight());
 
   // props.type 변경 시 baseHeight 재계산
   watch(
     () => props.type,
-    () => {
-      setTimeout(() => calculateDynamicBaseHeight(), 100);
+    async () => {
+      baseHeight.value = getInitialBaseHeight();
+      await nextTick();
+      requestAnimationFrame(() => calculateDynamicBaseHeight());
     },
   );
 
   // 탭 변경 시 baseHeight 재계산 (DOM 업데이트 후)
   watch(
     () => uiStore.currentTab,
-    () => {
-      setTimeout(() => calculateDynamicBaseHeight(), 150);
+    async () => {
+      await nextTick();
+      requestAnimationFrame(() => calculateDynamicBaseHeight());
     },
   );
 
   // 화면 방향 변경이나 레이아웃 변경 감지
   watch(
     () => [screenWidth.value, screenHeight.value],
-    () => {
-      setTimeout(() => calculateDynamicBaseHeight(), 100);
+    async () => {
+      await nextTick();
+      calculateDynamicBaseHeight();
     },
   );
 
@@ -544,20 +553,18 @@
         class="shadow-2 noselect col-12 button"
         no-caps
         push
-        :label="
-          calcStore.isShiftPressed && !settingsStore.showButtonAddedLabel && id !== shiftButtonId
-            ? (extendedFunctionSet[id]?.label ?? '')
-            : button.label.charAt(0) === '@'
-              ? undefined
-              : button.label
-        "
-        :icon="
-          calcStore.isShiftPressed && !settingsStore.showButtonAddedLabel && id !== shiftButtonId
+        :label="calcStore.isShiftPressed && !settingsStore.showButtonAddedLabel && id !== shiftButtonId
+          ? (extendedFunctionSet[id]?.label ?? '')
+          : button.label.charAt(0) === '@'
             ? undefined
-            : button.label.charAt(0) === '@'
-              ? button.label.slice(1)
-              : undefined
-        "
+            : button.label
+          "
+        :icon="calcStore.isShiftPressed && !settingsStore.showButtonAddedLabel && id !== shiftButtonId
+          ? undefined
+          : button.label.charAt(0) === '@'
+            ? button.label.slice(1)
+            : undefined
+          "
         :class="[
           calcStore.isShiftPressed && !settingsStore.showButtonAddedLabel && id !== shiftButtonId
             ? 'char'
@@ -565,8 +572,8 @@
               ? 'icon'
               : 'char',
           calcStore.isShiftPressed &&
-          !settingsStore.showButtonAddedLabel &&
-          !(extendedFunctionSet[id]?.isDisabled ?? false)
+            !settingsStore.showButtonAddedLabel &&
+            !(extendedFunctionSet[id]?.isDisabled ?? false)
             ? ''
             : (button.isDisabled ?? false) || calcStore.isShiftPressed
               ? 'disabled-button'
@@ -609,15 +616,14 @@
         <ToolTip
           :text-color="themesStore.getDarkColor()"
           :bg-color="themesStore.getCurrentThemeColors.ui.warning"
-          :text="
-            calcStore.isShiftPressed
-              ? (extendedFunctionSet[id]?.isDisabled ?? false)
-                ? t('disabledButton')
-                : getTooltipsOfKeys(id, true)
-              : (activeButtonSet[id]?.isDisabled ?? false)
-                ? t('disabledButton')
-                : getTooltipsOfKeys(id, false)
-          "
+          :text="calcStore.isShiftPressed
+            ? (extendedFunctionSet[id]?.isDisabled ?? false)
+              ? t('disabledButton')
+              : getTooltipsOfKeys(id, true)
+            : (activeButtonSet[id]?.isDisabled ?? false)
+              ? t('disabledButton')
+              : getTooltipsOfKeys(id, false)
+            "
         />
       </q-btn>
     </div>
@@ -634,18 +640,12 @@
 
   .icon {
     font-size: calc(((100vh - v-bind('baseHeight')) / 6 - 20px) * 0.25 * v-bind('labelSizeAdjustmentRatio'));
-    padding-top: calc(
-      ((100vh - v-bind('baseHeight')) / 6 - 13px) * 0.27 * v-bind('labelScalingFactor') *
-        v-bind('labelSizeAdjustmentRatio')
-    );
+    padding-top: calc(((100vh - v-bind('baseHeight')) / 6 - 13px) * 0.27 * v-bind('labelScalingFactor') * v-bind('labelSizeAdjustmentRatio'));
   }
 
   .char {
     font-size: calc(((100vh - v-bind('baseHeight')) / 6 - 20px) * 0.38 * v-bind('labelSizeAdjustmentRatio'));
-    padding-top: calc(
-      ((100vh - v-bind('baseHeight')) / 6 - 13px) * 0.26 * v-bind('labelScalingFactor') *
-        v-bind('labelSizeAdjustmentRatio')
-    );
+    padding-top: calc(((100vh - v-bind('baseHeight')) / 6 - 13px) * 0.26 * v-bind('labelScalingFactor') * v-bind('labelSizeAdjustmentRatio'));
   }
 
   .top-label {
@@ -654,7 +654,8 @@
     font-size: calc(((100vh - v-bind('baseHeight')) / 6 - 20px) * 0.25 * v-bind('labelSizeAdjustmentRatio'));
     color: inherit;
     opacity: 0.7;
-    width: 100%; /* 가로 중앙 정렬을 위해 추가 */
+    width: 100%;
+    /* 가로 중앙 정렬을 위해 추가 */
   }
 
   .top-label-icon {
