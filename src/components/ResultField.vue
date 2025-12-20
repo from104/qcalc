@@ -561,35 +561,15 @@
     }
   };
 
-  // 현재 탭에 따른 상태 스왑 함수
-  const swapCurrentTabState = () => {
-    switch (currentTab.value) {
-      case 'unit':
-        unitStore.swapUnits();
-        break;
-      case 'currency':
-        currencyStore.swapCurrencies();
-        break;
-      case 'radix':
-        radixStore.swapRadixes();
-        break;
-    }
-  };
-
   // 컴포넌트 마운트 후 초기 설정
   onMounted(async () => {
     // DOM 업데이트 완료 대기
     await nextTick();
 
-    // 초기 상태 스왑을 통한 레이아웃 안정화
-    setTimeout(() => {
-      swapCurrentTabState();
-      setTimeout(() => {
-        swapCurrentTabState();
-        // 초기 넘침 상태 체크
-        checkNeedFieldTooltip();
-      }, 200);
-    }, 200);
+    // 초기 넘침 상태 체크 (DOM 렌더링 완료 후 실행)
+    requestAnimationFrame(() => {
+      checkNeedFieldTooltip();
+    });
 
     // ResizeObserver 초기화
     initializeResizeObserver();
@@ -987,7 +967,7 @@
         anchor="bottom right"
         self="top right"
         @update:model-value="
-          (val) => {
+          (val: boolean) => {
             showPanelMenu = val;
           }
         "
