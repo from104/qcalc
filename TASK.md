@@ -14,6 +14,39 @@
 
 ## 📅 최근 작업 히스토리
 
+### 2025-12-20
+
+#### 🐛 버그 수정
+
+- **결과 필드 텍스트 넘침 감지 개선** `완료`
+
+  - ResizeObserver와 watch를 활용한 정확하고 상시적인 텍스트 넘침 추적 시스템 구현
+  - DOM 업데이트 및 렌더링 완료 후 정확한 측정을 위해 nextTick과 requestAnimationFrame 사용
+  - 넘침 상태에서 색상 강조 및 툴팁 표시가 정확하게 동작하도록 개선
+
+- **키보드 단축키 중복 등록 문제 해결** `완료`
+
+  - 탭 이동 단축키(Ctrl+Tab, ArrowRight, ArrowLeft)가 두 번씩 실행되던 문제 해결
+  - useMainLayout이 MainLayout, WideLayout, NarrowLayout에서 각각 호출되어 키 바인딩이 중복 등록되던 문제 발견
+  - MainLayout에서만 useMainLayout을 호출하고, WideLayout과 NarrowLayout은 props로 데이터를 받도록 구조 개선
+  - useKeyBinding의 자동 onMounted 호출 제거하여 사용하는 쪽에서만 수동으로 subscribe() 호출하도록 변경
+
+- **메모리 값 진법 변환 오류 수정** `완료`
+  - 초기화 시 또는 유효하지 않은 값이 전달될 때 발생하던 진법 변환 오류를 안전하게 처리
+  - memoryValue computed에서 try-catch를 사용하여 에러 핸들링 추가
+
+#### 🔧 리팩토링 및 구조 개선
+
+- **레이아웃 컴포넌트 구조 개선** `완료`
+
+  - WideLayout과 NarrowLayout에서 useMainLayout 호출 제거
+  - props를 통해 tabs, subPageConfig, subPageButtons를 전달받도록 변경
+  - 키 바인딩 중복 등록 방지 및 관심사의 분리로 코드 유지보수성 향상
+
+- **불필요한 코드 정리** `완료`
+  - useKeyBinding에서 주석 처리된 onMounted 코드 및 불필요한 import 제거
+  - useMainLayout의 onMounted에서 불필요한 주석 제거
+
 ### 2025-12-18
 
 #### ✨ 기능 추가

@@ -179,8 +179,6 @@ export function useMainLayout(t: (key: string) => string, recordManagerInstance?
 
   // 컴포넌트 마운트 시 초기화
   onMounted(() => {
-    subscribe();
-
     // 로케일 설정
     if (!settingsStore.locale) {
       settingsStore.useSystemLocale = true;
@@ -220,8 +218,8 @@ export function useMainLayout(t: (key: string) => string, recordManagerInstance?
   // 입력 포커스 상태에 따른 키보드 단축키 활성화/비활성화
   watch(
     () => uiStore.inputFocused,
-    () => {
-      if (uiStore.inputFocused) {
+    (isFocused) => {
+      if (isFocused) {
         unsubscribe();
       } else {
         subscribe();

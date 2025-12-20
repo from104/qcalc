@@ -17,13 +17,13 @@
 
   // 계산기 관련 타입과 클래스
   import { useKeyBinding } from '../composables/useKeyBinding';
-  import { Radix } from 'src/utils/RadixConverter';
+  import { Radix } from '../utils/RadixConverter';
 
   // 스토어 import
   import { useUIStore } from 'stores/uiStore';
   import { useSettingsStore } from 'stores/settingsStore';
   import { useRadixStore } from 'stores/radixStore';
-  import { useCalcStore } from 'src/stores/calcStore';
+  import { useCalcStore } from 'stores/calcStore';
   import { useThemesStore } from 'stores/themesStore';
 
   // 스토어 인스턴스 생성
@@ -34,7 +34,7 @@
   const calcStore = useCalcStore();
 
   // 컴포넌트 import
-  import ToolTip from 'src/components/snippets/ToolTip.vue';
+  import ToolTip from '../components/snippets/ToolTip.vue';
 
   // 단위 초기화
   radixStore.initRecentRadix();
