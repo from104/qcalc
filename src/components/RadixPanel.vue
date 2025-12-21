@@ -66,7 +66,7 @@
     },
   );
 
-    onMounted(() => {
+  onMounted(() => {
     radixStore.initRecentRadix();
     calcStore.calc.wordSize = radixStore.wordSize;
   });
@@ -250,12 +250,15 @@
 
 <style scoped lang="scss">
   $left: 2px;
+
   :deep(.q-field__control) {
     padding-left: $left !important;
     font-size: 0.81rem;
+
     .q-field__native {
       padding-left: $left !important;
     }
+
     .q-field__append {
       padding-left: $left !important;
     }

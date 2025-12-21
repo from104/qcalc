@@ -564,7 +564,7 @@
           :color="primaryAccentColor"
           class="col-5 q-pr-sm"
           dense
-          @update:model-value="(value) => currentDecimalPlaces = Number(value)"
+          @update:model-value="(value: any) => currentDecimalPlaces = Number(value)"
         >
           <template #marker-label-group="{ markerList }">
             <div
