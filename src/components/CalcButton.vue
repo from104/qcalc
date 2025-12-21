@@ -416,15 +416,6 @@
       // 5. 최소 높이 보장 및 최종 값 설정
       const calculatedHeight = Math.max(totalHeightToExclude, 120);
       baseHeight.value = `${calculatedHeight}px`;
-
-      // 6. 개발 환경에서 디버깅 정보 출력
-      logDev(`🎯 CalcButton baseHeight calculated for type "${props.type}": ${baseHeight.value}`, {
-        screenHeight: screenHeight.value,
-        headerHeight: 50,
-        totalExcluded: totalHeightToExclude,
-        finalHeight: calculatedHeight,
-        cardFound: !!currentCard,
-      });
     } catch (error) {
       // 에러 발생 시 타입별 기본값 사용
       console.warn('⚠️ Error calculating dynamic baseHeight, using fallback values:', error);
