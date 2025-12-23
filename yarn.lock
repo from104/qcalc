@@ -165,12 +165,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@capacitor/status-bar@npm:7.0.3":
-  version: 7.0.3
-  resolution: "@capacitor/status-bar@npm:7.0.3"
+"@capacitor/status-bar@npm:7.0.4":
+  version: 7.0.4
+  resolution: "@capacitor/status-bar@npm:7.0.4"
   peerDependencies:
     "@capacitor/core": ">=7.0.0"
-  checksum: 10/ecaea1fc8b1bd3709af4cb7d12d7434a6341731b80d60fcccfe3981cf2ff450edd9f212677447829df619d29528cb231ddb0f146b554f49a15381f2b2a86edd0
+  checksum: 10/b6b4356a63ad01214d3b3f9816df970dc9acaf330a6bb6d99c7822b777eb70592157caab4ab5ffb08b9e6c3f5faa441a4e69e2a3176188ef9215d290572f27fd
   languageName: node
   linkType: hard
 
@@ -8947,7 +8947,7 @@ __metadata:
     "@capacitor/haptics": "npm:7.0.3"
     "@capacitor/screen-orientation": "npm:7.0.3"
     "@capacitor/share": "npm:^7.0.3"
-    "@capacitor/status-bar": "npm:7.0.3"
+    "@capacitor/status-bar": "npm:7.0.4"
     "@eslint/js": "npm:9.38.0"
     "@everapi/freecurrencyapi-js": "npm:^1.0.1"
     "@intlify/unplugin-vue-i18n": "npm:11.0.1"
