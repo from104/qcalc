@@ -48,7 +48,7 @@
     "@capacitor/filesystem": "7.1.4",
     "@capacitor/haptics": "7.0.3",
     "@capacitor/screen-orientation": "7.0.3",
-    "@capacitor/share": "^7.0.2",
+    "@capacitor/share": "^7.0.3",
     "@capacitor/status-bar": "7.0.3",
     "@everapi/freecurrencyapi-js": "^1.0.1",
     "@intlify/unplugin-vue-i18n": "11.0.1",
