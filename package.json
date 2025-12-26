@@ -1,6 +1,6 @@
 {
   "name": "qcalc",
-  "version": "0.11.5",
+  "version": "0.11.6",
   "description": "com.atit.qcalc",
   "productName": "Q Calc",
   "repository": {
@@ -41,10 +41,10 @@
     "./src/boot/*": "./src/boot/*.ts"
   },
   "dependencies": {
-    "@capacitor/android": "7.4.3",
+    "@capacitor/android": "7.4.4",
     "@capacitor/app": "7.1.0",
-    "@capacitor/cli": "7.4.3",
-    "@capacitor/core": "7.4.3",
+    "@capacitor/cli": "7.4.4",
+    "@capacitor/core": "7.4.4",
     "@capacitor/filesystem": "7.1.4",
     "@capacitor/haptics": "7.0.2",
     "@capacitor/screen-orientation": "7.0.2",
@@ -58,7 +58,7 @@
     "@quasar/vite-plugin": "1.10.0",
     "@types/dompurify": "3.2.0",
     "@vitejs/plugin-vue": "6.0.1",
-    "axios": "1.12.2",
+    "axios": "1.13.1",
     "dotenv": "17.2.3",
     "electron-log": "5.4.3",
     "electron-updater": "6.7.0",
@@ -66,7 +66,7 @@
     "mathjs": "15.0.0",
     "papaparse": "^5.5.3",
     "pinia": "3.0.3",
-    "pinia-plugin-persistedstate": "4.5.0",
+    "pinia-plugin-persistedstate": "4.7.1",
     "quasar": "2.18.5",
     "tinykeys": "^3.0.0",
     "ts-pattern": "5.8.0",

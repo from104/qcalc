@@ -11,7 +11,7 @@
    */
 
   // Vue 핵심 기능 및 컴포지션 API 가져오기
-  import { ref, computed, onBeforeMount, onMounted, watch, onUnmounted, onBeforeUnmount } from 'vue';
+  import { ref, computed, onMounted, watch, onUnmounted, onBeforeUnmount, nextTick } from 'vue';
   import { Haptics, ImpactStyle } from '@capacitor/haptics';
   import { copyToClipboard } from 'quasar';
 
@@ -79,19 +79,45 @@
   const calcRecord = calc.record;
 
   // 필드 요소와 툴팁 상태 관리
-  const fieldElement = computed(() => document.getElementById(fieldID));
+  const fieldElementRef = ref<HTMLElement | null>(null);
   const needFieldTooltip = ref(false);
 
   /**
    * 필드 툴팁 표시 여부를 결정하는 함수
    *
    * @description
-   * - 필드 요소의 너비가 스크롤 너비보다 작은 경우 툴팁 표시 필요
+   * - 필드 요소의 실제 너비(offsetWidth)가 내용 너비(scrollWidth)보다 작은 경우 텍스트가 넘친 것으로 판단
+   * - DOM 업데이트가 완료된 후 정확한 크기를 측정하기 위해 nextTick 사용
+   * - 정확한 측정을 위해 requestAnimationFrame을 사용하여 렌더링 완료 후 체크
+   * @returns 넘침 상태 체크 성공 여부
    */
-  const checkNeedFieldTooltip = () => {
-    if (!fieldElement.value) return false;
-    needFieldTooltip.value = fieldElement.value.offsetWidth < fieldElement.value.scrollWidth;
-    return true;
+  const checkNeedFieldTooltip = async (): Promise<boolean> => {
+    // DOM 업데이트가 완료될 때까지 대기
+    await nextTick();
+
+    // 브라우저 렌더링이 완료될 때까지 대기 (레이아웃 계산 완료 보장)
+    return new Promise<boolean>((resolve) => {
+      requestAnimationFrame(() => {
+        const element = fieldElementRef.value || document.getElementById(fieldID);
+
+        if (!element) {
+          resolve(false);
+          return;
+        }
+
+        // 요소의 실제 표시 너비와 스크롤 가능한 전체 너비를 비교
+        // offsetWidth: 요소의 표시 너비 (padding 포함, 스크롤바 제외)
+        // scrollWidth: 요소의 내용 전체 너비 (스크롤 가능한 너비)
+        const isOverflowing = element.offsetWidth < element.scrollWidth;
+
+        // 상태가 실제로 변경된 경우에만 업데이트 (불필요한 반응성 트리거 방지)
+        if (needFieldTooltip.value !== isOverflowing) {
+          needFieldTooltip.value = isOverflowing;
+        }
+
+        resolve(true);
+      });
+    });
   };
 
   // 햅틱 피드백 함수
@@ -180,8 +206,8 @@
 
       const formattedNumber = calcStore.toFormattedNumber(inputBuffer, radixStore.sourceRadix);
 
-      // 소수점 자릿수 설정이 -2이고 소수점이 있는 경우
-      const hasSpecialDecimalPlaces = settingsStore.decimalPlaces === -1 && inputBuffer.includes('.');
+      // 소수점 자릿수 설정이 -1이고 소수점이 있는 경우
+      const hasSpecialDecimalPlaces = Number(settingsStore.getCurrentDecimalPlaces) === -1 && inputBuffer.includes('.');
 
       const result =
         hasSpecialDecimalPlaces && !calc.needsBufferReset
@@ -361,13 +387,24 @@
 
   // 메모리 값 계산된 속성
   const memoryValue = computed(() => {
-    if (isMainField) {
-      const convertedNumber = radixStore.convertIfRadix(calc.memory.getNumber());
-      return calcStore.toFormattedNumber(convertedNumber, radixStore.sourceRadix);
-    } else {
-      const rawMemoryNumber = calc.memory.getNumber();
-      if (!rawMemoryNumber) return ''; // 메모리가 비어있으면 빈 문자열 반환
+    // 메모리에서 숫자 가져오기
+    const rawMemoryNumber = calc.memory.getNumber();
 
+    // 메모리가 비어있으면 빈 문자열 반환
+    if (!rawMemoryNumber || rawMemoryNumber === '') {
+      return '';
+    }
+
+    if (isMainField) {
+      try {
+        const convertedNumber = radixStore.convertIfRadix(rawMemoryNumber);
+        return calcStore.toFormattedNumber(convertedNumber, radixStore.sourceRadix);
+      } catch (error) {
+        // 진법 변환 실패 시 빈 문자열 반환
+        console.warn('Failed to convert radix for memory value:', error);
+        return '';
+      }
+    } else {
       switch (props.addon) {
         case 'unit': {
           const convertedNumber = UnitConverter.convert(
@@ -389,12 +426,18 @@
           return calcStore.toFormattedNumber(convertedNumber);
         }
         case 'radix': {
-          const convertedNumber = radixStore.convertRadix(
-            radixStore.convertIfRadix(rawMemoryNumber), // 메모리 값을 변환 대상으로 사용
-            radixStore.sourceRadix, // 또는 targetRadix에 맞춰야 할 수도 있음
-            radixStore.targetRadix,
-          );
-          return calcStore.toFormattedNumber(convertedNumber, radixStore.targetRadix);
+          try {
+            const convertedNumber = radixStore.convertRadix(
+              radixStore.convertIfRadix(rawMemoryNumber), // 메모리 값을 변환 대상으로 사용
+              radixStore.sourceRadix, // 또는 targetRadix에 맞춰야 할 수도 있음
+              radixStore.targetRadix,
+            );
+            return calcStore.toFormattedNumber(convertedNumber, radixStore.targetRadix);
+          } catch (error) {
+            // 진법 변환 실패 시 빈 문자열 반환
+            console.warn('Failed to convert radix for memory value:', error);
+            return '';
+          }
         }
         default:
           return calcStore.toFormattedNumber(rawMemoryNumber); // 변환 없이 포맷팅만 적용
@@ -468,42 +511,74 @@
       } else {
         calc.currentRadix = Radix.Decimal;
       }
+      // 탭 변경 시 넘침 상태 재확인
+      checkNeedFieldTooltip();
     },
     { immediate: true },
   );
 
-  // 컴포넌트 마운트 전 이벤트 리스너 등록
-  onBeforeMount(() => {
-    window.addEventListener('resize', () => checkNeedFieldTooltip());
-  });
+  /**
+   * 표시된 결과 문자열 변경 시 넘침 상태 확인
+   * - displayedResult와 displayedResultWithMemory는 result, symbol, unit, radixPrefix, radixSuffix를 모두 포함하므로
+   *   이 두 속성만 감시하면 모든 관련 속성 변경을 감지할 수 있음
+   * - 메모리 표시 상태 변경 시에도 확인
+   */
+  watch(
+    [displayedResult, displayedResultWithMemory, () => calcStore.isMemoryVisible],
+    () => {
+      // 에러가 발생할 수 있으므로 try-catch로 감싸기
+      try {
+        checkNeedFieldTooltip();
+      } catch (error) {
+        // 넘침 상태 체크 실패 시 로그만 남기고 계속 진행
+        console.warn('Failed to check field tooltip:', error);
+      }
+    },
+    { flush: 'post' }, // DOM 업데이트 후 실행
+  );
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  let tooltipInterval: NodeJS.Timeout;
+  // ResizeObserver와 이벤트 리스너 관리
+  let resizeObserver: ResizeObserver | null = null;
+  let windowResizeHandler: (() => void) | null = null;
 
-  // 현재 탭에 따른 상태 스왑 함수
-  const swapCurrentTabState = () => {
-    switch (currentTab.value) {
-      case 'unit':
-        unitStore.swapUnits();
-        break;
-      case 'currency':
-        currencyStore.swapCurrencies();
-        break;
-      case 'radix':
-        radixStore.swapRadixes();
-        break;
+  /**
+   * ResizeObserver 초기화 함수
+   * 필드 요소에 대한 크기 변경 감지 시작
+   */
+  const initializeResizeObserver = () => {
+    // 기존 observer가 있으면 정리
+    if (resizeObserver) {
+      resizeObserver.disconnect();
+      resizeObserver = null;
+    }
+
+    const element = fieldElementRef.value || document.getElementById(fieldID);
+    if (element) {
+      resizeObserver = new ResizeObserver(() => {
+        checkNeedFieldTooltip();
+      });
+      resizeObserver.observe(element);
     }
   };
 
   // 컴포넌트 마운트 후 초기 설정
-  onMounted(() => {
-    tooltipInterval = setTimeout(() => {
-      swapCurrentTabState();
-      setTimeout(() => {
-        swapCurrentTabState();
-        checkNeedFieldTooltip();
-      }, 200);
-    }, 200);
+  onMounted(async () => {
+    // DOM 업데이트 완료 대기
+    await nextTick();
+
+    // 초기 넘침 상태 체크 (DOM 렌더링 완료 후 실행)
+    requestAnimationFrame(() => {
+      checkNeedFieldTooltip();
+    });
+
+    // ResizeObserver 초기화
+    initializeResizeObserver();
+
+    // 윈도우 리사이즈 이벤트 리스너 등록
+    windowResizeHandler = () => {
+      checkNeedFieldTooltip();
+    };
+    window.addEventListener('resize', windowResizeHandler);
 
     // 창이 포커스를 잃었을 때 메뉴를 닫기 위한 이벤트 리스너 등록
     window.addEventListener('blur', () => {
@@ -514,10 +589,33 @@
     });
   });
 
-  // 컴포넌트 언마운트 시 이벤트 리스너 제거
+  /**
+   * fieldElementRef가 설정된 후 ResizeObserver 초기화
+   */
+  watch(
+    () => fieldElementRef.value,
+    (newElement) => {
+      if (newElement && !resizeObserver) {
+        initializeResizeObserver();
+      }
+    },
+    { immediate: true },
+  );
+
+  // 컴포넌트 언마운트 시 리소스 정리
   onUnmounted(() => {
-    // 화면 크기 변경 이벤트 리스너 제거
-    window.removeEventListener('resize', () => checkNeedFieldTooltip());
+    // ResizeObserver 정리
+    if (resizeObserver) {
+      resizeObserver.disconnect();
+      resizeObserver = null;
+    }
+
+    // 윈도우 리사이즈 이벤트 리스너 제거
+    if (windowResizeHandler) {
+      window.removeEventListener('resize', windowResizeHandler);
+      windowResizeHandler = null;
+    }
+
     // blur 이벤트 리스너 제거
     window.removeEventListener('blur', () => {
       if (showPanelMenu.value) {
@@ -683,16 +781,16 @@
   };
 
   // 키 바인딩 설정
-    const { subscribe, unsubscribe } =
+  const { subscribe, unsubscribe } =
     props.field === 'main'
       ? useKeyBinding([
-          [['Control+c', 'Control+Insert', 'Copy'], handleCopy],
-          [['Control+v', 'Shift+Insert', 'Paste'], () => handlePaste('main')],
-        ])
+        [['Control+c', 'Control+Insert', 'Copy'], handleCopy],
+        [['Control+v', 'Shift+Insert', 'Paste'], () => handlePaste('main')],
+      ])
       : useKeyBinding([
-          [['Shift+Control+c', 'Alt+Control+Insert', 'Shift+Copy'], handleCopy],
-          [['Shift+Control+v', 'Alt+Shift+Insert', 'Shift+Paste'], () => handlePaste('sub')],
-        ]);
+        [['Shift+Control+c', 'Alt+Control+Insert', 'Shift+Copy'], handleCopy],
+        [['Shift+Control+v', 'Alt+Shift+Insert', 'Shift+Paste'], () => handlePaste('sub')],
+      ]);
 
   /**
    * 입력 필드 포커스 상태에 따라 키 바인딩을 활성화/비활성화합니다.
@@ -700,7 +798,7 @@
   watch(
     () => uiStore.inputFocused,
     () => {
-            if (uiStore.inputFocused) {
+      if (uiStore.inputFocused) {
         unsubscribe();
       } else {
         subscribe();
@@ -709,7 +807,7 @@
     { immediate: true },
   );
 
-    onMounted(() => {
+  onMounted(() => {
     subscribe();
   });
 
@@ -807,20 +905,19 @@
       <template #control>
         <div
           :id="fieldID"
-          v-mutation="
-            () => {
-              checkNeedFieldTooltip();
-              return true;
-            }
-          "
+          ref="fieldElementRef"
+          v-mutation="() => {
+            checkNeedFieldTooltip();
+            return true;
+          }
+            "
           v-mutation.characterData
           class="self-center no-outline full-width full-height ellipsis text-right q-pt-xs noselect"
           :class="[`text-${calcStore.isMemoryVisible ? memoryTextColor : panelTextColor}`]"
-          :style="
-            isMainField
-              ? `padding-top: ${mainPanelPaddingTop}; padding-bottom: ${mainPanelPaddingBottom};`
-              : `padding-top: ${subPanelPaddingTop}; padding-bottom: ${subPanelPaddingBottom};`
-          "
+          :style="isMainField
+            ? `padding-top: ${mainPanelPaddingTop}; padding-bottom: ${mainPanelPaddingBottom};`
+            : `padding-top: ${subPanelPaddingTop}; padding-bottom: ${subPanelPaddingBottom};`
+            "
           role="text"
           :aria-label="t('ariaLabel.result', { type: isMainField ? t('ariaLabel.main') : t('ariaLabel.sub') })"
           @click="
@@ -870,7 +967,7 @@
         anchor="bottom right"
         self="top right"
         @update:model-value="
-          (val) => {
+          (val: boolean) => {
             showPanelMenu = val;
           }
         "
@@ -927,9 +1024,12 @@
     margin-left: 1px;
     position: relative;
     bottom: -3px;
-    min-width: 2ch; /* 2글자 폭 확보 */
-    display: inline-block; /* 폭 설정을 위해 필요 */
-    text-align: left; /* 왼쪽 정렬 (선택사항) */
+    min-width: 2ch;
+    /* 2글자 폭 확보 */
+    display: inline-block;
+    /* 폭 설정을 위해 필요 */
+    text-align: left;
+    /* 왼쪽 정렬 (선택사항) */
   }
 
   // 메인 필드의 결과 영역 커서를 기본 커서로 설정
@@ -944,6 +1044,7 @@
       text-align: right;
       font-size: 20px;
     }
+
     :deep(.q-field__control) {
       padding-top: 0px;
     }

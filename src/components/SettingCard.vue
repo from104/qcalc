@@ -297,6 +297,41 @@
   const primaryAccentColor = computed(() => {
     return themesStore.isDarkMode() ? 'accent' : 'primary';
   });
+
+  /**
+   * 현재 계산기의 포맷 설정을 반환하는 computed 속성
+   */
+  const currentFormatSettings = computed(() => settingsStore.getCurrentFormatSettings);
+
+  /**
+   * 현재 계산기의 useGrouping 설정
+   */
+  const currentUseGrouping = computed({
+    get: () => currentFormatSettings.value.useGrouping,
+    set: (value: boolean) => {
+      settingsStore.updateCurrentSettings({ useGrouping: value });
+    },
+  });
+
+  /**
+   * 현재 계산기의 groupingUnit 설정
+   */
+  const currentGroupingUnit = computed({
+    get: () => currentFormatSettings.value.groupingUnit,
+    set: (value: number) => {
+      settingsStore.updateCurrentSettings({ groupingUnit: value as 3 | 4 });
+    },
+  });
+
+  /**
+   * 현재 계산기의 decimalPlaces 설정
+   */
+  const currentDecimalPlaces = computed({
+    get: () => currentFormatSettings.value.decimalPlaces,
+    set: (value: number) => {
+      settingsStore.updateCurrentSettings({ decimalPlaces: value });
+    },
+  });
 </script>
 
 <template>
@@ -347,6 +382,8 @@
         />
       </q-item>
 
+      <q-separator spaced="md" role="separator" />
+
       <!-- 다크 모드 -->
       <q-item class="q-mb-md">
         <q-item-label class="self-center" role="text">{{ t('darkMode.title') }} (Alt-D)</q-item-label>
@@ -374,7 +411,7 @@
         />
       </q-item>
 
-      <!-- 색상 테마 선택 추가 -->
+      <!-- 색상 테마 선택 -->
       <q-item class="q-mb-md">
         <q-item-label class="self-center" role="text">{{ t('colorTheme') }}</q-item-label>
         <q-space />
@@ -447,6 +484,7 @@
         </q-select>
       </q-item>
 
+      <!-- 새 테마 만들기 버튼 -->
       <q-item>
         <q-btn
           flat
@@ -460,29 +498,32 @@
         />
       </q-item>
 
+      <!-- 테마 편집기 -->
       <ThemeEditor ref="themeEditor" />
 
       <q-separator spaced="md" role="separator" />
 
-      <!-- 버튼 추가 라벨 표시 -->
+      <!-- 숫자 형식 계산기별 적용 -->
       <q-item class="q-mb-sm">
-        <q-item-label class="self-center" role="text">{{ t('showButtonAddedLabel') }} (;)</q-item-label>
+        <q-item-label class="self-center" role="text">{{ t('numberFormatPerCalculator') }} (Alt-N)</q-item-label>
         <q-space />
         <q-toggle
-          v-model="settingsStore.showButtonAddedLabel"
+          v-model="settingsStore.numberFormatPerCalculator"
           keep-color
           :color="primaryAccentColor"
           dense
           role="switch"
-          :aria-label="t('ariaLabel.showButtonAddedLabel')"
+          :aria-label="t('ariaLabel.numberFormatPerCalculator')"
         />
       </q-item>
+
+      <q-separator spaced="sm" role="separator" />
 
       <!-- 숫자 묶음 표시 -->
       <q-item class="q-mb-xs">
         <q-item-label class="self-center" role="text">{{ t('useGrouping') }} (,)</q-item-label>
         <q-space />
-        <q-toggle v-model="settingsStore.useGrouping" keep-color :color="primaryAccentColor" dense />
+        <q-toggle v-model="currentUseGrouping" keep-color :color="primaryAccentColor" dense role="switch" :aria-label="t('ariaLabel.useGrouping')" />
       </q-item>
 
       <!-- 숫자 묶음 단위 -->
@@ -490,11 +531,11 @@
         <q-item-label class="self-center" role="text">{{ t('groupingUnit') }} (Alt-,)</q-item-label>
         <q-space />
         <q-slider
-          v-model="settingsStore.groupingUnit"
+          v-model="currentGroupingUnit"
           :min="3"
           :max="4"
           :step="1"
-          :disable="!settingsStore.useGrouping"
+          :disable="!currentUseGrouping"
           dense
           :color="primaryAccentColor"
           class="col-2 q-pr-sm q-pt-xs"
@@ -507,15 +548,15 @@
         <ToolTip :text-color="themesStore.getDarkColor()" :bg-color="themesStore.getCurrentThemeColors.ui.warning">
           {{ t('decimalPlacesStat') }}:
           {{
-            settingsStore.decimalPlaces == -1
+            currentDecimalPlaces == -1
               ? t('noLimit')
-              : `${DECIMAL_PLACES[settingsStore.decimalPlaces as keyof typeof DECIMAL_PLACES]} ${t('toNDecimalPlaces')}`
+              : `${DECIMAL_PLACES[currentDecimalPlaces as keyof typeof DECIMAL_PLACES]} ${t('toNDecimalPlaces')}`
           }}
         </ToolTip>
         <q-item-label class="q-pt-xs self-start">{{ t('decimalPlaces') }} ([,])</q-item-label>
         <q-space />
         <q-slider
-          :model-value="Number(settingsStore.decimalPlaces)"
+          :model-value="Number(currentDecimalPlaces)"
           :min="-1"
           :max="5"
           :step="1"
@@ -523,7 +564,7 @@
           :color="primaryAccentColor"
           class="col-5 q-pr-sm"
           dense
-          @update:model-value="(value) => settingsStore.setDecimalPlaces(Number(value))"
+          @update:model-value="(value: any) => currentDecimalPlaces = Number(value)"
         >
           <template #marker-label-group="{ markerList }">
             <div
@@ -532,7 +573,7 @@
               class="cursor-pointer"
               :class="marker.classes"
               :style="marker.style as any"
-              @click="settingsStore.setDecimalPlaces(Number(marker.value))"
+              @click="currentDecimalPlaces = Number(marker.value)"
             >
               {{ marker.value.toString() == '-1' ? '∞' : DECIMAL_PLACES[marker.value] }}
             </div>
@@ -542,7 +583,7 @@
 
       <!-- 단위 표시 -->
       <template v-if="uiStore.currentTab == 'unit'">
-        <q-separator spaced="md" />
+        <q-separator spaced="md" role="separator" />
 
         <q-item class="q-mb-sm">
           <q-item-label class="self-center" role="text"> {{ t('showUnit') }} (Alt-\\) </q-item-label>
@@ -553,7 +594,7 @@
 
       <!-- 기호 표시 -->
       <template v-else-if="uiStore.currentTab == 'currency'">
-        <q-separator spaced="md" />
+        <q-separator spaced="md" role="separator" />
 
         <q-item class="q-mb-sm">
           <q-item-label class="self-center" role="text"> {{ t('showSymbol') }} (Alt-\) </q-item-label>
@@ -564,7 +605,7 @@
 
       <!-- 진법 표시 -->
       <template v-else-if="uiStore.currentTab == 'radix'">
-        <q-separator spaced="md" />
+        <q-separator spaced="md" role="separator" />
 
         <q-item class="q-mb-sm">
           <q-item-label class="self-center" role="text"> {{ t('showRadix') }} (Alt-\) </q-item-label>
@@ -596,7 +637,23 @@
         </q-item>
       </template>
 
-      <q-separator spaced="md" />
+      <q-separator spaced="md" role="separator" />
+
+      <!-- 버튼 추가 라벨 표시 -->
+      <q-item class="q-mb-sm">
+        <q-item-label class="self-center" role="text">{{ t('showButtonAddedLabel') }} (;)</q-item-label>
+        <q-space />
+        <q-toggle
+          v-model="settingsStore.showButtonAddedLabel"
+          keep-color
+          :color="primaryAccentColor"
+          dense
+          role="switch"
+          :aria-label="t('ariaLabel.showButtonAddedLabel')"
+        />
+      </q-item>
+      
+      <q-separator spaced="md" role="separator" />
 
       <!-- 시스템 언어 사용 -->
       <q-item class="q-mb-sm">
@@ -636,7 +693,7 @@
         />
       </q-item>
 
-      <q-separator spaced="md" />
+      <q-separator spaced="md" role="separator" />
 
       <!-- 자동 업데이트 설정 -->
       <q-item v-if="$g.isElectron && !$g.isSnap" class="q-mb-sm">
@@ -660,7 +717,7 @@
         />
       </q-item>
 
-      <q-separator spaced="md" />
+      <q-separator spaced="md" role="separator" />
 
       <!-- 설정 관리 -->
       <q-item class="q-mb-sm">
@@ -707,7 +764,8 @@
           />
         </div>
       </q-item>
-      <q-separator spaced="xl" />
+
+      <q-separator spaced="xl" role="separator" />
 
       <!-- 버전 -->
       <q-item>
@@ -724,15 +782,18 @@
 <style scoped lang="scss">
   $height: 26px;
   $left: 4px;
+
   :deep(.q-field__control) {
     min-height: $height !important;
     height: auto !important;
     padding-left: $left !important;
+
     .q-field__native {
       min-height: $height !important;
       height: auto !important;
       padding-left: $left !important;
     }
+
     .q-field__append {
       min-height: $height !important;
       height: auto !important;
@@ -790,6 +851,7 @@
       system: '시스템'
     hapticsMode: '진동 모드'
     showButtonAddedLabel: '버튼 추가 라벨 표시'
+    numberFormatPerCalculator: '숫자 형식 계산기별 적용'
     useGrouping: '숫자 묶음 표시'
     groupingUnit: '숫자 묶음 단위'
     decimalPlaces: '소수점'
@@ -813,6 +875,7 @@
       hapticsMode: '진동 모드 설정'
       darkMode: '다크 모드 설정'
       showButtonAddedLabel: '버튼 추가 라벨 표시 설정'
+      numberFormatPerCalculator: '숫자 형식 계산기별 적용 설정'
       useGrouping: '숫자 묶음 표시 설정'
       groupingUnit: '숫자 묶음 단위 설정'
       decimalPlaces: '소수점 자리수 설정'
@@ -871,6 +934,7 @@
       system: 'System'
     hapticsMode: 'Haptics mode'
     showButtonAddedLabel: 'Show button added label'
+    numberFormatPerCalculator: 'Apply number format per calculator'
     useGrouping: 'Use grouping'
     groupingUnit: 'Grouping unit'
     decimalPlaces: 'Decimal'
@@ -894,6 +958,7 @@
       hapticsMode: 'Haptics mode setting'
       darkMode: 'Dark mode setting'
       showButtonAddedLabel: 'Show button added label setting'
+      numberFormatPerCalculator: 'Apply number format per calculator setting'
       useGrouping: 'Use grouping setting'
       groupingUnit: 'Grouping unit setting'
       decimalPlaces: 'Decimal places setting'

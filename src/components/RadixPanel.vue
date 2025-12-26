@@ -17,13 +17,13 @@
 
   // 계산기 관련 타입과 클래스
   import { useKeyBinding } from '../composables/useKeyBinding';
-  import { Radix } from 'src/utils/RadixConverter';
+  import { Radix } from '../utils/RadixConverter';
 
   // 스토어 import
   import { useUIStore } from 'stores/uiStore';
   import { useSettingsStore } from 'stores/settingsStore';
   import { useRadixStore } from 'stores/radixStore';
-  import { useCalcStore } from 'src/stores/calcStore';
+  import { useCalcStore } from 'stores/calcStore';
   import { useThemesStore } from 'stores/themesStore';
 
   // 스토어 인스턴스 생성
@@ -34,7 +34,7 @@
   const calcStore = useCalcStore();
 
   // 컴포넌트 import
-  import ToolTip from 'src/components/snippets/ToolTip.vue';
+  import ToolTip from '../components/snippets/ToolTip.vue';
 
   // 단위 초기화
   radixStore.initRecentRadix();
@@ -66,7 +66,7 @@
     },
   );
 
-    onMounted(() => {
+  onMounted(() => {
     radixStore.initRecentRadix();
     calcStore.calc.wordSize = radixStore.wordSize;
   });
@@ -250,12 +250,15 @@
 
 <style scoped lang="scss">
   $left: 2px;
+
   :deep(.q-field__control) {
     padding-left: $left !important;
     font-size: 0.81rem;
+
     .q-field__native {
       padding-left: $left !important;
     }
+
     .q-field__append {
       padding-left: $left !important;
     }

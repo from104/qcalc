@@ -108,6 +108,15 @@ export interface UIState {
 }
 
 /**
+ * 계산기별 포맷 설정 인터페이스
+ */
+export interface CalculatorFormatSettings {
+  useGrouping: boolean;
+  groupingUnit: GroupingUnitType;
+  decimalPlaces: DecimalPlacesType;
+}
+
+/**
  * 설정 스토어 상태 인터페이스
  */
 export interface SettingsState {
@@ -115,13 +124,24 @@ export interface SettingsState {
   initPanel: boolean;
   showButtonAddedLabel: boolean;
   hapticsMode: boolean;
+  // 레거시 필드 (호환성 유지)
   useGrouping: boolean;
   groupingUnit: GroupingUnitType;
   decimalPlaces: DecimalPlacesType;
+  // 새로운 계산기별 설정
+  // true일 때 각 계산기별로 개별 설정 사용, false일 때 calc(기본) 계산기 설정을 공통으로 사용
+  numberFormatPerCalculator: boolean;
+  formatSettings: {
+    calc: CalculatorFormatSettings;
+    unit: CalculatorFormatSettings;
+    currency: CalculatorFormatSettings;
+    radix: CalculatorFormatSettings;
+  };
   useSystemLocale: boolean;
   locale: string;
   userLocale: string;
   autoUpdate: boolean;
+  recordFontSize: number;
 }
 
 /**
@@ -200,13 +220,20 @@ export interface SettingsActions {
   toggleButtonAddedLabel(): void;
   setHapticsMode(isEnabled: boolean): void;
   toggleHapticsMode(): void;
+  getCurrentSettings(): CalculatorFormatSettings;
+  updateCurrentSettings(updates: Partial<CalculatorFormatSettings>): void;
+  toggleNumberFormatPerCalculator(): void;
+  setNumberFormatPerCalculator(value: boolean): void;
   toggleUseGrouping(): void;
   setGroupingUnit(digitCount: GroupingUnitType): void;
+  toggleGroupingUnit(): void;
   setDecimalPlaces(places: DecimalPlacesType): void;
   incrementDecimalPlaces(): void;
   decrementDecimalPlaces(): void;
   setAutoUpdate(value: boolean): void;
   toggleAutoUpdate(): void;
+  incrementRecordFontSize(): void;
+  decrementRecordFontSize(): void;
 }
 
 /**
@@ -222,6 +249,10 @@ export type SettingsStore = DefineStore<
   SettingsState,
   {
     getDecimalPlaces: (state: SettingsState) => number;
+    getCurrentFormatSettings: (state: SettingsState) => CalculatorFormatSettings;
+    getCurrentUseGrouping: (state: SettingsState) => boolean;
+    getCurrentGroupingUnit: (state: SettingsState) => GroupingUnitType;
+    getCurrentDecimalPlaces: (state: SettingsState) => DecimalPlacesType;
   },
   SettingsActions
 >;

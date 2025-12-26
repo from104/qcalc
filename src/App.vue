@@ -86,6 +86,7 @@
    * Alt+i: 초기화 패널 토글
    * Alt+d: 다크모드 토글
    * Alt+p: 햅틱 모드 토글
+   * Alt+n: 숫자 형식 계산기별 적용 토글
    * F1-F4: 각종 페이지 이동
    * q: 앱 종료
    * 기타: 계산기 관련 기능
@@ -95,9 +96,10 @@
     [['Alt+i'], settingsStore.toggleInitPanel],
     [['Alt+d'], toggleDarkModeWithNotification],
     [['Alt+p'], settingsStore.toggleHapticsMode],
+    [['Alt+n'], settingsStore.toggleNumberFormatPerCalculator],
     [[';'], settingsStore.toggleButtonAddedLabel],
     [[','], settingsStore.toggleUseGrouping],
-    [['Alt+,'], () => settingsStore.setGroupingUnit(settingsStore.groupingUnit === 3 ? 4 : 3)],
+    [['Alt+,'], () => settingsStore.toggleGroupingUnit()],
     [['['], settingsStore.decrementDecimalPlaces],
     [[']'], settingsStore.incrementDecimalPlaces],
     [['q'], quitApp],
@@ -205,7 +207,13 @@
 <template>
   <router-view v-slot="{ Component, route: routeProps }">
     <transition :name="isFirstNavigation ? '' : computeTransition || ''" mode="default">
-      <component :is="Component" :key="routeProps.path + '-' + isWideLayout" />
+      <!--
+        WideLayout(넓은 화면)에서는 서브페이지(오른쪽 패널)만 전환되는 애니메이션을 보여주기 위해 레이아웃 컴포넌트 자체가 파괴되지 않고 유지되어야 하므로 고정된 키('wide-layout')를 사용하여 컴포넌트 재사용을 유도하고, 좁은 화면(NarrowLayout)에서는 페이지 전환 효과를 위해 경로(routeProps.path)를 키로 사용.
+      -->
+      <component 
+        :is="Component" 
+        :key="isWideLayout ? 'wide-layout' : routeProps.path" 
+      />
     </transition>
   </router-view>
   <AutoUpdate />
@@ -214,6 +222,7 @@
 </template>
 
 <style scoped lang="scss">
+
   // === 공통 트랜지션 스타일 ===
   %transition-base {
     position: absolute;
@@ -236,10 +245,12 @@
   .slide-back-enter-from {
     transform: translateX(-100%);
   }
+
   .slide-back-enter-to,
   .slide-back-leave-from {
     transform: translateX(0);
   }
+
   .slide-back-leave-to {
     transform: translateX(100%);
   }

@@ -4,18 +4,26 @@
   import { useRouter, useRoute } from 'vue-router';
   import { useUIStore } from 'stores/uiStore';
   import { useThemesStore } from 'stores/themesStore';
-  import { useMainLayout } from '../composables/useMainLayout';
-  import { useRecordManager } from '../composables/useRecordManager';
   import { navigateToPath } from '../utils/NavigationUtils';
   import { isWideWidth } from '../utils/GlobalHelpers';
   import ToolTip from 'components/snippets/ToolTip.vue';
   import MenuPanel from 'components/MenuPanel.vue';
   import HelpIcon from 'components/snippets/HelpIcon.vue';
+  import { useRecordManager } from '../composables/useRecordManager';
+  import type { Tab, SubPageConfig } from '../types/layout.d';
 
   const props = defineProps({
     leftDrawerOpen: {
       type: Boolean,
       default: false,
+    },
+    tabs: {
+      type: Array as () => Tab[],
+      required: true,
+    },
+    subPageConfig: {
+      type: Object as () => SubPageConfig,
+      required: true,
     },
   });
 
@@ -28,8 +36,9 @@
   const themesStore = useThemesStore();
   const $g = window.globalVars;
 
+  // useRecordManager는 컴포저블이므로 같은 인스턴스를 반환함
+  // 하지만 키 바인딩은 useMainLayout에서만 등록되므로 중복 등록 방지
   const recordManager = useRecordManager();
-  const { tabs, SUB_PAGE_CONFIG } = useMainLayout(t, recordManager);
   const { recordFileInput, handleRecordFileChange } = recordManager;
 
   const localLeftDrawerOpen = computed({
@@ -49,7 +58,7 @@
   });
 
   const isSubPage = computed(() => {
-    return Object.keys(SUB_PAGE_CONFIG)
+    return Object.keys(props.subPageConfig)
       .filter((key) => !isWideWidth() || key !== 'record')
       .includes(String(route.name));
   });
@@ -109,7 +118,7 @@
           :aria-label="t('ariaLabel.mainTabs')"
         >
           <q-tab
-            v-for="tab in tabs"
+            v-for="tab in props.tabs"
             :id="`tab-${tab.name}`"
             :key="tab.name"
             :label="typeof tab.title === 'string' ? tab.title : (tab.title as any).value"
@@ -163,9 +172,9 @@
         />
         <q-toolbar-title class="text-subtitle1">
           {{
-            typeof SUB_PAGE_CONFIG[currentSubPage]?.title === 'string'
-              ? SUB_PAGE_CONFIG[currentSubPage]?.title
-              : (SUB_PAGE_CONFIG[currentSubPage]?.title as any)?.value
+            typeof props.subPageConfig[currentSubPage]?.title === 'string'
+              ? props.subPageConfig[currentSubPage]?.title
+              : (props.subPageConfig[currentSubPage]?.title as any)?.value
           }}
           <HelpIcon
             v-if="currentSubPage === 'record' && $g.isMobile"
@@ -176,7 +185,7 @@
         </q-toolbar-title>
         <q-space />
         <q-btn
-          v-for="button in SUB_PAGE_CONFIG[currentSubPage]?.buttons"
+          v-for="button in props.subPageConfig[currentSubPage]?.buttons"
           :key="button.icon"
           dense
           flat
@@ -209,14 +218,13 @@
           :aria-label="t('ariaLabel.calculatorContent')"
         >
           <q-tab-panel
-            v-for="(tab, index) in tabs"
+            v-for="(tab, index) in props.tabs"
             :id="`panel-${tab.name}`"
             :key="index"
             :name="tab.name"
             role="tabpanel"
-            :aria-label="
-              t('ariaLabel.tabPanel', { name: typeof tab.title === 'string' ? tab.title : (tab.title as any).value })
-            "
+            :aria-label="t('ariaLabel.tabPanel', { name: typeof tab.title === 'string' ? tab.title : (tab.title as any).value })
+              "
             :aria-labelledby="`tab-${tab.name}`"
           >
             <component :is="tab.component" />
@@ -228,7 +236,7 @@
       <template v-else>
         <div class="col-12 sub-content">
           <q-scroll-area class="sub-scroll-area" :class="{ 'hide-scrollbar': currentSubPage === 'record' }">
-            <component :is="SUB_PAGE_CONFIG[currentSubPage]?.component" class="sub-page" />
+            <component :is="props.subPageConfig[currentSubPage]?.component" class="sub-page" />
           </q-scroll-area>
         </div>
       </template>

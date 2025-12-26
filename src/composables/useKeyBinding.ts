@@ -1,5 +1,4 @@
-
-import { onMounted, onUnmounted } from 'vue';
+import { onUnmounted } from 'vue';
 import { tinykeys } from 'tinykeys';
 import type { KeyBindingMap } from 'tinykeys';
 
@@ -29,10 +28,6 @@ export function useKeyBinding(keybindings: KeyBindings) {
       unsubscribe = null;
     }
   };
-
-  onMounted(() => {
-    subscribe();
-  });
 
   onUnmounted(() => {
     unsubscribeAll();

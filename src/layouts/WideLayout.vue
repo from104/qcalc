@@ -4,17 +4,29 @@
   import { useRouter, useRoute } from 'vue-router';
   import { useUIStore } from 'stores/uiStore';
   import { useThemesStore } from 'stores/themesStore';
-  import { useMainLayout } from '../composables/useMainLayout';
-  import { useRecordManager } from '../composables/useRecordManager';
   import { navigateToPath } from '../utils/NavigationUtils';
   import ToolTip from 'components/snippets/ToolTip.vue';
   import MenuPanel from 'components/MenuPanel.vue';
   import HelpIcon from 'components/snippets/HelpIcon.vue';
+  import { useRecordManager } from '../composables/useRecordManager';
+  import type { Tab, SubPageConfig, SubPageButton } from '../types/layout.d';
 
   const props = defineProps({
     leftDrawerOpen: {
       type: Boolean,
       default: false,
+    },
+    tabs: {
+      type: Array as () => Tab[],
+      required: true,
+    },
+    subPageConfig: {
+      type: Object as () => SubPageConfig,
+      required: true,
+    },
+    subPageButtons: {
+      type: Array,
+      required: true,
     },
   });
 
@@ -27,8 +39,9 @@
   const themesStore = useThemesStore();
   const $g = window.globalVars;
 
+  // useRecordManager는 컴포저블이므로 같은 인스턴스를 반환함
+  // 하지만 키 바인딩은 useMainLayout에서만 등록되므로 중복 등록 방지
   const recordManager = useRecordManager();
-  const { tabs, SUB_PAGE_CONFIG, SUB_PAGE_BUTTONS } = useMainLayout(t, recordManager);
   const { recordFileInput, handleRecordFileChange } = recordManager;
 
   const localLeftDrawerOpen = computed({
@@ -102,16 +115,15 @@
           :aria-label="t('ariaLabel.mainTabs')"
         >
           <q-tab
-            v-for="tab in tabs"
+            v-for="tab in props.tabs"
             :key="tab.name"
             :label="typeof tab.title === 'string' ? tab.title : (tab.title as any).value"
             :name="tab.name"
             class="q-px-xs"
             dense
             role="tab"
-            :aria-label="
-              t('ariaLabel.tab', { name: typeof tab.title === 'string' ? tab.title : (tab.title as any).value })
-            "
+            :aria-label="t('ariaLabel.tab', { name: typeof tab.title === 'string' ? tab.title : (tab.title as any).value })
+              "
             :aria-selected="localCurrentTab === tab.name"
             :aria-controls="`panel-${tab.name}`"
           />
@@ -125,19 +137,18 @@
             <q-toolbar-title
               class="text-subtitle1 col-3"
               role="heading"
-              :aria-label="
-                t('ariaLabel.subPageTitle', {
-                  title:
-                    typeof SUB_PAGE_CONFIG[currentSubPage]?.title === 'string'
-                      ? SUB_PAGE_CONFIG[currentSubPage]?.title
-                      : (SUB_PAGE_CONFIG[currentSubPage]?.title as any)?.value,
-                })
-              "
+              :aria-label="t('ariaLabel.subPageTitle', {
+                title:
+                  typeof props.subPageConfig[currentSubPage]?.title === 'string'
+                    ? props.subPageConfig[currentSubPage]?.title
+                    : (props.subPageConfig[currentSubPage]?.title as any)?.value,
+              })
+                "
             >
               {{
-                typeof SUB_PAGE_CONFIG[currentSubPage]?.title === 'string'
-                  ? SUB_PAGE_CONFIG[currentSubPage]?.title
-                  : (SUB_PAGE_CONFIG[currentSubPage]?.title as any)?.value
+                typeof props.subPageConfig[currentSubPage]?.title === 'string'
+                  ? props.subPageConfig[currentSubPage]?.title
+                  : (props.subPageConfig[currentSubPage]?.title as any)?.value
               }}
               <HelpIcon
                 v-if="(currentSubPage === 'record' || currentSubPage === '') && $g.isMobile"
@@ -148,7 +159,7 @@
             </q-toolbar-title>
             <div class="col-9 row justify-end sub-header-buttons">
               <q-btn
-                v-for="button in SUB_PAGE_BUTTONS.filter((btn) => btn.path !== route.path)"
+                v-for="button in (props.subPageButtons as SubPageButton[]).filter((btn) => btn.path !== route.path)"
                 :key="button.label"
                 dense
                 flat
@@ -166,7 +177,7 @@
               </q-btn>
               <q-separator vertical class="sub-header-separator q-mx-sm" />
               <q-btn
-                v-for="button in SUB_PAGE_CONFIG[currentSubPage]?.buttons"
+                v-for="button in props.subPageConfig[currentSubPage]?.buttons"
                 :key="button.icon"
                 class="q-pl-none"
                 dense
@@ -185,7 +196,7 @@
                 />
               </q-btn>
               <q-btn
-                v-if="SUB_PAGE_CONFIG[currentSubPage]?.showClose"
+                v-if="props.subPageConfig[currentSubPage]?.showClose"
                 class="q-mx-none q-px-none"
                 flat
                 dense
@@ -213,14 +224,13 @@
           :aria-label="t('ariaLabel.calculatorContent')"
         >
           <q-tab-panel
-            v-for="(tab, index) in tabs"
+            v-for="(tab, index) in props.tabs"
             :id="`panel-${tab.name}`"
             :key="index"
             :name="tab.name"
             role="tabpanel"
-            :aria-label="
-              t('ariaLabel.tabPanel', { name: typeof tab.title === 'string' ? tab.title : (tab.title as any).value })
-            "
+            :aria-label="t('ariaLabel.tabPanel', { name: typeof tab.title === 'string' ? tab.title : (tab.title as any).value })
+              "
             :aria-labelledby="`tab-${tab.name}`"
           >
             <component :is="tab.component" />
@@ -238,7 +248,7 @@
         >
           <transition name="animate-sub-page">
             <component
-              :is="SUB_PAGE_CONFIG[currentSubPage]?.component"
+              :is="props.subPageConfig[currentSubPage]?.component"
               :key="currentSubPage"
               :data-page="currentSubPage"
               class="sub-page"

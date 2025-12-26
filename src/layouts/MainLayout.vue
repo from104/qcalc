@@ -7,13 +7,15 @@
   import ShowTips from 'components/ShowTips.vue';
   import { useI18n } from 'vue-i18n';
   import { computed } from 'vue';
+  import { useRecordManager } from '../composables/useRecordManager';
 
   // Layout.yml의 메시지들을 가져와서 useMainLayout에 전달
   const { t } = useI18n();
 
   const uiStore = useUIStore();
 
-  const { leftDrawerOpen, toggleLeftDrawer } = useMainLayout(t);
+  const recordManager = useRecordManager();
+  const { leftDrawerOpen, toggleLeftDrawer, tabs, SUB_PAGE_CONFIG, SUB_PAGE_BUTTONS } = useMainLayout(t, recordManager);
 
   const isWideLayout = computed(() => isWideWidth());
 </script>
@@ -23,9 +25,18 @@
     <NarrowLayout
       v-if="!isWideLayout"
       v-model:left-drawer-open="leftDrawerOpen"
+      :tabs="tabs"
+      :sub-page-config="SUB_PAGE_CONFIG"
       @toggle-left-drawer="toggleLeftDrawer"
     />
-    <WideLayout v-else v-model:left-drawer-open="leftDrawerOpen" @toggle-left-drawer="toggleLeftDrawer" />
+    <WideLayout
+      v-else
+      v-model:left-drawer-open="leftDrawerOpen"
+      :tabs="tabs"
+      :sub-page-config="SUB_PAGE_CONFIG"
+      :sub-page-buttons="SUB_PAGE_BUTTONS"
+      @toggle-left-drawer="toggleLeftDrawer"
+    />
     <ShowTips v-model="uiStore.showTipsDialog" />
   </div>
 </template>

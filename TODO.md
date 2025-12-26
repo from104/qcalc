@@ -15,11 +15,11 @@
   - [x] High contrast mode
   - [x] Haptic mode
 - [ ] Settings related
-  - [X] Reset to default
-  - [X] Export to file
-  - [X] Import from file
+  - [x] Reset to default
+  - [x] Export to file
+  - [x] Import from file
   - [ ] Sync to cloud
-  
+
 ## Done
 
 - [x] Add dark mode
@@ -42,4 +42,5 @@
 - [x] Theme function
 - [x] Unit and currency item favorites
 - [x] User theme settings
-- [X] Export and import calculation history
+- [x] Export and import calculation history
+- [x] Number format per calculator feature
