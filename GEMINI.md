@@ -75,6 +75,26 @@ QCalc is a multi-purpose calculator application built with Vue 3, Quasar 2, and 
 yarn test
 ```
 
+## Release Preparation
+
+When preparing a new release (e.g., v0.11.6), follow these steps to ensure all metadata and documents are consistent:
+
+1.  **Update Version**: Update the `version` field in `package.json`.
+2.  **Update Changelogs**:
+    *   Update the release date for the new version in `CHANGELOG.md` and `CHANGELOG-ko.md`.
+    *   Ensure all new features and fixes are listed under the correct version header.
+3.  **Sync About Pages**:
+    *   Update `src/pages/AboutPage-en.md` and `src/pages/AboutPage-ko.md`.
+    *   Copy the latest version's changelog entries from the main changelog files to these pages.
+4.  **Sync Help Pages**:
+    *   Update `src/pages/HelpPage-en.md` based on `README.md`.
+    *   Update `src/pages/HelpPage-ko.md` based on `README-ko.md`.
+    *   Ensure all shortcuts and feature descriptions are synchronized.
+5.  **Verify Integrity**:
+    *   Run `yarn lint` to check for code style issues.
+    *   Run `yarn test` to ensure all tests pass.
+6.  **Update Documentation**: Update `walkthrough.md` to summarize the release preparation steps taken.
+
 ## Development Conventions
 
 *   **Code Style:** The project uses Prettier for code formatting and ESLint for linting.

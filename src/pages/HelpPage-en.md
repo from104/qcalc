@@ -19,18 +19,18 @@ QCalc is more than just a simple calculator - it's evolving into a modern produc
 #### Standard Calculator
 
 - **How to Access**: Ctrl+1 or select the top tab
-- **Basic Operations**: Enter numbers 0-9, +, -, \*, / keys
+- **Basic Operations**: Enter numbers 0-9, +, -, *, / keys
 - **Advanced Functions**: Trigonometric functions (q, w, e), square (u), square root (i), constants (z: π, x: φ, c: e)
 - **Memory Functions**: Ctrl+Enter (MS), Ctrl+Backspace (MR), Ctrl+Delete (MC)
 - **Percentage Calculation**: 'number, /, number, %(k)' calculates percentage
-- **Apply Percentage**: 'number, \*, number, %(k)' applies percentage
+- **Apply Percentage**: 'number, *, number, %(k)' applies percentage
 
 #### Unit Converter
 
 - **How to Access**: Ctrl+2 or select the top tab
 - **Conversion Categories**: Over 15 categories including length, area, volume, weight, angle, etc.
 - **Favorites**: Set frequently used units as favorites for quick access
-- **Swap Units**: Use \ key to swap original/converted units
+- **Swap Units**: Use '\' key to swap original/converted units
 - **Quick Conversion**: ×10/×100/×1000 (a/s/d), ÷10/÷100/÷1000 (z/x/c)
 - **Unit Symbol**: Toggle unit symbol display/hide with Alt+\ key
 
@@ -40,7 +40,7 @@ QCalc is more than just a simple calculator - it's evolving into a modern produc
 - **Latest Exchange Rates**: Reflects real-time exchange rate information
 - **Favorites**: Set frequently used currencies as favorites for quick access
 - **Quick Calculation**: +5/+10/+100 (f/g/h), -5/-10/-100 (q/w/e)
-- **Swap Currencies**: Use \ key to swap original/converted currencies
+- **Swap Currencies**: Use '\' key to swap original/converted currencies
 - **Currency Symbol**: Toggle currency symbol display/hide with Alt+\ key
 
 #### Programmer Calculator
@@ -48,7 +48,7 @@ QCalc is more than just a simple calculator - it's evolving into a modern produc
 - **How to Access**: Ctrl+4 or select the top tab
 - **Supported Radix**: Convert between binary, octal, decimal, and hexadecimal
 - **Hexadecimal Input**: Enter A-F using z, x, c, a, s, d keys
-- **Swap Radix**: Use \ key to swap original/converted radix
+- **Swap Radix**: Use '\' key to swap original/converted radix
 - **Radix Symbol**: Toggle unit symbol display/hide with Alt+\ key
 - **Symbol Position**: Toggle unit symbol position (front/back) with Alt+Ctrl+\ key
 
@@ -138,8 +138,8 @@ QCalc is more than just a simple calculator - it's evolving into a modern produc
 
 | Shortcut    | Function                  |
 | ----------- | ------------------------- |
-| 0-9\.       | Enter numbers and decimal |
-| +, -, \*, / | Basic arithmetic          |
+| 0-9.       | Enter numbers and decimal |
+| +, -, *, / | Basic arithmetic          |
 | Enter, =    | Calculate result          |
 | Backspace   | Delete one character      |
 | Delete      | Reset calculator          |
@@ -174,7 +174,7 @@ QCalc is more than just a simple calculator - it's evolving into a modern produc
 | C-Enter, C-=      | Memory store (MS)    |
 | C-+, C-Numpad +   | Memory add (M+)      |
 | C--, C-Numpad -   | Memory subtract (M-) |
-| C-\*, C-Numpad \* | Memory multiply (M×) |
+| C-*, C-Numpad * | Memory multiply (M×) |
 | C-/, C-Numpad /   | Memory divide (M÷)   |
 
 ### Unit/Currency Conversion Mode (Shift Mode)
@@ -227,6 +227,7 @@ QCalc is more than just a simple calculator - it's evolving into a modern produc
 | A-d      | Toggle dark mode                    |
 | A-p      | Toggle haptic mode                  |
 | A-n      | Toggle number format per calculator |
+| ;        | Toggle extra button functions       |
 | ,        | Toggle number grouping              |
 | A-,      | Change grouping unit (3/4)          |
 | [, ]     | Adjust decimal places (∞~16)        |
@@ -249,5 +250,5 @@ QCalc is more than just a simple calculator - it's evolving into a modern produc
 | PageUp/PageDown | Scroll 400px up/down |
 | Home/End        | Scroll to top/bottom |
 | C-f             | Search history       |
-| C-\[            | Decrease font size   |
-| C-\]            | Increase font size   |
+| C-[            | Decrease font size   |
+| C-]            | Increase font size   |

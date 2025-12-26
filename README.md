@@ -230,14 +230,16 @@ The calculator alone appears when the window width is reduced.
 
 | Shortcut | Function                     |
 | -------- | ---------------------------- |
-| A-t      | Toggle always on top         |
-| A-i      | Toggle init panel on startup |
-| A-d      | Toggle dark mode             |
-| A-p      | Toggle haptic mode           |
-| ,        | Toggle number grouping       |
-| A-,      | Change grouping unit (3/4)   |
-| [, ]     | Adjust decimal places (∞~16) |
-| q        | Quit application             |
+| A-t      | Toggle always on top                |
+| A-i      | Toggle init panel on startup        |
+| A-d      | Toggle dark mode                    |
+| A-p      | Toggle haptic mode                  |
+| A-n      | Toggle number format per calculator |
+| ;        | Toggle extra button functions       |
+| ,        | Toggle number grouping              |
+| A-,      | Change grouping unit (3/4)          |
+| [, ]     | Adjust decimal places (∞~16)        |
+| q        | Quit application                    |
 
 ### Clipboard Operations
 
