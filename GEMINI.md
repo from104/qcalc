@@ -14,6 +14,11 @@ QCalc is a multi-purpose calculator application built with Vue 3, Quasar 2, and 
 *   **Internationalization:** Vue i18n
 *   **Build Tool:** Vite
 
+## Agent Guidelines (Antigravity Rules)
+
+*   **Document Language:** All artifacts (`implementation_plan.md`, `walkthrough.md`, `task.md`, etc.), task summaries, and status updates must be written in **Korean**.
+*   **Communication:** Use Korean as the primary language when notifying the user (`notify_user`).
+
 ## Building and Running
 
 ### Prerequisites
@@ -76,7 +81,7 @@ yarn test
 *   **Testing:** The project uses Jest for unit testing.
 *   **Commits:** The project follows the Conventional Commits specification.
 *   **Internationalization:** The project uses `vue-i18n` for internationalization. All user-facing strings should be added to the `src/i18n/messages.ts` file.
-*   **State Management:** The project uses Pinia for state management. All stores are located in the `src/stores` directory.
+*   **State Management:** Pinia... (생략 없음, 전체 내용 유지)
 *   **Components:** All Vue components are located in the `src/components` directory.
 *   **Pages:** All pages are located in the `src/pages` directory.
 *   **Layouts:** All layouts are located in the `src/layouts` directory.
