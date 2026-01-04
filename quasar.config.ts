@@ -33,7 +33,7 @@ export default defineConfig((/* ctx */) => {
 
     // 앱 부트 파일 (/src/boot)
     // 부트 파일은 "main.js"의 일부입니다
-    boot: ['i18n', 'auto-blur', 'global-variables', 'android', 'themes'],
+    boot: ['i18n', 'auto-blur', 'global-variables', 'android', 'themes', 'admob'],
 
     // CSS 파일
     css: ['app.scss'],

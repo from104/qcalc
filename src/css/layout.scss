@@ -90,3 +90,17 @@
     background-color: var(--q-dark) !important;
   }
 }
+
+// AdMob 배너 광고 영역 스타일 (Capacitor/Android)
+.body--capacitor {
+  // 배너 광고 높이(50dp) + 여유 공간
+  --ad-banner-height: 50px;
+
+  .q-page-container {
+    padding-bottom: var(--ad-banner-height) !important;
+  }
+
+  .sub-scroll-area {
+    height: calc(100vh - 50px - var(--ad-banner-height));
+  }
+}

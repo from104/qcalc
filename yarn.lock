@@ -72,6 +72,16 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@capacitor-community/admob@npm:^8.0.0":
+  version: 8.0.0
+  resolution: "@capacitor-community/admob@npm:8.0.0"
+  dependencies:
+    "@capacitor/core": "npm:^8.0.0"
+    "@rdlabo/capacitor-docgen": "npm:^0.4.1"
+  checksum: 10/ea5bcb3b84bc697c7b867e7470662be1bfa74ae55b1b00ca4903c16c1bce40673bb190f8f528301fbf9a15abe153fc46bcfdfa47825aca302ca1a33fc4c6b05f
+  languageName: node
+  linkType: hard
+
 "@capacitor/android@npm:7.4.4":
   version: 7.4.4
   resolution: "@capacitor/android@npm:7.4.4"
@@ -124,6 +134,15 @@ __metadata:
   dependencies:
     tslib: "npm:^2.1.0"
   checksum: 10/956b82d016663a7fdac5de5577104b4bedc845948492156fcfb847b1da9d376fde6db159e27eeac45cc4bbd4e29e8e06b29766d95441b0775faea9b696365606
+  languageName: node
+  linkType: hard
+
+"@capacitor/core@npm:^8.0.0":
+  version: 8.0.0
+  resolution: "@capacitor/core@npm:8.0.0"
+  dependencies:
+    tslib: "npm:^2.1.0"
+  checksum: 10/1ad8940fe729218dfe00632571c5212fa9ea4a490d1fc06518f4c70eed0a9c9b3b8967371424733926da06946a551da46c3a894826a4909024fc3df1be99b36c
   languageName: node
   linkType: hard
 
@@ -1595,6 +1614,20 @@ __metadata:
     vite: ^2.0.0 || ^3.0.0 || ^4.0.0 || ^5.0.0 || ^6.0.0 || ^7.0.0
     vue: ^3.0.0
   checksum: 10/536746d24191bd5fbfcc2d66214c621210e242eb5fa04b00529c04093e969dcf71a2881635321fc9d9461f67818b8a5344f6f7deb85af21fc1aa1c6a3b997b3e
+  languageName: node
+  linkType: hard
+
+"@rdlabo/capacitor-docgen@npm:^0.4.1":
+  version: 0.4.1
+  resolution: "@rdlabo/capacitor-docgen@npm:0.4.1"
+  dependencies:
+    colorette: "npm:^2.0.20"
+    github-slugger: "npm:^1.5.0"
+    minimist: "npm:^1.2.8"
+    typescript: "npm:~4.2.4"
+  bin:
+    docgen: bin/docgen
+  checksum: 10/a5c07b3e069a5e7cc5332ca80dc53368db7288b573c0449d2f99b99cc5a9b49d0fabe8bccc104cfeb2e60a29878e3d315e8621cf5f3faf8aebe749c9539b71d5
   languageName: node
   linkType: hard
 
@@ -3977,6 +4010,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"colorette@npm:^2.0.20":
+  version: 2.0.20
+  resolution: "colorette@npm:2.0.20"
+  checksum: 10/0b8de48bfa5d10afc160b8eaa2b9938f34a892530b2f7d7897e0458d9535a066e3998b49da9d21161c78225b272df19ae3a64d6df28b4c9734c0e55bbd02406f
+  languageName: node
+  linkType: hard
+
 "colorjs.io@npm:^0.5.0":
   version: 0.5.2
   resolution: "colorjs.io@npm:0.5.2"
@@ -6070,6 +6110,13 @@ __metadata:
   dependencies:
     resolve-pkg-maps: "npm:^1.0.0"
   checksum: 10/3603c6da30e312636e4c20461e779114c9126601d1eca70ee4e36e3e3c00e3c21892d2d920027333afa2cc9e20998a436b14abe03a53cde40742581cb0e9ceb2
+  languageName: node
+  linkType: hard
+
+"github-slugger@npm:^1.5.0":
+  version: 1.5.0
+  resolution: "github-slugger@npm:1.5.0"
+  checksum: 10/c70988224578b3bdaa25df65973ffc8c24594a77a28550c3636e495e49d17aef5cdb04c04fa3f1744babef98c61eecc6a43299a13ea7f3cc33d680bf9053ffbe
   languageName: node
   linkType: hard
 
@@ -8914,6 +8961,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "qcalc@workspace:."
   dependencies:
+    "@capacitor-community/admob": "npm:^8.0.0"
     "@capacitor/android": "npm:7.4.4"
     "@capacitor/app": "npm:7.1.0"
     "@capacitor/cli": "npm:7.4.4"
@@ -10901,6 +10949,16 @@ __metadata:
   languageName: node
   linkType: hard
 
+"typescript@npm:~4.2.4":
+  version: 4.2.4
+  resolution: "typescript@npm:4.2.4"
+  bin:
+    tsc: bin/tsc
+    tsserver: bin/tsserver
+  checksum: 10/ca42873f8cdf67f7540e923475e7ad2a31aaa6e5e336ac309c9ab08ccc04555f4d3779285e8e8d8ab05413d4c02c5a26f96e0f8ea9a16affe721f639f87d053a
+  languageName: node
+  linkType: hard
+
 "typescript@patch:typescript@npm%3A5.7.3#optional!builtin<compat/typescript>":
   version: 5.7.3
   resolution: "typescript@patch:typescript@npm%3A5.7.3#optional!builtin<compat/typescript>::version=5.7.3&hash=5786d5"
@@ -10908,6 +10966,16 @@ __metadata:
     tsc: bin/tsc
     tsserver: bin/tsserver
   checksum: 10/dc58d777eb4c01973f7fbf1fd808aad49a0efdf545528dab9b07d94fdcb65b8751742804c3057e9619a4627f2d9cc85547fdd49d9f4326992ad0181b49e61d81
+  languageName: node
+  linkType: hard
+
+"typescript@patch:typescript@npm%3A~4.2.4#optional!builtin<compat/typescript>":
+  version: 4.2.4
+  resolution: "typescript@patch:typescript@npm%3A4.2.4#optional!builtin<compat/typescript>::version=4.2.4&hash=334f98"
+  bin:
+    tsc: bin/tsc
+    tsserver: bin/tsserver
+  checksum: 10/1ea3cb3bd8aca37b6fd4970ffecf2da000ce4ccaed54c71de87f56f6b0d792a8a7d8a36b521574911804a9789c2f461d319679e1f5580440910987e9f1fcc22a
   languageName: node
   linkType: hard
 
