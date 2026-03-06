@@ -3,6 +3,7 @@
   "version": "0.11.6",
   "description": "com.atit.qcalc",
   "productName": "Q Calc",
+  "desktopName": "com.atit.qcalc.desktop",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/from104/qcalc.git"
@@ -17,13 +18,7 @@
     "url": "https://github.com/from104/qcalc/issues"
   },
   "homepage": "https://github.com/from104/qcalc#readme",
-  "keywords": [
-    "calculator",
-    "quasar",
-    "vue",
-    "electron",
-    "typescript"
-  ],
+  "keywords": ["calculator", "quasar", "vue", "electron", "typescript"],
   "type": "module",
   "scripts": {
     "postinstall": "quasar prepare",
@@ -35,6 +30,7 @@
     "build": "quasar build -m electron",
     "build:win32": "quasar build -m electron -T win32",
     "build:android": "quasar build -m capacitor -T android",
+    "build:flatpak": "cd flatpak && bash build-flatpak.sh install",
     "icons": "icongenie g -m spa,electron -i ./assets/qcalc_icon_v3.png; icongenie g -m capacitor -i ./assets/qcalc_icon_v3.png --skip-trim; rm -r src-capacitor/ios"
   },
   "exports": {

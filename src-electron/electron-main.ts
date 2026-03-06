@@ -18,6 +18,10 @@ const { autoUpdater } = useAutoUpdate;
 
 // Electron의 main 프로세스 또는 preload 스크립트에서
 const isSnap = process.platform === 'linux' && !!process.env.SNAP;
+const isFlatpak = process.platform === 'linux' && !!process.env.FLATPAK_ID;
+
+// Snap 또는 Flatpak 환경에서는 자체 업데이트 메커니즘을 사용하므로 자동 업데이트 비활성화
+const isSandboxed = isSnap || isFlatpak;
 
 // 현재 디렉토리 경로 설정
 const currentDir = fileURLToPath(new URL('.', import.meta.url));
@@ -72,7 +76,7 @@ const checkForUpdates = async () => {
 async function createWindow() {
   try {
     // snap이 아닐 경우에만 자동 업데이트 설정
-    if (!isSnap) {
+    if (!isSandboxed) {
       autoUpdater.autoDownload = false;
       autoUpdater.autoInstallOnAppQuit = true;
 
@@ -176,13 +180,13 @@ async function createWindow() {
     // 윈도우가 준비되면 업데이트 확인 시작
     mainWindow.once('ready-to-show', () => {
       mainWindow?.show();
-      if (!isSnap) {
+      if (!isSandboxed) {
         checkForUpdates();
       }
     });
 
     // IPC 이벤트 핸들러 추가
-    if (!isSnap) {
+    if (!isSandboxed) {
       ipcMain.on('start-update', () => {
         autoUpdater.downloadUpdate().catch((err) => {
           console.error('Error occurred during update download:', err);

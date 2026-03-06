@@ -192,7 +192,7 @@ export default defineConfig((/* ctx */) => {
         productName: 'QCalc',
         artifactName: '${productName}-${version}-${os}.${ext}',
         linux: {
-          target: ['AppImage', 'snap'],
+          target: ['AppImage', 'snap', 'dir'],
           category: 'Utility',
           // latest-linux.yml 생성을 위한 설정
           generateUpdatesFilesForAllChannels: true,

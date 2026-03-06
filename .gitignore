@@ -63,3 +63,10 @@ mainToHead.txt
 # Settings files
 qcalc-settings*.json
 
+# Flatpak build artifacts
+flatpak/.flatpak-builder
+flatpak/repo
+flatpak/build-dir
+flatpak/linux-unpacked
+flatpak/icons
+flatpak/generated-sources.json

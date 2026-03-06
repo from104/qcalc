@@ -178,6 +178,23 @@ build_android() {
     fi
 }
 
+# Flatpak 빌드 함수
+build_flatpak() {
+    echo "Building Flatpak version..."
+
+    if ! command -v flatpak-builder &> /dev/null; then
+        echo "Error: flatpak-builder is not installed."
+        echo "Please install it using your distribution's package manager."
+        echo "  Ubuntu/Debian: sudo apt install flatpak-builder"
+        echo "  Fedora:        sudo dnf install flatpak-builder"
+        echo "  Arch:          sudo pacman -S flatpak-builder"
+        exit 1
+    fi
+
+    bash flatpak/build-flatpak.sh install
+    echo "Flatpak build completed!"
+}
+
 # 인수 처리
 BUILD_TYPE=${1:-all} # 인수가 없으면 'all'을 기본값으로 사용
 
@@ -196,8 +213,11 @@ case "$BUILD_TYPE" in
     "android")
         build_android
         ;;
+    "flatpak")
+        build_flatpak
+        ;;
     *)
-        echo "Invalid build type. Available options: all, linux, win, android"
+        echo "Invalid build type. Available options: all, linux, win, android, flatpak"
         exit 1
         ;;
 esac
