@@ -90,31 +90,31 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@capacitor/cli@npm:7.4.3":
-  version: 7.4.3
-  resolution: "@capacitor/cli@npm:7.4.3"
+"@capacitor/cli@npm:7.5.0":
+  version: 7.5.0
+  resolution: "@capacitor/cli@npm:7.5.0"
   dependencies:
-    "@ionic/cli-framework-output": "npm:^2.2.8"
-    "@ionic/utils-subprocess": "npm:^3.0.1"
-    "@ionic/utils-terminal": "npm:^2.3.5"
-    commander: "npm:^12.1.0"
-    debug: "npm:^4.4.0"
-    env-paths: "npm:^2.2.0"
-    fs-extra: "npm:^11.2.0"
-    kleur: "npm:^4.1.5"
-    native-run: "npm:^2.0.1"
-    open: "npm:^8.4.0"
-    plist: "npm:^3.1.0"
-    prompts: "npm:^2.4.2"
-    rimraf: "npm:^6.0.1"
-    semver: "npm:^7.6.3"
-    tar: "npm:^6.1.11"
-    tslib: "npm:^2.8.1"
-    xml2js: "npm:^0.6.2"
+    "@ionic/cli-framework-output": ^2.2.8
+    "@ionic/utils-subprocess": ^3.0.1
+    "@ionic/utils-terminal": ^2.3.5
+    commander: ^12.1.0
+    debug: ^4.4.0
+    env-paths: ^2.2.0
+    fs-extra: ^11.2.0
+    kleur: ^4.1.5
+    native-run: ^2.0.3
+    open: ^8.4.0
+    plist: ^3.1.0
+    prompts: ^2.4.2
+    rimraf: ^6.0.1
+    semver: ^7.6.3
+    tar: ^7.5.3
+    tslib: ^2.8.1
+    xml2js: ^0.6.2
   bin:
     cap: bin/capacitor
     capacitor: bin/capacitor
-  checksum: b96080830036b4baaf906b31a174843dc3849797bea462bc7804efe522520140a80679a9ac16c02bd9d661797a61a42c6dc2421cb3b2ce904339d5c32e7d7c1e
+  checksum: 8/161baa9c64222bfa14e3ae15996538b0b48e69d99d1fad73e15751feceac5fe913247007b2c75a733e3c079e668845b9c1b4a9c3fc6c4ef50ba521ee774cf6ae
   languageName: node
   linkType: hard
 
@@ -6029,7 +6029,7 @@ __metadata:
 
 "fsevents@patch:fsevents@npm%3A~2.3.2#~builtin<compat/fsevents>, fsevents@patch:fsevents@npm%3A~2.3.3#~builtin<compat/fsevents>":
   version: 2.3.3
-  resolution: "fsevents@patch:fsevents@npm%3A2.3.3#~builtin<compat/fsevents>::version=2.3.3&hash=df0bf1"
+  resolution: "fsevents@patch:fsevents@npm%3A2.3.3#~builtin<compat/fsevents>::version=2.3.3&hash=18f3a7"
   dependencies:
     node-gyp: "npm:latest"
   conditions: os=darwin
@@ -8045,24 +8045,24 @@ __metadata:
   languageName: node
   linkType: hard
 
-"native-run@npm:^2.0.1":
-  version: 2.0.1
-  resolution: "native-run@npm:2.0.1"
+"native-run@npm:^2.0.3":
+  version: 2.0.3
+  resolution: "native-run@npm:2.0.3"
   dependencies:
-    "@ionic/utils-fs": "npm:^3.1.7"
-    "@ionic/utils-terminal": "npm:^2.3.4"
-    bplist-parser: "npm:^0.3.2"
-    debug: "npm:^4.3.4"
-    elementtree: "npm:^0.1.7"
-    ini: "npm:^4.1.1"
-    plist: "npm:^3.1.0"
-    split2: "npm:^4.2.0"
-    through2: "npm:^4.0.2"
-    tslib: "npm:^2.6.2"
-    yauzl: "npm:^2.10.0"
+    "@ionic/utils-fs": ^3.1.7
+    "@ionic/utils-terminal": ^2.3.4
+    bplist-parser: ^0.3.2
+    debug: ^4.3.4
+    elementtree: ^0.1.7
+    ini: ^4.1.1
+    plist: ^3.1.0
+    split2: ^4.2.0
+    through2: ^4.0.2
+    tslib: ^2.6.2
+    yauzl: ^2.10.0
   bin:
     native-run: bin/native-run
-  checksum: a495b52ac1d89a03cfdd57f18d977a41af5722c0e3a4f29c84ca82e367e770578db2b24c692b48ce29f8a2d15c5272d36f68bbc8a35634d17202925e66b1ee77
+  checksum: 8/a65e8a9fe94307ae4add531750e97de00bd0fd6217574ccc3bf78727b27e81be1312cf2697631891012cd95fcf33e3b0f869ad556704ddac4024fdd7940cc070
   languageName: node
   linkType: hard
 
@@ -8941,7 +8941,7 @@ __metadata:
   dependencies:
     "@capacitor/android": 7.4.3
     "@capacitor/app": 7.1.0
-    "@capacitor/cli": 7.4.3
+    "@capacitor/cli": 7.5.0
     "@capacitor/core": 7.4.3
     "@capacitor/filesystem": 7.1.4
     "@capacitor/haptics": 7.0.3
@@ -9285,7 +9285,7 @@ __metadata:
 
 "resolve@patch:resolve@npm%3A^1.22.4#~builtin<compat/resolve>":
   version: 1.22.10
-  resolution: "resolve@patch:resolve@npm%3A1.22.10#~builtin<compat/resolve>::version=1.22.10&hash=c3c19d"
+  resolution: "resolve@patch:resolve@npm%3A1.22.10#~builtin<compat/resolve>::version=1.22.10&hash=07638b"
   dependencies:
     is-core-module: "npm:^2.16.0"
     path-parse: "npm:^1.0.7"
@@ -10509,7 +10509,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"tar@npm:^6.0.5, tar@npm:^6.1.11, tar@npm:^6.1.12":
+"tar@npm:^6.0.5, tar@npm:^6.1.12":
   version: 6.2.1
   resolution: "tar@npm:6.2.1"
   dependencies:
@@ -10533,6 +10533,19 @@ __metadata:
     minizlib: "npm:^3.1.0"
     yallist: "npm:^5.0.0"
   checksum: 4848cd2fa2fcaf0734cf54e14bc685056eb43a74d7cc7f954c3ac88fea88c85d95b1d7896619f91aab6f2234c5eec731c18aaa201a78fcf86985bdc824ed7a00
+  languageName: node
+  linkType: hard
+
+"tar@npm:^7.5.3":
+  version: 7.5.10
+  resolution: "tar@npm:7.5.10"
+  dependencies:
+    "@isaacs/fs-minipass": ^4.0.0
+    chownr: ^3.0.0
+    minipass: ^7.1.2
+    minizlib: ^3.1.0
+    yallist: ^5.0.0
+  checksum: 8/aed1a7ae188fc80539184682bfaed7c4d5ae276f591dce67cc03b4ed8898aebde0cc195187f6abd455e3f25b24399a809ed2eaf6410ca3abc1ba30b19a94089e
   languageName: node
   linkType: hard
 
@@ -10902,7 +10915,7 @@ __metadata:
 
 "typescript@patch:typescript@5.7.3#~builtin<compat/typescript>":
   version: 5.7.3
-  resolution: "typescript@patch:typescript@npm%3A5.7.3#~builtin<compat/typescript>::version=5.7.3&hash=d73830"
+  resolution: "typescript@patch:typescript@npm%3A5.7.3#~builtin<compat/typescript>::version=5.7.3&hash=701156"
   bin:
     tsc: bin/tsc
     tsserver: bin/tsserver
