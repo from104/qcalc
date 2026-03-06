@@ -81,12 +81,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@capacitor/app@npm:7.1.0":
-  version: 7.1.0
-  resolution: "@capacitor/app@npm:7.1.0"
+"@capacitor/app@npm:7.1.1":
+  version: 7.1.1
+  resolution: "@capacitor/app@npm:7.1.1"
   peerDependencies:
     "@capacitor/core": ">=7.0.0"
-  checksum: 10/acc985402cf7a6a3dbabae3ba71522c98e4b2f919f0000688681faf6d86878588fd1fbffa7e706118be94f012cd67ca813d5ca3a7228ba98cd600968cedebf43
+  checksum: 10/0892bb3d0e159fe808bb25ca862d17c9c24b7c8baf2e77f5f1294ee38131502f70729f7770e7b90086f2a86ec2105a8ed32aee5153c6a964cbfb0fc01c97ff3e
   languageName: node
   linkType: hard
 
@@ -157,11 +157,11 @@ __metadata:
   linkType: hard
 
 "@capacitor/share@npm:^7.0.3":
-  version: 7.0.3
-  resolution: "@capacitor/share@npm:7.0.3"
+  version: 7.0.4
+  resolution: "@capacitor/share@npm:7.0.4"
   peerDependencies:
     "@capacitor/core": ">=7.0.0"
-  checksum: 10/fe1c4b08c3937fd617c7cd9fbe5c5c1051c523433039ddd25abfa6cba02dba1b59c5da6199dcd33f4ac3b6dbb554b316d4c4e73caabf57a287789f0138cab302
+  checksum: 10/7a50cf42405245e5fda7c6dd2bcfd5b44a37afbffd3b6afd46f3d91d0c7f0a71a556f3a7a6d49094d7deb27fee503b6e0e743f978ed194e1c5908c6aed193368
   languageName: node
   linkType: hard
 
@@ -8940,7 +8940,7 @@ __metadata:
   resolution: "qcalc@workspace:."
   dependencies:
     "@capacitor/android": "npm:7.4.3"
-    "@capacitor/app": "npm:7.1.0"
+    "@capacitor/app": "npm:7.1.1"
     "@capacitor/cli": "npm:8.0.2"
     "@capacitor/core": "npm:7.4.3"
     "@capacitor/filesystem": "npm:7.1.4"
