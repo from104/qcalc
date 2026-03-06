@@ -207,211 +207,31 @@ export class Calculator {
     this.inputHandler.changeSign();
   }
 
-  // 단항 연산 메서드
-  public rec(): void {
-    this.operationHandler.rec();
+  /**
+   * 단항 연산을 연산자로 디스패치합니다.
+   * @param operator - 단항 연산자 (REC, SQRT, POW2, FCT, EXP10, INT, FRAC, SIN, COS, TAN, BIT_NOT)
+   */
+  public executeUnary(operator: Operator): void {
+    this.operationHandler.executeUnary(operator);
     this.inputHandler.setCurrentNumberToBuffer();
   }
 
-  public sqrt(): void {
-    this.operationHandler.sqrt();
+  /**
+   * 이항 연산을 연산자로 설정합니다.
+   * @param operator - 이항 연산자 (ADD, SUB, MUL, DIV, POW, ROOT, MOD, BIT_*)
+   */
+  public executeBinary(operator: Operator): void {
+    this.operationHandler.performBinaryOperation(operator);
     this.inputHandler.setCurrentNumberToBuffer();
   }
 
-  public pow2(): void {
-    this.operationHandler.pow2();
-    this.inputHandler.setCurrentNumberToBuffer();
-  }
-
-  public fct(): void {
-    this.operationHandler.fct();
-    this.inputHandler.setCurrentNumberToBuffer();
-  }
-
-  public exp10(): void {
-    this.operationHandler.exp10();
-    this.inputHandler.setCurrentNumberToBuffer();
-  }
-
-  public int(): void {
-    this.operationHandler.int();
-    this.inputHandler.setCurrentNumberToBuffer();
-  }
-
-  public frac(): void {
-    this.operationHandler.frac();
-    this.inputHandler.setCurrentNumberToBuffer();
-  }
-
-  public sin(): void {
-    this.operationHandler.sin();
-    this.inputHandler.setCurrentNumberToBuffer();
-  }
-
-  public cos(): void {
-    this.operationHandler.cos();
-    this.inputHandler.setCurrentNumberToBuffer();
-  }
-
-  public tan(): void {
-    this.operationHandler.tan();
-    this.inputHandler.setCurrentNumberToBuffer();
-  }
-
-  public bitNot(): void {
-    this.operationHandler.bitNot();
-    this.inputHandler.setCurrentNumberToBuffer();
-  }
-
-  // 이항 연산 메서드
-  public add(): void {
-    this.operationHandler.add();
-    this.inputHandler.setCurrentNumberToBuffer();
-  }
-
-  public sub(): void {
-    this.operationHandler.sub();
-    this.inputHandler.setCurrentNumberToBuffer();
-  }
-
-  public mul(): void {
-    this.operationHandler.mul();
-    this.inputHandler.setCurrentNumberToBuffer();
-  }
-
-  public div(): void {
-    this.operationHandler.div();
-    this.inputHandler.setCurrentNumberToBuffer();
-  }
-
-  public pow(): void {
-    this.operationHandler.pow();
-    this.inputHandler.setCurrentNumberToBuffer();
-  }
-
-  public root(): void {
-    this.operationHandler.root();
-    this.inputHandler.setCurrentNumberToBuffer();
-  }
-
-  public mod(): void {
-    this.operationHandler.mod();
-    this.inputHandler.setCurrentNumberToBuffer();
-  }
-
-  public bitSftL(): void {
-    this.operationHandler.bitSftL();
-    this.inputHandler.setCurrentNumberToBuffer();
-  }
-
-  public bitSftR(): void {
-    this.operationHandler.bitSftR();
-    this.inputHandler.setCurrentNumberToBuffer();
-  }
-
-  public bitAnd(): void {
-    this.operationHandler.bitAnd();
-    this.inputHandler.setCurrentNumberToBuffer();
-  }
-
-  public bitOr(): void {
-    this.operationHandler.bitOr();
-    this.inputHandler.setCurrentNumberToBuffer();
-  }
-
-  public bitXor(): void {
-    this.operationHandler.bitXor();
-    this.inputHandler.setCurrentNumberToBuffer();
-  }
-
-  public bitNand(): void {
-    this.operationHandler.bitNand();
-    this.inputHandler.setCurrentNumberToBuffer();
-  }
-
-  public bitNor(): void {
-    this.operationHandler.bitNor();
-    this.inputHandler.setCurrentNumberToBuffer();
-  }
-
-  public bitXnor(): void {
-    this.operationHandler.bitXnor();
-    this.inputHandler.setCurrentNumberToBuffer();
-  }
-
-  // 숫자를 직접 사용하는 이항 연산 메서드
-  public addNumber(n: number): void {
-    this.operationHandler.addNumber(n);
-    this.inputHandler.setCurrentNumberToBuffer();
-  }
-
-  public subNumber(n: number): void {
-    this.operationHandler.subNumber(n);
-    this.inputHandler.setCurrentNumberToBuffer();
-  }
-
-  public mulNumber(n: number): void {
-    this.operationHandler.mulNumber(n);
-    this.inputHandler.setCurrentNumberToBuffer();
-  }
-
-  public divNumber(n: number): void {
-    this.operationHandler.divNumber(n);
-    this.inputHandler.setCurrentNumberToBuffer();
-  }
-
-  public powNumber(n: number): void {
-    this.operationHandler.powNumber(n);
-    this.inputHandler.setCurrentNumberToBuffer();
-  }
-
-  public rootNumber(n: number): void {
-    this.operationHandler.rootNumber(n);
-    this.inputHandler.setCurrentNumberToBuffer();
-  }
-
-  public modNumber(n: number): void {
-    this.operationHandler.modNumber(n);
-    this.inputHandler.setCurrentNumberToBuffer();
-  }
-
-  public bitSftLNumber(n: number): void {
-    this.operationHandler.bitSftLNumber(n);
-    this.inputHandler.setCurrentNumberToBuffer();
-  }
-
-  public bitSftRNumber(n: number): void {
-    this.operationHandler.bitSftRNumber(n);
-    this.inputHandler.setCurrentNumberToBuffer();
-  }
-
-  public bitAndNumber(n: number): void {
-    this.operationHandler.bitAndNumber(n);
-    this.inputHandler.setCurrentNumberToBuffer();
-  }
-
-  public bitOrNumber(n: number): void {
-    this.operationHandler.bitOrNumber(n);
-    this.inputHandler.setCurrentNumberToBuffer();
-  }
-
-  public bitXorNumber(n: number): void {
-    this.operationHandler.bitXorNumber(n);
-    this.inputHandler.setCurrentNumberToBuffer();
-  }
-
-  public bitNandNumber(n: number): void {
-    this.operationHandler.bitNandNumber(n);
-    this.inputHandler.setCurrentNumberToBuffer();
-  }
-
-  public bitNorNumber(n: number): void {
-    this.operationHandler.bitNorNumber(n);
-    this.inputHandler.setCurrentNumberToBuffer();
-  }
-
-  public bitXnorNumber(n: number): void {
-    this.operationHandler.bitXnorNumber(n);
+  /**
+   * 숫자를 직접 사용하는 이항 연산을 실행합니다.
+   * @param operator - 이항 연산자
+   * @param n - 사용할 숫자
+   */
+  public executeBinaryWithNumber(operator: Operator, n: number): void {
+    this.operationHandler.executeWithNumber(operator, n);
     this.inputHandler.setCurrentNumberToBuffer();
   }
 

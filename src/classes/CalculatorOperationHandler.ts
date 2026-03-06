@@ -192,175 +192,50 @@ export class CalculatorOperationHandler {
     }
   }
 
-  // 단항 연산 메서드들
-  public rec(): void {
-    checkError(toBigNumber(this.state.currentNumber).eq(0), 'error.divide_by_zero');
-    this.performUnaryOperation(Operator.REC, () => this.math.div('1', this.state.currentNumber));
-  }
-
-  public sqrt(): void {
-    checkError(toBigNumber(this.state.currentNumber).lt(0), 'error.math.negative_root');
-    this.performUnaryOperation(Operator.SQRT, () => this.math.root(this.state.currentNumber, '2'));
-  }
-
-  public pow2(): void {
-    this.performUnaryOperation(Operator.POW2, () => this.math.pow(this.state.currentNumber, '2'));
-  }
-
-  public fct(): void {
-    checkError(toBigNumber(this.state.currentNumber).lt(0), 'error.math.negative_factorial');
-    this.performUnaryOperation(Operator.FCT, () => this.math.fact(this.state.currentNumber));
-  }
-
-  public exp10(): void {
-    this.performUnaryOperation(Operator.EXP10, () => this.math.exp10(this.state.currentNumber));
-  }
-
-  public int(): void {
-    this.performUnaryOperation(Operator.INT, () => this.math.int(this.state.currentNumber));
-  }
-
-  public frac(): void {
-    this.performUnaryOperation(Operator.FRAC, () => this.math.frac(this.state.currentNumber));
-  }
-
-  public sin(): void {
-    this.performUnaryOperation(Operator.SIN, () => this.math.sin(this.state.currentNumber));
-  }
-
-  public cos(): void {
-    this.performUnaryOperation(Operator.COS, () => this.math.cos(this.state.currentNumber));
-  }
-
-  public tan(): void {
-    this.performUnaryOperation(Operator.TAN, () => this.math.tan(this.state.currentNumber));
-  }
-
-  public bitNot(): void {
-    this.performUnaryOperation(Operator.BIT_NOT, () =>
-      this.math.bitwiseNot(this.state.currentNumber, this.state.wordSize),
-    );
-  }
-
-  // 이항 연산 메서드들
-  public add(): void {
-    this.performBinaryOperation(Operator.ADD);
-  }
-
-  public sub(): void {
-    this.performBinaryOperation(Operator.SUB);
-  }
-
-  public mul(): void {
-    this.performBinaryOperation(Operator.MUL);
-  }
-
-  public div(): void {
-    this.performBinaryOperation(Operator.DIV);
-  }
-
-  public pow(): void {
-    this.performBinaryOperation(Operator.POW);
-  }
-
-  public root(): void {
-    this.performBinaryOperation(Operator.ROOT);
-  }
-
-  public mod(): void {
-    this.performBinaryOperation(Operator.MOD);
-  }
-
-  public bitSftL(): void {
-    this.performBinaryOperation(Operator.BIT_SFT_L);
-  }
-
-  public bitSftR(): void {
-    this.performBinaryOperation(Operator.BIT_SFT_R);
-  }
-
-  public bitAnd(): void {
-    this.performBinaryOperation(Operator.BIT_AND);
-  }
-
-  public bitOr(): void {
-    this.performBinaryOperation(Operator.BIT_OR);
-  }
-
-  public bitXor(): void {
-    this.performBinaryOperation(Operator.BIT_XOR);
-  }
-
-  public bitNand(): void {
-    this.performBinaryOperation(Operator.BIT_NAND);
-  }
-
-  public bitNor(): void {
-    this.performBinaryOperation(Operator.BIT_NOR);
-  }
-
-  public bitXnor(): void {
-    this.performBinaryOperation(Operator.BIT_XNOR);
-  }
-
-  // 숫자를 직접 사용하는 이항 연산 메서드들
-  public addNumber(n: number): void {
-    this.executeWithNumber(Operator.ADD, n);
-  }
-
-  public subNumber(n: number): void {
-    this.executeWithNumber(Operator.SUB, n);
-  }
-
-  public mulNumber(n: number): void {
-    this.executeWithNumber(Operator.MUL, n);
-  }
-
-  public divNumber(n: number): void {
-    this.executeWithNumber(Operator.DIV, n);
-  }
-
-  public powNumber(n: number): void {
-    this.executeWithNumber(Operator.POW, n);
-  }
-
-  public rootNumber(n: number): void {
-    this.executeWithNumber(Operator.ROOT, n);
-  }
-
-  public modNumber(n: number): void {
-    this.executeWithNumber(Operator.MOD, n);
-  }
-
-  public bitSftLNumber(n: number): void {
-    this.executeWithNumber(Operator.BIT_SFT_L, n);
-  }
-
-  public bitSftRNumber(n: number): void {
-    this.executeWithNumber(Operator.BIT_SFT_R, n);
-  }
-
-  public bitAndNumber(n: number): void {
-    this.executeWithNumber(Operator.BIT_AND, n);
-  }
-
-  public bitOrNumber(n: number): void {
-    this.executeWithNumber(Operator.BIT_OR, n);
-  }
-
-  public bitXorNumber(n: number): void {
-    this.executeWithNumber(Operator.BIT_XOR, n);
-  }
-
-  public bitNandNumber(n: number): void {
-    this.executeWithNumber(Operator.BIT_NAND, n);
-  }
-
-  public bitNorNumber(n: number): void {
-    this.executeWithNumber(Operator.BIT_NOR, n);
-  }
-
-  public bitXnorNumber(n: number): void {
-    this.executeWithNumber(Operator.BIT_XNOR, n);
+  /**
+   * 단항 연산을 연산자로 디스패치합니다.
+   * @param operator - 단항 연산자
+   */
+  public executeUnary(operator: Operator): void {
+    match(operator)
+      .with(Operator.REC, () => {
+        checkError(toBigNumber(this.state.currentNumber).eq(0), 'error.divide_by_zero');
+        this.performUnaryOperation(Operator.REC, () => this.math.div('1', this.state.currentNumber));
+      })
+      .with(Operator.SQRT, () => {
+        checkError(toBigNumber(this.state.currentNumber).lt(0), 'error.math.negative_root');
+        this.performUnaryOperation(Operator.SQRT, () => this.math.root(this.state.currentNumber, '2'));
+      })
+      .with(Operator.POW2, () => {
+        this.performUnaryOperation(Operator.POW2, () => this.math.pow(this.state.currentNumber, '2'));
+      })
+      .with(Operator.FCT, () => {
+        checkError(toBigNumber(this.state.currentNumber).lt(0), 'error.math.negative_factorial');
+        this.performUnaryOperation(Operator.FCT, () => this.math.fact(this.state.currentNumber));
+      })
+      .with(Operator.EXP10, () => {
+        this.performUnaryOperation(Operator.EXP10, () => this.math.exp10(this.state.currentNumber));
+      })
+      .with(Operator.INT, () => {
+        this.performUnaryOperation(Operator.INT, () => this.math.int(this.state.currentNumber));
+      })
+      .with(Operator.FRAC, () => {
+        this.performUnaryOperation(Operator.FRAC, () => this.math.frac(this.state.currentNumber));
+      })
+      .with(Operator.SIN, () => {
+        this.performUnaryOperation(Operator.SIN, () => this.math.sin(this.state.currentNumber));
+      })
+      .with(Operator.COS, () => {
+        this.performUnaryOperation(Operator.COS, () => this.math.cos(this.state.currentNumber));
+      })
+      .with(Operator.TAN, () => {
+        this.performUnaryOperation(Operator.TAN, () => this.math.tan(this.state.currentNumber));
+      })
+      .with(Operator.BIT_NOT, () => {
+        this.performUnaryOperation(Operator.BIT_NOT, () =>
+          this.math.bitwiseNot(this.state.currentNumber, this.state.wordSize),
+        );
+      })
+      .otherwise(() => {});
   }
 }
