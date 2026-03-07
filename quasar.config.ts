@@ -115,6 +115,13 @@ export default defineConfig((/* ctx */) => {
     devServer: {
       open: false,
       host: '0.0.0.0',
+      // flatpak/ 디렉토리의 대량 바이너리 파일이 inotify watcher를 소진시켜
+      // Electron dev 모드 실행이 차단되는 문제 방지
+      viteVueDevServerOptions: {
+        watch: {
+          ignored: ['**/flatpak/**'],
+        },
+      },
     },
 
     // Quasar 프레임워크 설정
