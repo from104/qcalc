@@ -6,7 +6,7 @@
    */
 
   // Vue 핵심 기능 가져오기
-  import { defineProps, defineEmits, computed, ref } from 'vue';
+  import { computed, ref } from 'vue';
 
   // i18n 설정
   import { useI18n } from 'vue-i18n';
@@ -342,24 +342,24 @@
 </style>
 
 <i18n lang="yaml">
-  ko:
-    tipsTitle: '짧은 팁'
-    prevTip: '이전 팁'
-    nextTip: '다음 팁'
-    showTipsOnStart: '시작 시 팁 보이기'
-    closeTips: '팁 닫기'
-    tipContent: '팁 내용'
-    dialogAriaLabel: '도움말 다이얼로그'
-    mainContentAriaLabel: '팁 메인 콘텐츠'
-    navigationAriaLabel: '팁 네비게이션'
-  en:
-    tipsTitle: 'Quick Tips'
-    prevTip: 'Previous tip'
-    nextTip: 'Next tip'
-    showTipsOnStart: 'Show tips on start'
-    closeTips: 'Close tips'
-    tipContent: 'Tip content'
-    dialogAriaLabel: 'Help dialog'
-    mainContentAriaLabel: 'Tip main content'
-    navigationAriaLabel: 'Tip navigation'
+ko:
+  tipsTitle: '짧은 팁'
+  prevTip: '이전 팁'
+  nextTip: '다음 팁'
+  showTipsOnStart: '시작 시 팁 보이기'
+  closeTips: '팁 닫기'
+  tipContent: '팁 내용'
+  dialogAriaLabel: '도움말 다이얼로그'
+  mainContentAriaLabel: '팁 메인 콘텐츠'
+  navigationAriaLabel: '팁 네비게이션'
+en:
+  tipsTitle: 'Quick Tips'
+  prevTip: 'Previous tip'
+  nextTip: 'Next tip'
+  showTipsOnStart: 'Show tips on start'
+  closeTips: 'Close tips'
+  tipContent: 'Tip content'
+  dialogAriaLabel: 'Help dialog'
+  mainContentAriaLabel: 'Tip main content'
+  navigationAriaLabel: 'Tip navigation'
 </i18n>

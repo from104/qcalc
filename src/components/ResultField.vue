@@ -11,7 +11,7 @@
    */
 
   // Vue 핵심 기능 및 컴포지션 API 가져오기
-  import { ref, computed, onMounted, watch, onUnmounted, onBeforeUnmount, nextTick } from 'vue';
+  import { ref, computed, onMounted, watch, onUnmounted, onBeforeUnmount, nextTick, useTemplateRef } from 'vue';
   import { Haptics, ImpactStyle } from '@capacitor/haptics';
   import { copyToClipboard } from 'quasar';
 
@@ -79,7 +79,7 @@
   const calcRecord = calc.record;
 
   // 필드 요소와 툴팁 상태 관리
-  const fieldElementRef = ref<HTMLElement | null>(null);
+  const fieldElementRef = useTemplateRef<HTMLElement>('fieldElementRef');
   const needFieldTooltip = ref(false);
 
   /**
@@ -784,13 +784,13 @@
   const { subscribe, unsubscribe } =
     props.field === 'main'
       ? useKeyBinding([
-        [['Control+c', 'Control+Insert', 'Copy'], handleCopy],
-        [['Control+v', 'Shift+Insert', 'Paste'], () => handlePaste('main')],
-      ])
+          [['Control+c', 'Control+Insert', 'Copy'], handleCopy],
+          [['Control+v', 'Shift+Insert', 'Paste'], () => handlePaste('main')],
+        ])
       : useKeyBinding([
-        [['Shift+Control+c', 'Alt+Control+Insert', 'Shift+Copy'], handleCopy],
-        [['Shift+Control+v', 'Alt+Shift+Insert', 'Shift+Paste'], () => handlePaste('sub')],
-      ]);
+          [['Shift+Control+c', 'Alt+Control+Insert', 'Shift+Copy'], handleCopy],
+          [['Shift+Control+v', 'Alt+Shift+Insert', 'Shift+Paste'], () => handlePaste('sub')],
+        ]);
 
   /**
    * 입력 필드 포커스 상태에 따라 키 바인딩을 활성화/비활성화합니다.
@@ -906,18 +906,20 @@
         <div
           :id="fieldID"
           ref="fieldElementRef"
-          v-mutation="() => {
-            checkNeedFieldTooltip();
-            return true;
-          }
-            "
+          v-mutation="
+            () => {
+              checkNeedFieldTooltip();
+              return true;
+            }
+          "
           v-mutation.characterData
           class="self-center no-outline full-width full-height ellipsis text-right q-pt-xs noselect"
           :class="[`text-${calcStore.isMemoryVisible ? memoryTextColor : panelTextColor}`]"
-          :style="isMainField
-            ? `padding-top: ${mainPanelPaddingTop}; padding-bottom: ${mainPanelPaddingBottom};`
-            : `padding-top: ${subPanelPaddingTop}; padding-bottom: ${subPanelPaddingBottom};`
-            "
+          :style="
+            isMainField
+              ? `padding-top: ${mainPanelPaddingTop}; padding-bottom: ${mainPanelPaddingBottom};`
+              : `padding-top: ${subPanelPaddingTop}; padding-bottom: ${subPanelPaddingBottom};`
+          "
           role="text"
           :aria-label="t('ariaLabel.result', { type: isMainField ? t('ariaLabel.main') : t('ariaLabel.sub') })"
           @click="
@@ -1052,60 +1054,60 @@
 </style>
 
 <i18n lang="yaml">
-  ko:
-    copiedDisplayedResult: '표시된 결과가 복사되었습니다.<br><center>{result}</center>'
-    copiedDisplayedResultSub: '보조 패널에 표시된 결과가 복사되었습니다.<br><center>{result}</center>'
-    copyDisplayedResult: '표시된 결과 복사'
-    copiedOnlyNumber: '결과 숫자가 복사되었습니다.<br><center>{result}</center>'
-    copiedOnlyNumberSub: '보조 패널에 표시된 결과 숫자가 복사되었습니다.<br><center>{result}</center>'
-    copyOnlyNumber: '결과 숫자 복사'
-    pastedFromClipboard: '클립보드로부터 숫자를 붙여넣었습니다.'
-    pastedFromClipboardToSubPanel: '클립보드로부터 숫자를 <br> 보조 패널에 붙여넣었습니다.'
-    clipboardIsEmptyOrContainsDataThatCannotBePasted: '클립보드가 비어있거나 붙여넣을 수 없는 데이터가 포함되어 있습니다.'
-    failedToPasteFromClipboard: '클립보드로부터 붙여넣기에 실패했습니다.'
-    paste: '붙여넣기'
-    ariaLabel:
-      resultField: '{type} 결과 필드'
-      main: '주'
-      sub: '보조'
-      expression: '계산식'
-      memory: '메모리 값 표시'
-      memoryIcon: '메모리 아이콘'
-      operator: '현재 연산자: {operator}'
-      operatorIcon: '{operator} 연산자 아이콘'
-      result: '{type} 결과 값'
-      value: '계산 결과'
-      radixPrefix: '진법 접두사'
-      radixSuffix: '진법 접미사'
-      currencySymbol: '통화 기호'
-      unit: '단위'
-      contextMenu: '결과 복사 메뉴'
-  en:
-    copiedDisplayedResult: 'The displayed result has been copied.<br><center>{result}</center>'
-    copiedDisplayedResultSub: 'The sub panel result has been copied.<br><center>{result}</center>'
-    copyDisplayedResult: 'Copy displayed result'
-    copiedOnlyNumber: 'The result number has been copied.<br><center>{result}</center>'
-    copiedOnlyNumberSub: 'The sub panel result number has been copied.<br><center>{result}</center>'
-    copyOnlyNumber: 'Copy result number'
-    pastedFromClipboard: 'The number has been pasted from the clipboard.'
-    pastedFromClipboardToSubPanel: 'The number has been pasted <br>from the clipboard to the sub panel.'
-    clipboardIsEmptyOrContainsDataThatCannotBePasted: 'The clipboard is empty or contains data that cannot be pasted.'
-    failedToPasteFromClipboard: 'Failed to paste from clipboard.'
-    paste: 'Paste'
-    ariaLabel:
-      resultField: '{type} result field'
-      main: 'main'
-      sub: 'sub'
-      expression: 'Calculation expression'
-      memory: 'Show memory value'
-      memoryIcon: 'Memory icon'
-      operator: 'Current operator: {operator}'
-      operatorIcon: '{operator} operator icon'
-      result: '{type} result value'
-      value: 'Calculation result'
-      radixPrefix: 'Radix prefix'
-      radixSuffix: 'Radix suffix'
-      currencySymbol: 'Currency symbol'
-      unit: 'Unit'
-      contextMenu: 'Result copy menu'
+ko:
+  copiedDisplayedResult: '표시된 결과가 복사되었습니다.<br><center>{result}</center>'
+  copiedDisplayedResultSub: '보조 패널에 표시된 결과가 복사되었습니다.<br><center>{result}</center>'
+  copyDisplayedResult: '표시된 결과 복사'
+  copiedOnlyNumber: '결과 숫자가 복사되었습니다.<br><center>{result}</center>'
+  copiedOnlyNumberSub: '보조 패널에 표시된 결과 숫자가 복사되었습니다.<br><center>{result}</center>'
+  copyOnlyNumber: '결과 숫자 복사'
+  pastedFromClipboard: '클립보드로부터 숫자를 붙여넣었습니다.'
+  pastedFromClipboardToSubPanel: '클립보드로부터 숫자를 <br> 보조 패널에 붙여넣었습니다.'
+  clipboardIsEmptyOrContainsDataThatCannotBePasted: '클립보드가 비어있거나 붙여넣을 수 없는 데이터가 포함되어 있습니다.'
+  failedToPasteFromClipboard: '클립보드로부터 붙여넣기에 실패했습니다.'
+  paste: '붙여넣기'
+  ariaLabel:
+    resultField: '{type} 결과 필드'
+    main: '주'
+    sub: '보조'
+    expression: '계산식'
+    memory: '메모리 값 표시'
+    memoryIcon: '메모리 아이콘'
+    operator: '현재 연산자: {operator}'
+    operatorIcon: '{operator} 연산자 아이콘'
+    result: '{type} 결과 값'
+    value: '계산 결과'
+    radixPrefix: '진법 접두사'
+    radixSuffix: '진법 접미사'
+    currencySymbol: '통화 기호'
+    unit: '단위'
+    contextMenu: '결과 복사 메뉴'
+en:
+  copiedDisplayedResult: 'The displayed result has been copied.<br><center>{result}</center>'
+  copiedDisplayedResultSub: 'The sub panel result has been copied.<br><center>{result}</center>'
+  copyDisplayedResult: 'Copy displayed result'
+  copiedOnlyNumber: 'The result number has been copied.<br><center>{result}</center>'
+  copiedOnlyNumberSub: 'The sub panel result number has been copied.<br><center>{result}</center>'
+  copyOnlyNumber: 'Copy result number'
+  pastedFromClipboard: 'The number has been pasted from the clipboard.'
+  pastedFromClipboardToSubPanel: 'The number has been pasted <br>from the clipboard to the sub panel.'
+  clipboardIsEmptyOrContainsDataThatCannotBePasted: 'The clipboard is empty or contains data that cannot be pasted.'
+  failedToPasteFromClipboard: 'Failed to paste from clipboard.'
+  paste: 'Paste'
+  ariaLabel:
+    resultField: '{type} result field'
+    main: 'main'
+    sub: 'sub'
+    expression: 'Calculation expression'
+    memory: 'Show memory value'
+    memoryIcon: 'Memory icon'
+    operator: 'Current operator: {operator}'
+    operatorIcon: '{operator} operator icon'
+    result: '{type} result value'
+    value: 'Calculation result'
+    radixPrefix: 'Radix prefix'
+    radixSuffix: 'Radix suffix'
+    currencySymbol: 'Currency symbol'
+    unit: 'Unit'
+    contextMenu: 'Result copy menu'
 </i18n>

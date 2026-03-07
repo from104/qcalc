@@ -48,7 +48,15 @@
 </script>
 
 <template>
-  <q-card-section v-auto-blur class="row wrap justify-center q-pt-xs q-pb-none q-px-none">
+  <q-card-section
+    v-auto-blur
+    class="row wrap justify-center q-pt-xs q-pb-none q-px-none"
+    :style="{
+      '--base-height': baseHeight,
+      '--label-size-ratio': labelSizeAdjustmentRatio,
+      '--label-scale': labelScalingFactor,
+    }"
+  >
     <div v-for="(button, id) in activeButtonSet" :key="id" class="col-3 row wrap justify-center q-pa-sm">
       <q-btn
         :id="'btn-' + id"
@@ -56,18 +64,20 @@
         class="shadow-2 noselect col-12 button"
         no-caps
         push
-        :label="calcStore.isShiftPressed && !settingsStore.showButtonAddedLabel && id !== shiftButtonId
-          ? (extendedFunctionSet[id]?.label ?? '')
-          : button.label.charAt(0) === '@'
+        :label="
+          calcStore.isShiftPressed && !settingsStore.showButtonAddedLabel && id !== shiftButtonId
+            ? (extendedFunctionSet[id]?.label ?? '')
+            : button.label.charAt(0) === '@'
+              ? undefined
+              : button.label
+        "
+        :icon="
+          calcStore.isShiftPressed && !settingsStore.showButtonAddedLabel && id !== shiftButtonId
             ? undefined
-            : button.label
-          "
-        :icon="calcStore.isShiftPressed && !settingsStore.showButtonAddedLabel && id !== shiftButtonId
-          ? undefined
-          : button.label.charAt(0) === '@'
-            ? button.label.slice(1)
-            : undefined
-          "
+            : button.label.charAt(0) === '@'
+              ? button.label.slice(1)
+              : undefined
+        "
         :class="[
           calcStore.isShiftPressed && !settingsStore.showButtonAddedLabel && id !== shiftButtonId
             ? 'char'
@@ -75,8 +85,8 @@
               ? 'icon'
               : 'char',
           calcStore.isShiftPressed &&
-            !settingsStore.showButtonAddedLabel &&
-            !(extendedFunctionSet[id]?.isDisabled ?? false)
+          !settingsStore.showButtonAddedLabel &&
+          !(extendedFunctionSet[id]?.isDisabled ?? false)
             ? ''
             : (button.isDisabled ?? false) || calcStore.isShiftPressed
               ? 'disabled-button'
@@ -119,14 +129,15 @@
         <ToolTip
           :text-color="themesStore.getDarkColor()"
           :bg-color="themesStore.getCurrentThemeColors.ui.warning"
-          :text="calcStore.isShiftPressed
-            ? (extendedFunctionSet[id]?.isDisabled ?? false)
-              ? t('disabledButton')
-              : getTooltipsOfKeys(id, true)
-            : (activeButtonSet[id]?.isDisabled ?? false)
-              ? t('disabledButton')
-              : getTooltipsOfKeys(id, false)
-            "
+          :text="
+            calcStore.isShiftPressed
+              ? (extendedFunctionSet[id]?.isDisabled ?? false)
+                ? t('disabledButton')
+                : getTooltipsOfKeys(id, true)
+              : (activeButtonSet[id]?.isDisabled ?? false)
+                ? t('disabledButton')
+                : getTooltipsOfKeys(id, false)
+          "
         />
       </q-btn>
     </div>
@@ -135,26 +146,26 @@
 
 <style scoped lang="scss">
   .button {
-    min-height: calc((100vh - v-bind('baseHeight')) / 6 - 20px);
-    max-height: calc((100vh - v-bind('baseHeight')) / 6 - 20px);
+    min-height: calc((100vh - var(--base-height)) / 6 - 20px);
+    max-height: calc((100vh - var(--base-height)) / 6 - 20px);
     font-weight: 700;
     position: relative;
   }
 
   .icon {
-    font-size: calc(((100vh - v-bind('baseHeight')) / 6 - 20px) * 0.25 * v-bind('labelSizeAdjustmentRatio'));
-    padding-top: calc(((100vh - v-bind('baseHeight')) / 6 - 13px) * 0.27 * v-bind('labelScalingFactor') * v-bind('labelSizeAdjustmentRatio'));
+    font-size: calc(((100vh - var(--base-height)) / 6 - 20px) * 0.25 * var(--label-size-ratio));
+    padding-top: calc(((100vh - var(--base-height)) / 6 - 13px) * 0.27 * var(--label-scale) * var(--label-size-ratio));
   }
 
   .char {
-    font-size: calc(((100vh - v-bind('baseHeight')) / 6 - 20px) * 0.38 * v-bind('labelSizeAdjustmentRatio'));
-    padding-top: calc(((100vh - v-bind('baseHeight')) / 6 - 13px) * 0.26 * v-bind('labelScalingFactor') * v-bind('labelSizeAdjustmentRatio'));
+    font-size: calc(((100vh - var(--base-height)) / 6 - 20px) * 0.38 * var(--label-size-ratio));
+    padding-top: calc(((100vh - var(--base-height)) / 6 - 13px) * 0.26 * var(--label-scale) * var(--label-size-ratio));
   }
 
   .top-label {
     text-align: center;
     position: absolute;
-    font-size: calc(((100vh - v-bind('baseHeight')) / 6 - 20px) * 0.25 * v-bind('labelSizeAdjustmentRatio'));
+    font-size: calc(((100vh - var(--base-height)) / 6 - 20px) * 0.25 * var(--label-size-ratio));
     color: inherit;
     opacity: 0.7;
     width: 100%;
@@ -182,46 +193,46 @@
 </style>
 
 <i18n lang="yaml">
-  ko:
-    cannotDivideByZero: '0으로 나눌 수 없습니다.'
-    squareRootOfANegativeNumberIsNotAllowed: '음수의 제곱근은 허용되지 않습니다.'
-    factorialOfANegativeNumberIsNotAllowed: '음수의 팩토리얼은 허용되지 않습니다.'
-    bitOperationPreprocessingCompleted: '비트 연산을 위해 절대값 정수로 계산을 완료되었습니다.'
-    bitOperationPreprocessingReady: '비트 연산을 위해 절대값 정수로 계산을 준비하였습니다.'
-    memoryCleared: '메모리를 초기화했습니다.'
-    memoryRecalled: '메모리를 불러왔습니다.'
-    memorySaved: '메모리에 저장되었습니다.'
-    noMemoryToRecall: '불러올 메모리가 없습니다.'
-    disabledButton: '비활성화된 버튼'
-    ariaLabel:
-      backspace: '지우기'
-      plusMinus: '부호 바꾸기'
-      divide: '나누기'
-      multiply: '곱하기'
-      subtract: '빼기'
-      add: '더하기'
-      equals: '계산하기'
-      decimal: '소수점'
-      shift: '시프트'
-  en:
-    cannotDivideByZero: 'Cannot divide by zero'
-    squareRootOfANegativeNumberIsNotAllowed: 'The square root of a negative number is not allowed.'
-    factorialOfANegativeNumberIsNotAllowed: 'The factorial of a negative number is not allowed.'
-    bitOperationPreprocessingCompleted: 'Bit operation preprocessing completed.'
-    bitOperationPreprocessingReady: 'Bit operation preprocessing ready.'
-    memoryCleared: 'Memory cleared.'
-    memoryRecalled: 'Memory recalled.'
-    memorySaved: 'Memory saved.'
-    noMemoryToRecall: 'No memory to recall.'
-    disabledButton: 'Disabled button'
-    ariaLabel:
-      backspace: 'Backspace'
-      plusMinus: 'Change sign'
-      divide: 'Divide'
-      multiply: 'Multiply'
-      subtract: 'Subtract'
-      add: 'Add'
-      equals: 'Calculate'
-      decimal: 'Decimal point'
-      shift: 'Shift'
+ko:
+  cannotDivideByZero: '0으로 나눌 수 없습니다.'
+  squareRootOfANegativeNumberIsNotAllowed: '음수의 제곱근은 허용되지 않습니다.'
+  factorialOfANegativeNumberIsNotAllowed: '음수의 팩토리얼은 허용되지 않습니다.'
+  bitOperationPreprocessingCompleted: '비트 연산을 위해 절대값 정수로 계산을 완료되었습니다.'
+  bitOperationPreprocessingReady: '비트 연산을 위해 절대값 정수로 계산을 준비하였습니다.'
+  memoryCleared: '메모리를 초기화했습니다.'
+  memoryRecalled: '메모리를 불러왔습니다.'
+  memorySaved: '메모리에 저장되었습니다.'
+  noMemoryToRecall: '불러올 메모리가 없습니다.'
+  disabledButton: '비활성화된 버튼'
+  ariaLabel:
+    backspace: '지우기'
+    plusMinus: '부호 바꾸기'
+    divide: '나누기'
+    multiply: '곱하기'
+    subtract: '빼기'
+    add: '더하기'
+    equals: '계산하기'
+    decimal: '소수점'
+    shift: '시프트'
+en:
+  cannotDivideByZero: 'Cannot divide by zero'
+  squareRootOfANegativeNumberIsNotAllowed: 'The square root of a negative number is not allowed.'
+  factorialOfANegativeNumberIsNotAllowed: 'The factorial of a negative number is not allowed.'
+  bitOperationPreprocessingCompleted: 'Bit operation preprocessing completed.'
+  bitOperationPreprocessingReady: 'Bit operation preprocessing ready.'
+  memoryCleared: 'Memory cleared.'
+  memoryRecalled: 'Memory recalled.'
+  memorySaved: 'Memory saved.'
+  noMemoryToRecall: 'No memory to recall.'
+  disabledButton: 'Disabled button'
+  ariaLabel:
+    backspace: 'Backspace'
+    plusMinus: 'Change sign'
+    divide: 'Divide'
+    multiply: 'Multiply'
+    subtract: 'Subtract'
+    add: 'Add'
+    equals: 'Calculate'
+    decimal: 'Decimal point'
+    shift: 'Shift'
 </i18n>

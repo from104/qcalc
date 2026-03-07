@@ -4,6 +4,28 @@ All notable changes to this project are recorded in this file.
 
 The format is based on [Keep a Changelog] and this project follows [Semantic Versioning].
 
+## [0.11.7] 2026-03-07
+
+### Added
+
+- **Vitest Test Infrastructure**: Added unit test framework with 30 tests for CalculatorMath class (`vitest.config.ts`, `src/classes/__tests__/CalculatorMath.test.ts`).
+- **GitHub Actions CI/CD Pipeline**: Added automated CI workflow for linting and testing (`.github/workflows/ci.yml`).
+- **Pre-commit Hooks**: Added husky + lint-staged for automated code quality checks before commits.
+
+### Changed
+
+- **Electron 35 → 40 Upgrade**: Upgraded Electron to version 40 with ESM compatibility fixes for the main process.
+- **Vue 3.5+ useTemplateRef Migration**: Replaced legacy `ref<T | null>(null)` template ref pattern with `useTemplateRef<T>()` across 5 components (`ResultField.vue`, `SettingCard.vue`, `ToolTip.vue`, `QuasarColorPicker.vue`, `useRecordManager.ts`).
+- **Any Type Removal**: Reduced `any` type usage from 16 to 1 by using Vue 3.3+ `toValue()` for `ComputedRef` unwrapping in `NarrowLayout.vue` and `WideLayout.vue`.
+- **CSS v-bind → CSS Custom Properties**: Migrated Vue CSS `v-bind()` to `:style` injection with `var()` CSS custom properties in `CalcButton.vue` and `RecordCard.vue` for better performance and standards compliance.
+- **CSP Security Hardening**: Split Content Security Policy configuration for development and production environments with stricter production rules.
+- **Dependencies Updated**: Upgraded all dependencies to latest minor versions and applied Snyk security fixes for Capacitor packages.
+
+### Fixed
+
+- **Electron Main Process ESM Compatibility**: Fixed build errors caused by CJS/ESM format conflicts by using static `import fs from 'fs'` and removing top-level `await`.
+- **vue-tsc Type Errors**: Fixed type checking errors in `ShowTips.vue`, `ErrorUtils.ts`, `electron-env.d.ts`, `electron-main.ts`, and `electron-preload.ts`.
+
 ## [0.11.6] 2025-12-27
 
 ### Added

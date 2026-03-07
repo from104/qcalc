@@ -3,7 +3,7 @@
  * @description 계산 기록 관리를 위한 컴포저블
  */
 
-import { ref, computed } from 'vue';
+import { computed, useTemplateRef } from 'vue';
 import { useCalcStore } from 'stores/calcStore';
 import { useUIStore } from 'stores/uiStore';
 import { useQuasar } from 'quasar';
@@ -23,7 +23,7 @@ export function useRecordManager() {
   /**
    * 파일 입력 요소에 대한 참조
    */
-  const recordFileInput = ref<HTMLInputElement | null>(null);
+  const recordFileInput = useTemplateRef<HTMLInputElement>('recordFileInput');
 
   /**
    * 레코드 버튼 비활성화 여부

@@ -8,6 +8,7 @@
 
 // 필요한 모듈 가져오기
 import { fileURLToPath } from 'url';
+import fs from 'fs';
 import path from 'path';
 import os from 'os';
 import { app, BrowserWindow, nativeTheme, ipcMain, screen } from 'electron';
@@ -32,8 +33,6 @@ const platform = process.platform || os.platform();
 // Windows에서 다크 모드일 때 DevTools Extensions 제거 시도
 try {
   if (platform === 'win32' && nativeTheme.shouldUseDarkColors === true) {
-    const fs = await import('fs');
-    const path = await import('path');
     fs.unlinkSync(path.join(app.getPath('userData'), 'DevTools Extensions'));
   }
 } catch (error) {
@@ -235,7 +234,7 @@ app
     });
 
     // 항상 위에 표시 토글 이벤트 처리
-    ipcMain.on('toggle-always-on-top', (_event, res) => {
+    ipcMain.on('toggle-always-on-top', (_event: Electron.IpcMainEvent, res: boolean) => {
       mainWindow?.setAlwaysOnTop(res);
     });
 
@@ -244,7 +243,7 @@ app
       app.quit();
     });
   })
-  .catch((err) => {
+  .catch((err: unknown) => {
     console.error('Error occurred during app preparation:', err);
   });
 
