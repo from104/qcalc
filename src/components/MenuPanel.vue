@@ -177,7 +177,7 @@ ko:
       caption: '진법 변환기'
     formula:
       title: '수식 계산기'
-      caption: '수식 계산기 (예: (1+3)*5)'
+      caption: '수식 계산기'
     record:
       title: '기록'
       caption: '기록 화면'
@@ -211,7 +211,7 @@ en:
       caption: 'Radix Converter'
     formula:
       title: 'Formula Calculator'
-      caption: 'Formula Calculator (e.g. (1+3)*5)'
+      caption: 'Formula Calculator'
     record:
       title: 'Record'
       caption: 'Record Screen'
@@ -245,7 +245,7 @@ ja:
       caption: '進数変換機'
     formula:
       title: '数式計算機'
-      caption: '数式計算機 (例: (1+3)*5)'
+      caption: '数式計算機'
     record:
       title: '履歴'
       caption: '履歴画面'

@@ -118,10 +118,6 @@ export function useCalcButtonActions(type: () => string, t: ComposerTranslation)
   };
 
   const extendedFunctionSet = computed(() => {
-    // formula 모드: 수식용 shift 함수만 사용 (standardExtendedFunctions 병합 없음)
-    if (type() === 'formula') {
-      return transformExtendedFunctions(modeSpecificExtendedFunctions['formula'] ?? {});
-    }
     const categoryButtons = modeSpecificExtendedFunctions[type() as keyof typeof modeSpecificExtendedFunctions] ?? {};
     return { ...transformExtendedFunctions(standardExtendedFunctions), ...transformExtendedFunctions(categoryButtons) };
   });
