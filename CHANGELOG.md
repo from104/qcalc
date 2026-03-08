@@ -8,23 +8,27 @@ The format is based on [Keep a Changelog] and this project follows [Semantic Ver
 
 ### Added
 
-- **Vitest Test Infrastructure**: Added unit test framework with 30 tests for CalculatorMath class (`vitest.config.ts`, `src/classes/__tests__/CalculatorMath.test.ts`).
-- **GitHub Actions CI/CD Pipeline**: Added automated CI workflow for linting and testing (`.github/workflows/ci.yml`).
-- **Pre-commit Hooks**: Added husky + lint-staged for automated code quality checks before commits.
+- **Formula Calculator Mode**: Added a new calculator mode that lets you type and evaluate mathematical expressions directly using [mathjs](https://mathjs.org/) syntax. Supports arithmetic operators, parentheses, built-in functions (`sin`, `cos`, `sqrt`, `log`, `ln`, `abs`, `round`, `nthRoot`, etc.), and constants (`pi`, `e`, `phi`).
+  - Use `@` in expressions to reference the current calculator value, and `$` to reference the stored memory value.
+  - Includes an inline formula editor (Space key) for direct expression editing.
+  - Built-in help menu lists available functions, constants, and placeholders with a link to the mathjs documentation.
+  - Formula evaluation results are saved to calculation history with the full expression shown in the result field.
+  - Supports all standard memory operations (MC, MR, MS, M+, M−, M×, M÷) via shift-function buttons.
+- **Flatpak Build Support**: Added Flatpak packaging support for broader Linux desktop distribution.
+- **Automated Testing**: Added unit test framework (Vitest) with tests for core math operations.
+- **CI/CD Pipeline**: Added GitHub Actions workflow for automated linting and testing on every push.
+- **Pre-commit Quality Checks**: Added automatic code formatting and lint checks before each commit.
 
 ### Changed
 
-- **Electron 35 → 40 Upgrade**: Upgraded Electron to version 40 with ESM compatibility fixes for the main process.
-- **Vue 3.5+ useTemplateRef Migration**: Replaced legacy `ref<T | null>(null)` template ref pattern with `useTemplateRef<T>()` across 5 components (`ResultField.vue`, `SettingCard.vue`, `ToolTip.vue`, `QuasarColorPicker.vue`, `useRecordManager.ts`).
-- **Any Type Removal**: Reduced `any` type usage from 16 to 1 by using Vue 3.3+ `toValue()` for `ComputedRef` unwrapping in `NarrowLayout.vue` and `WideLayout.vue`.
-- **CSS v-bind → CSS Custom Properties**: Migrated Vue CSS `v-bind()` to `:style` injection with `var()` CSS custom properties in `CalcButton.vue` and `RecordCard.vue` for better performance and standards compliance.
-- **CSP Security Hardening**: Split Content Security Policy configuration for development and production environments with stricter production rules.
-- **Dependencies Updated**: Upgraded all dependencies to latest minor versions and applied Snyk security fixes for Capacitor packages.
+- **Electron 35 → 40 Upgrade**: Improved desktop app performance and compatibility with the latest Electron runtime.
+- **Security Hardening**: Strengthened Content Security Policy with stricter rules for production builds.
+- **Dependencies Updated**: Upgraded all dependencies to latest versions and applied security fixes for Capacitor packages.
 
 ### Fixed
 
-- **Electron Main Process ESM Compatibility**: Fixed build errors caused by CJS/ESM format conflicts by using static `import fs from 'fs'` and removing top-level `await`.
-- **vue-tsc Type Errors**: Fixed type checking errors in `ShowTips.vue`, `ErrorUtils.ts`, `electron-env.d.ts`, `electron-main.ts`, and `electron-preload.ts`.
+- **Electron Desktop App Startup**: Fixed startup errors on some systems caused by module format conflicts.
+- **Type Safety Improvements**: Resolved type checking issues across multiple components for better stability.
 
 ## [0.11.6] 2025-12-27
 
