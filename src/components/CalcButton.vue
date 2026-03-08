@@ -23,7 +23,7 @@
   const uiStore = useUIStore();
 
   // 컴포저블 사용
-  const { baseHeight, labelScalingFactor, labelSizeAdjustmentRatio } = useCalcButtonLayout(
+  const { baseHeight, labelScalingFactor, labelSizeAdjustmentRatio, rowCount } = useCalcButtonLayout(
     () => props.type,
     () => uiStore.currentTab,
   );
@@ -39,6 +39,7 @@
     displayDisabledButtonNotification,
     getAriaLabel,
     getTooltipsOfKeys,
+    resolveDisabled,
   } = useCalcButtonActions(() => props.type, t);
 
   const { themesStore, calcStore, settingsStore, getFinalButtonStyle } = useCalcButtonStyle();
@@ -55,6 +56,7 @@
       '--base-height': baseHeight,
       '--label-size-ratio': labelSizeAdjustmentRatio,
       '--label-scale': labelScalingFactor,
+      '--row-count': rowCount,
     }"
   >
     <div v-for="(button, id) in activeButtonSet" :key="id" class="col-3 row wrap justify-center q-pa-sm">
@@ -86,9 +88,9 @@
               : 'char',
           calcStore.isShiftPressed &&
           !settingsStore.showButtonAddedLabel &&
-          !(extendedFunctionSet[id]?.isDisabled ?? false)
+          !resolveDisabled(extendedFunctionSet[id]?.isDisabled)
             ? ''
-            : (button.isDisabled ?? false) || calcStore.isShiftPressed
+            : resolveDisabled(button.isDisabled) || calcStore.isShiftPressed
               ? 'disabled-button'
               : '',
         ]"
@@ -99,7 +101,7 @@
             !settingsStore.showButtonAddedLabel || !(extendedFunctionSet[id]?.label ?? '') ? '4px' : undefined,
         }"
         :aria-label="getAriaLabel(id, button)"
-        @click="() => (button.isDisabled ? displayDisabledButtonNotification() : handleClickBtn(id))"
+        @click="() => (resolveDisabled(button.isDisabled) ? displayDisabledButtonNotification() : handleClickBtn(id))"
         @touchstart="() => hapticFeedbackLight()"
       >
         <span
@@ -107,8 +109,10 @@
           class="top-label"
           :class="[
             `top-label-${button.label.charAt(0) === '@' ? 'icon' : 'char'}`,
-            extendedFunctionSet[id].isDisabled ? 'disabled-button-added-label' : '',
-            calcStore.isShiftPressed && !extendedFunctionSet[id].isDisabled ? 'shifted-button-added-label' : '',
+            resolveDisabled(extendedFunctionSet[id]?.isDisabled) ? 'disabled-button-added-label' : '',
+            calcStore.isShiftPressed && !resolveDisabled(extendedFunctionSet[id]?.isDisabled)
+              ? 'shifted-button-added-label'
+              : '',
           ]"
         >
           {{ extendedFunctionSet[id].label }}
@@ -131,10 +135,10 @@
           :bg-color="themesStore.getCurrentThemeColors.ui.warning"
           :text="
             calcStore.isShiftPressed
-              ? (extendedFunctionSet[id]?.isDisabled ?? false)
+              ? resolveDisabled(extendedFunctionSet[id]?.isDisabled)
                 ? t('disabledButton')
                 : getTooltipsOfKeys(id, true)
-              : (activeButtonSet[id]?.isDisabled ?? false)
+              : resolveDisabled(activeButtonSet[id]?.isDisabled)
                 ? t('disabledButton')
                 : getTooltipsOfKeys(id, false)
           "
@@ -146,26 +150,30 @@
 
 <style scoped lang="scss">
   .button {
-    min-height: calc((100vh - var(--base-height)) / 6 - 20px);
-    max-height: calc((100vh - var(--base-height)) / 6 - 20px);
+    min-height: calc((100vh - var(--base-height)) / var(--row-count) - 20px);
+    max-height: calc((100vh - var(--base-height)) / var(--row-count) - 20px);
     font-weight: 700;
     position: relative;
   }
 
   .icon {
-    font-size: calc(((100vh - var(--base-height)) / 6 - 20px) * 0.25 * var(--label-size-ratio));
-    padding-top: calc(((100vh - var(--base-height)) / 6 - 13px) * 0.27 * var(--label-scale) * var(--label-size-ratio));
+    font-size: calc(((100vh - var(--base-height)) / var(--row-count) - 20px) * 0.25 * var(--label-size-ratio));
+    padding-top: calc(
+      ((100vh - var(--base-height)) / var(--row-count) - 13px) * 0.27 * var(--label-scale) * var(--label-size-ratio)
+    );
   }
 
   .char {
-    font-size: calc(((100vh - var(--base-height)) / 6 - 20px) * 0.38 * var(--label-size-ratio));
-    padding-top: calc(((100vh - var(--base-height)) / 6 - 13px) * 0.26 * var(--label-scale) * var(--label-size-ratio));
+    font-size: calc(((100vh - var(--base-height)) / var(--row-count) - 20px) * 0.38 * var(--label-size-ratio));
+    padding-top: calc(
+      ((100vh - var(--base-height)) / var(--row-count) - 13px) * 0.26 * var(--label-scale) * var(--label-size-ratio)
+    );
   }
 
   .top-label {
     text-align: center;
     position: absolute;
-    font-size: calc(((100vh - var(--base-height)) / 6 - 20px) * 0.25 * var(--label-size-ratio));
+    font-size: calc(((100vh - var(--base-height)) / var(--row-count) - 20px) * 0.25 * var(--label-size-ratio));
     color: inherit;
     opacity: 0.7;
     width: 100%;
@@ -204,6 +212,7 @@ ko:
   memorySaved: '메모리에 저장되었습니다.'
   noMemoryToRecall: '불러올 메모리가 없습니다.'
   disabledButton: '비활성화된 버튼'
+  formulaEvaluationError: '수식 평가 오류. 수식을 확인해 주세요.'
   ariaLabel:
     backspace: '지우기'
     plusMinus: '부호 바꾸기'
@@ -225,6 +234,7 @@ en:
   memorySaved: 'Memory saved.'
   noMemoryToRecall: 'No memory to recall.'
   disabledButton: 'Disabled button'
+  formulaEvaluationError: 'Formula evaluation error. Please check your expression.'
   ariaLabel:
     backspace: 'Backspace'
     plusMinus: 'Change sign'
@@ -235,4 +245,16 @@ en:
     equals: 'Calculate'
     decimal: 'Decimal point'
     shift: 'Shift'
+ja:
+  cannotDivideByZero: 'ゼロで割ることはできません。'
+  squareRootOfANegativeNumberIsNotAllowed: '負の数の平方根は許可されていません。'
+  factorialOfANegativeNumberIsNotAllowed: '負の数の階乗は許可されていません。'
+  bitOperationPreprocessingCompleted: 'ビット演算のために絶対値整数として計算が完了しました。'
+  bitOperationPreprocessingReady: 'ビット演算のために絶対値整数として計算を準備しました。'
+  memoryCleared: 'メモリをリセットしました。'
+  memoryRecalled: 'メモリを読み込みました。'
+  memorySaved: 'メモリに保存しました。'
+  noMemoryToRecall: '読み込むメモリがありません。'
+  disabledButton: '無効なボタン'
+  formulaEvaluationError: '数式評価エラー。数式を確認してください。'
 </i18n>

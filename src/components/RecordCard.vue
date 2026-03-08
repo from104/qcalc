@@ -68,6 +68,8 @@
     calculationResult: CalculationResult;
     timestamp: number;
     memo?: string | undefined;
+    mode?: 'calc' | 'formula';
+    expression?: string;
   }
 
   interface CalculationResult {
@@ -363,7 +365,7 @@
     // 기본 레코드 문자열 생성
     const strings = records.value.map((record: Record) => {
       const displayText = [
-        calcStore.getLeftSideInRecord(record.calculationResult, true),
+        calcStore.getLeftSideInRecord(record.calculationResult, true, record.expression),
         '\n= ',
         calcStore.getRightSideInRecord(record.calculationResult),
       ].join('');

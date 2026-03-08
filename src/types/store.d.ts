@@ -159,7 +159,7 @@ export interface CalcActions {
   onNeedButtonNotification(): void;
   offNeedButtonNotification(): void;
   toFormattedNumber(value: string, radix?: Radix): string;
-  getLeftSideInRecord(result: CalculationResult, useLineBreak?: boolean): string;
+  getLeftSideInRecord(result: CalculationResult, useLineBreak?: boolean, expression?: string): string;
   getRightSideInRecord(result: CalculationResult): string;
 }
 

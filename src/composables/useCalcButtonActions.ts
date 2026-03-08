@@ -66,17 +66,33 @@ export function useCalcButtonActions(type: () => string, t: ComposerTranslation)
     return Number(radixStore.convertRadix(value, Radix.Hexadecimal, Radix.Decimal)) >= currentRadixBase.value;
   };
 
+  const resolveDisabled = (val: boolean | (() => boolean) | undefined): boolean =>
+    typeof val === 'function' ? val() : (val ?? false);
+
   // 버튼 정의 변환
   const transformButtonDefinitions = (buttons: CalculatorButtonDefinition) => {
     return Object.fromEntries(
       Object.entries(buttons).map(([id, [label, color, keys, action, isDisabled]]) => [
         id,
-        { label, color, shortcutKeys: keys, action, isDisabled: isDisabled || isButtonDisabledForCurrentBase(label) },
+        {
+          label,
+          color,
+          shortcutKeys: keys,
+          action,
+          isDisabled:
+            typeof isDisabled === 'function'
+              ? () => (isDisabled as () => boolean)() || isButtonDisabledForCurrentBase(label)
+              : isDisabled || isButtonDisabledForCurrentBase(label),
+        },
       ]),
     );
   };
 
   const activeButtonSet = computed(() => {
+    // formula 모드: row-0 버튼이 최상단에 오도록 standardButtons 병합 없이 단독 사용
+    if (type() === 'formula') {
+      return transformButtonDefinitions(modeSpecificButtons['formula'] ?? {});
+    }
     const modeSpecificButtonsForType = modeSpecificButtons[type() as keyof typeof modeSpecificButtons] ?? {};
     return {
       ...transformButtonDefinitions(standardButtons),
@@ -88,14 +104,25 @@ export function useCalcButtonActions(type: () => string, t: ComposerTranslation)
     return Object.fromEntries(
       Object.entries(buttons).map(([id, [label, shortcutKeys, action, isDisabled]]) => [
         id,
-        { label, shortcutKeys, action, isDisabled: isDisabled || isButtonDisabledForCurrentBase(label) },
+        {
+          label,
+          shortcutKeys,
+          action,
+          isDisabled:
+            typeof isDisabled === 'function'
+              ? () => (isDisabled as () => boolean)() || isButtonDisabledForCurrentBase(label)
+              : isDisabled || isButtonDisabledForCurrentBase(label),
+        },
       ]),
     );
   };
 
   const extendedFunctionSet = computed(() => {
-    const categoryButtons =
-      modeSpecificExtendedFunctions[type() as keyof typeof modeSpecificExtendedFunctions] ?? {};
+    // formula 모드: 수식용 shift 함수만 사용 (standardExtendedFunctions 병합 없음)
+    if (type() === 'formula') {
+      return transformExtendedFunctions(modeSpecificExtendedFunctions['formula'] ?? {});
+    }
+    const categoryButtons = modeSpecificExtendedFunctions[type() as keyof typeof modeSpecificExtendedFunctions] ?? {};
     return { ...transformExtendedFunctions(standardExtendedFunctions), ...transformExtendedFunctions(categoryButtons) };
   });
 
@@ -158,8 +185,8 @@ export function useCalcButtonActions(type: () => string, t: ComposerTranslation)
   // 버튼 클릭 핸들러
   const handleClickBtn = (id: ButtonID) => {
     const isDisabled = calcStore.isShiftPressed
-      ? (extendedFunctionSet.value[id]?.isDisabled ?? false)
-      : (activeButtonSet.value[id]?.isDisabled ?? false);
+      ? resolveDisabled(extendedFunctionSet.value[id]?.isDisabled)
+      : resolveDisabled(activeButtonSet.value[id]?.isDisabled);
     const action = calcStore.isShiftPressed ? extendedFunctionSet.value[id]?.action : activeButtonSet.value[id]?.action;
 
     if (isDisabled) {
@@ -180,7 +207,7 @@ export function useCalcButtonActions(type: () => string, t: ComposerTranslation)
     hapticFeedbackMedium();
     const buttonFunctions = calcStore.isShiftPressed ? activeButtonSet.value : extendedFunctionSet.value;
     const buttonAction = buttonFunctions[id]?.action;
-    const isDisabled = buttonFunctions[id]?.isDisabled ?? false;
+    const isDisabled = resolveDisabled(buttonFunctions[id]?.isDisabled);
 
     if (isDisabled) {
       displayDisabledButtonNotification();
@@ -300,5 +327,6 @@ export function useCalcButtonActions(type: () => string, t: ComposerTranslation)
     displayDisabledButtonNotification,
     getAriaLabel,
     getTooltipsOfKeys,
+    resolveDisabled,
   };
 }

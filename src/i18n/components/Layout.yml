@@ -3,6 +3,7 @@ ko:
   unit: 단위
   currency: 환율
   radix: 진법
+  formula: 수식
   help: 도움말
   about: 정보
   record: 기록
@@ -69,6 +70,7 @@ en:
   unit: Unit
   currency: Currency
   radix: Radix
+  formula: Formula
   help: Help
   about: About
   record: Record
@@ -130,3 +132,9 @@ en:
     search: 'Search'
     menu: 'Open menu'
     recordSwipeHelp: 'You can add, modify, or delete records by swiping left on the record screen, or by swiping right to delete the record.'
+ja:
+  calc: 基本
+  unit: 単位
+  currency: 通貨
+  radix: 進数
+  formula: 数式

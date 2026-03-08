@@ -77,6 +77,14 @@
       icon: 'transform',
       action: () => (uiStore.currentTab = 'radix'),
     },
+    {
+      id: 'formula',
+      title: t('item.formula.title'),
+      caption: t('item.formula.caption'),
+      shortcut: 'Ctrl-5',
+      icon: 'functions',
+      action: () => (uiStore.currentTab = 'formula'),
+    },
     { id: 'separator1', separator: true },
     {
       id: 'record',
@@ -153,66 +161,106 @@
 </template>
 
 <i18n lang="yaml">
-  ko:
-    item:
-      calc:
-        title: '계산기'
-        caption: '계산기'
-      unit:
-        title: '단위 변환'
-        caption: '단위 변환기'
-      currency:
-        title: '통화 환전'
-        caption: '통화 환전기'
-      radix:
-        title: '진법 변환'
-        caption: '진법 변환기'
-      record:
-        title: '기록'
-        caption: '기록 화면'
-      settings:
-        title: '설정'
-        caption: '설정'
-      tips:
-        title: '팁'
-        caption: '팁 다이얼로그'
-      help:
-        title: '도움말'
-        caption: '기능과 사용법'
-      about:
-        title: '소개'
-        caption: '앱에 대한 소개'
-    ariaLabel:
-      menu: '메인 메뉴'
-  en:
-    item:
-      calc:
-        title: 'Calculator'
-        caption: 'Calculator'
-      unit:
-        title: 'Unit Converter'
-        caption: 'Unit Converter'
-      currency:
-        title: 'Currency Converter'
-        caption: 'Currency Converter'
-      radix:
-        title: 'Radix Converter'
-        caption: 'Radix Converter'  
-      record:
-        title: 'Record'
-        caption: 'Record Screen'
-      settings:
-        title: 'Settings'
-        caption: 'Settings'
-      tips:
-        title: 'Tips'
-        caption: 'Tips dialog'
-      help:
-        title: 'Help'
-        caption: 'Features and Usage'
-      about:
-        title: 'About'
-        caption: 'About the app'
-    ariaLabel:
-      menu: 'Main menu'
+ko:
+  item:
+    calc:
+      title: '계산기'
+      caption: '계산기'
+    unit:
+      title: '단위 변환'
+      caption: '단위 변환기'
+    currency:
+      title: '통화 환전'
+      caption: '통화 환전기'
+    radix:
+      title: '진법 변환'
+      caption: '진법 변환기'
+    formula:
+      title: '수식 계산기'
+      caption: '수식 계산기 (예: (1+3)*5)'
+    record:
+      title: '기록'
+      caption: '기록 화면'
+    settings:
+      title: '설정'
+      caption: '설정'
+    tips:
+      title: '팁'
+      caption: '팁 다이얼로그'
+    help:
+      title: '도움말'
+      caption: '기능과 사용법'
+    about:
+      title: '소개'
+      caption: '앱에 대한 소개'
+  ariaLabel:
+    menu: '메인 메뉴'
+en:
+  item:
+    calc:
+      title: 'Calculator'
+      caption: 'Calculator'
+    unit:
+      title: 'Unit Converter'
+      caption: 'Unit Converter'
+    currency:
+      title: 'Currency Converter'
+      caption: 'Currency Converter'
+    radix:
+      title: 'Radix Converter'
+      caption: 'Radix Converter'
+    formula:
+      title: 'Formula Calculator'
+      caption: 'Formula Calculator (e.g. (1+3)*5)'
+    record:
+      title: 'Record'
+      caption: 'Record Screen'
+    settings:
+      title: 'Settings'
+      caption: 'Settings'
+    tips:
+      title: 'Tips'
+      caption: 'Tips dialog'
+    help:
+      title: 'Help'
+      caption: 'Features and Usage'
+    about:
+      title: 'About'
+      caption: 'About the app'
+  ariaLabel:
+    menu: 'Main menu'
+ja:
+  item:
+    calc:
+      title: '計算機'
+      caption: '計算機'
+    unit:
+      title: '単位変換'
+      caption: '単位変換機'
+    currency:
+      title: '通貨変換'
+      caption: '通貨変換機'
+    radix:
+      title: '進数変換'
+      caption: '進数変換機'
+    formula:
+      title: '数式計算機'
+      caption: '数式計算機 (例: (1+3)*5)'
+    record:
+      title: '履歴'
+      caption: '履歴画面'
+    settings:
+      title: '設定'
+      caption: '設定'
+    tips:
+      title: 'ヒント'
+      caption: 'ヒントダイアログ'
+    help:
+      title: 'ヘルプ'
+      caption: '機能と使い方'
+    about:
+      title: 'アプリについて'
+      caption: 'アプリの紹介'
+  ariaLabel:
+    menu: 'メインメニュー'
 </i18n>

@@ -12,11 +12,13 @@ import type { ButtonType } from '../types/store';
 
 import { toBigNumber } from 'classes/CalculatorMath';
 import { Operator } from 'classes/Calculator';
-import { showMessage } from 'src/utils/NotificationUtils';
+import { showMessage, showError } from 'src/utils/NotificationUtils';
 
 import { useCalcStore } from 'src/stores/calcStore';
+import { useFormulaStore } from 'src/stores/formulaStore';
 
 const calcStore = useCalcStore();
+const formulaStore = useFormulaStore();
 
 const { calc } = calcStore;
 
@@ -87,10 +89,16 @@ export function createCalcButtonSet(t: ComposerTranslation) {
 
   // 버튼 타입 정의
   type CalculatorButtonDefinition = {
-    [id: string]: [label: string, color: ButtonType, keys: string[], action: () => void, isDisabled: boolean];
+    [id: string]: [
+      label: string,
+      color: ButtonType,
+      keys: string[],
+      action: () => void,
+      isDisabled: boolean | (() => boolean),
+    ];
   };
 
-  type CalculatorModeButtons = { [key in 'unit' | 'currency' | 'radix']: CalculatorButtonDefinition };
+  type CalculatorModeButtons = { [key in 'unit' | 'currency' | 'radix' | 'formula']: CalculatorButtonDefinition };
 
   // prettier-ignore
   const standardButtons: CalculatorButtonDefinition = {
@@ -131,14 +139,52 @@ export function createCalcButtonSet(t: ComposerTranslation) {
         b2: ['OR', 'function', ['k'], () => bitOperationPreprocessing(() => calc.executeBinary(Operator.BIT_OR)), false],
         c2: ['XOR', 'function', ['l'], () => bitOperationPreprocessing(() => calc.executeBinary(Operator.BIT_XOR)), false],
     },
+    // formula 모드: row-0(수식전용) + row1-6 전부 정의 (standardButtons 미사용, 순서 보장)
+    formula: {
+      // Row 0: 수식 전용 버튼
+      a0: ['(', 'function', ['('], () => formulaStore.append('('), () => !formulaStore.canAppend('(')],
+      b0: [')', 'function', [')'], () => formulaStore.append(')'), () => !formulaStore.canAppend(')')],
+      c0: ['@alternate_email', 'normal', ['@'], () => formulaStore.append('@'), () => !formulaStore.canAppend('@')],
+      d0: ['?', 'important', ['?'], () => formulaStore.toggleHelp(), false],
+      // Row 1
+      a1: ['x²', 'function', ['u'], () => formulaStore.wrapLastToken((s) => `(${s})^2`), false],
+      b1: ['√x', 'function', ['i'], () => formulaStore.wrapLastToken((s) => `sqrt(${s})`), false],
+      c1: ['Ｃ', 'important', ['Delete'], () => formulaStore.clearAll(), false],
+      d1: ['@mdi-backspace', 'important', ['Backspace'], () => formulaStore.deleteChar(), false],
+      // Row 2
+      a2: ['@mdi-plus-minus-variant', 'function', ['j'], () => formulaStore.wrapLastToken((s) => `-(${s})`), false],
+      b2: ['%', 'function', ['k'], () => formulaStore.append('%'), () => !formulaStore.canAppend('%')],
+      c2: ['1/x', 'function', ['l'], () => formulaStore.wrapLastToken((s) => `1/(${s})`), false],
+      d2: ['@mdi-division', 'function', ['/'], () => formulaStore.append('/'), () => !formulaStore.canAppend('/')],
+      // Row 3
+      a3: ['7', 'normal', ['7'], () => formulaStore.append('7'), () => !formulaStore.canAppend('7')],
+      b3: ['8', 'normal', ['8'], () => formulaStore.append('8'), () => !formulaStore.canAppend('8')],
+      c3: ['9', 'normal', ['9'], () => formulaStore.append('9'), () => !formulaStore.canAppend('9')],
+      d3: ['@mdi-close', 'function', ['*'], () => formulaStore.append('*'), () => !formulaStore.canAppend('*')],
+      // Row 4
+      a4: ['4', 'normal', ['4'], () => formulaStore.append('4'), () => !formulaStore.canAppend('4')],
+      b4: ['5', 'normal', ['5'], () => formulaStore.append('5'), () => !formulaStore.canAppend('5')],
+      c4: ['6', 'normal', ['6'], () => formulaStore.append('6'), () => !formulaStore.canAppend('6')],
+      d4: ['@mdi-minus', 'function', ['-'], () => formulaStore.append('-'), () => !formulaStore.canAppend('-')],
+      // Row 5
+      a5: ['1', 'normal', ['1'], () => formulaStore.append('1'), () => !formulaStore.canAppend('1')],
+      b5: ['2', 'normal', ['2'], () => formulaStore.append('2'), () => !formulaStore.canAppend('2')],
+      c5: ['3', 'normal', ['3'], () => formulaStore.append('3'), () => !formulaStore.canAppend('3')],
+      d5: ['@mdi-plus', 'function', ['+'], () => formulaStore.append('+'), () => !formulaStore.canAppend('+')],
+      // Row 6
+      a6: ['@keyboard_capslock', 'important', ["'"], () => handleShift(), false],
+      b6: ['0', 'normal', ['0'], () => formulaStore.append('0'), () => !formulaStore.canAppend('0')],
+      c6: ['@mdi-circle-small', 'normal', ['.'], () => formulaStore.append('.'), () => !formulaStore.canAppend('.')],
+      d6: ['@mdi-equal', 'important', ['=', 'Enter'], () => { try { formulaStore.evaluate(); } catch { showError(t('formulaEvaluationError')); } }, false],
+    },
   };
 
   // 버튼 기능 정의
   type ExtendedButtonFunction = {
-    [key: string]: [label: string, shortcutKeys: string[], action: () => void, isDisabled: boolean];
+    [key: string]: [label: string, shortcutKeys: string[], action: () => void, isDisabled: boolean | (() => boolean)];
   };
 
-  type ExtendedButtonFunctionsByMode = { [key in 'unit' | 'currency' | 'radix']: ExtendedButtonFunction };
+  type ExtendedButtonFunctionsByMode = { [key in 'unit' | 'currency' | 'radix' | 'formula']: ExtendedButtonFunction };
 
   // 공통으로 사용할 기본 버튼 기능
   // prettier-ignore
@@ -198,11 +244,52 @@ export function createCalcButtonSet(t: ComposerTranslation) {
       b5: ['÷100', ['x'], () => calc.executeBinaryWithNumber(Operator.DIV, 100), false],
       c5: ['÷1000', ['c'], () => calc.executeBinaryWithNumber(Operator.DIV, 1000), false],
     },
+    // formula 모드 shift 함수: 수식에 맞는 수학 함수들
+    formula: {
+      c0: ['$', ['$'], () => formulaStore.append('$'), () => !formulaStore.canAppend('$')],
+      a1: ['xⁿ', ['r'], () => formulaStore.append('^'), () => !formulaStore.canAppend('^')],
+      b1: ['ⁿ√x', ['t'], () => formulaStore.wrapLastToken((s) => `nthRoot(${s},`), false],
+      a2: ['10ⁿ', ['f'], () => formulaStore.wrapLastToken((s) => `10^(${s})`), false],
+      b2: ['x%y', ['g'], () => formulaStore.append('%'), () => !formulaStore.canAppend('%')],
+      c2: ['x!', ['h'], () => formulaStore.wrapLastToken((s) => `factorial(${s})`), false],
+      a3: ['sin', ['q'], () => formulaStore.wrapLastToken((s) => `sin(${s})`), false],
+      b3: ['cos', ['w'], () => formulaStore.wrapLastToken((s) => `cos(${s})`), false],
+      c3: ['tan', ['e'], () => formulaStore.wrapLastToken((s) => `tan(${s})`), false],
+      a4: ['pi/2', ['a'], () => formulaStore.append('pi/2'), () => !formulaStore.canAppend('pi/2')],
+      b4: ['log10', ['s'], () => formulaStore.append('log10('), () => !formulaStore.canAppend('log10(')],
+      c4: ['log2', ['d'], () => formulaStore.append('log2('), () => !formulaStore.canAppend('log2(')],
+      a5: ['pi', ['z'], () => formulaStore.append('pi'), () => !formulaStore.canAppend('pi')],
+      b5: ['phi', ['x'], () => formulaStore.append('phi'), () => !formulaStore.canAppend('phi')],
+      c5: ['e', ['c'], () => formulaStore.append('e'), () => !formulaStore.canAppend('e')],
+      a6: ['', ['Shifted'], () => handleShiftLock(), false],
+      b6: ['int', ['v'], () => formulaStore.wrapLastToken((s) => `floor(${s})`), false],
+      c6: ['frac', ['b'], () => formulaStore.wrapLastToken((s) => `(${s} - floor(${s}))`), false],
+    },
     radix: {
-      a1: ['x<<1', ['r'], () => bitOperationPreprocessing(() => calc.executeBinaryWithNumber(Operator.BIT_SFT_L, 1), false), false],
-      b1: ['x>>1', ['t'], () => bitOperationPreprocessing(() => calc.executeBinaryWithNumber(Operator.BIT_SFT_R, 1), false), false],
-      a2: ['x<<4', ['f'], () => bitOperationPreprocessing(() => calc.executeBinaryWithNumber(Operator.BIT_SFT_L, 4), false), false],
-      b2: ['x>>4', ['g'], () => bitOperationPreprocessing(() => calc.executeBinaryWithNumber(Operator.BIT_SFT_R, 4), false), false],
+      a1: [
+        'x<<1',
+        ['r'],
+        () => bitOperationPreprocessing(() => calc.executeBinaryWithNumber(Operator.BIT_SFT_L, 1), false),
+        false,
+      ],
+      b1: [
+        'x>>1',
+        ['t'],
+        () => bitOperationPreprocessing(() => calc.executeBinaryWithNumber(Operator.BIT_SFT_R, 1), false),
+        false,
+      ],
+      a2: [
+        'x<<4',
+        ['f'],
+        () => bitOperationPreprocessing(() => calc.executeBinaryWithNumber(Operator.BIT_SFT_L, 4), false),
+        false,
+      ],
+      b2: [
+        'x>>4',
+        ['g'],
+        () => bitOperationPreprocessing(() => calc.executeBinaryWithNumber(Operator.BIT_SFT_R, 4), false),
+        false,
+      ],
       c2: ['NOT', ['h'], () => bitOperationPreprocessing(() => calc.executeUnary(Operator.BIT_NOT), false), false],
       a3: ['NAND', ['q'], () => bitOperationPreprocessing(() => calc.executeBinary(Operator.BIT_NAND)), false],
       b3: ['NOR', ['w'], () => bitOperationPreprocessing(() => calc.executeBinary(Operator.BIT_NOR)), false],

@@ -20,6 +20,8 @@ export function useCalcButtonLayout(type: () => string, currentTab: () => string
   };
 
   const getInitialBaseHeight = () => {
+    // formula는 수식 입력 필드(~50px)가 추가되어 calc보다 높음
+    if (type() === 'formula') return '180px';
     return type() === 'calc' ? '130px' : '220px';
   };
 
@@ -38,7 +40,7 @@ export function useCalcButtonLayout(type: () => string, currentTab: () => string
         totalHeightToExclude += 10;
       }
 
-      const currentCard = document.querySelector('.q-tab-panel--active q-card') as HTMLElement;
+      const currentCard = document.querySelector('.q-tab-panel--active .q-card') as HTMLElement;
 
       if (currentCard) {
         const cardStyles = window.getComputedStyle(currentCard);
@@ -59,7 +61,9 @@ export function useCalcButtonLayout(type: () => string, currentTab: () => string
           }
         }
       } else {
-        if (type() === 'calc') {
+        if (type() === 'formula') {
+          totalHeightToExclude += 150; // ResultField + 수식 입력 필드
+        } else if (type() === 'calc') {
           totalHeightToExclude += 100;
         } else {
           totalHeightToExclude += 200;
@@ -71,8 +75,9 @@ export function useCalcButtonLayout(type: () => string, currentTab: () => string
       baseHeight.value = `${calculatedHeight}px`;
     } catch (error) {
       console.warn('Error calculating dynamic baseHeight, using fallback values:', error);
-      baseHeight.value =
-        type() === 'calc' ? '130px' : ['unit', 'currency', 'radix'].includes(type()) ? '220px' : '130px';
+      if (['unit', 'currency', 'radix'].includes(type())) baseHeight.value = '220px';
+      else if (type() === 'formula') baseHeight.value = '180px';
+      else baseHeight.value = '130px';
     }
   };
 
@@ -95,6 +100,9 @@ export function useCalcButtonLayout(type: () => string, currentTab: () => string
   const labelSizeAdjustmentRatio = computed(() => {
     return $g.isCapacitor ? 1 / labelScalingFactor.value : 1;
   });
+
+  // formula 모드는 row-0 추가로 7행, 나머지는 6행
+  const rowCount = computed(() => (type() === 'formula' ? 7 : 6));
 
   // props.type 변경 시 baseHeight 재계산
   watch(type, async () => {
@@ -134,5 +142,6 @@ export function useCalcButtonLayout(type: () => string, currentTab: () => string
     baseHeight,
     labelScalingFactor,
     labelSizeAdjustmentRatio,
+    rowCount,
   };
 }

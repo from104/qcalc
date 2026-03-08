@@ -454,26 +454,24 @@
    * - 그 외의 경우: 빈 문자열
    */
   const calculationExpression = computed(() => {
-    // 마지막 계산 기록 가져오기
     const lastRecord = calcRecord.getCount() > 0 ? calcRecord.getAllRecords()[0] : null;
-
-    // 초기화 필요 여부와 연산자 존재 여부 확인
     const needsReset = calc.needsBufferReset;
-    const hasOperator = operator.value !== '';
 
-    // 마지막 계산 기록이 있고 초기화가 필요한 경우
-    const isLastRecordValid =
-      lastRecord !== null && needsReset && calc.currentNumber === lastRecord?.calculationResult.resultNumber;
+    // 수식 기록: 결과값이 현재 표시값과 일치하면 표시 (needsReset 불문)
+    if (lastRecord?.expression && calc.currentNumber === lastRecord.calculationResult.resultNumber) {
+      return `${calcStore.getLeftSideInRecord(lastRecord.calculationResult, false, lastRecord.expression)} =`;
+    }
 
-    if (isLastRecordValid) {
+    // 일반 기록: needsReset이고 결과값이 현재 표시값과 일치할 때 표시
+    if (lastRecord != null && needsReset && calc.currentNumber === lastRecord.calculationResult.resultNumber) {
       return `${calcStore.getLeftSideInRecord(lastRecord.calculationResult)} =`;
     }
 
-    // 연산자가 있고 초기화가 필요없는 경우
-    if (hasOperator && !needsReset) {
+    // 연산자 입력 중 (아직 계산 전)
+    if (operator.value !== '' && !needsReset) {
       const radix = currentTab.value === 'radix' ? radixStore.sourceRadix : Radix.Decimal;
-      const convrtedPreviousNumber = calcStore.toFormattedNumber(radixStore.convertIfRadix(calc.previousNumber), radix);
-      return currentTab.value === 'radix' ? getRadixResult(convrtedPreviousNumber) : convrtedPreviousNumber;
+      const converted = calcStore.toFormattedNumber(radixStore.convertIfRadix(calc.previousNumber), radix);
+      return currentTab.value === 'radix' ? getRadixResult(converted) : converted;
     }
 
     return '';
@@ -892,7 +890,7 @@
           />
         </div>
         <div
-          v-if="operator != '' && !calcStore.isMemoryVisible"
+          v-if="operator != '' && !calcStore.isMemoryVisible && currentTab !== 'formula'"
           v-auto-blur
           class="noselect full-height q-mt-xs q-pt-sm"
           :class="[`text-${isMainField && calcStore.isMemoryVisible ? memoryTextColor : panelTextColor}`]"

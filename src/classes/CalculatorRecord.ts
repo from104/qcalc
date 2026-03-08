@@ -48,22 +48,22 @@ export class CalculatorRecord {
    * 필요한 경우 최대 크기를 초과하지 않도록 조정합니다.
    *
    * @param record - 저장할 계산 결과의 스냅샷 데이터
+   * @param mode - 계산기 모드 ('calc' | 'formula'), 기본값 'calc'
+   * @param expression - formula 모드의 수식 문자열 (@ 치환된 버전)
    * @throws {Error} 기록 객체 생성 또는 추가 과정에서 오류가 발생한 경우
    */
-  public addRecord(record: CalculationResult): void {
+  public addRecord(record: CalculationResult, mode?: CalcMode, expression?: string): void {
     try {
       // 새로운 기록 항목의 고유 ID 생성
       const newId = this.generateNewId();
 
-      // 새로운 기록 객체 생성
-      // - id: 고유한 식별자
-      // - resultSnapshot: 계산 결과 데이터
-      // - memo: 사용자 메모 (초기값: 빈 문자열)
       const newRecord: ResultRecord = {
         id: newId,
         calculationResult: record,
         memo: '',
         timestamp: Date.now(),
+        mode: mode ?? 'calc',
+        ...(expression !== undefined && { expression }),
       };
 
       // 새로운 기록을 배열의 맨 앞에 추가 (LIFO 구조)
