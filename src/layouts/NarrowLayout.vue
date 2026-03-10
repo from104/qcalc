@@ -51,6 +51,11 @@
     set: (value) => uiStore.setCurrentTab(value),
   });
 
+  const MAX_VISIBLE_TABS = 4;
+  const visibleTabs = computed(() => props.tabs.slice(0, MAX_VISIBLE_TABS));
+  const overflowTabs = computed(() => props.tabs.slice(MAX_VISIBLE_TABS));
+  const isOverflowActive = computed(() => overflowTabs.value.some((tab) => tab.name === localCurrentTab.value));
+
   // 서브 페이지 관련
   const currentSubPage = computed(() => {
     const validPages = ['help', 'about', 'settings', 'record'];
@@ -106,30 +111,59 @@
         <q-tabs
           v-model="localCurrentTab"
           align="left"
-          class="col-8 q-px-none"
+          class="col-grow q-px-none"
           active-color="text-primary"
           indicator-color="secondary"
           dense
           shrink
-          inline-label
-          outside-arrows
-          mobile-arrows
+          :arrows="false"
           role="tablist"
           :aria-label="t('ariaLabel.mainTabs')"
         >
           <q-tab
-            v-for="tab in props.tabs"
+            v-for="tab in visibleTabs"
             :id="`tab-${tab.name}`"
             :key="tab.name"
-            :label="toValue(tab.title)"
+            :icon="tab.icon"
             :name="tab.name"
             class="q-px-xs"
             dense
             role="tab"
+            :aria-label="toValue(tab.title)"
             :aria-selected="localCurrentTab === tab.name"
             :aria-controls="`panel-${tab.name}`"
-          />
+          >
+            <q-tooltip :delay="500">{{ toValue(tab.title) }}</q-tooltip>
+          </q-tab>
         </q-tabs>
+        <!-- 오버플로우 메뉴 -->
+        <q-btn
+          v-if="overflowTabs.length > 0"
+          flat
+          dense
+          icon="more_horiz"
+          class="q-px-xs overflow-menu-btn"
+          :color="isOverflowActive ? 'secondary' : undefined"
+        >
+          <q-menu anchor="bottom right" self="top right" :offset="[0, 14]" class="overflow-menu-wrapper">
+            <q-list dense style="min-width: 160px" class="overflow-menu-list">
+              <q-item
+                v-for="tab in overflowTabs"
+                :key="tab.name"
+                v-close-popup
+                clickable
+                :active="localCurrentTab === tab.name"
+                active-class="text-secondary"
+                @click="uiStore.setCurrentTab(tab.name)"
+              >
+                <q-item-section avatar>
+                  <q-icon :name="tab.icon" size="20px" />
+                </q-item-section>
+                <q-item-section>{{ toValue(tab.title) }}</q-item-section>
+              </q-item>
+            </q-list>
+          </q-menu>
+        </q-btn>
         <q-space />
         <q-btn
           flat

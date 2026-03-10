@@ -15,15 +15,14 @@
 
   // 스토어 import
   import { useUIStore } from 'stores/uiStore';
-  import { useThemesStore } from 'stores/themesStore';
 
   // 스토어 인스턴스 생성
   const uiStore = useUIStore();
-  const themesStore = useThemesStore();
 
   // tips 폴더 내의 모든 .md 파일을 동적으로 import
   const koTipModules = import.meta.glob('./tips/ko/*.md', { eager: true });
   const enTipModules = import.meta.glob('./tips/en/*.md', { eager: true });
+  const jaTipModules = import.meta.glob('./tips/ja/*.md', { eager: true });
 
   /**
    * tips 폴더 내의 .md 파일을 파일명 기준으로 정렬하여 배열로 반환합니다.
@@ -42,18 +41,21 @@
       .map((item) => item.src);
   }
 
-  // 한글, 영어 팁 배열 생성
+  // 한글, 영어, 일본어 팁 배열 생성
   const koTips = getSortedTips(koTipModules as Record<string, { default: string }>);
   const enTips = getSortedTips(enTipModules as Record<string, { default: string }>);
+  const jaTips = getSortedTips(jaTipModules as Record<string, { default: string }>);
 
   // tips 배열을 현재 언어에 따라 선택
   const tips = computed(() => {
-    const isKorean = locale.value.substring(0, 2) === 'ko';
-    // 한/영 팁 개수가 다르면 오류 발생
-    if (koTips.length !== enTips.length) {
-      throw new Error('The number of Korean and English tips does not match.');
+    const lang = locale.value.substring(0, 2);
+    // 각 언어별 팁 개수가 다르면 오류 발생
+    if (koTips.length !== enTips.length || koTips.length !== jaTips.length) {
+      throw new Error('The number of tips does not match across languages.');
     }
-    return isKorean ? koTips : enTips;
+    if (lang === 'ko') return koTips;
+    if (lang === 'ja') return jaTips;
+    return enTips;
   });
 
   // Props 정의
@@ -123,7 +125,7 @@
 
 <template>
   <q-dialog v-model="dialogVisible" role="dialog" :aria-label="t('dialogAriaLabel')">
-    <q-card class="tips-dialog" :class="{ 'bg-dark': themesStore.darkMode }" role="article">
+    <q-card class="tips-dialog" role="article">
       <q-bar class="bg-primary text-white" role="banner">
         <q-space />
         <div class="text-subtitle1" role="heading" aria-level="1">{{ t('tipsTitle') }} ({{ pageText }})</div>
@@ -141,33 +143,21 @@
       <q-card-section
         v-touch-swipe.horizontal="swipeConfig"
         class="tips-content"
-        :class="{ 'bg-dark': themesStore.darkMode }"
         role="main"
         :aria-label="t('mainContentAriaLabel')"
       >
         <transition v-bind="transitionClasses">
           <div :key="currentIndex" class="tip-container scrollbar-custom" role="region" :aria-label="t('tipContent')">
-            <q-markdown
-              :src="currentTip"
-              no-linkify
-              no-heading-anchor-links
-              class="q-px-md q-pt-sm"
-              :class="{ 'text-white': themesStore.darkMode }"
-            />
+            <q-markdown :src="currentTip" no-linkify no-heading-anchor-links class="q-px-md q-pt-sm" />
           </div>
         </transition>
       </q-card-section>
-      <q-card-actions
-        align="between"
-        :class="['q-px-md', themesStore.darkMode ? 'bg-dark' : 'bg-white']"
-        role="group"
-        :aria-label="t('navigationAriaLabel')"
-      >
+      <q-card-actions align="between" class="q-px-md" role="group" :aria-label="t('navigationAriaLabel')">
         <q-btn
           flat
           round
-          :color="themesStore.darkMode ? 'white' : 'primary'"
           icon="chevron_left"
+          class="tips-nav-btn"
           :aria-label="t('prevTip')"
           role="button"
           @click="prevTip"
@@ -178,15 +168,15 @@
           v-model="uiStore.showTips"
           :label="t('showTipsOnStart')"
           dense
-          :class="themesStore.darkMode ? 'text-white' : 'text-primary'"
+          class="tips-checkbox"
           role="checkbox"
           :aria-label="t('showTipsOnStart')"
         />
         <q-btn
           flat
           round
-          :color="themesStore.darkMode ? 'white' : 'primary'"
           icon="chevron_right"
+          class="tips-nav-btn"
           :aria-label="t('nextTip')"
           role="button"
           @click="nextTip"
@@ -210,7 +200,7 @@
     flex-direction: column;
     overflow: hidden;
 
-    &.bg-dark {
+    .body--dark & {
       border: 1px solid rgba(255, 255, 255, 0.1);
     }
 
@@ -249,7 +239,7 @@
       touch-action: pan-y pinch-zoom;
       position: relative;
 
-      &.bg-dark {
+      .body--dark & {
         background: #1d1d1d;
       }
 
@@ -267,6 +257,22 @@
       position: absolute;
       left: 0;
       top: 0;
+    }
+
+    .tips-nav-btn {
+      color: var(--q-primary);
+
+      .body--dark & {
+        color: rgba(255, 255, 255, 0.9);
+      }
+    }
+
+    .tips-checkbox {
+      color: var(--q-primary);
+
+      .body--dark & {
+        color: rgba(255, 255, 255, 0.85);
+      }
     }
   }
 
@@ -362,4 +368,14 @@ en:
   dialogAriaLabel: 'Help dialog'
   mainContentAriaLabel: 'Tip main content'
   navigationAriaLabel: 'Tip navigation'
+ja:
+  tipsTitle: 'ヒント'
+  prevTip: '前のヒント'
+  nextTip: '次のヒント'
+  showTipsOnStart: '起動時にヒントを表示'
+  closeTips: 'ヒントを閉じる'
+  tipContent: 'ヒント内容'
+  dialogAriaLabel: 'ヘルプダイアログ'
+  mainContentAriaLabel: 'ヒントメインコンテンツ'
+  navigationAriaLabel: 'ヒントナビゲーション'
 </i18n>

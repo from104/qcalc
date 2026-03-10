@@ -1,10 +1,10 @@
 # QCalc - A Multi-purpose Calculator for Productivity and Accessibility
 
-QCalc is more than just a simple calculator - it's evolving into a modern productivity tool. Built with the latest web technologies like Vue3 (Quasar v2), TypeScript, and Electron, this multi-purpose calculator is being developed into an app that's useful for real work, tasks, and learning. We're also focusing on accessibility so that users with disabilities can use it intuitively, and we're working hard to provide a helpful user experience on both desktop and mobile with a simple and clean UI.
+High-precision calculations, unit/currency/radix conversion, and formula evaluation in one app. A multi-purpose calculator with a consistent experience across desktop and mobile.
 
 ## Main Features of the App
 
-- **4 Professional Calculators**: Standard calculator, unit converter, currency converter, and programmer calculator meet all your calculation needs
+- **5 Professional Calculators**: Standard calculator, unit converter, currency converter, programmer calculator, and formula calculator meet all your calculation needs
 - **High-precision Calculation Engine**: Supports accurate calculations up to 64 digits with advanced math functions like trigonometry, factorial, and powers
 - **Number Base & Bit Operations**: Converts between binary/octal/decimal/hexadecimal and supports professional bit operations (AND, OR, XOR, NOT) for programmers
 - **Smart User Experience**: Provides personalized environment with unit/currency favorites, various color themes, and calculation history notes and export/import
@@ -14,16 +14,16 @@ QCalc is more than just a simple calculator - it's evolving into a modern produc
 
 ## Guide to Main Features
 
-### How to Use the 4 Calculators
+### How to Use the 5 Calculators
 
 #### Standard Calculator
 
 - **How to Access**: Ctrl+1 or select the top tab
-- **Basic Operations**: Enter numbers 0-9, +, -, *, / keys
+- **Basic Operations**: Enter numbers 0-9, +, -, \*, / keys
 - **Advanced Functions**: Trigonometric functions (q, w, e), square (u), square root (i), constants (z: π, x: φ, c: e)
 - **Memory Functions**: Ctrl+Enter (MS), Ctrl+Backspace (MR), Ctrl+Delete (MC)
 - **Percentage Calculation**: 'number, /, number, %(k)' calculates percentage
-- **Apply Percentage**: 'number, *, number, %(k)' applies percentage
+- **Apply Percentage**: 'number, \*, number, %(k)' applies percentage
 
 #### Unit Converter
 
@@ -51,6 +51,14 @@ QCalc is more than just a simple calculator - it's evolving into a modern produc
 - **Swap Radix**: Use '\' key to swap original/converted radix
 - **Radix Symbol**: Toggle unit symbol display/hide with Alt+\ key
 - **Symbol Position**: Toggle unit symbol position (front/back) with Alt+Ctrl+\ key
+
+#### Formula Calculator
+
+- **How to Access**: Ctrl+5 or select the top tab
+- **Expression Input**: Enter mathematical expressions directly using mathjs syntax
+- **Supported Operations**: All mathjs math functions including arithmetic, powers, trigonometry, logarithms
+- **Current Value Reference**: Use @ symbol to include current calculated value in expressions
+- **Memory Functions**: Ctrl+Enter (MS), Ctrl+Backspace (MR), Ctrl+Delete (MC)
 
 ### How to Use Productivity Features
 
@@ -138,8 +146,8 @@ QCalc is more than just a simple calculator - it's evolving into a modern produc
 
 | Shortcut    | Function                  |
 | ----------- | ------------------------- |
-| 0-9.       | Enter numbers and decimal |
-| +, -, *, / | Basic arithmetic          |
+| 0-9.        | Enter numbers and decimal |
+| +, -, \*, / | Basic arithmetic          |
 | Enter, =    | Calculate result          |
 | Backspace   | Delete one character      |
 | Delete      | Reset calculator          |
@@ -167,15 +175,15 @@ QCalc is more than just a simple calculator - it's evolving into a modern produc
 
 ### Memory Operations
 
-| Shortcut          | Function             |
-| ----------------- | -------------------- |
-| C-Delete          | Memory clear (MC)    |
-| C-Backspace       | Memory recall (MR)   |
-| C-Enter, C-=      | Memory store (MS)    |
-| C-+, C-Numpad +   | Memory add (M+)      |
-| C--, C-Numpad -   | Memory subtract (M-) |
-| C-*, C-Numpad * | Memory multiply (M×) |
-| C-/, C-Numpad /   | Memory divide (M÷)   |
+| Shortcut        | Function             |
+| --------------- | -------------------- |
+| C-Delete        | Memory clear (MC)    |
+| C-Backspace     | Memory recall (MR)   |
+| C-Enter, C-=    | Memory store (MS)    |
+| C-+, C-Numpad + | Memory add (M+)      |
+| C--, C-Numpad - | Memory subtract (M-) |
+| C-_, C-Numpad _ | Memory multiply (M×) |
+| C-/, C-Numpad / | Memory divide (M÷)   |
 
 ### Unit/Currency Conversion Mode (Shift Mode)
 
@@ -213,7 +221,7 @@ QCalc is more than just a simple calculator - it's evolving into a modern produc
 | F3        | Settings               |
 | F4        | History                |
 | F5        | Tips                   |
-| C-[1234]  | Switch calculator tabs |
+| C-[12345] | Switch calculator tabs |
 | C-Tab, →  | Move to right tab      |
 | CS-Tab, ← | Move to left tab       |
 | Escape    | Close current screen   |
@@ -250,5 +258,5 @@ QCalc is more than just a simple calculator - it's evolving into a modern produc
 | PageUp/PageDown | Scroll 400px up/down |
 | Home/End        | Scroll to top/bottom |
 | C-f             | Search history       |
-| C-[            | Decrease font size   |
-| C-]            | Increase font size   |
+| C-[             | Decrease font size   |
+| C-]             | Increase font size   |

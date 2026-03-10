@@ -265,7 +265,7 @@
         @keydown="handleKeydown"
         @blur="handleBlur"
       >
-        <template #prepend>
+        <template v-if="!isExpressionEmpty" #prepend>
           <q-btn
             flat
             round

@@ -84,7 +84,8 @@ export const useFormulaStore = defineStore('formula', {
      * - 실패 시 Error를 throw (호출부에서 노티 처리)
      */
     evaluate(): void {
-      if (!this.expression.trim()) return;
+      this.expression = this.expression.trim();
+      if (!this.expression) return;
 
       const resolved = this._resolvePlaceholders(this.expression);
 

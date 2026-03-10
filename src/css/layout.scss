@@ -1,4 +1,6 @@
 .q-tab {
+  min-width: 40px !important;
+
   :deep(.q-tab__label) {
     font-size: 16px;
   }

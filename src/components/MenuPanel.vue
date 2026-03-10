@@ -58,7 +58,7 @@
       title: t('item.unit.title'),
       caption: t('item.unit.caption'),
       shortcut: 'Ctrl-2',
-      icon: 'swap_vert',
+      icon: 'straighten',
       action: () => (uiStore.currentTab = 'unit'),
     },
     {
@@ -74,7 +74,7 @@
       title: t('item.radix.title'),
       caption: t('item.radix.caption'),
       shortcut: 'Ctrl-4',
-      icon: 'transform',
+      icon: 'memory',
       action: () => (uiStore.currentTab = 'radix'),
     },
     {
@@ -123,7 +123,7 @@
     {
       id: 'about',
       title: t('item.about.title'),
-      caption: t('iem.about.caption'),
+      caption: t('item.about.caption'),
       shortcut: 'F2',
       icon: 'info',
       action: () => navigateToPath('/about', route, router),

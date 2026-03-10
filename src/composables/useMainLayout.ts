@@ -58,11 +58,16 @@ export function useMainLayout(t: (key: string) => string, recordManagerInstance?
    * 메인 탭 설정
    */
   const tabs = reactive<Tab[]>([
-    { name: 'calc', title: computed(() => t('calc')), component: shallowRef(CalcPage) },
-    { name: 'unit', title: computed(() => t('unit')), component: shallowRef(UnitPage) },
-    { name: 'currency', title: computed(() => t('currency')), component: shallowRef(CurrencyPage) },
-    { name: 'radix', title: computed(() => t('radix')), component: shallowRef(RadixPage) },
-    { name: 'formula', title: computed(() => t('formula')), component: shallowRef(FormulaPage) },
+    { name: 'calc', title: computed(() => t('calc')), icon: 'calculate', component: shallowRef(CalcPage) },
+    { name: 'unit', title: computed(() => t('unit')), icon: 'straighten', component: shallowRef(UnitPage) },
+    {
+      name: 'currency',
+      title: computed(() => t('currency')),
+      icon: 'currency_exchange',
+      component: shallowRef(CurrencyPage),
+    },
+    { name: 'radix', title: computed(() => t('radix')), icon: 'memory', component: shallowRef(RadixPage) },
+    { name: 'formula', title: computed(() => t('formula')), icon: 'functions', component: shallowRef(FormulaPage) },
   ]);
 
   /**

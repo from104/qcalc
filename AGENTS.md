@@ -61,10 +61,10 @@ src-capacitor/         # Capacitor Android project
 - Locales: `src/i18n/ko/*.yaml`, `src/i18n/en/*.yaml`, `src/i18n/ja/*.yaml`
 - Fallback: `en`
 - **Escape `@` as `{'@'}`** in YAML values (vue-i18n link syntax). Same for `{`, `}`, `|`.
-- YAML 값에 특수문자가 포함되면 반드시 쌍따옴표로 감쌀 것: `key: "value with {'@'}"`
-- 새 언어 추가 시 `src/i18n/languages.ts`의 `SUPPORTED_LANGUAGES`에 등록 필수
-- i18n 키를 추가/수정할 때 **ko, en, ja 3개 언어 파일 모두** 동시에 업데이트할 것
-- 번역이 불확실하면 `en` 값을 그대로 두어도 됨 (fallback이 `en`이므로 누락보다 나음)
+- If the YAML value contains special characters, always wrap it in double quotes: `key: "value with {'@'}"`
+- When adding a new language, you must register it in `SUPPORTED_LANGUAGES` in `src/i18n/languages.ts`
+- When adding or modifying i18n keys, always update all three language files (**ko, en, ja**) at the same time
+- If the translation is unclear, you may keep the `en` value as-is (since the fallback is `en`, it is better than missing values)
 
 ## Git Conventions
 
@@ -76,10 +76,10 @@ src-capacitor/         # Capacitor Android project
 
 1. Update `version` in `package.json`
 2. Update `CHANGELOG.md` and `CHANGELOG-ko.md`
-3. Sync `src/pages/AboutPage-en.md` / `AboutPage-ko.md` with changelog
-4. Sync `src/pages/HelpPage-en.md` / `HelpPage-ko.md` with README
+3. Sync all `src/pages/AboutPage-*.md` files with the changelog (include all supported language extensions)
+4. Sync all `src/pages/HelpPage-*.md` files with the README (include all supported language extensions)
 5. Run `yarn lint` and `yarn test`
-6. All documents have en/ko pairs — update both
+6. Ensure every document exists for each supported language pair (e.g., en/ko/ja) — always update all when adding or modifying
 
 ## Testing
 
