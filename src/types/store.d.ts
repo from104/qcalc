@@ -6,9 +6,9 @@
  *              상태 정의, 액션, 변이 등을 포함하여 UI와 비즈니스 로직을 연결합니다.
  */
 
-import type { Calculator } from '../classes/Calculator';
-import type { CurrencyConverter } from '../classes/CurrencyConverter';
-import type { Radix } from '../utils/RadixConverter';
+import type { Calculator } from '../core/calculator/Calculator';
+import type { CurrencyConverter } from '../core/converters/CurrencyConverter';
+import type { Radix } from '../core/converters/RadixConverter';
 import type { DefineStore } from 'pinia';
 import type { CalculationResult } from './calculator';
 

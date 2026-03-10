@@ -10,7 +10,7 @@ import { match } from 'ts-pattern';
 import { createCalcButtonSet } from '../constants/CalcButtonSet';
 import { showError, showMessage } from '../utils/NotificationUtils';
 import { clickButtonById } from '../utils/GlobalHelpers';
-import { Radix } from '../utils/RadixConverter';
+import { Radix } from '../core/converters/RadixConverter';
 
 import { useSettingsStore } from 'stores/settingsStore';
 import { useCalcStore } from '../stores/calcStore';

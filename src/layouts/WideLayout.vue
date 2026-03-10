@@ -5,9 +5,9 @@
   import { useUIStore } from 'stores/uiStore';
   import { useThemesStore } from 'stores/themesStore';
   import { navigateToPath } from '../utils/NavigationUtils';
-  import ToolTip from 'components/snippets/ToolTip.vue';
-  import MenuPanel from 'components/MenuPanel.vue';
-  import HelpIcon from 'components/snippets/HelpIcon.vue';
+  import ToolTip from 'components/common/ToolTip.vue';
+  import MenuPanel from 'components/settings/MenuPanel.vue';
+  import HelpIcon from 'components/common/HelpIcon.vue';
   import { useRecordManager } from '../composables/useRecordManager';
   import type { Tab, SubPageConfig, SubPageButton } from '../types/layout.d';
 

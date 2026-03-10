@@ -10,8 +10,8 @@ import { match } from 'ts-pattern';
 import type { ComposerTranslation } from 'vue-i18n';
 import type { ButtonType } from '../types/store';
 
-import { toBigNumber } from 'classes/CalculatorMath';
-import { Operator } from 'classes/Calculator';
+import { toBigNumber } from 'core/calculator/CalculatorMath';
+import { Operator } from 'core/calculator/Calculator';
 import { showMessage, showError } from 'src/utils/NotificationUtils';
 
 import { useCalcStore } from 'src/stores/calcStore';

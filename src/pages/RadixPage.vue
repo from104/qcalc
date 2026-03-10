@@ -6,9 +6,9 @@
    *              진법 변환 기능을 수행하는 데 필요한 컴포넌트를 포함합니다.
    */
 
-  import RadixPanel from 'components/RadixPanel.vue';
-  import ResultField from 'components/ResultField.vue';
-  import CalcButton from 'components/CalcButton.vue';
+  import RadixPanel from 'components/panels/RadixPanel.vue';
+  import ResultField from 'components/calc/ResultField.vue';
+  import CalcButton from 'components/calc/CalcButton.vue';
 </script>
 
 <template>

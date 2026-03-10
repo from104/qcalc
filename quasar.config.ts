@@ -74,7 +74,7 @@ export default defineConfig((/* ctx */) => {
 
       // 폴더 별칭 설정
       alias: {
-        classes: join(__dirname, 'src/classes'),
+        core: join(__dirname, 'src/core'),
         types: join(__dirname, 'src/types'),
         constants: join(__dirname, 'src/constants'),
       },

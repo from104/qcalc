@@ -7,9 +7,9 @@
    *              Space 키로 수식 직접 편집 다이얼로그를 엽니다.
    */
 
-  import ResultField from 'components/ResultField.vue';
-  import CalcButton from 'components/CalcButton.vue';
-  import FormulaField from 'components/FormulaField.vue';
+  import ResultField from 'components/calc/ResultField.vue';
+  import CalcButton from 'components/calc/CalcButton.vue';
+  import FormulaField from 'components/calc/FormulaField.vue';
 </script>
 
 <template>

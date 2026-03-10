@@ -10,9 +10,9 @@
 
   const { locale, t } = useI18n();
 
-  import HelpMdEn from './HelpPage-en.md';
-  import HelpMdKo from './HelpPage-ko.md';
-  import HelpMdJa from './HelpPage-ja.md';
+  import HelpMdEn from '../content/pages/HelpPage-en.md';
+  import HelpMdKo from '../content/pages/HelpPage-ko.md';
+  import HelpMdJa from '../content/pages/HelpPage-ja.md';
 
   const currentMd = computed(() => {
     const lang = locale.value.substring(0, 2);

@@ -5,7 +5,7 @@ export default defineConfig({
   resolve: {
     alias: {
       src: join(__dirname, 'src'),
-      classes: join(__dirname, 'src/classes'),
+      core: join(__dirname, 'src/core'),
       types: join(__dirname, 'src/types'),
       constants: join(__dirname, 'src/constants'),
       stores: join(__dirname, 'src/stores'),
@@ -18,7 +18,7 @@ export default defineConfig({
     include: ['src/**/*.{test,spec}.ts'],
     coverage: {
       provider: 'v8',
-      include: ['src/classes/**/*.ts', 'src/utils/**/*.ts'],
+      include: ['src/core/**/*.ts', 'src/utils/**/*.ts'],
     },
   },
 });

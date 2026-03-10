@@ -4,7 +4,7 @@
  */
 
 import { defineStore } from 'pinia';
-import { UnitConverter } from 'classes/UnitConverter';
+import { UnitConverter } from 'core/converters/UnitConverter';
 
 interface UnitState {
   selectedCategory: string;

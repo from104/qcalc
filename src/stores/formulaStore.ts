@@ -5,7 +5,7 @@
  */
 
 import { defineStore } from 'pinia';
-import { MathB } from '../classes/CalculatorMath';
+import { MathB } from '../core/calculator/CalculatorMath';
 import { useCalcStore } from './calcStore';
 import { formatDecimalPlaces } from '../utils/NumberUtils';
 

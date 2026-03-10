@@ -4,10 +4,10 @@
  */
 
 import { defineStore } from 'pinia';
-import { Calculator } from 'classes/Calculator';
+import { Calculator } from 'core/calculator/Calculator';
 import { match } from 'ts-pattern';
-import { Operator } from 'classes/Calculator';
-import { Radix, convertRadix } from '../utils/RadixConverter';
+import { Operator } from 'core/calculator/Calculator';
+import { Radix, convertRadix } from 'core/converters/RadixConverter';
 import { numberGrouping, formatDecimalPlaces, formatExpressionNumbers } from '../utils/NumberUtils';
 import { useSettingsStore } from './settingsStore';
 import { useRadixStore } from './radixStore';

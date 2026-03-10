@@ -15,9 +15,9 @@
   import { useQuasar } from 'quasar';
 
   // === 컴포넌트 임포트 ===
-  import AutoUpdate from 'components/AutoUpdate.vue';
-  import SnapFirst from 'components/SnapFirst.vue';
-  import VersionChangelogDialog from 'components/VersionChangelogDialog.vue';
+  import AutoUpdate from 'components/dialogs/AutoUpdate.vue';
+  import SnapFirst from 'components/dialogs/SnapFirst.vue';
+  import VersionChangelogDialog from 'components/dialogs/VersionChangelogDialog.vue';
 
   // === 유틸리티 클래스 임포트 ===
   import { useKeyBinding } from './composables/useKeyBinding';
@@ -210,10 +210,7 @@
       <!--
         WideLayout(넓은 화면)에서는 서브페이지(오른쪽 패널)만 전환되는 애니메이션을 보여주기 위해 레이아웃 컴포넌트 자체가 파괴되지 않고 유지되어야 하므로 고정된 키('wide-layout')를 사용하여 컴포넌트 재사용을 유도하고, 좁은 화면(NarrowLayout)에서는 페이지 전환 효과를 위해 경로(routeProps.path)를 키로 사용.
       -->
-      <component 
-        :is="Component" 
-        :key="isWideLayout ? 'wide-layout' : routeProps.path" 
-      />
+      <component :is="Component" :key="isWideLayout ? 'wide-layout' : routeProps.path" />
     </transition>
   </router-view>
   <AutoUpdate />
@@ -222,7 +219,6 @@
 </template>
 
 <style scoped lang="scss">
-
   // === 공통 트랜지션 스타일 ===
   %transition-base {
     position: absolute;

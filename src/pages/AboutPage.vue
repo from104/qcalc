@@ -10,9 +10,9 @@
 
   const { locale, t } = useI18n();
 
-  import AboutMdEn from './AboutPage-en.md';
-  import AboutMdKo from './AboutPage-ko.md';
-  import AboutMdJa from './AboutPage-ja.md';
+  import AboutMdEn from '../content/pages/AboutPage-en.md';
+  import AboutMdKo from '../content/pages/AboutPage-ko.md';
+  import AboutMdJa from '../content/pages/AboutPage-ja.md';
 
   const currentMd = computed(() => {
     const lang = locale.value.substring(0, 2);
