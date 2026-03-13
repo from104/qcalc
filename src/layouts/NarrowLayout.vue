@@ -51,7 +51,7 @@
     set: (value) => uiStore.setCurrentTab(value),
   });
 
-  const MAX_VISIBLE_TABS = 4;
+  const MAX_VISIBLE_TABS = 3;
   const visibleTabs = computed(() => props.tabs.slice(0, MAX_VISIBLE_TABS));
   const overflowTabs = computed(() => props.tabs.slice(MAX_VISIBLE_TABS));
   const isOverflowActive = computed(() => overflowTabs.value.some((tab) => tab.name === localCurrentTab.value));
@@ -101,7 +101,7 @@
     <q-header id="header" class="z-top noselect" elevated>
       <!-- 좁은 화면 메인 헤더 -->
       <q-toolbar v-if="!isSubPage" v-auto-blur :class="{ 'q-pt-md': $g.isAndroid && $g.apiLevel >= 35 }">
-        <q-btn flat dense round class="q-mr-sm" icon="menu" aria-label="Menu" @click="emit('toggleLeftDrawer')">
+        <q-btn flat dense round class="q-mr-none" icon="menu" aria-label="Menu" @click="emit('toggleLeftDrawer')">
           <ToolTip
             :text-color="themesStore.getDarkColor()"
             :bg-color="themesStore.getCurrentThemeColors.ui.warning"
