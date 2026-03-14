@@ -12,22 +12,30 @@ All notable changes to this project are recorded in this file.
 
 The format is based on [Keep a Changelog] and this project follows [Semantic Versioning].
 
-## [0.11.6] 2025-12-27
+## [0.12.0] 2026-03-14
 
 ### Added
 
-- **Number Format Per Calculator Feature**: Added ability to use independent number format settings (number grouping, grouping unit, decimal places) for each calculator (basic, unit, currency, radix). Toggle with Alt+n shortcut key.
+- **Formula Calculator (5th Calculator)**: Type and evaluate math expressions directly — supports arithmetic, parentheses, functions (`sin`, `cos`, `sqrt`, `log`, `ln`, `abs`, `round`, `nthRoot`, etc.), and constants (`pi`, `e`, `phi`) via [mathjs](https://mathjs.org/) syntax.
+  - Press Space to open the inline formula editor for direct expression editing.
+  - Use `@` to reference the current value, `$` for the stored memory value.
+  - Full memory support (MC, MR, MS, M+, M−, M×, M÷) available through shift-function buttons.
+  - Evaluated results are saved to calculation history with the full expression displayed.
+  - Built-in help menu lists all available functions, constants, and placeholders.
+- **5 New Languages (8 total)**: Chinese (Simplified), Hindi, German, Spanish, and French join the existing Korean, English, and Japanese. Every screen is translated — menus, settings, unit names, currency names, help pages, about pages, tips, and error messages.
+- **Flatpak Packaging**: Install QCalc from Flatpak for broader Linux desktop support.
 
 ### Changed
 
+- **Smoother Language Switching**: If a translation is missing, the app now falls back to English automatically instead of showing raw key paths.
+- **Tab Overflow Menu Icon**: The calculator tab overflow button now uses a downward chevron (▾) instead of "..." to better indicate a dropdown menu.
+- **Faster Desktop Performance**: Upgraded to Electron 40 for improved startup speed and compatibility.
+- **Updated Dependencies**: All packages upgraded to latest versions with security patches applied.
+
 ### Fixed
 
-- **Calculator Button Dynamic Height Calculation Improved**: Optimized the button height calculation logic by using `requestAnimationFrame` and `nextTick` instead of `setTimeout` for better accuracy and performance.
-- **Result Field Initialization Optimized**: Removed redundant state swapping logic during component mount and improved text overflow detection to run immediately after rendering.
-- **Calculator Type-Specific Initial Layout Optimization**: Refined initial button height settings for different calculator types (Basic, Unit, Currency, Radix) to reduce layout shifts.
-- **Wide Layout Sub-page Transition Bug Fixed**: Fixed an issue where the transition effect for sub-pages (right section) in wide layout did not work properly.
-- **Result Field Text Overflow Detection Improved**: Completely reviewed and rewritten the text overflow detection logic in result fields. Implemented a precise and continuous tracking system using ResizeObserver and watch, ensuring accurate color highlighting and tooltip display when text overflows.
-- **Keyboard Shortcut Duplicate Registration Issue Fixed**: Fixed an issue where tab navigation shortcuts (Ctrl+Tab, ArrowRight, etc.) were executed twice. Resolved by ensuring useMainLayout is only called from MainLayout, preventing duplicate key binding registrations from multiple layout components.
-- **Memory Value Radix Conversion Error Fixed**: Added safe error handling for radix conversion errors that occurred during initialization or when invalid values were passed.
+- **Formula Whitespace Handling**: Leading and trailing spaces in formula expressions are now trimmed before evaluation.
+- **Formula Clear Button Visibility**: The X button in the formula editor now hides correctly when the expression field is empty.
+- **Desktop App Startup**: Resolved startup errors on some systems caused by module format conflicts.
 
 For information about previous versions, please check [here](https://github.com/from104/qcalc/blob/main/CHANGELOG.md).

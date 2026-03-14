@@ -12,22 +12,30 @@ Alle wichtigen Änderungen an diesem Projekt werden in dieser Datei festgehalten
 
 Das Format basiert auf [Keep a Changelog] und dieses Projekt folgt der [Semantischen Versionierung].
 
-## [0.11.6] 2025-12-27
+## [0.12.0] 2026-03-14
 
 ### Hinzugefügt
 
-- **Zahlenformat pro Rechner**: Möglichkeit hinzugefügt, unabhängige Zahlenformateinstellungen (Zahlengruppierung, Gruppierungseinheit, Dezimalstellen) für jeden Rechner (Standard, Einheiten, Währung, Zahlensystem) zu verwenden. Umschaltbar mit Alt+n Tastenkombination.
+- **Formelrechner (5. Rechner)**: Mathematische Ausdrücke direkt eingeben und auswerten — unterstützt Arithmetik, Klammern, Funktionen (`sin`, `cos`, `sqrt`, `log`, `ln`, `abs`, `round`, `nthRoot` usw.) und Konstanten (`pi`, `e`, `phi`) über [mathjs](https://mathjs.org/)-Syntax.
+  - Drücken Sie die Leertaste, um den Inline-Formeleditor zur direkten Ausdrucksbearbeitung zu öffnen.
+  - Verwenden Sie `@`, um auf den aktuellen Wert zu verweisen, und `$` für den gespeicherten Speicherwert.
+  - Volle Speicherunterstützung (MC, MR, MS, M+, M−, M×, M÷) über Shift-Funktionstasten verfügbar.
+  - Ausgewertete Ergebnisse werden mit dem vollständigen Ausdruck im Berechnungsverlauf gespeichert.
+  - Das integrierte Hilfemenü listet alle verfügbaren Funktionen, Konstanten und Platzhalter auf.
+- **5 neue Sprachen (8 insgesamt)**: Chinesisch (vereinfacht), Hindi, Deutsch, Spanisch und Französisch ergänzen die bestehenden Sprachen Koreanisch, Englisch und Japanisch. Jeder Bildschirm ist übersetzt — Menüs, Einstellungen, Einheitsnamen, Währungsnamen, Hilfeseiten, Info-Seiten, Tipps und Fehlermeldungen.
+- **Flatpak-Paketierung**: Installieren Sie QCalc über Flatpak für breitere Linux-Desktop-Unterstützung.
 
 ### Geändert
 
+- **Reibungsloserer Sprachwechsel**: Wenn eine Übersetzung fehlt, fällt die App jetzt automatisch auf Englisch zurück, anstatt rohe Schlüsselpfade anzuzeigen.
+- **Tab-Überlaufmenü-Symbol**: Die Überlaufschaltfläche der Rechner-Tabs verwendet jetzt ein Abwärtspfeil-Symbol (▾) anstelle von „..." zur besseren Kennzeichnung eines Dropdown-Menüs.
+- **Schnellere Desktop-Leistung**: Upgrade auf Electron 40 für verbesserte Startgeschwindigkeit und Kompatibilität.
+- **Aktualisierte Abhängigkeiten**: Alle Pakete auf die neuesten Versionen aktualisiert mit angewendeten Sicherheitspatches.
+
 ### Behoben
 
-- **Dynamische Höhenberechnung der Rechner-Tasten verbessert**: Die Logik zur Berechnung der Tastenhöhe wurde durch Verwendung von `requestAnimationFrame` und `nextTick` anstelle von `setTimeout` für bessere Genauigkeit und Leistung optimiert.
-- **Ergebnisfeld-Initialisierung optimiert**: Redundante Zustandstausch-Logik beim Komponenten-Mount wurde entfernt und die Textüberlauf-Erkennung so verbessert, dass sie sofort nach dem Rendern ausgeführt wird.
-- **Rechnertypspezifische Layout-Optimierung**: Anfängliche Tastenhöhen-Einstellungen für verschiedene Rechnertypen (Standard, Einheiten, Währung, Zahlensystem) verfeinert, um Layout-Verschiebungen zu reduzieren.
-- **Seitenwechsel-Fehler im breiten Layout behoben**: Ein Problem wurde behoben, bei dem der Übergangseffekt für Unterseiten (rechter Bereich) im breiten Layout nicht korrekt funktionierte.
-- **Textüberlauf-Erkennung im Ergebnisfeld verbessert**: Die Logik zur Erkennung von Textüberläufen in Ergebnisfeldern wurde vollständig überprüft und neu geschrieben. Ein präzises und kontinuierliches Tracking-System mit ResizeObserver und watch wurde implementiert, das eine genaue Farbhervorhebung und Tooltip-Anzeige bei Textüberlauf gewährleistet.
-- **Doppelte Registrierung von Tastenkombinationen behoben**: Ein Problem wurde behoben, bei dem Tab-Navigations-Tastenkombinationen (Ctrl+Tab, ArrowRight usw.) zweimal ausgeführt wurden. Gelöst durch Sicherstellung, dass useMainLayout nur von MainLayout aufgerufen wird, um doppelte Tastenbindungsregistrierungen durch mehrere Layout-Komponenten zu vermeiden.
-- **Speicherwert-Zahlensystemkonvertierungsfehler behoben**: Sichere Fehlerbehandlung für Zahlensystemkonvertierungsfehler hinzugefügt, die während der Initialisierung oder bei ungültigen Werten auftraten.
+- **Formel-Leerzeichenbehandlung**: Führende und nachfolgende Leerzeichen in Formelausdrücken werden jetzt vor der Auswertung entfernt.
+- **Sichtbarkeit der Formel-Löschtaste**: Die X-Schaltfläche im Formeleditor wird jetzt korrekt ausgeblendet, wenn das Ausdrucksfeld leer ist.
+- **Desktop-App-Start**: Startfehler auf einigen Systemen, die durch Modulformatkonflikte verursacht wurden, wurden behoben.
 
 Informationen zu früheren Versionen finden Sie [hier](https://github.com/from104/qcalc/blob/main/CHANGELOG.md).

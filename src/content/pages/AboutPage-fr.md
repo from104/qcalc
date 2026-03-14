@@ -12,22 +12,30 @@ Tous les changements notables de ce projet sont enregistrés dans ce fichier.
 
 Le format est basé sur [Keep a Changelog] et ce projet suit le [Versionnage sémantique].
 
-## [0.11.6] 2025-12-27
+## [0.12.0] 2026-03-14
 
 ### Ajouté
 
-- **Fonctionnalité de format numérique par calculatrice** : Ajout de la possibilité d'utiliser des paramètres de format numérique indépendants (groupement des nombres, unité de groupement, décimales) pour chaque calculatrice (standard, unités, devises, bases). Basculer avec le raccourci clavier Alt+n.
+- **Calculatrice de formules (5e calculatrice)** : Saisissez et évaluez directement des expressions mathématiques — prend en charge l'arithmétique, les parenthèses, les fonctions (`sin`, `cos`, `sqrt`, `log`, `ln`, `abs`, `round`, `nthRoot`, etc.) et les constantes (`pi`, `e`, `phi`) via la syntaxe [mathjs](https://mathjs.org/).
+  - Appuyez sur Espace pour ouvrir l'éditeur de formules en ligne pour modifier directement les expressions.
+  - Utilisez `@` pour référencer la valeur actuelle et `$` pour la valeur mémoire stockée.
+  - Support mémoire complet (MC, MR, MS, M+, M−, M×, M÷) disponible via les boutons de fonction Shift.
+  - Les résultats évalués sont enregistrés dans l'historique des calculs avec l'expression complète affichée.
+  - Le menu d'aide intégré liste toutes les fonctions, constantes et espaces réservés disponibles.
+- **5 nouvelles langues (8 au total)** : Le chinois (simplifié), l'hindi, l'allemand, l'espagnol et le français rejoignent le coréen, l'anglais et le japonais existants. Chaque écran est traduit — menus, paramètres, noms d'unités, noms de devises, pages d'aide, pages à propos, astuces et messages d'erreur.
+- **Empaquetage Flatpak** : Installez QCalc depuis Flatpak pour un support plus large des bureaux Linux.
 
 ### Modifié
 
+- **Changement de langue plus fluide** : Si une traduction est manquante, l'application revient désormais automatiquement à l'anglais au lieu d'afficher les chemins de clés bruts.
+- **Icône du menu de débordement des onglets** : Le bouton de débordement des onglets de la calculatrice utilise désormais un chevron vers le bas (▾) au lieu de « ... » pour mieux indiquer un menu déroulant.
+- **Performances bureau plus rapides** : Mise à niveau vers Electron 40 pour une vitesse de démarrage et une compatibilité améliorées.
+- **Dépendances mises à jour** : Tous les paquets mis à niveau vers les dernières versions avec les correctifs de sécurité appliqués.
+
 ### Corrigé
 
-- **Calcul dynamique de la hauteur des boutons amélioré** : Optimisation de la logique de calcul de la hauteur des boutons en utilisant `requestAnimationFrame` et `nextTick` au lieu de `setTimeout` pour une meilleure précision et performance.
-- **Initialisation du champ de résultat optimisée** : Suppression de la logique d'échange d'état redondante lors du montage du composant et amélioration de la détection de débordement de texte pour s'exécuter immédiatement après le rendu.
-- **Optimisation de la disposition initiale par type de calculatrice** : Affinement des paramètres initiaux de hauteur des boutons pour les différents types de calculatrices (Standard, Unités, Devises, Bases) afin de réduire les décalages de disposition.
-- **Correction du bug de transition des sous-pages en disposition large** : Correction d'un problème où l'effet de transition des sous-pages (section droite) en disposition large ne fonctionnait pas correctement.
-- **Détection du débordement de texte dans le champ de résultat améliorée** : Révision complète et réécriture de la logique de détection de débordement de texte dans les champs de résultat. Mise en place d'un système de suivi précis et continu utilisant ResizeObserver et watch, garantissant une mise en surbrillance des couleurs et un affichage des infobulles précis lorsque le texte déborde.
-- **Correction du problème d'enregistrement en double des raccourcis clavier** : Correction d'un problème où les raccourcis de navigation par onglets (Ctrl+Tab, ArrowRight, etc.) étaient exécutés deux fois. Résolu en s'assurant que useMainLayout n'est appelé que depuis MainLayout, empêchant les enregistrements en double des liaisons de touches provenant de plusieurs composants de disposition.
-- **Correction de l'erreur de conversion de base de la valeur mémoire** : Ajout d'une gestion sécurisée des erreurs pour les erreurs de conversion de base qui se produisaient lors de l'initialisation ou lorsque des valeurs invalides étaient transmises.
+- **Gestion des espaces dans les formules** : Les espaces en début et en fin des expressions de formule sont désormais supprimés avant l'évaluation.
+- **Visibilité du bouton d'effacement de formule** : Le bouton X dans l'éditeur de formules se masque désormais correctement lorsque le champ d'expression est vide.
+- **Démarrage de l'application bureau** : Résolution des erreurs de démarrage sur certains systèmes causées par des conflits de format de module.
 
 Pour des informations sur les versions précédentes, veuillez consulter [ici](https://github.com/from104/qcalc/blob/main/CHANGELOG.md).

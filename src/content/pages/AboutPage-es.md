@@ -12,22 +12,30 @@ Todos los cambios notables de este proyecto se registran en este archivo.
 
 El formato se basa en [Keep a Changelog] y este proyecto sigue [Versionado Semántico].
 
-## [0.11.6] 2025-12-27
+## [0.12.0] 2026-03-14
 
 ### Añadido
 
-- **Función de Formato de Números Por Calculadora**: Se añadió la capacidad de usar configuraciones de formato de números independientes (agrupación de números, unidad de agrupación, lugares decimales) para cada calculadora (básica, unidades, divisas, bases numéricas). Alternar con la tecla de atajo Alt+n.
+- **Calculadora de Fórmulas (5.ª calculadora)**: Escriba y evalúe expresiones matemáticas directamente — soporta aritmética, paréntesis, funciones (`sin`, `cos`, `sqrt`, `log`, `ln`, `abs`, `round`, `nthRoot`, etc.) y constantes (`pi`, `e`, `phi`) mediante sintaxis de [mathjs](https://mathjs.org/).
+  - Presione Espacio para abrir el editor de fórmulas en línea para editar expresiones directamente.
+  - Use `@` para referenciar el valor actual y `$` para el valor almacenado en memoria.
+  - Soporte completo de memoria (MC, MR, MS, M+, M−, M×, M÷) disponible a través de los botones de función con Shift.
+  - Los resultados evaluados se guardan en el historial de cálculos con la expresión completa mostrada.
+  - El menú de ayuda integrado lista todas las funciones, constantes y marcadores de posición disponibles.
+- **5 nuevos idiomas (8 en total)**: Chino (simplificado), hindi, alemán, español y francés se unen a los existentes coreano, inglés y japonés. Todas las pantallas están traducidas — menús, configuraciones, nombres de unidades, nombres de monedas, páginas de ayuda, páginas de información, consejos y mensajes de error.
+- **Empaquetado Flatpak**: Instale QCalc desde Flatpak para un soporte más amplio en escritorios Linux.
 
 ### Cambiado
 
+- **Cambio de idioma más fluido**: Si falta una traducción, la aplicación ahora recurre automáticamente al inglés en lugar de mostrar las rutas de claves sin procesar.
+- **Icono del menú de desbordamiento de pestañas**: El botón de desbordamiento de pestañas de la calculadora ahora usa un chevron hacia abajo (▾) en lugar de "..." para indicar mejor un menú desplegable.
+- **Rendimiento de escritorio más rápido**: Actualización a Electron 40 para una velocidad de inicio y compatibilidad mejoradas.
+- **Dependencias actualizadas**: Todos los paquetes actualizados a las últimas versiones con parches de seguridad aplicados.
+
 ### Corregido
 
-- **Cálculo Dinámico de Altura de Botones de Calculadora Mejorado**: Se optimizó la lógica de cálculo de altura de botones usando `requestAnimationFrame` y `nextTick` en lugar de `setTimeout` para mayor precisión y rendimiento.
-- **Inicialización del Campo de Resultado Optimizada**: Se eliminó la lógica redundante de intercambio de estado durante el montaje del componente y se mejoró la detección de desbordamiento de texto para ejecutarse inmediatamente después del renderizado.
-- **Optimización del Diseño Inicial Según Tipo de Calculadora**: Se refinaron las configuraciones iniciales de altura de botones para diferentes tipos de calculadora (Básica, Unidades, Divisas, Bases numéricas) para reducir los cambios de diseño.
-- **Error de Transición de Subpágina en Diseño Amplio Corregido**: Se corrigió un problema donde el efecto de transición para subpáginas (sección derecha) en el diseño amplio no funcionaba correctamente.
-- **Detección de Desbordamiento de Texto en Campo de Resultado Mejorada**: Se revisó y reescribió completamente la lógica de detección de desbordamiento de texto en los campos de resultado. Se implementó un sistema de seguimiento preciso y continuo usando ResizeObserver y watch, asegurando el resaltado de color y la visualización de información emergente precisos cuando el texto se desborda.
-- **Problema de Registro Duplicado de Atajos de Teclado Corregido**: Se corrigió un problema donde los atajos de navegación de pestañas (Ctrl+Tab, ArrowRight, etc.) se ejecutaban dos veces. Se resolvió asegurando que useMainLayout solo se llame desde MainLayout, previniendo registros duplicados de enlaces de teclas desde múltiples componentes de diseño.
-- **Error de Conversión de Base del Valor de Memoria Corregido**: Se añadió manejo seguro de errores para los errores de conversión de base que ocurrían durante la inicialización o cuando se pasaban valores inválidos.
+- **Manejo de espacios en fórmulas**: Los espacios iniciales y finales en las expresiones de fórmulas ahora se recortan antes de la evaluación.
+- **Visibilidad del botón de borrar fórmula**: El botón X en el editor de fórmulas ahora se oculta correctamente cuando el campo de expresión está vacío.
+- **Inicio de la aplicación de escritorio**: Se resolvieron los errores de inicio en algunos sistemas causados por conflictos de formato de módulos.
 
 Para información sobre versiones anteriores, por favor consulte [aquí](https://github.com/from104/qcalc/blob/main/CHANGELOG.md).

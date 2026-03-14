@@ -23,6 +23,11 @@
   const koTipModules = import.meta.glob('../../content/tips/ko/*.md', { eager: true });
   const enTipModules = import.meta.glob('../../content/tips/en/*.md', { eager: true });
   const jaTipModules = import.meta.glob('../../content/tips/ja/*.md', { eager: true });
+  const zhTipModules = import.meta.glob('../../content/tips/zh/*.md', { eager: true });
+  const hiTipModules = import.meta.glob('../../content/tips/hi/*.md', { eager: true });
+  const deTipModules = import.meta.glob('../../content/tips/de/*.md', { eager: true });
+  const esTipModules = import.meta.glob('../../content/tips/es/*.md', { eager: true });
+  const frTipModules = import.meta.glob('../../content/tips/fr/*.md', { eager: true });
 
   /**
    * tips 폴더 내의 .md 파일을 파일명 기준으로 정렬하여 배열로 반환합니다.
@@ -41,21 +46,22 @@
       .map((item) => item.src);
   }
 
-  // 한글, 영어, 일본어 팁 배열 생성
-  const koTips = getSortedTips(koTipModules as Record<string, { default: string }>);
-  const enTips = getSortedTips(enTipModules as Record<string, { default: string }>);
-  const jaTips = getSortedTips(jaTipModules as Record<string, { default: string }>);
+  // 언어별 팁 배열 생성
+  const tipsByLang: Record<string, string[]> = {
+    ko: getSortedTips(koTipModules as Record<string, { default: string }>),
+    en: getSortedTips(enTipModules as Record<string, { default: string }>),
+    ja: getSortedTips(jaTipModules as Record<string, { default: string }>),
+    zh: getSortedTips(zhTipModules as Record<string, { default: string }>),
+    hi: getSortedTips(hiTipModules as Record<string, { default: string }>),
+    de: getSortedTips(deTipModules as Record<string, { default: string }>),
+    es: getSortedTips(esTipModules as Record<string, { default: string }>),
+    fr: getSortedTips(frTipModules as Record<string, { default: string }>),
+  };
 
   // tips 배열을 현재 언어에 따라 선택
   const tips = computed(() => {
     const lang = locale.value.substring(0, 2);
-    // 각 언어별 팁 개수가 다르면 오류 발생
-    if (koTips.length !== enTips.length || koTips.length !== jaTips.length) {
-      throw new Error('The number of tips does not match across languages.');
-    }
-    if (lang === 'ko') return koTips;
-    if (lang === 'ja') return jaTips;
-    return enTips;
+    return tipsByLang[lang] ?? tipsByLang['en']!;
   });
 
   // Props 정의

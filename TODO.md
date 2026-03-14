@@ -10,7 +10,7 @@
 - [ ] Skin / custom theme function
 - [ ] Monetization (ads)
 
-## Done (v0.11.7)
+## Done (v0.12.0)
 
 - [x] Formula calculator mode (mathjs expression evaluation)
 - [x] Memory placeholder (`$`) in formula expressions

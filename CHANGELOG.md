@@ -4,31 +4,31 @@ All notable changes to this project are recorded in this file.
 
 The format is based on [Keep a Changelog] and this project follows [Semantic Versioning].
 
-## [0.11.7] 2026-03-07
+## [0.12.0] 2026-03-14
 
 ### Added
 
-- **Formula Calculator Mode**: Added a new calculator mode that lets you type and evaluate mathematical expressions directly using [mathjs](https://mathjs.org/) syntax. Supports arithmetic operators, parentheses, built-in functions (`sin`, `cos`, `sqrt`, `log`, `ln`, `abs`, `round`, `nthRoot`, etc.), and constants (`pi`, `e`, `phi`).
-  - Use `@` in expressions to reference the current calculator value, and `$` to reference the stored memory value.
-  - Includes an inline formula editor (Space key) for direct expression editing.
-  - Built-in help menu lists available functions, constants, and placeholders with a link to the mathjs documentation.
-  - Formula evaluation results are saved to calculation history with the full expression shown in the result field.
-  - Supports all standard memory operations (MC, MR, MS, M+, M−, M×, M÷) via shift-function buttons.
-- **Flatpak Build Support**: Added Flatpak packaging support for broader Linux desktop distribution.
-- **Automated Testing**: Added unit test framework (Vitest) with tests for core math operations.
-- **CI/CD Pipeline**: Added GitHub Actions workflow for automated linting and testing on every push.
-- **Pre-commit Quality Checks**: Added automatic code formatting and lint checks before each commit.
+- **Formula Calculator (5th Calculator)**: Type and evaluate math expressions directly — supports arithmetic, parentheses, functions (`sin`, `cos`, `sqrt`, `log`, `ln`, `abs`, `round`, `nthRoot`, etc.), and constants (`pi`, `e`, `phi`) via [mathjs](https://mathjs.org/) syntax.
+  - Press Space to open the inline formula editor for direct expression editing.
+  - Use `@` to reference the current value, `$` for the stored memory value.
+  - Full memory support (MC, MR, MS, M+, M−, M×, M÷) available through shift-function buttons.
+  - Evaluated results are saved to calculation history with the full expression displayed.
+  - Built-in help menu lists all available functions, constants, and placeholders.
+- **5 New Languages (8 total)**: Chinese (Simplified), Hindi, German, Spanish, and French join the existing Korean, English, and Japanese. Every screen is translated — menus, settings, unit names, currency names, help pages, about pages, tips, and error messages.
+- **Flatpak Packaging**: Install QCalc from Flatpak for broader Linux desktop support.
 
 ### Changed
 
-- **Electron 35 → 40 Upgrade**: Improved desktop app performance and compatibility with the latest Electron runtime.
-- **Security Hardening**: Strengthened Content Security Policy with stricter rules for production builds.
-- **Dependencies Updated**: Upgraded all dependencies to latest versions and applied security fixes for Capacitor packages.
+- **Smoother Language Switching**: If a translation is missing, the app now falls back to English automatically instead of showing raw key paths.
+- **Tab Overflow Menu Icon**: The calculator tab overflow button now uses a downward chevron (▾) instead of "..." to better indicate a dropdown menu.
+- **Faster Desktop Performance**: Upgraded to Electron 40 for improved startup speed and compatibility.
+- **Updated Dependencies**: All packages upgraded to latest versions with security patches applied.
 
 ### Fixed
 
-- **Electron Desktop App Startup**: Fixed startup errors on some systems caused by module format conflicts.
-- **Type Safety Improvements**: Resolved type checking issues across multiple components for better stability.
+- **Formula Whitespace Handling**: Leading and trailing spaces in formula expressions are now trimmed before evaluation.
+- **Formula Clear Button Visibility**: The X button in the formula editor now hides correctly when the expression field is empty.
+- **Desktop App Startup**: Resolved startup errors on some systems caused by module format conflicts.
 
 ## [0.11.6] 2025-12-27
 
