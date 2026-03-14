@@ -1,5 +1,5 @@
 <script setup lang="ts">
-  import { computed } from 'vue';
+  import { computed, toValue } from 'vue';
   import { useI18n } from 'vue-i18n';
   import { useRouter, useRoute } from 'vue-router';
   import { useUIStore } from 'stores/uiStore';
@@ -121,7 +121,7 @@
             v-for="tab in props.tabs"
             :id="`tab-${tab.name}`"
             :key="tab.name"
-            :label="typeof tab.title === 'string' ? tab.title : (tab.title as any).value"
+            :label="toValue(tab.title)"
             :name="tab.name"
             class="q-px-xs"
             dense
@@ -172,9 +172,9 @@
         />
         <q-toolbar-title class="text-subtitle1">
           {{
-            typeof props.subPageConfig[currentSubPage]?.title === 'string'
-              ? props.subPageConfig[currentSubPage]?.title
-              : (props.subPageConfig[currentSubPage]?.title as any)?.value
+            props.subPageConfig[currentSubPage]?.title != null
+              ? toValue(props.subPageConfig[currentSubPage]!.title)
+              : ''
           }}
           <HelpIcon
             v-if="currentSubPage === 'record' && $g.isMobile"
@@ -194,13 +194,13 @@
           :icon="button.icon"
           role="button"
           :aria-label="t(`ariaLabel.${button.icon}`)"
-          :disable="(button.disabled as any).value"
+          :disable="toValue(button.disabled)"
           @click="button.action"
         >
           <ToolTip
             :text-color="themesStore.getDarkColor()"
             :bg-color="themesStore.getCurrentThemeColors.ui.warning"
-            :text="button.tooltip as any"
+            :text="toValue(button.tooltip)"
           />
         </q-btn>
       </q-toolbar>
@@ -223,8 +223,7 @@
             :key="index"
             :name="tab.name"
             role="tabpanel"
-            :aria-label="t('ariaLabel.tabPanel', { name: typeof tab.title === 'string' ? tab.title : (tab.title as any).value })
-              "
+            :aria-label="t('ariaLabel.tabPanel', { name: toValue(tab.title) })"
             :aria-labelledby="`tab-${tab.name}`"
           >
             <component :is="tab.component" />
@@ -241,7 +240,13 @@
         </div>
       </template>
     </q-page-container>
-    <input ref="recordFileInput" type="file" style="display: none" accept="text/csv,.csv" @change="handleRecordFileChange" />
+    <input
+      ref="recordFileInput"
+      type="file"
+      style="display: none"
+      accept="text/csv,.csv"
+      @change="handleRecordFileChange"
+    />
   </q-layout>
 </template>
 

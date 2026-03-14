@@ -1,6 +1,6 @@
 {
   "name": "qcalc",
-  "version": "0.11.6",
+  "version": "0.11.7",
   "description": "com.atit.qcalc",
   "productName": "Q Calc",
   "desktopName": "com.atit.qcalc.desktop",
@@ -18,26 +18,23 @@
     "url": "https://github.com/from104/qcalc/issues"
   },
   "homepage": "https://github.com/from104/qcalc#readme",
-  "keywords": [
-    "calculator",
-    "quasar",
-    "vue",
-    "electron",
-    "typescript"
-  ],
+  "keywords": ["calculator", "quasar", "vue", "electron", "typescript"],
   "type": "module",
   "scripts": {
     "postinstall": "quasar prepare",
     "lint": "eslint -c ./eslint.config.js \"./src*/**/*.{ts,js,cjs,mjs,vue}\"",
     "format": "prettier --write \"**/*.{js,mjs,cjs,ts,vue,scss,html,md,json}\" --ignore-path .gitignore",
-    "test": "yarn node --experimental-vm-modules $(yarn bin jest)",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage",
     "dev": "quasar dev -m electron",
     "dev:android": "quasar dev -m capacitor -T android",
     "build": "quasar build -m electron",
     "build:win32": "quasar build -m electron -T win32",
     "build:android": "quasar build -m capacitor -T android",
     "build:flatpak": "cd flatpak && bash build-flatpak.sh install",
-    "icons": "icongenie g -m spa,electron -i ./assets/qcalc_icon_v3.png; icongenie g -m capacitor -i ./assets/qcalc_icon_v3.png --skip-trim; rm -r src-capacitor/ios"
+    "icons": "icongenie g -m spa,electron -i ./assets/qcalc_icon_v3.png; icongenie g -m capacitor -i ./assets/qcalc_icon_v3.png --skip-trim; rm -r src-capacitor/ios",
+    "prepare": "husky"
   },
   "exports": {
     "./src/boot/*": "./src/boot/*.ts"
@@ -88,17 +85,20 @@
     "@types/papaparse": "^5.5.2",
     "@typescript-eslint/eslint-plugin": "8.56.1",
     "@typescript-eslint/parser": "8.56.1",
+    "@vitest/coverage-v8": "^4.0.18",
     "@vue/devtools": "8.0.7",
     "@vue/eslint-config-prettier": "10.2.0",
     "@vue/eslint-config-typescript": "14.7.0",
     "autoprefixer": "10.4.27",
-    "electron": "35.7.5",
+    "electron": "^40.8.0",
     "electron-builder": "26.8.2",
     "eslint": "9.39.3",
     "eslint-config-prettier": "10.1.8",
     "eslint-plugin-import": "2.32.0",
     "eslint-plugin-vue": "10.8.0",
     "globals": "16.5.0",
+    "husky": "^9.1.7",
+    "lint-staged": "^16.3.2",
     "postcss": "8.5.8",
     "prettier": "3.8.1",
     "sass": "1.97.3",
@@ -107,6 +107,7 @@
     "typescript": "5.9.3",
     "vite": "7.3.1",
     "vite-plugin-checker": "0.12.0",
+    "vitest": "^4.0.18",
     "vue-eslint-parser": "10.4.0",
     "vue-tsc": "3.2.5"
   },
@@ -121,5 +122,9 @@
     "ansi-regex": "5.0.1",
     "strip-ansi": "6.0.1"
   },
-  "packageManager": "yarn@4.10.3"
+  "packageManager": "yarn@4.10.3",
+  "lint-staged": {
+    "*.{ts,js,cjs,mjs,vue}": ["eslint -c ./eslint.config.js --fix"],
+    "*.{ts,js,cjs,mjs,vue,scss,html,md,json}": ["prettier --write"]
+  }
 }

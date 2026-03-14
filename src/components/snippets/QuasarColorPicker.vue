@@ -1,5 +1,5 @@
 <script setup lang="ts">
-  import { ref, computed, nextTick } from 'vue';
+  import { ref, computed, nextTick, useTemplateRef } from 'vue';
   import type { QCardSection } from 'quasar';
   import { useI18n } from 'vue-i18n';
 
@@ -15,7 +15,7 @@
   });
 
   const dialogVisible = ref(false);
-  const dialogContentRef = ref<QCardSection | null>(null);
+  const dialogContentRef = useTemplateRef<QCardSection>('dialogContentRef');
   const focusedColor = ref({ groupIndex: 0, colorIndex: 0 });
 
   const mainColors = [
@@ -203,10 +203,10 @@
 </style>
 
 <i18n lang="yaml">
-  ko:
-    openColorPicker: '색상 선택기 열기'
-    close: '닫기'
-  en:
-    openColorPicker: 'Open color picker'
-    close: 'Close'
+ko:
+  openColorPicker: '색상 선택기 열기'
+  close: '닫기'
+en:
+  openColorPicker: 'Open color picker'
+  close: 'Close'
 </i18n>

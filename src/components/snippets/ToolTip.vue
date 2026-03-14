@@ -8,8 +8,8 @@
    *              HEX 색상 코드(#000000)와 Quasar 색상 클래스 모두를 지원합니다.
    */
 
-  import { ref, computed } from 'vue';
-  import { QTooltip } from 'quasar';
+  import { computed, useTemplateRef } from 'vue';
+  import type { QTooltip } from 'quasar';
 
   interface Props {
     modelValue?: boolean | null;
@@ -31,7 +31,7 @@
     autoHide = 0,
   } = defineProps<Props>();
 
-  const tooltipRef = ref<QTooltip>();
+  const tooltipRef = useTemplateRef<QTooltip>('tooltipRef');
 
   const emit = defineEmits<{
     'update:modelValue': [value: boolean];

@@ -37,7 +37,14 @@ contextBridge.exposeInMainWorld('electronUpdater', {
   onUpdateStatus: (
     callback: (status: UpdateStatusInfo['status'], info?: UpdateInfo | UpdateProgressInfo | UpdateError) => void,
   ) => {
-    ipcRenderer.on('update-status', (_event, status, info) => callback(status, info));
+    ipcRenderer.on(
+      'update-status',
+      (
+        _event: Electron.IpcRendererEvent,
+        status: UpdateStatusInfo['status'],
+        info: UpdateInfo | UpdateProgressInfo | UpdateError,
+      ) => callback(status, info),
+    );
   },
   removeUpdateStatusListener: () => {
     ipcRenderer.removeAllListeners('update-status');

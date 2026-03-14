@@ -451,6 +451,10 @@
     class="full-width row justify-center items-start relative-position scrollbar-custom"
     :style="{
       paddingTop: calculatedTopMargin,
+      '--header-height': calculatedHeaderHeight,
+      '--search-bar-height': searchBarHeight + 'px',
+      '--menu-btn-opacity': $g.isMobile ? 1 : 0,
+      '--menu-btn-visibility': $g.isMobile ? 'visible' : 'hidden',
     }"
     @scroll="handleScroll"
   >
@@ -782,7 +786,7 @@
 
 <style scoped lang="scss">
   #record-card {
-    max-height: calc(100vh - v-bind('calculatedHeaderHeight'));
+    max-height: calc(100vh - var(--header-height));
     overflow: auto;
     transition: padding-top 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   }
@@ -847,7 +851,7 @@
   .search-bar {
     position: fixed;
     width: 100%;
-    height: v-bind('searchBarHeight + "px"');
+    height: var(--search-bar-height);
     top: 0;
     left: 0;
     z-index: 2000;
@@ -932,8 +936,8 @@
     @include dark-mode-fg-colors;
 
     .menu-btn {
-      opacity: v-bind('$g.isMobile ? 1 : 0');
-      visibility: v-bind('$g.isMobile ? "visible" : "hidden"');
+      opacity: var(--menu-btn-opacity);
+      visibility: var(--menu-btn-visibility);
       transition: all 0.3s ease-in-out;
     }
   }
@@ -977,62 +981,62 @@
 </style>
 
 <i18n lang="yaml">
-  ko:
-    record: '계산 기록'
-    noRecord: '계산 기록이 없습니다.'
-    noSearchResult: '검색 결과가 없습니다.'
-    search: '검색'
-    doYouDeleteRecord: '모든 계산 기록을 지우겠어요?'
-    memo: '메모'
-    copySuccess: '클립보드에 복사되었습니다.'
-    copyFailure: '클립보드 복사에 실패했습니다.'
-    addMemo: '메모 추가'
-    editMemo: '메모 수정'
-    copyMemo: '메모 복사'
-    deleteMemo: '메모 삭제'
-    copyDisplayedResult: '표시된 결과 복사'
-    copyResultNumber: '결과 숫자 복사'
-    loadToMainPanel: '메인 패널에 불러오기'
-    loadToSubPanel: '서브 패널에 불러오기'
-    deleteResult: '결과 삭제'
-    copyTime: '시간 복사'
-    fontSize:
-      increase: '글자 크게'
-      decrease: '글자 작게'
-    ariaLabel:
-      scrollToTop: '맨 위로 스크롤'
-      editMemo: '메모 편집'
-      deleteRecord: '기록 삭제'
-      searchInput: '검색'
-      dragHandle: '검색창 이동'
-      closeSearch: '검색창 닫기'
-  en:
-    record: 'record'
-    noRecord: 'No record.'
-    noSearchResult: 'No search results.'
-    search: 'Search'
-    doYouDeleteRecord: 'Do you want to delete all record?'
-    memo: 'Memo'
-    copySuccess: 'Copied to clipboard.'
-    copyFailure: 'Failed to copy to clipboard.'
-    addMemo: 'Add memo'
+ko:
+  record: '계산 기록'
+  noRecord: '계산 기록이 없습니다.'
+  noSearchResult: '검색 결과가 없습니다.'
+  search: '검색'
+  doYouDeleteRecord: '모든 계산 기록을 지우겠어요?'
+  memo: '메모'
+  copySuccess: '클립보드에 복사되었습니다.'
+  copyFailure: '클립보드 복사에 실패했습니다.'
+  addMemo: '메모 추가'
+  editMemo: '메모 수정'
+  copyMemo: '메모 복사'
+  deleteMemo: '메모 삭제'
+  copyDisplayedResult: '표시된 결과 복사'
+  copyResultNumber: '결과 숫자 복사'
+  loadToMainPanel: '메인 패널에 불러오기'
+  loadToSubPanel: '서브 패널에 불러오기'
+  deleteResult: '결과 삭제'
+  copyTime: '시간 복사'
+  fontSize:
+    increase: '글자 크게'
+    decrease: '글자 작게'
+  ariaLabel:
+    scrollToTop: '맨 위로 스크롤'
+    editMemo: '메모 편집'
+    deleteRecord: '기록 삭제'
+    searchInput: '검색'
+    dragHandle: '검색창 이동'
+    closeSearch: '검색창 닫기'
+en:
+  record: 'record'
+  noRecord: 'No record.'
+  noSearchResult: 'No search results.'
+  search: 'Search'
+  doYouDeleteRecord: 'Do you want to delete all record?'
+  memo: 'Memo'
+  copySuccess: 'Copied to clipboard.'
+  copyFailure: 'Failed to copy to clipboard.'
+  addMemo: 'Add memo'
+  editMemo: 'Edit memo'
+  copyMemo: 'Copy memo'
+  deleteMemo: 'Delete memo'
+  copyDisplayedResult: 'Copy displayed result'
+  copyResultNumber: 'Copy result number'
+  loadToMainPanel: 'Load to main panel'
+  loadToSubPanel: 'Load to sub panel'
+  deleteResult: 'Delete result'
+  copyTime: 'Copy time'
+  fontSize:
+    increase: 'Increase font size'
+    decrease: 'Decrease font size'
+  ariaLabel:
+    scrollToTop: 'Scroll to top'
     editMemo: 'Edit memo'
-    copyMemo: 'Copy memo'
-    deleteMemo: 'Delete memo'    
-    copyDisplayedResult: 'Copy displayed result'
-    copyResultNumber: 'Copy result number'
-    loadToMainPanel: 'Load to main panel'
-    loadToSubPanel: 'Load to sub panel'
-    deleteResult: 'Delete result'
-    copyTime: 'Copy time'
-    fontSize:
-      increase: 'Increase font size'
-      decrease: 'Decrease font size'
-    ariaLabel:
-      scrollToTop: 'Scroll to top'
-      editMemo: 'Edit memo'
-      deleteRecord: 'Delete record'
-      searchInput: 'Search'
-      dragHandle: 'Move search window'
-      closeSearch: 'Close search window'
+    deleteRecord: 'Delete record'
+    searchInput: 'Search'
+    dragHandle: 'Move search window'
+    closeSearch: 'Close search window'
 </i18n>

@@ -48,9 +48,14 @@
   <content_rating type="oars-1.1" />
 
   <releases>
-    <release version="0.11.6" date="2026-03-01">
+    <release version="0.11.7" date="2026-03-07">
       <description>
-        <p>Latest release with bug fixes and improvements.</p>
+        <p>Electron 40 upgrade, Vue 3.5+ modernization, Vitest test infrastructure, CI/CD pipeline, and CSP security hardening.</p>
+      </description>
+    </release>
+    <release version="0.11.6" date="2025-12-27">
+      <description>
+        <p>Number format per calculator feature and various bug fixes.</p>
       </description>
     </release>
   </releases>
