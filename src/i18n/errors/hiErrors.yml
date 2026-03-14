@@ -1,0 +1,47 @@
+calc:
+  invalid_digit: 'वर्तमान आधार के लिए अमान्य अंक'
+  constant_not_found: 'अनुरोधित गणितीय स्थिरांक नहीं मिला'
+  invalid_radix: 'अमान्य आधार मान'
+  no_memory: 'मेमोरी में कोई मान संग्रहीत नहीं है'
+  failed_to_add_record_item: 'रिकॉर्ड आइटम जोड़ने में विफल: {error}'
+  failed_to_delete_record_item: 'रिकॉर्ड आइटम हटाने में विफल: {error}'
+  invalid_record_index: 'अमान्य रिकॉर्ड अनुक्रमणिका'
+  record_not_found: 'अनुरोधित रिकॉर्ड आइटम नहीं मिला'
+  invalid_operation: 'अमान्य संक्रिया'
+  memory_operation_failed: 'मेमोरी संक्रिया विफल'
+radix:
+  invalid_radix: 'अमान्य आधार मान'
+  invalid_number: 'आधार {radix} के लिए अमान्य संख्या: {number}'
+currency:
+  exchange_rates_not_available: 'विनिमय दरें उपलब्ध नहीं हैं'
+  invalid_currency: 'अमान्य मुद्रा'
+  invalid_base_currency: 'अमान्य आधार मुद्रा'
+  conversion_failed: 'मुद्रा रूपांतरण विफल'
+unit:
+  invalid_category: 'अमान्य इकाई श्रेणी: {category}'
+  invalid_unit: 'अमान्य इकाई: {unit}'
+  invalid_format: 'अमान्य आइटम प्रारूप। "category.unit" का उपयोग करें'
+  no_units_found: 'श्रेणी के लिए कोई इकाई नहीं मिली: {category}'
+  conversion_failed: 'इकाई रूपांतरण विफल'
+  invalid_base_value: 'आधार मान की गणना विफल'
+component:
+  clipboard:
+    copy_failed: 'क्लिपबोर्ड पर कॉपी करने में विफल'
+    paste_failed: 'क्लिपबोर्ड से पेस्ट करने में विफल'
+  update:
+    check_failed: 'अपडेट की जाँच करने में विफल'
+    download_failed: 'अपडेट डाउनलोड करने में विफल'
+    install_failed: 'अपडेट इंस्टॉल करने में विफल'
+  navigation:
+    route_not_found: 'अनुरोधित पृष्ठ नहीं मिला'
+    invalid_route: 'अमान्य पृष्ठ अनुरोध'
+math:
+  divide_by_zero: 'शून्य से भाग नहीं दिया जा सकता'
+  negative_factorial: 'ऋणात्मक संख्या का क्रमगुणन अनुमत नहीं है'
+  division_error: 'भाग के दौरान त्रुटि हुई'
+  negative_root: 'ऋणात्मक संख्या का मूल अनुमत नहीं है'
+  negative_root_index: 'ऋणात्मक मूल समर्थित नहीं हैं'
+  negative_bit_operation: 'बिट संक्रियाओं में ऋणात्मक संख्याएँ अनुमत नहीं हैं'
+  overflow: 'संक्रिया का परिणाम अनुमत सीमा से अधिक है'
+  invalid_operation: 'अमान्य गणितीय संक्रिया'
+unknown: 'एक अज्ञात त्रुटि हुई: {error}'

@@ -209,4 +209,22 @@ ko:
 en:
   openColorPicker: 'Open color picker'
   close: 'Close'
+ja:
+  openColorPicker: 'カラーピッカーを開く'
+  close: '閉じる'
+zh:
+  openColorPicker: '打开颜色选择器'
+  close: '关闭'
+hi:
+  openColorPicker: 'रंग चयनकर्ता खोलें'
+  close: 'बंद करें'
+de:
+  openColorPicker: 'Farbauswahl öffnen'
+  close: 'Schließen'
+es:
+  openColorPicker: 'Abrir selector de color'
+  close: 'Cerrar'
+fr:
+  openColorPicker: 'Ouvrir le sélecteur de couleurs'
+  close: 'Fermer'
 </i18n>

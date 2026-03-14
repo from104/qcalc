@@ -1,0 +1,47 @@
+calc:
+  invalid_digit: 'Chiffre invalide pour la base actuelle'
+  constant_not_found: "La constante mathématique demandée n'a pas été trouvée"
+  invalid_radix: 'Valeur de base invalide'
+  no_memory: 'Aucune valeur stockée en mémoire'
+  failed_to_add_record_item: "Échec de l'ajout de l'élément d'historique : {error}"
+  failed_to_delete_record_item: "Échec de la suppression de l'élément d'historique : {error}"
+  invalid_record_index: "Index d'historique invalide"
+  record_not_found: "L'élément d'historique demandé n'a pas été trouvé"
+  invalid_operation: 'Opération invalide'
+  memory_operation_failed: 'Opération mémoire échouée'
+radix:
+  invalid_radix: 'Valeur de base invalide'
+  invalid_number: 'Nombre invalide pour la base {radix} : {number}'
+currency:
+  exchange_rates_not_available: 'Les taux de change ne sont pas disponibles'
+  invalid_currency: 'Devise invalide'
+  invalid_base_currency: 'Devise de base invalide'
+  conversion_failed: 'Échec de la conversion de devise'
+unit:
+  invalid_category: "Catégorie d'unité invalide : {category}"
+  invalid_unit: 'Unité invalide : {unit}'
+  invalid_format: 'Format d''élément invalide. Utilisez "category.unit"'
+  no_units_found: "Aucune unité trouvée pour la catégorie : {category}"
+  conversion_failed: "Échec de la conversion d'unité"
+  invalid_base_value: 'Échec du calcul de la valeur de base'
+component:
+  clipboard:
+    copy_failed: 'Échec de la copie dans le presse-papiers'
+    paste_failed: 'Échec du collage depuis le presse-papiers'
+  update:
+    check_failed: 'Échec de la vérification des mises à jour'
+    download_failed: 'Échec du téléchargement de la mise à jour'
+    install_failed: "Échec de l'installation de la mise à jour"
+  navigation:
+    route_not_found: 'Page demandée introuvable'
+    invalid_route: 'Demande de page invalide'
+math:
+  divide_by_zero: 'Impossible de diviser par zéro'
+  negative_factorial: "La factorielle d'un nombre négatif n'est pas autorisée"
+  division_error: "Une erreur s'est produite lors de la division"
+  negative_root: "La racine d'un nombre négatif n'est pas autorisée"
+  negative_root_index: 'Les racines négatives ne sont pas prises en charge'
+  negative_bit_operation: 'Les nombres négatifs ne sont pas autorisés dans les opérations sur les bits'
+  overflow: 'Le résultat de l''opération dépasse la plage autorisée'
+  invalid_operation: 'Opération mathématique invalide'
+unknown: 'Une erreur inconnue est survenue : {error}'

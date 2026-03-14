@@ -5,24 +5,31 @@
  *              이 파일은 Vue 애플리케이션에서 i18n 기능을 통해 다국어 메시지를 제공하는 데 사용됩니다.
  */
 
-// 한국어와 영어 메시지 파일을 가져옵니다.
 import koMessages from './messages/koMessages.yml';
 import enMessages from './messages/enMessages.yml';
+import jaMessages from './messages/jaMessages.yml';
+import zhMessages from './messages/zhMessages.yml';
+import hiMessages from './messages/hiMessages.yml';
+import deMessages from './messages/deMessages.yml';
+import esMessages from './messages/esMessages.yml';
+import frMessages from './messages/frMessages.yml';
 
-// 에러 메시지 파일을 가져옵니다.
 import koErrors from './errors/koErrors.yml';
 import enErrors from './errors/enErrors.yml';
+import jaErrors from './errors/jaErrors.yml';
+import zhErrors from './errors/zhErrors.yml';
+import hiErrors from './errors/hiErrors.yml';
+import deErrors from './errors/deErrors.yml';
+import esErrors from './errors/esErrors.yml';
+import frErrors from './errors/frErrors.yml';
 
-// 다국어 메시지 객체를 내보냅니다.
 export default {
-  // 한국어 메시지
-  ko: {
-    message: koMessages,
-    error: koErrors,
-  },
-  // 영어 메시지
-  en: {
-    message: enMessages,
-    error: enErrors,
-  },
+  ko: { message: koMessages, error: koErrors },
+  en: { message: enMessages, error: enErrors },
+  ja: { message: jaMessages, error: jaErrors },
+  zh: { message: zhMessages, error: zhErrors },
+  hi: { message: hiMessages, error: hiErrors },
+  de: { message: deMessages, error: deErrors },
+  es: { message: esMessages, error: esErrors },
+  fr: { message: frMessages, error: frErrors },
 };

@@ -13,12 +13,25 @@
   import AboutMdEn from '../content/pages/AboutPage-en.md';
   import AboutMdKo from '../content/pages/AboutPage-ko.md';
   import AboutMdJa from '../content/pages/AboutPage-ja.md';
+  import AboutMdZh from '../content/pages/AboutPage-zh.md';
+  import AboutMdHi from '../content/pages/AboutPage-hi.md';
+  import AboutMdDe from '../content/pages/AboutPage-de.md';
+  import AboutMdEs from '../content/pages/AboutPage-es.md';
+  import AboutMdFr from '../content/pages/AboutPage-fr.md';
+
+  const aboutMdMap: Record<string, string> = {
+    ko: AboutMdKo,
+    ja: AboutMdJa,
+    zh: AboutMdZh,
+    hi: AboutMdHi,
+    de: AboutMdDe,
+    es: AboutMdEs,
+    fr: AboutMdFr,
+  };
 
   const currentMd = computed(() => {
     const lang = locale.value.substring(0, 2);
-    if (lang === 'ko') return AboutMdKo;
-    if (lang === 'ja') return AboutMdJa;
-    return AboutMdEn;
+    return aboutMdMap[lang] ?? AboutMdEn;
   });
 
   const changelog = computed(() => {
@@ -144,4 +157,34 @@ ja:
   license: 'ライセンス'
   contact: '連絡先'
   changelog: '変更履歴'
+zh:
+  description: '使用现代网络技术构建的多功能计算器。可在桌面和移动平台上使用。'
+  author: '开发者'
+  license: '许可证'
+  contact: '联系方式'
+  changelog: '更新日志'
+hi:
+  description: 'आधुनिक वेब तकनीकों से निर्मित बहुउद्देशीय कैलकुलेटर। डेस्कटॉप और मोबाइल दोनों प्लेटफ़ॉर्म पर उपलब्ध।'
+  author: 'डेवलपर'
+  license: 'लाइसेंस'
+  contact: 'संपर्क'
+  changelog: 'परिवर्तन लॉग'
+de:
+  description: 'Ein Mehrzweckrechner mit modernen Webtechnologien. Verfügbar auf Desktop- und Mobilplattformen.'
+  author: 'Entwickler'
+  license: 'Lizenz'
+  contact: 'Kontakt'
+  changelog: 'Änderungsprotokoll'
+es:
+  description: 'Una calculadora multipropósito construida con tecnologías web modernas. Disponible en plataformas de escritorio y móviles.'
+  author: 'Desarrollador'
+  license: 'Licencia'
+  contact: 'Contacto'
+  changelog: 'Registro de cambios'
+fr:
+  description: 'Une calculatrice polyvalente construite avec des technologies web modernes. Disponible sur ordinateur et mobile.'
+  author: 'Développeur'
+  license: 'Licence'
+  contact: 'Contact'
+  changelog: 'Journal des modifications'
 </i18n>

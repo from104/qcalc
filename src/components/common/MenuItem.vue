@@ -57,4 +57,22 @@ ko:
 en:
   ariaLabel:
     icon: '{name} menu icon'
+ja:
+  ariaLabel:
+    icon: '{name} メニューアイコン'
+zh:
+  ariaLabel:
+    icon: '{name} 菜单图标'
+hi:
+  ariaLabel:
+    icon: '{name} मेनू आइकन'
+de:
+  ariaLabel:
+    icon: '{name} Menüsymbol'
+es:
+  ariaLabel:
+    icon: 'Icono de menú {name}'
+fr:
+  ariaLabel:
+    icon: 'Icône de menu {name}'
 </i18n>

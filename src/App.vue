@@ -355,4 +355,76 @@ en:
       light: 'Changed to light mode.'
       dark: 'Changed to dark mode.'
   persistedSettingsCorrected: 'Some saved settings have been reset due to an app update.'
+ja:
+  targetToBeCopiedResult: '計算結果を'
+  targetToBeCopiedSelected: '選択した内容を'
+  copiedToClipboard: '{target}クリップボードにコピーしました。'
+  alwaysOnTopOn: '常に前面表示が有効になりました。'
+  alwaysOnTopOff: '常に前面表示が無効になりました。'
+  darkMode:
+    message:
+      system: 'ダークモードをシステム設定に従うように変更しました。'
+      light: 'ライトモードに変更しました。'
+      dark: 'ダークモードに変更しました。'
+  persistedSettingsCorrected: 'アプリの更新により一部の保存された設定がリセットされました。'
+zh:
+  targetToBeCopiedResult: '计算结果'
+  targetToBeCopiedSelected: '选中内容'
+  copiedToClipboard: '已将{target}复制到剪贴板。'
+  alwaysOnTopOn: '已启用始终置顶。'
+  alwaysOnTopOff: '已禁用始终置顶。'
+  darkMode:
+    message:
+      system: '已将深色模式更改为跟随系统设置。'
+      light: '已切换到浅色模式。'
+      dark: '已切换到深色模式。'
+  persistedSettingsCorrected: '由于应用更新，部分保存的设置已被重置。'
+hi:
+  targetToBeCopiedResult: 'गणना परिणाम'
+  targetToBeCopiedSelected: 'चयनित सामग्री'
+  copiedToClipboard: '{target} क्लिपबोर्ड पर कॉपी किया गया।'
+  alwaysOnTopOn: 'हमेशा ऊपर सक्षम किया गया।'
+  alwaysOnTopOff: 'हमेशा ऊपर अक्षम किया गया।'
+  darkMode:
+    message:
+      system: 'डार्क मोड सिस्टम सेटिंग्स के अनुसार बदला गया।'
+      light: 'लाइट मोड में बदला गया।'
+      dark: 'डार्क मोड में बदला गया।'
+  persistedSettingsCorrected: 'ऐप अपडेट के कारण कुछ सहेजी गई सेटिंग्स रीसेट की गई हैं।'
+de:
+  targetToBeCopiedResult: 'das Berechnungsergebnis'
+  targetToBeCopiedSelected: 'den ausgewählten Inhalt'
+  copiedToClipboard: '{target} in die Zwischenablage kopiert.'
+  alwaysOnTopOn: 'Immer im Vordergrund wurde aktiviert.'
+  alwaysOnTopOff: 'Immer im Vordergrund wurde deaktiviert.'
+  darkMode:
+    message:
+      system: 'Dunkelmodus folgt jetzt den Systemeinstellungen.'
+      light: 'Zum hellen Modus gewechselt.'
+      dark: 'Zum dunklen Modus gewechselt.'
+  persistedSettingsCorrected: 'Einige gespeicherte Einstellungen wurden aufgrund eines App-Updates zurückgesetzt.'
+es:
+  targetToBeCopiedResult: 'el resultado del cálculo'
+  targetToBeCopiedSelected: 'el contenido seleccionado'
+  copiedToClipboard: 'Se copió {target} al portapapeles.'
+  alwaysOnTopOn: 'Siempre arriba ha sido activado.'
+  alwaysOnTopOff: 'Siempre arriba ha sido desactivado.'
+  darkMode:
+    message:
+      system: 'El modo oscuro ahora sigue la configuración del sistema.'
+      light: 'Cambiado a modo claro.'
+      dark: 'Cambiado a modo oscuro.'
+  persistedSettingsCorrected: 'Algunas configuraciones guardadas se han restablecido debido a una actualización de la aplicación.'
+fr:
+  targetToBeCopiedResult: 'le résultat du calcul'
+  targetToBeCopiedSelected: 'le contenu sélectionné'
+  copiedToClipboard: '{target} copié dans le presse-papiers.'
+  alwaysOnTopOn: 'Toujours au-dessus a été activé.'
+  alwaysOnTopOff: 'Toujours au-dessus a été désactivé.'
+  darkMode:
+    message:
+      system: 'Le mode sombre suit maintenant les paramètres du système.'
+      light: 'Passé en mode clair.'
+      dark: 'Passé en mode sombre.'
+  persistedSettingsCorrected: "Certains paramètres enregistrés ont été réinitialisés suite à une mise à jour de l'application."
 </i18n>

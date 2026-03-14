@@ -311,4 +311,112 @@ en:
     sourceRadix: 'Select source radix'
     targetRadix: 'Select target radix'
     swapRadix: 'Swap source and target radix'
+ja:
+  tooltipSwap: '基数を入れ替え'
+  radixLabel:
+    bin: '2進数'
+    oct: '8進数'
+    dec: '10進数'
+    hex: '16進数'
+    main: '変換前'
+    sub: '変換後'
+    wordSize: 'ワードサイズ'
+  bit: ビット
+  ariaLabel:
+    wordSize: 'ワードサイズ選択'
+    sourceDirection: '元の基数方向'
+    targetDirection: '対象基数方向'
+    sourceRadix: '元の基数選択'
+    targetRadix: '対象基数選択'
+    swapRadix: '元と対象の基数を入れ替え'
+zh:
+  tooltipSwap: '交换进制'
+  radixLabel:
+    bin: '二进制'
+    oct: '八进制'
+    dec: '十进制'
+    hex: '十六进制'
+    main: '转换前'
+    sub: '转换后'
+    wordSize: '字长'
+  bit: 位
+  ariaLabel:
+    wordSize: '选择字长'
+    sourceDirection: '源进制方向'
+    targetDirection: '目标进制方向'
+    sourceRadix: '选择源进制'
+    targetRadix: '选择目标进制'
+    swapRadix: '交换源和目标进制'
+hi:
+  tooltipSwap: 'आधार बदलें'
+  radixLabel:
+    bin: 'द्विआधारी'
+    oct: 'अष्टाधारी'
+    dec: 'दशमलव'
+    hex: 'षोडश आधारी'
+    main: 'पहले'
+    sub: 'बाद में'
+    wordSize: 'वर्ड साइज़'
+  bit: बिट
+  ariaLabel:
+    wordSize: 'वर्ड साइज़ चुनें'
+    sourceDirection: 'स्रोत आधार दिशा'
+    targetDirection: 'लक्ष्य आधार दिशा'
+    sourceRadix: 'स्रोत आधार चुनें'
+    targetRadix: 'लक्ष्य आधार चुनें'
+    swapRadix: 'स्रोत और लक्ष्य आधार बदलें'
+de:
+  tooltipSwap: 'Zahlensystem tauschen'
+  radixLabel:
+    bin: 'Binär'
+    oct: 'Oktal'
+    dec: 'Dezimal'
+    hex: 'Hexadezimal'
+    main: 'Vorher'
+    sub: 'Nachher'
+    wordSize: 'Wortgröße'
+  bit: Bit
+  ariaLabel:
+    wordSize: 'Wortgröße auswählen'
+    sourceDirection: 'Quell-Zahlensystem Richtung'
+    targetDirection: 'Ziel-Zahlensystem Richtung'
+    sourceRadix: 'Quell-Zahlensystem auswählen'
+    targetRadix: 'Ziel-Zahlensystem auswählen'
+    swapRadix: 'Quell- und Ziel-Zahlensystem tauschen'
+es:
+  tooltipSwap: 'Intercambiar base'
+  radixLabel:
+    bin: 'Binario'
+    oct: 'Octal'
+    dec: 'Decimal'
+    hex: 'Hexadecimal'
+    main: 'Antes'
+    sub: 'Después'
+    wordSize: 'Tamaño de palabra'
+  bit: Bit
+  ariaLabel:
+    wordSize: 'Seleccionar tamaño de palabra'
+    sourceDirection: 'Dirección de base origen'
+    targetDirection: 'Dirección de base destino'
+    sourceRadix: 'Seleccionar base origen'
+    targetRadix: 'Seleccionar base destino'
+    swapRadix: 'Intercambiar base origen y destino'
+fr:
+  tooltipSwap: 'Échanger la base'
+  radixLabel:
+    bin: 'Binaire'
+    oct: 'Octal'
+    dec: 'Décimal'
+    hex: 'Hexadécimal'
+    main: 'Avant'
+    sub: 'Après'
+    wordSize: 'Taille du mot'
+  bit: Bit
+  ariaLabel:
+    wordSize: 'Sélectionner la taille du mot'
+    sourceDirection: 'Direction de la base source'
+    targetDirection: 'Direction de la base cible'
+    sourceRadix: 'Sélectionner la base source'
+    targetRadix: 'Sélectionner la base cible'
+    swapRadix: 'Échanger les bases source et cible'
 </i18n>

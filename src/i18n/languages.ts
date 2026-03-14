@@ -18,6 +18,15 @@ export interface LanguageEntry {
   code: string;
 }
 
-export const SUPPORTED_LANGUAGES: LanguageEntry[] = [{ code: 'ko' }, { code: 'en' }, { code: 'ja' }];
+export const SUPPORTED_LANGUAGES: LanguageEntry[] = [
+  { code: 'ko' },
+  { code: 'en' },
+  { code: 'ja' },
+  { code: 'zh' },
+  { code: 'hi' },
+  { code: 'de' },
+  { code: 'es' },
+  { code: 'fr' },
+];
 
 export type SupportedLocale = string;

@@ -138,3 +138,399 @@ ja:
   currency: 通貨
   radix: 進数
   formula: 数式
+  help: ヘルプ
+  about: 情報
+  record: 履歴
+  settings: 設定
+  message:
+    fileSavedTo: '(保存先: {path})'
+  tooltipTips: 'ヒントを表示します。'
+  openRecordPage: 'クリックして履歴画面を開きます。'
+  tooltipHelp: 'ヘルプを表示します。'
+  clearRecords:
+    confirmTitle: '計算履歴のクリア確認'
+    confirmMessage: 'すべての計算履歴をクリアしますか？この操作は元に戻せません。'
+    success: '計算履歴が正常にクリアされました。'
+  exportRecords:
+    success: '計算履歴のエクスポートに成功しました。'
+    fail: '計算履歴のエクスポートに失敗しました。'
+    noData: 'エクスポートする計算履歴がありません。'
+    cancelled: '計算履歴のエクスポートがキャンセルされました。'
+    shareTitle: 'qcalc 計算履歴'
+    shareText: 'qcalcの計算履歴をご確認ください。'
+    shareDialogTitle: '履歴のエクスポート'
+    exportMethodTitle: 'エクスポート方法の選択'
+    exportMethodMessage: '計算履歴をデバイスに保存するか、他のアプリと共有できます。'
+    saveToDevice: 'デバイスに保存'
+    shareFile: '共有'
+    successMobile: 'ファイルの保存に成功しました。({fileName})'
+    mobileSaveLocation: 'Documentsフォルダでファイルを確認できます。'
+  importRecords:
+    confirmTitle: '計算履歴のインポート確認'
+    confirmMessage: '現在の計算履歴を選択したファイルの記録で上書きしますか？'
+    success: '計算履歴のインポートに成功しました。'
+    fail: '計算履歴のインポートに失敗しました。ファイルが破損しているか、形式が正しくない可能性があります。'
+    cancelled: '計算履歴のインポートがキャンセルされました。'
+  ariaLabel:
+    delete_outline: 'すべての履歴を削除'
+    back: '前の画面に戻る'
+    backToRecord: '履歴画面に戻る'
+    mainTabs: 'メインタブリスト'
+    tab: '{name} タブ'
+    subPageTitle: '{title} 画面'
+    subPageButton: '{label} ボタン'
+    closeSubPage: 'サブ画面を閉じる'
+    calculatorSection: '電卓セクション'
+    calculatorContent: '電卓コンテンツ'
+    tabPanel: '{name} タブパネル'
+    subPageSection: 'サブ画面セクション'
+    subPageContent: 'サブ画面コンテンツ'
+    tabSelected: '{name} タブ選択中'
+    tabUnselected: '{name} タブ未選択'
+    record: '履歴画面を開く'
+    help: 'ヘルプを見る'
+  tooltip:
+    help: 'ヘルプ'
+    about: '情報'
+    settings: '設定'
+    deleteRecord: 'すべての履歴を削除'
+    exportRecords: '履歴をエクスポート'
+    importRecords: '履歴をインポート'
+    search: '検索'
+    menu: 'メニューを開く'
+    recordSwipeHelp: '履歴画面で左にスワイプしてメモの追加・編集、右にスワイプして履歴の削除ができます。'
+zh:
+  calc: 基本
+  unit: 单位
+  currency: 汇率
+  radix: 进制
+  formula: 公式
+  help: 帮助
+  about: 关于
+  record: 记录
+  settings: 设置
+  message:
+    fileSavedTo: '(保存路径: {path})'
+  tooltipTips: '显示提示。'
+  openRecordPage: '点击打开记录页面。'
+  tooltipHelp: '显示帮助。'
+  clearRecords:
+    confirmTitle: '确认清除记录'
+    confirmMessage: '确定要清除所有计算记录吗？此操作无法撤消。'
+    success: '计算记录已成功清除。'
+  exportRecords:
+    success: '计算记录已成功导出。'
+    fail: '导出计算记录失败。'
+    noData: '没有可导出的计算记录。'
+    cancelled: '记录导出已取消。'
+    shareTitle: 'qcalc 计算记录'
+    shareText: '查看我的 qcalc 计算记录。'
+    shareDialogTitle: '导出记录'
+    exportMethodTitle: '选择导出方式'
+    exportMethodMessage: '您可以将计算记录保存到设备或与其他应用共享。'
+    saveToDevice: '保存到设备'
+    shareFile: '共享'
+    successMobile: '文件保存成功。({fileName})'
+    mobileSaveLocation: '您可以在 Documents 文件夹中找到该文件。'
+  importRecords:
+    confirmTitle: '确认导入记录'
+    confirmMessage: '确定要用所选文件的记录覆盖当前计算记录吗？'
+    success: '计算记录已成功导入。'
+    fail: '导入计算记录失败。文件可能已损坏或格式不正确。'
+    cancelled: '记录导入已取消。'
+  ariaLabel:
+    delete_outline: '删除所有记录'
+    back: '返回上一页'
+    backToRecord: '返回记录页面'
+    mainTabs: '主选项卡列表'
+    tab: '{name} 选项卡'
+    subPageTitle: '{title} 页面'
+    subPageButton: '{label} 按钮'
+    closeSubPage: '关闭子页面'
+    calculatorSection: '计算器区域'
+    calculatorContent: '计算器内容'
+    tabPanel: '{name} 选项卡面板'
+    subPageSection: '子页面区域'
+    subPageContent: '子页面内容'
+    tabSelected: '{name} 选项卡已选中'
+    tabUnselected: '{name} 选项卡未选中'
+    record: '打开记录页面'
+    help: '查看帮助'
+  tooltip:
+    help: '帮助'
+    about: '关于'
+    settings: '设置'
+    deleteRecord: '删除所有记录'
+    exportRecords: '导出记录'
+    importRecords: '导入记录'
+    search: '搜索'
+    menu: '打开菜单'
+    recordSwipeHelp: '在记录页面向左滑动可添加或编辑备注，向右滑动可删除记录。'
+hi:
+  calc: बेसिक
+  unit: इकाई
+  currency: मुद्रा
+  radix: आधार
+  formula: सूत्र
+  help: सहायता
+  about: जानकारी
+  record: रिकॉर्ड
+  settings: सेटिंग्स
+  message:
+    fileSavedTo: '(सहेजा गया: {path})'
+  tooltipTips: 'सुझाव दिखाएँ।'
+  openRecordPage: 'रिकॉर्ड स्क्रीन खोलने के लिए क्लिक करें।'
+  tooltipHelp: 'सहायता दिखाएँ।'
+  clearRecords:
+    confirmTitle: 'रिकॉर्ड साफ़ करने की पुष्टि'
+    confirmMessage: 'क्या आप वाकई सभी गणना रिकॉर्ड साफ़ करना चाहते हैं? यह क्रिया पूर्ववत नहीं की जा सकती।'
+    success: 'गणना रिकॉर्ड सफलतापूर्वक साफ़ किए गए।'
+  exportRecords:
+    success: 'गणना रिकॉर्ड सफलतापूर्वक निर्यात किए गए।'
+    fail: 'गणना रिकॉर्ड निर्यात करने में विफल।'
+    noData: 'निर्यात करने के लिए कोई गणना रिकॉर्ड नहीं।'
+    cancelled: 'रिकॉर्ड निर्यात रद्द।'
+    shareTitle: 'qcalc गणना रिकॉर्ड'
+    shareText: 'qcalc के गणना रिकॉर्ड देखें।'
+    shareDialogTitle: 'रिकॉर्ड निर्यात'
+    exportMethodTitle: 'निर्यात विधि चुनें'
+    exportMethodMessage: 'आप गणना रिकॉर्ड को डिवाइस में सहेज सकते हैं या अन्य ऐप्स के साथ साझा कर सकते हैं।'
+    saveToDevice: 'डिवाइस में सहेजें'
+    shareFile: 'साझा करें'
+    successMobile: 'फ़ाइल सफलतापूर्वक सहेजी गई। ({fileName})'
+    mobileSaveLocation: 'आप Documents फ़ोल्डर में फ़ाइल पा सकते हैं।'
+  importRecords:
+    confirmTitle: 'रिकॉर्ड आयात की पुष्टि'
+    confirmMessage: 'क्या आप वर्तमान गणना रिकॉर्ड को चयनित फ़ाइल के रिकॉर्ड से बदलना चाहते हैं?'
+    success: 'गणना रिकॉर्ड सफलतापूर्वक आयात किए गए।'
+    fail: 'गणना रिकॉर्ड आयात करने में विफल। फ़ाइल दूषित हो सकती है या गलत प्रारूप में है।'
+    cancelled: 'रिकॉर्ड आयात रद्द।'
+  ariaLabel:
+    delete_outline: 'सभी रिकॉर्ड हटाएँ'
+    back: 'पिछली स्क्रीन पर वापस जाएँ'
+    backToRecord: 'रिकॉर्ड स्क्रीन पर लौटें'
+    mainTabs: 'मुख्य टैब सूची'
+    tab: '{name} टैब'
+    subPageTitle: '{title} स्क्रीन'
+    subPageButton: '{label} बटन'
+    closeSubPage: 'उप स्क्रीन बंद करें'
+    calculatorSection: 'कैलकुलेटर अनुभाग'
+    calculatorContent: 'कैलकुलेटर सामग्री'
+    tabPanel: '{name} टैब पैनल'
+    subPageSection: 'उप स्क्रीन अनुभाग'
+    subPageContent: 'उप स्क्रीन सामग्री'
+    tabSelected: '{name} टैब चयनित'
+    tabUnselected: '{name} टैब अचयनित'
+    record: 'रिकॉर्ड स्क्रीन खोलें'
+    help: 'सहायता देखें'
+  tooltip:
+    help: 'सहायता'
+    about: 'जानकारी'
+    settings: 'सेटिंग्स'
+    deleteRecord: 'सभी रिकॉर्ड हटाएँ'
+    exportRecords: 'रिकॉर्ड निर्यात करें'
+    importRecords: 'रिकॉर्ड आयात करें'
+    search: 'खोजें'
+    menu: 'मेनू खोलें'
+    recordSwipeHelp: 'रिकॉर्ड स्क्रीन पर बाएँ स्वाइप करके मेमो जोड़ें या संपादित करें, दाएँ स्वाइप करके हटाएँ।'
+de:
+  calc: Standard
+  unit: Einheit
+  currency: Währung
+  radix: Zahlensystem
+  formula: Formel
+  help: Hilfe
+  about: Über
+  record: Verlauf
+  settings: Einstellungen
+  message:
+    fileSavedTo: '(Gespeichert unter: {path})'
+  tooltipTips: 'Tipps anzeigen.'
+  openRecordPage: 'Klicken Sie, um den Verlauf zu öffnen.'
+  tooltipHelp: 'Hilfe anzeigen.'
+  clearRecords:
+    confirmTitle: 'Verlauf löschen bestätigen'
+    confirmMessage: 'Möchten Sie wirklich alle Berechnungsverläufe löschen? Diese Aktion kann nicht rückgängig gemacht werden.'
+    success: 'Berechnungsverlauf wurde erfolgreich gelöscht.'
+  exportRecords:
+    success: 'Berechnungsverlauf wurde erfolgreich exportiert.'
+    fail: 'Export des Berechnungsverlaufs fehlgeschlagen.'
+    noData: 'Keine Berechnungsverläufe zum Exportieren vorhanden.'
+    cancelled: 'Export des Verlaufs abgebrochen.'
+    shareTitle: 'qcalc Berechnungsverlauf'
+    shareText: 'Sehen Sie sich meinen qcalc Berechnungsverlauf an.'
+    shareDialogTitle: 'Verlauf exportieren'
+    exportMethodTitle: 'Exportmethode wählen'
+    exportMethodMessage: 'Sie können den Berechnungsverlauf auf dem Gerät speichern oder mit anderen Apps teilen.'
+    saveToDevice: 'Auf Gerät speichern'
+    shareFile: 'Teilen'
+    successMobile: 'Datei erfolgreich gespeichert. ({fileName})'
+    mobileSaveLocation: 'Sie finden die Datei im Ordner Documents.'
+  importRecords:
+    confirmTitle: 'Import des Verlaufs bestätigen'
+    confirmMessage: 'Möchten Sie den aktuellen Berechnungsverlauf mit den Daten der ausgewählten Datei überschreiben?'
+    success: 'Berechnungsverlauf wurde erfolgreich importiert.'
+    fail: 'Import des Berechnungsverlaufs fehlgeschlagen. Die Datei ist möglicherweise beschädigt oder hat ein falsches Format.'
+    cancelled: 'Import des Verlaufs abgebrochen.'
+  ariaLabel:
+    delete_outline: 'Alle Verläufe löschen'
+    back: 'Zurück zur vorherigen Seite'
+    backToRecord: 'Zurück zum Verlauf'
+    mainTabs: 'Haupttabliste'
+    tab: '{name} Tab'
+    subPageTitle: '{title} Seite'
+    subPageButton: '{label} Schaltfläche'
+    closeSubPage: 'Unterseite schließen'
+    calculatorSection: 'Rechnerbereich'
+    calculatorContent: 'Rechnerinhalt'
+    tabPanel: '{name} Tab-Panel'
+    subPageSection: 'Unterseitenbereich'
+    subPageContent: 'Unterseiteninhalt'
+    tabSelected: '{name} Tab ausgewählt'
+    tabUnselected: '{name} Tab nicht ausgewählt'
+    record: 'Verlauf öffnen'
+    help: 'Hilfe anzeigen'
+  tooltip:
+    help: 'Hilfe'
+    about: 'Über'
+    settings: 'Einstellungen'
+    deleteRecord: 'Alle Verläufe löschen'
+    exportRecords: 'Verlauf exportieren'
+    importRecords: 'Verlauf importieren'
+    search: 'Suche'
+    menu: 'Menü öffnen'
+    recordSwipeHelp: 'Im Verlauf nach links wischen, um Notizen hinzuzufügen oder zu bearbeiten, nach rechts wischen, um zu löschen.'
+es:
+  calc: Básica
+  unit: Unidad
+  currency: Moneda
+  radix: Base
+  formula: Fórmula
+  help: Ayuda
+  about: Acerca de
+  record: Historial
+  settings: Configuración
+  message:
+    fileSavedTo: '(Guardado en: {path})'
+  tooltipTips: 'Mostrar consejos.'
+  openRecordPage: 'Haga clic para abrir la pantalla de historial.'
+  tooltipHelp: 'Mostrar ayuda.'
+  clearRecords:
+    confirmTitle: 'Confirmar eliminación del historial'
+    confirmMessage: '¿Está seguro de que desea eliminar todo el historial de cálculos? Esta acción no se puede deshacer.'
+    success: 'El historial de cálculos se ha eliminado correctamente.'
+  exportRecords:
+    success: 'El historial de cálculos se ha exportado correctamente.'
+    fail: 'Error al exportar el historial de cálculos.'
+    noData: 'No hay historial de cálculos para exportar.'
+    cancelled: 'Exportación del historial cancelada.'
+    shareTitle: 'Historial de cálculos de qcalc'
+    shareText: 'Consulte mi historial de cálculos de qcalc.'
+    shareDialogTitle: 'Exportar historial'
+    exportMethodTitle: 'Elegir método de exportación'
+    exportMethodMessage: 'Puede guardar el historial de cálculos en el dispositivo o compartirlo con otras aplicaciones.'
+    saveToDevice: 'Guardar en dispositivo'
+    shareFile: 'Compartir'
+    successMobile: 'Archivo guardado correctamente. ({fileName})'
+    mobileSaveLocation: 'Puede encontrar el archivo en la carpeta Documents.'
+  importRecords:
+    confirmTitle: 'Confirmar importación del historial'
+    confirmMessage: '¿Está seguro de que desea sobrescribir el historial actual con los registros del archivo seleccionado?'
+    success: 'El historial de cálculos se ha importado correctamente.'
+    fail: 'Error al importar el historial de cálculos. El archivo puede estar dañado o tener un formato incorrecto.'
+    cancelled: 'Importación del historial cancelada.'
+  ariaLabel:
+    delete_outline: 'Eliminar todo el historial'
+    back: 'Volver a la pantalla anterior'
+    backToRecord: 'Volver a la pantalla de historial'
+    mainTabs: 'Lista de pestañas principales'
+    tab: 'Pestaña {name}'
+    subPageTitle: 'Pantalla {title}'
+    subPageButton: 'Botón {label}'
+    closeSubPage: 'Cerrar subpantalla'
+    calculatorSection: 'Sección de calculadora'
+    calculatorContent: 'Contenido de calculadora'
+    tabPanel: 'Panel de pestaña {name}'
+    subPageSection: 'Sección de subpantalla'
+    subPageContent: 'Contenido de subpantalla'
+    tabSelected: 'Pestaña {name} seleccionada'
+    tabUnselected: 'Pestaña {name} no seleccionada'
+    record: 'Abrir pantalla de historial'
+    help: 'Ver ayuda'
+  tooltip:
+    help: 'Ayuda'
+    about: 'Acerca de'
+    settings: 'Configuración'
+    deleteRecord: 'Eliminar todo el historial'
+    exportRecords: 'Exportar historial'
+    importRecords: 'Importar historial'
+    search: 'Buscar'
+    menu: 'Abrir menú'
+    recordSwipeHelp: 'Deslice hacia la izquierda para agregar o editar notas, deslice hacia la derecha para eliminar registros.'
+fr:
+  calc: Base
+  unit: Unité
+  currency: Devise
+  radix: Base numérique
+  formula: Formule
+  help: Aide
+  about: À propos
+  record: Historique
+  settings: Paramètres
+  message:
+    fileSavedTo: '(Enregistré dans : {path})'
+  tooltipTips: 'Afficher les astuces.'
+  openRecordPage: "Cliquez pour ouvrir l'écran d'historique."
+  tooltipHelp: "Afficher l'aide."
+  clearRecords:
+    confirmTitle: "Confirmer la suppression de l'historique"
+    confirmMessage: "Êtes-vous sûr de vouloir supprimer tout l'historique des calculs ? Cette action est irréversible."
+    success: "L'historique des calculs a été supprimé avec succès."
+  exportRecords:
+    success: "L'historique des calculs a été exporté avec succès."
+    fail: "Échec de l'exportation de l'historique des calculs."
+    noData: "Aucun historique de calcul à exporter."
+    cancelled: "Exportation de l'historique annulée."
+    shareTitle: 'Historique de calculs qcalc'
+    shareText: 'Consultez mon historique de calculs qcalc.'
+    shareDialogTitle: "Exporter l'historique"
+    exportMethodTitle: "Choisir la méthode d'exportation"
+    exportMethodMessage: "Vous pouvez enregistrer l'historique des calculs sur l'appareil ou le partager avec d'autres applications."
+    saveToDevice: "Enregistrer sur l'appareil"
+    shareFile: 'Partager'
+    successMobile: 'Fichier enregistré avec succès. ({fileName})'
+    mobileSaveLocation: 'Vous pouvez trouver le fichier dans le dossier Documents.'
+  importRecords:
+    confirmTitle: "Confirmer l'importation de l'historique"
+    confirmMessage: "Êtes-vous sûr de vouloir remplacer l'historique actuel par les enregistrements du fichier sélectionné ?"
+    success: "L'historique des calculs a été importé avec succès."
+    fail: "Échec de l'importation de l'historique des calculs. Le fichier est peut-être corrompu ou dans un format incorrect."
+    cancelled: "Importation de l'historique annulée."
+  ariaLabel:
+    delete_outline: "Supprimer tout l'historique"
+    back: "Retour à l'écran précédent"
+    backToRecord: "Retour à l'écran d'historique"
+    mainTabs: 'Liste des onglets principaux'
+    tab: 'Onglet {name}'
+    subPageTitle: 'Écran {title}'
+    subPageButton: 'Bouton {label}'
+    closeSubPage: "Fermer le sous-écran"
+    calculatorSection: 'Section calculatrice'
+    calculatorContent: 'Contenu calculatrice'
+    tabPanel: 'Panneau onglet {name}'
+    subPageSection: 'Section sous-écran'
+    subPageContent: 'Contenu sous-écran'
+    tabSelected: 'Onglet {name} sélectionné'
+    tabUnselected: 'Onglet {name} non sélectionné'
+    record: "Ouvrir l'écran d'historique"
+    help: "Voir l'aide"
+  tooltip:
+    help: 'Aide'
+    about: 'À propos'
+    settings: 'Paramètres'
+    deleteRecord: "Supprimer tout l'historique"
+    exportRecords: "Exporter l'historique"
+    importRecords: "Importer l'historique"
+    search: 'Rechercher'
+    menu: 'Ouvrir le menu'
+    recordSwipeHelp: "Glissez vers la gauche pour ajouter ou modifier des notes, glissez vers la droite pour supprimer des enregistrements."

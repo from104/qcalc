@@ -383,4 +383,89 @@ ja:
     trig: '三角関数'
     constants: '定数'
     other: 'その他'
+zh:
+  expressionPlaceholder: '输入表达式 (例: (1+3)*5)'
+  editExpression: '编辑表达式 (Space)'
+  clearExpression: '清除表达式'
+  formulaEvaluationError: '公式求值错误。请检查您的表达式。'
+  ariaLabel:
+    expressionField: '公式输入字段'
+  help:
+    title: 'mathjs 参考'
+    atHint: '替换为当前计算器值'
+    dollarHint: '替换为内存值'
+    docsLink: 'mathjs 官方文档'
+    arithmetic: '算术'
+    functions: '函数'
+    trig: '三角函数'
+    constants: '常数'
+    other: '其他'
+hi:
+  expressionPlaceholder: 'अभिव्यक्ति दर्ज करें (उदा: (1+3)*5)'
+  editExpression: 'अभिव्यक्ति संपादित करें (Space)'
+  clearExpression: 'अभिव्यक्ति साफ़ करें'
+  formulaEvaluationError: 'सूत्र मूल्यांकन त्रुटि। कृपया अपनी अभिव्यक्ति जाँचें।'
+  ariaLabel:
+    expressionField: 'सूत्र इनपुट फ़ील्ड'
+  help:
+    title: 'mathjs संदर्भ'
+    atHint: 'वर्तमान कैलकुलेटर मान से प्रतिस्थापित'
+    dollarHint: 'मेमोरी मान से प्रतिस्थापित'
+    docsLink: 'mathjs दस्तावेज़ीकरण'
+    arithmetic: 'अंकगणित'
+    functions: 'फ़ंक्शन'
+    trig: 'त्रिकोणमिति'
+    constants: 'स्थिरांक'
+    other: 'अन्य'
+de:
+  expressionPlaceholder: 'Ausdruck eingeben (z.B. (1+3)*5)'
+  editExpression: 'Ausdruck bearbeiten (Space)'
+  clearExpression: 'Ausdruck löschen'
+  formulaEvaluationError: 'Formelauswertungsfehler. Bitte überprüfen Sie Ihren Ausdruck.'
+  ariaLabel:
+    expressionField: 'Formeleingabefeld'
+  help:
+    title: 'mathjs Referenz'
+    atHint: 'Aktueller Rechnerwert'
+    dollarHint: 'Speicherwert'
+    docsLink: 'mathjs Dokumentation'
+    arithmetic: 'Arithmetik'
+    functions: 'Funktionen'
+    trig: 'Trigonometrie'
+    constants: 'Konstanten'
+    other: 'Sonstige'
+es:
+  expressionPlaceholder: 'Ingrese expresión (ej: (1+3)*5)'
+  editExpression: 'Editar expresión (Space)'
+  clearExpression: 'Borrar expresión'
+  formulaEvaluationError: 'Error de evaluación de fórmula. Verifique su expresión.'
+  ariaLabel:
+    expressionField: 'Campo de entrada de fórmula'
+  help:
+    title: 'Referencia mathjs'
+    atHint: 'Valor actual de la calculadora'
+    dollarHint: 'Valor de memoria'
+    docsLink: 'Documentación de mathjs'
+    arithmetic: 'Aritmética'
+    functions: 'Funciones'
+    trig: 'Trigonometría'
+    constants: 'Constantes'
+    other: 'Otros'
+fr:
+  expressionPlaceholder: 'Entrez une expression (ex: (1+3)*5)'
+  editExpression: "Modifier l'expression (Space)"
+  clearExpression: "Effacer l'expression"
+  formulaEvaluationError: "Erreur d'évaluation de formule. Veuillez vérifier votre expression."
+  ariaLabel:
+    expressionField: 'Champ de saisie de formule'
+  help:
+    title: 'Référence mathjs'
+    atHint: 'Valeur actuelle de la calculatrice'
+    dollarHint: 'Valeur mémoire'
+    docsLink: 'Documentation mathjs'
+    arithmetic: 'Arithmétique'
+    functions: 'Fonctions'
+    trig: 'Trigonométrie'
+    constants: 'Constantes'
+    other: 'Autres'
 </i18n>

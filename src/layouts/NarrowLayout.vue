@@ -141,7 +141,7 @@
           v-if="overflowTabs.length > 0"
           flat
           dense
-          icon="more_horiz"
+          icon="expand_more"
           class="q-px-xs overflow-menu-btn"
           :color="isOverflowActive ? 'secondary' : undefined"
         >

@@ -132,4 +132,76 @@ en:
     For more information, click 'View Issue' to visit the GitHub issue page.
   confirm: 'Confirm'
   viewIssue: 'View Issue'
+ja:
+  snapNoticeTitle: 'Snap環境のお知らせ'
+  snapFirstRun: |
+    Snapのstrictモードでのfontconfigキャッシュの問題により、初回起動時に遅延が発生する場合があります。
+
+    一部のシステムダイアログでフォントが四角(□)で表示される場合がありますが、強制終了せずにしばらくお待ちください。
+
+    以降の起動は正常に動作します。
+
+    詳細は「Issue を見る」ボタンをクリックしてGitHub issueページをご確認ください。
+  confirm: '確認'
+  viewIssue: 'Issue を見る'
+zh:
+  snapNoticeTitle: 'Snap 环境提示'
+  snapFirstRun: |
+    由于 Snap strict 模式中的 fontconfig 缓存问题，首次启动时可能会出现延迟。
+
+    某些系统对话框中的字体可能显示为方块(□)，请不要强制退出，请稍等片刻。
+
+    后续启动将正常运行。
+
+    有关更多信息，请点击"查看问题"访问 GitHub 问题页面。
+  confirm: '确认'
+  viewIssue: '查看问题'
+hi:
+  snapNoticeTitle: 'Snap वातावरण सूचना'
+  snapFirstRun: |
+    Snap strict मोड में fontconfig कैश समस्याओं के कारण प्रारंभिक लॉन्च में देरी हो सकती है।
+
+    कुछ सिस्टम डायलॉग में फ़ॉन्ट वर्गों (□) के रूप में दिखाई दे सकते हैं, कृपया बलपूर्वक बंद न करें और थोड़ा प्रतीक्षा करें।
+
+    बाद के लॉन्च सामान्य रूप से काम करेंगे।
+
+    अधिक जानकारी के लिए 'समस्या देखें' बटन पर क्लिक करें।
+  confirm: 'पुष्टि करें'
+  viewIssue: 'समस्या देखें'
+de:
+  snapNoticeTitle: 'Snap-Umgebungshinweis'
+  snapFirstRun: |
+    Aufgrund von Fontconfig-Cache-Problemen im Snap-Strict-Modus kann es beim ersten Start zu Verzögerungen kommen.
+
+    In einigen Systemdialogen werden Schriftarten möglicherweise als Quadrate (□) angezeigt. Bitte erzwingen Sie keinen Abbruch und warten Sie einen Moment.
+
+    Nachfolgende Starts funktionieren normal.
+
+    Weitere Informationen finden Sie auf der GitHub-Issue-Seite über die Schaltfläche „Issue anzeigen".
+  confirm: 'Bestätigen'
+  viewIssue: 'Issue anzeigen'
+es:
+  snapNoticeTitle: 'Aviso del entorno Snap'
+  snapFirstRun: |
+    Debido a problemas de caché de fontconfig en el modo estricto de Snap, puede haber un retraso durante el primer inicio.
+
+    Algunos diálogos del sistema pueden mostrar fuentes como cuadrados (□), por favor no fuerce el cierre y espere un momento.
+
+    Los inicios posteriores funcionarán normalmente.
+
+    Para más información, haga clic en 'Ver problema' para visitar la página de problemas de GitHub.
+  confirm: 'Confirmar'
+  viewIssue: 'Ver problema'
+fr:
+  snapNoticeTitle: "Avis sur l'environnement Snap"
+  snapFirstRun: |
+    En raison de problèmes de cache fontconfig en mode strict Snap, il peut y avoir un délai lors du premier lancement.
+
+    Certaines boîtes de dialogue système peuvent afficher les polices sous forme de carrés (□), veuillez ne pas forcer la fermeture et patienter un instant.
+
+    Les lancements suivants fonctionneront normalement.
+
+    Pour plus d'informations, cliquez sur « Voir le problème » pour visiter la page GitHub.
+  confirm: 'Confirmer'
+  viewIssue: 'Voir le problème'
 </i18n>

@@ -13,12 +13,25 @@
   import HelpMdEn from '../content/pages/HelpPage-en.md';
   import HelpMdKo from '../content/pages/HelpPage-ko.md';
   import HelpMdJa from '../content/pages/HelpPage-ja.md';
+  import HelpMdZh from '../content/pages/HelpPage-zh.md';
+  import HelpMdHi from '../content/pages/HelpPage-hi.md';
+  import HelpMdDe from '../content/pages/HelpPage-de.md';
+  import HelpMdEs from '../content/pages/HelpPage-es.md';
+  import HelpMdFr from '../content/pages/HelpPage-fr.md';
+
+  const helpMdMap: Record<string, string> = {
+    ko: HelpMdKo,
+    ja: HelpMdJa,
+    zh: HelpMdZh,
+    hi: HelpMdHi,
+    de: HelpMdDe,
+    es: HelpMdEs,
+    fr: HelpMdFr,
+  };
 
   const currentMd = computed(() => {
     const lang = locale.value.substring(0, 2);
-    if (lang === 'ko') return HelpMdKo;
-    if (lang === 'ja') return HelpMdJa;
-    return HelpMdEn;
+    return helpMdMap[lang] ?? HelpMdEn;
   });
 
   interface HelpSection {
@@ -131,4 +144,44 @@ ja:
     '2': '通貨'
     '3': '進数'
     '4': '数式'
+zh:
+  title: '帮助'
+  calc:
+    '0': '标准'
+    '1': '单位'
+    '2': '汇率'
+    '3': '进制'
+    '4': '公式'
+hi:
+  title: 'सहायता'
+  calc:
+    '0': 'मानक'
+    '1': 'इकाई'
+    '2': 'मुद्रा'
+    '3': 'आधार'
+    '4': 'सूत्र'
+de:
+  title: 'Hilfe'
+  calc:
+    '0': 'Standard'
+    '1': 'Einheit'
+    '2': 'Währung'
+    '3': 'Zahlensystem'
+    '4': 'Formel'
+es:
+  title: 'Ayuda'
+  calc:
+    '0': 'Estándar'
+    '1': 'Unidad'
+    '2': 'Moneda'
+    '3': 'Base'
+    '4': 'Fórmula'
+fr:
+  title: 'Aide'
+  calc:
+    '0': 'Standard'
+    '1': 'Unité'
+    '2': 'Devise'
+    '3': 'Base numérique'
+    '4': 'Formule'
 </i18n>

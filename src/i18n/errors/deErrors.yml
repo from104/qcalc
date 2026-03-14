@@ -1,0 +1,47 @@
+calc:
+  invalid_digit: 'Ungültige Ziffer für aktuelles Zahlensystem'
+  constant_not_found: 'Die angeforderte mathematische Konstante wurde nicht gefunden'
+  invalid_radix: 'Ungültiger Zahlensystemwert'
+  no_memory: 'Kein Wert im Speicher gespeichert'
+  failed_to_add_record_item: 'Verlaufseintrag konnte nicht hinzugefügt werden: {error}'
+  failed_to_delete_record_item: 'Verlaufseintrag konnte nicht gelöscht werden: {error}'
+  invalid_record_index: 'Ungültiger Verlaufsindex'
+  record_not_found: 'Der angeforderte Verlaufseintrag wurde nicht gefunden'
+  invalid_operation: 'Ungültige Operation'
+  memory_operation_failed: 'Speicheroperation fehlgeschlagen'
+radix:
+  invalid_radix: 'Ungültiger Zahlensystemwert'
+  invalid_number: 'Ungültige Zahl für Zahlensystem {radix}: {number}'
+currency:
+  exchange_rates_not_available: 'Wechselkurse sind nicht verfügbar'
+  invalid_currency: 'Ungültige Währung'
+  invalid_base_currency: 'Ungültige Basiswährung'
+  conversion_failed: 'Währungsumrechnung fehlgeschlagen'
+unit:
+  invalid_category: 'Ungültige Einheitenkategorie: {category}'
+  invalid_unit: 'Ungültige Einheit: {unit}'
+  invalid_format: 'Ungültiges Elementformat. Verwenden Sie "category.unit"'
+  no_units_found: 'Keine Einheiten für Kategorie gefunden: {category}'
+  conversion_failed: 'Einheitenumrechnung fehlgeschlagen'
+  invalid_base_value: 'Basiswert konnte nicht berechnet werden'
+component:
+  clipboard:
+    copy_failed: 'Kopieren in die Zwischenablage fehlgeschlagen'
+    paste_failed: 'Einfügen aus der Zwischenablage fehlgeschlagen'
+  update:
+    check_failed: 'Updateprüfung fehlgeschlagen'
+    download_failed: 'Update-Download fehlgeschlagen'
+    install_failed: 'Update-Installation fehlgeschlagen'
+  navigation:
+    route_not_found: 'Angeforderte Seite nicht gefunden'
+    invalid_route: 'Ungültige Seitenanforderung'
+math:
+  divide_by_zero: 'Division durch Null ist nicht möglich'
+  negative_factorial: 'Die Fakultät einer negativen Zahl ist nicht erlaubt'
+  division_error: 'Bei der Division ist ein Fehler aufgetreten'
+  negative_root: 'Die Wurzel einer negativen Zahl ist nicht erlaubt'
+  negative_root_index: 'Negative Wurzeln werden nicht unterstützt'
+  negative_bit_operation: 'Negative Zahlen sind bei Bitoperationen nicht erlaubt'
+  overflow: 'Operationsergebnis überschreitet den erlaubten Bereich'
+  invalid_operation: 'Ungültige mathematische Operation'
+unknown: 'Ein unbekannter Fehler ist aufgetreten: {error}'

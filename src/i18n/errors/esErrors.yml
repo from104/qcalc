@@ -1,0 +1,47 @@
+calc:
+  invalid_digit: 'Dígito inválido para la base actual'
+  constant_not_found: 'No se encontró la constante matemática solicitada'
+  invalid_radix: 'Valor de base inválido'
+  no_memory: 'No hay valor almacenado en la memoria'
+  failed_to_add_record_item: 'Error al agregar elemento del historial: {error}'
+  failed_to_delete_record_item: 'Error al eliminar elemento del historial: {error}'
+  invalid_record_index: 'Índice de historial inválido'
+  record_not_found: 'No se encontró el elemento del historial solicitado'
+  invalid_operation: 'Operación inválida'
+  memory_operation_failed: 'Operación de memoria fallida'
+radix:
+  invalid_radix: 'Valor de base inválido'
+  invalid_number: 'Número inválido para base {radix}: {number}'
+currency:
+  exchange_rates_not_available: 'Las tasas de cambio no están disponibles'
+  invalid_currency: 'Moneda inválida'
+  invalid_base_currency: 'Moneda base inválida'
+  conversion_failed: 'Conversión de moneda fallida'
+unit:
+  invalid_category: 'Categoría de unidad inválida: {category}'
+  invalid_unit: 'Unidad inválida: {unit}'
+  invalid_format: 'Formato de elemento inválido. Use "category.unit"'
+  no_units_found: 'No se encontraron unidades para la categoría: {category}'
+  conversion_failed: 'Conversión de unidad fallida'
+  invalid_base_value: 'Error al calcular el valor base'
+component:
+  clipboard:
+    copy_failed: 'Error al copiar al portapapeles'
+    paste_failed: 'Error al pegar desde el portapapeles'
+  update:
+    check_failed: 'Error al buscar actualizaciones'
+    download_failed: 'Error al descargar la actualización'
+    install_failed: 'Error al instalar la actualización'
+  navigation:
+    route_not_found: 'Página solicitada no encontrada'
+    invalid_route: 'Solicitud de página inválida'
+math:
+  divide_by_zero: 'No se puede dividir por cero'
+  negative_factorial: 'El factorial de un número negativo no está permitido'
+  division_error: 'Ocurrió un error durante la división'
+  negative_root: 'La raíz de un número negativo no está permitida'
+  negative_root_index: 'Las raíces negativas no son compatibles'
+  negative_bit_operation: 'Los números negativos no están permitidos en operaciones de bits'
+  overflow: 'El resultado de la operación excede el rango permitido'
+  invalid_operation: 'Operación matemática inválida'
+unknown: 'Ocurrió un error desconocido: {error}'

@@ -263,4 +263,174 @@ ja:
       caption: 'アプリの紹介'
   ariaLabel:
     menu: 'メインメニュー'
+zh:
+  item:
+    calc:
+      title: '计算器'
+      caption: '计算器'
+    unit:
+      title: '单位转换'
+      caption: '单位转换器'
+    currency:
+      title: '货币兑换'
+      caption: '货币兑换器'
+    radix:
+      title: '进制转换'
+      caption: '进制转换器'
+    formula:
+      title: '公式计算器'
+      caption: '公式计算器'
+    record:
+      title: '记录'
+      caption: '记录页面'
+    settings:
+      title: '设置'
+      caption: '设置'
+    tips:
+      title: '提示'
+      caption: '提示对话框'
+    help:
+      title: '帮助'
+      caption: '功能和用法'
+    about:
+      title: '关于'
+      caption: '关于应用'
+  ariaLabel:
+    menu: '主菜单'
+hi:
+  item:
+    calc:
+      title: 'कैलकुलेटर'
+      caption: 'कैलकुलेटर'
+    unit:
+      title: 'इकाई रूपांतरण'
+      caption: 'इकाई रूपांतरक'
+    currency:
+      title: 'मुद्रा रूपांतरण'
+      caption: 'मुद्रा रूपांतरक'
+    radix:
+      title: 'आधार रूपांतरण'
+      caption: 'आधार रूपांतरक'
+    formula:
+      title: 'सूत्र कैलकुलेटर'
+      caption: 'सूत्र कैलकुलेटर'
+    record:
+      title: 'रिकॉर्ड'
+      caption: 'रिकॉर्ड स्क्रीन'
+    settings:
+      title: 'सेटिंग्स'
+      caption: 'सेटिंग्स'
+    tips:
+      title: 'सुझाव'
+      caption: 'सुझाव डायलॉग'
+    help:
+      title: 'सहायता'
+      caption: 'सुविधाएँ और उपयोग'
+    about:
+      title: 'जानकारी'
+      caption: 'ऐप के बारे में'
+  ariaLabel:
+    menu: 'मुख्य मेनू'
+de:
+  item:
+    calc:
+      title: 'Rechner'
+      caption: 'Rechner'
+    unit:
+      title: 'Einheitenumrechnung'
+      caption: 'Einheitenumrechner'
+    currency:
+      title: 'Währungsumrechnung'
+      caption: 'Währungsumrechner'
+    radix:
+      title: 'Zahlensystemumrechnung'
+      caption: 'Zahlensystemumrechner'
+    formula:
+      title: 'Formelrechner'
+      caption: 'Formelrechner'
+    record:
+      title: 'Verlauf'
+      caption: 'Verlaufsseite'
+    settings:
+      title: 'Einstellungen'
+      caption: 'Einstellungen'
+    tips:
+      title: 'Tipps'
+      caption: 'Tipps-Dialog'
+    help:
+      title: 'Hilfe'
+      caption: 'Funktionen und Nutzung'
+    about:
+      title: 'Über'
+      caption: 'Über die App'
+  ariaLabel:
+    menu: 'Hauptmenü'
+es:
+  item:
+    calc:
+      title: 'Calculadora'
+      caption: 'Calculadora'
+    unit:
+      title: 'Conversión de unidades'
+      caption: 'Conversor de unidades'
+    currency:
+      title: 'Conversión de moneda'
+      caption: 'Conversor de moneda'
+    radix:
+      title: 'Conversión de base'
+      caption: 'Conversor de base'
+    formula:
+      title: 'Calculadora de fórmulas'
+      caption: 'Calculadora de fórmulas'
+    record:
+      title: 'Historial'
+      caption: 'Pantalla de historial'
+    settings:
+      title: 'Configuración'
+      caption: 'Configuración'
+    tips:
+      title: 'Consejos'
+      caption: 'Diálogo de consejos'
+    help:
+      title: 'Ayuda'
+      caption: 'Funciones y uso'
+    about:
+      title: 'Acerca de'
+      caption: 'Acerca de la aplicación'
+  ariaLabel:
+    menu: 'Menú principal'
+fr:
+  item:
+    calc:
+      title: 'Calculatrice'
+      caption: 'Calculatrice'
+    unit:
+      title: "Conversion d'unités"
+      caption: "Convertisseur d'unités"
+    currency:
+      title: 'Conversion de devises'
+      caption: 'Convertisseur de devises'
+    radix:
+      title: 'Conversion de base'
+      caption: 'Convertisseur de base'
+    formula:
+      title: 'Calculatrice de formules'
+      caption: 'Calculatrice de formules'
+    record:
+      title: 'Historique'
+      caption: "Écran d'historique"
+    settings:
+      title: 'Paramètres'
+      caption: 'Paramètres'
+    tips:
+      title: 'Astuces'
+      caption: "Dialogue d'astuces"
+    help:
+      title: 'Aide'
+      caption: 'Fonctions et utilisation'
+    about:
+      title: 'À propos'
+      caption: "À propos de l'application"
+  ariaLabel:
+    menu: 'Menu principal'
 </i18n>
