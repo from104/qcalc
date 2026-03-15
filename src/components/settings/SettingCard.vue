@@ -660,6 +660,7 @@
             map-options
             options-dense
             :disable="!radixStore.showRadix"
+            :aria-label="t('ariaLabel.radixType')"
             :label-color="selectTextColor"
             :options-selected-class="`text-${selectTextColor}`"
             :popup-content-class="`bg-${selectBackgroundColor} noselect`"
