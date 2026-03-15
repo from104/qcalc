@@ -289,7 +289,7 @@
     @extend .scrollable-content;
     max-height: 300px;
     margin: 8px 0;
-    background: rgba(var(--q-primary-rgb), 0.05);
+    background: color-mix(in srgb, var(--q-primary) 5%, transparent);
 
     @media (max-width: 599px) {
       max-height: 200px;

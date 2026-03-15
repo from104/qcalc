@@ -468,8 +468,7 @@
         glossy
         color="secondary"
         icon="publish"
-        class="fixed"
-        :class="uiStore.isSearchOpen ? 'q-ma-xl' : 'q-ma-md'"
+        class="fixed q-ma-md"
         style="z-index: 15"
         :aria-label="t('ariaLabel.scrollToTop')"
         @click="scrollToRecord('top')"

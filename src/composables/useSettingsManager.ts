@@ -32,7 +32,7 @@ type StoreKeys = keyof typeof stores;
 
 export function useSettingsManager() {
   const $q = useQuasar();
-  const { t } = useI18n();
+  const { t } = useI18n({ useScope: 'global' });
   const $g = window.globalVars;
 
   const gatherSettings = (): Record<StoreKeys, unknown> => {
@@ -46,7 +46,13 @@ export function useSettingsManager() {
         showSymbol: state.showSymbol,
         favoriteCurrencies: state.favoriteCurrencies,
       }),
-      radix: (state) => ({ wordSize: state.wordSize, sourceRadix: state.sourceRadix, targetRadix: state.targetRadix, showRadix: state.showRadix, radixType: state.radixType }),
+      radix: (state) => ({
+        wordSize: state.wordSize,
+        sourceRadix: state.sourceRadix,
+        targetRadix: state.targetRadix,
+        showRadix: state.showRadix,
+        radixType: state.radixType,
+      }),
       unit: (state) => ({ ...state }),
       ui: (state) => ({ showTips: state.showTips, showTipsDialog: state.showTipsDialog, currentTab: state.currentTab }),
     };

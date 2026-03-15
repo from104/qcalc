@@ -15,7 +15,7 @@ import { Share } from '@capacitor/share';
 
 export function useRecordManager() {
   const $q = useQuasar();
-  const { t } = useI18n();
+  const { t } = useI18n({ useScope: 'global' });
   const calcStore = useCalcStore();
   const uiStore = useUIStore();
   const $g = window.globalVars;

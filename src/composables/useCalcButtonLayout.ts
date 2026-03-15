@@ -83,7 +83,7 @@ export function useCalcButtonLayout(type: () => string, currentTab: () => string
 
   const labelScalingFactor = computed(() => {
     if ($g.isCapacitor) {
-      logDev('window.textZoom: ', $g.textZoom);
+      // logDev('window.textZoom: ', $g.textZoom);
       return $g.textZoom / 100;
     }
     const screenWidthPx = screenWidth.value;

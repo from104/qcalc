@@ -89,27 +89,27 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@capacitor/android@npm:7.6.0":
-  version: 7.6.0
-  resolution: "@capacitor/android@npm:7.6.0"
+"@capacitor/android@npm:8.2.0":
+  version: 8.2.0
+  resolution: "@capacitor/android@npm:8.2.0"
   peerDependencies:
-    "@capacitor/core": ^7.6.0
-  checksum: 10/1a80c6d12236ebf23521680f1705569ceabd53236a5a3978b3ebe005d6000c028b81d16abf25bac757287dc9906d86bc335ce9e60de15671fc864a293f0fc218
+    "@capacitor/core": ^8.2.0
+  checksum: 10/73fefd2df483cfca1989f51e7b99e83d5c294282b7ef7f5f8fe8a2f170e141446c0f8e5f8b1c5ee9335dd98408ab6bc188f70cea71874d74c717c4828ade99de
   languageName: node
   linkType: hard
 
-"@capacitor/app@npm:7.1.2":
-  version: 7.1.2
-  resolution: "@capacitor/app@npm:7.1.2"
+"@capacitor/app@npm:8.0.1":
+  version: 8.0.1
+  resolution: "@capacitor/app@npm:8.0.1"
   peerDependencies:
-    "@capacitor/core": ">=7.0.0"
-  checksum: 10/f48ebfca4e86cbf578a893cbfc9136b70af85a42638048467b32a68a98548b0713d524f7fe24ed0172acaa8d94324d185ba4e2d6e83608da84ce79f1cb38aafe
+    "@capacitor/core": ">=8.0.0"
+  checksum: 10/f36e1bbeecc6f99dd9a6f67ab6aa19cf73ea680d95b23afee3c3e7f9736d6c37cce1ad0afab3595023636d38556002e5164a1bbe75e2e70571293a1d04102c88
   languageName: node
   linkType: hard
 
-"@capacitor/cli@npm:7.6.0":
-  version: 7.6.0
-  resolution: "@capacitor/cli@npm:7.6.0"
+"@capacitor/cli@npm:8.2.0":
+  version: 8.2.0
+  resolution: "@capacitor/cli@npm:8.2.0"
   dependencies:
     "@ionic/cli-framework-output": "npm:^2.2.8"
     "@ionic/utils-subprocess": "npm:^3.0.1"
@@ -131,20 +131,11 @@ __metadata:
   bin:
     cap: bin/capacitor
     capacitor: bin/capacitor
-  checksum: 10/87d5a765df53548814b5aac2da15f4bd53fb0b5bd400e6837f906d7a486e59f88a0e67891a12f31c1acf89a210703396d5a90744aa68794aae04ca6ef47beba3
+  checksum: 10/4e5ef67a9352333b86d87df2dc5b455fb8ce544ee550446926f6916714adb7753c96f9941d974c3f2874ba390c3b962c778747a2f2353121f9c5b17aeac6de28
   languageName: node
   linkType: hard
 
-"@capacitor/core@npm:7.6.0":
-  version: 7.6.0
-  resolution: "@capacitor/core@npm:7.6.0"
-  dependencies:
-    tslib: "npm:^2.1.0"
-  checksum: 10/7eb5e45e8e5a39852b758c0fe3fab62df4af7ad903dd286395bdb1408a46eac0eb1a6c36d34b94f66f7c7263f026b543325fd973adf93ed0886d1b27b62c9f99
-  languageName: node
-  linkType: hard
-
-"@capacitor/core@npm:^8.0.0":
+"@capacitor/core@npm:8.2.0, @capacitor/core@npm:^8.0.0":
   version: 8.2.0
   resolution: "@capacitor/core@npm:8.2.0"
   dependencies:
@@ -153,54 +144,54 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@capacitor/filesystem@npm:7.1.8":
-  version: 7.1.8
-  resolution: "@capacitor/filesystem@npm:7.1.8"
+"@capacitor/filesystem@npm:8.1.2":
+  version: 8.1.2
+  resolution: "@capacitor/filesystem@npm:8.1.2"
   dependencies:
-    "@capacitor/synapse": "npm:^1.0.3"
+    "@capacitor/synapse": "npm:^1.0.4"
   peerDependencies:
-    "@capacitor/core": ">=7.0.0"
-  checksum: 10/3f5e7129a39cb6f5250b463be0faaa0456afb91fed36df48abae7675b6f83d6b5f3f3e502d2985c23b2ab8e841f334c01b555e04976214f9be9c486e4044f830
+    "@capacitor/core": ">=8.0.0"
+  checksum: 10/219fe963f670c6bb1fcb6fba7d072c82676926032cfb2b13b46d56c258405e08edb5a04518452f100d5e26e6115a8bfdc6690864d09376996c0e2a046b0c33ef
   languageName: node
   linkType: hard
 
-"@capacitor/haptics@npm:7.0.4":
-  version: 7.0.4
-  resolution: "@capacitor/haptics@npm:7.0.4"
+"@capacitor/haptics@npm:8.0.1":
+  version: 8.0.1
+  resolution: "@capacitor/haptics@npm:8.0.1"
   peerDependencies:
-    "@capacitor/core": ">=7.0.0"
-  checksum: 10/a0e2acf6656aaffb6ed306dbb1beaf173e132c11db538792f94f56608276198251e0ade8d998b59ca428b0f96db65421f5e73ae52bdb321cbe6e580a763c0b0d
+    "@capacitor/core": ">=8.0.0"
+  checksum: 10/64d1ed5088d39d4295f45ff37100f1bacaadefb21f58f98560fb6df326b1f943c96a3ad42e231cf29fc3dc9acb22af61cea759d2aad4bae0d5eb23a8286ebb49
   languageName: node
   linkType: hard
 
-"@capacitor/screen-orientation@npm:7.0.4":
-  version: 7.0.4
-  resolution: "@capacitor/screen-orientation@npm:7.0.4"
+"@capacitor/screen-orientation@npm:8.0.1":
+  version: 8.0.1
+  resolution: "@capacitor/screen-orientation@npm:8.0.1"
   peerDependencies:
-    "@capacitor/core": ">=7.0.0"
-  checksum: 10/604783637766c061aefe20b2b5c5e3303553e065eb7c4fbd0bb329d755434326cd1e0b0628f8118adb0df489848ce71dca27ccaecf865b8b16aa89e10ff77a70
+    "@capacitor/core": ">=8.0.0"
+  checksum: 10/28f90e7247b6868a3cf87402a520514e153adaaa36ce2f597a7ba33d07def7fdb3314ca283a3fd231399abcfc2733d813629785b2bc7de304fc5bfda098b0eed
   languageName: node
   linkType: hard
 
-"@capacitor/share@npm:^7.0.4":
-  version: 7.0.4
-  resolution: "@capacitor/share@npm:7.0.4"
+"@capacitor/share@npm:8.0.1":
+  version: 8.0.1
+  resolution: "@capacitor/share@npm:8.0.1"
   peerDependencies:
-    "@capacitor/core": ">=7.0.0"
-  checksum: 10/7a50cf42405245e5fda7c6dd2bcfd5b44a37afbffd3b6afd46f3d91d0c7f0a71a556f3a7a6d49094d7deb27fee503b6e0e743f978ed194e1c5908c6aed193368
+    "@capacitor/core": ">=8.0.0"
+  checksum: 10/87d7adfc5a2485f628bb07f2625a63fbe05399d15f3fad635637f8fc054fd2c2a4c281af1c2eb452ee5adf5f28041dd248b4d3881c726e3a80cb9751840d57c5
   languageName: node
   linkType: hard
 
-"@capacitor/status-bar@npm:7.0.5":
-  version: 7.0.5
-  resolution: "@capacitor/status-bar@npm:7.0.5"
+"@capacitor/status-bar@npm:8.0.1":
+  version: 8.0.1
+  resolution: "@capacitor/status-bar@npm:8.0.1"
   peerDependencies:
-    "@capacitor/core": ">=7.0.0"
-  checksum: 10/8a50eb8a4c14126469dde5604bb272c33472ee7a607e40a031f26adaff8de0ac72bb0a45575fe727084a9a5e87340dacb46f153e095c6cb147fbe76506bb98e4
+    "@capacitor/core": ">=8.0.0"
+  checksum: 10/d745938e32b77ada21b986b14b8f239671d67e740b94d05f724734607b69d006d5eeb485eb6dcf69851e0b0cc7d957322b6729a4eda3818d7d6084954effc9e2
   languageName: node
   linkType: hard
 
-"@capacitor/synapse@npm:^1.0.3":
+"@capacitor/synapse@npm:^1.0.4":
   version: 1.0.4
   resolution: "@capacitor/synapse@npm:1.0.4"
   checksum: 10/1e7d4e4abb7ad0890e37544062523eb4ab1ec4478aaccd1d9d4550033ab67c126f50de622cfc202f0bad1c38aaee686505c248196873c81fa4175158214cafaa
@@ -9174,15 +9165,15 @@ __metadata:
   resolution: "qcalc@workspace:."
   dependencies:
     "@capacitor-community/admob": "npm:^8.0.0"
-    "@capacitor/android": "npm:7.6.0"
-    "@capacitor/app": "npm:7.1.2"
-    "@capacitor/cli": "npm:7.6.0"
-    "@capacitor/core": "npm:7.6.0"
-    "@capacitor/filesystem": "npm:7.1.8"
-    "@capacitor/haptics": "npm:7.0.4"
-    "@capacitor/screen-orientation": "npm:7.0.4"
-    "@capacitor/share": "npm:^7.0.4"
-    "@capacitor/status-bar": "npm:7.0.5"
+    "@capacitor/android": "npm:8.2.0"
+    "@capacitor/app": "npm:8.0.1"
+    "@capacitor/cli": "npm:8.2.0"
+    "@capacitor/core": "npm:8.2.0"
+    "@capacitor/filesystem": "npm:8.1.2"
+    "@capacitor/haptics": "npm:8.0.1"
+    "@capacitor/screen-orientation": "npm:8.0.1"
+    "@capacitor/share": "npm:8.0.1"
+    "@capacitor/status-bar": "npm:8.0.1"
     "@eslint/js": "npm:9.39.3"
     "@everapi/freecurrencyapi-js": "npm:^1.0.1"
     "@intlify/unplugin-vue-i18n": "npm:11.1.0"
