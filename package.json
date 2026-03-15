@@ -78,6 +78,7 @@
   "devDependencies": {
     "@eslint/js": "9.39.3",
     "@modyfi/vite-plugin-yaml": "1.1.1",
+    "@pinia/testing": "^1.0.3",
     "@quasar/app-vite": "2.4.1",
     "@quasar/quasar-app-extension-qmarkdown": "^2.0.5",
     "@rushstack/eslint-patch": "1.16.1",
@@ -89,7 +90,9 @@
     "@vue/devtools": "8.0.7",
     "@vue/eslint-config-prettier": "10.2.0",
     "@vue/eslint-config-typescript": "14.7.0",
+    "@vue/test-utils": "^2.4.6",
     "autoprefixer": "10.4.27",
+    "axe-core": "^4.11.1",
     "electron": "^40.8.0",
     "electron-builder": "26.8.2",
     "eslint": "9.39.3",
@@ -108,6 +111,7 @@
     "vite": "7.3.1",
     "vite-plugin-checker": "0.12.0",
     "vitest": "^4.0.18",
+    "vitest-axe": "^0.1.0",
     "vue-eslint-parser": "10.4.0",
     "vue-tsc": "3.2.5"
   },
