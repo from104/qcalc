@@ -46,7 +46,13 @@
 </script>
 
 <template>
-  <q-dialog v-if="$g.isSnap" v-model="uiStore.isSnapFirstRun" persistent>
+  <q-dialog
+    v-if="$g.isSnap"
+    v-model="uiStore.isSnapFirstRun"
+    persistent
+    role="dialog"
+    :aria-label="t('snapNoticeTitle')"
+  >
     <q-card class="snap-dialog">
       <q-card-section class="dialog-header">
         <div class="text-h6">{{ t('snapNoticeTitle') }}</div>

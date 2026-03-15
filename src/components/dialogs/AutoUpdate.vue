@@ -184,7 +184,7 @@
 <template>
   <!-- Electron 환경에서만 업데이트 관련 UI 표시 -->
   <template v-if="$g.isElectron && !$g.isSnap">
-    <q-dialog v-model="updateDialog" persistent>
+    <q-dialog v-model="updateDialog" persistent role="dialog" :aria-label="t('title')">
       <q-card class="update-dialog">
         <q-card-section class="dialog-header">
           <div class="text-h6">{{ t('title') }}</div>

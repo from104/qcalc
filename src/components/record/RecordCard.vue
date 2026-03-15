@@ -538,7 +538,15 @@
         </q-item-section>
       </q-item>
       <!-- 기록이 있을 경우 -->
-      <q-list v-else id="record-list" separator class="full-width q-pt-md" role="list" :class="recordFontClass">
+      <q-list
+        v-else
+        id="record-list"
+        separator
+        class="full-width q-pt-md"
+        role="list"
+        aria-live="polite"
+        :class="recordFontClass"
+      >
         <transition-group name="record-list">
           <q-slide-item
             v-for="record in recordStrings"
@@ -730,6 +738,8 @@
     transition-show="scale"
     transition-hide="scale"
     style="z-index: 15"
+    role="alertdialog"
+    :aria-label="t('doYouDeleteRecord')"
   >
     <q-card class="noselect text-center text-white bg-negative" style="width: 240px">
       <q-card-section>{{ t('doYouDeleteRecord') }} </q-card-section>
@@ -744,6 +754,8 @@
   <q-dialog
     v-model="showMemoDialog"
     persistent
+    role="dialog"
+    :aria-label="t('memo')"
     transition-show="slide-right"
     :transition-hide="memoSlideDirection"
     style="z-index: 15"

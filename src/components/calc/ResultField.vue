@@ -857,6 +857,8 @@
       readonly
       :dark="false"
       role="textbox"
+      aria-live="polite"
+      aria-atomic="true"
       :aria-label="t('ariaLabel.resultField', { type: isMainField ? t('ariaLabel.main') : t('ariaLabel.sub') })"
       :bg-color="panelBackgroundColor"
       :label-slot="isMainField"

@@ -41,6 +41,17 @@ See [DEVELOP.md](DEVELOP.md) for the development setup, then:
 6. Create `src/content/pages/AboutPage-{lang}.md`
 7. Create `src/content/tips/{lang}/` directory with tip files
 
+## Accessibility
+
+QCalc strives to be accessible to all users. When contributing, please keep the following in mind:
+
+- Add `aria-label` to all interactive elements (buttons, toggles, selects)
+- Use `aria-live="polite"` for dynamically updated content (calculation results, record lists)
+- Use `role="dialog"` and `aria-label` on all dialog components
+- Use `role="alertdialog"` for confirmation dialogs
+- Ensure keyboard navigation works — avoid breaking existing shortcut bindings
+- Respect `prefers-reduced-motion` — avoid adding animations without the media query guard
+
 ## Bug Reports & Feature Requests
 
 Please use [GitHub Issues](https://github.com/from104/qcalc/issues).

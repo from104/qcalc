@@ -41,6 +41,17 @@ QCalc에 관심을 가져주셔서 감사합니다!
 6. `src/content/pages/AboutPage-{lang}.md` 생성
 7. `src/content/tips/{lang}/` 디렉토리 생성 및 팁 파일 작성
 
+## 접근성
+
+QCalc은 모든 사용자가 접근할 수 있도록 노력하고 있습니다. 기여 시 다음 사항을 지켜주세요:
+
+- 모든 상호작용 요소(버튼, 토글, 셀렉트)에 `aria-label` 추가
+- 동적으로 변경되는 콘텐츠(계산 결과, 기록 목록)에 `aria-live="polite"` 사용
+- 모든 다이얼로그에 `role="dialog"` + `aria-label` 추가
+- 확인 다이얼로그에는 `role="alertdialog"` 사용
+- 키보드 내비게이션 유지 — 기존 단축키 바인딩을 깨뜨리지 않기
+- `prefers-reduced-motion` 존중 — 미디어 쿼리 가드 없이 애니메이션 추가하지 않기
+
 ## 버그 신고 및 기능 요청
 
 [GitHub Issues](https://github.com/from104/qcalc/issues)를 이용해 주세요.

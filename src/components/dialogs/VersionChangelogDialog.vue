@@ -88,7 +88,7 @@
 </script>
 
 <template>
-  <q-dialog v-model="showDialog" persistent>
+  <q-dialog v-model="showDialog" persistent role="dialog" :aria-label="t('dialogTitle')">
     <q-card class="changelog-dialog">
       <q-card-section class="dialog-header">
         <div class="text-h6">{{ t('dialogTitle') }}</div>

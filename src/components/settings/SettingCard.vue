@@ -602,7 +602,13 @@
         <q-item class="q-mb-sm">
           <q-item-label class="self-center" role="text"> {{ t('showUnit') }} (Alt-\\) </q-item-label>
           <q-space />
-          <q-toggle v-model="unitStore.showUnit" keep-color :color="primaryAccentColor" dense />
+          <q-toggle
+            v-model="unitStore.showUnit"
+            keep-color
+            :color="primaryAccentColor"
+            dense
+            :aria-label="t('ariaLabel.showUnit')"
+          />
         </q-item>
       </template>
 
@@ -613,7 +619,13 @@
         <q-item class="q-mb-sm">
           <q-item-label class="self-center" role="text"> {{ t('showSymbol') }} (Alt-\) </q-item-label>
           <q-space />
-          <q-toggle v-model="currencyStore.showSymbol" keep-color :color="primaryAccentColor" dense />
+          <q-toggle
+            v-model="currencyStore.showSymbol"
+            keep-color
+            :color="primaryAccentColor"
+            dense
+            :aria-label="t('ariaLabel.showSymbol')"
+          />
         </q-item>
       </template>
 
@@ -624,7 +636,13 @@
         <q-item class="q-mb-sm">
           <q-item-label class="self-center" role="text"> {{ t('showRadix') }} (Alt-\) </q-item-label>
           <q-space />
-          <q-toggle v-model="radixStore.showRadix" keep-color :color="primaryAccentColor" dense />
+          <q-toggle
+            v-model="radixStore.showRadix"
+            keep-color
+            :color="primaryAccentColor"
+            dense
+            :aria-label="t('ariaLabel.showRadix')"
+          />
         </q-item>
 
         <!-- 진법 형식 -->
@@ -678,6 +696,7 @@
           keep-color
           :color="primaryAccentColor"
           dense
+          :aria-label="t('ariaLabel.useSystemLocale')"
           @click="setLanguage()"
         />
       </q-item>

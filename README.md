@@ -47,6 +47,7 @@ QCalc packs **5 specialized calculators (Standard, Unit, Currency, Radix, Formul
 
 - **Themes** — multiple color themes beyond dark/light
 - **Adaptive Layout** — history panel auto-appears on wider screens
+- **Accessibility** — ARIA labels, screen reader announcements (aria-live), keyboard focus indicators, reduced motion support
 - **Keyboard-first** — every function has a shortcut
 - **Mobile** — swipe to switch modes, haptic feedback
 - **Always on Top** — pin the calculator above other windows
