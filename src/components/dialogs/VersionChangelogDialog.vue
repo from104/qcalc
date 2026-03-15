@@ -75,10 +75,6 @@
     showDialog.value = false;
   };
 
-  const openReleasePage = () => {
-    window.open(`https://github.com/from104/qcalc/releases/tag/v${$g.version}`, '_blank');
-  };
-
   const testShowChangelog = () => {
     uiStore.updateLastSeenChangelogVersion('');
     checkVersionAndShowChangelog();

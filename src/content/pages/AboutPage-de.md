@@ -28,14 +28,5 @@ Das Format basiert auf [Keep a Changelog] und dieses Projekt folgt der [Semantis
 ### Geändert
 
 - **Reibungsloserer Sprachwechsel**: Wenn eine Übersetzung fehlt, fällt die App jetzt automatisch auf Englisch zurück, anstatt rohe Schlüsselpfade anzuzeigen.
-- **Tab-Überlaufmenü-Symbol**: Die Überlaufschaltfläche der Rechner-Tabs verwendet jetzt ein Abwärtspfeil-Symbol (▾) anstelle von „..." zur besseren Kennzeichnung eines Dropdown-Menüs.
-- **Schnellere Desktop-Leistung**: Upgrade auf Electron 40 für verbesserte Startgeschwindigkeit und Kompatibilität.
-- **Aktualisierte Abhängigkeiten**: Alle Pakete auf die neuesten Versionen aktualisiert mit angewendeten Sicherheitspatches.
-
-### Behoben
-
-- **Formel-Leerzeichenbehandlung**: Führende und nachfolgende Leerzeichen in Formelausdrücken werden jetzt vor der Auswertung entfernt.
-- **Sichtbarkeit der Formel-Löschtaste**: Die X-Schaltfläche im Formeleditor wird jetzt korrekt ausgeblendet, wenn das Ausdrucksfeld leer ist.
-- **Desktop-App-Start**: Startfehler auf einigen Systemen, die durch Modulformatkonflikte verursacht wurden, wurden behoben.
 
 Informationen zu früheren Versionen finden Sie [hier](https://github.com/from104/qcalc/blob/main/CHANGELOG.md).

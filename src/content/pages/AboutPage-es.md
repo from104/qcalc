@@ -28,14 +28,5 @@ El formato se basa en [Keep a Changelog] y este proyecto sigue [Versionado Semá
 ### Cambiado
 
 - **Cambio de idioma más fluido**: Si falta una traducción, la aplicación ahora recurre automáticamente al inglés en lugar de mostrar las rutas de claves sin procesar.
-- **Icono del menú de desbordamiento de pestañas**: El botón de desbordamiento de pestañas de la calculadora ahora usa un chevron hacia abajo (▾) en lugar de "..." para indicar mejor un menú desplegable.
-- **Rendimiento de escritorio más rápido**: Actualización a Electron 40 para una velocidad de inicio y compatibilidad mejoradas.
-- **Dependencias actualizadas**: Todos los paquetes actualizados a las últimas versiones con parches de seguridad aplicados.
-
-### Corregido
-
-- **Manejo de espacios en fórmulas**: Los espacios iniciales y finales en las expresiones de fórmulas ahora se recortan antes de la evaluación.
-- **Visibilidad del botón de borrar fórmula**: El botón X en el editor de fórmulas ahora se oculta correctamente cuando el campo de expresión está vacío.
-- **Inicio de la aplicación de escritorio**: Se resolvieron los errores de inicio en algunos sistemas causados por conflictos de formato de módulos.
 
 Para información sobre versiones anteriores, por favor consulte [aquí](https://github.com/from104/qcalc/blob/main/CHANGELOG.md).

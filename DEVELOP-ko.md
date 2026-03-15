@@ -168,12 +168,17 @@ build.bat all         # Windows
 
 ```text
 src/
-├── classes/          # 핵심 계산기 클래스 (Calculator, CalculatorMath 등)
+├── boot/             # Quasar 부트 파일 (android, capacitor 등)
 ├── components/       # Vue 컴포넌트
 ├── composables/      # Vue 컴포저블 (useCalcButtonActions, useRecordManager 등)
 ├── constants/        # 버튼 정의, 단위/통화 데이터
-├── i18n/             # 국제화 (ko, en, ja)
+├── content/          # 마크다운 콘텐츠 (도움말, 소개, 팁)
+├── core/             # 핵심 계산기 클래스 (Calculator, CalculatorMath 등)
+├── css/              # 공통 SCSS 스타일
+├── i18n/             # 국제화 (8개 언어: ko, en, ja, zh, hi, de, es, fr)
+├── layouts/          # 레이아웃 컴포넌트 (Narrow/Wide)
 ├── pages/            # 페이지 컴포넌트
+├── router/           # Vue Router 설정
 ├── stores/           # Pinia 스토어
 ├── types/            # TypeScript 타입 정의
 └── utils/            # 유틸리티 함수

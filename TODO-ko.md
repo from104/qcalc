@@ -5,6 +5,8 @@
 - [ ] 접근성 개선
   - [ ] 결과 음성 출력
   - [ ] 계산기 음성 조작
+- [ ] 수식 자동 완성
+- [ ] 공학용 계산기
 - [ ] 설정 클라우드 동기화
 - [ ] iOS 앱 (Capacitor)
 - [ ] 스킨 / 커스텀 테마 기능
@@ -13,19 +15,8 @@
 ## 완료 (v0.12.0)
 
 - [x] 수식 계산기 모드 (mathjs 수식 평가)
-- [x] 수식에서 메모리 플레이스홀더 (`$`) 지원
-- [x] 수식 도움말 메뉴 및 mathjs 문서 링크
-- [x] 수식 모드에서 메모리 버튼 지원 (MC, MR, MS, M+, M−, M×, M÷)
+- [x] 다국어 지원 (한국어, English, 日本語, 中文, हिन्दी, Deutsch, Español, Français)
 - [x] Flatpak 빌드 지원
-- [x] Vitest 단위 테스트 인프라
-- [x] GitHub Actions CI/CD 파이프라인
-- [x] 커밋 전 자동 검사 (husky + lint-staged)
-- [x] Electron 35 → 40 업그레이드
-- [x] CSP 보안 강화
-- [x] Vue 3.5+ useTemplateRef 마이그레이션
-- [x] CSS v-bind → CSS custom properties 마이그레이션
-- [x] any 타입 제거 (16 → 1)
-- [x] vue-tsc 타입 에러 수정
 
 ## 완료 (v0.11.6 이전)
 

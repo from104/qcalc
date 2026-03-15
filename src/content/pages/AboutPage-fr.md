@@ -28,14 +28,5 @@ Le format est basé sur [Keep a Changelog] et ce projet suit le [Versionnage sé
 ### Modifié
 
 - **Changement de langue plus fluide** : Si une traduction est manquante, l'application revient désormais automatiquement à l'anglais au lieu d'afficher les chemins de clés bruts.
-- **Icône du menu de débordement des onglets** : Le bouton de débordement des onglets de la calculatrice utilise désormais un chevron vers le bas (▾) au lieu de « ... » pour mieux indiquer un menu déroulant.
-- **Performances bureau plus rapides** : Mise à niveau vers Electron 40 pour une vitesse de démarrage et une compatibilité améliorées.
-- **Dépendances mises à jour** : Tous les paquets mis à niveau vers les dernières versions avec les correctifs de sécurité appliqués.
-
-### Corrigé
-
-- **Gestion des espaces dans les formules** : Les espaces en début et en fin des expressions de formule sont désormais supprimés avant l'évaluation.
-- **Visibilité du bouton d'effacement de formule** : Le bouton X dans l'éditeur de formules se masque désormais correctement lorsque le champ d'expression est vide.
-- **Démarrage de l'application bureau** : Résolution des erreurs de démarrage sur certains systèmes causées par des conflits de format de module.
 
 Pour des informations sur les versions précédentes, veuillez consulter [ici](https://github.com/from104/qcalc/blob/main/CHANGELOG.md).

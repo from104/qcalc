@@ -168,12 +168,17 @@ Release builds require a signed keystore. Set the `MY_JKS_*` variables in your `
 
 ```text
 src/
-├── classes/          # Core calculator classes (Calculator, CalculatorMath, etc.)
+├── boot/             # Quasar boot files (android, capacitor, etc.)
 ├── components/       # Vue components
 ├── composables/      # Vue composables (useCalcButtonActions, useRecordManager, etc.)
 ├── constants/        # Button definitions, unit/currency data
-├── i18n/             # Internationalization (ko, en, ja)
+├── content/          # Markdown content (help, about, tips)
+├── core/             # Core calculator classes (Calculator, CalculatorMath, etc.)
+├── css/              # Shared SCSS styles
+├── i18n/             # Internationalization (8 languages: ko, en, ja, zh, hi, de, es, fr)
+├── layouts/          # Layout components (Narrow/Wide)
 ├── pages/            # Page components
+├── router/           # Vue Router configuration
 ├── stores/           # Pinia stores
 ├── types/            # TypeScript type definitions
 └── utils/            # Utility functions

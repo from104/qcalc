@@ -28,14 +28,5 @@ The format is based on [Keep a Changelog] and this project follows [Semantic Ver
 ### Changed
 
 - **Smoother Language Switching**: If a translation is missing, the app now falls back to English automatically instead of showing raw key paths.
-- **Tab Overflow Menu Icon**: The calculator tab overflow button now uses a downward chevron (▾) instead of "..." to better indicate a dropdown menu.
-- **Faster Desktop Performance**: Upgraded to Electron 40 for improved startup speed and compatibility.
-- **Updated Dependencies**: All packages upgraded to latest versions with security patches applied.
-
-### Fixed
-
-- **Formula Whitespace Handling**: Leading and trailing spaces in formula expressions are now trimmed before evaluation.
-- **Formula Clear Button Visibility**: The X button in the formula editor now hides correctly when the expression field is empty.
-- **Desktop App Startup**: Resolved startup errors on some systems caused by module format conflicts.
 
 For information about previous versions, please check [here](https://github.com/from104/qcalc/blob/main/CHANGELOG.md).

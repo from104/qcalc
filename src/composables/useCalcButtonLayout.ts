@@ -5,7 +5,7 @@
  */
 
 import { ref, computed, watch, onMounted, onBeforeUnmount, nextTick } from 'vue';
-import { isWideWidth, logDev } from '../utils/GlobalHelpers';
+import { isWideWidth } from '../utils/GlobalHelpers';
 
 const $g = window.globalVars;
 

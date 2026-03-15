@@ -1,10 +1,12 @@
 # QCalc TODO
 
-## Todo
+## Planned
 
 - [ ] Accessibility improvements
   - [ ] Voice output of results
   - [ ] Voice control of calculator
+- [ ] Formula auto-completion
+- [ ] Engineering calculator
 - [ ] Settings sync to cloud
 - [ ] iOS app (Capacitor)
 - [ ] Skin / custom theme function
@@ -13,19 +15,8 @@
 ## Done (v0.12.0)
 
 - [x] Formula calculator mode (mathjs expression evaluation)
-- [x] Memory placeholder (`$`) in formula expressions
-- [x] Formula help menu with mathjs docs link
-- [x] Memory buttons in formula mode (MC, MR, MS, M+, M−, M×, M÷)
+- [x] Multilingual support (한국어, English, 日本語, 中文, हिन्दी, Deutsch, Español, Français)
 - [x] Flatpak build support
-- [x] Vitest unit test infrastructure
-- [x] GitHub Actions CI/CD pipeline
-- [x] Pre-commit hooks (husky + lint-staged)
-- [x] Electron 35 → 40 upgrade
-- [x] CSP security hardening
-- [x] Vue 3.5+ useTemplateRef migration
-- [x] CSS v-bind → CSS custom properties migration
-- [x] Any type removal (16 → 1)
-- [x] vue-tsc type error fixes
 
 ## Done (v0.11.6 and earlier)
 
