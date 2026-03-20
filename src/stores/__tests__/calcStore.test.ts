@@ -21,8 +21,11 @@ vi.stubGlobal('window', {
 // import 전에 Pinia를 활성화해야 한다.
 // 매 테스트마다 새 Pinia를 설정하기 위해 dynamic import를 사용한다.
 describe('calcStore', () => {
+  // eslint-disable-next-line @typescript-eslint/consistent-type-imports
   let useCalcStore: (typeof import('../calcStore'))['useCalcStore'];
+  // eslint-disable-next-line @typescript-eslint/consistent-type-imports
   let useUIStore: (typeof import('../uiStore'))['useUIStore'];
+  // eslint-disable-next-line @typescript-eslint/consistent-type-imports
   let useSettingsStore: (typeof import('../settingsStore'))['useSettingsStore'];
 
   beforeEach(async () => {
