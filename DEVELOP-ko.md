@@ -13,7 +13,7 @@
 ### 주요 라이브러리
 
 - **mathjs** — 고정밀 BigNumber 수학 연산
-- **freecurrencyapi-js** — 실시간 환율 데이터
+- **Frankfurter API + fawazahmed0 currency-api** — 실시간 환율 데이터 (API 키 불필요)
 - **tinykeys** — 키보드 단축키 처리
 - **markdown-it** — 마크다운 렌더링
 - **electron-updater** — 데스크톱 자동 업데이트
@@ -52,9 +52,6 @@ yarn install
 프로젝트 루트에 `.env` 파일을 생성합니다:
 
 ```plaintext
-# 통화 환율 API 키 (통화 변환기에 필수)
-FREECURRENCY_API_KEY=<your_api_key>
-
 # 안드로이드 키스토어 (안드로이드 릴리즈 빌드에 필수)
 MY_JKS_KEY_FILE=/path/to/keystore.jks
 MY_JKS_STORE_PASSWORD=store_password
@@ -62,7 +59,7 @@ MY_JKS_KEY_ALIAS=key_alias
 MY_JKS_KEY_PASSWORD=key_password
 ```
 
-> [freecurrencyapi.com](https://freecurrencyapi.com/)에서 무료 API 키를 발급받을 수 있습니다 (월 5,000회 무료).
+> 환율 데이터는 무료 공공 API(Frankfurter + fawazahmed0)에서 가져오며 API 키가 필요 없습니다.
 
 ---
 
@@ -171,7 +168,7 @@ src/
 ├── boot/             # Quasar 부트 파일 (android, capacitor 등)
 ├── components/       # Vue 컴포넌트
 ├── composables/      # Vue 컴포저블 (useCalcButtonActions, useRecordManager 등)
-├── constants/        # 버튼 정의, 단위/통화 데이터
+├── constants/        # 버튼 정의, 단위/통화 데이터, 환율 스냅샷
 ├── content/          # 마크다운 콘텐츠 (도움말, 소개, 팁)
 ├── core/             # 핵심 계산기 클래스 (Calculator, CalculatorMath 등)
 ├── css/              # 공통 SCSS 스타일
@@ -184,15 +181,17 @@ src/
 └── utils/            # 유틸리티 함수
 src-electron/         # Electron main/preload
 src-capacitor/        # Capacitor 안드로이드 프로젝트
+scripts/              # 빌드 시점 스크립트 (fetch-fallback-rates.ts 등)
 ```
 
 ---
 
 ## 주의사항
 
-1. **API 키 보안** — `.env` 파일을 절대 커밋하지 마세요. 프로덕션 빌드 전 API 키를 확인하세요.
-2. **안드로이드** — `ANDROID_HOME` 환경변수 필수. 릴리즈 빌드에는 키스토어 필요.
-3. **자동 업데이트** — Windows 설치파일과 Linux AppImage에서 지원. Snap/Flatpak은 자체 업데이트 메커니즘 사용.
+1. **환경 보안** — 인증 정보가 포함된 `.env` 파일을 절대 커밋하지 마세요.
+2. **환율 데이터** — `yarn fetch-rates`로 빌드 시점 환율 스냅샷을 갱신할 수 있습니다. 빌드 스크립트(`build.sh` / `build.bat`)가 빌드 전에 자동으로 실행합니다.
+3. **안드로이드** — `ANDROID_HOME` 환경변수 필수. 릴리즈 빌드에는 키스토어 필요.
+4. **자동 업데이트** — Windows 설치파일과 Linux AppImage에서 지원. Snap/Flatpak은 자체 업데이트 메커니즘 사용.
 
 ---
 

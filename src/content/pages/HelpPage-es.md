@@ -40,7 +40,8 @@ Cálculos de alta precisión, conversión de unidades/divisas/bases numéricas y
 #### Conversor de Divisas
 
 - **Cómo Acceder**: Ctrl+3 o seleccione la pestaña superior
-- **Últimos Tipos de Cambio**: Refleja información de tipos de cambio en tiempo real
+- **340 divisas**: Fiat, criptomonedas y metales preciosos — sin clave API necesaria
+- **Últimos Tipos de Cambio**: Tipos en tiempo real (se usa una instantánea integrada sin conexión)
 - **Favoritos**: Establezca las divisas de uso frecuente como favoritos para acceso rápido
 - **Cálculo Rápido**: +5/+10/+100 (f/g/h), -5/-10/-100 (q/w/e)
 - **Intercambiar Divisas**: Use la tecla '\' para intercambiar divisas de origen/destino

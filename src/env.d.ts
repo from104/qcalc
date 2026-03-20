@@ -6,11 +6,6 @@
  */
 
 /**
- * freecurrencyapi-js 모듈 선언
- */
-declare module '@everapi/freecurrencyapi-js';
-
-/**
  * YAML 파일 모듈 선언
  */
 declare module '*.yml' {

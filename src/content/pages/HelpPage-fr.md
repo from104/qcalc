@@ -40,7 +40,8 @@ Calculs de haute précision, conversion d'unités/devises/bases numériques et �
 #### Convertisseur de devises
 
 - **Comment y accéder** : Ctrl+3 ou sélectionner l'onglet supérieur
-- **Derniers taux de change** : Reflète les informations de taux de change en temps réel
+- **340 devises** : Fiduciaires, cryptomonnaies et métaux précieux — aucune clé API requise
+- **Derniers taux de change** : Taux en temps réel (snapshot intégré utilisé hors ligne)
 - **Favoris** : Définissez les devises fréquemment utilisées comme favoris pour un accès rapide
 - **Calcul rapide** : +5/+10/+100 (f/g/h), -5/-10/-100 (q/w/e)
 - **Échanger les devises** : Utilisez la touche '\' pour échanger les devises source/cible

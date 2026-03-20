@@ -188,6 +188,13 @@ if errorlevel 1 (
     exit /b 1
 )
 
+:: 환율 스냅샷 갱신
+echo Updating fallback exchange rates...
+call npx tsx scripts/fetch-fallback-rates.ts
+if errorlevel 1 (
+    echo Warning: Failed to update fallback rates. Using existing snapshot.
+)
+
 :: 빌드 디렉토리 생성
 echo Creating build directory: %BUILD_DIR%
 if not exist "%BUILD_DIR%" mkdir "%BUILD_DIR%"

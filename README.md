@@ -23,7 +23,7 @@ QCalc packs **5 specialized calculators (Standard, Unit, Currency, Radix, Formul
 | ---------------------- | ------------------------------------------------------------------------- | -------- |
 | **Standard**           | Arithmetic, percentages, trig, powers, roots, factorial                   | `Ctrl+1` |
 | **Unit Converter**     | 15+ categories — length, weight, area, volume, angle, and more            | `Ctrl+2` |
-| **Currency Converter** | Real-time exchange rates with quick adjustments                           | `Ctrl+3` |
+| **Currency Converter** | 340 currencies (fiat, crypto, metals) — no API key needed                 | `Ctrl+3` |
 | **Radix Converter**    | Binary / Octal / Decimal / Hex with AND, OR, XOR, NOT, shifts             | `Ctrl+4` |
 | **Formula**            | Type math expressions directly using [mathjs](https://mathjs.org/) syntax | `Ctrl+5` |
 

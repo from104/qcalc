@@ -13,7 +13,7 @@
 ### Key Libraries
 
 - **mathjs** — high-precision BigNumber math operations
-- **freecurrencyapi-js** — real-time currency exchange rates
+- **Frankfurter API + fawazahmed0 currency-api** — real-time currency exchange rates (no API key required)
 - **tinykeys** — keyboard shortcut handling
 - **markdown-it** — Markdown rendering
 - **electron-updater** — automatic desktop updates
@@ -52,9 +52,6 @@ yarn install
 Create a `.env` file in the project root:
 
 ```plaintext
-# Currency exchange API key (required for currency converter)
-FREECURRENCY_API_KEY=<your_api_key>
-
 # Android keystore (required for Android release builds)
 MY_JKS_KEY_FILE=/path/to/keystore.jks
 MY_JKS_STORE_PASSWORD=store_password
@@ -62,7 +59,7 @@ MY_JKS_KEY_ALIAS=key_alias
 MY_JKS_KEY_PASSWORD=key_password
 ```
 
-> Get a free API key from [freecurrencyapi.com](https://freecurrencyapi.com/) (5,000 requests/month free).
+> Currency exchange rates are fetched from free public APIs (Frankfurter + fawazahmed0) — no API key required.
 
 ---
 
@@ -171,7 +168,7 @@ src/
 ├── boot/             # Quasar boot files (android, capacitor, etc.)
 ├── components/       # Vue components
 ├── composables/      # Vue composables (useCalcButtonActions, useRecordManager, etc.)
-├── constants/        # Button definitions, unit/currency data
+├── constants/        # Button definitions, unit/currency data, fallback exchange rates
 ├── content/          # Markdown content (help, about, tips)
 ├── core/             # Core calculator classes (Calculator, CalculatorMath, etc.)
 ├── css/              # Shared SCSS styles
@@ -184,15 +181,17 @@ src/
 └── utils/            # Utility functions
 src-electron/         # Electron main/preload
 src-capacitor/        # Capacitor Android project
+scripts/              # Build-time scripts (fetch-fallback-rates.ts, etc.)
 ```
 
 ---
 
 ## Important Notes
 
-1. **API Key Security** — Never commit `.env` files. Verify API key before production builds.
-2. **Android** — `ANDROID_HOME` must be set. Keystore required for release builds.
-3. **Auto Updates** — Supported for Windows installer and Linux AppImage. Snap/Flatpak use their own update mechanisms.
+1. **Environment Security** — Never commit `.env` files containing credentials.
+2. **Currency Rates** — Run `yarn fetch-rates` to update the build-time fallback exchange rate snapshot. The build scripts (`build.sh` / `build.bat`) run this automatically before each build.
+3. **Android** — `ANDROID_HOME` must be set. Keystore required for release builds.
+4. **Auto Updates** — Supported for Windows installer and Linux AppImage. Snap/Flatpak use their own update mechanisms.
 
 ---
 

@@ -40,7 +40,8 @@ Hochpräzise Berechnungen, Einheiten-/Währungs-/Zahlensystemumrechnung und Form
 #### Währungsumrechner
 
 - **Zugriff**: Ctrl+3 oder oberen Tab auswählen
-- **Aktuelle Wechselkurse**: Spiegelt Echtzeit-Wechselkursinformationen wider
+- **340 Währungen**: Fiat, Kryptowährungen und Edelmetalle — kein API-Schlüssel erforderlich
+- **Aktuelle Wechselkurse**: Echtzeit-Kurse (bei Offline-Nutzung wird ein integrierter Snapshot verwendet)
 - **Favoriten**: Häufig verwendete Währungen als Favoriten für schnellen Zugriff festlegen
 - **Schnellberechnung**: +5/+10/+100 (f/g/h), -5/-10/-100 (q/w/e)
 - **Währungen tauschen**: '\' Taste zum Tauschen von Ausgangs-/Zielwährung verwenden

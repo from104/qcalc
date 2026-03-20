@@ -37,7 +37,8 @@ High-precision calculations, unit/currency/radix conversion, and formula evaluat
 #### Currency Converter
 
 - **How to Access**: Ctrl+3 or select the top tab
-- **Latest Exchange Rates**: Reflects real-time exchange rate information
+- **340 Currencies**: Fiat, cryptocurrencies, and precious metals — no API key needed
+- **Latest Exchange Rates**: Real-time rates (built-in snapshot used when offline)
 - **Favorites**: Set frequently used currencies as favorites for quick access
 - **Quick Calculation**: +5/+10/+100 (f/g/h), -5/-10/-100 (q/w/e)
 - **Swap Currencies**: Use '\' key to swap original/converted currencies

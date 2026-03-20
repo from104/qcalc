@@ -24,9 +24,11 @@ Das Format basiert auf [Keep a Changelog] und dieses Projekt folgt der [Semantis
   - Das integrierte Hilfemenü listet alle verfügbaren Funktionen, Konstanten und Platzhalter auf.
 - **5 neue Sprachen (8 insgesamt)**: Chinesisch (vereinfacht), Hindi, Deutsch, Spanisch und Französisch ergänzen die bestehenden Sprachen Koreanisch, Englisch und Japanisch. Jeder Bildschirm ist übersetzt — Menüs, Einstellungen, Einheitsnamen, Währungsnamen, Hilfeseiten, Info-Seiten, Tipps und Fehlermeldungen.
 - **Flatpak-Paketierung**: Installieren Sie QCalc über Flatpak für breitere Linux-Desktop-Unterstützung.
+- **Migration zu kostenlosen öffentlichen Währungs-APIs**: Umstellung von FreeCurrencyAPI (API-Schlüssel erforderlich) auf kostenlose öffentliche APIs (Frankfurter + fawazahmed0). Unterstützung von 340 Währungen (Fiat, Edelmetalle, Kryptowährungen) ohne API-Schlüssel. Build-Zeit-Kurs-Snapshots ermöglichen Währungsumrechnung auch beim ersten Offline-Start.
 
 ### Geändert
 
 - **Reibungsloserer Sprachwechsel**: Wenn eine Übersetzung fehlt, fällt die App jetzt automatisch auf Englisch zurück, anstatt rohe Schlüsselpfade anzuzeigen.
+- **Erweiterte Währungsabdeckung**: Von 170 auf 340 Währungen — wichtige Kryptowährungen (ETH, SOL, XRP usw.), Edelmetalle (Palladium, Platin) und historische Währungen hinzugefügt. Vollständige i18n-Unterstützung für alle 8 Sprachen.
 
 Informationen zu früheren Versionen finden Sie [hier](https://github.com/from104/qcalc/blob/main/CHANGELOG.md).
