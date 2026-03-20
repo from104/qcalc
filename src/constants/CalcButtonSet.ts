@@ -115,7 +115,7 @@ export function createCalcButtonSet(t: ComposerTranslation) {
     a3: ['7', 'normal', ['7'], () => calc.addDigit(7), false],
     b3: ['8', 'normal', ['8'], () => calc.addDigit(8), false],
     c3: ['9', 'normal', ['9'], () => calc.addDigit(9), false],
-    d3: ['@mdi-close', 'function', ['*'], () => calc.executeBinary(Operator.MUL), false],
+    d3: ['@mdi-close', 'function', ['Shift+*', '*'], () => calc.executeBinary(Operator.MUL), false],
     a4: ['4', 'normal', ['4'], () => calc.addDigit(4), false],
     b4: ['5', 'normal', ['5'], () => calc.addDigit(5), false],
     c4: ['6', 'normal', ['6'], () => calc.addDigit(6), false],
@@ -123,7 +123,7 @@ export function createCalcButtonSet(t: ComposerTranslation) {
     a5: ['1', 'normal', ['1'], () => calc.addDigit(1), false],
     b5: ['2', 'normal', ['2'], () => calc.addDigit(2), false],
     c5: ['3', 'normal', ['3'], () => calc.addDigit(3), false],
-    d5: ['@mdi-plus', 'function', ['+'], () => calc.executeBinary(Operator.ADD), false],
+    d5: ['@mdi-plus', 'function', ['Shift++', '+'], () => calc.executeBinary(Operator.ADD), false],
     a6: ['@keyboard_capslock', 'important', ['\''], () => handleShift(), false],
     b6: ['0', 'normal', ['0'], () => calc.addDigit(0), false],
     c6: ['@mdi-circle-small', 'normal', ['.'], () => calc.addDot(), false],
@@ -144,10 +144,10 @@ export function createCalcButtonSet(t: ComposerTranslation) {
     // formula 모드: row-0(수식전용) + row1-6 전부 정의 (standardButtons 미사용, 순서 보장)
     formula: {
       // Row 0: 수식 전용 버튼
-      a0: ['(', 'function', ['('], () => formulaStore.append('('), () => !formulaStore.canAppend('(')],
-      b0: [')', 'function', [')'], () => formulaStore.append(')'), () => !formulaStore.canAppend(')')],
-      c0: ['@alternate_email', 'normal', ['@'], () => formulaStore.append('@'), () => !formulaStore.canAppend('@')],
-      d0: ['?', 'important', ['?'], () => formulaStore.toggleHelp(), false],
+      a0: ['(', 'function', ['Shift+('], () => formulaStore.append('('), () => !formulaStore.canAppend('(')],
+      b0: [')', 'function', ['Shift+)'], () => formulaStore.append(')'), () => !formulaStore.canAppend(')')],
+      c0: ['@alternate_email', 'normal', ['Shift+@'], () => formulaStore.append('@'), () => !formulaStore.canAppend('@')],
+      d0: ['?', 'important', ['Shift+?'], () => formulaStore.toggleHelp(), false],
       // Row 1
       a1: ['x²', 'function', ['u'], () => formulaStore.wrapLastToken((s) => `(${s})^2`), false],
       b1: ['√x', 'function', ['i'], () => formulaStore.wrapLastToken((s) => `sqrt(${s})`), false],
@@ -162,7 +162,7 @@ export function createCalcButtonSet(t: ComposerTranslation) {
       a3: ['7', 'normal', ['7'], () => formulaStore.append('7'), () => !formulaStore.canAppend('7')],
       b3: ['8', 'normal', ['8'], () => formulaStore.append('8'), () => !formulaStore.canAppend('8')],
       c3: ['9', 'normal', ['9'], () => formulaStore.append('9'), () => !formulaStore.canAppend('9')],
-      d3: ['@mdi-close', 'function', ['*'], () => formulaStore.append('*'), () => !formulaStore.canAppend('*')],
+      d3: ['@mdi-close', 'function', ['Shift+*', '*'], () => formulaStore.append('*'), () => !formulaStore.canAppend('*')],
       // Row 4
       a4: ['4', 'normal', ['4'], () => formulaStore.append('4'), () => !formulaStore.canAppend('4')],
       b4: ['5', 'normal', ['5'], () => formulaStore.append('5'), () => !formulaStore.canAppend('5')],
@@ -172,7 +172,7 @@ export function createCalcButtonSet(t: ComposerTranslation) {
       a5: ['1', 'normal', ['1'], () => formulaStore.append('1'), () => !formulaStore.canAppend('1')],
       b5: ['2', 'normal', ['2'], () => formulaStore.append('2'), () => !formulaStore.canAppend('2')],
       c5: ['3', 'normal', ['3'], () => formulaStore.append('3'), () => !formulaStore.canAppend('3')],
-      d5: ['@mdi-plus', 'function', ['+'], () => formulaStore.append('+'), () => !formulaStore.canAppend('+')],
+      d5: ['@mdi-plus', 'function', ['Shift++', '+'], () => formulaStore.append('+'), () => !formulaStore.canAppend('+')],
       // Row 6
       a6: ['@keyboard_capslock', 'important', ["'"], () => handleShift(), false],
       b6: ['0', 'normal', ['0'], () => formulaStore.append('0'), () => !formulaStore.canAppend('0')],
@@ -248,7 +248,18 @@ export function createCalcButtonSet(t: ComposerTranslation) {
     },
     // formula 모드 shift 함수: 수식에 맞는 수학 함수들
     formula: {
-      c0: ['$', ['$'], () => formulaStore.append('$'), () => !formulaStore.canAppend('$')],
+      c0: [
+        '$',
+        ['Shift+$'],
+        () => {
+          if (calcStore.calc.memory.isEmpty) {
+            showMessage(t('noMemoryToRecall'));
+            return;
+          }
+          formulaStore.append('$');
+        },
+        () => !formulaStore.canAppend('$'),
+      ],
       a1: ['xⁿ', ['r'], () => formulaStore.append('^'), () => !formulaStore.canAppend('^')],
       b1: ['ⁿ√x', ['t'], () => formulaStore.wrapLastToken((s) => `nthRoot(${s},`), false],
       a2: ['10ⁿ', ['f'], () => formulaStore.wrapLastToken((s) => `10^(${s})`), false],

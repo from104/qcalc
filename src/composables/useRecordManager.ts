@@ -7,15 +7,14 @@ import { computed, useTemplateRef } from 'vue';
 import { useCalcStore } from 'stores/calcStore';
 import { useUIStore } from 'stores/uiStore';
 import { useQuasar } from 'quasar';
-import { useI18n } from 'vue-i18n';
+import type { Composer } from 'vue-i18n';
 import Papa from 'papaparse';
 
 import { Filesystem, Directory, Encoding } from '@capacitor/filesystem';
 import { Share } from '@capacitor/share';
 
-export function useRecordManager() {
+export function useRecordManager(t: Composer['t']) {
   const $q = useQuasar();
-  const { t } = useI18n({ useScope: 'global' });
   const calcStore = useCalcStore();
   const uiStore = useUIStore();
   const $g = window.globalVars;

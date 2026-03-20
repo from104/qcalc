@@ -41,7 +41,7 @@
 
   // useRecordManager는 컴포저블이므로 같은 인스턴스를 반환함
   // 하지만 키 바인딩은 useMainLayout에서만 등록되므로 중복 등록 방지
-  const recordManager = useRecordManager();
+  const recordManager = useRecordManager(t);
   const { recordFileInput, handleRecordFileChange } = recordManager;
 
   const localLeftDrawerOpen = computed({

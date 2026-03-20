@@ -39,6 +39,7 @@ export const useFormulaStore = defineStore('formula', {
       if (!this.expression && /^[+\-*/^%]/.test(s)) {
         this.expression = '@' + s;
       } else {
+        if (!this.canAppend(s)) return;
         this.expression += s;
       }
     },
@@ -248,13 +249,28 @@ export const useFormulaStore = defineStore('formula', {
       const isOpenParen = s === '(' || (/^[a-zA-Z]/.test(s) && s.endsWith('('));
       const isCloseParen = s === ')';
       const isDecimal = s === '.';
+      const isPlaceholder = s === '@' || s === '$';
       const isConstant = /^[@$a-zA-Z]/.test(s) && !s.endsWith('(');
+
+      // @, $ 단독 토큰 강제: 앞에 숫자/문자/@/$ 불가
+      if (isPlaceholder && expr) {
+        const lastChar = expr[expr.length - 1]!;
+        if (/[\d.a-zA-Z@$)]/.test(lastChar)) return false;
+      }
 
       // 빈 수식: ')' 와 '.' 만 불가
       if (!expr) return !isCloseParen && !isDecimal;
 
       const lastChar = expr[expr.length - 1]!;
       const depth = (expr.match(/\(/g) ?? []).length - (expr.match(/\)/g) ?? []).length;
+
+      // @, $ 뒤에 숫자/소수점/@/$ 불가
+      if (/[@$]/.test(lastChar)) {
+        if (isDigit || isDecimal || isPlaceholder) return false;
+        if (isOperator) return true;
+        if (isCloseParen) return depth > 0;
+        return false;
+      }
 
       if (/\d/.test(lastChar)) {
         if (isDigit) return true;
@@ -269,7 +285,7 @@ export const useFormulaStore = defineStore('formula', {
 
       if (lastChar === '.') return isDigit;
 
-      if (/[a-zA-Z@$]/.test(lastChar)) {
+      if (/[a-zA-Z]/.test(lastChar)) {
         if (isOperator) return true;
         if (isCloseParen) return depth > 0;
         return false;
@@ -298,12 +314,24 @@ export const useFormulaStore = defineStore('formula', {
     },
 
     /**
+     * @, $ 플레이스홀더가 단독 토큰으로 사용되었는지 검사합니다.
+     * - 앞뒤에 숫자, 문자, 소수점, 다른 플레이스홀더가 붙으면 false
+     */
+    _hasValidPlaceholders(expr: string): boolean {
+      if (!/@|\$/.test(expr)) return true;
+      // 숫자/문자/소수점/@/$ 바로 앞뒤에 @/$가 있으면 invalid
+      return !/[\d.a-zA-Z@$][@$]|[@$][\d.a-zA-Z@$]/.test(expr);
+    },
+
+    /**
      * 현재 수식이 mathjs로 평가 가능한지 여부를 반환합니다.
      * 빈 수식은 true (오류 없음), @는 현재 계산기 값으로 치환하여 시도합니다.
+     * @/$ 토큰 규칙 위반 시에도 false를 반환합니다.
      */
     isExpressionValid(): boolean {
       const expr = this.expression.trim();
       if (!expr) return true;
+      if (!this._hasValidPlaceholders(expr)) return false;
       try {
         const resolved = this._resolvePlaceholders(expr);
         MathB.evaluate(resolved);

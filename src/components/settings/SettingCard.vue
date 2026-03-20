@@ -48,7 +48,7 @@
   const fileInput = useTemplateRef<HTMLInputElement>('fileInput');
 
   const $q = useQuasar();
-  const { applySettings, resetSettings, exportSettings } = useSettingsManager();
+  const { applySettings, resetSettings, exportSettings } = useSettingsManager(t);
 
   // 설정 초기화 핸들러
   const handleResetSettings = () => {

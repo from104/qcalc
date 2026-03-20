@@ -5,7 +5,7 @@
  */
 
 import { useQuasar } from 'quasar';
-import { useI18n } from 'vue-i18n';
+import type { Composer } from 'vue-i18n';
 import { Filesystem, Directory, Encoding } from '@capacitor/filesystem';
 import { Share } from '@capacitor/share';
 
@@ -30,9 +30,8 @@ const stores = {
 
 type StoreKeys = keyof typeof stores;
 
-export function useSettingsManager() {
+export function useSettingsManager(t: Composer['t']) {
   const $q = useQuasar();
-  const { t } = useI18n({ useScope: 'global' });
   const $g = window.globalVars;
 
   const gatherSettings = (): Record<StoreKeys, unknown> => {

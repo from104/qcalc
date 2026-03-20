@@ -14,7 +14,7 @@
 
   const uiStore = useUIStore();
 
-  const recordManager = useRecordManager();
+  const recordManager = useRecordManager(t);
   const { leftDrawerOpen, toggleLeftDrawer, tabs, SUB_PAGE_CONFIG, SUB_PAGE_BUTTONS } = useMainLayout(t, recordManager);
 
   const isWideLayout = computed(() => isWideWidth());

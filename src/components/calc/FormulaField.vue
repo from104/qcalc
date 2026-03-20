@@ -82,6 +82,10 @@
       exitEditing();
       return;
     }
+    if (isWarning.value) {
+      showError(t('formulaEvaluationError'));
+      return;
+    }
     try {
       formulaStore.evaluate();
     } catch {
