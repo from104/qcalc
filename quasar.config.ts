@@ -115,11 +115,10 @@ export default defineConfig((/* ctx */) => {
     devServer: {
       open: false,
       host: '0.0.0.0',
-      // flatpak/ 디렉토리의 대량 바이너리 파일이 inotify watcher를 소진시켜
-      // Electron dev 모드 실행이 차단되는 문제 방지
+      // flatpak/ 디렉토리의 바이너리 파일이 inotify watcher를 소진하는 문제 방지
       viteVueDevServerOptions: {
         watch: {
-          ignored: ['**/flatpak/**'],
+          ignored: ['**/flatpak/linux-unpacked/**'],
         },
       },
     },
@@ -195,7 +194,7 @@ export default defineConfig((/* ctx */) => {
       bundler: 'builder', // 'packager' 또는 'builder'
 
       builder: {
-        appId: 'com.atit.qcalc',
+        appId: 'io.github.from104.qcalc',
         productName: 'QCalc',
         artifactName: '${productName}-${version}-${os}.${ext}',
         linux: {

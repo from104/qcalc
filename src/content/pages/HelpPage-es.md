@@ -22,6 +22,9 @@ Cálculos de alta precisión, conversión de unidades/divisas/bases numéricas y
 - **Operaciones Básicas**: Introduzca números 0-9, +, -, \*, / teclas
 - **Funciones Avanzadas**: Funciones trigonométricas (q, w, e), cuadrado (u), raíz cuadrada (i), constantes (z: π, x: φ, c: e)
 - **Funciones de Memoria**: Ctrl+Enter (MS), Ctrl+Backspace (MR), Ctrl+Delete (MC)
+- **Modo Edición**: Presione Space o Enter (cuando esté vacío) para entrar, Esc para borrar y salir
+- **Navegación de Historial**: Use las teclas ↑/↓ en modo edición para explorar expresiones anteriores, se reinicia automáticamente al editar
+- **Cargar Expresión**: Clic derecho en un registro de fórmula → "Cargar en campo de fórmula" para reutilizar
 - **Cálculo de Porcentaje**: 'número, /, número, %(k)' calcula el porcentaje
 - **Aplicar Porcentaje**: 'número, \*, número, %(k)' aplica el porcentaje
 
@@ -59,6 +62,9 @@ Cálculos de alta precisión, conversión de unidades/divisas/bases numéricas y
 - **Operaciones Soportadas**: Todas las funciones matemáticas de mathjs incluyendo aritmética, potencias, trigonometría, logaritmos
 - **Referencia al Valor Actual**: Use el símbolo @ para incluir el valor calculado actual en las expresiones
 - **Funciones de Memoria**: Ctrl+Enter (MS), Ctrl+Backspace (MR), Ctrl+Delete (MC)
+- **Modo Edición**: Presione Space o Enter (cuando esté vacío) para entrar, Esc para borrar y salir
+- **Navegación de Historial**: Use las teclas ↑/↓ en modo edición para explorar expresiones anteriores, se reinicia automáticamente al editar
+- **Cargar Expresión**: Clic derecho en un registro de fórmula → "Cargar en campo de fórmula" para reutilizar
 
 ### Cómo Usar las Funciones de Productividad
 
@@ -211,6 +217,16 @@ Cálculos de alta precisión, conversión de unidades/divisas/bases numéricas y
 | \     | Intercambiar origen y destino         |
 | A-\   | Alternar visualización de base        |
 | AC-\  | Alternar posición de base (pre/post)  |
+
+### Calculadora de Fórmulas (Modo Edición)
+
+| Atajo  | Función                                          |
+| ------ | ------------------------------------------------ |
+| Space  | Entrar en modo edición                           |
+| Enter  | Evaluar expresión (o entrar en edición si vacío) |
+| Escape | Borrar expresión y salir del modo edición        |
+| ↑/↓    | Explorar historial de expresiones                |
+| =      | Evaluar expresión                                |
 
 ### Navegación de Pantalla y Control de Interfaz
 

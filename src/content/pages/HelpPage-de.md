@@ -22,6 +22,9 @@ Hochpräzise Berechnungen, Einheiten-/Währungs-/Zahlensystemumrechnung und Form
 - **Grundrechenarten**: Zahlen 0-9, +, -, \*, / Tasten eingeben
 - **Erweiterte Funktionen**: Trigonometrische Funktionen (q, w, e), Quadrat (u), Quadratwurzel (i), Konstanten (z: π, x: φ, c: e)
 - **Speicherfunktionen**: Ctrl+Enter (MS), Ctrl+Backspace (MR), Ctrl+Delete (MC)
+- **Bearbeitungsmodus**: Space oder Enter (wenn leer) zum Starten, Esc zum Löschen und Beenden
+- **Verlaufsnavigation**: Im Bearbeitungsmodus mit ↑/↓ Pfeiltasten vorherige Ausdrücke durchsuchen, bei Bearbeitung automatisch zurückgesetzt
+- **Ausdruck laden**: Rechtsklick auf Formelprotokoll → „In Formelfeld laden" zur Wiederverwendung
 - **Prozentrechnung**: 'Zahl, /, Zahl, %(k)' berechnet den Prozentsatz
 - **Prozent anwenden**: 'Zahl, \*, Zahl, %(k)' wendet den Prozentsatz an
 
@@ -59,6 +62,9 @@ Hochpräzise Berechnungen, Einheiten-/Währungs-/Zahlensystemumrechnung und Form
 - **Unterstützte Operationen**: Alle mathematischen Funktionen von mathjs einschließlich Arithmetik, Potenzen, Trigonometrie, Logarithmen
 - **Aktueller Wertverweis**: @ Symbol verwenden, um den aktuellen Berechnungswert in Ausdrücke einzubeziehen
 - **Speicherfunktionen**: Ctrl+Enter (MS), Ctrl+Backspace (MR), Ctrl+Delete (MC)
+- **Bearbeitungsmodus**: Space oder Enter (wenn leer) zum Starten, Esc zum Löschen und Beenden
+- **Verlaufsnavigation**: Im Bearbeitungsmodus mit ↑/↓ Pfeiltasten vorherige Ausdrücke durchsuchen, bei Bearbeitung automatisch zurückgesetzt
+- **Ausdruck laden**: Rechtsklick auf Formelprotokoll → „In Formelfeld laden" zur Wiederverwendung
 
 ### Verwendung der Produktivitätsfunktionen
 
@@ -211,6 +217,16 @@ Hochpräzise Berechnungen, Einheiten-/Währungs-/Zahlensystemumrechnung und Form
 | \                 | Quelle und Ziel tauschen                   |
 | A-\               | Zahlensystemanzeige umschalten             |
 | AC-\              | Zahlensystemposition umschalten (vor/nach) |
+
+### Formelrechner (Bearbeitungsmodus)
+
+| Tastenkombination | Funktion                                              |
+| ----------------- | ----------------------------------------------------- |
+| Space             | Bearbeitungsmodus starten                             |
+| Enter             | Ausdruck auswerten (oder Bearbeitungsmodus wenn leer) |
+| Escape            | Ausdruck löschen und Bearbeitungsmodus beenden        |
+| ↑/↓               | Ausdrucksverlauf durchsuchen                          |
+| =                 | Ausdruck auswerten                                    |
 
 ### Bildschirmnavigation und UI-Steuerung
 

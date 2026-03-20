@@ -22,6 +22,9 @@ Calculs de haute précision, conversion d'unités/devises/bases numériques et �
 - **Opérations de base** : Entrez les chiffres 0-9, +, -, \*, / touches
 - **Fonctions avancées** : Fonctions trigonométriques (q, w, e), carré (u), racine carrée (i), constantes (z : π, x : φ, c : e)
 - **Fonctions mémoire** : Ctrl+Enter (MS), Ctrl+Backspace (MR), Ctrl+Delete (MC)
+- **Mode édition** : Appuyez sur Space ou Enter (si vide) pour entrer, Esc pour effacer et quitter
+- **Navigation dans l'historique** : Utilisez les touches ↑/↓ en mode édition pour parcourir les expressions précédentes, réinitialisation automatique lors de l'édition
+- **Charger une expression** : Clic droit sur un enregistrement de formule → « Charger dans le champ de formule » pour réutiliser
 - **Calcul de pourcentage** : 'nombre, /, nombre, %(k)' calcule le pourcentage
 - **Appliquer un pourcentage** : 'nombre, \*, nombre, %(k)' applique le pourcentage
 
@@ -59,6 +62,9 @@ Calculs de haute précision, conversion d'unités/devises/bases numériques et �
 - **Opérations prises en charge** : Toutes les fonctions mathématiques mathjs incluant l'arithmétique, les puissances, la trigonométrie, les logarithmes
 - **Référence à la valeur actuelle** : Utilisez le symbole @ pour inclure la valeur calculée actuelle dans les expressions
 - **Fonctions mémoire** : Ctrl+Enter (MS), Ctrl+Backspace (MR), Ctrl+Delete (MC)
+- **Mode édition** : Appuyez sur Space ou Enter (si vide) pour entrer, Esc pour effacer et quitter
+- **Navigation dans l'historique** : Utilisez les touches ↑/↓ en mode édition pour parcourir les expressions précédentes, réinitialisation automatique lors de l'édition
+- **Charger une expression** : Clic droit sur un enregistrement de formule → « Charger dans le champ de formule » pour réutiliser
 
 ### Comment utiliser les fonctionnalités de productivité
 
@@ -211,6 +217,16 @@ Calculs de haute précision, conversion d'unités/devises/bases numériques et �
 | \         | Échanger source et cible                   |
 | A-\       | Basculer l'affichage de la base            |
 | AC-\      | Basculer la position de la base (pré/post) |
+
+### Calculatrice de formules (Mode édition)
+
+| Raccourci | Fonction                                        |
+| --------- | ----------------------------------------------- |
+| Space     | Entrer en mode édition                          |
+| Enter     | Évaluer l'expression (ou mode édition si vide)  |
+| Escape    | Effacer l'expression et quitter le mode édition |
+| ↑/↓       | Parcourir l'historique des expressions          |
+| =         | Évaluer l'expression                            |
 
 ### Navigation d'écran et contrôle de l'interface
 

@@ -1,4 +1,4 @@
-id: com.atit.qcalc
+id: io.github.from104.qcalc
 runtime: org.freedesktop.Platform
 runtime-version: '24.08'
 sdk: org.freedesktop.Sdk
@@ -10,9 +10,10 @@ command: run.sh
 separate-locales: false
 
 finish-args:
-  # X11 + shared memory (Electron은 아직 Wayland 실험적)
+  # 디스플레이 (Wayland 우선, X11 fallback)
+  - --socket=wayland
+  - --socket=fallback-x11
   - --share=ipc
-  - --socket=x11
   # GPU 가속
   - --device=dri
   # 네트워크 (환율 정보 업데이트용)
@@ -37,23 +38,23 @@ modules:
           - zypak-wrapper /app/qcalc/qcalc "$@"
       # desktop 파일
       - type: file
-        path: com.atit.qcalc.desktop
+        path: io.github.from104.qcalc.desktop
       # metainfo 파일
       - type: file
-        path: com.atit.qcalc.metainfo.xml
+        path: io.github.from104.qcalc.metainfo.xml
       # 아이콘 파일
       - type: file
-        path: icons/com.atit.qcalc.png
+        path: icons/io.github.from104.qcalc.png
     build-commands:
       # 빌드된 앱 복사
       - cp -a linux-unpacked /app/qcalc
       # desktop 파일 이름 패치 (Flatpak ID에 맞춤)
       - patch-desktop-filename /app/qcalc/resources/app.asar
       # 아이콘 설치 (256x256)
-      - install -Dm644 com.atit.qcalc.png /app/share/icons/hicolor/256x256/apps/com.atit.qcalc.png
+      - install -Dm644 io.github.from104.qcalc.png /app/share/icons/hicolor/256x256/apps/io.github.from104.qcalc.png
       # desktop 파일 설치
-      - install -Dm644 com.atit.qcalc.desktop /app/share/applications/com.atit.qcalc.desktop
+      - install -Dm644 io.github.from104.qcalc.desktop /app/share/applications/io.github.from104.qcalc.desktop
       # metainfo 설치
-      - install -Dm644 com.atit.qcalc.metainfo.xml /app/share/metainfo/com.atit.qcalc.metainfo.xml
+      - install -Dm644 io.github.from104.qcalc.metainfo.xml /app/share/metainfo/io.github.from104.qcalc.metainfo.xml
       # 실행 스크립트 설치
       - install -Dm755 run.sh /app/bin/run.sh

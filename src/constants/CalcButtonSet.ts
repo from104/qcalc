@@ -16,9 +16,11 @@ import { showMessage, showError } from 'src/utils/NotificationUtils';
 
 import { useCalcStore } from 'src/stores/calcStore';
 import { useFormulaStore } from 'src/stores/formulaStore';
+import { useUIStore } from 'src/stores/uiStore';
 
 const calcStore = useCalcStore();
 const formulaStore = useFormulaStore();
+const uiStore = useUIStore();
 
 const { calc } = calcStore;
 
@@ -175,7 +177,7 @@ export function createCalcButtonSet(t: ComposerTranslation) {
       a6: ['@keyboard_capslock', 'important', ["'"], () => handleShift(), false],
       b6: ['0', 'normal', ['0'], () => formulaStore.append('0'), () => !formulaStore.canAppend('0')],
       c6: ['@mdi-circle-small', 'normal', ['.'], () => formulaStore.append('.'), () => !formulaStore.canAppend('.')],
-      d6: ['@mdi-equal', 'important', ['=', 'Enter'], () => { try { formulaStore.evaluate(); } catch { showError(t('formulaEvaluationError')); } }, false],
+      d6: ['@mdi-equal', 'important', ['=', 'Enter'], () => { if (!formulaStore.expression) { formulaStore.openEditDialog(); uiStore.inputFocused = true; return; } try { formulaStore.evaluate(); } catch { showError(t('formulaEvaluationError')); } }, false],
     },
   };
 

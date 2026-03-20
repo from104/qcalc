@@ -44,6 +44,7 @@
   import { useCurrencyStore } from 'stores/currencyStore';
   import { useUnitStore } from 'stores/unitStore';
   import { useSettingsStore } from 'src/stores/settingsStore';
+  import { useFormulaStore } from 'src/stores/formulaStore';
 
   // 스토어 인스턴스 생성
   const uiStore = useUIStore();
@@ -52,6 +53,7 @@
   const currencyStore = useCurrencyStore();
   const unitStore = useUnitStore();
   const settingsStore = useSettingsStore();
+  const formulaStore = useFormulaStore();
 
   const fabOpen = ref(false);
 
@@ -76,14 +78,6 @@
     resultNumber: string;
     previousNumber: string;
     operator: string;
-  }
-
-  interface RecordString {
-    id: number;
-    memo?: string;
-    timestamp: number;
-    displayText: string;
-    origResult: CalculationResult;
   }
 
   // records 계산 속성 수정
@@ -249,7 +243,7 @@
   // 히스토리 항목 복사 함수
   const copyRecordItem = async (
     id: number,
-    copyType: 'formattedNumber' | 'onlyNumber' | 'memo' | 'time',
+    copyType: 'formattedNumber' | 'onlyNumber' | 'memo' | 'time' | 'expression',
   ): Promise<void> => {
     const record = calcStore.calc.record.getRecordById(id);
     const copyText =
@@ -261,7 +255,9 @@
             ? (calcStore.calc.record.getMemo(id) as string)
             : copyType === 'time'
               ? formatDateTime(record.timestamp)
-              : '';
+              : copyType === 'expression'
+                ? (record.expression ?? '')
+                : '';
     try {
       await copyToClipboard(copyText);
       showMessage(t('copySuccess'));
@@ -277,6 +273,19 @@
     calcStore.calc.currentNumber = record.calculationResult.resultNumber;
     calcStore.calc.offBufferReset();
     if (!isWideWidth()) navigateToPath('/', route, router);
+  };
+
+  const loadToFormulaField = (id: number) => {
+    const record = calcStore.calc.record.getRecordById(id);
+    if (record.expression) {
+      formulaStore.expression = record.expression;
+      if (!isWideWidth()) navigateToPath('/', route, router);
+      // 메뉴 닫힘/포커스 경합이 끝난 후 편집 모드 진입
+      setTimeout(() => {
+        formulaStore.openEditDialog();
+        uiStore.inputFocused = true;
+      }, 100);
+    }
   };
 
   const loadToSubPanel = (id: number) => {
@@ -376,6 +385,8 @@
         timestamp: record.timestamp,
         displayText,
         origResult: record.calculationResult,
+        ...(record.mode && { mode: record.mode }),
+        ...(record.expression && { expression: record.expression }),
       };
     });
 
@@ -653,6 +664,18 @@
                             :title="t('copyTime')"
                             :action="() => copyRecordItem(record.id as number, 'time')"
                             :caption="formatDateTime(record.timestamp)"
+                          />
+                          <MenuItem v-if="record.mode === 'formula' && record.expression" separator />
+                          <MenuItem
+                            v-if="record.mode === 'formula' && record.expression"
+                            :title="t('copyExpression')"
+                            :action="() => copyRecordItem(record.id as number, 'expression')"
+                            :caption="record.expression"
+                          />
+                          <MenuItem
+                            v-if="record.mode === 'formula' && record.expression && uiStore.currentTab === 'formula'"
+                            :title="t('loadToFormulaField')"
+                            :action="() => loadToFormulaField(record.id as number)"
                           />
                           <MenuItem separator />
                           <MenuItem
@@ -1013,6 +1036,8 @@ ko:
   loadToSubPanel: '서브 패널에 불러오기'
   deleteResult: '결과 삭제'
   copyTime: '시간 복사'
+  copyExpression: '수식 복사'
+  loadToFormulaField: '수식 필드에 불러오기'
   fontSize:
     increase: '글자 크게'
     decrease: '글자 작게'
@@ -1042,6 +1067,8 @@ en:
   loadToSubPanel: 'Load to sub panel'
   deleteResult: 'Delete result'
   copyTime: 'Copy time'
+  copyExpression: 'Copy expression'
+  loadToFormulaField: 'Load to formula field'
   fontSize:
     increase: 'Increase font size'
     decrease: 'Decrease font size'
@@ -1071,6 +1098,8 @@ ja:
   loadToSubPanel: 'サブパネルに読み込む'
   deleteResult: '結果を削除'
   copyTime: '時間をコピー'
+  copyExpression: '数式をコピー'
+  loadToFormulaField: '数式フィールドに読み込む'
   fontSize:
     increase: '文字を大きく'
     decrease: '文字を小さく'
@@ -1100,6 +1129,8 @@ zh:
   loadToSubPanel: '加载到子面板'
   deleteResult: '删除结果'
   copyTime: '复制时间'
+  copyExpression: '复制表达式'
+  loadToFormulaField: '加载到公式字段'
   fontSize:
     increase: '增大字体'
     decrease: '减小字体'
@@ -1129,6 +1160,8 @@ hi:
   loadToSubPanel: 'सब पैनल में लोड करें'
   deleteResult: 'परिणाम हटाएं'
   copyTime: 'समय कॉपी करें'
+  copyExpression: 'सूत्र कॉपी करें'
+  loadToFormulaField: 'सूत्र फ़ील्ड में लोड करें'
   fontSize:
     increase: 'फ़ॉन्ट बड़ा करें'
     decrease: 'फ़ॉन्ट छोटा करें'
@@ -1158,6 +1191,8 @@ de:
   loadToSubPanel: 'In Unterpanel laden'
   deleteResult: 'Ergebnis löschen'
   copyTime: 'Zeit kopieren'
+  copyExpression: 'Formel kopieren'
+  loadToFormulaField: 'In Formelfeld laden'
   fontSize:
     increase: 'Schrift vergrößern'
     decrease: 'Schrift verkleinern'
@@ -1187,6 +1222,8 @@ es:
   loadToSubPanel: 'Cargar en panel secundario'
   deleteResult: 'Eliminar resultado'
   copyTime: 'Copiar hora'
+  copyExpression: 'Copiar expresión'
+  loadToFormulaField: 'Cargar en campo de fórmula'
   fontSize:
     increase: 'Aumentar tamaño de fuente'
     decrease: 'Reducir tamaño de fuente'
@@ -1216,6 +1253,8 @@ fr:
   loadToSubPanel: 'Charger dans le sous-panneau'
   deleteResult: 'Supprimer le résultat'
   copyTime: "Copier l'heure"
+  copyExpression: "Copier l'expression"
+  loadToFormulaField: 'Charger dans le champ de formule'
   fontSize:
     increase: 'Augmenter la taille de police'
     decrease: 'Réduire la taille de police'

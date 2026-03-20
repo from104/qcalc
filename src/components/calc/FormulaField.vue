@@ -54,7 +54,11 @@
   const fieldBgColor = computed(() =>
     isWarning.value
       ? themesStore.getPanelColor('background', 'warning')
-      : themesStore.getPanelColor('background', 'normal'),
+      : isBrowsingHistory.value
+        ? themesStore.isDarkMode()
+          ? 'blue-10'
+          : 'blue-1'
+        : themesStore.getPanelColor('background', 'normal'),
   );
   const fieldTextColor = computed(() =>
     isWarning.value ? themesStore.getPanelColor('text', 'warning') : themesStore.getPanelColor('text', 'normal'),
@@ -72,6 +76,12 @@
   };
 
   const evaluateAndClose = () => {
+    // Enter keydown으로 편집 모드 진입 직후 Enter keyup 무시
+    if (Date.now() - formulaStore._editOpenedAt < 200) return;
+    if (!formulaStore.expression.trim()) {
+      exitEditing();
+      return;
+    }
     try {
       formulaStore.evaluate();
     } catch {
@@ -81,26 +91,52 @@
   };
 
   const cancelEdit = () => {
+    formulaStore.clearExpression();
     exitEditing();
   };
 
-  // '=' 키 → 계산 (Enter와 동일 효과)
+  // 히스토리 탐색 중 여부
+  const isBrowsingHistory = computed(() => formulaStore.historyIndex >= 0);
+
+  // 사용자가 수식을 직접 편집하면 히스토리 탐색 리셋
+  // flush: 'sync' → expression 변경 즉시 실행 (_isNavigating이 true인 동안 감지)
+  watch(
+    () => formulaStore.expression,
+    () => {
+      if (isBrowsingHistory.value && !formulaStore._isNavigating) {
+        formulaStore.resetHistory();
+      }
+    },
+    { flush: 'sync' },
+  );
+
+  // 편집 모드 키 처리
   const handleKeydown = (event: KeyboardEvent) => {
     if (event.key === '=') {
       event.preventDefault();
       evaluateAndClose();
+    } else if (event.key === 'ArrowUp') {
+      event.preventDefault();
+      event.stopPropagation();
+      formulaStore.historyUp();
+    } else if (event.key === 'ArrowDown') {
+      event.preventDefault();
+      event.stopPropagation();
+      formulaStore.historyDown();
     }
   };
 
-  // 포커스 아웃 시 계산 및 편집 종료
+  // 포커스 아웃 시 편집 종료 (평가하지 않음 — 평가는 Enter에서만)
   const handleBlur = (event: Event) => {
+    // 편집 모드 진입 직후 blur 무시 (외부에서 openEditDialog 호출 시 포커스 경합 방지)
+    if (Date.now() - formulaStore._editOpenedAt < 300) return;
     const relatedTarget = (event as FocusEvent).relatedTarget as Node | null;
     const container = editContainerRef.value;
     // 포커스가 컴포넌트 내부(도움말 버튼 등)로 이동한 경우 유지
     if (relatedTarget && container?.contains(relatedTarget)) return;
     // 도움말 메뉴가 열려 있는 경우 유지 (메뉴는 body에 텔레포트됨)
     if (formulaStore.isHelpOpen) return;
-    evaluateAndClose();
+    exitEditing();
   };
 
   // 도움말 메뉴가 닫힌 후 포커스가 컴포넌트 밖에 있으면 편집 종료
@@ -110,7 +146,7 @@
       if (!val && isEditing.value) {
         const container = editContainerRef.value;
         if (!container?.contains(document.activeElement)) {
-          evaluateAndClose();
+          exitEditing();
         }
       }
     },
@@ -150,8 +186,14 @@
   watch(
     () => formulaStore.isEditDialogOpen,
     (isOpen) => {
-      if (isOpen) unsubscribe();
-      else subscribe();
+      if (isOpen) {
+        unsubscribe();
+        // 외부(RecordCard 등)에서 편집 모드 진입 시에도 포커스 보장
+        // q-input 렌더링 완료 후 포커스 (이중 nextTick으로 Quasar 내부 초기화 대기)
+        nextTick(() => nextTick(() => inputRef.value?.focus()));
+      } else {
+        subscribe();
+      }
     },
     { immediate: true },
   );
@@ -265,8 +307,9 @@
         @keydown="handleKeydown"
         @blur="handleBlur"
       >
-        <template v-if="!isExpressionEmpty" #prepend>
+        <template v-if="!isExpressionEmpty || isBrowsingHistory" #prepend>
           <q-btn
+            v-if="!isExpressionEmpty"
             flat
             round
             dense
@@ -278,6 +321,7 @@
             @mousedown.prevent
             @click="formulaStore.clearExpression()"
           />
+          <q-icon v-if="isBrowsingHistory" name="history" size="xs" :color="fieldTextColor" />
         </template>
       </q-input>
     </div>

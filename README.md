@@ -31,7 +31,9 @@ QCalc packs **5 specialized calculators (Standard, Unit, Currency, Radix, Formul
 
 - Write expressions like `sqrt(2) * pi`, `sin(45 deg)`, `log(1000)`
 - Use `@` to reference the current value, `$` to reference memory
-- Inline editor (Space key) for free-form expression editing
+- Inline editor (Space or Enter when empty) for free-form expression editing
+- **History navigation** — ↑/↓ arrow keys to browse and reuse previous expressions
+- **Load from history** — right-click a formula record to load it back into the formula field
 - Built-in help with available functions, constants, and a link to mathjs docs
 - Full expression shown in result field and saved to history
 
@@ -125,6 +127,16 @@ QCalc packs **5 specialized calculators (Standard, Unit, Currency, Radix, Formul
 | `\`                     | Swap source ↔ target |
 | `A-\`                   | Toggle radix display |
 | `A-C-\`                 | Toggle prefix/suffix |
+
+### Formula (Edit Mode)
+
+| Key      | Action                            |
+| -------- | --------------------------------- |
+| `Space`  | Enter edit mode                   |
+| `Enter`  | Evaluate (or enter edit if empty) |
+| `Escape` | Clear expression and exit edit    |
+| `↑` `↓`  | Browse expression history         |
+| `=`      | Evaluate expression               |
 
 ### Navigation & UI
 

@@ -14,6 +14,10 @@ interface FormulaState {
   lastExpression: string; // 직전 평가된 수식 (ResultField label 표시용)
   isEditDialogOpen: boolean; // 인라인 편집 모드 활성화 여부
   isHelpOpen: boolean; // mathjs 참조 메뉴 표시 여부
+  historyIndex: number; // 히스토리 탐색 인덱스 (-1: 현재 입력)
+  savedExpression: string; // 히스토리 탐색 전 사용자 입력 백업
+  _isNavigating: boolean; // historyUp/Down에 의한 expression 변경 여부 (내부용)
+  _editOpenedAt: number; // 편집 모드 진입 시각 (Enter keyup 가드용)
 }
 
 export const useFormulaStore = defineStore('formula', {
@@ -22,6 +26,10 @@ export const useFormulaStore = defineStore('formula', {
     lastExpression: '',
     isEditDialogOpen: false,
     isHelpOpen: false,
+    historyIndex: -1,
+    savedExpression: '',
+    _isNavigating: false,
+    _editOpenedAt: 0,
   }),
 
   actions: {
@@ -116,6 +124,7 @@ export const useFormulaStore = defineStore('formula', {
 
       this.lastExpression = resolved;
       this.clearExpression();
+      this.resetHistory();
     },
 
     /**
@@ -161,13 +170,59 @@ export const useFormulaStore = defineStore('formula', {
       return 0; // 전체 감싸기
     },
 
+    /** formula 모드 기록만 반환 (최신순, expression 배열) */
+    _getFormulaHistory(): string[] {
+      const calcStore = useCalcStore();
+      return calcStore.calc.record
+        .getAllRecords()
+        .filter((r) => r.mode === 'formula' && r.expression)
+        .map((r) => r.expression!);
+    },
+
+    /** 히스토리 탐색 초기화 */
+    resetHistory(): void {
+      this.historyIndex = -1;
+      this.savedExpression = '';
+    },
+
+    /** ↑ 키: 이전 수식으로 이동 */
+    historyUp(): void {
+      const history = this._getFormulaHistory();
+      if (history.length === 0) return;
+      if (this.historyIndex === -1) {
+        this.savedExpression = this.expression;
+      }
+      if (this.historyIndex < history.length - 1) {
+        this._isNavigating = true;
+        this.historyIndex++;
+        this.expression = history[this.historyIndex]!;
+        this._isNavigating = false;
+      }
+    },
+
+    /** ↓ 키: 다음 수식으로 이동 */
+    historyDown(): void {
+      if (this.historyIndex < 0) return;
+      this._isNavigating = true;
+      this.historyIndex--;
+      if (this.historyIndex === -1) {
+        this.expression = this.savedExpression;
+      } else {
+        const history = this._getFormulaHistory();
+        this.expression = history[this.historyIndex]!;
+      }
+      this._isNavigating = false;
+    },
+
     openEditDialog(): void {
       this.isEditDialogOpen = true;
+      this._editOpenedAt = Date.now();
     },
 
     closeEditDialog(): void {
       this.isEditDialogOpen = false;
       this.isHelpOpen = false;
+      this.resetHistory();
     },
 
     toggleHelp(): void {
@@ -259,5 +314,7 @@ export const useFormulaStore = defineStore('formula', {
     },
   },
 
-  persist: true,
+  persist: {
+    pick: ['expression', 'lastExpression', 'isEditDialogOpen', 'isHelpOpen'],
+  },
 });

@@ -59,6 +59,9 @@ High-precision calculations, unit/currency/radix conversion, and formula evaluat
 - **Supported Operations**: All mathjs math functions including arithmetic, powers, trigonometry, logarithms
 - **Current Value Reference**: Use @ symbol to include current calculated value in expressions
 - **Memory Functions**: Ctrl+Enter (MS), Ctrl+Backspace (MR), Ctrl+Delete (MC)
+- **Edit Mode**: Press Space or Enter (when empty) to enter, Esc to clear and exit
+- **History Navigation**: Use ↑/↓ arrow keys in edit mode to browse previous expressions, auto-resets on edit
+- **Load Expression**: Right-click a formula record → "Load to formula field" to reuse expressions
 
 ### How to Use Productivity Features
 
@@ -211,6 +214,16 @@ High-precision calculations, unit/currency/radix conversion, and formula evaluat
 | \        | Swap source and target           |
 | A-\      | Toggle radix display             |
 | AC-\     | Toggle radix position (pre/post) |
+
+### Formula Calculator (Edit Mode)
+
+| Shortcut | Function                               |
+| -------- | -------------------------------------- |
+| Space    | Enter edit mode                        |
+| Enter    | Evaluate (or enter edit mode if empty) |
+| Escape   | Clear expression and exit edit mode    |
+| ↑/↓      | Browse expression history              |
+| =        | Evaluate expression                    |
 
 ### Screen Navigation and UI Control
 

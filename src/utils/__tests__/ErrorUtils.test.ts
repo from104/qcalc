@@ -79,14 +79,7 @@ describe('ErrorUtils', () => {
     });
 
     it('반환 타입이 never (항상 throw)', () => {
-      let reached = false;
-      try {
-        throwError('errors.never');
-        reached = true;
-      } catch {
-        // expected
-      }
-      expect(reached).toBe(false);
+      expect(() => throwError('errors.never')).toThrow();
     });
   });
 });

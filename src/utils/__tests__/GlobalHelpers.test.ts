@@ -100,21 +100,33 @@ describe('GlobalHelpers', () => {
     });
 
     it('폰: 항상 false', () => {
-      globalThis.window.globalVars = { isTablet: false, isPhone: true } as typeof globalThis.window.globalVars;
+      Object.defineProperty(globalThis.window, 'globalVars', {
+        value: { isTablet: false, isPhone: true },
+        writable: true,
+        configurable: true,
+      });
       (Screen as { width: number }).width = 1000;
       (Screen as { height: number }).height = 500;
       expect(isWideWidth()).toBe(false);
     });
 
     it('태블릿: 가로 모드면 true', () => {
-      globalThis.window.globalVars = { isTablet: true, isPhone: false } as typeof globalThis.window.globalVars;
+      Object.defineProperty(globalThis.window, 'globalVars', {
+        value: { isTablet: true, isPhone: false },
+        writable: true,
+        configurable: true,
+      });
       (Screen as { width: number }).width = 1024;
       (Screen as { height: number }).height = 768;
       expect(isWideWidth()).toBe(true);
     });
 
     it('태블릿: 세로 모드면 false', () => {
-      globalThis.window.globalVars = { isTablet: true, isPhone: false } as typeof globalThis.window.globalVars;
+      Object.defineProperty(globalThis.window, 'globalVars', {
+        value: { isTablet: true, isPhone: false },
+        writable: true,
+        configurable: true,
+      });
       (Screen as { width: number }).width = 768;
       (Screen as { height: number }).height = 1024;
       expect(isWideWidth()).toBe(false);
