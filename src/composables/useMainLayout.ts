@@ -18,6 +18,7 @@ import CalcPage from 'pages/CalcPage.vue';
 import UnitPage from 'pages/UnitPage.vue';
 import CurrencyPage from 'pages/CurrencyPage.vue';
 import RadixPage from 'pages/RadixPage.vue';
+import FormulaPage from 'pages/FormulaPage.vue';
 import HelpPage from 'src/pages/HelpPage.vue';
 import AboutPage from 'src/pages/AboutPage.vue';
 import RecordPage from 'src/pages/RecordPage.vue';
@@ -57,10 +58,16 @@ export function useMainLayout(t: (key: string) => string, recordManagerInstance?
    * 메인 탭 설정
    */
   const tabs = reactive<Tab[]>([
-    { name: 'calc', title: computed(() => t('calc')), component: shallowRef(CalcPage) },
-    { name: 'unit', title: computed(() => t('unit')), component: shallowRef(UnitPage) },
-    { name: 'currency', title: computed(() => t('currency')), component: shallowRef(CurrencyPage) },
-    { name: 'radix', title: computed(() => t('radix')), component: shallowRef(RadixPage) },
+    { name: 'calc', title: computed(() => t('calc')), icon: 'calculate', component: shallowRef(CalcPage) },
+    { name: 'unit', title: computed(() => t('unit')), icon: 'straighten', component: shallowRef(UnitPage) },
+    {
+      name: 'currency',
+      title: computed(() => t('currency')),
+      icon: 'currency_exchange',
+      component: shallowRef(CurrencyPage),
+    },
+    { name: 'radix', title: computed(() => t('radix')), icon: 'memory', component: shallowRef(RadixPage) },
+    { name: 'formula', title: computed(() => t('formula')), icon: 'functions', component: shallowRef(FormulaPage) },
   ]);
 
   /**
@@ -167,6 +174,7 @@ export function useMainLayout(t: (key: string) => string, recordManagerInstance?
     [['Control+2'], () => uiStore.setCurrentTab('unit')],
     [['Control+3'], () => uiStore.setCurrentTab('currency')],
     [['Control+4'], () => uiStore.setCurrentTab('radix')],
+    [['Control+5'], () => uiStore.setCurrentTab('formula')],
     [['Control+Tab', 'ArrowRight'], moveTabRight],
     [['Control+Shift+Tab', 'ArrowLeft'], moveTabLeft],
     [['F1'], () => navigateToPath('/help', route, router)],

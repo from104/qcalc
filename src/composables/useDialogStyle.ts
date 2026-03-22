@@ -33,7 +33,8 @@ export function useDialogStyle() {
   /**
    * 다이얼로그 헤더의 그라데이션 배경 스타일을 반환합니다.
    */
-  const headerGradient = 'linear-gradient(135deg, var(--q-primary) 0%, rgba(var(--q-primary-rgb), 0.8) 100%)';
+  const headerGradient =
+    'linear-gradient(135deg, var(--q-primary) 0%, color-mix(in srgb, var(--q-primary) 80%, transparent) 100%)';
 
   return {
     isDarkMode,

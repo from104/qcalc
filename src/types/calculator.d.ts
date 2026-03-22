@@ -6,7 +6,7 @@
  */
 
 import type { BigNumber as tBigNumber } from 'mathjs';
-import type { Radix } from '../utils/RadixConverter';
+import type { Radix } from '../core/converters/RadixConverter';
 
 declare global {
   type BigNumber = tBigNumber;
@@ -22,11 +22,15 @@ declare global {
 
   type WordSize = 0 | 4 | 8 | 16 | 32 | 64;
 
+  type CalcMode = 'calc' | 'formula';
+
   type ResultRecord = {
     id?: number;
     memo?: string;
     timestamp: number;
     calculationResult: CalculationResult;
+    mode?: CalcMode;
+    expression?: string; // formula 모드: 수식 문자열 (@는 계산 시점의 currentNumber로 치환된 값)
   };
 
   interface RecordString {
@@ -35,15 +39,23 @@ declare global {
     timestamp: number;
     displayText: string;
     origResult: CalculationResult;
+    mode?: CalcMode;
+    expression?: string;
   }
 
   type CalculatorButtonDefinition = {
-    [id: string]: [label: string, color: string, keys: string[], action: () => void, isDisabled: boolean];
+    [id: string]: [
+      label: string,
+      color: string,
+      keys: string[],
+      action: () => void,
+      isDisabled: boolean | (() => boolean),
+    ];
   };
 
   type ExtendedButtonFunction = {
-    [key: string]: [label: string, shortcutKeys: string[], action: () => void, isDisabled: boolean];
+    [key: string]: [label: string, shortcutKeys: string[], action: () => void, isDisabled: boolean | (() => boolean)];
   };
 }
 
-export { WordSize, CalculationResult, ResultRecord, RecordString };
+export { WordSize, CalculationResult, ResultRecord, RecordString, CalcMode };

@@ -46,12 +46,11 @@ export default defineRouter(function (/* { store, ssrContext } */) {
   });
 
   // 네비게이션 가드 설정
-  Router.beforeEach((to, from, next) => {
+  Router.beforeEach((to, from) => {
     // 경로 깊이 계산 함수
 
     // '/' == 0, '/a' == 1, '/a/b' == 2, '/a/b/c' == 3
     const getPathDepth = (path: string): number => {
-      // 시작과 끝의 '/'를 제거하고 남은 '/'의 수를 계산
       const trimmedPath = path.replace(/^\/+|\/+$/g, '');
       if (trimmedPath === '') {
         return 0;
@@ -68,11 +67,8 @@ export default defineRouter(function (/* { store, ssrContext } */) {
     } else if (toDepth < fromDepth) {
       to.meta.navigationMethod = 'back';
     } else {
-      // 같은 깊이일 경우 이전 경로로 판단
       to.meta.navigationMethod = 'forward';
     }
-
-    next();
   });
 
   // 생성된 라우터 인스턴스 반환

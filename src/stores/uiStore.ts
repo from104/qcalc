@@ -39,7 +39,7 @@ export const useUIStore = defineStore('ui', {
   actions: {
     // 탭 관리
     setCurrentTab(tab: string): void {
-      if (['calc', 'unit', 'currency', 'radix'].includes(tab)) {
+      if (['calc', 'unit', 'currency', 'radix', 'formula'].includes(tab)) {
         this.currentTab = tab;
       } else if (tab === '' || this.currentTab === '') {
         this.currentTab = 'calc'; // 기본값으로 'calc' 설정

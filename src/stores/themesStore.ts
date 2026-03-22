@@ -128,7 +128,7 @@ export const useThemesStore = defineStore('themes', {
           await StatusBar.setStyle({ style: Style.Dark });
           // 상태바 배경색 설정
           await StatusBar.setBackgroundColor({ color });
-          console.log('상태바 설정 완료:', { color, overlay: false });
+          // console.log('상태바 설정 완료:', { color, overlay: false });
         } catch (error) {
           console.error('상태바 설정 실패:', error);
         }

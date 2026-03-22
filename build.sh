@@ -1,206 +1,224 @@
 #!/bin/bash
+#
+# QCalc 빌드 스크립트
+# 사용법: ./build.sh [linux|win|android|flatpak|all] [--skip-install]
+#
 
-# 스크립트 오류 발생 시 즉시 종료
-set -e
-# 정의되지 않은 변수 사용 시 오류 발생
-set -u
-# 파이프라인의 명령 중 하나라도 실패하면 전체 파이프라인 실패
-set -o pipefail
+set -euo pipefail
 
-# 버전 체크 함수
-check_versions() {
-    echo "Checking Node.js and Yarn versions..."
+# ── 색상 출력 ──
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+BLUE='\033[0;34m'
+BOLD='\033[1m'
+NC='\033[0m'
 
-    # Node.js 설치 확인
-    if ! command -v node &> /dev/null; then
-        echo "Error: Node.js is not installed."
-        echo "Please install Node.js from https://nodejs.org."
-        exit 1
-    fi
+info()  { echo -e "${GREEN}[INFO]${NC} $*"; }
+warn()  { echo -e "${YELLOW}[WARN]${NC} $*"; }
+error() { echo -e "${RED}[ERROR]${NC} $*"; exit 1; }
+step()  { echo -e "\n${BLUE}${BOLD}── $* ──${NC}"; }
 
-    # Yarn 설치 확인
-    if ! command -v yarn &> /dev/null; then
-        echo "Error: Yarn is not installed."
-        echo "Please install Yarn using 'npm install -g yarn'."
-        exit 1
-    fi
+# ── 프로젝트 설정 ──
+PROJECT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+cd "$PROJECT_DIR"
 
-    # Node.js 버전 체크 (package.json의 engines.node 참조)
-    REQUIRED_NODE_VERSION=$(grep -oP '(?<="node": ")[^"]+' package.json | sed 's/[^0-9.]//g')
-    CURRENT_NODE_VERSION=$(node -v | cut -d'v' -f2)
+BUILD_DIR="./package"
+VERSION=$(node -p "require('./package.json').version" 2>/dev/null) || error "package.json에서 버전을 읽을 수 없습니다."
+SKIP_INSTALL=false
 
-    if [ -z "$REQUIRED_NODE_VERSION" ]; then
-        echo "Warning: Node.js required version not found in package.json. Skipping Node.js version check."
-    elif ! printf '%s\n' "$REQUIRED_NODE_VERSION" "$CURRENT_NODE_VERSION" | sort -V -C; then
-        echo "Error: Node.js version $REQUIRED_NODE_VERSION or higher is required."
-        echo "Current version: $CURRENT_NODE_VERSION"
-        exit 1
-    fi
+# ── 인수 파싱 ──
+BUILD_TYPE="${1:-all}"
+[[ "${2:-}" == "--skip-install" ]] && SKIP_INSTALL=true
 
-    # Yarn 버전 체크 (package.json의 engines.yarn 참조)
-    REQUIRED_YARN_VERSION=$(grep -oP '(?<="yarn": ")[^"]+' package.json | sed 's/[^0-9.]//g')
-    CURRENT_YARN_VERSION=$(yarn -v)
-
-    if [ -z "$REQUIRED_YARN_VERSION" ]; then
-        echo "Warning: Yarn required version not found in package.json. Skipping Yarn version check."
-    elif ! printf '%s\n' "$REQUIRED_YARN_VERSION" "$CURRENT_YARN_VERSION" | sort -V -C; then
-        echo "Error: Yarn version $REQUIRED_YARN_VERSION or higher is required."
-        echo "Current version: $CURRENT_YARN_VERSION"
-        exit 1
-    fi
-
-    echo "Node.js and Yarn versions are sufficient."
+# ── 유틸리티 ──
+require_cmd() {
+    command -v "$1" &>/dev/null || error "'$1'이(가) 설치되어 있지 않습니다. $2"
 }
 
-# Wine 설치 확인 및 설치 안내 함수
-check_wine() {
-    if ! command -v wine &> /dev/null; then
-        echo "Error: Wine is not installed."
-        echo "To build for Windows, Wine is required. Please install it using your distribution's package manager."
-        echo "For Debian/Ubuntu-based systems, you can use:"
-        echo "  sudo dpkg --add-architecture i386"
-        echo "  sudo apt update"
-        echo "  sudo apt install -y wine64 wine32"
-        exit 1
-    fi
+elapsed() {
+    local start=$1
+    local end
+    end=$(date +%s)
+    local diff=$((end - start))
+    echo "$((diff / 60))m $((diff % 60))s"
 }
 
-# Android Studio 환경 체크 함수
-check_android_env() {
-    echo "Checking Android environment variables..."
-    if [ -z "${ANDROID_HOME:-}" ]; then
-        echo "Error: ANDROID_HOME environment variable is not set."
-        echo "Please install Android Studio and set ANDROID_HOME in your environment."
-        echo "Example: export ANDROID_HOME=\$HOME/Android/Sdk"
-        exit 1
-    fi
+# ── 환경 체크 ──
+check_env() {
+    step "환경 체크"
+    require_cmd node "https://nodejs.org 에서 설치하세요."
+    require_cmd yarn "npm install -g yarn 으로 설치하세요."
 
-    if [ ! -d "$ANDROID_HOME/platform-tools" ]; then
-        echo "Error: Android SDK platform-tools not found at $ANDROID_HOME/platform-tools."
-        echo "Please install platform-tools using Android Studio SDK Manager."
-        exit 1
-    fi
-
-    if [ ! -d "$ANDROID_HOME/build-tools" ]; then
-        echo "Error: Android SDK build-tools not found at $ANDROID_HOME/build-tools."
-        echo "Please install build-tools using Android Studio SDK Manager."
-        exit 1
-    fi
-    echo "Android environment is set up correctly."
+    local node_ver
+    node_ver=$(node -v | cut -d'v' -f2)
+    local yarn_ver
+    yarn_ver=$(yarn -v)
+    info "Node.js $node_ver / Yarn $yarn_ver / Version $VERSION"
 }
 
-# .env 파일 로드
 load_env() {
     if [ -f .env ]; then
-        echo "Loading environment variables from .env file..."
-        # shellcheck disable=SC2046
-        export $(grep -v '^#' .env | xargs)
-    else
-        echo "No .env file found. Skipping environment variable loading."
+        info ".env 파일 로드 중..."
+        set -a
+        # shellcheck disable=SC1091
+        source .env
+        set +a
     fi
 }
 
-# 빌드 디렉토리 설정
-BUILD_DIR="./package"
+install_deps() {
+    if [ "$SKIP_INSTALL" = true ]; then
+        info "의존성 설치 건너뜀 (--skip-install)"
+        return
+    fi
+    step "의존성 설치"
+    yarn install --immutable
+}
 
-# 버전 정보 추출
-VERSION=$(grep -oP '(?<="version": ")[^"]+' package.json)
-if [ -z "$VERSION" ]; then
-    echo "Error: Could not extract version from package.json."
-    exit 1
-fi
-echo "Building version $VERSION..."
+update_fallback_rates() {
+    step "환율 스냅샷 갱신"
+    if npx tsx scripts/fetch-fallback-rates.ts; then
+        info "환율 스냅샷 갱신 완료"
+    else
+        warn "환율 스냅샷 갱신 실패 — 기존 스냅샷을 사용합니다."
+    fi
+}
 
-# 빌드 전 환경 체크
-check_versions
-load_env
-
-# 필요한 모듈 설치
-echo "Installing dependencies..."
-yarn install --immutable --check-cache
-
-# 빌드 디렉토리 생성
-echo "Creating build directory: $BUILD_DIR"
-mkdir -p "$BUILD_DIR"
-
-# Linux 빌드 함수
+# ── 빌드 함수 ──
 build_linux() {
-    echo "Building Linux version..."
+    step "Linux 빌드"
+    local start
+    start=$(date +%s)
+
     quasar build -m electron -T linux
 
-    echo "Linux build completed. Moving artifacts..."
-    # AppImage 파일 이동
-    find dist/electron/Packaged -name "*.AppImage" -exec mv {} "$BUILD_DIR/QCalc-$VERSION-linux.AppImage" \; || true
-    # snap 파일 이동
-    find dist/electron/Packaged -name "*.snap" -exec mv {} "$BUILD_DIR/QCalc-$VERSION-linux.snap" \; || true
-    # latest-linux.yml 파일 복사
-    if [ -f dist/electron/Packaged/latest-linux.yml ]; then
-        cp dist/electron/Packaged/latest-linux.yml "$BUILD_DIR/latest-linux.yml"
-    fi
+    mkdir -p "$BUILD_DIR"
+    find dist/electron/Packaged -name "*.AppImage" -exec mv {} "$BUILD_DIR/QCalc-$VERSION-linux.AppImage" \; 2>/dev/null || true
+    find dist/electron/Packaged -name "*.snap" -exec mv {} "$BUILD_DIR/QCalc-$VERSION-linux.snap" \; 2>/dev/null || true
+    [ -f dist/electron/Packaged/latest-linux.yml ] && cp dist/electron/Packaged/latest-linux.yml "$BUILD_DIR/"
+
+    info "Linux 빌드 완료 ($(elapsed "$start"))"
 }
 
-# Windows 빌드 함수
 build_windows() {
-    echo "Building Windows version..."
-    check_wine
+    step "Windows 빌드"
+    local start
+    start=$(date +%s)
+
+    require_cmd wine "Wine이 필요합니다: sudo apt install -y wine64 wine32"
     export WINEARCH=win64
     export WINEPREFIX=~/.wine64
 
     quasar build -m electron -T win32
 
-    echo "Windows build completed. Moving artifacts..."
+    mkdir -p "$BUILD_DIR"
     mv dist/electron/Packaged/*.exe "$BUILD_DIR/QCalc-$VERSION-win.exe"
-    # latest.yml 파일 복사
-    cp dist/electron/Packaged/latest.yml "$BUILD_DIR/latest.yml"
+    [ -f dist/electron/Packaged/latest.yml ] && cp dist/electron/Packaged/latest.yml "$BUILD_DIR/"
+
+    info "Windows 빌드 완료 ($(elapsed "$start"))"
 }
 
-# Android 빌드 함수
 build_android() {
-    echo "Building Android version..."
-    check_android_env
+    step "Android 빌드"
+    local start
+    start=$(date +%s)
+
+    [ -z "${ANDROID_HOME:-}" ] && error "ANDROID_HOME 환경변수가 설정되지 않았습니다."
+    [ ! -d "$ANDROID_HOME/platform-tools" ] && error "Android SDK platform-tools를 찾을 수 없습니다."
 
     quasar build -m capacitor -T android
 
-    echo "Android build completed. Signing and moving APK..."
+    mkdir -p "$BUILD_DIR"
+    local keystore="${MY_JKS_KEY_FILE:-src-capacitor/android/app/my-release-key.jks}"
 
-    # .env 파일에서 MY_JKS_KEY_FILE 가져오기 (기본값 설정)
-    MY_JKS_KEY_FILE="${MY_JKS_KEY_FILE:-src-capacitor/android/app/my-release-key.jks}"
-
-    if [ ! -f "$MY_JKS_KEY_FILE" ]; then
-        echo "Warning: Keystore file not found at $MY_JKS_KEY_FILE."
-        echo "Android app will be unsigned. To sign, provide MY_JKS_KEY_FILE in .env or ensure the default path is correct."
-        # 서명되지 않은 APK 이동 (있는 경우)
-        find src-capacitor/android/app/build/outputs/apk/debug -name "app-debug.apk" -exec cp {} "$BUILD_DIR/QCalc-$VERSION-android-debug.apk" \; || true
-    else
-        echo "Building signed APK..."
+    if [ -f "$keystore" ]; then
+        info "서명된 APK 빌드 중..."
         (cd src-capacitor/android && ./gradlew assembleRelease)
         cp src-capacitor/android/app/build/outputs/apk/release/app-release.apk "$BUILD_DIR/QCalc-$VERSION-android.apk"
+    else
+        warn "키스토어 없음 ($keystore) — 디버그 APK로 대체"
+        find src-capacitor/android/app/build/outputs/apk/debug -name "app-debug.apk" \
+            -exec cp {} "$BUILD_DIR/QCalc-$VERSION-android-debug.apk" \; 2>/dev/null || true
     fi
+
+    info "Android 빌드 완료 ($(elapsed "$start"))"
 }
 
-# 인수 처리
-BUILD_TYPE=${1:-all} # 인수가 없으면 'all'을 기본값으로 사용
+build_flatpak() {
+    step "Flatpak 빌드"
+    local start
+    start=$(date +%s)
 
-case "$BUILD_TYPE" in
-    "all")
-        build_linux
-        build_windows
-        build_android
-        ;;
-    "linux")
-        build_linux
-        ;;
-    "win")
-        build_windows
-        ;;
-    "android")
-        build_android
-        ;;
-    *)
-        echo "Invalid build type. Available options: all, linux, win, android"
-        exit 1
-        ;;
-esac
+    require_cmd flatpak-builder "sudo apt install flatpak-builder 로 설치하세요."
+    bash flatpak/build-flatpak.sh build
 
-echo "Build process finished successfully!"
-echo "You can find the build files in the $BUILD_DIR directory."
+    # .flatpak 번들을 package 디렉토리로 복사
+    mkdir -p "$BUILD_DIR"
+    local flatpak_bundle="/tmp/qcalc-flatpak-builder/io.github.from104.qcalc.flatpak"
+    if [ -f "$flatpak_bundle" ]; then
+        cp "$flatpak_bundle" "$BUILD_DIR/QCalc-$VERSION-linux.flatpak"
+    fi
+
+    info "Flatpak 빌드 완료 ($(elapsed "$start"))"
+}
+
+# ── 사용법 ──
+usage() {
+    cat <<EOF
+${BOLD}QCalc 빌드 스크립트 v$VERSION${NC}
+
+사용법: $0 [TARGET] [OPTIONS]
+
+Targets:
+  linux       Linux (AppImage + Snap)
+  win         Windows (exe, Wine 필요)
+  android     Android (APK, Android SDK 필요)
+  flatpak     Flatpak 패키지
+  all         linux + win + android (기본값)
+
+Options:
+  --skip-install  의존성 설치 건너뜀
+
+예시:
+  $0 linux                  Linux만 빌드
+  $0 all --skip-install     전체 빌드 (의존성 설치 생략)
+EOF
+}
+
+# ── 메인 ──
+main() {
+    local total_start
+    total_start=$(date +%s)
+
+    check_env
+    load_env
+    install_deps
+    update_fallback_rates
+
+    case "$BUILD_TYPE" in
+        linux)   build_linux ;;
+        win)     build_windows ;;
+        android) build_android ;;
+        flatpak) build_flatpak ;;
+        all)
+            build_linux
+            build_flatpak
+            build_windows
+            build_android
+            ;;
+        help|-h|--help)
+            usage
+            exit 0
+            ;;
+        *)
+            error "알 수 없는 타깃: $BUILD_TYPE\n$(usage)"
+            ;;
+    esac
+
+    echo ""
+    info "${BOLD}빌드 완료!${NC} (총 $(elapsed "$total_start"))"
+    [ -d "$BUILD_DIR" ] && info "결과물: $BUILD_DIR/" && ls -lh "$BUILD_DIR/"
+}
+
+main

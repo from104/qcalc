@@ -6,7 +6,7 @@
  */
 
 // mathjs 라이브러리에서 필요한 함수와 타입을 가져옵니다.
-import { toBigNumber } from 'classes/CalculatorMath';
+import { toBigNumber } from 'core/calculator/CalculatorMath';
 
 // Unit 인터페이스는 각 단위에 대한 정보를 정의합니다.
 interface Unit {
@@ -97,7 +97,7 @@ export const unitBaseData: UnitBaseData = {
   angle: {
     // 각도
     deg: { value: 0.017453292519943295, desc: 'Degree' }, // 도
-    'μrad': { value: 0.000001, desc: 'Microradian' }, // 마이크로라디안
+    μrad: { value: 0.000001, desc: 'Microradian' }, // 마이크로라디안
     grad: { value: 0.015707963267948967, desc: 'Gradian' }, // 그라디안
     rad: { value: 1, desc: 'Radian' }, // 라디안
     amin: { value: 0.0002908882086657216, desc: 'Minute of arc' }, // 분(각도)

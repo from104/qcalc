@@ -1,14 +1,14 @@
 <script setup lang="ts">
-  import { computed } from 'vue';
+  import { computed, toValue } from 'vue';
   import { useI18n } from 'vue-i18n';
   import { useRouter, useRoute } from 'vue-router';
   import { useUIStore } from 'stores/uiStore';
   import { useThemesStore } from 'stores/themesStore';
   import { navigateToPath } from '../utils/NavigationUtils';
   import { isWideWidth } from '../utils/GlobalHelpers';
-  import ToolTip from 'components/snippets/ToolTip.vue';
-  import MenuPanel from 'components/MenuPanel.vue';
-  import HelpIcon from 'components/snippets/HelpIcon.vue';
+  import ToolTip from 'components/common/ToolTip.vue';
+  import MenuPanel from 'components/settings/MenuPanel.vue';
+  import HelpIcon from 'components/common/HelpIcon.vue';
   import { useRecordManager } from '../composables/useRecordManager';
   import type { Tab, SubPageConfig } from '../types/layout.d';
 
@@ -38,7 +38,7 @@
 
   // useRecordManager는 컴포저블이므로 같은 인스턴스를 반환함
   // 하지만 키 바인딩은 useMainLayout에서만 등록되므로 중복 등록 방지
-  const recordManager = useRecordManager();
+  const recordManager = useRecordManager(t);
   const { recordFileInput, handleRecordFileChange } = recordManager;
 
   const localLeftDrawerOpen = computed({
@@ -50,6 +50,11 @@
     get: () => uiStore.currentTab,
     set: (value) => uiStore.setCurrentTab(value),
   });
+
+  const MAX_VISIBLE_TABS = 3;
+  const visibleTabs = computed(() => props.tabs.slice(0, MAX_VISIBLE_TABS));
+  const overflowTabs = computed(() => props.tabs.slice(MAX_VISIBLE_TABS));
+  const isOverflowActive = computed(() => overflowTabs.value.some((tab) => tab.name === localCurrentTab.value));
 
   // 서브 페이지 관련
   const currentSubPage = computed(() => {
@@ -95,8 +100,8 @@
 
     <q-header id="header" class="z-top noselect" elevated>
       <!-- 좁은 화면 메인 헤더 -->
-      <q-toolbar v-if="!isSubPage" v-auto-blur :class="{ 'q-pt-md': $g.isAndroid && $g.apiLevel >= 35 }">
-        <q-btn flat dense round class="q-mr-sm" icon="menu" aria-label="Menu" @click="emit('toggleLeftDrawer')">
+      <q-toolbar v-if="!isSubPage" v-auto-blur :class="{ 'q-pt-lg': $g.isAndroid && $g.apiLevel >= 35 }">
+        <q-btn flat dense round class="q-mr-none" icon="menu" aria-label="Menu" @click="emit('toggleLeftDrawer')">
           <ToolTip
             :text-color="themesStore.getDarkColor()"
             :bg-color="themesStore.getCurrentThemeColors.ui.warning"
@@ -106,30 +111,59 @@
         <q-tabs
           v-model="localCurrentTab"
           align="left"
-          class="col-8 q-px-none"
+          class="col-grow q-px-none"
           active-color="text-primary"
           indicator-color="secondary"
           dense
           shrink
-          inline-label
-          outside-arrows
-          mobile-arrows
+          :arrows="false"
           role="tablist"
           :aria-label="t('ariaLabel.mainTabs')"
         >
           <q-tab
-            v-for="tab in props.tabs"
+            v-for="tab in visibleTabs"
             :id="`tab-${tab.name}`"
             :key="tab.name"
-            :label="typeof tab.title === 'string' ? tab.title : (tab.title as any).value"
+            :icon="tab.icon"
             :name="tab.name"
             class="q-px-xs"
             dense
             role="tab"
+            :aria-label="toValue(tab.title)"
             :aria-selected="localCurrentTab === tab.name"
             :aria-controls="`panel-${tab.name}`"
-          />
+          >
+            <q-tooltip :delay="500">{{ toValue(tab.title) }}</q-tooltip>
+          </q-tab>
         </q-tabs>
+        <!-- 오버플로우 메뉴 -->
+        <q-btn
+          v-if="overflowTabs.length > 0"
+          flat
+          dense
+          icon="expand_more"
+          class="q-px-xs overflow-menu-btn"
+          :color="isOverflowActive ? 'secondary' : undefined"
+        >
+          <q-menu anchor="bottom right" self="top right" :offset="[0, 14]" class="overflow-menu-wrapper">
+            <q-list dense style="min-width: 160px" class="overflow-menu-list">
+              <q-item
+                v-for="tab in overflowTabs"
+                :key="tab.name"
+                v-close-popup
+                clickable
+                :active="localCurrentTab === tab.name"
+                active-class="text-secondary"
+                @click="uiStore.setCurrentTab(tab.name)"
+              >
+                <q-item-section avatar>
+                  <q-icon :name="tab.icon" size="20px" />
+                </q-item-section>
+                <q-item-section>{{ toValue(tab.title) }}</q-item-section>
+              </q-item>
+            </q-list>
+          </q-menu>
+        </q-btn>
         <q-space />
         <q-btn
           flat
@@ -160,7 +194,7 @@
       </q-toolbar>
 
       <!-- 좁은 화면 서브 헤더 -->
-      <q-toolbar v-else v-auto-blur class="q-px-sm" :class="{ 'q-pt-md': $g.isAndroid && $g.apiLevel >= 35 }">
+      <q-toolbar v-else v-auto-blur class="q-px-sm" :class="{ 'q-pt-lg': $g.isAndroid && $g.apiLevel >= 35 }">
         <q-btn
           flat
           dense
@@ -172,9 +206,9 @@
         />
         <q-toolbar-title class="text-subtitle1">
           {{
-            typeof props.subPageConfig[currentSubPage]?.title === 'string'
-              ? props.subPageConfig[currentSubPage]?.title
-              : (props.subPageConfig[currentSubPage]?.title as any)?.value
+            props.subPageConfig[currentSubPage]?.title != null
+              ? toValue(props.subPageConfig[currentSubPage]!.title)
+              : ''
           }}
           <HelpIcon
             v-if="currentSubPage === 'record' && $g.isMobile"
@@ -194,13 +228,13 @@
           :icon="button.icon"
           role="button"
           :aria-label="t(`ariaLabel.${button.icon}`)"
-          :disable="(button.disabled as any).value"
+          :disable="toValue(button.disabled)"
           @click="button.action"
         >
           <ToolTip
             :text-color="themesStore.getDarkColor()"
             :bg-color="themesStore.getCurrentThemeColors.ui.warning"
-            :text="button.tooltip as any"
+            :text="toValue(button.tooltip)"
           />
         </q-btn>
       </q-toolbar>
@@ -223,8 +257,7 @@
             :key="index"
             :name="tab.name"
             role="tabpanel"
-            :aria-label="t('ariaLabel.tabPanel', { name: typeof tab.title === 'string' ? tab.title : (tab.title as any).value })
-              "
+            :aria-label="t('ariaLabel.tabPanel', { name: toValue(tab.title) })"
             :aria-labelledby="`tab-${tab.name}`"
           >
             <component :is="tab.component" />
@@ -241,7 +274,13 @@
         </div>
       </template>
     </q-page-container>
-    <input ref="recordFileInput" type="file" style="display: none" accept="text/csv,.csv" @change="handleRecordFileChange" />
+    <input
+      ref="recordFileInput"
+      type="file"
+      style="display: none"
+      accept="text/csv,.csv"
+      @change="handleRecordFileChange"
+    />
   </q-layout>
 </template>
 

@@ -1,0 +1,60 @@
+id: io.github.from104.qcalc
+runtime: org.freedesktop.Platform
+runtime-version: '24.08'
+sdk: org.freedesktop.Sdk
+base: org.electronjs.Electron2.BaseApp
+base-version: '24.08'
+
+command: run.sh
+
+separate-locales: false
+
+finish-args:
+  # 디스플레이 (Wayland 우선, X11 fallback)
+  - --socket=wayland
+  - --socket=fallback-x11
+  - --share=ipc
+  # GPU 가속
+  - --device=dri
+  # 네트워크 (환율 정보 업데이트용)
+  - --share=network
+  # 오디오 (버튼 사운드)
+  - --socket=pulseaudio
+  # Electron trash 지원
+  - --env=ELECTRON_TRASH=gio
+
+modules:
+  - name: qcalc
+    buildsystem: simple
+    sources:
+      # 미리 빌드된 Electron 앱 (linux-unpacked 디렉토리)
+      - type: dir
+        path: linux-unpacked
+        dest: linux-unpacked
+      # 실행 스크립트
+      - type: script
+        dest-filename: run.sh
+        commands:
+          - zypak-wrapper /app/qcalc/qcalc "$@"
+      # desktop 파일
+      - type: file
+        path: io.github.from104.qcalc.desktop
+      # metainfo 파일
+      - type: file
+        path: io.github.from104.qcalc.metainfo.xml
+      # 아이콘 파일
+      - type: file
+        path: icons/io.github.from104.qcalc.png
+    build-commands:
+      # 빌드된 앱 복사
+      - cp -a linux-unpacked /app/qcalc
+      # desktop 파일 이름 패치 (Flatpak ID에 맞춤)
+      - patch-desktop-filename /app/qcalc/resources/app.asar
+      # 아이콘 설치 (256x256)
+      - install -Dm644 io.github.from104.qcalc.png /app/share/icons/hicolor/256x256/apps/io.github.from104.qcalc.png
+      # desktop 파일 설치
+      - install -Dm644 io.github.from104.qcalc.desktop /app/share/applications/io.github.from104.qcalc.desktop
+      # metainfo 설치
+      - install -Dm644 io.github.from104.qcalc.metainfo.xml /app/share/metainfo/io.github.from104.qcalc.metainfo.xml
+      # 실행 스크립트 설치
+      - install -Dm755 run.sh /app/bin/run.sh

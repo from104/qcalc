@@ -5,10 +5,10 @@
    *              이 페이지는 통화 변환 기능을 수행하는 데 필요한 컴포넌트를 포함합니다.
    *              통화 변환 기능을 수행하는 데 필요한 컴포넌트를 포함합니다.
    */
-  
-  import CurrencyPanel from 'components/CurrencyPanel.vue';
-  import ResultField from 'components/ResultField.vue';
-  import CalcButton from 'components/CalcButton.vue';
+
+  import CurrencyPanel from 'components/panels/CurrencyPanel.vue';
+  import ResultField from 'components/calc/ResultField.vue';
+  import CalcButton from 'components/calc/CalcButton.vue';
 </script>
 
 <template>

@@ -3,19 +3,18 @@
  * @description 계산 기록 관리를 위한 컴포저블
  */
 
-import { ref, computed } from 'vue';
+import { computed, useTemplateRef } from 'vue';
 import { useCalcStore } from 'stores/calcStore';
 import { useUIStore } from 'stores/uiStore';
 import { useQuasar } from 'quasar';
-import { useI18n } from 'vue-i18n';
+import type { Composer } from 'vue-i18n';
 import Papa from 'papaparse';
 
 import { Filesystem, Directory, Encoding } from '@capacitor/filesystem';
 import { Share } from '@capacitor/share';
 
-export function useRecordManager() {
+export function useRecordManager(t: Composer['t']) {
   const $q = useQuasar();
-  const { t } = useI18n();
   const calcStore = useCalcStore();
   const uiStore = useUIStore();
   const $g = window.globalVars;
@@ -23,7 +22,7 @@ export function useRecordManager() {
   /**
    * 파일 입력 요소에 대한 참조
    */
-  const recordFileInput = ref<HTMLInputElement | null>(null);
+  const recordFileInput = useTemplateRef<HTMLInputElement>('recordFileInput');
 
   /**
    * 레코드 버튼 비활성화 여부

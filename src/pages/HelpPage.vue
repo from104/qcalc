@@ -1,34 +1,187 @@
 <script setup lang="ts">
   /**
    * @file HelpPage.vue
-   * @description 이 파일은 사용자가 도움을 받을 수 있는 페이지를 정의합니다.
-   *              이 페이지는 사용자가 애플리케이션의 기능이나 사용 방법에 대한 정보를
-   *              Markdown 형식으로 표시합니다. 사용자의 언어 설정에 따라 한국어 또는
-   *              영어로 콘텐츠를 제공합니다.
+   * @description 도움말 페이지 - 앱의 기능과 사용법을 섹션별로 구조화하여 표시합니다.
+   *              기존 마크다운 콘텐츠를 파싱하여 확장 패널로 구성합니다.
    */
 
+  import { computed } from 'vue';
   import { useI18n } from 'vue-i18n';
-  const { locale } = useI18n({ useScope: 'global' });
 
-  import HelpPageMD_en from './HelpPage-en.md';
-  import HelpPageMD_ko from './HelpPage-ko.md';
+  const { locale, t } = useI18n();
+
+  import HelpMdEn from '../content/pages/HelpPage-en.md';
+  import HelpMdKo from '../content/pages/HelpPage-ko.md';
+  import HelpMdJa from '../content/pages/HelpPage-ja.md';
+  import HelpMdZh from '../content/pages/HelpPage-zh.md';
+  import HelpMdHi from '../content/pages/HelpPage-hi.md';
+  import HelpMdDe from '../content/pages/HelpPage-de.md';
+  import HelpMdEs from '../content/pages/HelpPage-es.md';
+  import HelpMdFr from '../content/pages/HelpPage-fr.md';
+
+  const helpMdMap: Record<string, string> = {
+    ko: HelpMdKo,
+    ja: HelpMdJa,
+    zh: HelpMdZh,
+    hi: HelpMdHi,
+    de: HelpMdDe,
+    es: HelpMdEs,
+    fr: HelpMdFr,
+  };
+
+  const currentMd = computed(() => {
+    const lang = locale.value.substring(0, 2);
+    return helpMdMap[lang] ?? HelpMdEn;
+  });
+
+  interface HelpSection {
+    title: string;
+    content: string;
+    icon: string;
+  }
+
+  const sectionIcons = ['star_outline', 'menu_book', 'keyboard'];
+
+  const sections = computed<HelpSection[]>(() => {
+    const md = currentMd.value;
+    const parts = md.split(/(?=\n## )/m).slice(1);
+    return parts.map((part, i) => {
+      const trimmed = part.trim();
+      const firstNewline = trimmed.indexOf('\n');
+      const title = (firstNewline >= 0 ? trimmed.substring(0, firstNewline) : trimmed).replace(/^## /, '').trim();
+      const content = firstNewline >= 0 ? trimmed.substring(firstNewline + 1).trim() : '';
+      return { title, content, icon: sectionIcons[i] || 'article' };
+    });
+  });
+
+  // 마크다운에서 intro 텍스트 추출 (h1과 첫 h2 사이)
+  const intro = computed(() => {
+    const md = currentMd.value;
+    const idx = md.indexOf('\n## ');
+    const rawIntro = idx >= 0 ? md.substring(0, idx) : md;
+    return rawIntro.replace(/^# .+\n+/, '').trim();
+  });
+
+  const calculatorIcons = ['calculate', 'straighten', 'currency_exchange', 'memory', 'functions'];
 </script>
 
 <template>
   <q-page class="scrollbar-custom">
-    <q-card flat class="q-pa-lg">
-      <q-markdown
-        :src="locale.substring(0, 2) == 'ko' ? HelpPageMD_ko : HelpPageMD_en"
-        no-linkify
-        no-heading-anchor-links
-        class="markdown-content"
-      />
-    </q-card>
+    <!-- Header -->
+    <div class="q-pa-lg q-pb-sm">
+      <p class="text-body2 q-mb-none" style="opacity: 0.7">{{ intro }}</p>
+    </div>
+
+    <!-- Calculator type chips -->
+    <div class="row justify-center q-px-lg q-pb-md q-gutter-xs" style="max-width: 100%">
+      <q-chip v-for="(icon, i) in calculatorIcons" :key="i" outline size="md" class="col-3 calc-chip">
+        <q-icon :name="icon" size="xs" class="q-mr-xs" />
+        {{ t(`calc.${i}`) }}
+      </q-chip>
+    </div>
+
+    <q-separator />
+
+    <!-- Help sections -->
+    <q-list>
+      <q-expansion-item
+        v-for="(section, i) in sections"
+        :key="i"
+        :icon="section.icon"
+        :label="section.title"
+        header-class="text-weight-medium"
+        expand-separator
+      >
+        <q-card flat>
+          <q-card-section class="section-content">
+            <q-markdown :src="section.content" no-linkify no-heading-anchor-links class="markdown-content" />
+          </q-card-section>
+        </q-card>
+      </q-expansion-item>
+    </q-list>
   </q-page>
 </template>
 
-<style>
-  .body--dark .markdown-content a {
-    color: #7cb7ff !important; /* 다크모드에서 밝은 파란색 링크 */
+<style scoped>
+  .calc-chip :deep(.q-chip__content) {
+    justify-content: center;
+  }
+
+  .section-content :deep(h3:first-child),
+  .section-content :deep(h4:first-child) {
+    margin-top: 0;
   }
 </style>
+
+<style>
+  .body--dark .markdown-content a {
+    color: #7cb7ff !important;
+  }
+</style>
+
+<i18n lang="yaml">
+ko:
+  title: '도움말'
+  calc:
+    '0': '표준'
+    '1': '단위'
+    '2': '통화'
+    '3': '진법'
+    '4': '수식'
+en:
+  title: 'Help'
+  calc:
+    '0': 'Standard'
+    '1': 'Unit'
+    '2': 'Currency'
+    '3': 'Radix'
+    '4': 'Formula'
+ja:
+  title: 'ヘルプ'
+  calc:
+    '0': '標準'
+    '1': '単位'
+    '2': '通貨'
+    '3': '進数'
+    '4': '数式'
+zh:
+  title: '帮助'
+  calc:
+    '0': '标准'
+    '1': '单位'
+    '2': '汇率'
+    '3': '进制'
+    '4': '公式'
+hi:
+  title: 'सहायता'
+  calc:
+    '0': 'मानक'
+    '1': 'इकाई'
+    '2': 'मुद्रा'
+    '3': 'आधार'
+    '4': 'सूत्र'
+de:
+  title: 'Hilfe'
+  calc:
+    '0': 'Standard'
+    '1': 'Einheit'
+    '2': 'Währung'
+    '3': 'Zahlensystem'
+    '4': 'Formel'
+es:
+  title: 'Ayuda'
+  calc:
+    '0': 'Estándar'
+    '1': 'Unidad'
+    '2': 'Moneda'
+    '3': 'Base'
+    '4': 'Fórmula'
+fr:
+  title: 'Aide'
+  calc:
+    '0': 'Standard'
+    '1': 'Unité'
+    '2': 'Devise'
+    '3': 'Base numérique'
+    '4': 'Formule'
+</i18n>
