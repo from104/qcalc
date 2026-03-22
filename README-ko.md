@@ -4,7 +4,7 @@
 
 [![Get it from the Snap Store](https://snapcraft.io/en/dark/install.svg)](https://snapcraft.io/qcalc)
 
-![Screenshot](https://github.com/from104/qcalc/raw/main/assets/screenshot_v0.11.5-ko.png)
+![Screenshot](https://github.com/from104/qcalc/raw/main/assets/screenshot_v0.12.0-ko.png)
 
 ## QCalc을 선택하는 이유
 

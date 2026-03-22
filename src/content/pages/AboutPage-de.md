@@ -12,7 +12,7 @@ Alle wichtigen Änderungen an diesem Projekt werden in dieser Datei festgehalten
 
 Das Format basiert auf [Keep a Changelog] und dieses Projekt folgt der [Semantischen Versionierung].
 
-## [0.12.0] 2026-03-14
+## [0.12.0] 2026-03-22
 
 ### Hinzugefügt
 

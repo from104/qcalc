@@ -12,7 +12,7 @@ Copyright © 2022 Seo Kihyun. MIT License.
 
 フォーマットは[Keep a Changelog]に基づいており、このプロジェクトは[Semantic Versioning]に従っています。
 
-## [0.12.0] 2026-03-14
+## [0.12.0] 2026-03-22
 
 ### 追加
 
