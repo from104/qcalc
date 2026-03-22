@@ -100,7 +100,7 @@
 
     <q-header id="header" class="z-top noselect" elevated>
       <!-- 좁은 화면 메인 헤더 -->
-      <q-toolbar v-if="!isSubPage" v-auto-blur :class="{ 'q-pt-md': $g.isAndroid && $g.apiLevel >= 35 }">
+      <q-toolbar v-if="!isSubPage" v-auto-blur :class="{ 'q-pt-lg': $g.isAndroid && $g.apiLevel >= 35 }">
         <q-btn flat dense round class="q-mr-none" icon="menu" aria-label="Menu" @click="emit('toggleLeftDrawer')">
           <ToolTip
             :text-color="themesStore.getDarkColor()"
@@ -194,7 +194,7 @@
       </q-toolbar>
 
       <!-- 좁은 화면 서브 헤더 -->
-      <q-toolbar v-else v-auto-blur class="q-px-sm" :class="{ 'q-pt-md': $g.isAndroid && $g.apiLevel >= 35 }">
+      <q-toolbar v-else v-auto-blur class="q-px-sm" :class="{ 'q-pt-lg': $g.isAndroid && $g.apiLevel >= 35 }">
         <q-btn
           flat
           dense

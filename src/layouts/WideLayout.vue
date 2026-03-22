@@ -99,7 +99,7 @@
 
     <q-header id="header" class="z-top noselect row" elevated>
       <!-- 넓은 화면 계산기 영역 헤더 -->
-      <q-toolbar v-auto-blur class="col-6 calc-header" :class="{ 'q-pt-md': $g.isAndroid && $g.apiLevel >= 35 }">
+      <q-toolbar v-auto-blur class="col-6 calc-header" :class="{ 'q-pt-lg': $g.isAndroid && $g.apiLevel >= 35 }">
         <q-btn flat dense round class="q-mr-none" icon="menu" aria-label="Menu" @click="emit('toggleLeftDrawer')">
           <ToolTip
             :text-color="themesStore.getDarkColor()"
@@ -164,7 +164,7 @@
       </q-toolbar>
 
       <!-- 넓은 화면 서브 헤더 -->
-      <q-toolbar v-auto-blur class="col-6 sub-header" :class="{ 'q-pt-md': $g.isAndroid && $g.apiLevel >= 35 }">
+      <q-toolbar v-auto-blur class="col-6 sub-header" :class="{ 'q-pt-lg': $g.isAndroid && $g.apiLevel >= 35 }">
         <transition name="animate-sub-page">
           <div :key="currentSubPage" :data-page="currentSubPage" class="header-content full-width row items-center">
             <q-toolbar-title

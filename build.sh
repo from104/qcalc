@@ -151,7 +151,14 @@ build_flatpak() {
     start=$(date +%s)
 
     require_cmd flatpak-builder "sudo apt install flatpak-builder 로 설치하세요."
-    bash flatpak/build-flatpak.sh install
+    bash flatpak/build-flatpak.sh build
+
+    # .flatpak 번들을 package 디렉토리로 복사
+    mkdir -p "$BUILD_DIR"
+    local flatpak_bundle="/tmp/qcalc-flatpak-builder/io.github.from104.qcalc.flatpak"
+    if [ -f "$flatpak_bundle" ]; then
+        cp "$flatpak_bundle" "$BUILD_DIR/QCalc-$VERSION-linux.flatpak"
+    fi
 
     info "Flatpak 빌드 완료 ($(elapsed "$start"))"
 }
@@ -196,6 +203,7 @@ main() {
         flatpak) build_flatpak ;;
         all)
             build_linux
+            build_flatpak
             build_windows
             build_android
             ;;

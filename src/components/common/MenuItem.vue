@@ -35,7 +35,15 @@
 
 <template>
   <q-separator v-if="separator" :color="themesStore.isDarkMode() ? 'grey-7' : 'grey-5'" size="1px" spaced="md" />
-  <q-item v-else v-close-popup clickable role="menuitem" :aria-label="title" @click="(evt: Event) => action(evt)">
+  <q-item
+    v-else
+    v-close-popup
+    clickable
+    class="q-py-xs"
+    role="menuitem"
+    :aria-label="title"
+    @click="(evt: Event) => action(evt)"
+  >
     <q-item-section v-if="icon" avatar class="col-3">
       <q-icon :name="icon" role="img" :aria-label="t('ariaLabel.icon', { name: title })" />
     </q-item-section>
