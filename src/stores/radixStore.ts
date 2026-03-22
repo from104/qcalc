@@ -4,7 +4,7 @@
  */
 
 import { defineStore } from 'pinia';
-import { Radix, convertRadix, isValidRadixNumber } from '../utils/RadixConverter';
+import { Radix, convertRadix, isValidRadixNumber } from '../core/converters/RadixConverter';
 import { useUIStore } from './uiStore';
 
 // const uiStore = useUIStore();
@@ -69,11 +69,7 @@ export const useRadixStore = defineStore('radix', {
     // 진법 변환 관련
     convertIfRadix(value: string): string {
       const uiStore = useUIStore();
-      return this.convertRadix(
-        value,
-        Radix.Decimal,
-        uiStore.currentTab === 'radix' ? this.sourceRadix : Radix.Decimal,
-      );
+      return this.convertRadix(value, Radix.Decimal, uiStore.currentTab === 'radix' ? this.sourceRadix : Radix.Decimal);
     },
 
     convertRadix(value: string, fromRadix: Radix, toRadix: Radix): string {
@@ -141,4 +137,3 @@ export const useRadixStore = defineStore('radix', {
 
   persist: true,
 });
-

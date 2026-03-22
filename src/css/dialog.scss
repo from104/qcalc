@@ -24,7 +24,7 @@
   background: linear-gradient(
     135deg,
     var(--q-primary) 0%,
-    rgba(var(--q-primary-rgb), 0.8) 100%
+    color-mix(in srgb, var(--q-primary) 80%, transparent) 100%
   );
   color: white;
 

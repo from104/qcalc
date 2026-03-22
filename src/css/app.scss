@@ -109,6 +109,47 @@ body {
   }
 }
 
+// 오버플로우 탭 메뉴 스타일 (q-menu는 body에 포탈 렌더링되므로 글로벌 스타일 필요)
+.overflow-menu-wrapper {
+  border-radius: 12px;
+  overflow: hidden;
+  background-color: color-mix(in srgb, var(--q-primary) 8%, white 92%);
+}
+
+.body--dark .overflow-menu-wrapper {
+  background-color: color-mix(in srgb, var(--q-primary) 15%, #1d1d1d 85%);
+}
+
+.overflow-menu-list {
+  padding: 4px;
+
+  .q-item {
+    padding: 8px 16px;
+    min-height: 40px;
+    border-radius: 8px;
+    margin: 2px 0;
+  }
+}
+
 .body--android .q-notification {
   margin-bottom: var(--notify-bottom-margin, 0px);
+}
+
+// 접근성: 키보드 포커스 표시
+*:focus-visible {
+  outline: 2px solid var(--q-primary);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+// 접근성: 모션 감소 설정 존중
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }

@@ -1,0 +1,12 @@
+[Desktop Entry]
+Name=QCalc
+GenericName=Calculator
+Comment=A multi-purpose calculator for productivity and accessibility
+Exec=run.sh %U
+Icon=io.github.from104.qcalc
+Terminal=false
+Type=Application
+Categories=Utility;Calculator;
+Keywords=calculator;unit;currency;converter;programmer;math;
+StartupWMClass=QCalc
+MimeType=

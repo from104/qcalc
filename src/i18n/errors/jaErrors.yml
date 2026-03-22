@@ -1,0 +1,47 @@
+calc:
+  constant_not_found: '要求された数学定数が見つかりません。'
+  invalid_radix: '無効な基数値です。'
+  invalid_digit: '現在の基数では無効な数字です。'
+  no_memory: 'メモリに値が保存されていません。'
+  failed_to_add_record_item: '記録項目の追加中にエラーが発生しました: {error}'
+  failed_to_delete_record_item: '記録項目の削除中にエラーが発生しました: {error}'
+  invalid_record_index: '無効な記録インデックスです。'
+  record_not_found: '要求された記録項目が見つかりません。'
+  invalid_operation: '無効な操作です。'
+  memory_operation_failed: 'メモリ操作中にエラーが発生しました。'
+radix:
+  invalid_radix: '無効な基数値です。'
+  invalid_number: '基数 {radix} に対して無効な数値です: {number}'
+currency:
+  exchange_rates_not_available: '為替レートが利用できません。'
+  invalid_currency: '無効な通貨です。'
+  invalid_base_currency: '無効な基準通貨です。'
+  conversion_failed: '通貨変換に失敗しました。'
+unit:
+  invalid_category: '無効な単位カテゴリです: {category}'
+  invalid_unit: '無効な単位です: {unit}'
+  invalid_format: '無効な形式です。"category.unit" 形式を使用してください。'
+  no_units_found: 'カテゴリの単位が見つかりません: {category}'
+  conversion_failed: '単位変換に失敗しました。'
+  invalid_base_value: '基本値の計算に失敗しました。'
+component:
+  clipboard:
+    copy_failed: 'クリップボードへのコピーに失敗しました。'
+    paste_failed: 'クリップボードからの貼り付けに失敗しました。'
+  update:
+    check_failed: '更新の確認に失敗しました。'
+    download_failed: '更新のダウンロードに失敗しました。'
+    install_failed: '更新のインストールに失敗しました。'
+  navigation:
+    route_not_found: '要求されたページが見つかりません。'
+    invalid_route: '無効なページリクエストです。'
+math:
+  divide_by_zero: 'ゼロで割ることはできません。'
+  negative_factorial: '負の数の階乗は許可されていません。'
+  division_error: '除算中にエラーが発生しました。'
+  negative_root: '負の数の平方根は許可されていません。'
+  negative_root_index: '負のべき指数の根はサポートされていません。'
+  negative_bit_operation: 'ビット演算に負の数は使用できません。'
+  overflow: '演算結果が許容範囲を超えています。'
+  invalid_operation: '無効な数学演算です。'
+unknown: '不明なエラーが発生しました: {error}'

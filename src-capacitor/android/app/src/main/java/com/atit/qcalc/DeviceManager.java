@@ -131,7 +131,7 @@ public class DeviceManager {
   }
 
   public int getTextZoom() {
-    Log.d("QCalc", "textZoom: " + textZoom);
+    // Log.d("QCalc", "textZoom: " + textZoom);
     return textZoom;
   }
 

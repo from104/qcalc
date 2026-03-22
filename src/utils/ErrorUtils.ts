@@ -16,7 +16,8 @@ import { i18n } from 'src/i18n/initLocale';
  * @returns 현재 로케일에 맞는 번역된 에러 메시지
  */
 export function getErrorMessage(key: string, params?: Record<string, unknown>): string {
-  return i18n.global.t(key, params ?? {});
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  return (i18n.global as any).t(key, params ?? {}) as string;
 }
 
 /**

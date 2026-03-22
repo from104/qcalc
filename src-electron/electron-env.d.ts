@@ -1,3 +1,7 @@
+// electron 패키지의 exports 필드에 types가 없어서 module: "preserve" 모드에서 타입을 찾지 못하는 문제 해결
+// eslint-disable-next-line @typescript-eslint/triple-slash-reference
+/// <reference path="../node_modules/electron/electron.d.ts" />
+
 /**
  * NodeJS 네임스페이스에 대한 타입 선언
  * 이 선언은 Electron 환경에서 사용되는 프로세스 환경 변수의 타입을 정의합니다.

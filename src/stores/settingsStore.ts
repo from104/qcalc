@@ -21,7 +21,7 @@ interface CalculatorFormatSettings {
 /**
  * 계산기 타입
  */
-type CalculatorType = 'calc' | 'unit' | 'currency' | 'radix';
+type CalculatorType = 'calc' | 'unit' | 'currency' | 'radix' | 'formula';
 
 interface SettingsState {
   alwaysOnTop: boolean;
@@ -40,6 +40,7 @@ interface SettingsState {
     unit: CalculatorFormatSettings;
     currency: CalculatorFormatSettings;
     radix: CalculatorFormatSettings;
+    formula: CalculatorFormatSettings;
   };
   useSystemLocale: boolean;
   locale: string;
@@ -79,6 +80,7 @@ export const useSettingsStore = defineStore('settings', {
         unit: { ...defaultFormat },
         currency: { ...defaultFormat },
         radix: { ...defaultFormat },
+        formula: { ...defaultFormat },
       },
       useSystemLocale: true,
       locale: '',
@@ -92,8 +94,9 @@ export const useSettingsStore = defineStore('settings', {
     getDecimalPlaces: (state: SettingsState) => {
       const uiStore = useUIStore();
       // numberFormatPerCalculator가 true이면 현재 탭의 설정 사용, false이면 calc(기본) 설정 사용
+      // formula 등 formatSettings에 없는 탭은 calc 설정으로 fallback
       const currentSettings = state.numberFormatPerCalculator
-        ? state.formatSettings[uiStore.currentTab as CalculatorType]
+        ? (state.formatSettings[uiStore.currentTab as CalculatorType] ?? state.formatSettings.calc)
         : state.formatSettings.calc;
       return DECIMAL_PLACES[currentSettings.decimalPlaces ?? -1] ?? -1;
     },

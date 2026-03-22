@@ -13,6 +13,7 @@ import type { ComputedRef } from 'vue';
 export interface Tab {
   name: string;
   title: ComputedRef<string> | string;
+  icon: string;
   component: unknown;
 }
 

@@ -4,11 +4,11 @@
  */
 
 import { defineStore } from 'pinia';
-import { Calculator } from 'classes/Calculator';
+import { Calculator } from 'core/calculator/Calculator';
 import { match } from 'ts-pattern';
-import { Operator } from 'classes/Calculator';
-import { Radix } from '../utils/RadixConverter';
-import { numberGrouping, formatDecimalPlaces } from '../utils/NumberUtils';
+import { Operator } from 'core/calculator/Calculator';
+import { Radix, convertRadix } from 'core/converters/RadixConverter';
+import { numberGrouping, formatDecimalPlaces, formatExpressionNumbers } from '../utils/NumberUtils';
 import { useSettingsStore } from './settingsStore';
 import { useRadixStore } from './radixStore';
 import { useUIStore } from './uiStore';
@@ -66,15 +66,11 @@ export const useCalcStore = defineStore('calc', {
     },
 
     showMemoryTemporarily(): void {
-      let timer: NodeJS.Timeout | null = null;
       if (this.isMemoryVisible) {
         this.hideMemory();
-        if (timer) {
-          clearTimeout(timer);
-        }
       } else {
         this.isMemoryVisible = true;
-        timer = setTimeout(() => {
+        setTimeout(() => {
           this.isMemoryVisible = false;
         }, 3000);
       }
@@ -105,7 +101,43 @@ export const useCalcStore = defineStore('calc', {
     },
 
     // 계산 기록 관련
-    getLeftSideInRecord(result: CalculationResult, useLineBreak = false): string {
+    getLeftSideInRecord(result: CalculationResult, useLineBreak = false, expression?: string): string {
+      // formula 수식: 진수 변환 + 쉼표 포맷팅 적용
+      if (expression) {
+        const currentSettings = settingsStore.getCurrentFormatSettings;
+        const inRadix = uiStore.currentTab === 'radix' && radixStore.sourceRadix !== Radix.Decimal;
+
+        if (inRadix) {
+          // 진법 표시 설정 (접두사/접미사)
+          const prefix =
+            radixStore.showRadix && radixStore.radixType === 'prefix'
+              ? radixStore.getRadixPrefix(radixStore.sourceRadix)
+              : '';
+          const suffix =
+            radixStore.showRadix && radixStore.radixType === 'suffix'
+              ? radixStore.getRadixSuffix(radixStore.sourceRadix)
+              : '';
+
+          // 수식 내 10진수를 대상 진수로 변환 후 그룹핑 + 진법 표시 적용
+          return expression.replace(/\d+(?:\.\d+)?/g, (match) => {
+            const converted = convertRadix(match, Radix.Decimal, radixStore.sourceRadix);
+            const grouped = currentSettings.useGrouping
+              ? numberGrouping(converted, currentSettings.groupingUnit)
+              : converted;
+            return `${prefix}${grouped}${suffix ? `(${suffix})` : ''}`;
+          });
+        }
+
+        // 10진수 모드: 쉼표 포맷팅만 적용
+        return currentSettings.useGrouping
+          ? formatExpressionNumbers(
+              expression,
+              currentSettings.groupingUnit,
+              Number(settingsStore.getCurrentDecimalPlaces),
+            )
+          : expression;
+      }
+
       const radix = uiStore.currentTab === 'radix' ? radixStore.sourceRadix : Radix.Decimal;
       const radixPrefix =
         uiStore.currentTab === 'radix' && radixStore.showRadix && radixStore.radixType === 'prefix'

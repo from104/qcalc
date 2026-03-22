@@ -4,7 +4,7 @@
  */
 
 import { defineStore } from 'pinia';
-import { CurrencyConverter } from 'classes/CurrencyConverter';
+import { CurrencyConverter } from 'core/converters/CurrencyConverter';
 import { currencyBaseData } from 'src/constants/CurrencyBaseData';
 
 interface CurrencyState {
@@ -68,9 +68,7 @@ export const useCurrencyStore = defineStore('currency', {
       }
       // favoriteCurrencies 유효성 검사
       const originalCount = this.favoriteCurrencies.length;
-      this.favoriteCurrencies = this.favoriteCurrencies.filter((c) =>
-        availableCodes.includes(c),
-      );
+      this.favoriteCurrencies = this.favoriteCurrencies.filter((c) => availableCodes.includes(c));
       if (this.favoriteCurrencies.length !== originalCount) {
         wasMutated = true;
       }

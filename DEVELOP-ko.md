@@ -1,80 +1,105 @@
 # QCalc 개발 가이드
 
-이 문서는 QCalc의 개발 및 빌드 프로세스에 대한 상세한 가이드를 제공합니다.
-
 ## 기술 스택
 
-### 핵심 프레임워크
+### 코어
 
-- Vue 3 + TypeScript
-- Quasar 2 (UI 프레임워크)
-- Electron (데스크톱 앱)
-- Capacitor (모바일 앱)
+- **Vue 3** + **TypeScript** (strict 모드)
+- **Quasar 2** — UI 프레임워크
+- **Electron 40** — 데스크톱 앱
+- **Capacitor** — 모바일 앱 (Android)
+- **Vite 7** — 빌드 도구
 
 ### 주요 라이브러리
 
-- MathJS (고정밀 수학 연산)
-- freecurrencyapi-js (실시간 환율 데이터)
-- tinykeys (키보드 단축키)
-- markdown-it (마크다운 렌더링)
-- electron-updater (자동 업데이트)
+- **mathjs** — 고정밀 BigNumber 수학 연산
+- **Frankfurter API + fawazahmed0 currency-api** — 실시간 환율 데이터 (API 키 불필요)
+- **tinykeys** — 키보드 단축키 처리
+- **markdown-it** — 마크다운 렌더링
+- **electron-updater** — 데스크톱 자동 업데이트
 
 ### 개발 도구
 
-- Node.js 20.0 이상
-- Yarn 패키지 매니저
-- VSCode + Copilot 또는 Cursor AI
-- Android Studio (안드로이드 빌드용)
+- **Node.js** 20+
+- **Yarn** 4.x (패키지 매니저)
+- **Vitest** — 단위 테스트
+- **ESLint 9** — flat config 린팅
+- **husky + lint-staged** — 커밋 전 자동 검사
+- **GitHub Actions** — CI/CD 파이프라인
+- **VSCode** 또는 **Cursor** (권장 IDE)
+- **Android Studio** (안드로이드 빌드용)
 
-## 개발 시작하기
+---
 
-### 1. 기본 설정
+## 시작하기
 
-플랫폼(리눅스,윈도우 등)에 따라 node.js를 설치합니다.
+### 1. 사전 준비
 
-#### yarn 전역 설치
+Node.js 20+를 설치한 후 Yarn을 전역 설치합니다:
 
 ```bash
 npm install -g yarn
 ```
 
-#### 프로젝트 의존성 설치
+### 2. 의존성 설치
 
 ```bash
 yarn install
 ```
 
-### 2. 환경 변수 설정
+### 3. 환경 변수
 
-프로젝트 루트에 `.env` 파일 생성:
+프로젝트 루트에 `.env` 파일을 생성합니다:
 
 ```plaintext
-# 통화 환율 API 키 (필수)
-FREECURRENCY_API_KEY=<your_api_key>
-# 안드로이드 키스토어 설정 (안드로이드 빌드 시 필수)
+# 안드로이드 키스토어 (안드로이드 릴리즈 빌드에 필수)
 MY_JKS_KEY_FILE=/path/to/keystore.jks
 MY_JKS_STORE_PASSWORD=store_password
 MY_JKS_KEY_ALIAS=key_alias
 MY_JKS_KEY_PASSWORD=key_password
 ```
 
-## 개발 모드 실행
+> 환율 데이터는 무료 공공 API(Frankfurter + fawazahmed0)에서 가져오며 API 키가 필요 없습니다.
 
-### 데스크톱 앱 개발
+---
+
+## 개발
+
+### 데스크톱 (Electron)
 
 ```bash
 quasar dev -m electron
 ```
 
-### 안드로이드 앱 개발
+### 안드로이드 (Capacitor)
 
 ```bash
 quasar dev -m capacitor -T android
 ```
 
-## 빌드 프로세스
+### 테스트 실행
 
-### 데스크톱 앱 빌드
+```bash
+yarn test
+```
+
+### 린트
+
+```bash
+yarn lint
+```
+
+---
+
+## 빌드
+
+### 데스크톱
+
+#### Linux
+
+```bash
+quasar build -m electron
+```
 
 #### Windows
 
@@ -82,148 +107,94 @@ quasar dev -m capacitor -T android
 quasar build -m electron -T win32
 ```
 
-#### Linux
+> Linux에서 Windows 빌드를 하려면 Wine이 필요합니다.
 
-```bash
-quasar build -m electron -T win32
-```
-
-### 안드로이드 앱 빌드
+### 안드로이드
 
 ```bash
 quasar build -m capacitor -T android
 ```
 
-## 빌드 시 유의사항
+### Flatpak
 
-릴리즈 페이지의 설치파일을 사용할 때 통화환전기능은 잘 작동할 것입니다. 하지만 직접 빌드할 경우에는 그 기능이 동작하지 않을 수 있습니다. 이는 통화환전 데이터를 [외부 사이트(https://freecurrencyapi.com/)](https://freecurrencyapi.com/)에서 가져오기 때문입니다. 이 사이트에서 무료 API key를 발급받아 프로젝트 폴더의 '.env' 파일에 다음과 같이 넣고 빌드하세요. 월 5000회 데이터를 무료로 갱신할 수 있습니다.
+프로젝트의 Flatpak 빌드 설정 파일을 참조하세요.
 
-```plaintext
-FREECURRENCY_API_KEY=<당신의_키>
-```
+### 자동화 빌드 스크립트
 
-## Android Studio에서의 개발
-
-### Android Studio 설치 및 설정
-
-1. [Android Studio](https://developer.android.com/studio) 최신 버전을 설치합니다.
-2. Android Studio를 열고, 기본적인 설정을 완료합니다 (SDK 설정 등).
-
-### Quasar 프로젝트 Android Studio로 가져오기
-
-1. Quasar 프로젝트 디렉토리에서 `quasar build -m capacitor -T android` 명령어를 실행하여 안드로이드 빌드를 생성합니다.
-2. `src-capacitor` 디렉토리 안에 `capacitor.config.json` 파일이 생성됩니다.
-3. Android Studio에서 `Open an existing Android Studio project`를 선택하고, `src-capacitor` 디렉토리를 엽니다.
-
-### Android 프로젝트 설정
-
-1. Android Studio에서 프로젝트가 열리면, `Sync Project with Gradle Files`를 클릭하여 프로젝트를 동기화합니다.
-2. `MainActivity.java` 또는 `MainActivity.kt` 파일을 열고, 필요한 패키지 및 설정을 확인합니다.
-
-### Android 키스토어 설정
-
-릴리스 빌드를 위해서는 키스토어 설정이 필요합니다. 프로젝트 루트에 `.env` 파일을 생성하고 다음 변수들을 추가하세요:
-
-```plaintext
-MY_JKS_KEY_FILE=/path/to/your/keystore.jks
-MY_JKS_STORE_PASSWORD=your_store_password
-MY_JKS_KEY_ALIAS=your_key_alias
-MY_JKS_KEY_PASSWORD=your_key_password
-```
-
-이러한 환경 변수들은 릴리스 APK에 서명하는 빌드 과정에서 사용됩니다. 다음 사항들을 반드시 지켜주세요:
-
-- `.env` 파일을 버전 관리에 절대 커밋하지 마세요
-- 키스토어 파일을 안전하게 보관하세요
-- 키스토어 비밀번호를 잘 기억해두세요
-
-### 빌드 및 실행
-
-1. Android 기기를 USB 디버깅 모드로 연결하거나 Android 에뮬레이터를 실행합니다.
-2. Android Studio에서 `Run` 버튼을 클릭하여 앱을 빌드하고 실행합니다.
-
-## 자동화된 빌드 스크립트
-
-프로젝트 루트에는 빌드 자동화를 위한 스크립트가 포함되어 있습니다:
-
-### 빌드 스크립트 사용법
-
-빌드 스크립트는 특정 플랫폼에 대한 빌드를 수행하기 위한 인수를 지원합니다. 인수를 제공하지 않으면 모든 플랫폼(Linux, Windows, Android)에 대한 빌드를 시도합니다.
+프로젝트에 포함된 빌드 스크립트는 의존성 확인, 버전 감지, 플랫폼별 빌드를 자동 처리합니다:
 
 ```bash
-# 모든 플랫폼 빌드 (기본값)
-./build.sh all
-build.bat all
+# 모든 플랫폼 빌드
+./build.sh all        # Linux
+build.bat all         # Windows
 
-# Linux 빌드
+# 특정 플랫폼 빌드
 ./build.sh linux
-
-# Windows 빌드
 ./build.sh win
-build.bat win
-
-# Android 빌드
 ./build.sh android
-build.bat android
 ```
 
-### Linux 사용자 (build.sh)
+> Linux에서는 먼저 `chmod +x build.sh`를 실행하세요.
 
-`build.sh` 스크립트는 Linux 환경에서 사용됩니다. Windows 빌드를 위해서는 Wine이 설치되어 있어야 합니다.
+---
 
-```bash
-# 스크립트에 실행 권한 부여
-chmod +x build.sh
+## Android Studio 설정
 
-# 스크립트 실행
-./build.sh
+1. 안드로이드 타겟 빌드: `quasar build -m capacitor -T android`
+2. Android Studio에서 `src-capacitor` 디렉토리 열기
+3. **Sync Project with Gradle Files** 클릭
+4. 기기 연결 (USB 디버깅) 또는 에뮬레이터 시작
+5. **Run** 클릭
+
+### 키스토어 설정
+
+릴리즈 빌드에는 서명된 키스토어가 필요합니다. `.env` 파일에 `MY_JKS_*` 변수를 설정하세요 (위 참조).
+
+> `.env` 파일이나 키스토어 파일을 버전 관리에 절대 커밋하지 마세요.
+
+---
+
+## CI/CD
+
+- **GitHub Actions** — 모든 푸시에 린트 및 테스트 자동 실행 (`.github/workflows/ci.yml`)
+- **husky + lint-staged** — 커밋 전 ESLint 및 포맷팅 검사 자동 실행
+
+---
+
+## 프로젝트 구조
+
+```text
+src/
+├── boot/             # Quasar 부트 파일 (android, capacitor 등)
+├── components/       # Vue 컴포넌트
+├── composables/      # Vue 컴포저블 (useCalcButtonActions, useRecordManager 등)
+├── constants/        # 버튼 정의, 단위/통화 데이터, 환율 스냅샷
+├── content/          # 마크다운 콘텐츠 (도움말, 소개, 팁)
+├── core/             # 핵심 계산기 클래스 (Calculator, CalculatorMath 등)
+├── css/              # 공통 SCSS 스타일
+├── i18n/             # 국제화 (8개 언어: ko, en, ja, zh, hi, de, es, fr)
+├── layouts/          # 레이아웃 컴포넌트 (Narrow/Wide)
+├── pages/            # 페이지 컴포넌트
+├── router/           # Vue Router 설정
+├── stores/           # Pinia 스토어
+├── types/            # TypeScript 타입 정의
+└── utils/            # 유틸리티 함수
+src-electron/         # Electron main/preload
+src-capacitor/        # Capacitor 안드로이드 프로젝트
+scripts/              # 빌드 시점 스크립트 (fetch-fallback-rates.ts 등)
 ```
 
-### Windows 사용자 (build.bat)
-
-`build.bat` 스크립트는 Windows 환경에서 사용됩니다.
-
-```batch
-:: 명령 프롬프트에서 실행
-build.bat
-```
-
-빌드 스크립트는 다음과 같은 작업을 자동으로 수행합니다:
-
-- 프로젝트 버전 확인
-- 필요한 의존성 설치
-- Android 개발 환경 확인 (안드로이드 빌드 시)
-- 빌드 디렉토리 생성 및 정리
-- 플랫폼별 빌드 수행
+---
 
 ## 주의사항
 
-1. **API 키 보안**
-   - `.env` 파일을 절대 Git에 커밋하지 마세요
-   - 프로덕션 빌드 전 API 키 설정을 확인하세요
+1. **환경 보안** — 인증 정보가 포함된 `.env` 파일을 절대 커밋하지 마세요.
+2. **환율 데이터** — `yarn fetch-rates`로 빌드 시점 환율 스냅샷을 갱신할 수 있습니다. 빌드 스크립트(`build.sh` / `build.bat`)가 빌드 전에 자동으로 실행합니다.
+3. **안드로이드** — `ANDROID_HOME` 환경변수 필수. 릴리즈 빌드에는 키스토어 필요.
+4. **자동 업데이트** — Windows 설치파일과 Linux AppImage에서 지원. Snap/Flatpak은 자체 업데이트 메커니즘 사용.
 
-2. **안드로이드 개발**
-   - ANDROID_HOME 환경변수 설정 필수
-   - 키스토어 설정 필수 (릴리즈 빌드)
-   - USB 디버깅 모드 활성화 (실제 기기 테스트)
+---
 
-3. **자동 업데이트**
-   - Linux Snap 패키지에서는 자동 업데이트 비활성화
-   - 개발 모드에서는 업데이트 시뮬레이션만 가능
-
-## 접근성 가이드라인
-
-현재 구현된 접근성 기능:
-
-- ARIA 레이블
-- 햅틱 피드백 (모바일)
-
-개발 중인 기능:
-
-- 결과 음성 출력
-- 음성 명령
-- 고대비 모드
-
-## 지원 및 문의
+## 문의
 
 개발 관련 문의: 서기현 <from104@gmail.com>

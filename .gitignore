@@ -63,3 +63,13 @@ mainToHead.txt
 # Settings files
 qcalc-settings*.json
 
+# Flatpak build artifacts
+flatpak/.flatpak-builder
+flatpak/repo
+flatpak/build-dir
+flatpak/linux-unpacked
+flatpak/icons
+flatpak/generated-sources.json
+.claude/settings.local.json
+.claude/settings.json
+.github/hooks/context-mode.json

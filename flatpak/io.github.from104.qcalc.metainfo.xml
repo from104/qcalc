@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component type="desktop-application">
+  <id>io.github.from104.qcalc</id>
+
+  <name>QCalc</name>
+  <summary>5 calculators, 8 languages — built for productivity and accessibility</summary>
+
+  <metadata_license>CC0-1.0</metadata_license>
+  <project_license>MIT</project_license>
+
+  <developer id="io.github.from104">
+    <name>Seo Kihyun</name>
+  </developer>
+
+  <description>
+    <p>
+      QCalc packs 5 specialized calculators and 8 languages into one clean,
+      keyboard-friendly app. Built with Vue 3, Quasar, and Electron, it covers
+      everyday arithmetic, unit conversion, currency exchange, programmer math,
+      and formula evaluation — all one tab away.
+    </p>
+    <p>5 Calculator Modes:</p>
+    <ul>
+      <li>Standard — arithmetic, percentages, trig, powers, roots, factorial</li>
+      <li>Unit Converter — 15+ categories (length, area, volume, weight, and more)</li>
+      <li>Currency Converter — real-time exchange rates with quick adjustments</li>
+      <li>Radix Converter — binary/octal/decimal/hex with bitwise operations</li>
+      <li>Formula — type math expressions directly using mathjs syntax</li>
+    </ul>
+    <p>Productivity and Accessibility:</p>
+    <ul>
+      <li>64-digit precision powered by mathjs BigNumber</li>
+      <li>Calculation history with notes and CSV export/import</li>
+      <li>8 languages — Korean, English, Japanese, Chinese, Hindi, German, Spanish, French</li>
+      <li>ARIA labels, screen reader announcements, keyboard focus indicators, reduced motion support</li>
+      <li>Multiple color themes, dark mode, and keyboard-first design</li>
+      <li>Settings and history export/import for consistent environments</li>
+    </ul>
+  </description>
+
+  <launchable type="desktop-id">io.github.from104.qcalc.desktop</launchable>
+
+  <url type="homepage">https://github.com/from104/qcalc</url>
+  <url type="bugtracker">https://github.com/from104/qcalc/issues</url>
+  <url type="vcs-browser">https://github.com/from104/qcalc</url>
+
+  <screenshots>
+    <screenshot type="default">
+      <caption>QCalc standard calculator view</caption>
+      <image>https://github.com/from104/qcalc/raw/main/assets/screenshot_v0.11.5.png</image>
+    </screenshot>
+  </screenshots>
+
+  <content_rating type="oars-1.1" />
+
+  <releases>
+    <release version="0.12.0" date="2026-03-22">
+      <description>
+        <p>New Formula calculator, 5 additional languages (Chinese, Hindi, German, Spanish, French), Flatpak packaging, Electron 40, and accessibility improvements.</p>
+      </description>
+    </release>
+    <release version="0.11.6" date="2025-12-27">
+      <description>
+        <p>Number format per calculator feature and various bug fixes.</p>
+      </description>
+    </release>
+  </releases>
+
+  <supports>
+    <control>pointing</control>
+    <control>keyboard</control>
+  </supports>
+
+  <requires>
+    <display_length compare="ge">352</display_length>
+  </requires>
+</component>

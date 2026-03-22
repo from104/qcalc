@@ -1,0 +1,98 @@
+name: CI
+
+on:
+  push:
+    branches: [develop, main]
+  pull_request:
+    branches: [develop, main]
+
+jobs:
+  lint-test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Enable Corepack
+        run: corepack enable
+
+      - name: Install dependencies
+        run: yarn install --immutable
+
+      - name: Lint
+        run: yarn lint
+
+      - name: Type check
+        run: npx vue-tsc --noEmit
+
+      - name: Test
+        run: yarn test
+
+  build-electron:
+    runs-on: ubuntu-latest
+    needs: lint-test
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Enable Corepack
+        run: corepack enable
+
+      - name: Install dependencies
+        run: yarn install --immutable
+
+      - name: Build Electron (linux-unpacked)
+        run: npx quasar build -m electron
+
+      - name: Verify build output
+        run: test -d dist/electron/Packaged/linux-unpacked
+
+      - name: Upload linux-unpacked artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: linux-unpacked
+          path: dist/electron/Packaged/linux-unpacked/
+          retention-days: 3
+
+  build-flatpak:
+    runs-on: ubuntu-latest
+    needs: build-electron
+    if: startsWith(github.ref, 'refs/heads/release/') || github.ref == 'refs/heads/main'
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Download linux-unpacked artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: linux-unpacked
+          path: flatpak/linux-unpacked/
+
+      - name: Setup Flatpak
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y flatpak flatpak-builder
+          flatpak remote-add --user --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
+          flatpak install -y --user flathub org.freedesktop.Platform//24.08
+          flatpak install -y --user flathub org.freedesktop.Sdk//24.08
+          flatpak install -y --user flathub org.electronjs.Electron2.BaseApp//24.08
+
+      - name: Copy icon
+        run: |
+          mkdir -p flatpak/icons
+          cp src-electron/icons/icon.png flatpak/icons/com.atit.qcalc.png
+
+      - name: Build Flatpak
+        run: |
+          cd flatpak
+          flatpak-builder --force-clean --user --disable-updates --repo=repo .flatpak-builder/build com.atit.qcalc.yml

@@ -6,7 +6,7 @@
    *              설정 기능을 수행하는 데 필요한 컴포넌트를 포함합니다.
    */
 
-  import SettingCard from 'components/SettingCard.vue';
+  import SettingCard from 'components/settings/SettingCard.vue';
 </script>
 
 <template>

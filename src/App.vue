@@ -1,30 +1,26 @@
 <script setup lang="ts">
   /**
    * @file App.vue
-   * @description 이 파일은 Vue 애플리케이션의 주요 컴포넌트를 정의합니다.
-   *              사용자 인터페이스의 상태를 관리하고, 라우팅 및 다크모드와 같은 기능을 처리합니다.
-   *              또한, 전역 단축키 설정 및 사용자 알림 기능을 포함하여
-   *              애플리케이션의 전반적인 사용자 경험을 향상시키는 역할을 합니다.
+   * @description 앱 루트 컴포넌트.
+   *   - 전역 단축키 (Alt+t/d/p/n/i, 숫자 포맷, 앱 종료)
+   *   - 라우트 트랜지션 (slide/fade/expand/collapse)
+   *   - 모바일 화면 잠금, 다크모드 초기화, 저장 설정 검증
    */
 
-  // === 핵심 Vue 및 라우터 의존성 ===
   import { ref, onBeforeMount, watch, computed, onMounted, onUnmounted } from 'vue';
   import { useRoute } from 'vue-router';
   import { useI18n } from 'vue-i18n';
   import { ScreenOrientation } from '@capacitor/screen-orientation';
   import { useQuasar } from 'quasar';
 
-  // === 컴포넌트 임포트 ===
-  import AutoUpdate from 'components/AutoUpdate.vue';
-  import SnapFirst from 'components/SnapFirst.vue';
-  import VersionChangelogDialog from 'components/VersionChangelogDialog.vue';
+  import AutoUpdate from 'components/dialogs/AutoUpdate.vue';
+  import SnapFirst from 'components/dialogs/SnapFirst.vue';
+  import VersionChangelogDialog from 'components/dialogs/VersionChangelogDialog.vue';
 
-  // === 유틸리티 클래스 임포트 ===
   import { useKeyBinding } from './composables/useKeyBinding';
   import { showMessage } from './utils/NotificationUtils';
   import { isWideWidth } from './utils/GlobalHelpers';
 
-  // === 스토어 임포트 및 설정 ===
   import { useUIStore } from 'stores/uiStore';
   import { useSettingsStore } from 'stores/settingsStore';
   import { useThemesStore } from './stores/themesStore';
@@ -39,62 +35,39 @@
   const currencyStore = useCurrencyStore();
   const radixStore = useRadixStore();
 
-  // === 전역 객체 및 상태 저장소 설정 ===
   const $g = window.globalVars;
-
   const route = useRoute();
   const { t } = useI18n();
   const $q = useQuasar();
 
-  // === 상태 관리 ===
+  // ── 상태 ──
   const isFirstNavigation = ref(true);
   const previousPath = ref(route.path);
   const isWideLayout = ref(isWideWidth());
   const currentTransition = ref('');
 
-  /**
-   * '항상 위에' 기능을 토글하고 사용자에게 알림을 표시합니다.
-   */
-  const toggleAlwaysOnTopWithNotification = () => {
-    if ($g.isElectron) {
-      settingsStore.toggleAlwaysOnTop();
-      showMessage(settingsStore.alwaysOnTop ? t('alwaysOnTopOn') : t('alwaysOnTopOff'));
-    }
+  // ── 단축키 액션 ──
+  const toggleAlwaysOnTop = () => {
+    if (!$g.isElectron) return;
+    settingsStore.toggleAlwaysOnTop();
+    showMessage(settingsStore.alwaysOnTop ? t('alwaysOnTopOn') : t('alwaysOnTopOff'));
   };
 
-  /**
-   * 다크모드를 토글하고 현재 설정 상태를 사용자에게 알립니다.
-   */
-  const toggleDarkModeWithNotification = () => {
+  const toggleDarkMode = () => {
     themesStore.toggleDarkMode();
-    showMessage(
-      themesStore.darkMode === 'system' ? t('darkMode.message.system') : t('darkMode.message.' + themesStore.darkMode),
-    );
+    const mode = themesStore.darkMode;
+    showMessage(mode === 'system' ? t('darkMode.message.system') : t(`darkMode.message.${mode}`));
   };
 
-  /**
-   * 앱을 종료합니다.
-   */
   const quitApp = () => {
     if ($g.isElectron) window.electron.quitApp();
   };
 
-  // === 키 바인딩 설정 ===
-  /**
-   * 전역 단축키 설정
-   * Alt+t: 항상 위에 토글
-   * Alt+i: 초기화 패널 토글
-   * Alt+d: 다크모드 토글
-   * Alt+p: 햅틱 모드 토글
-   * Alt+n: 숫자 형식 계산기별 적용 토글
-   * F1-F4: 각종 페이지 이동
-   * q: 앱 종료
-   * 기타: 계산기 관련 기능
-   */
+  // ── 전역 키 바인딩 ──
   const { subscribe, unsubscribe } = useKeyBinding([
-    [['Alt+t'], toggleAlwaysOnTopWithNotification],
+    [['Alt+t'], toggleAlwaysOnTop],
     [['Alt+i'], settingsStore.toggleInitPanel],
-    [['Alt+d'], toggleDarkModeWithNotification],
+    [['Alt+d'], toggleDarkMode],
     [['Alt+p'], settingsStore.toggleHapticsMode],
     [['Alt+n'], settingsStore.toggleNumberFormatPerCalculator],
     [[';'], settingsStore.toggleButtonAddedLabel],
@@ -105,23 +78,32 @@
     [['q'], quitApp],
   ]);
 
-  // === 라이프사이클 훅 및 감시자 ===
-  /**
-   * 첫 번째 네비게이션 플래그를 설정합니다.
-   * 초기 트랜지션 애니메이션을 방지하기 위해 사용됩니다.
-   */
-  onBeforeMount(() => {
+  // ── 라이프사이클 ──
+  onBeforeMount(async () => {
+    uiStore.isAppStarted = false;
+
+    // 모바일 세로 고정
+    if ($g.isCapacitor && $g.isPhone) {
+      await ScreenOrientation.lock({ orientation: 'portrait' });
+    }
+
+    themesStore.updateDarkModeAndTheme();
+
+    // 초기 트랜지션 방지 (마운트 직후 100ms간 애니메이션 억제)
     setTimeout(() => {
       isFirstNavigation.value = false;
     }, 100);
   });
 
   onMounted(() => {
-    const unitCorrected = unitStore.validateAndCorrectUnits();
-    const currencyCorrected = currencyStore.validateAndCorrectCurrencies();
-    const radixCorrected = radixStore.validateAndCorrectRadixSettings();
+    // 앱 업데이트 후 유효하지 않은 저장 설정 자동 보정
+    // 모두 실행해야 하므로 개별 호출 후 합산 (|| 단축 평가 방지)
+    const u = unitStore.validateAndCorrectUnits();
+    const c = currencyStore.validateAndCorrectCurrencies();
+    const r = radixStore.validateAndCorrectRadixSettings();
+    const corrected = u || c || r;
 
-    if (unitCorrected || currencyCorrected || radixCorrected) {
+    if (corrected) {
       setTimeout(() => {
         $q.notify({
           message: t('persistedSettingsCorrected'),
@@ -135,37 +117,33 @@
     }
   });
 
-  /**
-   * 입력 필드 포커스 상태에 따라 키 바인딩을 활성화/비활성화합니다.
-   */
+  onUnmounted(async () => {
+    if ($g.isCapacitor && $g.isPhone) {
+      await ScreenOrientation.unlock();
+    }
+  });
+
+  // ── 워처 ──
+
+  // 입력 필드 포커스 시 전역 단축키 비활성화
   watch(
     () => uiStore.inputFocused,
-    () => {
-      if (uiStore.inputFocused) {
-        unsubscribe();
-      } else {
-        subscribe();
-      }
-    },
+    (focused) => (focused ? unsubscribe() : subscribe()),
     { immediate: true },
   );
 
-  /**
-   * 레이아웃 너비 변경을 감시하고 적절한 트랜지션을 설정합니다.
-   */
+  // 레이아웃 전환 (넓은 ↔ 좁은)
   watch(
     () => isWideWidth(),
-    (newValue) => {
-      if (isWideLayout.value !== newValue) {
-        currentTransition.value = newValue ? 'expand-layout' : 'collapse-layout';
-        isWideLayout.value = newValue;
+    (wide) => {
+      if (isWideLayout.value !== wide) {
+        currentTransition.value = wide ? 'expand-layout' : 'collapse-layout';
+        isWideLayout.value = wide;
       }
     },
   );
 
-  /**
-   * 라우트 변경을 감시하고 적절한 트랜지션을 설정합니다.
-   */
+  // 라우트 전환 애니메이션
   watch(
     () => route.path,
     (newPath) => {
@@ -180,40 +158,17 @@
     },
   );
 
-  // === 계산된 속성 ===
-  /**
-   * 현재 적용할 트랜지션 이름을 반환합니다.
-   */
-  const computeTransition = computed(() => currentTransition.value);
-
-  onBeforeMount(async () => {
-    if ($g.isCapacitor && $g.isPhone) {
-      await ScreenOrientation.lock({
-        orientation: 'portrait',
-      });
-    }
-    themesStore.updateDarkModeAndTheme();
-  });
-
-  onUnmounted(async () => {
-    if ($g.isCapacitor && $g.isPhone) {
-      await ScreenOrientation.unlock();
-    }
-  });
-
-  uiStore.isAppStarted = false;
+  const transitionName = computed(() => (isFirstNavigation.value ? '' : currentTransition.value));
 </script>
 
 <template>
   <router-view v-slot="{ Component, route: routeProps }">
-    <transition :name="isFirstNavigation ? '' : computeTransition || ''" mode="default">
-      <!--
-        WideLayout(넓은 화면)에서는 서브페이지(오른쪽 패널)만 전환되는 애니메이션을 보여주기 위해 레이아웃 컴포넌트 자체가 파괴되지 않고 유지되어야 하므로 고정된 키('wide-layout')를 사용하여 컴포넌트 재사용을 유도하고, 좁은 화면(NarrowLayout)에서는 페이지 전환 효과를 위해 경로(routeProps.path)를 키로 사용.
-      -->
-      <component 
-        :is="Component" 
-        :key="isWideLayout ? 'wide-layout' : routeProps.path" 
-      />
+    <!--
+      Wide: 고정 키('wide-layout')로 레이아웃 유지, 서브페이지만 전환
+      Narrow: routeProps.path를 키로 사용하여 페이지 전환 애니메이션
+    -->
+    <transition :name="transitionName" mode="default">
+      <component :is="Component" :key="isWideLayout ? 'wide-layout' : routeProps.path" />
     </transition>
   </router-view>
   <AutoUpdate />
@@ -222,8 +177,6 @@
 </template>
 
 <style scoped lang="scss">
-
-  // === 공통 트랜지션 스타일 ===
   %transition-base {
     position: absolute;
     width: 100%;
@@ -231,8 +184,7 @@
     overflow: hidden;
   }
 
-  // === 슬라이드 트랜지션 ===
-  // 뒤로 가기/앞으로 가기 애니메이션 공통 속성
+  // 슬라이드 (뒤로/앞으로)
   .slide-back-enter-active,
   .slide-back-leave-active,
   .slide-forward-enter-active,
@@ -241,7 +193,6 @@
     transition: transform 0.2s ease;
   }
 
-  // 뒤로 가기 애니메이션
   .slide-back-enter-from {
     transform: translateX(-100%);
   }
@@ -255,7 +206,6 @@
     transform: translateX(100%);
   }
 
-  // 앞으로 가기 애니메이션
   .slide-forward-enter-from {
     transform: translateX(100%);
   }
@@ -269,7 +219,7 @@
     transform: translateX(-100%);
   }
 
-  // === 페이드 트랜지션 ===
+  // 페이드
   .fade-enter-active,
   .fade-leave-active {
     @extend %transition-base;
@@ -286,8 +236,7 @@
     opacity: 1;
   }
 
-  // === 레이아웃 확장/축소 트랜지션 ===
-  // 확장 애니메이션
+  // 레이아웃 확장
   .expand-layout-enter-active,
   .expand-layout-leave-active {
     @extend %transition-base;
@@ -310,7 +259,7 @@
     transform-origin: left;
   }
 
-  // 축소 애니메이션
+  // 레이아웃 축소
   .collapse-layout-enter-active,
   .collapse-layout-leave-active {
     @extend %transition-base;
@@ -359,4 +308,76 @@ en:
       light: 'Changed to light mode.'
       dark: 'Changed to dark mode.'
   persistedSettingsCorrected: 'Some saved settings have been reset due to an app update.'
+ja:
+  targetToBeCopiedResult: '計算結果を'
+  targetToBeCopiedSelected: '選択した内容を'
+  copiedToClipboard: '{target}クリップボードにコピーしました。'
+  alwaysOnTopOn: '常に前面表示が有効になりました。'
+  alwaysOnTopOff: '常に前面表示が無効になりました。'
+  darkMode:
+    message:
+      system: 'ダークモードをシステム設定に従うように変更しました。'
+      light: 'ライトモードに変更しました。'
+      dark: 'ダークモードに変更しました。'
+  persistedSettingsCorrected: 'アプリの更新により一部の保存された設定がリセットされました。'
+zh:
+  targetToBeCopiedResult: '计算结果'
+  targetToBeCopiedSelected: '选中内容'
+  copiedToClipboard: '已将{target}复制到剪贴板。'
+  alwaysOnTopOn: '已启用始终置顶。'
+  alwaysOnTopOff: '已禁用始终置顶。'
+  darkMode:
+    message:
+      system: '已将深色模式更改为跟随系统设置。'
+      light: '已切换到浅色模式。'
+      dark: '已切换到深色模式。'
+  persistedSettingsCorrected: '由于应用更新，部分保存的设置已被重置。'
+hi:
+  targetToBeCopiedResult: 'गणना परिणाम'
+  targetToBeCopiedSelected: 'चयनित सामग्री'
+  copiedToClipboard: '{target} क्लिपबोर्ड पर कॉपी किया गया।'
+  alwaysOnTopOn: 'हमेशा ऊपर सक्षम किया गया।'
+  alwaysOnTopOff: 'हमेशा ऊपर अक्षम किया गया।'
+  darkMode:
+    message:
+      system: 'डार्क मोड सिस्टम सेटिंग्स के अनुसार बदला गया।'
+      light: 'लाइट मोड में बदला गया।'
+      dark: 'डार्क मोड में बदला गया।'
+  persistedSettingsCorrected: 'ऐप अपडेट के कारण कुछ सहेजी गई सेटिंग्स रीसेट की गई हैं।'
+de:
+  targetToBeCopiedResult: 'das Berechnungsergebnis'
+  targetToBeCopiedSelected: 'den ausgewählten Inhalt'
+  copiedToClipboard: '{target} in die Zwischenablage kopiert.'
+  alwaysOnTopOn: 'Immer im Vordergrund wurde aktiviert.'
+  alwaysOnTopOff: 'Immer im Vordergrund wurde deaktiviert.'
+  darkMode:
+    message:
+      system: 'Dunkelmodus folgt jetzt den Systemeinstellungen.'
+      light: 'Zum hellen Modus gewechselt.'
+      dark: 'Zum dunklen Modus gewechselt.'
+  persistedSettingsCorrected: 'Einige gespeicherte Einstellungen wurden aufgrund eines App-Updates zurückgesetzt.'
+es:
+  targetToBeCopiedResult: 'el resultado del cálculo'
+  targetToBeCopiedSelected: 'el contenido seleccionado'
+  copiedToClipboard: 'Se copió {target} al portapapeles.'
+  alwaysOnTopOn: 'Siempre arriba ha sido activado.'
+  alwaysOnTopOff: 'Siempre arriba ha sido desactivado.'
+  darkMode:
+    message:
+      system: 'El modo oscuro ahora sigue la configuración del sistema.'
+      light: 'Cambiado a modo claro.'
+      dark: 'Cambiado a modo oscuro.'
+  persistedSettingsCorrected: 'Algunas configuraciones guardadas se han restablecido debido a una actualización de la aplicación.'
+fr:
+  targetToBeCopiedResult: 'le résultat du calcul'
+  targetToBeCopiedSelected: 'le contenu sélectionné'
+  copiedToClipboard: '{target} copié dans le presse-papiers.'
+  alwaysOnTopOn: 'Toujours au-dessus a été activé.'
+  alwaysOnTopOff: 'Toujours au-dessus a été désactivé.'
+  darkMode:
+    message:
+      system: 'Le mode sombre suit maintenant les paramètres du système.'
+      light: 'Passé en mode clair.'
+      dark: 'Passé en mode sombre.'
+  persistedSettingsCorrected: "Certains paramètres enregistrés ont été réinitialisés suite à une mise à jour de l'application."
 </i18n>

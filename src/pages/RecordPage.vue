@@ -5,8 +5,8 @@
    *              이 페이지는 기록 기능을 수행하는 데 필요한 컴포넌트를 포함합니다.
    *              기록 기능을 수행하는 데 필요한 컴포넌트를 포함합니다.
    */
-  
-  import RecordCard from 'components/RecordCard.vue';
+
+  import RecordCard from 'components/record/RecordCard.vue';
 </script>
 
 <template>
@@ -16,4 +16,3 @@
     </q-card>
   </q-page>
 </template>
-

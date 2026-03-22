@@ -57,9 +57,12 @@ export default defineBoot(() => {
     // 버전 정보
     version: version,
   };
-  
+
   // Capacitor 환경에서 자바스크립트 인터페이스 추가
   if (Platform.is.capacitor) {
+    // Capacitor 플랫폼 식별을 위한 body 클래스 추가
+    document.body.classList.add('body--capacitor');
+
     globalVars.isTablet = window.androidInterface?.isTablet() ?? false;
     globalVars.isPhone = window.androidInterface?.isPhone() ?? false;
     globalVars.isFoldable = window.androidInterface?.isFoldable() ?? false;

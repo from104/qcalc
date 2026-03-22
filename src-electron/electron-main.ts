@@ -8,6 +8,7 @@
 
 // 필요한 모듈 가져오기
 import { fileURLToPath } from 'url';
+import fs from 'fs';
 import path from 'path';
 import os from 'os';
 import { app, BrowserWindow, nativeTheme, ipcMain, screen } from 'electron';
@@ -18,6 +19,10 @@ const { autoUpdater } = useAutoUpdate;
 
 // Electron의 main 프로세스 또는 preload 스크립트에서
 const isSnap = process.platform === 'linux' && !!process.env.SNAP;
+const isFlatpak = process.platform === 'linux' && !!process.env.FLATPAK_ID;
+
+// Snap 또는 Flatpak 환경에서는 자체 업데이트 메커니즘을 사용하므로 자동 업데이트 비활성화
+const isSandboxed = isSnap || isFlatpak;
 
 // 현재 디렉토리 경로 설정
 const currentDir = fileURLToPath(new URL('.', import.meta.url));
@@ -28,8 +33,6 @@ const platform = process.platform || os.platform();
 // Windows에서 다크 모드일 때 DevTools Extensions 제거 시도
 try {
   if (platform === 'win32' && nativeTheme.shouldUseDarkColors === true) {
-    const fs = await import('fs');
-    const path = await import('path');
     fs.unlinkSync(path.join(app.getPath('userData'), 'DevTools Extensions'));
   }
 } catch (error) {
@@ -72,7 +75,7 @@ const checkForUpdates = async () => {
 async function createWindow() {
   try {
     // snap이 아닐 경우에만 자동 업데이트 설정
-    if (!isSnap) {
+    if (!isSandboxed) {
       autoUpdater.autoDownload = false;
       autoUpdater.autoInstallOnAppQuit = true;
 
@@ -176,13 +179,13 @@ async function createWindow() {
     // 윈도우가 준비되면 업데이트 확인 시작
     mainWindow.once('ready-to-show', () => {
       mainWindow?.show();
-      if (!isSnap) {
+      if (!isSandboxed) {
         checkForUpdates();
       }
     });
 
     // IPC 이벤트 핸들러 추가
-    if (!isSnap) {
+    if (!isSandboxed) {
       ipcMain.on('start-update', () => {
         autoUpdater.downloadUpdate().catch((err) => {
           console.error('Error occurred during update download:', err);
@@ -231,7 +234,7 @@ app
     });
 
     // 항상 위에 표시 토글 이벤트 처리
-    ipcMain.on('toggle-always-on-top', (_event, res) => {
+    ipcMain.on('toggle-always-on-top', (_event: Electron.IpcMainEvent, res: boolean) => {
       mainWindow?.setAlwaysOnTop(res);
     });
 
@@ -240,7 +243,7 @@ app
       app.quit();
     });
   })
-  .catch((err) => {
+  .catch((err: unknown) => {
     console.error('Error occurred during app preparation:', err);
   });
 

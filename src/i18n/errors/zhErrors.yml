@@ -1,0 +1,47 @@
+calc:
+  invalid_digit: '当前进制的无效数字'
+  constant_not_found: '未找到请求的数学常数'
+  invalid_radix: '无效的进制值'
+  no_memory: '内存中没有存储的值'
+  failed_to_add_record_item: '添加记录项失败：{error}'
+  failed_to_delete_record_item: '删除记录项失败：{error}'
+  invalid_record_index: '无效的记录索引'
+  record_not_found: '未找到请求的记录项'
+  invalid_operation: '无效操作'
+  memory_operation_failed: '内存操作失败'
+radix:
+  invalid_radix: '无效的进制值'
+  invalid_number: '{radix}进制的无效数字：{number}'
+currency:
+  exchange_rates_not_available: '汇率不可用'
+  invalid_currency: '无效货币'
+  invalid_base_currency: '无效的基准货币'
+  conversion_failed: '货币转换失败'
+unit:
+  invalid_category: '无效的单位类别：{category}'
+  invalid_unit: '无效的单位：{unit}'
+  invalid_format: '无效的项目格式。请使用"category.unit"'
+  no_units_found: '未找到类别的单位：{category}'
+  conversion_failed: '单位转换失败'
+  invalid_base_value: '计算基准值失败'
+component:
+  clipboard:
+    copy_failed: '复制到剪贴板失败'
+    paste_failed: '从剪贴板粘贴失败'
+  update:
+    check_failed: '检查更新失败'
+    download_failed: '下载更新失败'
+    install_failed: '安装更新失败'
+  navigation:
+    route_not_found: '未找到请求的页面'
+    invalid_route: '无效的页面请求'
+math:
+  divide_by_zero: '不能除以零'
+  negative_factorial: '不允许负数的阶乘'
+  division_error: '除法过程中发生错误'
+  negative_root: '不允许负数的根'
+  negative_root_index: '不支持负数根'
+  negative_bit_operation: '位运算中不允许负数'
+  overflow: '运算结果超出允许范围'
+  invalid_operation: '无效的数学运算'
+unknown: '发生未知错误：{error}'

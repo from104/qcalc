@@ -1,5 +1,3 @@
-/* eslint-env node */
-
 /*
  * 이 파일은 Node 환경에서 실행됩니다 (Babel로 트랜스파일되지 않음).
  * 따라서 현재 Node 버전에서 지원하는 ES6 기능만 사용하세요.
@@ -33,7 +31,7 @@ export default defineConfig((/* ctx */) => {
 
     // 앱 부트 파일 (/src/boot)
     // 부트 파일은 "main.js"의 일부입니다
-    boot: ['i18n', 'auto-blur', 'global-variables', 'android', 'themes'],
+    boot: ['i18n', 'auto-blur', 'global-variables', 'android', 'themes', 'admob'],
 
     // CSS 파일
     css: ['app.scss'],
@@ -74,7 +72,7 @@ export default defineConfig((/* ctx */) => {
 
       // 폴더 별칭 설정
       alias: {
-        classes: join(__dirname, 'src/classes'),
+        core: join(__dirname, 'src/core'),
         types: join(__dirname, 'src/types'),
         constants: join(__dirname, 'src/constants'),
       },
@@ -115,6 +113,12 @@ export default defineConfig((/* ctx */) => {
     devServer: {
       open: false,
       host: '0.0.0.0',
+      // flatpak/ 디렉토리의 바이너리 파일이 inotify watcher를 소진하는 문제 방지
+      viteVueDevServerOptions: {
+        watch: {
+          ignored: ['**/flatpak/linux-unpacked/**'],
+        },
+      },
     },
 
     // Quasar 프레임워크 설정
@@ -188,11 +192,11 @@ export default defineConfig((/* ctx */) => {
       bundler: 'builder', // 'packager' 또는 'builder'
 
       builder: {
-        appId: 'com.atit.qcalc',
+        appId: 'io.github.from104.qcalc',
         productName: 'QCalc',
         artifactName: '${productName}-${version}-${os}.${ext}',
         linux: {
-          target: ['AppImage', 'snap'],
+          target: ['AppImage', 'snap', 'dir'],
           category: 'Utility',
           // latest-linux.yml 생성을 위한 설정
           generateUpdatesFilesForAllChannels: true,

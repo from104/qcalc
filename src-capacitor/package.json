@@ -1,7 +1,7 @@
 {
   "name": "qcalc",
-  "version": "0.11.6",
-  "description": "com.atit.qcalc",
+  "version": "0.12.0",
+  "description": "io.github.from104.qcalc",
   "author": {
     "name": "Seo Kihyun",
     "email": "from104@gmail.com",
@@ -9,14 +9,14 @@
   },
   "private": true,
   "dependencies": {
-    "@capacitor/android": "7.4.3",
-    "@capacitor/app": "7.1.0",
-    "@capacitor/cli": "7.4.3",
-    "@capacitor/core": "7.4.3",
-    "@capacitor/filesystem": "7.1.4",
-    "@capacitor/haptics": "7.0.2",
-    "@capacitor/screen-orientation": "7.0.2",
-    "@capacitor/share": "^7.0.2",
-    "@capacitor/status-bar": "7.0.3"
+    "@capacitor/android": "8.2.0",
+    "@capacitor/app": "8.0.1",
+    "@capacitor/cli": "8.2.0",
+    "@capacitor/core": "8.2.0",
+    "@capacitor/filesystem": "8.1.2",
+    "@capacitor/haptics": "8.0.1",
+    "@capacitor/screen-orientation": "8.0.1",
+    "@capacitor/share": "8.0.1",
+    "@capacitor/status-bar": "8.0.1"
   }
 }
