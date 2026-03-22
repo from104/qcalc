@@ -3,7 +3,6 @@ name: CI
 on:
   push:
     branches: [develop, main]
-    tags: ['v*']
   pull_request:
     branches: [develop, main]
 
@@ -52,21 +51,13 @@ jobs:
       - name: Install dependencies
         run: yarn install --immutable
 
-      - name: Build Electron
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          if [[ "${{ github.ref }}" == refs/tags/v* ]]; then
-            npx quasar build -m electron --publish always
-          else
-            npx quasar build -m electron --publish never
-          fi
+      - name: Build Electron (linux-unpacked)
+        run: npx quasar build -m electron --publish never
 
       - name: Verify build output
         run: test -d dist/electron/Packaged/linux-unpacked
 
       - name: Upload linux-unpacked artifact
-        if: "!startsWith(github.ref, 'refs/tags/v')"
         uses: actions/upload-artifact@v4
         with:
           name: linux-unpacked
