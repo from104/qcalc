@@ -122,12 +122,19 @@ describe('calcStore', () => {
       expect(store.isMemoryVisible).toBe(true);
     });
 
-    it('showMemoryTemporarily를 다시 호출하면 isMemoryVisible을 false로 설정해야 한다', () => {
+    it('showMemoryTemporarily를 다시 호출하면 타이머가 리셋되고 isMemoryVisible은 true를 유지해야 한다', () => {
+      vi.useFakeTimers();
       const store = useCalcStore();
       store.showMemoryTemporarily();
       expect(store.isMemoryVisible).toBe(true);
+      vi.advanceTimersByTime(2000);
       store.showMemoryTemporarily();
+      expect(store.isMemoryVisible).toBe(true);
+      vi.advanceTimersByTime(2000);
+      expect(store.isMemoryVisible).toBe(true);
+      vi.advanceTimersByTime(1000);
       expect(store.isMemoryVisible).toBe(false);
+      vi.useRealTimers();
     });
 
     it('showMemoryTemporarily 후 3초 뒤에 자동으로 숨겨져야 한다', () => {
