@@ -50,7 +50,7 @@
    */
   const changelogContent = computed(() => {
     const md = currentMd.value;
-    // 첫 번째 버전 섹션만 추출 (예: ## [0.12.0] 2026-03-14 ~ 다음 ## [ 전까지)
+    // 첫 번째 버전 섹션만 추출 (예: ## [0.12.0] 2026-03-22 ~ 다음 ## [ 전까지)
     const versionRegex = /(## \[\d+\.\d+\.\d+\][^\n]*\n[\s\S]*?)(?=\n## \[|$)/;
     const match = md.match(versionRegex);
     return match?.[1]?.trim() ?? '';

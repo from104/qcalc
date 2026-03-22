@@ -84,13 +84,9 @@ function roundFractionalPartEven(
   const nextValue = parseInt(nextDigit, radixNumber);
   const halfRadix = radixNumber / 2;
 
-  let roundUp = false;
+  let roundUp = nextValue > halfRadix;
 
-  if (nextValue > halfRadix) {
-    roundUp = true;
-  } else if (nextValue < halfRadix) {
-    roundUp = false;
-  } else {
+  if (!roundUp && nextValue === halfRadix) {
     const trailingPart = fractional.substring(decimalPlaces + 1);
     const hasNonZero = trailingPart.split('').some((d) => parseInt(d, radixNumber) !== 0);
     if (hasNonZero) {

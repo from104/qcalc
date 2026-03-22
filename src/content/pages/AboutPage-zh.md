@@ -12,7 +12,7 @@ Copyright © 2022 Seo Kihyun. MIT License.
 
 格式基于 [Keep a Changelog]，本项目遵循[语义化版本]。
 
-## [0.12.0] 2026-03-14
+## [0.12.0] 2026-03-22
 
 ### 新增
 

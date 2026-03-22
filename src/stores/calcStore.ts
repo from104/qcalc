@@ -25,6 +25,8 @@ interface CalcState {
   needButtonNotification: boolean;
 }
 
+let memoryTimer: ReturnType<typeof setTimeout> | null = null;
+
 export const useCalcStore = defineStore('calc', {
   state: (): CalcState => ({
     calc: new Calculator(),
@@ -66,18 +68,15 @@ export const useCalcStore = defineStore('calc', {
     },
 
     showMemoryTemporarily(): void {
-      let timer: NodeJS.Timeout | null = null;
-      if (this.isMemoryVisible) {
-        this.hideMemory();
-        if (timer) {
-          clearTimeout(timer);
-        }
-      } else {
-        this.isMemoryVisible = true;
-        timer = setTimeout(() => {
-          this.isMemoryVisible = false;
-        }, 3000);
+      if (memoryTimer) {
+        clearTimeout(memoryTimer);
+        memoryTimer = null;
       }
+      this.isMemoryVisible = true;
+      memoryTimer = setTimeout(() => {
+        this.isMemoryVisible = false;
+        memoryTimer = null;
+      }, 3000);
     },
 
     onNeedButtonNotification(): void {
