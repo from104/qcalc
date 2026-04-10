@@ -13,6 +13,8 @@ import hiMessages from './messages/hiMessages.yml';
 import deMessages from './messages/deMessages.yml';
 import esMessages from './messages/esMessages.yml';
 import frMessages from './messages/frMessages.yml';
+import ptMessages from './messages/ptMessages.yml';
+import ruMessages from './messages/ruMessages.yml';
 
 import koErrors from './errors/koErrors.yml';
 import enErrors from './errors/enErrors.yml';
@@ -22,6 +24,8 @@ import hiErrors from './errors/hiErrors.yml';
 import deErrors from './errors/deErrors.yml';
 import esErrors from './errors/esErrors.yml';
 import frErrors from './errors/frErrors.yml';
+import ptErrors from './errors/ptErrors.yml';
+import ruErrors from './errors/ruErrors.yml';
 
 export default {
   ko: { message: koMessages, error: koErrors },
@@ -32,4 +36,6 @@ export default {
   de: { message: deMessages, error: deErrors },
   es: { message: esMessages, error: esErrors },
   fr: { message: frMessages, error: frErrors },
+  pt: { message: ptMessages, error: ptErrors },
+  ru: { message: ruMessages, error: ruErrors },
 };

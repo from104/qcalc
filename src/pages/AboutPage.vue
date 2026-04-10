@@ -187,4 +187,16 @@ fr:
   license: 'Licence'
   contact: 'Contact'
   changelog: 'Journal des modifications'
+pt:
+  description: 'Uma calculadora multifuncional construída com tecnologias web modernas. Disponível em plataformas desktop e móveis.'
+  author: 'Desenvolvedor'
+  license: 'Licença'
+  contact: 'Contato'
+  changelog: 'Registro de alterações'
+ru:
+  description: 'Многофункциональный калькулятор, созданный с использованием современных веб-технологий. Доступен на настольных и мобильных платформах.'
+  author: 'Разработчик'
+  license: 'Лицензия'
+  contact: 'Контакты'
+  changelog: 'Журнал изменений'
 </i18n>

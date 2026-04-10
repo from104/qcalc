@@ -380,4 +380,28 @@ fr:
       light: 'Passé en mode clair.'
       dark: 'Passé en mode sombre.'
   persistedSettingsCorrected: "Certains paramètres enregistrés ont été réinitialisés suite à une mise à jour de l'application."
+pt:
+  targetToBeCopiedResult: 'o resultado do cálculo'
+  targetToBeCopiedSelected: 'o conteúdo selecionado'
+  copiedToClipboard: '{target} copiado para a área de transferência.'
+  alwaysOnTopOn: 'Sempre no topo foi ativado.'
+  alwaysOnTopOff: 'Sempre no topo foi desativado.'
+  darkMode:
+    message:
+      system: 'O modo escuro foi alterado para seguir as configurações do sistema.'
+      light: 'Alterado para o modo claro.'
+      dark: 'Alterado para o modo escuro.'
+  persistedSettingsCorrected: 'Algumas configurações salvas foram redefinidas devido a uma atualização do aplicativo.'
+ru:
+  targetToBeCopiedResult: 'результат вычисления'
+  targetToBeCopiedSelected: 'выбранное содержимое'
+  copiedToClipboard: '{target} скопировано в буфер обмена.'
+  alwaysOnTopOn: 'Режим «Всегда поверх» включён.'
+  alwaysOnTopOff: 'Режим «Всегда поверх» отключён.'
+  darkMode:
+    message:
+      system: 'Тёмный режим изменён на системные настройки.'
+      light: 'Переключено на светлый режим.'
+      dark: 'Переключено на тёмный режим.'
+  persistedSettingsCorrected: 'Некоторые сохранённые настройки были сброшены из-за обновления приложения.'
 </i18n>

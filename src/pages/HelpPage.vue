@@ -184,4 +184,20 @@ fr:
     '2': 'Devise'
     '3': 'Base numérique'
     '4': 'Formule'
+pt:
+  title: 'Ajuda'
+  calc:
+    '0': 'Padrão'
+    '1': 'Unidade'
+    '2': 'Moeda'
+    '3': 'Base numérica'
+    '4': 'Fórmula'
+ru:
+  title: 'Справка'
+  calc:
+    '0': 'Стандартный'
+    '1': 'Единицы'
+    '2': 'Валюта'
+    '3': 'Система счисления'
+    '4': 'Формула'
 </i18n>

@@ -205,4 +205,14 @@ fr:
   currentVersionMessage: 'Version actuelle : v{version}'
   confirm: 'OK'
   testChangelog: 'Tester le CHANGELOG'
+pt:
+  dialogTitle: 'Novidades'
+  currentVersionMessage: 'Versão atual: v{version}'
+  confirm: 'OK'
+  testChangelog: 'Testar CHANGELOG'
+ru:
+  dialogTitle: 'Что нового'
+  currentVersionMessage: 'Текущая версия: v{version}'
+  confirm: 'OK'
+  testChangelog: 'Тестировать CHANGELOG'
 </i18n>

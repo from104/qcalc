@@ -434,4 +434,24 @@ fr:
   dialogAriaLabel: "Dialogue d'aide"
   mainContentAriaLabel: "Contenu principal de l'astuce"
   navigationAriaLabel: 'Navigation des astuces'
+pt:
+  tipsTitle: 'Dicas rápidas'
+  prevTip: 'Dica anterior'
+  nextTip: 'Próxima dica'
+  showTipsOnStart: 'Mostrar dicas ao iniciar'
+  closeTips: 'Fechar dicas'
+  tipContent: 'Conteúdo da dica'
+  dialogAriaLabel: 'Diálogo de ajuda'
+  mainContentAriaLabel: 'Conteúdo principal da dica'
+  navigationAriaLabel: 'Navegação de dicas'
+ru:
+  tipsTitle: 'Быстрые советы'
+  prevTip: 'Предыдущий совет'
+  nextTip: 'Следующий совет'
+  showTipsOnStart: 'Показывать советы при запуске'
+  closeTips: 'Закрыть советы'
+  tipContent: 'Содержание совета'
+  dialogAriaLabel: 'Диалог справки'
+  mainContentAriaLabel: 'Основное содержание совета'
+  navigationAriaLabel: 'Навигация по советам'
 </i18n>
