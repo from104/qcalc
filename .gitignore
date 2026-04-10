@@ -9,6 +9,7 @@ __test__
 .yarn
 *.jks
 yarn.lock
+package-lock.json
 
 # Quasar core related directories
 .quasar
