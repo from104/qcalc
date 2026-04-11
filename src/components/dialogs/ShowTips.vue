@@ -28,6 +28,8 @@
   const deTipModules = import.meta.glob('../../content/tips/de/*.md', { eager: true });
   const esTipModules = import.meta.glob('../../content/tips/es/*.md', { eager: true });
   const frTipModules = import.meta.glob('../../content/tips/fr/*.md', { eager: true });
+  const ptTipModules = import.meta.glob('../../content/tips/pt/*.md', { eager: true });
+  const ruTipModules = import.meta.glob('../../content/tips/ru/*.md', { eager: true });
 
   /**
    * tips 폴더 내의 .md 파일을 파일명 기준으로 정렬하여 배열로 반환합니다.
@@ -56,6 +58,8 @@
     de: getSortedTips(deTipModules as Record<string, { default: string }>),
     es: getSortedTips(esTipModules as Record<string, { default: string }>),
     fr: getSortedTips(frTipModules as Record<string, { default: string }>),
+    pt: getSortedTips(ptTipModules as Record<string, { default: string }>),
+    ru: getSortedTips(ruTipModules as Record<string, { default: string }>),
   };
 
   // tips 배열을 현재 언어에 따라 선택

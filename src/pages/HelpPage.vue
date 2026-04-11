@@ -18,6 +18,8 @@
   import HelpMdDe from '../content/pages/HelpPage-de.md';
   import HelpMdEs from '../content/pages/HelpPage-es.md';
   import HelpMdFr from '../content/pages/HelpPage-fr.md';
+  import HelpMdPt from '../content/pages/HelpPage-pt.md';
+  import HelpMdRu from '../content/pages/HelpPage-ru.md';
 
   const helpMdMap: Record<string, string> = {
     ko: HelpMdKo,
@@ -27,6 +29,8 @@
     de: HelpMdDe,
     es: HelpMdEs,
     fr: HelpMdFr,
+    pt: HelpMdPt,
+    ru: HelpMdRu,
   };
 
   const currentMd = computed(() => {

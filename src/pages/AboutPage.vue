@@ -18,6 +18,8 @@
   import AboutMdDe from '../content/pages/AboutPage-de.md';
   import AboutMdEs from '../content/pages/AboutPage-es.md';
   import AboutMdFr from '../content/pages/AboutPage-fr.md';
+  import AboutMdPt from '../content/pages/AboutPage-pt.md';
+  import AboutMdRu from '../content/pages/AboutPage-ru.md';
 
   const aboutMdMap: Record<string, string> = {
     ko: AboutMdKo,
@@ -27,6 +29,8 @@
     de: AboutMdDe,
     es: AboutMdEs,
     fr: AboutMdFr,
+    pt: AboutMdPt,
+    ru: AboutMdRu,
   };
 
   const currentMd = computed(() => {
