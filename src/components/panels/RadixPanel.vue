@@ -419,4 +419,40 @@ fr:
     sourceRadix: 'Sélectionner la base source'
     targetRadix: 'Sélectionner la base cible'
     swapRadix: 'Échanger les bases source et cible'
+pt:
+  tooltipSwap: 'Trocar base'
+  radixLabel:
+    bin: 'Binário'
+    oct: 'Octal'
+    dec: 'Decimal'
+    hex: 'Hexadecimal'
+    main: 'Antes'
+    sub: 'Depois'
+    wordSize: 'Tamanho da palavra'
+  bit: Bit
+  ariaLabel:
+    wordSize: 'Selecionar tamanho da palavra'
+    sourceDirection: 'Direção da base de origem'
+    targetDirection: 'Direção da base de destino'
+    sourceRadix: 'Selecionar base de origem'
+    targetRadix: 'Selecionar base de destino'
+    swapRadix: 'Trocar base de origem e destino'
+ru:
+  tooltipSwap: 'Поменять систему счисления'
+  radixLabel:
+    bin: 'Двоичная'
+    oct: 'Восьмеричная'
+    dec: 'Десятичная'
+    hex: 'Шестнадцатеричная'
+    main: 'До'
+    sub: 'После'
+    wordSize: 'Размер слова'
+  bit: Бит
+  ariaLabel:
+    wordSize: 'Выбрать размер слова'
+    sourceDirection: 'Направление исходной системы счисления'
+    targetDirection: 'Направление целевой системы счисления'
+    sourceRadix: 'Выбрать исходную систему счисления'
+    targetRadix: 'Выбрать целевую систему счисления'
+    swapRadix: 'Поменять исходную и целевую системы счисления'
 </i18n>

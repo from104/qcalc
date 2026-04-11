@@ -1,0 +1,47 @@
+calc:
+  invalid_digit: 'Недопустимая цифра для текущей системы счисления'
+  constant_not_found: 'Запрашиваемая математическая константа не найдена'
+  invalid_radix: 'Недопустимое значение основания'
+  no_memory: 'В памяти нет сохранённого значения'
+  failed_to_add_record_item: 'Не удалось добавить запись в историю: {error}'
+  failed_to_delete_record_item: 'Не удалось удалить запись из истории: {error}'
+  invalid_record_index: 'Недопустимый индекс записи'
+  record_not_found: 'Запрашиваемая запись не найдена'
+  invalid_operation: 'Недопустимая операция'
+  memory_operation_failed: 'Ошибка операции с памятью'
+radix:
+  invalid_radix: 'Недопустимое значение основания'
+  invalid_number: 'Недопустимое число для основания {radix}: {number}'
+currency:
+  exchange_rates_not_available: 'Курсы валют недоступны'
+  invalid_currency: 'Недопустимая валюта'
+  invalid_base_currency: 'Недопустимая базовая валюта'
+  conversion_failed: 'Ошибка конвертации валюты'
+unit:
+  invalid_category: 'Недопустимая категория единиц: {category}'
+  invalid_unit: 'Недопустимая единица: {unit}'
+  invalid_format: 'Недопустимый формат. Используйте "category.unit"'
+  no_units_found: 'Единицы не найдены для категории: {category}'
+  conversion_failed: 'Ошибка конвертации единиц'
+  invalid_base_value: 'Не удалось вычислить базовое значение'
+component:
+  clipboard:
+    copy_failed: 'Не удалось скопировать в буфер обмена'
+    paste_failed: 'Не удалось вставить из буфера обмена'
+  update:
+    check_failed: 'Не удалось проверить обновления'
+    download_failed: 'Не удалось загрузить обновление'
+    install_failed: 'Не удалось установить обновление'
+  navigation:
+    route_not_found: 'Запрашиваемая страница не найдена'
+    invalid_route: 'Недопустимый запрос страницы'
+math:
+  divide_by_zero: 'Деление на ноль невозможно'
+  negative_factorial: 'Факториал отрицательного числа не допускается'
+  division_error: 'Произошла ошибка при делении'
+  negative_root: 'Корень из отрицательного числа не допускается'
+  negative_root_index: 'Отрицательные корни не поддерживаются'
+  negative_bit_operation: 'Отрицательные числа не допускаются в битовых операциях'
+  overflow: 'Результат операции превышает допустимый диапазон'
+  invalid_operation: 'Недопустимая математическая операция'
+unknown: 'Произошла неизвестная ошибка: {error}'

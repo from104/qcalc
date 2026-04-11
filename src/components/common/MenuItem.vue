@@ -83,4 +83,10 @@ es:
 fr:
   ariaLabel:
     icon: 'Icône de menu {name}'
+pt:
+  ariaLabel:
+    icon: 'Ícone de menu {name}'
+ru:
+  ariaLabel:
+    icon: 'Значок меню {name}'
 </i18n>

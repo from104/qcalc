@@ -534,3 +534,137 @@ fr:
     search: 'Rechercher'
     menu: 'Ouvrir le menu'
     recordSwipeHelp: "Glissez vers la gauche pour ajouter ou modifier des notes, glissez vers la droite pour supprimer des enregistrements."
+pt:
+  calc: Base
+  unit: Unidade
+  currency: Moeda
+  radix: Base numérica
+  formula: Fórmula
+  help: Ajuda
+  about: Sobre
+  record: Histórico
+  settings: Configurações
+  message:
+    fileSavedTo: '(Salvo em: {path})'
+  tooltipTips: 'Exibir dicas.'
+  openRecordPage: 'Clique para abrir a tela de histórico.'
+  tooltipHelp: 'Exibir ajuda.'
+  clearRecords:
+    confirmTitle: 'Confirmar exclusão do histórico'
+    confirmMessage: 'Tem certeza de que deseja excluir todo o histórico de cálculos? Esta ação é irreversível.'
+    success: 'O histórico de cálculos foi excluído com sucesso.'
+  exportRecords:
+    success: 'O histórico de cálculos foi exportado com sucesso.'
+    fail: 'Falha ao exportar o histórico de cálculos.'
+    noData: 'Nenhum histórico de cálculo para exportar.'
+    cancelled: 'Exportação do histórico cancelada.'
+    shareTitle: 'Histórico de cálculos qcalc'
+    shareText: 'Confira meu histórico de cálculos qcalc.'
+    shareDialogTitle: 'Exportar histórico'
+    exportMethodTitle: 'Escolher método de exportação'
+    exportMethodMessage: 'Você pode salvar o histórico de cálculos no dispositivo ou compartilhá-lo com outros aplicativos.'
+    saveToDevice: 'Salvar no dispositivo'
+    shareFile: 'Compartilhar'
+    successMobile: 'Arquivo salvo com sucesso. ({fileName})'
+    mobileSaveLocation: 'Você pode encontrar o arquivo na pasta Documentos.'
+  importRecords:
+    confirmTitle: 'Confirmar importação do histórico'
+    confirmMessage: 'Tem certeza de que deseja substituir o histórico atual pelos registros do arquivo selecionado?'
+    success: 'O histórico de cálculos foi importado com sucesso.'
+    fail: 'Falha ao importar o histórico de cálculos. O arquivo pode estar corrompido ou em um formato incorreto.'
+    cancelled: 'Importação do histórico cancelada.'
+  ariaLabel:
+    delete_outline: 'Excluir todo o histórico'
+    back: 'Voltar à tela anterior'
+    backToRecord: 'Voltar à tela de histórico'
+    mainTabs: 'Lista de abas principais'
+    tab: 'Aba {name}'
+    subPageTitle: 'Tela {title}'
+    subPageButton: 'Botão {label}'
+    closeSubPage: 'Fechar sub-tela'
+    calculatorSection: 'Seção da calculadora'
+    calculatorContent: 'Conteúdo da calculadora'
+    tabPanel: 'Painel da aba {name}'
+    subPageSection: 'Seção da sub-tela'
+    subPageContent: 'Conteúdo da sub-tela'
+    tabSelected: 'Aba {name} selecionada'
+    tabUnselected: 'Aba {name} não selecionada'
+    record: 'Abrir a tela de histórico'
+    help: 'Ver ajuda'
+  tooltip:
+    help: 'Ajuda'
+    about: 'Sobre'
+    settings: 'Configurações'
+    deleteRecord: 'Excluir todo o histórico'
+    exportRecords: 'Exportar histórico'
+    importRecords: 'Importar histórico'
+    search: 'Pesquisar'
+    menu: 'Abrir menu'
+    recordSwipeHelp: 'Deslize para a esquerda para adicionar ou editar notas, deslize para a direita para excluir registros.'
+ru:
+  calc: Основа
+  unit: Единица
+  currency: Валюта
+  radix: Система счисления
+  formula: Формула
+  help: Помощь
+  about: О программе
+  record: История
+  settings: Настройки
+  message:
+    fileSavedTo: '(Сохранено в: {path})'
+  tooltipTips: 'Показать подсказки.'
+  openRecordPage: 'Нажмите, чтобы открыть экран истории.'
+  tooltipHelp: 'Показать справку.'
+  clearRecords:
+    confirmTitle: 'Подтвердите удаление истории'
+    confirmMessage: 'Вы уверены, что хотите удалить всю историю вычислений? Это действие необратимо.'
+    success: 'История вычислений успешно удалена.'
+  exportRecords:
+    success: 'История вычислений успешно экспортирована.'
+    fail: 'Не удалось экспортировать историю вычислений.'
+    noData: 'Нет истории вычислений для экспорта.'
+    cancelled: 'Экспорт истории отменён.'
+    shareTitle: 'История вычислений qcalc'
+    shareText: 'Посмотрите мою историю вычислений qcalc.'
+    shareDialogTitle: 'Экспортировать историю'
+    exportMethodTitle: 'Выберите способ экспорта'
+    exportMethodMessage: 'Вы можете сохранить историю вычислений на устройство или поделиться ею с другими приложениями.'
+    saveToDevice: 'Сохранить на устройство'
+    shareFile: 'Поделиться'
+    successMobile: 'Файл успешно сохранён. ({fileName})'
+    mobileSaveLocation: 'Вы можете найти файл в папке «Документы».'
+  importRecords:
+    confirmTitle: 'Подтвердите импорт истории'
+    confirmMessage: 'Вы уверены, что хотите заменить текущую историю записями из выбранного файла?'
+    success: 'История вычислений успешно импортирована.'
+    fail: 'Не удалось импортировать историю вычислений. Файл может быть повреждён или иметь неправильный формат.'
+    cancelled: 'Импорт истории отменён.'
+  ariaLabel:
+    delete_outline: 'Удалить всю историю'
+    back: 'Вернуться к предыдущему экрану'
+    backToRecord: 'Вернуться к экрану истории'
+    mainTabs: 'Список основных вкладок'
+    tab: 'Вкладка {name}'
+    subPageTitle: 'Экран {title}'
+    subPageButton: 'Кнопка {label}'
+    closeSubPage: 'Закрыть подстраницу'
+    calculatorSection: 'Раздел калькулятора'
+    calculatorContent: 'Содержимое калькулятора'
+    tabPanel: 'Панель вкладки {name}'
+    subPageSection: 'Раздел подстраницы'
+    subPageContent: 'Содержимое подстраницы'
+    tabSelected: 'Вкладка {name} выбрана'
+    tabUnselected: 'Вкладка {name} не выбрана'
+    record: 'Открыть экран истории'
+    help: 'Посмотреть справку'
+  tooltip:
+    help: 'Помощь'
+    about: 'О программе'
+    settings: 'Настройки'
+    deleteRecord: 'Удалить всю историю'
+    exportRecords: 'Экспортировать историю'
+    importRecords: 'Импортировать историю'
+    search: 'Поиск'
+    menu: 'Открыть меню'
+    recordSwipeHelp: 'Проведите влево, чтобы добавить или изменить заметки, проведите вправо, чтобы удалить записи.'

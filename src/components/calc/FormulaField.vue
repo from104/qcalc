@@ -516,4 +516,38 @@ fr:
     trig: 'Trigonométrie'
     constants: 'Constantes'
     other: 'Autres'
+pt:
+  expressionPlaceholder: 'Digite uma expressão (ex: (1+3)*5)'
+  editExpression: 'Editar expressão (Space)'
+  clearExpression: 'Limpar expressão'
+  formulaEvaluationError: 'Erro na avaliação da fórmula. Verifique sua expressão.'
+  ariaLabel:
+    expressionField: 'Campo de entrada de fórmula'
+  help:
+    title: 'Referência mathjs'
+    atHint: 'Valor atual da calculadora'
+    dollarHint: 'Valor da memória'
+    docsLink: 'Documentação mathjs'
+    arithmetic: 'Aritmética'
+    functions: 'Funções'
+    trig: 'Trigonometria'
+    constants: 'Constantes'
+    other: 'Outros'
+ru:
+  expressionPlaceholder: 'Введите выражение (напр. (1+3)*5)'
+  editExpression: 'Редактировать выражение (Space)'
+  clearExpression: 'Очистить выражение'
+  formulaEvaluationError: 'Ошибка вычисления формулы. Проверьте выражение.'
+  ariaLabel:
+    expressionField: 'Поле ввода формулы'
+  help:
+    title: 'Справочник mathjs'
+    atHint: 'Текущее значение калькулятора'
+    dollarHint: 'Значение памяти'
+    docsLink: 'Документация mathjs'
+    arithmetic: 'Арифметика'
+    functions: 'Функции'
+    trig: 'Тригонометрия'
+    constants: 'Константы'
+    other: 'Прочее'
 </i18n>

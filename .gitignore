@@ -9,6 +9,7 @@ __test__
 .yarn
 *.jks
 yarn.lock
+package-lock.json
 
 # Quasar core related directories
 .quasar
@@ -71,5 +72,4 @@ flatpak/linux-unpacked
 flatpak/icons
 flatpak/generated-sources.json
 .claude/settings.local.json
-.claude/settings.json
 .github/hooks/context-mode.json

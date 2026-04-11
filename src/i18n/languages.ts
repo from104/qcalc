@@ -27,6 +27,8 @@ export const SUPPORTED_LANGUAGES: LanguageEntry[] = [
   { code: 'de' },
   { code: 'es' },
   { code: 'fr' },
+  { code: 'pt' },
+  { code: 'ru' },
 ];
 
 export type SupportedLocale = string;

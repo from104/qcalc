@@ -210,4 +210,28 @@ fr:
     Pour plus d'informations, cliquez sur « Voir le problème » pour visiter la page GitHub.
   confirm: 'Confirmer'
   viewIssue: 'Voir le problème'
+pt:
+  snapNoticeTitle: 'Aviso do Ambiente Snap'
+  snapFirstRun: |
+    Devido a problemas de cache do fontconfig no modo estrito do Snap, pode haver um atraso durante a primeira execução.
+
+    Algumas caixas de diálogo do sistema podem exibir fontes como quadrados (□), por favor não force o encerramento e aguarde um momento.
+
+    As execuções subsequentes funcionarão normalmente.
+
+    Para mais informações, clique em 'Ver problema' para visitar a página de problemas do GitHub.
+  confirm: 'Confirmar'
+  viewIssue: 'Ver problema'
+ru:
+  snapNoticeTitle: 'Уведомление о среде Snap'
+  snapFirstRun: |
+    Из-за проблем с кэшем fontconfig в строгом режиме Snap при первом запуске может возникнуть задержка.
+
+    В некоторых системных диалогах шрифты могут отображаться как квадраты (□), пожалуйста, не завершайте принудительно и подождите немного.
+
+    Последующие запуски будут работать нормально.
+
+    Для получения дополнительной информации нажмите «Просмотр проблемы», чтобы перейти на страницу GitHub.
+  confirm: 'Подтвердить'
+  viewIssue: 'Просмотр проблемы'
 </i18n>

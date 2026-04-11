@@ -18,6 +18,8 @@
   import AboutMdDe from '../content/pages/AboutPage-de.md';
   import AboutMdEs from '../content/pages/AboutPage-es.md';
   import AboutMdFr from '../content/pages/AboutPage-fr.md';
+  import AboutMdPt from '../content/pages/AboutPage-pt.md';
+  import AboutMdRu from '../content/pages/AboutPage-ru.md';
 
   const aboutMdMap: Record<string, string> = {
     ko: AboutMdKo,
@@ -27,6 +29,8 @@
     de: AboutMdDe,
     es: AboutMdEs,
     fr: AboutMdFr,
+    pt: AboutMdPt,
+    ru: AboutMdRu,
   };
 
   const currentMd = computed(() => {
@@ -187,4 +191,16 @@ fr:
   license: 'Licence'
   contact: 'Contact'
   changelog: 'Journal des modifications'
+pt:
+  description: 'Uma calculadora multifuncional construída com tecnologias web modernas. Disponível em plataformas desktop e móveis.'
+  author: 'Desenvolvedor'
+  license: 'Licença'
+  contact: 'Contato'
+  changelog: 'Registro de alterações'
+ru:
+  description: 'Многофункциональный калькулятор, созданный с использованием современных веб-технологий. Доступен на настольных и мобильных платформах.'
+  author: 'Разработчик'
+  license: 'Лицензия'
+  contact: 'Контакты'
+  changelog: 'Журнал изменений'
 </i18n>
