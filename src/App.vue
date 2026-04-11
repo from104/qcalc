@@ -48,7 +48,7 @@
 
   // ── 단축키 액션 ──
   const toggleAlwaysOnTop = () => {
-    if (!$g.isElectron) return;
+    if (!$g.isElectron && !$g.isTauri) return;
     settingsStore.toggleAlwaysOnTop();
     showMessage(settingsStore.alwaysOnTop ? t('alwaysOnTopOn') : t('alwaysOnTopOff'));
   };

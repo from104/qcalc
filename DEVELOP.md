@@ -6,7 +6,8 @@
 
 - **Vue 3** + **TypeScript** (strict mode)
 - **Quasar 2** — UI framework
-- **Electron 40** — desktop app
+- **Electron 40** — desktop app (default)
+- **Tauri 2** — desktop app (experimental, on `feature/tauri-integration` branch)
 - **Capacitor** — mobile app (Android)
 - **Vite 7** — build tool
 
@@ -70,6 +71,17 @@ MY_JKS_KEY_PASSWORD=key_password
 ```bash
 quasar dev -m electron
 ```
+
+### Desktop (Tauri, experimental)
+
+Prerequisites: Rust 1.88+ (`rustup update stable`), Linux build dependencies (`webkit2gtk-4.1`, `rsvg2`).
+
+```bash
+yarn dev:tauri     # dev mode (devtools auto-open)
+yarn build:tauri   # production bundle (.deb/.AppImage)
+```
+
+**Wayland users note**: GNOME/KDE Wayland sessions suffer from upstream bugs where `setTitle` does not repaint the CSD header bar and `setAlwaysOnTop` is a no-op ([tauri#13749](https://github.com/tauri-apps/tauri/issues/13749), [tauri#3117](https://github.com/tauri-apps/tauri/issues/3117)). As a workaround, `force_xwayland_if_needed()` in `src-tauri/src/lib.rs` forces `GDK_BACKEND=x11` on Wayland sessions. If HiDPI blur bothers you, opt out with `QCALC_FORCE_WAYLAND=1 yarn dev:tauri` (the two features above will not work).
 
 ### Android (Capacitor)
 

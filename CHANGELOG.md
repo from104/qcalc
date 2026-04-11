@@ -4,6 +4,17 @@ All notable changes to this project are recorded in this file.
 
 The format is based on [Keep a Changelog] and this project follows [Semantic Versioning].
 
+## [Unreleased]
+
+### Added
+
+- **Tauri 2 Desktop Build (experimental)**: Introduced a Tauri 2 based desktop target that coexists with the Electron build. Run with `yarn dev:tauri` / `yarn build:tauri`. The existing `src/` codebase is kept unmodified — `src/boot/tauri-shim.ts` bridges the `window.electron` / `window.electronUpdater` interfaces to Tauri APIs at runtime.
+  - **Ported features**: window min/max sizing, position/size persistence (`tauri-plugin-window-state`), package environment detection (Snap/Flatpak/AppImage), always-on-top toggle (Alt+T), app quit, devtools auto-open in dev, window title sync on locale change.
+  - **Wayland workaround**: On GNOME/KDE Wayland, `setTitle` does not repaint the CSD header bar ([tauri#13749](https://github.com/tauri-apps/tauri/issues/13749)) and `setAlwaysOnTop` is a no-op ([tauri#3117](https://github.com/tauri-apps/tauri/issues/3117), Wayland protocol limitation). The Tauri build automatically forces `GDK_BACKEND=x11` on Wayland sessions to work around both. Opt out with `QCALC_FORCE_WAYLAND=1` if HiDPI blur is a concern.
+  - **Deferred**: `tauri-plugin-updater` integration (pending endpoint + pubkey setup), Tauri-specific Snap/Flatpak manifests, Windows cross-builds.
+- **Extended global environment flags**: Added `isTauri` and `isFlatpak` to `window.globalVars`. Sandbox type detection is done at runtime via a Rust `get_package_env` command.
+- **Settings page**: "Always on top" toggle is now shown on Tauri in addition to Electron.
+
 ## [0.12.0] 2026-03-22
 
 ### Added
