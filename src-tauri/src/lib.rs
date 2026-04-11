@@ -75,15 +75,14 @@ pub fn run() {
     );
   }
 
-  // NOTE: tauri-plugin-updater는 tauri.conf.json의 plugins.updater 설정
-  // (endpoints + pubkey)이 갖춰진 뒤에 활성화한다. Snap/Flatpak 환경에서는
-  // 자체 업데이트 메커니즘을 사용하므로 등록하지 않는다.
-  // TODO: configure endpoints and pubkey, then enable:
-  // #[cfg(not(any(target_os = "android", target_os = "ios")))]
-  // if !is_sandboxed(detect_package_env()) {
-  //   builder = builder.plugin(tauri_plugin_updater::Builder::new().build());
-  // }
-  let _ = is_sandboxed(detect_package_env()); // suppress unused until enabled
+  // Snap/Flatpak은 자체 업데이트 메커니즘을 사용하므로 플러그인을 등록하지 않는다
+  // (Electron 버전의 electron-updater 조건부 비활성화와 동일한 정책).
+  // tauri.conf.json의 plugins.updater(pubkey + endpoints)가 설정되지 않으면
+  // 런타임에 check() 호출이 에러로 반환되며, JS shim이 이를 포착해 'error' 이벤트로 보고한다.
+  #[cfg(not(any(target_os = "android", target_os = "ios")))]
+  if !is_sandboxed(detect_package_env()) {
+    builder = builder.plugin(tauri_plugin_updater::Builder::new().build());
+  }
 
   builder
     .setup(|app| {

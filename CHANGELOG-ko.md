@@ -14,6 +14,8 @@
   - **보류**: `tauri-plugin-updater` 통합(endpoints + pubkey 준비 후 활성화 예정), Tauri용 Snap/Flatpak 매니페스트, Windows 크로스 빌드.
 - **전역 환경 플래그 확장**: `window.globalVars`에 `isTauri`, `isFlatpak` 추가. Rust 커맨드 `get_package_env`로 샌드박스 타입을 런타임에 조회.
 - **설정 페이지**: "항상 위" 토글이 Tauri 환경에서도 표시되도록 조건 확장.
+- **Tauri 자동 업데이트 준비**: `tauri-plugin-updater` 플러그인을 Rust 측에서 등록하고 (Snap/Flatpak 환경은 자체 업데이트 메커니즘을 위해 제외), JS shim에서 `window.electronUpdater` 인터페이스를 Tauri updater API(`check()` / `downloadAndInstall()`)로 매핑. `updater:default` capability 추가. 신규 `.github/workflows/tauri-release.yml`로 `tauri-v*` 태그 푸시 시 자동으로 아티팩트 빌드·서명·GitHub Release draft 업로드.
+  - **활성화 미완 (운영자 수동 작업 필요)**: 서명 키 생성(`yarn tauri signer generate -w ~/.tauri/qcalc.key`) → 공개키를 `src-tauri/tauri.conf.json`의 `plugins.updater.pubkey`에 붙여넣기 → GitHub Secrets에 `TAURI_SIGNING_PRIVATE_KEY` / `TAURI_SIGNING_PRIVATE_KEY_PASSWORD` 등록 → `bundle.createUpdaterArtifacts: true`와 `plugins.updater.endpoints` 추가. 이 네 단계가 완료되기 전까지는 `checkForUpdates()` 호출이 "업데이트 없음"으로 조용히 fallback 된다.
 
 ## [0.12.1] 2026-04-11
 

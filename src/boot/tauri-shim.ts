@@ -6,6 +6,7 @@
  */
 
 import { defineBoot } from '#q-app/wrappers';
+import type { Update } from '@tauri-apps/plugin-updater';
 
 const isTauri = typeof window !== 'undefined' && '__TAURI_INTERNALS__' in window;
 
@@ -55,19 +56,99 @@ export default defineBoot(async () => {
   });
   syncTitle();
 
-  // tauri-plugin-updater는 endpoints/pubkey 설정이 갖춰진 뒤 활성화한다.
-  // 그 전까지는 'not-available'만 보고하는 no-op shim으로 둔다.
-  let updateStatusListener: ((status: UpdateStatusInfo['status']) => void) | null = null;
+  // tauri-plugin-updater 브릿지.
+  // tauri.conf.json의 plugins.updater(pubkey + endpoints)가 설정되지 않은 상태에서는
+  // check() 호출이 에러로 반환되며, 해당 에러는 리스너에 'not-available'로 보고된다
+  // (Electron의 "업데이트 없음" 동작과 동일).
+  type UpdateCallback = (
+    status: UpdateStatusInfo['status'],
+    info?: UpdateInfo | UpdateProgressInfo | UpdateError,
+  ) => void;
+  let updateStatusListener: UpdateCallback | null = null;
+
+  // tauri-plugin-updater의 Update 객체를 캐시하여 startUpdate에서 재사용한다.
+  let pendingUpdate: Update | null = null;
+
+  const toUpdateInfo = (u: Update): UpdateInfo => ({
+    version: u.version,
+    files: [],
+    path: '',
+    sha512: '',
+    releaseDate: u.date ?? '',
+    releaseName: u.version,
+    releaseNotes: u.body ?? '',
+  });
+
+  const loadUpdater = () => import('@tauri-apps/plugin-updater');
 
   window.electronUpdater = {
     checkForUpdates: () => {
-      updateStatusListener?.('not-available');
+      updateStatusListener?.('checking');
+      loadUpdater()
+        .then(({ check }) => check())
+        .then((update) => {
+          if (update) {
+            pendingUpdate = update;
+            updateStatusListener?.('available', toUpdateInfo(update));
+          } else {
+            pendingUpdate = null;
+            updateStatusListener?.('not-available');
+          }
+        })
+        .catch((err: unknown) => {
+          // 설정 미완(pubkey/endpoints 없음) 또는 Snap/Flatpak 등 sandboxed는 여기로 떨어진다.
+          // 사용자에겐 "업데이트 없음"과 동일하게 보고한다.
+          console.warn('[tauri-shim] updater check failed', err);
+          updateStatusListener?.('not-available');
+        });
     },
     startUpdate: () => {
-      /* no-op until tauri-plugin-updater is wired */
+      if (!pendingUpdate) {
+        updateStatusListener?.('not-available');
+        return;
+      }
+      pendingUpdate
+        .downloadAndInstall((event) => {
+          switch (event.event) {
+            case 'Started': {
+              // 전체 크기 정보를 progress 이벤트 초기값으로 전달
+              updateStatusListener?.('progress', {
+                bytesPerSecond: 0,
+                percent: 0,
+                transferred: 0,
+                total: event.data.contentLength ?? 0,
+              });
+              break;
+            }
+            case 'Progress': {
+              // contentLength 없이 chunkLength만 있음; 누적 추적은 생략하고 증분만 보고
+              updateStatusListener?.('progress', {
+                bytesPerSecond: 0,
+                percent: 0,
+                transferred: event.data.chunkLength,
+                total: 0,
+              });
+              break;
+            }
+            case 'Finished': {
+              if (pendingUpdate) updateStatusListener?.('downloaded', toUpdateInfo(pendingUpdate));
+              break;
+            }
+          }
+        })
+        .catch((err: unknown) => {
+          console.error('[tauri-shim] updater download/install failed', err);
+          const error: UpdateError = {
+            code: 'UPDATER_FAILED',
+            message: err instanceof Error ? err.message : String(err),
+            ...(err instanceof Error && err.stack ? { stack: err.stack } : {}),
+          };
+          updateStatusListener?.('error', error);
+        });
     },
     installUpdate: () => {
-      /* no-op until tauri-plugin-updater is wired */
+      // Tauri의 downloadAndInstall이 설치+재시작까지 처리하므로 별도 액션 불필요.
+      // Electron 호환성을 위한 no-op.
     },
     onUpdateStatus: (callback) => {
       updateStatusListener = callback;
@@ -76,6 +157,7 @@ export default defineBoot(async () => {
       updateStatusListener = null;
     },
     testUpdate: () => {
+      updateStatusListener?.('checking');
       updateStatusListener?.('not-available');
     },
   };

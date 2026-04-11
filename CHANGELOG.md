@@ -14,6 +14,8 @@ The format is based on [Keep a Changelog] and this project follows [Semantic Ver
   - **Deferred**: `tauri-plugin-updater` integration (pending endpoint + pubkey setup), Tauri-specific Snap/Flatpak manifests, Windows cross-builds.
 - **Extended global environment flags**: Added `isTauri` and `isFlatpak` to `window.globalVars`. Sandbox type detection is done at runtime via a Rust `get_package_env` command.
 - **Settings page**: "Always on top" toggle is now shown on Tauri in addition to Electron.
+- **Tauri auto-update preparation**: Registered the `tauri-plugin-updater` plugin on the Rust side (excluding Snap/Flatpak environments which use their own update mechanisms). The JS shim now maps `window.electronUpdater` to the Tauri updater API (`check()` / `downloadAndInstall()`). Added the `updater:default` capability. A new `.github/workflows/tauri-release.yml` workflow automatically builds, signs, and uploads artifacts to a GitHub Release draft when a `tauri-v*` tag is pushed.
+  - **Activation incomplete (operator action required)**: Generate signing keys (`yarn tauri signer generate -w ~/.tauri/qcalc.key`), paste the public key into `src-tauri/tauri.conf.json` `plugins.updater.pubkey`, add `TAURI_SIGNING_PRIVATE_KEY` / `TAURI_SIGNING_PRIVATE_KEY_PASSWORD` to GitHub Secrets, and set `bundle.createUpdaterArtifacts: true` + `plugins.updater.endpoints`. Until these four steps are complete, `checkForUpdates()` silently falls back to "no update available".
 
 ## [0.12.0] 2026-03-22
 

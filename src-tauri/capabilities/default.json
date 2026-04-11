@@ -3,5 +3,5 @@
   "identifier": "default",
   "description": "enables the default permissions",
   "windows": ["main"],
-  "permissions": ["core:default", "core:window:allow-set-always-on-top", "core:window:allow-set-title"]
+  "permissions": ["core:default", "core:window:allow-set-always-on-top", "core:window:allow-set-title", "updater:default"]
 }
