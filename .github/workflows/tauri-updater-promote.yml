@@ -1,0 +1,42 @@
+name: tauri-updater-promote
+
+# 버전 릴리스(tauri-v*)가 만든 latest.json 을, 버전과 무관한 고정 'tauri-updater'
+# 롤링 릴리스로 복사한다. 앱의 updater endpoint 는 항상 이 고정 URL 을 조회하므로
+# Electron 릴리스(v*)와 GitHub의 `releases/latest` 가 충돌하는 문제를 피한다.
+#
+# 사전 조건: tauri-release 워크플로가 만든 draft 버전 릴리스를 검증한 뒤 Publish 해야 한다.
+#   latest.json 내부의 다운로드 URL 이 해당 버전 릴리스 에셋을 가리키므로,
+#   버전 릴리스를 먼저 Publish 하지 않으면 업데이트 다운로드가 404 가 된다.
+#
+# 실행: Actions 탭 > tauri-updater-promote > Run workflow > tag 입력 (예: tauri-v0.12.2)
+
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'latest.json 을 가져올 버전 릴리스 태그 (예: tauri-v0.12.2)'
+        required: true
+
+permissions:
+  contents: write
+
+jobs:
+  promote:
+    runs-on: ubuntu-latest
+    env:
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      GH_REPO: ${{ github.repository }}
+    steps:
+      - name: Download latest.json from version release
+        run: gh release download "${{ inputs.tag }}" --pattern latest.json --clobber
+
+      - name: Ensure rolling 'tauri-updater' release exists
+        run: |
+          gh release view tauri-updater >/dev/null 2>&1 || \
+          gh release create tauri-updater \
+            --title 'Tauri Updater Manifest (rolling)' \
+            --notes 'Tauri 자동 업데이트용 latest.json 호스팅 전용 릴리스. 수동 편집 금지 — tauri-updater-promote 워크플로가 갱신한다.' \
+            --latest=false
+
+      - name: Upload latest.json to rolling release
+        run: gh release upload tauri-updater latest.json --clobber
