@@ -35,7 +35,7 @@
   },
   "plugins": {
     "updater": {
-      "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IEM2QzJBNzdDQTBFRUNDRjIKUldUeXpPNmdmS2ZDeHMrbmVMZHBHUHpzT2s4eEdPNit2UE4ycHFkcVA4UlZOTUd1R21MeHd0SUEK",
+      "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IDk4MDVFQkYyODdCQzBDRDkKUldUWkRMeUg4dXNGbUhISFRyeDlYUUpQMGsxdUpHblRrWCtHSTZYVGpQdEpibGt3L2hIWndyQlMK",
       "endpoints": ["https://github.com/from104/qcalc/releases/download/tauri-updater/latest.json"]
     }
   }
