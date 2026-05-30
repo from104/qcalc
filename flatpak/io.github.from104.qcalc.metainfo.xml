@@ -78,6 +78,7 @@
   <url type="vcs-browser">https://github.com/from104/qcalc</url>
   <url type="contribute">https://github.com/from104/qcalc#contributing</url>
   <url type="translate">https://github.com/from104/qcalc/tree/develop/src/i18n</url>
+  <url type="contact">https://from104.github.io/#contact</url>
 
   <screenshots>
     <screenshot type="default" environment="gnome">
