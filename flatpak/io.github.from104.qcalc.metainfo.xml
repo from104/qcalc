@@ -144,7 +144,6 @@
 
   <recommends>
     <internet>always</internet>
-    <display_length compare="ge">352</display_length>
   </recommends>
 
   <requires>
