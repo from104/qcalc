@@ -1,12 +1,16 @@
 [Desktop Entry]
 Name=QCalc
+Name[ko]=큐칼크
 GenericName=Calculator
+GenericName[ko]=계산기
 Comment=A multi-purpose calculator for productivity and accessibility
+Comment[ko]=생산성과 접근성을 위한 다목적 계산기
 Exec=run.sh %U
 Icon=io.github.from104.qcalc
 Terminal=false
 Type=Application
 Categories=Utility;Calculator;
-Keywords=calculator;unit;currency;converter;programmer;math;
+Keywords=calculator;unit;currency;exchange;converter;programmer;scientific;radix;binary;hexadecimal;formula;math;
+Keywords[ko]=계산기;환율;단위변환;진법;수식;공학용;
+StartupNotify=true
 StartupWMClass=QCalc
-MimeType=

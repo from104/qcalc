@@ -3,18 +3,21 @@
   <id>io.github.from104.qcalc</id>
 
   <name>QCalc</name>
-  <summary>5 calculators, 8 languages — built for productivity and accessibility</summary>
+  <name xml:lang="ko">큐칼크</name>
+  <summary>Five calculators in one — currency, units, programmer, formula</summary>
+  <summary xml:lang="ko">계산기 5종 통합 — 환율, 단위, 진법, 수식</summary>
 
   <metadata_license>CC0-1.0</metadata_license>
   <project_license>MIT</project_license>
 
   <developer id="io.github.from104">
     <name>Seo Kihyun</name>
+    <name xml:lang="ko">서기현</name>
   </developer>
 
   <description>
     <p>
-      QCalc packs 5 specialized calculators and 8 languages into one clean,
+      QCalc packs 5 specialized calculators and 10 languages into one clean,
       keyboard-friendly app. Built with Vue 3, Quasar, and Electron, it covers
       everyday arithmetic, unit conversion, currency exchange, programmer math,
       and formula evaluation — all one tab away.
@@ -23,7 +26,7 @@
     <ul>
       <li>Standard — arithmetic, percentages, trig, powers, roots, factorial</li>
       <li>Unit Converter — 15+ categories (length, area, volume, weight, and more)</li>
-      <li>Currency Converter — real-time exchange rates with quick adjustments</li>
+      <li>Currency Converter — live exchange rates (requires internet)</li>
       <li>Radix Converter — binary/octal/decimal/hex with bitwise operations</li>
       <li>Formula — type math expressions directly using mathjs syntax</li>
     </ul>
@@ -31,7 +34,7 @@
     <ul>
       <li>64-digit precision powered by mathjs BigNumber</li>
       <li>Calculation history with notes and CSV export/import</li>
-      <li>8 languages — Korean, English, Japanese, Chinese, Hindi, German, Spanish, French</li>
+      <li>10 languages — Korean, English, Japanese, Chinese, Hindi, German, Spanish, French, Portuguese, Russian</li>
       <li>ARIA labels, screen reader announcements, keyboard focus indicators, reduced motion support</li>
       <li>Multiple color themes, dark mode, and keyboard-first design</li>
       <li>Settings and history export/import for consistent environments</li>
@@ -40,26 +43,93 @@
 
   <launchable type="desktop-id">io.github.from104.qcalc.desktop</launchable>
 
+  <categories>
+    <category>Utility</category>
+    <category>Calculator</category>
+  </categories>
+
+  <keywords>
+    <keyword>calculator</keyword>
+    <keyword>unit</keyword>
+    <keyword>currency</keyword>
+    <keyword>exchange</keyword>
+    <keyword>converter</keyword>
+    <keyword>programmer</keyword>
+    <keyword>scientific</keyword>
+    <keyword>radix</keyword>
+    <keyword>binary</keyword>
+    <keyword>hexadecimal</keyword>
+    <keyword>formula</keyword>
+    <keyword>math</keyword>
+    <keyword xml:lang="ko">계산기</keyword>
+    <keyword xml:lang="ko">환율</keyword>
+    <keyword xml:lang="ko">단위변환</keyword>
+    <keyword xml:lang="ko">진법</keyword>
+    <keyword xml:lang="ko">수식</keyword>
+  </keywords>
+
+  <branding>
+    <color type="primary" scheme_preference="light">#a0e6a0</color>
+    <color type="primary" scheme_preference="dark">#2e7d32</color>
+  </branding>
+
   <url type="homepage">https://github.com/from104/qcalc</url>
   <url type="bugtracker">https://github.com/from104/qcalc/issues</url>
   <url type="vcs-browser">https://github.com/from104/qcalc</url>
+  <url type="contribute">https://github.com/from104/qcalc#contributing</url>
+  <url type="translate">https://github.com/from104/qcalc/tree/develop/src/i18n</url>
 
   <screenshots>
-    <screenshot type="default">
+    <screenshot type="default" environment="gnome">
       <caption>QCalc standard calculator view</caption>
-      <image>https://github.com/from104/qcalc/raw/main/assets/screenshot_v0.11.5.png</image>
+      <image>https://github.com/from104/qcalc/raw/main/assets/screenshot_v0.12.0.png</image>
+    </screenshot>
+    <screenshot environment="gnome">
+      <caption xml:lang="ko">QCalc 표준 계산기 화면 (한국어)</caption>
+      <caption>QCalc standard calculator (Korean UI)</caption>
+      <image>https://github.com/from104/qcalc/raw/main/assets/screenshot_v0.12.0-ko.png</image>
     </screenshot>
   </screenshots>
 
-  <content_rating type="oars-1.1" />
+  <content_rating type="oars-1.1">
+    <content_attribute id="violence-cartoon">none</content_attribute>
+    <content_attribute id="violence-fantasy">none</content_attribute>
+    <content_attribute id="violence-realistic">none</content_attribute>
+    <content_attribute id="violence-bloodshed">none</content_attribute>
+    <content_attribute id="violence-sexual">none</content_attribute>
+    <content_attribute id="violence-desecration">none</content_attribute>
+    <content_attribute id="violence-slavery">none</content_attribute>
+    <content_attribute id="violence-worship">none</content_attribute>
+    <content_attribute id="drugs-alcohol">none</content_attribute>
+    <content_attribute id="drugs-narcotics">none</content_attribute>
+    <content_attribute id="drugs-tobacco">none</content_attribute>
+    <content_attribute id="sex-nudity">none</content_attribute>
+    <content_attribute id="sex-themes">none</content_attribute>
+    <content_attribute id="sex-homosexuality">none</content_attribute>
+    <content_attribute id="sex-prostitution">none</content_attribute>
+    <content_attribute id="sex-adultery">none</content_attribute>
+    <content_attribute id="sex-appearance">none</content_attribute>
+    <content_attribute id="language-profanity">none</content_attribute>
+    <content_attribute id="language-humor">none</content_attribute>
+    <content_attribute id="language-discrimination">none</content_attribute>
+    <content_attribute id="social-chat">none</content_attribute>
+    <content_attribute id="social-info">none</content_attribute>
+    <content_attribute id="social-audio">none</content_attribute>
+    <content_attribute id="social-location">none</content_attribute>
+    <content_attribute id="social-contacts">none</content_attribute>
+    <content_attribute id="money-purchasing">none</content_attribute>
+    <content_attribute id="money-gambling">none</content_attribute>
+  </content_rating>
 
   <releases>
     <release version="0.12.0" date="2026-03-22">
+      <url type="details">https://github.com/from104/qcalc/releases/tag/v0.12.0</url>
       <description>
         <p>New Formula calculator, 5 additional languages (Chinese, Hindi, German, Spanish, French), Flatpak packaging, Electron 40, and accessibility improvements.</p>
       </description>
     </release>
     <release version="0.11.6" date="2025-12-27">
+      <url type="details">https://github.com/from104/qcalc/releases/tag/v0.11.6</url>
       <description>
         <p>Number format per calculator feature and various bug fixes.</p>
       </description>
@@ -69,7 +139,13 @@
   <supports>
     <control>pointing</control>
     <control>keyboard</control>
+    <control>touch</control>
   </supports>
+
+  <recommends>
+    <internet>always</internet>
+    <display_length compare="ge">352</display_length>
+  </recommends>
 
   <requires>
     <display_length compare="ge">352</display_length>
