@@ -49,19 +49,19 @@ check_prerequisites() {
     fi
 
     # 런타임 및 SDK 설치 확인
-    if ! flatpak info org.freedesktop.Platform//24.08 &> /dev/null; then
-        warn "org.freedesktop.Platform//24.08이 설치되지 않았습니다. 설치합니다..."
-        flatpak install -y --user flathub org.freedesktop.Platform//24.08
+    if ! flatpak info org.freedesktop.Platform//25.08 &> /dev/null; then
+        warn "org.freedesktop.Platform//25.08이 설치되지 않았습니다. 설치합니다..."
+        flatpak install -y --user flathub org.freedesktop.Platform//25.08
     fi
 
-    if ! flatpak info org.freedesktop.Sdk//24.08 &> /dev/null; then
-        warn "org.freedesktop.Sdk//24.08이 설치되지 않았습니다. 설치합니다..."
-        flatpak install -y --user flathub org.freedesktop.Sdk//24.08
+    if ! flatpak info org.freedesktop.Sdk//25.08 &> /dev/null; then
+        warn "org.freedesktop.Sdk//25.08이 설치되지 않았습니다. 설치합니다..."
+        flatpak install -y --user flathub org.freedesktop.Sdk//25.08
     fi
 
-    if ! flatpak info org.electronjs.Electron2.BaseApp//24.08 &> /dev/null; then
-        warn "org.electronjs.Electron2.BaseApp//24.08이 설치되지 않았습니다. 설치합니다..."
-        flatpak install -y --user flathub org.electronjs.Electron2.BaseApp//24.08
+    if ! flatpak info org.electronjs.Electron2.BaseApp//25.08 &> /dev/null; then
+        warn "org.electronjs.Electron2.BaseApp//25.08이 설치되지 않았습니다. 설치합니다..."
+        flatpak install -y --user flathub org.electronjs.Electron2.BaseApp//25.08
     fi
 
     info "사전 조건 확인 완료."
