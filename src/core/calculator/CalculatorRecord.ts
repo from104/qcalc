@@ -169,6 +169,8 @@ export class CalculatorRecord {
     // 인덱스를 유효 범위로 클램프(배열 축소/확대에 대한 방어)
     const clampedIndex = Math.max(0, Math.min(index, this.records.length));
     this.records.splice(clampedIndex, 0, record);
+    // 복원으로 인해 최대 저장 개수를 초과하지 않도록 방어
+    this.trimRecordsIfNeeded();
   }
 
   /**
