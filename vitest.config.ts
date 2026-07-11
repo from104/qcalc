@@ -1,7 +1,9 @@
 import { defineConfig } from 'vitest/config';
 import { join } from 'node:path';
+import yamlPlugin from '@modyfi/vite-plugin-yaml';
 
 export default defineConfig({
+  plugins: [yamlPlugin()],
   resolve: {
     alias: {
       src: join(__dirname, 'src'),
