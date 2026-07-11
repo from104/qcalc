@@ -50,5 +50,6 @@ modules:
       - install -Dm644 io.github.from104.qcalc.desktop /app/share/applications/io.github.from104.qcalc.desktop
       # metainfo 설치
       - install -Dm644 io.github.from104.qcalc.metainfo.xml /app/share/metainfo/io.github.from104.qcalc.metainfo.xml
-      # 아이콘 설치 (256x256)
-      - install -Dm644 icons/io.github.from104.qcalc.png /app/share/icons/hicolor/256x256/apps/io.github.from104.qcalc.png
+      # 아이콘 설치 (256x256). type:file 소스는 path의 서브디렉토리(icons/)를
+      # 보존하지 않고 basename으로 빌드 디렉토리 루트에 복사되므로 basename으로 참조한다.
+      - install -Dm644 io.github.from104.qcalc.png /app/share/icons/hicolor/256x256/apps/io.github.from104.qcalc.png
