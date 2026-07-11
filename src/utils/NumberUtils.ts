@@ -252,7 +252,7 @@ const groupFormatterCache = new Map<string, Intl.NumberFormat>();
  * @param locale - 2글자 로케일 코드
  * @returns 그룹 구분자, 소수 구분자
  */
-function getLocaleNumberSymbols(locale: string): { group: string; decimal: string } {
+export function getLocaleNumberSymbols(locale: string): { group: string; decimal: string } {
   const key = locale || 'en';
   const cached = localeSymbolCache.get(key);
   if (cached) return cached;

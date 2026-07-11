@@ -55,7 +55,7 @@
   import MenuItem from 'components/common/MenuItem.vue';
   import ToolTip from 'src/components/common/ToolTip.vue';
   import { showError, showMessage } from 'src/utils/NotificationUtils';
-  import { formatNumberToLocale, parseLocaleNumber } from 'src/utils/NumberUtils';
+  import { formatNumberToLocale, parseLocaleNumber, getLocaleNumberSymbols } from 'src/utils/NumberUtils';
 
   type PropsType = {
     field?: 'main' | 'sub';
@@ -210,12 +210,22 @@
       // 소수점 자릿수 설정이 -1이고 소수점이 있는 경우
       const hasSpecialDecimalPlaces = Number(settingsStore.getCurrentDecimalPlaces) === -1 && inputBuffer.includes('.');
 
-      const result =
-        hasSpecialDecimalPlaces && !calc.needsBufferReset
-          ? `${formattedNumber.split('.')[0]}.${inputBuffer.split('.')[1]}`
-          : formattedNumber;
+      if (hasSpecialDecimalPlaces && !calc.needsBufferReset) {
+        // toFormattedNumber와 동일한 조건(10진수일 때만 로케일 표기)으로 소수 구분자를 결정한다.
+        // radix 모드에서는 항상 리터럴 '.'을 사용해 formattedNumber와 정합성을 유지한다.
+        const radixNumber = radixStore.radixEnumToNumber(
+          currentTab.value === 'radix' ? radixStore.sourceRadix : Radix.Decimal,
+        );
+        const decimalSeparator =
+          radixNumber === 10 ? getLocaleNumberSymbols(settingsStore.locale || 'en').decimal : '.';
+        const decimalIndex = formattedNumber.indexOf(decimalSeparator);
+        const integerPart = decimalIndex === -1 ? formattedNumber : formattedNumber.slice(0, decimalIndex);
+        // 소수부는 사용자가 입력 중인 원본(inputBuffer)에서 그대로 가져와 실시간 타이핑 상태를 보존한다.
+        const fractionalPart = inputBuffer.split('.')[1] ?? '';
+        return `${integerPart}${decimalSeparator}${fractionalPart}`;
+      }
 
-      return result;
+      return formattedNumber;
     } else {
       // 서브 필드인 경우 애드온 타입에 따라 처리
       switch (props.addon) {
