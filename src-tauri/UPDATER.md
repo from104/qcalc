@@ -9,7 +9,7 @@ QCalc의 Tauri 빌드에 자동 업데이트를 활성화하기 위한 운영자
 | Rust 플러그인 등록                | ✅             | [`src/lib.rs`](src/lib.rs) — Snap/Flatpak 제외                                                     |
 | Capability 권한                   | ✅             | [`capabilities/default.json`](capabilities/default.json) — `updater:default`                       |
 | JS 브릿지                         | ✅             | [`../src/boot/tauri-shim.ts`](../src/boot/tauri-shim.ts)                                           |
-| CI 워크플로 (빌드)                | ✅             | [`../.github/workflows/tauri-release.yml`](../.github/workflows/tauri-release.yml)                 |
+| CI 워크플로 (빌드)                | ✅             | [`../.github/workflows/release.yml`](../.github/workflows/release.yml)                             |
 | CI 워크플로 (manifest promote)    | ✅             | [`../.github/workflows/tauri-updater-promote.yml`](../.github/workflows/tauri-updater-promote.yml) |
 | 공개키 (`plugins.updater.pubkey`) | ✅             | [`tauri.conf.json`](tauri.conf.json)                                                               |
 | endpoint (고정 롤링 URL)          | ✅             | [`tauri.conf.json`](tauri.conf.json)                                                               |

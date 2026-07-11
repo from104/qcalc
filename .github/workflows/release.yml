@@ -1,0 +1,149 @@
+name: release
+
+# Tauri 2 데스크톱 프로덕션 릴리스 워크플로. Tauri 가 데스크톱 빌드의 유일한 경로이므로
+# 일반 버전 태그(`v*`)를 그대로 사용한다.
+#
+# 사전 준비 (1회):
+#   1. `yarn tauri signer generate -w ~/.tauri/qcalc.key` 로 서명 키 생성
+#   2. 공개키 내용을 `src-tauri/tauri.conf.json`의 `plugins.updater.pubkey`에 붙여넣기
+#   3. GitHub Repo Settings > Secrets > Actions 에 다음 secret 추가:
+#      - TAURI_SIGNING_PRIVATE_KEY         : 개인키 파일 (~/.tauri/qcalc.key) 내용
+#      - TAURI_SIGNING_PRIVATE_KEY_PASSWORD: 개인키 생성 시 설정한 암호
+#
+# 릴리스 절차:
+#   git tag v0.13.0 && git push origin v0.13.0
+#   → 이 워크플로가 실행되어 .deb/.rpm/.AppImage/.exe(NSIS) + .flatpak + .snap
+#     + .sig + latest.json 을 draft 릴리스로 업로드.
+#   → draft 릴리스를 검증·Publish 한 뒤, tauri-updater-promote 워크플로를 실행해
+#     latest.json 을 고정 'tauri-updater' 롤링 릴리스로 복사해야 업데이터가 동작한다.
+#
+# workflow_dispatch 로 수동 실행하면 태그 없이 전 포맷을 빌드해 아티팩트로만 업로드한다
+# (릴리스 미생성). 이 브랜치의 CI 빌드 검증 수단으로 사용한다.
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+
+jobs:
+  build-tauri:
+    name: Build Tauri bundle (${{ matrix.platform.target }})
+    runs-on: ${{ matrix.platform.os }}
+    permissions:
+      contents: write
+    strategy:
+      fail-fast: false
+      matrix:
+        platform:
+          - os: ubuntu-latest
+            target: x86_64-unknown-linux-gnu
+          - os: windows-latest
+            target: x86_64-pc-windows-msvc
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Enable Corepack
+        run: corepack enable
+
+      - name: Setup Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Cache Cargo registry
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            src-tauri/target
+          key: ${{ runner.os }}-cargo-${{ hashFiles('src-tauri/Cargo.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-cargo-
+
+      - name: Install Linux build dependencies
+        if: matrix.platform.os == 'ubuntu-latest'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            libwebkit2gtk-4.1-dev \
+            librsvg2-dev \
+            libayatana-appindicator3-dev \
+            libssl-dev \
+            build-essential
+
+      - name: Install JS dependencies
+        run: yarn install --immutable
+
+      - name: Build Tauri bundle
+        id: tauri
+        uses: tauri-apps/tauri-action@v0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
+          TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
+        with:
+          tagName: ${{ github.event_name == 'push' && github.ref_name || '' }}
+          releaseName: 'QCalc ${{ github.ref_name }}'
+          releaseBody: 'Tauri 2 데스크톱 빌드. 전체 변경 이력은 CHANGELOG를 참조하세요.'
+          releaseDraft: true
+          prerelease: false
+          # args: 번들 타깃(--bundles ...) 지정은 패키징 영역 담당.
+
+      - name: Upload bundles as artifacts (test build)
+        if: github.event_name == 'workflow_dispatch'
+        uses: actions/upload-artifact@v4
+        with:
+          name: tauri-bundle-${{ matrix.platform.target }}
+          path: src-tauri/target/release/bundle/**
+          retention-days: 7
+
+  build-flatpak:
+    name: Build Flatpak bundle
+    needs: build-tauri
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      # ... (패키징 영역 담당: Tauri deb 기반 flatpak 빌드로 재작성.
+      #      현행 flatpak/io.github.from104.qcalc.yml 은 Electron 기반이므로 교체 필요.)
+      - name: Attach to release (tag push)
+        if: github.event_name == 'push'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: gh release upload "${{ github.ref_name }}" <빌드산출.flatpak> --clobber
+      - name: Upload artifact (test build)
+        if: github.event_name == 'workflow_dispatch'
+        uses: actions/upload-artifact@v4
+        with:
+          name: flatpak-bundle
+          path: <빌드산출.flatpak>
+          retention-days: 7
+
+  build-snap:
+    name: Build Snap bundle
+    needs: build-tauri
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      # ... (패키징 영역 담당: snapcraft 기반 빌드.)
+      - name: Attach to release (tag push)
+        if: github.event_name == 'push'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: gh release upload "${{ github.ref_name }}" <빌드산출.snap> --clobber
+      - name: Upload artifact (test build)
+        if: github.event_name == 'workflow_dispatch'
+        uses: actions/upload-artifact@v4
+        with:
+          name: snap-bundle
+          path: <빌드산출.snap>
+          retention-days: 7
