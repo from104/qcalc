@@ -42,8 +42,11 @@ jobs:
           - os: ubuntu-22.04
             target: x86_64-unknown-linux-gnu
             args: --bundles deb,rpm,appimage
+          # bundle.targets: "all"(tauri.conf.json)이면 Windows에서 NSIS+MSI 둘 다
+          # 생성되므로 --bundles nsis 로 NSIS(.exe)만 산출하도록 제한한다.
           - os: windows-latest
             target: x86_64-pc-windows-msvc
+            args: --bundles nsis
 
     steps:
       - uses: actions/checkout@v4
@@ -102,8 +105,7 @@ jobs:
           releaseBody: 'Tauri 2 데스크톱 빌드. 전체 변경 이력은 CHANGELOG를 참조하세요.'
           releaseDraft: true
           prerelease: false
-          # deb/rpm/AppImage(Linux)는 matrix.platform.args 로 지정.
-          # Windows 번들 타깃(--bundles ...) 지정은 별도 작업 담당.
+          # deb/rpm/AppImage(Linux)·NSIS(Windows) 번들 타깃은 matrix.platform.args 로 지정.
           args: ${{ matrix.platform.args }}
 
       - name: Upload bundles as artifacts (test build)
