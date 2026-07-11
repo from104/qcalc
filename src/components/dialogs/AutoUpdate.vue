@@ -162,7 +162,7 @@
   // 컴포넌트가 마운트될 때 실행
   onMounted(() => {
     // Electron 환경에서만 업데이트 리스너 등록
-    if ($g.isElectron && !$g.isSnap) {
+    if (($g.isElectron || $g.isTauri) && !$g.isSnap) {
       window.electronUpdater.onUpdateStatus(handleUpdateStatus);
 
       // 개발 모드가 아닐 때만 업데이트 확인
@@ -175,7 +175,7 @@
   // 컴포넌트가 언마운트될 때 실행
   onUnmounted(() => {
     // Electron 환경에서만 리스너 제거
-    if ($g.isElectron && !$g.isSnap) {
+    if (($g.isElectron || $g.isTauri) && !$g.isSnap) {
       window.electronUpdater.removeUpdateStatusListener();
     }
   });
@@ -183,7 +183,7 @@
 
 <template>
   <!-- Electron 환경에서만 업데이트 관련 UI 표시 -->
-  <template v-if="$g.isElectron && !$g.isSnap">
+  <template v-if="($g.isElectron || $g.isTauri) && !$g.isSnap">
     <q-dialog v-model="updateDialog" persistent role="dialog" :aria-label="t('title')">
       <q-card class="update-dialog">
         <q-card-section class="dialog-header">
