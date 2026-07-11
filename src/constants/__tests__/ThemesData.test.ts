@@ -12,7 +12,9 @@ const src = readFileSync(join(process.cwd(), 'node_modules/quasar/src/css/variab
 const PALETTE: Record<string, string> = {};
 for (const line of src.split('\n')) {
   const m = line.match(/^\$([a-z0-9-]+)\s*:\s*(#[0-9A-Fa-f]{6})/);
-  if (m) PALETTE[m[1]] = m[2].toLowerCase();
+  const key = m?.[1];
+  const hex = m?.[2];
+  if (key && hex) PALETTE[key] = hex.toLowerCase();
 }
 
 function resolve(name: string): string {
@@ -22,10 +24,11 @@ function resolve(name: string): string {
 }
 
 function luminance(hex: string): number {
-  const [r, g, b] = [0, 2, 4].map((i) => {
+  const channel = (i: number): number => {
     const v = parseInt(hex.slice(1 + i, 3 + i), 16) / 255;
     return v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4);
-  });
+  };
+  const [r, g, b] = [channel(0), channel(2), channel(4)];
   return 0.2126 * r + 0.7152 * g + 0.0722 * b;
 }
 

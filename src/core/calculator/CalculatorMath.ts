@@ -44,7 +44,7 @@ export function createFormulaTrigScope(): Record<string, (...args: BigNumber[]) 
     asin: (x) => radToDeg(toBigNumber(x).asin()),
     acos: (x) => radToDeg(toBigNumber(x).acos()),
     atan: (x) => radToDeg(toBigNumber(x).atan()),
-    atan2: (y, x) => radToDeg(MathB.atan2(y, x)),
+    atan2: (y, x) => radToDeg(MathB.evaluate('atan2(y, x)', { y, x }) as BigNumber),
   };
 }
 
