@@ -24,6 +24,11 @@ export const MathB = create(all as FactoryFunctionMap, {
 export const toBigNumber = MathB.bignumber;
 
 /**
+ * 비트 연산의 기본 워드 크기 (바이트 단위)
+ */
+const DEFAULT_WORD_SIZE = 8;
+
+/**
  * 수학 상수 정의 객체
  */
 const CONSTANTS: { [key: string]: string } = {
@@ -260,7 +265,7 @@ export class CalculatorMath {
    * @param wordSize 비트 크기 (기본값: 8)
    * @returns 비트 크기로 자른 결과 (문자열)
    */
-  public truncateToBitSize(value: string, wordSize: number = 8): string {
+  public truncateToBitSize(value: string, wordSize: number = DEFAULT_WORD_SIZE): string {
     this.validateNonNegativeNumbers(value);
     return wordSize === 0
       ? toBigNumber(value).floor().toFixed()
@@ -274,7 +279,7 @@ export class CalculatorMath {
    * @param wordSize 비트 크기 (기본값: 8)
    * @returns 시프트 연산 결과 (문자열)
    */
-  public bitwiseLeftShift(value: string, shiftAmount: string, wordSize: number = 8): string {
+  public bitwiseLeftShift(value: string, shiftAmount: string, wordSize: number = DEFAULT_WORD_SIZE): string {
     this.validateNonNegativeNumbers(value, shiftAmount);
     return this.truncateToBitSize(
       toBigNumber(value)
@@ -293,7 +298,7 @@ export class CalculatorMath {
    * @param wordSize 비트 크기 (기본값: 8)
    * @returns 시프트 연산 결과 (문자열)
    */
-  public bitwiseRightShift(value: string, shiftAmount: string, wordSize: number = 8): string {
+  public bitwiseRightShift(value: string, shiftAmount: string, wordSize: number = DEFAULT_WORD_SIZE): string {
     this.validateNonNegativeNumbers(value, shiftAmount);
     return this.truncateToBitSize(
       toBigNumber(value)
@@ -317,7 +322,7 @@ export class CalculatorMath {
     firstValue: string,
     secondValue: string,
     operation: 'and' | 'or' | 'xor',
-    wordSize: number = 8,
+    wordSize: number = DEFAULT_WORD_SIZE,
   ): string {
     this.validateNonNegativeNumbers(firstValue, secondValue);
     const [firstBinary, secondBinary] = [firstValue, secondValue].map((n) =>
@@ -351,7 +356,7 @@ export class CalculatorMath {
    * @param wordSize 비트 크기 (기본값: 8)
    * @returns AND 연산 결과 (문자열)
    */
-  public bitwiseAnd(firstValue: string, secondValue: string, wordSize: number = 8): string {
+  public bitwiseAnd(firstValue: string, secondValue: string, wordSize: number = DEFAULT_WORD_SIZE): string {
     return this.performBitOperation(firstValue, secondValue, 'and', wordSize);
   }
 
@@ -362,7 +367,7 @@ export class CalculatorMath {
    * @param wordSize 비트 크기 (기본값: 8)
    * @returns OR 연산 결과 (문자열)
    */
-  public bitwiseOr(firstValue: string, secondValue: string, wordSize: number = 8): string {
+  public bitwiseOr(firstValue: string, secondValue: string, wordSize: number = DEFAULT_WORD_SIZE): string {
     return this.performBitOperation(firstValue, secondValue, 'or', wordSize);
   }
 
@@ -373,7 +378,7 @@ export class CalculatorMath {
    * @param wordSize 비트 크기 (기본값: 8)
    * @returns XOR 연산 결과 (문자열)
    */
-  public bitwiseXor(firstValue: string, secondValue: string, wordSize: number = 8): string {
+  public bitwiseXor(firstValue: string, secondValue: string, wordSize: number = DEFAULT_WORD_SIZE): string {
     return this.performBitOperation(firstValue, secondValue, 'xor', wordSize);
   }
 
@@ -383,7 +388,7 @@ export class CalculatorMath {
    * @param wordSize 비트 크기 (기본값: 8)
    * @returns NOT 연산 결과 (문자열)
    */
-  public bitwiseNot(value: string, wordSize: number = 8): string {
+  public bitwiseNot(value: string, wordSize: number = DEFAULT_WORD_SIZE): string {
     this.validateNonNegativeNumbers(value);
     const binary = convertRadix(this.int(this.abs(value)), Radix.Decimal, Radix.Binary);
     const paddedBinary = binary.padStart(Math.max(binary.length, wordSize), '0');
@@ -401,15 +406,15 @@ export class CalculatorMath {
    * @returns 비트 연산 결과 (문자열)
    */
 
-  public bitwiseNand(firstValue: string, secondValue: string, wordSize: number = 8): string {
+  public bitwiseNand(firstValue: string, secondValue: string, wordSize: number = DEFAULT_WORD_SIZE): string {
     return this.bitwiseNot(this.bitwiseAnd(firstValue, secondValue, wordSize), wordSize);
   }
 
-  public bitwiseNor(firstValue: string, secondValue: string, wordSize: number = 8): string {
+  public bitwiseNor(firstValue: string, secondValue: string, wordSize: number = DEFAULT_WORD_SIZE): string {
     return this.bitwiseNot(this.bitwiseOr(firstValue, secondValue, wordSize), wordSize);
   }
 
-  public bitwiseXnor(firstValue: string, secondValue: string, wordSize: number = 8): string {
+  public bitwiseXnor(firstValue: string, secondValue: string, wordSize: number = DEFAULT_WORD_SIZE): string {
     return this.bitwiseNot(this.bitwiseXor(firstValue, secondValue, wordSize), wordSize);
   }
 
