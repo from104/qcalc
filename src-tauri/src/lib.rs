@@ -109,8 +109,14 @@ pub fn run() {
           // 시절엔 드러나지 않던 경로). scale이 0이면 아래 연산이 전부 0으로 붕괴해
           // set_max_size(0, 0)이 호출되고 창이 거의 안 보일 만큼 쪼그라든다(실기기 재현,
           // 2026-07-12). 비정상 범위면 1.0으로 대체한다.
-          let scale = monitor.scale_factor();
-          let scale = if scale.is_finite() && scale > 0.0 { scale } else { 1.0 };
+          let raw_scale = monitor.scale_factor();
+          let scale = if raw_scale.is_finite() && raw_scale > 0.0 { raw_scale } else { 1.0 };
+          log::info!(
+            "monitor: size={}x{} raw_scale_factor={raw_scale} used_scale={scale}{}",
+            size.width,
+            size.height,
+            if scale == raw_scale { "" } else { " (FALLBACK — raw value was invalid)" },
+          );
           let work_width = (size.width as f64 / scale) as u32;
           let work_height = (size.height as f64 / scale) as u32;
           let is_landscape = work_width > work_height;
