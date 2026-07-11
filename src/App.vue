@@ -18,6 +18,7 @@
   import VersionChangelogDialog from 'components/dialogs/VersionChangelogDialog.vue';
 
   import { useKeyBinding } from './composables/useKeyBinding';
+  import { useHtmlLangSync } from './composables/useHtmlLangSync';
   import { showMessage } from './utils/NotificationUtils';
   import { isWideWidth } from './utils/GlobalHelpers';
 
@@ -45,6 +46,9 @@
   const previousPath = ref(route.path);
   const isWideLayout = ref(isWideWidth());
   const currentTransition = ref('');
+
+  // HTML lang 속성을 i18n locale과 동기화 (WCAG 3.1.1 Level A)
+  const { syncNow: syncHtmlLang } = useHtmlLangSync(locale);
 
   // ── 단축키 액션 ──
   const toggleAlwaysOnTop = () => {
@@ -117,7 +121,7 @@
     }
 
     // HTML lang 속성을 i18n locale과 동기화
-    document.documentElement.lang = locale.value as string;
+    syncHtmlLang();
   });
 
   onUnmounted(async () => {
@@ -127,14 +131,7 @@
   });
 
   // ── 워처 ──
-
-  // i18n locale 변경 시 HTML lang 속성 동기화
-  watch(
-    () => locale.value,
-    (newLocale) => {
-      document.documentElement.lang = newLocale as string;
-    },
-  );
+  // (HTML lang ↔ i18n locale 동기화는 useHtmlLangSync 컴포저블이 담당)
 
   // 입력 필드 포커스 시 전역 단축키 비활성화
   watch(

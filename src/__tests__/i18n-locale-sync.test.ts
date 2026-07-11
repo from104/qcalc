@@ -6,9 +6,12 @@
  */
 
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
-import { createI18n } from 'vue-i18n';
+import { readFileSync } from 'fs';
+import { resolve } from 'path';
+import { effectScope, ref } from 'vue';
+import { useHtmlLangSync } from '../composables/useHtmlLangSync';
 
-describe('i18n locale 동기화 (HTML lang 속성)', () => {
+describe('useHtmlLangSync (HTML lang 속성 동기화)', () => {
   let originalLang: string | null;
 
   beforeEach(() => {
@@ -25,76 +28,92 @@ describe('i18n locale 동기화 (HTML lang 속성)', () => {
     }
   });
 
-  it('초기 렌더링 시 HTML lang 속성이 i18n locale과 동기화됨', () => {
-    const i18n = createI18n({
-      locale: 'ko',
-      fallbackLocale: 'en',
-      messages: {},
-      legacy: false,
+  it('syncNow() 호출 전에는 documentElement.lang을 건드리지 않는다', () => {
+    const scope = effectScope();
+    scope.run(() => {
+      const locale = ref('ko');
+      document.documentElement.removeAttribute('lang');
+      useHtmlLangSync(locale);
+      expect(document.documentElement.hasAttribute('lang')).toBe(false);
     });
-
-    const { locale } = i18n.global;
-
-    // App 마운트 시뮬레이션
-    document.documentElement.lang = locale.value as string;
-
-    expect(document.documentElement.lang).toBe('ko');
+    scope.stop();
   });
 
-  it('locale 값 변경 시 수동으로 업데이트할 수 있음', () => {
-    const i18n = createI18n({
-      locale: 'ko',
-      fallbackLocale: 'en',
-      messages: {},
-      legacy: false,
+  it('syncNow() 호출 시 현재 locale 값이 documentElement.lang에 반영된다', () => {
+    const scope = effectScope();
+    scope.run(() => {
+      const locale = ref('ko');
+      const { syncNow } = useHtmlLangSync(locale);
+      syncNow();
+      expect(document.documentElement.lang).toBe('ko');
     });
+    scope.stop();
+  });
 
-    const { locale } = i18n.global;
+  it('locale.value 변경 시 watch가 documentElement.lang을 자동으로 갱신한다 (syncNow 재호출 없이)', async () => {
+    const scope = effectScope();
+    await scope.run(async () => {
+      const locale = ref('ko');
+      const { syncNow } = useHtmlLangSync(locale);
+      syncNow();
+      expect(document.documentElement.lang).toBe('ko');
 
-    // 초기 설정
-    document.documentElement.lang = locale.value as string;
+      locale.value = 'en';
+      // watch는 기본적으로 비동기(pre-flush)로 실행되므로 nextTick 대기
+      await import('vue').then((v) => v.nextTick());
+      expect(document.documentElement.lang).toBe('en');
+    });
+    scope.stop();
+  });
+
+  it('여러 언어로 순차 변경해도 매번 documentElement.lang이 갱신된다', async () => {
+    const scope = effectScope();
+    await scope.run(async () => {
+      const { nextTick } = await import('vue');
+      const locale = ref('ko');
+      const { syncNow } = useHtmlLangSync(locale);
+      syncNow();
+
+      const languages = ['en', 'ja', 'zh', 'hi', 'de', 'es', 'fr', 'pt', 'ru'];
+      for (const lang of languages) {
+        locale.value = lang;
+        await nextTick();
+        expect(document.documentElement.lang).toBe(lang);
+      }
+    });
+    scope.stop();
+  });
+
+  it('effectScope 종료(컴포넌트 언마운트 상당) 후에는 locale 변경이 더 이상 반영되지 않는다', async () => {
+    const scope = effectScope();
+    const locale = ref('ko');
+    scope.run(() => {
+      const { syncNow } = useHtmlLangSync(locale);
+      syncNow();
+    });
     expect(document.documentElement.lang).toBe('ko');
 
-    // App.vue의 watch가 수행할 업데이트 시뮬레이션
+    scope.stop();
     locale.value = 'en';
-    document.documentElement.lang = locale.value as string;
-    expect(document.documentElement.lang).toBe('en');
+    await import('vue').then((v) => v.nextTick());
+    // watch가 scope와 함께 정리되었으므로 lang은 그대로 유지되어야 한다
+    expect(document.documentElement.lang).toBe('ko');
+  });
+});
+
+describe('App.vue가 useHtmlLangSync를 실제로 사용하는지 (배선 회귀 가드)', () => {
+  const source = readFileSync(resolve(__dirname, '../App.vue'), 'utf-8');
+
+  it('useHtmlLangSync를 import한다', () => {
+    expect(source).toContain("import { useHtmlLangSync } from './composables/useHtmlLangSync'");
   });
 
-  it('여러 언어로 순차 변경 가능', () => {
-    const i18n = createI18n({
-      locale: 'ko',
-      fallbackLocale: 'en',
-      messages: {},
-      legacy: false,
-    });
-
-    const { locale } = i18n.global;
-
-    // 초기 설정
-    document.documentElement.lang = locale.value as string;
-
-    // 순차 변경 테스트
-    const languages = ['en', 'ja', 'zh', 'hi', 'de', 'es', 'fr', 'pt', 'ru'];
-    for (const lang of languages) {
-      locale.value = lang;
-      // App.vue의 watch가 수행할 업데이트 시뮬레이션
-      document.documentElement.lang = locale.value as string;
-      expect(document.documentElement.lang).toBe(lang);
-    }
+  it('locale ref를 넘겨 useHtmlLangSync를 호출한다', () => {
+    expect(source).toContain('useHtmlLangSync(locale)');
   });
 
-  it('i18n 생성 후 초기 locale이 반영됨', () => {
-    const i18n = createI18n({
-      locale: 'ja',
-      fallbackLocale: 'en',
-      messages: {},
-      legacy: false,
-    });
-
-    const { locale } = i18n.global;
-    document.documentElement.lang = locale.value as string;
-
-    expect(document.documentElement.lang).toBe('ja');
+  it('onMounted 내부에서 syncNow()를 호출해 초기 동기화를 수행한다', () => {
+    const onMountedBlock = source.slice(source.indexOf('onMounted(() => {'), source.indexOf('onUnmounted('));
+    expect(onMountedBlock).toContain('syncHtmlLang()');
   });
 });
