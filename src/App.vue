@@ -37,7 +37,7 @@
 
   const $g = window.globalVars;
   const route = useRoute();
-  const { t } = useI18n();
+  const { t, locale } = useI18n();
   const $q = useQuasar();
 
   // ── 상태 ──
@@ -115,6 +115,9 @@
         });
       }, 2500);
     }
+
+    // HTML lang 속성을 i18n locale과 동기화
+    document.documentElement.lang = locale.value as string;
   });
 
   onUnmounted(async () => {
@@ -124,6 +127,14 @@
   });
 
   // ── 워처 ──
+
+  // i18n locale 변경 시 HTML lang 속성 동기화
+  watch(
+    () => locale.value,
+    (newLocale) => {
+      document.documentElement.lang = newLocale as string;
+    },
+  );
 
   // 입력 필드 포커스 시 전역 단축키 비활성화
   watch(
