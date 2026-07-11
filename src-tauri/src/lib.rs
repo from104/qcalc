@@ -40,23 +40,22 @@ fn quit_app(app: tauri::AppHandle) {
 /// (tauri-apps/tauri#13749), `setAlwaysOnTop`은 Wayland 프로토콜 미지원으로 no-op이다
 /// (tauri-apps/tauri#3117 — wontfix, Wayland 프로토콜 확장 대기).
 ///
-/// 두 문제 모두 XWayland으로 전환하면 즉시 해결된다. 따라서 Linux에서 Wayland 세션일 때만
-/// `GDK_BACKEND=x11`을 강제해 XWayland 경로로 GTK를 초기화시킨다. X11 네이티브 세션은 영향 없음.
+/// 두 문제 모두 XWayland으로 전환하면 해결되지만, 그 강제 전환 자체가 실기기에서 재현되는
+/// 크래시를 유발한다: GDK가 X11(XWayland)로 붙으면 WebKitGTK/GTK 내부 여러 함수
+/// (`gdk_wayland_display_get_wl_display`, `gdk_wayland_window_set_dbus_properties_libgtk_only`
+/// 등)가 세션이 실제로는 Wayland 컴포지터임을 감지해 Wayland 전용 API를 호출하다 assertion
+/// 실패 후 SIGSEGV로 죽는다 — 발생 여부가 타이밍에 따라 갈리는 레이스로 보이며, 실기기
+/// AppImage와 `cargo run` 양쪽에서 재현 확인(2026-07-12, Ubuntu 24.04 GNOME/Wayland).
+/// `WEBKIT_DISABLE_DMABUF_RENDERER=1`을 함께 줘도 크래시가 사라지지 않았다.
 ///
-/// 이 강제 전환 자체가 새 크래시를 유발한다: GDK가 X11(XWayland)로 붙어도 WebKitGTK의
-/// DMA-BUF 렌더러는 세션이 실제 Wayland 컴포지터임을 감지해 하드웨어 버퍼 공유를 시도하고,
-/// `gdk_wayland_display_get_wl_display` assertion 실패 후 SIGSEGV로 죽는다(실기기 AppImage
-/// 실행으로 재현 확인, 2026-07-12). snap/snapcraft.yaml이 같은 증상을 이미
-/// `WEBKIT_DISABLE_DMABUF_RENDERER=1`로 회피하고 있었으나 Snap 전용이라 AppImage/deb/rpm/
-/// 네이티브 실행에는 적용되지 않았다 — XWayland 강제와 함께 여기서도 설정한다.
-///
-/// HiDPI/fractional scaling은 GTK가 `GDK_SCALE` / `GDK_DPI_SCALE` 환경변수를 존중하므로
-/// 사용자가 이미 설정한 값이 그대로 적용된다. 125~150% 사용자가 블러를 피하고 싶으면
-/// `QCALC_FORCE_WAYLAND=1`을 설정해 이 분기를 우회할 수 있다 (대신 setTitle·항상위는 작동 안 함).
+/// 안정성이 우선이므로 기본값은 XWayland 강제를 **하지 않음**(네이티브 Wayland) — setTitle
+/// 헤더바 미갱신·항상위 no-op은 남지만 크래시보다 낫다. 두 기능이 꼭 필요하고 크래시
+/// 위험을 감수할 사용자는 `QCALC_FORCE_XWAYLAND=1`로 옵트인할 수 있다(단 위 재현 결과상
+/// `WEBKIT_DISABLE_DMABUF_RENDERER=1`을 같이 줘도 크래시가 완전히 없어진다는 보장은 없다).
 #[cfg(target_os = "linux")]
 fn force_xwayland_if_needed() {
   if std::env::var_os("WAYLAND_DISPLAY").is_some()
-    && std::env::var_os("QCALC_FORCE_WAYLAND").is_none()
+    && std::env::var_os("QCALC_FORCE_XWAYLAND").is_some()
   {
     std::env::set_var("GDK_BACKEND", "x11");
     std::env::set_var("WEBKIT_DISABLE_DMABUF_RENDERER", "1");

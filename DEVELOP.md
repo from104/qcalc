@@ -81,7 +81,7 @@ yarn dev:tauri     # dev mode (devtools auto-open)
 yarn build:tauri   # production bundle (.deb/.AppImage)
 ```
 
-**Wayland users note**: GNOME/KDE Wayland sessions suffer from upstream bugs where `setTitle` does not repaint the CSD header bar and `setAlwaysOnTop` is a no-op ([tauri#13749](https://github.com/tauri-apps/tauri/issues/13749), [tauri#3117](https://github.com/tauri-apps/tauri/issues/3117)). As a workaround, `force_xwayland_if_needed()` in `src-tauri/src/lib.rs` forces `GDK_BACKEND=x11` on Wayland sessions. If HiDPI blur bothers you, opt out with `QCALC_FORCE_WAYLAND=1 yarn dev:tauri` (the two features above will not work).
+**Wayland users note**: GNOME/KDE Wayland sessions suffer from upstream bugs where `setTitle` does not repaint the CSD header bar and `setAlwaysOnTop` is a no-op ([tauri#13749](https://github.com/tauri-apps/tauri/issues/13749), [tauri#3117](https://github.com/tauri-apps/tauri/issues/3117)). `force_xwayland_if_needed()` in `src-tauri/src/lib.rs` can force `GDK_BACKEND=x11` to work around both, but this was found to cause an intermittent WebKitGTK crash on real Wayland hardware, so it defaults to off (native Wayland). If you need the two features and accept the crash risk, opt in with `QCALC_FORCE_XWAYLAND=1 yarn dev:tauri`.
 
 ### Android (Capacitor)
 

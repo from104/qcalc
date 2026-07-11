@@ -81,7 +81,7 @@ yarn dev:tauri     # 개발 모드 (devtools 자동 오픈)
 yarn build:tauri   # 프로덕션 번들 (.deb/.AppImage)
 ```
 
-**Wayland 사용자 주의사항**: GNOME/KDE Wayland 세션에서 `setTitle` CSD 헤더바 repaint와 `setAlwaysOnTop`이 작동하지 않는 업스트림 버그([tauri#13749](https://github.com/tauri-apps/tauri/issues/13749), [tauri#3117](https://github.com/tauri-apps/tauri/issues/3117))가 있어 `src-tauri/src/lib.rs`의 `force_xwayland_if_needed()`가 Wayland 세션에서 `GDK_BACKEND=x11`을 강제합니다. HiDPI 블러가 신경 쓰이면 `QCALC_FORCE_WAYLAND=1 yarn dev:tauri`로 우회 (두 기능은 작동하지 않음).
+**Wayland 사용자 주의사항**: GNOME/KDE Wayland 세션에서 `setTitle` CSD 헤더바 repaint와 `setAlwaysOnTop`이 작동하지 않는 업스트림 버그([tauri#13749](https://github.com/tauri-apps/tauri/issues/13749), [tauri#3117](https://github.com/tauri-apps/tauri/issues/3117))가 있습니다. `src-tauri/src/lib.rs`의 `force_xwayland_if_needed()`로 `GDK_BACKEND=x11`을 강제하면 두 문제가 해결되지만, 실기기 Wayland에서 간헐적 WebKitGTK 크래시를 유발하는 것이 확인돼 기본값은 강제하지 않음(네이티브 Wayland)입니다. 두 기능이 필요하고 크래시 위험을 감수할 경우 `QCALC_FORCE_XWAYLAND=1 yarn dev:tauri`로 옵트인하세요.
 
 ### 안드로이드 (Capacitor)
 

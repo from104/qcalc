@@ -10,7 +10,7 @@
 
 - **Tauri 2 데스크톱 빌드 (실험적)**: Electron과 공존하는 Tauri 2 기반 데스크톱 타겟 추가. `yarn dev:tauri` / `yarn build:tauri`로 실행. 기존 `src/` 코드는 무수정 유지하며, `src/boot/tauri-shim.ts`가 Tauri 환경에서 `window.electron` / `window.electronUpdater` 인터페이스를 Tauri API로 매핑함.
   - **포팅된 기능**: 창 크기 제한(min/max), 창 위치·크기 저장(`tauri-plugin-window-state`), 샌드박스 환경 감지(Snap/Flatpak/AppImage), 항상 위 토글(Alt+T), 앱 종료, devtools 자동 오픈(dev 모드), 로캐일 전환 시 창 제목 동기화.
-  - **Wayland 워크어라운드**: GNOME/KDE Wayland 세션에서 `setTitle` CSD 헤더바 repaint 누락([tauri#13749](https://github.com/tauri-apps/tauri/issues/13749))과 `setAlwaysOnTop` 미지원([tauri#3117](https://github.com/tauri-apps/tauri/issues/3117), Wayland 프로토콜 한계) 문제를 회피하기 위해 Wayland 세션에서 `GDK_BACKEND=x11`을 자동으로 강제함. `QCALC_FORCE_WAYLAND=1`로 우회 가능.
+  - **Wayland 워크어라운드**: GNOME/KDE Wayland 세션에서 `setTitle` CSD 헤더바 repaint 누락([tauri#13749](https://github.com/tauri-apps/tauri/issues/13749))과 `setAlwaysOnTop` 미지원([tauri#3117](https://github.com/tauri-apps/tauri/issues/3117), Wayland 프로토콜 한계) 문제는 `GDK_BACKEND=x11` 강제로 회피 가능하지만, 실기기 Wayland에서 간헐적 WebKitGTK 크래시를 유발하는 것이 확인돼 기본값은 강제하지 않음(네이티브 Wayland)으로 바뀌었다. 두 기능이 필요하고 크래시 위험을 감수할 경우 `QCALC_FORCE_XWAYLAND=1`로 옵트인.
   - **보류**: `tauri-plugin-updater` 통합(endpoints + pubkey 준비 후 활성화 예정), Tauri용 Snap/Flatpak 매니페스트, Windows 크로스 빌드.
 - **전역 환경 플래그 확장**: `window.globalVars`에 `isTauri`, `isFlatpak` 추가. Rust 커맨드 `get_package_env`로 샌드박스 타입을 런타임에 조회.
 - **설정 페이지**: "항상 위" 토글이 Tauri 환경에서도 표시되도록 조건 확장.
