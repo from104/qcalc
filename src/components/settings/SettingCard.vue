@@ -342,7 +342,7 @@
     <q-list v-auto-blur dense class="full-width" role="list" :aria-label="t('ariaLabel.settingsList')">
       <!-- 항상 위에 표시 -->
       <q-item v-if="$g.isElectron" class="q-mb-sm">
-        <q-item-label class="self-center" role="text">{{ t('alwaysOnTop') }} (Alt-T)</q-item-label>
+        <q-item-label class="self-center">{{ t('alwaysOnTop') }} (Alt-T)</q-item-label>
         <q-space />
         <q-toggle
           v-model="settingsStore.alwaysOnTop"
@@ -357,7 +357,7 @@
 
       <!-- 시작 시 패널 초기화 -->
       <q-item class="q-mb-sm">
-        <q-item-label class="self-center" role="text">{{ t('initPanel') }} (Alt-I)</q-item-label>
+        <q-item-label class="self-center">{{ t('initPanel') }} (Alt-I)</q-item-label>
         <q-space />
         <q-toggle
           v-model="settingsStore.initPanel"
@@ -372,7 +372,7 @@
 
       <!-- 진동 모드 -->
       <q-item v-if="$g.isCapacitor" class="q-mb-sm">
-        <q-item-label class="self-center" role="text">{{ t('hapticsMode') }} (Alt-P)</q-item-label>
+        <q-item-label class="self-center">{{ t('hapticsMode') }} (Alt-P)</q-item-label>
         <q-space />
         <q-toggle
           v-model="settingsStore.hapticsMode"
@@ -389,7 +389,7 @@
 
       <!-- 다크 모드 -->
       <q-item class="q-mb-md">
-        <q-item-label class="self-center" role="text">{{ t('darkMode.title') }} (Alt-D)</q-item-label>
+        <q-item-label class="self-center">{{ t('darkMode.title') }} (Alt-D)</q-item-label>
         <q-space />
         <q-select
           v-model="themesStore.darkMode"
@@ -416,7 +416,7 @@
 
       <!-- 색상 테마 선택 -->
       <q-item class="q-mb-md">
-        <q-item-label class="self-center" role="text">{{ t('colorTheme') }}</q-item-label>
+        <q-item-label class="self-center">{{ t('colorTheme') }}</q-item-label>
         <q-space />
         <q-select
           v-model="themesStore.currentTheme"
@@ -508,7 +508,7 @@
 
       <!-- 숫자 형식 계산기별 적용 -->
       <q-item class="q-mb-sm">
-        <q-item-label class="self-center" role="text">{{ t('numberFormatPerCalculator') }} (Alt-N)</q-item-label>
+        <q-item-label class="self-center">{{ t('numberFormatPerCalculator') }} (Alt-N)</q-item-label>
         <q-space />
         <q-toggle
           v-model="settingsStore.numberFormatPerCalculator"
@@ -524,7 +524,7 @@
 
       <!-- 숫자 묶음 표시 -->
       <q-item class="q-mb-xs">
-        <q-item-label class="self-center" role="text">{{ t('useGrouping') }} (,)</q-item-label>
+        <q-item-label class="self-center">{{ t('useGrouping') }} (,)</q-item-label>
         <q-space />
         <q-toggle
           v-model="currentUseGrouping"
@@ -538,7 +538,7 @@
 
       <!-- 숫자 묶음 단위 -->
       <q-item class="q-mb-sm">
-        <q-item-label class="self-center" role="text">{{ t('groupingUnit') }} (Alt-,)</q-item-label>
+        <q-item-label class="self-center">{{ t('groupingUnit') }} (Alt-,)</q-item-label>
         <q-space />
         <q-slider
           v-model="currentGroupingUnit"
@@ -600,7 +600,7 @@
         <q-separator spaced="md" role="separator" />
 
         <q-item class="q-mb-sm">
-          <q-item-label class="self-center" role="text"> {{ t('showUnit') }} (Alt-\\) </q-item-label>
+          <q-item-label class="self-center"> {{ t('showUnit') }} (Alt-\\) </q-item-label>
           <q-space />
           <q-toggle
             v-model="unitStore.showUnit"
@@ -617,7 +617,7 @@
         <q-separator spaced="md" role="separator" />
 
         <q-item class="q-mb-sm">
-          <q-item-label class="self-center" role="text"> {{ t('showSymbol') }} (Alt-\) </q-item-label>
+          <q-item-label class="self-center"> {{ t('showSymbol') }} (Alt-\) </q-item-label>
           <q-space />
           <q-toggle
             v-model="currencyStore.showSymbol"
@@ -634,7 +634,7 @@
         <q-separator spaced="md" role="separator" />
 
         <q-item class="q-mb-sm">
-          <q-item-label class="self-center" role="text"> {{ t('showRadix') }} (Alt-\) </q-item-label>
+          <q-item-label class="self-center"> {{ t('showRadix') }} (Alt-\) </q-item-label>
           <q-space />
           <q-toggle
             v-model="radixStore.showRadix"
@@ -647,7 +647,7 @@
 
         <!-- 진법 형식 -->
         <q-item class="q-mb-md">
-          <q-item-label class="self-center" role="text"> {{ t('radixType') }} (Alt-Ctrl-\) </q-item-label>
+          <q-item-label class="self-center"> {{ t('radixType') }} (Alt-Ctrl-\) </q-item-label>
           <q-space />
           <q-select
             v-model="radixStore.radixType"
@@ -674,7 +674,7 @@
 
       <!-- 버튼 추가 라벨 표시 -->
       <q-item class="q-mb-sm">
-        <q-item-label class="self-center" role="text">{{ t('showButtonAddedLabel') }} (;)</q-item-label>
+        <q-item-label class="self-center">{{ t('showButtonAddedLabel') }} (;)</q-item-label>
         <q-space />
         <q-toggle
           v-model="settingsStore.showButtonAddedLabel"
@@ -690,7 +690,7 @@
 
       <!-- 시스템 언어 사용 -->
       <q-item class="q-mb-sm">
-        <q-item-label class="self-center" role="text">{{ t('useSystemLocale') }}</q-item-label>
+        <q-item-label class="self-center">{{ t('useSystemLocale') }}</q-item-label>
         <q-space />
         <q-toggle
           v-model="settingsStore.useSystemLocale"
@@ -704,7 +704,7 @@
 
       <!-- 언어 -->
       <q-item class="q-mb-md">
-        <q-item-label class="self-center" role="text">
+        <q-item-label class="self-center">
           {{ t('language') }}
         </q-item-label>
         <q-space />
@@ -731,7 +731,7 @@
 
       <!-- 자동 업데이트 설정 -->
       <q-item v-if="$g.isElectron && !$g.isSnap" class="q-mb-sm">
-        <q-item-label class="self-center" role="text">
+        <q-item-label class="self-center">
           {{ t('autoUpdate') }}
           <HelpIcon
             :text-color="themesStore.getDarkColor()"
