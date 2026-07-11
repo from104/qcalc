@@ -31,12 +31,17 @@ apps:
       # WebKitGTK가 샌드박스 안에서 DMA-BUF 렌더러를 사용하면 빈 화면이 뜨는
       # 알려진 문제 회피
       WEBKIT_DISABLE_DMABUF_RENDERER: '1'
+      # WebKitGTK의 자체 bwrap 기반 프로세스 샌드박스가 strict confinement snap
+      # 안에서 중첩되지 못해 빈 화면이 뜨는 문제 회피
+      WEBKIT_DISABLE_SANDBOX: '1'
 
 parts:
   qcalc:
     plugin: dump
-    # CI가 tauri-deb-linux 아티팩트를 이 고정 경로로 배치
-    source: ./local/qcalc.deb
+    # CI가 tauri-deb-linux 아티팩트를 이 고정 경로로 배치.
+    # snapcraft는 상대 source 경로를 (snap/ 이 아니라) 프로젝트 루트(CRAFT_PROJECT_DIR)
+    # 기준으로 해석하므로 snap/ 접두사를 포함해야 한다.
+    source: ./snap/local/qcalc.deb
     source-type: deb
     # gnome extension은 GTK/GNOME 스택은 제공하지만 WebKitGTK는 포함하지 않으므로
     # Ubuntu 아카이브 패키지로 명시한다.
