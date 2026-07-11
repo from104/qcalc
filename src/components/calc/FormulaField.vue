@@ -173,7 +173,11 @@
         'exp(x)',
       ],
     },
-    { label: t('help.trig'), items: ['sin(x)', 'cos(x)', 'tan(x)', 'asin(x)', 'acos(x)', 'atan(x)', 'atan2(y,x)'] },
+    {
+      label: t('help.trig'),
+      hint: t('help.trigHint'),
+      items: ['sin(x)', 'cos(x)', 'tan(x)', 'asin(x)', 'acos(x)', 'atan(x)', 'atan2(y,x)'],
+    },
     { label: t('help.constants'), items: ['pi', 'e', 'phi', 'Infinity'] },
     { label: t('help.other'), items: ['factorial(n)', 'gcd(a,b)', 'lcm(a,b)', 'mod(a,b)', 'sign(x)', 'fix(x)'] },
   ]);
@@ -247,6 +251,9 @@
               clickable
               @click="appendFromHelp(item)"
             />
+          </div>
+          <div v-if="'hint' in group" class="text-caption help-group-label q-mb-xs">
+            {{ (group as { hint: string }).hint }}
           </div>
         </div>
       </q-card>
@@ -395,6 +402,7 @@ ko:
     arithmetic: '산술'
     functions: '함수'
     trig: '삼각함수'
+    trigHint: '각도는 도(°) 단위입니다'
     constants: '상수'
     other: '기타'
 en:
@@ -412,6 +420,7 @@ en:
     arithmetic: 'Arithmetic'
     functions: 'Functions'
     trig: 'Trigonometry'
+    trigHint: 'Angles are in degrees (°)'
     constants: 'Constants'
     other: 'Other'
 ja:
@@ -429,6 +438,7 @@ ja:
     arithmetic: '算術'
     functions: '関数'
     trig: '三角関数'
+    trigHint: '角度は度(°)単位です'
     constants: '定数'
     other: 'その他'
 zh:
@@ -446,6 +456,7 @@ zh:
     arithmetic: '算术'
     functions: '函数'
     trig: '三角函数'
+    trigHint: '角度以度(°)为单位'
     constants: '常数'
     other: '其他'
 hi:
@@ -463,6 +474,7 @@ hi:
     arithmetic: 'अंकगणित'
     functions: 'फ़ंक्शन'
     trig: 'त्रिकोणमिति'
+    trigHint: 'कोण डिग्री (°) में हैं'
     constants: 'स्थिरांक'
     other: 'अन्य'
 de:
@@ -480,6 +492,7 @@ de:
     arithmetic: 'Arithmetik'
     functions: 'Funktionen'
     trig: 'Trigonometrie'
+    trigHint: 'Winkel in Grad (°)'
     constants: 'Konstanten'
     other: 'Sonstige'
 es:
@@ -497,6 +510,7 @@ es:
     arithmetic: 'Aritmética'
     functions: 'Funciones'
     trig: 'Trigonometría'
+    trigHint: 'Los ángulos están en grados (°)'
     constants: 'Constantes'
     other: 'Otros'
 fr:
@@ -514,6 +528,7 @@ fr:
     arithmetic: 'Arithmétique'
     functions: 'Fonctions'
     trig: 'Trigonométrie'
+    trigHint: 'Les angles sont en degrés (°)'
     constants: 'Constantes'
     other: 'Autres'
 pt:
@@ -531,6 +546,7 @@ pt:
     arithmetic: 'Aritmética'
     functions: 'Funções'
     trig: 'Trigonometria'
+    trigHint: 'Ângulos em graus (°)'
     constants: 'Constantes'
     other: 'Outros'
 ru:
@@ -548,6 +564,7 @@ ru:
     arithmetic: 'Арифметика'
     functions: 'Функции'
     trig: 'Тригонометрия'
+    trigHint: 'Углы в градусах (°)'
     constants: 'Константы'
     other: 'Прочее'
 </i18n>

@@ -5,7 +5,7 @@
  */
 
 import { defineStore } from 'pinia';
-import { MathB } from '../core/calculator/CalculatorMath';
+import { MathB, createFormulaTrigScope } from '../core/calculator/CalculatorMath';
 import { useCalcStore } from './calcStore';
 import { formatDecimalPlaces } from '../utils/NumberUtils';
 
@@ -99,7 +99,7 @@ export const useFormulaStore = defineStore('formula', {
       const resolved = this._resolvePlaceholders(this.expression);
 
       // mathjs 평가 (실패 시 throw)
-      const raw: unknown = MathB.evaluate(resolved);
+      const raw: unknown = MathB.evaluate(resolved, createFormulaTrigScope());
 
       // BigNumber / 일반 number → string 변환
       const resultStr: string =
@@ -334,7 +334,7 @@ export const useFormulaStore = defineStore('formula', {
       if (!this._hasValidPlaceholders(expr)) return false;
       try {
         const resolved = this._resolvePlaceholders(expr);
-        MathB.evaluate(resolved);
+        MathB.evaluate(resolved, createFormulaTrigScope());
         return true;
       } catch {
         return false;
