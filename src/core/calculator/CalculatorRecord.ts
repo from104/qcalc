@@ -154,6 +154,24 @@ export class CalculatorRecord {
   }
 
   /**
+   * 삭제된 기록 항목을 원래 인덱스 위치에 복원합니다.
+   * 실행취소(undo) 동작에 사용됩니다. 삭제 후 새 기록이 추가되어
+   * 동일 ID가 재사용된 경우, ID 충돌을 피하기 위해 새 ID를 부여합니다.
+   *
+   * @param {ResultRecord} record - 복원할 기록 항목(삭제 시점에 캡처한 객체)
+   * @param {number} index - 복원할 배열 인덱스(삭제 직전 위치)
+   */
+  public restoreRecord(record: ResultRecord, index: number): void {
+    // ID 충돌 방지: 삭제 후 새 기록이 같은 ID를 재사용했으면 새 ID 부여
+    if (record.id !== undefined && this.records.some((r) => r.id === record.id)) {
+      record.id = this.generateNewId();
+    }
+    // 인덱스를 유효 범위로 클램프(배열 축소/확대에 대한 방어)
+    const clampedIndex = Math.max(0, Math.min(index, this.records.length));
+    this.records.splice(clampedIndex, 0, record);
+  }
+
+  /**
    * 저장된 모든 기록 항목을 삭제합니다.
    * 기록 배열을 빈 배열로 초기화합니다.
    */
