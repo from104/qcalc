@@ -212,7 +212,6 @@ ko:
   memorySaved: '메모리에 저장되었습니다.'
   noMemoryToRecall: '불러올 메모리가 없습니다.'
   disabledButton: '비활성화된 버튼'
-  formulaEvaluationError: '수식 평가 오류. 수식을 확인해 주세요.'
   ariaLabel:
     backspace: '지우기'
     plusMinus: '부호 바꾸기'
@@ -234,7 +233,6 @@ en:
   memorySaved: 'Memory saved.'
   noMemoryToRecall: 'No memory to recall.'
   disabledButton: 'Disabled button'
-  formulaEvaluationError: 'Formula evaluation error. Please check your expression.'
   ariaLabel:
     backspace: 'Backspace'
     plusMinus: 'Change sign'
@@ -256,7 +254,6 @@ ja:
   memorySaved: 'メモリに保存しました。'
   noMemoryToRecall: '読み込むメモリがありません。'
   disabledButton: '無効なボタン'
-  formulaEvaluationError: '数式評価エラー。数式を確認してください。'
   ariaLabel:
     backspace: '削除'
     plusMinus: '符号切替'
@@ -278,7 +275,6 @@ zh:
   memorySaved: '已保存到内存。'
   noMemoryToRecall: '没有可调出的内存。'
   disabledButton: '已禁用的按钮'
-  formulaEvaluationError: '公式求值错误。请检查您的表达式。'
   ariaLabel:
     backspace: '退格'
     plusMinus: '切换符号'
@@ -300,7 +296,6 @@ hi:
   memorySaved: 'मेमोरी में सहेजा गया।'
   noMemoryToRecall: 'लोड करने के लिए कोई मेमोरी नहीं।'
   disabledButton: 'अक्षम बटन'
-  formulaEvaluationError: 'सूत्र मूल्यांकन त्रुटि। कृपया अपनी अभिव्यक्ति जाँचें।'
   ariaLabel:
     backspace: 'मिटाएँ'
     plusMinus: 'चिह्न बदलें'
@@ -322,7 +317,6 @@ de:
   memorySaved: 'Im Speicher gespeichert.'
   noMemoryToRecall: 'Kein Speicher zum Abrufen.'
   disabledButton: 'Deaktivierte Taste'
-  formulaEvaluationError: 'Formelauswertungsfehler. Bitte überprüfen Sie Ihren Ausdruck.'
   ariaLabel:
     backspace: 'Löschen'
     plusMinus: 'Vorzeichen wechseln'
@@ -344,7 +338,6 @@ es:
   memorySaved: 'Guardado en memoria.'
   noMemoryToRecall: 'No hay memoria para recuperar.'
   disabledButton: 'Botón desactivado'
-  formulaEvaluationError: 'Error de evaluación de fórmula. Verifique su expresión.'
   ariaLabel:
     backspace: 'Borrar'
     plusMinus: 'Cambiar signo'
@@ -366,7 +359,6 @@ fr:
   memorySaved: 'Enregistré en mémoire.'
   noMemoryToRecall: 'Aucune mémoire à rappeler.'
   disabledButton: 'Bouton désactivé'
-  formulaEvaluationError: "Erreur d'évaluation de formule. Veuillez vérifier votre expression."
   ariaLabel:
     backspace: 'Effacer'
     plusMinus: 'Changer le signe'
@@ -388,7 +380,6 @@ pt:
   memorySaved: 'Salvo na memória.'
   noMemoryToRecall: 'Nenhuma memória para recuperar.'
   disabledButton: 'Botão desativado'
-  formulaEvaluationError: 'Erro na avaliação da fórmula. Verifique sua expressão.'
   ariaLabel:
     backspace: 'Apagar'
     plusMinus: 'Trocar sinal'
@@ -410,7 +401,6 @@ ru:
   memorySaved: 'Сохранено в память.'
   noMemoryToRecall: 'Нет сохранённой памяти.'
   disabledButton: 'Неактивная кнопка'
-  formulaEvaluationError: 'Ошибка вычисления формулы. Проверьте выражение.'
   ariaLabel:
     backspace: 'Удалить'
     plusMinus: 'Сменить знак'
