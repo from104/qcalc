@@ -24,6 +24,10 @@ on:
   push:
     tags:
       - 'v*'
+    # TODO(0.13.0): 머지 전 제거 — 브랜치에서 전 포맷 CI 빌드를 검증하기 위한 임시 트리거.
+    # 릴리스/테스트 분기는 ref가 태그인지로 판별하므로 브랜치 push는 항상 테스트 모드다.
+    branches:
+      - feature/0.13.0-tauri-main
   workflow_dispatch:
 
 jobs:
@@ -100,7 +104,8 @@ jobs:
           # Linux 이외 플랫폼에서는 아무 효과 없음.
           APPIMAGE_EXTRACT_AND_RUN: 1
         with:
-          tagName: ${{ github.event_name == 'push' && github.ref_name || '' }}
+          # 태그 push일 때만 릴리스 생성 — 그 외(workflow_dispatch·브랜치 push)는 빌드만 하는 테스트 모드.
+          tagName: ${{ startsWith(github.ref, 'refs/tags/v') && github.ref_name || '' }}
           releaseName: 'QCalc ${{ github.ref_name }}'
           releaseBody: 'Tauri 2 데스크톱 빌드. 전체 변경 이력은 CHANGELOG를 참조하세요.'
           releaseDraft: true
@@ -109,7 +114,7 @@ jobs:
           args: ${{ matrix.platform.args }}
 
       - name: Upload bundles as artifacts (test build)
-        if: github.event_name == 'workflow_dispatch'
+        if: ${{ !startsWith(github.ref, 'refs/tags/v') }}
         uses: actions/upload-artifact@v4
         with:
           name: tauri-bundle-${{ matrix.platform.target }}
@@ -167,13 +172,13 @@ jobs:
           flatpak build-bundle repo "Q-Calc-${VER}-linux.flatpak" io.github.from104.qcalc
 
       - name: Attach to release (tag push)
-        if: github.event_name == 'push'
+        if: startsWith(github.ref, 'refs/tags/v')
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: gh release upload "${{ github.ref_name }}" flatpak/Q-Calc-*.flatpak --clobber
 
       - name: Upload artifact (test build)
-        if: github.event_name == 'workflow_dispatch'
+        if: ${{ !startsWith(github.ref, 'refs/tags/v') }}
         uses: actions/upload-artifact@v4
         with:
           name: flatpak-bundle
@@ -203,13 +208,13 @@ jobs:
         id: snapbuild
 
       - name: Attach to release (tag push)
-        if: github.event_name == 'push'
+        if: startsWith(github.ref, 'refs/tags/v')
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: gh release upload "${{ github.ref_name }}" "${{ steps.snapbuild.outputs.snap }}" --clobber
 
       - name: Upload artifact (test build)
-        if: github.event_name == 'workflow_dispatch'
+        if: ${{ !startsWith(github.ref, 'refs/tags/v') }}
         uses: actions/upload-artifact@v4
         with:
           name: snap-bundle
