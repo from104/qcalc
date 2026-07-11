@@ -7,6 +7,7 @@
 
 import { defineBoot } from '#q-app/wrappers';
 import type { Update } from '@tauri-apps/plugin-updater';
+import { computeDownloadPercent } from 'src/utils/TauriUpdaterUtils';
 
 const isTauri = typeof window !== 'undefined' && '__TAURI_INTERNALS__' in window;
 
@@ -107,26 +108,30 @@ export default defineBoot(async () => {
         updateStatusListener?.('not-available');
         return;
       }
+      // Started의 contentLength(전체 크기)와 Progress의 chunkLength(증분)를 누적해 percent를 계산한다.
+      let totalBytes = 0;
+      let downloadedBytes = 0;
       pendingUpdate
         .downloadAndInstall((event) => {
           switch (event.event) {
             case 'Started': {
-              // 전체 크기 정보를 progress 이벤트 초기값으로 전달
+              totalBytes = event.data.contentLength ?? 0;
+              downloadedBytes = 0;
               updateStatusListener?.('progress', {
                 bytesPerSecond: 0,
                 percent: 0,
                 transferred: 0,
-                total: event.data.contentLength ?? 0,
+                total: totalBytes,
               });
               break;
             }
             case 'Progress': {
-              // contentLength 없이 chunkLength만 있음; 누적 추적은 생략하고 증분만 보고
+              downloadedBytes += event.data.chunkLength;
               updateStatusListener?.('progress', {
                 bytesPerSecond: 0,
-                percent: 0,
-                transferred: event.data.chunkLength,
-                total: 0,
+                percent: computeDownloadPercent(downloadedBytes, totalBytes),
+                transferred: downloadedBytes,
+                total: totalBytes,
               });
               break;
             }
