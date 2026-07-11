@@ -4,8 +4,8 @@
 # 사용법: bash build-flatpak.sh [build|install|run|clean]
 #
 # 2단계 빌드 방식:
-# 1단계: Quasar + electron-builder로 linux-unpacked 디렉토리 빌드 (로컬)
-# 2단계: flatpak-builder로 linux-unpacked를 Flatpak으로 패키징
+# 1단계: `yarn tauri build`로 .deb 패키지 빌드 (로컬, Rust/cargo 필요)
+# 2단계: flatpak-builder로 .deb를 Flatpak으로 패키징
 
 set -e
 set -u
@@ -19,7 +19,7 @@ MANIFEST="$SCRIPT_DIR/$APP_ID.yml"
 BUILD_DIR="/tmp/qcalc-flatpak-builder"
 STATE_DIR="/tmp/qcalc-flatpak-state"
 REPO_DIR="/tmp/qcalc-flatpak-repo"
-LINUX_UNPACKED="$SCRIPT_DIR/linux-unpacked"
+DEB_FILE="$SCRIPT_DIR/qcalc.deb"
 ICONS_DIR="$SCRIPT_DIR/icons"
 
 # 색상 출력
@@ -48,28 +48,24 @@ check_prerequisites() {
         error "flatpak이 설치되어 있지 않습니다."
     fi
 
-    # 런타임 및 SDK 설치 확인
-    if ! flatpak info org.freedesktop.Platform//24.08 &> /dev/null; then
-        warn "org.freedesktop.Platform//24.08이 설치되지 않았습니다. 설치합니다..."
-        flatpak install -y --user flathub org.freedesktop.Platform//24.08
+    # 런타임 및 SDK 설치 확인 (org.freedesktop.* 에는 WebKitGTK가 없으므로
+    # org.gnome.Platform/Sdk를 사용한다 — GNOME 런타임이 webkit2gtk-4.1을 내장)
+    if ! flatpak info org.gnome.Platform//46 &> /dev/null; then
+        warn "org.gnome.Platform//46이 설치되지 않았습니다. 설치합니다..."
+        flatpak install -y --user flathub org.gnome.Platform//46
     fi
 
-    if ! flatpak info org.freedesktop.Sdk//24.08 &> /dev/null; then
-        warn "org.freedesktop.Sdk//24.08이 설치되지 않았습니다. 설치합니다..."
-        flatpak install -y --user flathub org.freedesktop.Sdk//24.08
-    fi
-
-    if ! flatpak info org.electronjs.Electron2.BaseApp//24.08 &> /dev/null; then
-        warn "org.electronjs.Electron2.BaseApp//24.08이 설치되지 않았습니다. 설치합니다..."
-        flatpak install -y --user flathub org.electronjs.Electron2.BaseApp//24.08
+    if ! flatpak info org.gnome.Sdk//46 &> /dev/null; then
+        warn "org.gnome.Sdk//46이 설치되지 않았습니다. 설치합니다..."
+        flatpak install -y --user flathub org.gnome.Sdk//46
     fi
 
     info "사전 조건 확인 완료."
 }
 
-# 1단계: Electron 앱 로컬 빌드
-build_electron() {
-    info "1단계: Electron 앱 빌드 중..."
+# 1단계: Tauri 앱 로컬 빌드 (.deb)
+build_tauri() {
+    info "1단계: Tauri 앱 빌드 중..."
     cd "$PROJECT_DIR"
 
     # 의존성 설치
@@ -78,42 +74,35 @@ build_electron() {
         yarn install
     fi
 
-    # electron-builder의 Linux 타깃을 dir로 변경하여 빌드
-    # (package.json을 직접 수정하지 않고 환경변수로 설정)
-    info "Quasar + electron-builder 빌드 시작..."
-    npx quasar build -m electron
+    info "yarn tauri build 시작 (Rust/cargo 필요)..."
+    yarn tauri build --bundles deb
 
-    # linux-unpacked 디렉토리 확인
-    UNPACKED_SRC="$PROJECT_DIR/dist/electron/Packaged/linux-unpacked"
-    if [ ! -d "$UNPACKED_SRC" ]; then
-        error "linux-unpacked 디렉토리를 찾을 수 없습니다: $UNPACKED_SRC
-electron-builder의 Linux 빌드 타깃에 'dir'이 포함되어 있는지 확인하세요."
+    # 빌드된 .deb 확인
+    DEB_SRC=$(find "$PROJECT_DIR/src-tauri/target/release/bundle/deb" -maxdepth 1 -name '*.deb' | head -n1)
+    if [ -z "$DEB_SRC" ]; then
+        error ".deb 파일을 찾을 수 없습니다: $PROJECT_DIR/src-tauri/target/release/bundle/deb
+tauri.conf.json의 bundle.targets에 deb가 포함되어 있는지 확인하세요."
     fi
 
     # flatpak 디렉토리로 복사
     info "빌드 결과물을 flatpak 디렉토리로 복사 중..."
-    rm -rf "$LINUX_UNPACKED"
-    cp -a "$UNPACKED_SRC" "$LINUX_UNPACKED"
-
-    # Flatpak에 불필요한 electron-builder 자동 업데이트 파일 제거
-    # (cross-device hardlink 에러 방지)
-    find "$LINUX_UNPACKED" -name "app-update.yml" -delete
+    cp -f "$DEB_SRC" "$DEB_FILE"
 
     # 아이콘 복사
     mkdir -p "$ICONS_DIR"
-    cp "$PROJECT_DIR/src-electron/icons/icon.png" "$ICONS_DIR/io.github.from104.qcalc.png"
+    cp "$PROJECT_DIR/src-tauri/icons/128x128@2x.png" "$ICONS_DIR/io.github.from104.qcalc.png"
 
-    info "1단계 완료: linux-unpacked 준비됨."
+    info "1단계 완료: qcalc.deb 준비됨."
 }
 
 # 2단계: Flatpak 빌드
 build_flatpak() {
     check_prerequisites
 
-    # linux-unpacked가 없으면 먼저 빌드
-    if [ ! -d "$LINUX_UNPACKED" ]; then
-        warn "linux-unpacked 디렉토리가 없습니다. Electron 앱을 먼저 빌드합니다..."
-        build_electron
+    # .deb가 없으면 먼저 빌드
+    if [ ! -f "$DEB_FILE" ]; then
+        warn "qcalc.deb가 없습니다. Tauri 앱을 먼저 빌드합니다..."
+        build_tauri
     fi
 
     info "2단계: Flatpak 빌드 시작..."
@@ -139,10 +128,10 @@ build_flatpak() {
 
 # Flatpak 설치 (로컬)
 install_app() {
-    # linux-unpacked가 없으면 먼저 빌드
-    if [ ! -d "$LINUX_UNPACKED" ]; then
-        warn "linux-unpacked 디렉토리가 없습니다. Electron 앱을 먼저 빌드합니다..."
-        build_electron
+    # .deb가 없으면 먼저 빌드
+    if [ ! -f "$DEB_FILE" ]; then
+        warn "qcalc.deb가 없습니다. Tauri 앱을 먼저 빌드합니다..."
+        build_tauri
     fi
 
     check_prerequisites
@@ -176,7 +165,7 @@ run_app() {
 # 빌드 아티팩트 정리
 clean() {
     info "빌드 아티팩트 정리 중..."
-    rm -rf "$BUILD_DIR" "$STATE_DIR" "$REPO_DIR" "$LINUX_UNPACKED" "$ICONS_DIR"
+    rm -rf "$BUILD_DIR" "$STATE_DIR" "$REPO_DIR" "$DEB_FILE" "$ICONS_DIR"
     info "정리 완료."
 }
 
@@ -185,22 +174,22 @@ usage() {
     echo "사용법: $0 [COMMAND]"
     echo ""
     echo "Commands:"
-    echo "  electron    1단계: Electron 앱 로컬 빌드 (linux-unpacked 생성)"
-    echo "  build       2단계: Flatpak 빌드 (linux-unpacked 필요)"
+    echo "  tauri       1단계: Tauri 앱 로컬 빌드 (qcalc.deb 생성, Rust/cargo 필요)"
+    echo "  build       2단계: Flatpak 빌드 (qcalc.deb 필요)"
     echo "  install     전체 빌드 + Flatpak 로컬 설치"
     echo "  run         설치된 Flatpak 앱 실행"
     echo "  clean       빌드 아티팩트 정리"
     echo ""
     echo "첫 빌드 시에는 'install'을 사용하세요."
-    echo "이미 Electron 앱이 빌드되어 있다면 'build'만 실행해도 됩니다."
+    echo "이미 qcalc.deb가 빌드되어 있다면 'build'만 실행해도 됩니다."
 }
 
 # 인수 처리
 COMMAND="${1:-}"
 
 case "$COMMAND" in
-    electron)
-        build_electron
+    tauri)
+        build_tauri
         ;;
     build)
         build_flatpak

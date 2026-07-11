@@ -114,47 +114,102 @@ jobs:
           path: src-tauri/target/release/bundle/**
           retention-days: 7
 
+      # flatpak/snap 잡은 GitHub 릴리스가 아니라 이 워크플로 아티팩트에서 .deb를
+      # 가져온다 (태그 push와 workflow_dispatch 양쪽에서 동일하게 소비 가능하도록
+      # 이벤트 종류와 무관하게 매번 업로드한다).
+      - name: Upload deb artifact (linux only)
+        if: matrix.platform.os == 'ubuntu-22.04'
+        uses: actions/upload-artifact@v4
+        with:
+          name: tauri-deb-linux
+          path: src-tauri/target/release/bundle/deb/*.deb
+          retention-days: 3
+
   build-flatpak:
     name: Build Flatpak bundle
     needs: build-tauri
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     permissions:
       contents: write
     steps:
       - uses: actions/checkout@v4
-      # ... (패키징 영역 담당: Tauri deb 기반 flatpak 빌드로 재작성.
-      #      현행 flatpak/io.github.from104.qcalc.yml 은 Electron 기반이므로 교체 필요.)
+
+      - name: Download deb
+        uses: actions/download-artifact@v4
+        with:
+          name: tauri-deb-linux
+          path: flatpak/
+
+      - name: Prepare sources
+        run: |
+          mv flatpak/*.deb flatpak/qcalc.deb
+          mkdir -p flatpak/icons
+          cp src-tauri/icons/128x128@2x.png flatpak/icons/io.github.from104.qcalc.png
+
+      - name: Setup Flatpak
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y flatpak flatpak-builder
+          flatpak remote-add --user --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
+          flatpak install -y --user flathub org.gnome.Platform//46 org.gnome.Sdk//46
+
+      - name: Build Flatpak
+        run: |
+          cd flatpak
+          flatpak-builder --force-clean --user --install-deps-from=flathub --disable-updates --repo=repo .flatpak-builder/build io.github.from104.qcalc.yml
+
+      - name: Bundle
+        run: |
+          cd flatpak
+          VER=$(node -p "require('../package.json').version")
+          flatpak build-bundle repo "Q-Calc-${VER}-linux.flatpak" io.github.from104.qcalc
+
       - name: Attach to release (tag push)
         if: github.event_name == 'push'
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: gh release upload "${{ github.ref_name }}" <빌드산출.flatpak> --clobber
+        run: gh release upload "${{ github.ref_name }}" flatpak/Q-Calc-*.flatpak --clobber
+
       - name: Upload artifact (test build)
         if: github.event_name == 'workflow_dispatch'
         uses: actions/upload-artifact@v4
         with:
           name: flatpak-bundle
-          path: <빌드산출.flatpak>
+          path: flatpak/Q-Calc-*.flatpak
           retention-days: 7
 
   build-snap:
     name: Build Snap bundle
     needs: build-tauri
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     permissions:
       contents: write
     steps:
       - uses: actions/checkout@v4
-      # ... (패키징 영역 담당: snapcraft 기반 빌드.)
+
+      - name: Download deb
+        uses: actions/download-artifact@v4
+        with:
+          name: tauri-deb-linux
+          path: snap/local/
+
+      - name: Rename deb
+        run: mv snap/local/*.deb snap/local/qcalc.deb
+
+      - name: Build snap
+        uses: snapcore/action-build@v1
+        id: snapbuild
+
       - name: Attach to release (tag push)
         if: github.event_name == 'push'
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: gh release upload "${{ github.ref_name }}" <빌드산출.snap> --clobber
+        run: gh release upload "${{ github.ref_name }}" "${{ steps.snapbuild.outputs.snap }}" --clobber
+
       - name: Upload artifact (test build)
         if: github.event_name == 'workflow_dispatch'
         uses: actions/upload-artifact@v4
         with:
           name: snap-bundle
-          path: <빌드산출.snap>
+          path: ${{ steps.snapbuild.outputs.snap }}
           retention-days: 7

@@ -3,7 +3,7 @@
   <id>io.github.from104.qcalc</id>
 
   <name>QCalc</name>
-  <summary>5 calculators, 8 languages — built for productivity and accessibility</summary>
+  <summary>5 calculators, 10 languages — built for productivity and accessibility</summary>
 
   <metadata_license>CC0-1.0</metadata_license>
   <project_license>MIT</project_license>
@@ -14,8 +14,8 @@
 
   <description>
     <p>
-      QCalc packs 5 specialized calculators and 8 languages into one clean,
-      keyboard-friendly app. Built with Vue 3, Quasar, and Electron, it covers
+      QCalc packs 5 specialized calculators and 10 languages into one clean,
+      keyboard-friendly app. Built with Vue 3, Quasar, and Tauri, it covers
       everyday arithmetic, unit conversion, currency exchange, programmer math,
       and formula evaluation — all one tab away.
     </p>
@@ -31,7 +31,7 @@
     <ul>
       <li>64-digit precision powered by mathjs BigNumber</li>
       <li>Calculation history with notes and CSV export/import</li>
-      <li>8 languages — Korean, English, Japanese, Chinese, Hindi, German, Spanish, French</li>
+      <li>10 languages — Korean, English, Japanese, Chinese, Hindi, German, Spanish, French, Portuguese, Russian</li>
       <li>ARIA labels, screen reader announcements, keyboard focus indicators, reduced motion support</li>
       <li>Multiple color themes, dark mode, and keyboard-first design</li>
       <li>Settings and history export/import for consistent environments</li>
@@ -54,6 +54,11 @@
   <content_rating type="oars-1.1" />
 
   <releases>
+    <release version="0.13.0" date="2026-07-12">
+      <description>
+        <p>Desktop production build switched from Electron to Tauri, 2 additional languages (Portuguese, Russian), and a smaller, faster app.</p>
+      </description>
+    </release>
     <release version="0.12.0" date="2026-03-22">
       <description>
         <p>New Formula calculator, 5 additional languages (Chinese, Hindi, German, Spanish, French), Flatpak packaging, Electron 40, and accessibility improvements.</p>
