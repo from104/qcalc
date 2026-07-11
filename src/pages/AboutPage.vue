@@ -7,7 +7,9 @@
   import { computed } from 'vue';
   import { useI18n } from 'vue-i18n';
   import { version } from '../../package.json';
+  import { openExternalLink } from '../utils/ExternalLinkUtils';
 
+  const $g = window.globalVars;
   const { locale, t } = useI18n();
 
   import AboutMdEn from '../content/pages/AboutPage-en.md';
@@ -47,7 +49,7 @@
   const techStack = ['Vue 3', 'Quasar', 'TypeScript', 'Electron', 'Capacitor'];
 
   const openExternal = (url: string) => {
-    window.open(url, '_blank', 'noopener');
+    openExternalLink(url, $g.isTauri);
   };
 </script>
 

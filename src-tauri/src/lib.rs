@@ -65,6 +65,7 @@ pub fn run() {
 
   let mut builder = tauri::Builder::default()
     .plugin(tauri_plugin_window_state::Builder::default().build())
+    .plugin(tauri_plugin_opener::init())
     .invoke_handler(tauri::generate_handler![get_package_env, quit_app]);
 
   if cfg!(debug_assertions) {

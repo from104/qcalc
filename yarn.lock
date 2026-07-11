@@ -2260,6 +2260,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@tauri-apps/api@npm:^2.11.0":
+  version: 2.11.1
+  resolution: "@tauri-apps/api@npm:2.11.1"
+  checksum: 10/95ff573095f03fee3cef9a6a52dbb4e27fd25de8793a2f5d7f2f9850ba85b56777f8fa697e6e863927345432a0c6af0649e55dafbc0de4f84a34f0c08637a662
+  languageName: node
+  linkType: hard
+
 "@tauri-apps/cli-darwin-arm64@npm:2.10.1":
   version: 2.10.1
   resolution: "@tauri-apps/cli-darwin-arm64@npm:2.10.1"
@@ -2378,6 +2385,15 @@ __metadata:
   bin:
     tauri: tauri.js
   checksum: 10/9533de72531bb63ce0da3ca19b03df853fff50d4cb167239342b8f825341d5bb8ef7be3d7e53b0ee2e137dd2b1216deef5c5cb19daf0f91ac4e0b439e91744db
+  languageName: node
+  linkType: hard
+
+"@tauri-apps/plugin-opener@npm:^2":
+  version: 2.5.4
+  resolution: "@tauri-apps/plugin-opener@npm:2.5.4"
+  dependencies:
+    "@tauri-apps/api": "npm:^2.11.0"
+  checksum: 10/cbb2adc1a0ffe04de2b9b4407932d27fa0eb3ea9202687be8c839db0cf8301aba813bd8267f6dba4235b2fdea5a6d114772f628143e5cdfcddd9a19668953119
   languageName: node
   linkType: hard
 
@@ -10237,6 +10253,7 @@ __metadata:
     "@rushstack/eslint-patch": "npm:1.16.1"
     "@tauri-apps/api": "npm:^2"
     "@tauri-apps/cli": "npm:^2"
+    "@tauri-apps/plugin-opener": "npm:^2"
     "@tauri-apps/plugin-updater": "npm:^2"
     "@tauri-apps/plugin-window-state": "npm:^2"
     "@types/node": "npm:25.5.0"
