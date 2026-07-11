@@ -5,6 +5,8 @@ import { createI18n } from 'vue-i18n';
 import { mount, flushPromises } from '@vue/test-utils';
 import { nextTick, type DefineComponent } from 'vue';
 import { axe } from 'vitest-axe';
+import { readFileSync } from 'fs';
+import { resolve } from 'path';
 // Calculator는 pinia/window.globalVars에 의존하지 않으므로 정적 import로 충분함
 import { Operator } from 'core/calculator/Calculator';
 import type { useCalcStore as UseCalcStoreFn } from 'stores/calcStore';
@@ -127,5 +129,41 @@ describe('ResultField 접근성 (mount)', () => {
     // 컴포넌트 단독 mount(페이지 밖 조각)에는 적용 대상이 아니므로 비활성화한다.
     const results = await axe(wrapper.element, { rules: { region: { enabled: false } } });
     expect(results.violations).toEqual([]);
+  });
+
+  it('메모리 토글 div가 키보드로 포커스 가능하고 Enter/Space로 showMemoryTemporarily가 발동된다', async () => {
+    const calcStore = useCalcStore();
+    useUIStore().currentTab = 'calc';
+    calcStore.calc.addDigit(9);
+    calcStore.calc.memory.save();
+
+    const wrapper = mountField(ResultField);
+    await nextTick();
+
+    const memoryToggle = wrapper.find('[role="button"]');
+    expect(memoryToggle.exists()).toBe(true);
+    expect(memoryToggle.attributes('tabindex')).toBe('0');
+
+    expect(calcStore.isMemoryVisible).toBe(false);
+    await memoryToggle.trigger('keydown', { key: 'Enter' });
+    expect(calcStore.isMemoryVisible).toBe(true);
+
+    calcStore.hideMemory();
+    await memoryToggle.trigger('keydown', { key: ' ' });
+    expect(calcStore.isMemoryVisible).toBe(true);
+  });
+
+  it('메모리 토글 div에서 v-auto-blur 디렉티브가 제거되었다 (회귀 가드)', () => {
+    const source = readFileSync(resolve(__dirname, '../../calc/ResultField.vue'), 'utf-8');
+    const match = source.match(/<div\b[^>]*role="button"[^>]*>/);
+    expect(match).not.toBeNull();
+    expect(match![0]).not.toContain('v-auto-blur');
+    expect(match![0]).toContain('tabindex="0"');
+  });
+
+  it('메모리 토글 div에 keydown enter/space 핸들러가 소스에 존재한다', () => {
+    const source = readFileSync(resolve(__dirname, '../../calc/ResultField.vue'), 'utf-8');
+    expect(source).toContain('@keydown.enter.prevent="calcStore.showMemoryTemporarily()"');
+    expect(source).toContain('@keydown.space.prevent.stop="calcStore.showMemoryTemporarily()"');
   });
 });

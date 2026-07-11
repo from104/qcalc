@@ -901,11 +901,13 @@
       <template v-if="isMainField" #prepend>
         <div
           v-if="!isMemoryEmpty"
-          v-auto-blur
           class="noselect full-height q-mt-xs q-pt-sm"
           role="button"
+          tabindex="0"
           :aria-label="t('ariaLabel.memory')"
           @click="calcStore.showMemoryTemporarily()"
+          @keydown.enter.prevent="calcStore.showMemoryTemporarily()"
+          @keydown.space.prevent.stop="calcStore.showMemoryTemporarily()"
         >
           <q-icon
             :color="isMainField && calcStore.isMemoryVisible ? memoryTextColor : panelTextColor"

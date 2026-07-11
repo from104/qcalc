@@ -268,7 +268,16 @@
     </q-menu>
 
     <!-- 표시 모드 -->
-    <div v-if="!isEditing" class="cursor-pointer" :title="t('editExpression')" @click="startEditing">
+    <div
+      v-if="!isEditing"
+      class="cursor-pointer"
+      role="button"
+      tabindex="0"
+      :title="t('editExpression')"
+      @click="startEditing"
+      @keydown.enter.prevent="startEditing"
+      @keydown.space.prevent.stop="startEditing"
+    >
       <q-field
         class="shadow-1 formula-expression-field"
         filled
