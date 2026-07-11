@@ -102,9 +102,11 @@ export default defineConfig((/* ctx */) => {
       typescript: {
         strict: true, // (recommended) enables strict settings for TypeScript
         vueShim: true, // required when using ESLint with type-checked rules, will generate a shim file for `*.vue` files
-        extendTsConfig() {
-          // You can use this hook to extend tsConfig dynamically
-          // For basic use cases, you can still update the usual tsconfig.json file to override some settings
+        extendTsConfig(tsConfig) {
+          // src-tauri는 Rust 프로젝트 — 빌드 산출물(target/**/tauri-codegen-assets/*.js 등)이
+          // 생성된 tsconfig의 `../**/*` include에 걸리면 vue-tsc가 바이너리 자산을 파싱하다
+          // 실패한다 (CI에서 cargo 캐시 복원 직후 quasar build가 깨지는 원인).
+          tsConfig.exclude = [...(tsConfig.exclude ?? []), './../src-tauri'];
         },
       },
     },
