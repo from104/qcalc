@@ -15,6 +15,8 @@
   import { useUIStore } from 'stores/uiStore';
   import { useKeyBinding } from 'src/composables/useKeyBinding';
   import { showError } from 'src/utils/NotificationUtils';
+  import { getErrorMessage } from 'src/utils/ErrorUtils';
+  import { classifyFormulaError, type FormulaErrorInfo } from 'src/utils/FormulaError';
 
   const { t } = useI18n();
   const formulaStore = useFormulaStore();
@@ -75,6 +77,11 @@
     nextTick(() => inputRef.value?.focus());
   };
 
+  const formatFormulaError = (info: FormulaErrorInfo): string => {
+    const base = getErrorMessage(info.key);
+    return info.detail ? `${base} (${info.detail})` : base;
+  };
+
   const evaluateAndClose = () => {
     // Enter keydown으로 편집 모드 진입 직후 Enter keyup 무시
     if (Date.now() - formulaStore._editOpenedAt < 200) return;
@@ -82,14 +89,15 @@
       exitEditing();
       return;
     }
-    if (isWarning.value) {
-      showError(t('formulaEvaluationError'));
+    const errorInfo = formulaStore.expressionError();
+    if (errorInfo) {
+      showError(formatFormulaError(errorInfo));
       return;
     }
     try {
       formulaStore.evaluate();
-    } catch {
-      showError(t('formulaEvaluationError'));
+    } catch (e) {
+      showError(formatFormulaError(classifyFormulaError(e instanceof Error ? e.message : String(e))));
     }
     exitEditing();
   };
@@ -391,7 +399,6 @@ ko:
   expressionPlaceholder: '수식을 입력하세요 (예: (1+3)*5)'
   editExpression: '수식 편집 (Space)'
   clearExpression: '수식 지우기'
-  formulaEvaluationError: '수식 평가 오류. 수식을 확인해 주세요.'
   ariaLabel:
     expressionField: '수식 입력 필드'
   help:
@@ -409,7 +416,6 @@ en:
   expressionPlaceholder: 'Enter expression (e.g. (1+3)*5)'
   editExpression: 'Edit expression (Space)'
   clearExpression: 'Clear expression'
-  formulaEvaluationError: 'Formula evaluation error. Please check your expression.'
   ariaLabel:
     expressionField: 'Formula input field'
   help:
@@ -427,7 +433,6 @@ ja:
   expressionPlaceholder: '数式を入力 (例: (1+3)*5)'
   editExpression: '数式編集 (Space)'
   clearExpression: '数式をクリア'
-  formulaEvaluationError: '数式の評価エラー。数式を確認してください。'
   ariaLabel:
     expressionField: '数式入力フィールド'
   help:
@@ -445,7 +450,6 @@ zh:
   expressionPlaceholder: '输入表达式 (例: (1+3)*5)'
   editExpression: '编辑表达式 (Space)'
   clearExpression: '清除表达式'
-  formulaEvaluationError: '公式求值错误。请检查您的表达式。'
   ariaLabel:
     expressionField: '公式输入字段'
   help:
@@ -463,7 +467,6 @@ hi:
   expressionPlaceholder: 'अभिव्यक्ति दर्ज करें (उदा: (1+3)*5)'
   editExpression: 'अभिव्यक्ति संपादित करें (Space)'
   clearExpression: 'अभिव्यक्ति साफ़ करें'
-  formulaEvaluationError: 'सूत्र मूल्यांकन त्रुटि। कृपया अपनी अभिव्यक्ति जाँचें।'
   ariaLabel:
     expressionField: 'सूत्र इनपुट फ़ील्ड'
   help:
@@ -481,7 +484,6 @@ de:
   expressionPlaceholder: 'Ausdruck eingeben (z.B. (1+3)*5)'
   editExpression: 'Ausdruck bearbeiten (Space)'
   clearExpression: 'Ausdruck löschen'
-  formulaEvaluationError: 'Formelauswertungsfehler. Bitte überprüfen Sie Ihren Ausdruck.'
   ariaLabel:
     expressionField: 'Formeleingabefeld'
   help:
@@ -499,7 +501,6 @@ es:
   expressionPlaceholder: 'Ingrese expresión (ej: (1+3)*5)'
   editExpression: 'Editar expresión (Space)'
   clearExpression: 'Borrar expresión'
-  formulaEvaluationError: 'Error de evaluación de fórmula. Verifique su expresión.'
   ariaLabel:
     expressionField: 'Campo de entrada de fórmula'
   help:
@@ -517,7 +518,6 @@ fr:
   expressionPlaceholder: 'Entrez une expression (ex: (1+3)*5)'
   editExpression: "Modifier l'expression (Space)"
   clearExpression: "Effacer l'expression"
-  formulaEvaluationError: "Erreur d'évaluation de formule. Veuillez vérifier votre expression."
   ariaLabel:
     expressionField: 'Champ de saisie de formule'
   help:
@@ -535,7 +535,6 @@ pt:
   expressionPlaceholder: 'Digite uma expressão (ex: (1+3)*5)'
   editExpression: 'Editar expressão (Space)'
   clearExpression: 'Limpar expressão'
-  formulaEvaluationError: 'Erro na avaliação da fórmula. Verifique sua expressão.'
   ariaLabel:
     expressionField: 'Campo de entrada de fórmula'
   help:
@@ -553,7 +552,6 @@ ru:
   expressionPlaceholder: 'Введите выражение (напр. (1+3)*5)'
   editExpression: 'Редактировать выражение (Space)'
   clearExpression: 'Очистить выражение'
-  formulaEvaluationError: 'Ошибка вычисления формулы. Проверьте выражение.'
   ariaLabel:
     expressionField: 'Поле ввода формулы'
   help:

@@ -72,3 +72,39 @@ describe('formulaStore 삼각함수 도 단위 기준 (BENCH-02)', () => {
     expect(f.isExpressionValid()).toBe(false);
   });
 });
+
+describe('formulaStore.expressionError (UX-06)', () => {
+  // eslint-disable-next-line @typescript-eslint/consistent-type-imports
+  let useFormulaStore: (typeof import('../formulaStore'))['useFormulaStore'];
+
+  beforeEach(async () => {
+    vi.resetModules();
+    setActivePinia(createPinia());
+    useFormulaStore = (await import('../formulaStore')).useFormulaStore;
+  });
+
+  it('빈 수식은 오류 없이 null을 반환한다', () => {
+    const f = useFormulaStore();
+    f.expression = '';
+    expect(f.expressionError()).toBeNull();
+  });
+
+  it('괄호 불일치 수식은 error.formula.paren_mismatch로 분류된다', () => {
+    const f = useFormulaStore();
+    f.expression = '(1+2';
+    expect(f.expressionError()?.key).toBe('error.formula.paren_mismatch');
+  });
+
+  it('유효한 수식은 null을 반환한다', () => {
+    const f = useFormulaStore();
+    f.expression = '1+2*3';
+    expect(f.expressionError()).toBeNull();
+  });
+
+  it('isExpressionValid는 expressionError가 null인지 여부와 동일하다', () => {
+    const f = useFormulaStore();
+    f.expression = 'x+1';
+    expect(f.isExpressionValid()).toBe(false);
+    expect(f.expressionError()?.key).toBe('error.formula.unknown_symbol');
+  });
+});

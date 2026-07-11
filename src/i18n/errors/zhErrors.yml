@@ -44,4 +44,10 @@ math:
   negative_bit_operation: '位运算中不允许负数'
   overflow: '运算结果超出允许范围'
   invalid_operation: '无效的数学运算'
+formula:
+  paren_mismatch: '括号不匹配。请检查左右括号的数量是否一致。'
+  unknown_symbol: '未知的符号或函数。请检查您输入的名称。'
+  syntax: '表达式语法无效。请重新检查您的表达式。'
+  not_finite: '计算结果为无穷大或未定义。（例如：除以零）'
+  evaluation: '无法求值表达式: {detail}'
 unknown: '发生未知错误：{error}'
