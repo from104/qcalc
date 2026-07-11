@@ -24,10 +24,6 @@ on:
   push:
     tags:
       - 'v*'
-    # TODO(0.13.0): 머지 전 제거 — 브랜치에서 전 포맷 CI 빌드를 검증하기 위한 임시 트리거.
-    # 릴리스/테스트 분기는 ref가 태그인지로 판별하므로 브랜치 push는 항상 테스트 모드다.
-    branches:
-      - feature/0.13.0-tauri-main
   workflow_dispatch:
 
 jobs:
