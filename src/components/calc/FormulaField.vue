@@ -266,16 +266,7 @@
     </q-menu>
 
     <!-- 표시 모드 -->
-    <div
-      v-if="!isEditing"
-      class="cursor-pointer"
-      role="button"
-      tabindex="0"
-      :title="t('editExpression')"
-      @click="startEditing"
-      @keydown.enter.prevent="startEditing"
-      @keydown.space.prevent.stop="startEditing"
-    >
+    <div v-if="!isEditing" class="cursor-pointer" @click="startEditing">
       <q-field
         class="shadow-1 formula-expression-field"
         filled
@@ -302,10 +293,20 @@
         <template #control>
           <div class="row items-center no-wrap full-width full-height overflow-hidden q-pt-xs">
             <span v-if="overflowLeft" class="formula-overflow-indicator">...</span>
+            <!--
+              role="button"는 clear 버튼(위 prepend)을 포함하지 않는 이 텍스트 요소에만 부여한다.
+              바깥 div에 부여하면 clear 버튼(q-btn)이 하위에 중첩된 인터랙티브 컨트롤이 되어
+              axe-core nested-interactive 위반이 발생한다.
+            -->
             <div
               ref="innerText"
               class="col no-outline text-right noselect formula-expression-text"
               :class="[isExpressionEmpty ? 'formula-expression-placeholder' : '', `text-${fieldTextColor}`]"
+              role="button"
+              tabindex="0"
+              :title="t('editExpression')"
+              @keydown.enter.prevent="startEditing"
+              @keydown.space.prevent.stop="startEditing"
             >
               {{ displayExpression }}
             </div>
