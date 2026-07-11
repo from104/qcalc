@@ -58,6 +58,9 @@ fn force_xwayland_if_needed() {
 #[cfg(not(target_os = "linux"))]
 fn force_xwayland_if_needed() {}
 
+// TODO: CSP 설정 — tauri.conf.json의 `app.security.csp`(현재 null)에 실기기 런타임 검증과 함께
+// 값을 채워야 한다. currency API·GitHub updater 엔드포인트용 connect-src 허용이 필요.
+// (JSON 설정 파일은 주석을 지원하지 않아 이 메모를 여기 남긴다.)
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
   // 반드시 tauri::Builder::default() 이전에 호출. Builder 초기화가 GTK 세션 백엔드를 확정한다.
