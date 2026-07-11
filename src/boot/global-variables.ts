@@ -11,7 +11,7 @@ import { Platform } from 'quasar';
 import { version } from '../../package.json';
 
 // 불변 속성 정의 함수
-import { defineImmutableProperty } from 'src/utils/GlobalHelpers';
+import { defineImmutableProperty, shouldApplyTauriLinuxFontFix } from 'src/utils/GlobalHelpers';
 
 // 불변 속성 정의 함수
 // const defineImmutableProperty = <T>(obj: object, prop: string, value: T) => {
@@ -90,6 +90,11 @@ export default defineBoot(async () => {
     globalVars.apiLevel = window.androidInterface?.getApiLevel() ?? 0;
     globalVars.navigationBarHeight = window.androidInterface?.getNavigationBarHeight() ?? 0;
     globalVars.isGestureNavigation = window.androidInterface?.isGestureNavigation() ?? false;
+  }
+
+  // WebKitGTK(Linux) font-weight +100 버그 워크어라운드용 body 클래스 (tauri#14286)
+  if (shouldApplyTauriLinuxFontFix(isTauri, Platform.is.linux)) {
+    document.body.classList.add('body--tauri-linux');
   }
 
   // window.globalVars로 전역 변수 설정

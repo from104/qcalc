@@ -1,0 +1,35 @@
+/**
+ * @file tauri-linux-fontfix.scss
+ * WebKitGTK(Linux) font-weight +100 렌더링 워크어라운드.
+ * 업스트림: https://github.com/tauri-apps/tauri/issues/14286
+ * WebKitGTK는 지정 font-weight보다 한 단계(+100) 굵게 렌더링한다.
+ * global-variables.ts 가 Tauri+Linux 에서만 부여하는 body--tauri-linux 하에서
+ * 코드베이스 명시 weight를 한 단계(-100) 낮춰 보정한다.
+ * Windows(WebView2)·Electron·Android 에는 이 클래스가 없으므로 영향 0.
+ * 라이트/다크 공통(선택자에 테마 한정 없음).
+ * 버그 수정 시 이 파일 + global-variables.ts 의 body 클래스 부여 코드만 제거하면 됨.
+ */
+.body--tauri-linux {
+  // CalcButton.vue .button (700 → 600)
+  .button {
+    font-weight: 600 !important;
+  }
+
+  // app.scss .q-markdown h2/h3 (500 → 400)
+  .q-markdown h2,
+  .q-markdown h3 {
+    font-weight: 400 !important;
+  }
+
+  // dialog.scss .dialog-header .text-h6 (600 → 500)
+  .dialog-header .text-h6 {
+    font-weight: 500 !important;
+  }
+
+  // dialog.scss .scrollable-content h2/h3/strong (600 → 500)
+  .scrollable-content h2,
+  .scrollable-content h3,
+  .scrollable-content strong {
+    font-weight: 500 !important;
+  }
+}
