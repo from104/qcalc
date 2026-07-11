@@ -33,6 +33,12 @@ export default defineConfig({
     coverage: {
       provider: 'v8',
       include: ['src/core/**/*.ts', 'src/utils/**/*.ts', 'src/stores/**/*.ts'],
+      thresholds: {
+        statements: 60,
+        branches: 42,
+        functions: 65,
+        lines: 60,
+      },
     },
   },
 });
