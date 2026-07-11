@@ -44,4 +44,10 @@ math:
   negative_bit_operation: 'Negative Zahlen sind bei Bitoperationen nicht erlaubt'
   overflow: 'Operationsergebnis überschreitet den erlaubten Bereich'
   invalid_operation: 'Ungültige mathematische Operation'
+formula:
+  paren_mismatch: 'Klammern stimmen nicht überein. Prüfen Sie öffnende und schließende Klammern.'
+  unknown_symbol: 'Unbekanntes Symbol oder unbekannte Funktion. Bitte überprüfen Sie den Namen.'
+  syntax: 'Die Syntax des Ausdrucks ist ungültig. Bitte überprüfen Sie den Ausdruck.'
+  not_finite: 'Das Ergebnis ist unendlich oder undefiniert (z.B. Division durch null).'
+  evaluation: 'Der Ausdruck kann nicht ausgewertet werden: {detail}'
 unknown: 'Ein unbekannter Fehler ist aufgetreten: {error}'

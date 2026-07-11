@@ -44,4 +44,10 @@ math:
   negative_bit_operation: 'Negative numbers are not allowed in bit operations'
   overflow: 'Operation result exceeds allowed range'
   invalid_operation: 'Invalid mathematical operation'
+formula:
+  paren_mismatch: 'Parentheses do not match. Check that every opening bracket has a closing one.'
+  unknown_symbol: 'Unknown symbol or function. Please check the name you entered.'
+  syntax: 'The expression syntax is invalid. Please review your expression.'
+  not_finite: 'The result is infinite or undefined (e.g. division by zero).'
+  evaluation: 'Unable to evaluate the expression: {detail}'
 unknown: 'An unknown error occurred: {error}'

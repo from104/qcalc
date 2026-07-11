@@ -55,6 +55,7 @@
   import MenuItem from 'components/common/MenuItem.vue';
   import ToolTip from 'src/components/common/ToolTip.vue';
   import { showError, showMessage } from 'src/utils/NotificationUtils';
+  import { formatNumberToLocale, parseLocaleNumber, getLocaleNumberSymbols } from 'src/utils/NumberUtils';
 
   type PropsType = {
     field?: 'main' | 'sub';
@@ -209,12 +210,22 @@
       // 소수점 자릿수 설정이 -1이고 소수점이 있는 경우
       const hasSpecialDecimalPlaces = Number(settingsStore.getCurrentDecimalPlaces) === -1 && inputBuffer.includes('.');
 
-      const result =
-        hasSpecialDecimalPlaces && !calc.needsBufferReset
-          ? `${formattedNumber.split('.')[0]}.${inputBuffer.split('.')[1]}`
-          : formattedNumber;
+      if (hasSpecialDecimalPlaces && !calc.needsBufferReset) {
+        // toFormattedNumber와 동일한 조건(10진수일 때만 로케일 표기)으로 소수 구분자를 결정한다.
+        // radix 모드에서는 항상 리터럴 '.'을 사용해 formattedNumber와 정합성을 유지한다.
+        const radixNumber = radixStore.radixEnumToNumber(
+          currentTab.value === 'radix' ? radixStore.sourceRadix : Radix.Decimal,
+        );
+        const decimalSeparator =
+          radixNumber === 10 ? getLocaleNumberSymbols(settingsStore.locale || 'en').decimal : '.';
+        const decimalIndex = formattedNumber.indexOf(decimalSeparator);
+        const integerPart = decimalIndex === -1 ? formattedNumber : formattedNumber.slice(0, decimalIndex);
+        // 소수부는 사용자가 입력 중인 원본(inputBuffer)에서 그대로 가져와 실시간 타이핑 상태를 보존한다.
+        const fractionalPart = inputBuffer.split('.')[1] ?? '';
+        return `${integerPart}${decimalSeparator}${fractionalPart}`;
+      }
 
-      return result;
+      return formattedNumber;
     } else {
       // 서브 필드인 경우 애드온 타입에 따라 처리
       switch (props.addon) {
@@ -337,13 +348,16 @@
    * 필드와 애드온 타입에 따라 적절한 숫자를 반환
    */
   const onlyNumber = computed(() => {
+    // 복사 왕복 무손실을 위해 '.'-decimal 소수 구분자만 로케일화 (그룹핑 없음)
+    const localizeDecimal = (v: string) => (v ? formatNumberToLocale(v, settingsStore.locale || 'en', false, 3) : v);
+
     // 메인 필드 처리
     if (props.field === 'main') {
       if (props.addon === 'radix') {
         const convertedNumber = radixStore.convertRadix(calc.currentNumber, Radix.Decimal, radixStore.sourceRadix);
         return getRadixResult(convertedNumber, true);
       }
-      return calc.currentNumber;
+      return localizeDecimal(calc.currentNumber);
     }
 
     // 서브 필드 처리
@@ -357,7 +371,7 @@
     const result = converter?.() || '';
 
     // 진법 모드인 경우 접두사/접미사 추가
-    return props.addon === 'radix' ? getRadixResult(result, true) : result;
+    return props.addon === 'radix' ? getRadixResult(result, true) : localizeDecimal(result);
   });
 
   // 연산자 문자열 계산된 속성
@@ -476,6 +490,29 @@
 
     return '';
   });
+
+  /**
+   * 계산이 확정(연산 완료)되었는지 여부.
+   * - 마지막 기록의 결과값이 현재 표시값과 일치하고 버퍼 리셋 대기 상태일 때만 true
+   * - 키 입력 중(needsBufferReset=false)에는 false → 과낭독 방지
+   */
+  const isCalculationCompleted = computed(() => {
+    const lastRecord = calcRecord.getCount() > 0 ? calcRecord.getAllRecords()[0] : null;
+    return (
+      lastRecord != null && calc.needsBufferReset && calc.currentNumber === lastRecord.calculationResult.resultNumber
+    );
+  });
+
+  /**
+   * 스크린리더 라이브 리전에 낭독할 결과 문자열.
+   * - 메인 필드에서 계산이 확정된 순간에만 "결과: {값}" 형태로 채워짐
+   * - 그 외에는 빈 문자열 → 낭독 트리거되지 않음
+   */
+  const announcedResult = computed(() =>
+    isMainField && isCalculationCompleted.value && displayedResult.value
+      ? t('ariaLabel.announcedResult', { value: displayedResult.value })
+      : '',
+  );
 
   // 결과 색상 관련 computed 속성 (themesStore 사용)
   const panelNormalTextColor = computed(() => themesStore.getPanelColor('text', 'normal'));
@@ -686,7 +723,7 @@
         numberToPaste.value = calc.filterNumberCharacters(clipboardText, radixStore.targetRadix);
       }
     } else {
-      numberToPaste.value = calc.filterNumberCharacters(clipboardText);
+      numberToPaste.value = calc.filterNumberCharacters(parseLocaleNumber(clipboardText, settingsStore.locale || 'en'));
     }
   };
 
@@ -715,13 +752,17 @@
       // 햅틱 피드백
       hapticFeedbackMedium();
 
+      // 비-radix 탭: 로케일 표기(그룹/소수 구분자)를 내부 '.'-decimal로 정규화
+      const pasteText =
+        currentTab.value === 'radix' ? clipboardText : parseLocaleNumber(clipboardText, settingsStore.locale || 'en');
+
       // 보조 필드 처리
       if (target === 'sub') {
         if (currentTab.value === 'unit') {
           // 단위 탭 스왑
           unitStore.swapUnits();
           // 버퍼에 붙여넣기
-          calc.pasteToBuffer(clipboardText);
+          calc.pasteToBuffer(pasteText);
           // 현재 숫자 변환
           calc.currentNumber = UnitConverter.convert(
             unitStore.selectedCategory,
@@ -735,7 +776,7 @@
           // 통화 탭 스왑
           currencyStore.swapCurrencies();
           // 버퍼에 붙여넣기
-          calc.pasteToBuffer(clipboardText);
+          calc.pasteToBuffer(pasteText);
           // 현재 숫자 변환
           calc.currentNumber = currencyStore.currencyConverter
             .convert(toBigNumber(calc.currentNumber), currencyStore.sourceCurrency, currencyStore.targetCurrency)
@@ -765,7 +806,7 @@
           }, 10);
         } else {
           // 버퍼에 붙여넣기
-          calc.pasteToBuffer(clipboardText);
+          calc.pasteToBuffer(pasteText);
         }
 
         // 클립보드 붙여넣기 메시지 표시
@@ -856,33 +897,25 @@
       dense
       readonly
       :dark="false"
-      role="textbox"
-      aria-live="polite"
-      aria-atomic="true"
-      :aria-label="t('ariaLabel.resultField', { type: isMainField ? t('ariaLabel.main') : t('ariaLabel.sub') })"
       :bg-color="panelBackgroundColor"
       :label-slot="isMainField"
       :stack-label="isMainField"
     >
       <template v-if="isMainField && !calcStore.isMemoryVisible" #label>
-        <div
-          v-auto-blur
-          class="noselect"
-          :class="[`text-${panelTextColor}`]"
-          role="text"
-          :aria-label="t('ariaLabel.expression')"
-        >
+        <div v-auto-blur class="noselect" :class="[`text-${panelTextColor}`]">
           {{ calculationExpression }}
         </div>
       </template>
       <template v-if="isMainField" #prepend>
         <div
           v-if="!isMemoryEmpty"
-          v-auto-blur
           class="noselect full-height q-mt-xs q-pt-sm"
           role="button"
+          tabindex="0"
           :aria-label="t('ariaLabel.memory')"
           @click="calcStore.showMemoryTemporarily()"
+          @keydown.enter.prevent="calcStore.showMemoryTemporarily()"
+          @keydown.space.prevent.stop="calcStore.showMemoryTemporarily()"
         >
           <q-icon
             :color="isMainField && calcStore.isMemoryVisible ? memoryTextColor : panelTextColor"
@@ -896,8 +929,6 @@
           v-auto-blur
           class="noselect full-height q-mt-xs q-pt-sm"
           :class="[`text-${isMainField && calcStore.isMemoryVisible ? memoryTextColor : panelTextColor}`]"
-          role="text"
-          :aria-label="t('ariaLabel.operator', { operator })"
         >
           <q-icon :name="operatorIcons[operator]" role="img" :aria-label="t('ariaLabel.operatorIcon', { operator })" />
         </div>
@@ -920,8 +951,6 @@
               ? `padding-top: ${mainPanelPaddingTop}; padding-bottom: ${mainPanelPaddingBottom};`
               : `padding-top: ${subPanelPaddingTop}; padding-bottom: ${subPanelPaddingBottom};`
           "
-          role="text"
-          :aria-label="t('ariaLabel.result', { type: isMainField ? t('ariaLabel.main') : t('ariaLabel.sub') })"
           @click="
             () => {
               showPanelMenu = !showPanelMenu;
@@ -935,21 +964,15 @@
             }
           "
         >
-          <span v-if="currentTab === 'radix'" id="radixPrefix" role="text" :aria-label="t('ariaLabel.radixPrefix')">{{
-            radixPrefix
-          }}</span>
-          <span v-if="currentTab === 'currency'" id="symbol" role="text" :aria-label="t('ariaLabel.currencySymbol')">{{
-            symbol
-          }}</span>
-          <span :id="isMainField ? 'result' : 'subResult'" role="text" :aria-label="t('ariaLabel.value')">
+          <span v-if="currentTab === 'radix'" id="radixPrefix">{{ radixPrefix }}</span>
+          <span v-if="currentTab === 'currency'" id="symbol">{{ symbol }}</span>
+          <span :id="isMainField ? 'result' : 'subResult'">
             {{ calcStore.isMemoryVisible ? memoryValue : result }}
           </span>
-          <span v-if="currentTab === 'unit'" id="unit" role="text" :aria-label="t('ariaLabel.unit')">{{ unit }}</span>
+          <span v-if="currentTab === 'unit'" id="unit">{{ unit }}</span>
           <span
             v-if="currentTab === 'radix' && radixStore.showRadix && radixStore.radixType === 'suffix'"
             id="radixSuffix"
-            role="text"
-            :aria-label="t('ariaLabel.radixSuffix')"
           >
             {{ radixSuffix }}
           </span>
@@ -991,6 +1014,9 @@
         </q-list>
       </q-menu>
     </q-field>
+    <div v-if="isMainField" class="sr-only" role="status" aria-live="polite" aria-atomic="true">
+      {{ announcedResult }}
+    </div>
   </q-card-section>
 </template>
 
@@ -998,6 +1024,18 @@
   @font-face {
     font-family: 'resultFont';
     src: url('/digital-7.monoitalic.ttf') format('truetype');
+  }
+
+  .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
   }
 
   #symbol {
@@ -1082,6 +1120,7 @@ ko:
     currencySymbol: '통화 기호'
     unit: '단위'
     contextMenu: '결과 복사 메뉴'
+    announcedResult: '결과: {value}'
 en:
   copiedDisplayedResult: 'The displayed result has been copied.<br><center>{result}</center>'
   copiedDisplayedResultSub: 'The sub panel result has been copied.<br><center>{result}</center>'
@@ -1110,6 +1149,7 @@ en:
     currencySymbol: 'Currency symbol'
     unit: 'Unit'
     contextMenu: 'Result copy menu'
+    announcedResult: 'Result: {value}'
 ja:
   copiedDisplayedResult: '表示された結果がコピーされました。<br><center>{result}</center>'
   copiedDisplayedResultSub: 'サブパネルの結果がコピーされました。<br><center>{result}</center>'
@@ -1138,6 +1178,7 @@ ja:
     currencySymbol: '通貨記号'
     unit: '単位'
     contextMenu: '結果コピーメニュー'
+    announcedResult: '結果: {value}'
 zh:
   copiedDisplayedResult: '已复制显示的结果。<br><center>{result}</center>'
   copiedDisplayedResultSub: '已复制副面板的结果。<br><center>{result}</center>'
@@ -1166,6 +1207,7 @@ zh:
     currencySymbol: '货币符号'
     unit: '单位'
     contextMenu: '结果复制菜单'
+    announcedResult: '结果: {value}'
 hi:
   copiedDisplayedResult: 'प्रदर्शित परिणाम कॉपी किया गया।<br><center>{result}</center>'
   copiedDisplayedResultSub: 'उप पैनल का परिणाम कॉपी किया गया।<br><center>{result}</center>'
@@ -1194,6 +1236,7 @@ hi:
     currencySymbol: 'मुद्रा प्रतीक'
     unit: 'इकाई'
     contextMenu: 'परिणाम कॉपी मेनू'
+    announcedResult: 'परिणाम: {value}'
 de:
   copiedDisplayedResult: 'Das angezeigte Ergebnis wurde kopiert.<br><center>{result}</center>'
   copiedDisplayedResultSub: 'Das Ergebnis des Nebenpanels wurde kopiert.<br><center>{result}</center>'
@@ -1222,6 +1265,7 @@ de:
     currencySymbol: 'Währungssymbol'
     unit: 'Einheit'
     contextMenu: 'Ergebnis-Kopiermenü'
+    announcedResult: 'Ergebnis: {value}'
 es:
   copiedDisplayedResult: 'El resultado mostrado ha sido copiado.<br><center>{result}</center>'
   copiedDisplayedResultSub: 'El resultado del panel secundario ha sido copiado.<br><center>{result}</center>'
@@ -1250,6 +1294,7 @@ es:
     currencySymbol: 'Símbolo de moneda'
     unit: 'Unidad'
     contextMenu: 'Menú de copia de resultado'
+    announcedResult: 'Resultado: {value}'
 fr:
   copiedDisplayedResult: 'Le résultat affiché a été copié.<br><center>{result}</center>'
   copiedDisplayedResultSub: 'Le résultat du panneau secondaire a été copié.<br><center>{result}</center>'
@@ -1278,6 +1323,7 @@ fr:
     currencySymbol: 'Symbole de devise'
     unit: 'Unité'
     contextMenu: 'Menu de copie du résultat'
+    announcedResult: 'Résultat : {value}'
 pt:
   copiedDisplayedResult: 'O resultado exibido foi copiado.<br><center>{result}</center>'
   copiedDisplayedResultSub: 'O resultado do painel secundário foi copiado.<br><center>{result}</center>'
@@ -1306,6 +1352,7 @@ pt:
     currencySymbol: 'Símbolo de moeda'
     unit: 'Unidade'
     contextMenu: 'Menu de cópia do resultado'
+    announcedResult: 'Resultado: {value}'
 ru:
   copiedDisplayedResult: 'Отображённый результат скопирован.<br><center>{result}</center>'
   copiedDisplayedResultSub: 'Результат дополнительной панели скопирован.<br><center>{result}</center>'
@@ -1334,4 +1381,5 @@ ru:
     currencySymbol: 'Символ валюты'
     unit: 'Единица измерения'
     contextMenu: 'Меню копирования результата'
+    announcedResult: 'Результат: {value}'
 </i18n>

@@ -30,8 +30,8 @@ jobs:
       - name: Type check
         run: npx vue-tsc --noEmit
 
-      - name: Test
-        run: yarn test
+      - name: Test with coverage
+        run: yarn test:coverage
 
   build-electron:
     runs-on: ubuntu-latest
@@ -90,9 +90,24 @@ jobs:
       - name: Copy icon
         run: |
           mkdir -p flatpak/icons
-          cp src-electron/icons/icon.png flatpak/icons/com.atit.qcalc.png
+          cp src-electron/icons/icon.png flatpak/icons/io.github.from104.qcalc.png
 
       - name: Build Flatpak
         run: |
           cd flatpak
-          flatpak-builder --force-clean --user --disable-updates --repo=repo .flatpak-builder/build com.atit.qcalc.yml
+          flatpak-builder --force-clean --user --disable-updates --repo=repo .flatpak-builder/build io.github.from104.qcalc.yml
+
+      - name: Create .flatpak bundle
+        run: |
+          cd flatpak
+          APP_VERSION=$(node -p "require('../package.json').version")
+          BUNDLE_FILE="Q-Calc-${APP_VERSION}-linux.flatpak"
+          flatpak build-bundle repo "$BUNDLE_FILE" io.github.from104.qcalc
+          ls -lh "$BUNDLE_FILE"
+
+      - name: Upload Flatpak bundle artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: flatpak-bundle
+          path: flatpak/Q-Calc-*.flatpak
+          retention-days: 14

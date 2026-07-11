@@ -1,5 +1,11 @@
 import { describe, it, expect } from 'vitest';
-import { numberGrouping, formatDecimalPlaces, formatExpressionNumbers } from '../NumberUtils';
+import {
+  numberGrouping,
+  formatDecimalPlaces,
+  formatExpressionNumbers,
+  formatNumberToLocale,
+  parseLocaleNumber,
+} from '../NumberUtils';
 
 describe('NumberUtils', () => {
   describe('numberGrouping', () => {
@@ -188,6 +194,104 @@ describe('NumberUtils', () => {
 
     it('소수부 자릿수 제한 0이면 소수부 제거', () => {
       expect(formatExpressionNumbers('3.14', 3, 0)).toBe('3');
+    });
+  });
+
+  describe('formatNumberToLocale', () => {
+    it('en 3자리 그룹핑', () => {
+      expect(formatNumberToLocale('1234567.89', 'en', true, 3)).toBe('1,234,567.89');
+    });
+
+    it('de 3자리 그룹핑', () => {
+      expect(formatNumberToLocale('1234567.89', 'de', true, 3)).toBe('1.234.567,89');
+    });
+
+    it('fr 3자리 그룹핑 (narrow no-break space)', () => {
+      expect(formatNumberToLocale('1234567.89', 'fr', true, 3)).toBe(`1${' '}234${' '}567,89`);
+    });
+
+    it('hi 3자리 그룹핑 (lakh)', () => {
+      expect(formatNumberToLocale('1234567.89', 'hi', true, 3)).toBe('12,34,567.89');
+    });
+
+    it('de useGrouping=false여도 소수 구분자는 로케일화', () => {
+      expect(formatNumberToLocale('1234.56', 'de', false, 3)).toBe('1234,56');
+    });
+
+    it('en 4자리 그룹핑', () => {
+      expect(formatNumberToLocale('12345678', 'en', true, 4)).toBe('1234,5678');
+    });
+
+    it('de 4자리 그룹핑 (수동 그룹핑, 로케일 구분자 사용)', () => {
+      expect(formatNumberToLocale('12345678', 'de', true, 4)).toBe('1234.5678');
+    });
+
+    it('음수 de', () => {
+      expect(formatNumberToLocale('-1234.5', 'de', true, 3)).toBe('-1.234,5');
+    });
+
+    it('0', () => {
+      expect(formatNumberToLocale('0', 'de', true, 3)).toBe('0');
+    });
+
+    it('빈 문자열', () => {
+      expect(formatNumberToLocale('', 'de', true, 3)).toBe('');
+    });
+
+    it('큰 정수 정밀도 무손실 (de)', () => {
+      expect(formatNumberToLocale('123456789012345678', 'de', true, 3)).toBe('123.456.789.012.345.678');
+    });
+  });
+
+  describe('parseLocaleNumber', () => {
+    it('de 그룹/소수 구분자 정규화', () => {
+      expect(parseLocaleNumber('1.234,56', 'de')).toBe('1234.56');
+    });
+
+    it('fr 일반 공백 그룹 구분자', () => {
+      expect(parseLocaleNumber('1 234,56', 'fr')).toBe('1234.56');
+    });
+
+    it('fr narrow no-break space 그룹 구분자', () => {
+      expect(parseLocaleNumber(`1${' '}234,56`, 'fr')).toBe('1234.56');
+    });
+
+    it('en 그룹/소수 구분자 정규화', () => {
+      expect(parseLocaleNumber('1,234.56', 'en')).toBe('1234.56');
+    });
+
+    it('hi lakh 그룹 정규화', () => {
+      expect(parseLocaleNumber('12,34,567.89', 'hi')).toBe('1234567.89');
+    });
+
+    it('ru no-break space 그룹 구분자', () => {
+      expect(parseLocaleNumber(`1${' '}234,56`, 'ru')).toBe('1234.56');
+    });
+
+    it('모호성 규칙: de에서 그룹 구분자는 항상 제거', () => {
+      expect(parseLocaleNumber('1.234', 'de')).toBe('1234');
+    });
+
+    it('모호성 규칙: de에서 콤마는 항상 소수 구분자', () => {
+      expect(parseLocaleNumber('3,14', 'de')).toBe('3.14');
+    });
+
+    it('빈 문자열', () => {
+      expect(parseLocaleNumber('', 'de')).toBe('');
+    });
+  });
+
+  describe('roundtrip', () => {
+    const locales = ['en', 'de', 'fr', 'hi'];
+
+    it.each(locales)('%s: 그룹핑 표시 → 파싱 왕복 무손실', (locale) => {
+      const formatted = formatNumberToLocale('1234567.89', locale, true, 3);
+      expect(parseLocaleNumber(formatted, locale)).toBe('1234567.89');
+    });
+
+    it.each(locales)('%s: 그룹핑 없는 표시(onlyNumber 경로) → 파싱 왕복 무손실', (locale) => {
+      const formatted = formatNumberToLocale('1234567.89', locale, false, 3);
+      expect(parseLocaleNumber(formatted, locale)).toBe('1234567.89');
     });
   });
 });

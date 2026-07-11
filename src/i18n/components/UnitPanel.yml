@@ -370,7 +370,7 @@ en:
       bar: 'Bar'
       psi: 'Pound per square inch'
       ksi: 'Kilopound per square inch'
-    storage:
+    data:
       B: 'Byte'
       kiB: 'Kibibyte (1024 bytes)'
       kB: 'Kilobyte (1000 bytes)'
@@ -593,7 +593,7 @@ ja:
       bar: 'バール'
       psi: 'ポンド毎平方インチ'
       ksi: 'キロポンド毎平方インチ'
-    storage:
+    data:
       B: 'バイト'
       kiB: 'キビバイト (1024 バイト)'
       kB: 'キロバイト (1000 バイト)'
@@ -816,7 +816,7 @@ zh:
       bar: '巴'
       psi: '磅每平方英寸'
       ksi: '千磅每平方英寸'
-    storage:
+    data:
       B: '字节'
       kiB: '千二进制字节 (1024 字节)'
       kB: '千字节 (1000 字节)'
@@ -1039,7 +1039,7 @@ hi:
       bar: 'बार'
       psi: 'पाउंड प्रति वर्ग इंच'
       ksi: 'किलोपाउंड प्रति वर्ग इंच'
-    storage:
+    data:
       B: 'बाइट'
       kiB: 'किबीबाइट (1024 बाइट)'
       kB: 'किलोबाइट (1000 बाइट)'
@@ -1262,7 +1262,7 @@ de:
       bar: 'Bar'
       psi: 'Pfund pro Quadratzoll'
       ksi: 'Kilopfund pro Quadratzoll'
-    storage:
+    data:
       B: 'Byte'
       kiB: 'Kibibyte (1024 Bytes)'
       kB: 'Kilobyte (1000 Bytes)'
@@ -1485,7 +1485,7 @@ es:
       bar: 'Bar'
       psi: 'Libra por pulgada cuadrada'
       ksi: 'Kilolibra por pulgada cuadrada'
-    storage:
+    data:
       B: 'Byte'
       kiB: 'Kibibyte (1024 bytes)'
       kB: 'Kilobyte (1000 bytes)'
@@ -1708,7 +1708,7 @@ fr:
       bar: 'Bar'
       psi: 'Livre par pouce carré'
       ksi: 'Kilolivre par pouce carré'
-    storage:
+    data:
       B: 'Octet'
       kiB: 'Kibioctet (1024 octets)'
       kB: 'Kilooctet (1000 octets)'
@@ -1931,7 +1931,7 @@ pt:
       bar: 'Bar'
       psi: 'Libra por polegada quadrada'
       ksi: 'Quilo-libra por polegada quadrada'
-    storage:
+    data:
       B: 'Byte'
       kiB: 'Kibibyte (1024 bytes)'
       kB: 'Kilobyte (1000 bytes)'
@@ -2154,7 +2154,7 @@ ru:
       bar: 'Бар'
       psi: 'Фунт на квадратный дюйм'
       ksi: 'Килофунт на квадратный дюйм'
-    storage:
+    data:
       B: 'Байт'
       kiB: 'Кибибайт (1024 байта)'
       kB: 'Килобайт (1000 байтов)'

@@ -7,7 +7,16 @@
 export type DarkModeType = 'light' | 'dark' | 'system';
 
 // 테마 타입 정의
-export type ThemeType = 'default' | 'azalea' | 'autumn' | 'forest' | 'ocean' | 'amethyst' | 'slate' | 'grey' | 'highcontrast';
+export type ThemeType =
+  | 'default'
+  | 'azalea'
+  | 'autumn'
+  | 'forest'
+  | 'ocean'
+  | 'amethyst'
+  | 'slate'
+  | 'grey'
+  | 'highcontrast';
 
 // 테마 이름 다국어 인터페이스 정의
 export interface ThemeName {
@@ -80,10 +89,10 @@ export const themes: Record<ThemeType, ThemeColors> = {
     },
     panel: {
       text: {
-        normal: 'light-green-8',
-        warning: 'deep-orange-5',
+        normal: 'light-green-10',
+        warning: 'brown-9',
         normalAccent: 'light-green-10',
-        warningAccent: 'deep-orange-8',
+        warningAccent: 'brown-10',
       },
       background: {
         normal: 'light-green-3',
@@ -122,8 +131,8 @@ export const themes: Record<ThemeType, ThemeColors> = {
     },
     panel: {
       text: {
-        normal: 'pink-8',
-        warning: 'cyan-8',
+        normal: 'pink-10',
+        warning: 'cyan-10',
         normalAccent: 'pink-10',
         warningAccent: 'cyan-10',
       },
@@ -165,7 +174,7 @@ export const themes: Record<ThemeType, ThemeColors> = {
     panel: {
       text: {
         normal: 'brown-7',
-        warning: 'blue-8',
+        warning: 'blue-10',
         normalAccent: 'brown-9',
         warningAccent: 'blue-10',
       },
@@ -206,7 +215,7 @@ export const themes: Record<ThemeType, ThemeColors> = {
     },
     panel: {
       text: {
-        normal: 'green-8',
+        normal: 'green-10',
         warning: 'purple-8',
         normalAccent: 'green-10',
         warningAccent: 'purple-10',
@@ -248,10 +257,10 @@ export const themes: Record<ThemeType, ThemeColors> = {
     },
     panel: {
       text: {
-        normal: 'light-blue-8',
-        warning: 'amber-9',
+        normal: 'light-blue-10',
+        warning: 'brown-9',
         normalAccent: 'light-blue-10',
-        warningAccent: 'amber-10',
+        warningAccent: 'brown-10',
       },
       background: {
         normal: 'light-blue-2',
@@ -265,7 +274,7 @@ export const themes: Record<ThemeType, ThemeColors> = {
       },
       background: {
         light: 'light-blue-1',
-        dark: 'light-blue-9',
+        dark: 'light-blue-10',
       },
     },
   },
@@ -291,9 +300,9 @@ export const themes: Record<ThemeType, ThemeColors> = {
     panel: {
       text: {
         normal: 'deep-purple-7',
-        warning: 'yellow-9',
+        warning: 'brown-9',
         normalAccent: 'deep-purple-9',
-        warningAccent: 'yellow-10',
+        warningAccent: 'brown-10',
       },
       background: {
         normal: 'deep-purple-2',
@@ -332,7 +341,7 @@ export const themes: Record<ThemeType, ThemeColors> = {
     },
     panel: {
       text: {
-        normal: 'blue-grey-7',
+        normal: 'blue-grey-9',
         warning: 'brown-8',
         normalAccent: 'blue-grey-9',
         warningAccent: 'brown-10',
@@ -416,10 +425,10 @@ export const themes: Record<ThemeType, ThemeColors> = {
     },
     panel: {
       text: {
-        normal: 'grey-7',
-        warning: 'grey-9',
+        normal: 'grey-10',
+        warning: 'grey-10',
         normalAccent: 'grey-10',
-        warningAccent: 'grey-7',
+        warningAccent: 'grey-10',
       },
       background: {
         normal: 'yellow-2',
@@ -429,11 +438,11 @@ export const themes: Record<ThemeType, ThemeColors> = {
     select: {
       text: {
         light: 'grey-10',
-        dark: 'grey-4',
+        dark: 'grey-1',
       },
       background: {
-        light: 'red-2',
-        dark: 'red-6',
+        light: 'grey-1',
+        dark: 'grey-10',
       },
     },
   },

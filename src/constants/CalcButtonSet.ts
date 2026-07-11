@@ -13,6 +13,8 @@ import type { ButtonType } from '../types/store';
 import { toBigNumber } from 'core/calculator/CalculatorMath';
 import { Operator } from 'core/calculator/Calculator';
 import { showMessage, showError } from 'src/utils/NotificationUtils';
+import { getErrorMessage } from 'src/utils/ErrorUtils';
+import { classifyFormulaError, type FormulaErrorInfo } from 'src/utils/FormulaError';
 
 import { useCalcStore } from 'src/stores/calcStore';
 import { useFormulaStore } from 'src/stores/formulaStore';
@@ -26,6 +28,10 @@ const { calc } = calcStore;
 
 // ComposerTranslation 타입 사용
 export function createCalcButtonSet(t: ComposerTranslation) {
+  // 수식 계산기 오류 메시지 포맷팅 (FormulaField.vue의 formatFormulaError와 동일한 규칙)
+  const formatFormulaError = (info: FormulaErrorInfo): string =>
+    getErrorMessage(info.key, info.detail ? { detail: info.detail } : undefined);
+
   // 시프트 버튼 메서드
   const handleShift = () => {
     calcStore.toggleShift();
@@ -177,7 +183,7 @@ export function createCalcButtonSet(t: ComposerTranslation) {
       a6: ['@keyboard_capslock', 'important', ["'"], () => handleShift(), false],
       b6: ['0', 'normal', ['0'], () => formulaStore.append('0'), () => !formulaStore.canAppend('0')],
       c6: ['@mdi-circle-small', 'normal', ['.'], () => formulaStore.append('.'), () => !formulaStore.canAppend('.')],
-      d6: ['@mdi-equal', 'important', ['=', 'Enter'], () => { if (!formulaStore.expression) { formulaStore.openEditDialog(); uiStore.inputFocused = true; return; } try { formulaStore.evaluate(); } catch { showError(t('formulaEvaluationError')); } }, false],
+      d6: ['@mdi-equal', 'important', ['=', 'Enter'], () => { if (!formulaStore.expression) { formulaStore.openEditDialog(); uiStore.inputFocused = true; return; } const errorInfo = formulaStore.expressionError(); if (errorInfo) { showError(formatFormulaError(errorInfo)); return; } try { formulaStore.evaluate(); } catch (e) { showError(formatFormulaError(classifyFormulaError(e instanceof Error ? e.message : String(e)))); } }, false],
     },
   };
 

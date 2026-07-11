@@ -86,6 +86,68 @@ describe('CalculatorRecord', () => {
     });
   });
 
+  describe('restoreRecord', () => {
+    it('원래 인덱스로 복원', () => {
+      record.addRecord(makeResult('1', Operator.ADD, '2', '3')); // id 1
+      record.addRecord(makeResult('4', Operator.SUB, '1', '3')); // id 2
+      record.addRecord(makeResult('5', Operator.MUL, '2', '10')); // id 3
+      const index = record.findIndexById(2);
+      const target = record.getRecordByIndex(index);
+      record.deleteRecord(2);
+      expect(record.getCount()).toBe(2);
+      record.restoreRecord(target, index);
+      expect(record.getCount()).toBe(3);
+      const all = record.getAllRecords();
+      expect(all.map((r) => r.id)).toEqual([3, 2, 1]);
+      expect(all[1]!.id).toBe(2);
+    });
+
+    it('메모/타임스탬프/모드/수식 등 데이터 보존', () => {
+      record.addRecord(makeResult('1', Operator.ADD, '2', '3'), 'formula', '1+2');
+      record.setMemo(1, '메모A');
+      const target = record.getRecordById(1);
+      const savedTs = target.timestamp;
+      record.deleteRecord(1);
+      record.restoreRecord(target, 0);
+      const restored = record.getRecordById(1);
+      expect(restored.memo).toBe('메모A');
+      expect(restored.timestamp).toBe(savedTs);
+      expect(restored.mode).toBe('formula');
+      expect(restored.expression).toBe('1+2');
+    });
+
+    it('삭제 후 복원한 배열이 삭제 전과 동일', () => {
+      record.addRecord(makeResult('1', Operator.ADD, '2', '3'));
+      record.addRecord(makeResult('4', Operator.SUB, '1', '3'));
+      const before = JSON.parse(JSON.stringify(record.getAllRecords())) as unknown;
+      const index = record.findIndexById(1);
+      const target = record.getRecordByIndex(index);
+      record.deleteRecord(1);
+      record.restoreRecord(target, index);
+      const after = JSON.parse(JSON.stringify(record.getAllRecords())) as unknown;
+      expect(after).toEqual(before);
+    });
+
+    it('ID 충돌 시 새 ID 부여', () => {
+      record.addRecord(makeResult('1', Operator.ADD, '2', '3')); // id 1
+      record.addRecord(makeResult('4', Operator.SUB, '1', '3')); // id 2
+      const target = record.getRecordById(2);
+      record.deleteRecord(2);
+      record.addRecord(makeResult('9', Operator.ADD, '1', '10')); // id 2 재사용
+      record.restoreRecord(target, 0);
+      const ids = record.getAllRecords().map((r) => r.id);
+      expect(new Set(ids).size).toBe(ids.length);
+    });
+
+    it('범위를 벗어난 인덱스는 클램프되어 예외 없이 처리', () => {
+      record.addRecord(makeResult('1', Operator.ADD, '2', '3'));
+      const target = record.getRecordById(1);
+      record.deleteRecord(1);
+      expect(() => record.restoreRecord(target, 99)).not.toThrow();
+      expect(record.getCount()).toBe(1);
+    });
+  });
+
   describe('clearRecords', () => {
     it('모든 기록 삭제', () => {
       record.addRecord(makeResult('1', Operator.ADD, '2', '3'));

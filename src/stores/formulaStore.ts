@@ -5,9 +5,10 @@
  */
 
 import { defineStore } from 'pinia';
-import { MathB } from '../core/calculator/CalculatorMath';
+import { MathB, createFormulaTrigScope } from '../core/calculator/CalculatorMath';
 import { useCalcStore } from './calcStore';
 import { formatDecimalPlaces } from '../utils/NumberUtils';
+import { classifyFormulaError, type FormulaErrorInfo } from '../utils/FormulaError';
 
 interface FormulaState {
   expression: string; // 현재 입력 중인 수식 (@는 currentNumber, $는 메모리 값 플레이스홀더)
@@ -99,7 +100,7 @@ export const useFormulaStore = defineStore('formula', {
       const resolved = this._resolvePlaceholders(this.expression);
 
       // mathjs 평가 (실패 시 throw)
-      const raw: unknown = MathB.evaluate(resolved);
+      const raw: unknown = MathB.evaluate(resolved, createFormulaTrigScope());
 
       // BigNumber / 일반 number → string 변환
       const resultStr: string =
@@ -324,21 +325,33 @@ export const useFormulaStore = defineStore('formula', {
     },
 
     /**
+     * 현재 수식의 평가 오류를 분류해 반환합니다. 유효하면 null.
+     * - 빈 수식: null (오류 없음)
+     * - @/$ 토큰 규칙 위반: 구문 오류로 분류
+     * - mathjs 평가 예외: 카테고리로 매핑
+     */
+    expressionError(): FormulaErrorInfo | null {
+      const expr = this.expression.trim();
+      if (!expr) return null;
+      if (!this._hasValidPlaceholders(expr)) {
+        return { key: 'error.formula.syntax' };
+      }
+      try {
+        const resolved = this._resolvePlaceholders(expr);
+        MathB.evaluate(resolved, createFormulaTrigScope());
+        return null;
+      } catch (e) {
+        return classifyFormulaError(e instanceof Error ? e.message : String(e));
+      }
+    },
+
+    /**
      * 현재 수식이 mathjs로 평가 가능한지 여부를 반환합니다.
      * 빈 수식은 true (오류 없음), @는 현재 계산기 값으로 치환하여 시도합니다.
      * @/$ 토큰 규칙 위반 시에도 false를 반환합니다.
      */
     isExpressionValid(): boolean {
-      const expr = this.expression.trim();
-      if (!expr) return true;
-      if (!this._hasValidPlaceholders(expr)) return false;
-      try {
-        const resolved = this._resolvePlaceholders(expr);
-        MathB.evaluate(resolved);
-        return true;
-      } catch {
-        return false;
-      }
+      return this.expressionError() === null;
     },
   },
 

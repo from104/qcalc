@@ -44,4 +44,10 @@ math:
   negative_bit_operation: 'ビット演算に負の数は使用できません。'
   overflow: '演算結果が許容範囲を超えています。'
   invalid_operation: '無効な数学演算です。'
+formula:
+  paren_mismatch: '括弧が一致しません。開き括弧と閉じ括弧の数を確認してください。'
+  unknown_symbol: '不明な記号または関数です。入力した名前を確認してください。'
+  syntax: '数式の構文が正しくありません。数式を確認してください。'
+  not_finite: '計算結果が無限大または未定義です。（例: 0 による除算）'
+  evaluation: '数式を評価できません: {detail}'
 unknown: '不明なエラーが発生しました: {error}'
