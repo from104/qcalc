@@ -14,10 +14,10 @@
       {
         "label": "main",
         "title": "Q Calc",
-        "width": 352,
-        "height": 604,
-        "minWidth": 352,
-        "minHeight": 604,
+        "width": 480,
+        "height": 756,
+        "minWidth": 480,
+        "minHeight": 756,
         "resizable": true,
         "maximizable": false,
         "fullscreen": false

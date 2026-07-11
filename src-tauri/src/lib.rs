@@ -132,9 +132,11 @@ pub fn run() {
             (work_width as f64 * 2.0 / 3.0) as u32
           };
 
+          // 바닥값(480/756)은 tauri.conf.json의 minWidth/minHeight와 반드시 일치해야 한다
+          // — 안 그러면 좁은 화면에서 max_size가 min_size보다 작아지는 모순이 생긴다.
           let _ = window.set_max_size(Some(Size::Physical(PhysicalSize {
-            width: (max_width.max(352) as f64 * scale) as u32,
-            height: (max_height.max(604) as f64 * scale) as u32,
+            width: (max_width.max(480) as f64 * scale) as u32,
+            height: (max_height.max(756) as f64 * scale) as u32,
           })));
         }
       }
