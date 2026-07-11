@@ -65,7 +65,7 @@
   };
 
   const quitApp = () => {
-    if ($g.isElectron) window.electron.quitApp();
+    if ($g.isElectron || $g.isTauri) window.electron.quitApp();
   };
 
   // ── 전역 키 바인딩 ──
