@@ -182,6 +182,42 @@ export class CalculatorRecord {
   }
 
   /**
+   * 외부(설정 가져오기/마이그레이션)에서 받은 기록 배열로 통째로 교체합니다.
+   * 유효하지 않은 항목은 건너뛰고, 배열 순서(최신 우선)를 유지하며 최대 MAX_RECORDS로 제한합니다.
+   *
+   * @param records 가져온 기록 배열(신뢰할 수 없는 입력)
+   */
+  public loadRecords(records: unknown): void {
+    if (!Array.isArray(records)) return;
+    const valid: ResultRecord[] = [];
+    let nextId = 1;
+    for (const raw of records) {
+      if (!raw || typeof raw !== 'object') continue;
+      const rec = raw as Partial<ResultRecord>;
+      const cr = rec.calculationResult as CalculationResult | undefined;
+      if (!cr || typeof cr !== 'object') continue;
+      if (typeof cr.previousNumber !== 'string' || typeof cr.resultNumber !== 'string') continue;
+      if (cr.operator === undefined || cr.operator === null) continue;
+      const id = typeof rec.id === 'number' ? rec.id : nextId;
+      nextId = Math.max(nextId, id) + 1;
+      valid.push({
+        id,
+        calculationResult: {
+          previousNumber: cr.previousNumber,
+          operator: cr.operator,
+          ...(cr.argumentNumber !== undefined && { argumentNumber: cr.argumentNumber }),
+          resultNumber: cr.resultNumber,
+        },
+        memo: typeof rec.memo === 'string' ? rec.memo : '',
+        timestamp: typeof rec.timestamp === 'number' ? rec.timestamp : Date.now(),
+        mode: rec.mode === 'formula' ? 'formula' : 'calc',
+        ...(typeof rec.expression === 'string' && { expression: rec.expression }),
+      });
+    }
+    this.records = valid.slice(0, this.MAX_RECORDS);
+  }
+
+  /**
    * 기록 항목에 메모를 추가하거나 수정합니다.
    *
    * @param {number} id - 메모를 추가할 기록 항목의 고유 ID

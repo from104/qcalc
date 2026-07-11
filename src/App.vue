@@ -16,6 +16,7 @@
   import AutoUpdate from 'components/dialogs/AutoUpdate.vue';
   import SnapFirst from 'components/dialogs/SnapFirst.vue';
   import VersionChangelogDialog from 'components/dialogs/VersionChangelogDialog.vue';
+  import MigrationOnboarding from 'components/dialogs/MigrationOnboarding.vue';
 
   import { useKeyBinding } from './composables/useKeyBinding';
   import { useHtmlLangSync } from './composables/useHtmlLangSync';
@@ -182,6 +183,7 @@
   <AutoUpdate />
   <SnapFirst />
   <VersionChangelogDialog />
+  <MigrationOnboarding />
 </template>
 
 <style scoped lang="scss">

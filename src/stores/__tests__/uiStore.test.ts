@@ -34,6 +34,7 @@ describe('uiStore', () => {
       expect(store.isSnapFirstRun).toBe(false);
       expect(store.snapLastSeenVersion).toBe('');
       expect(store.lastSeenChangelogVersion).toBe('');
+      expect(store.migrationOnboardingSeen).toBe(false);
     });
   });
 
@@ -128,6 +129,14 @@ describe('uiStore', () => {
       store.updateSnapVersion('1.0.0');
       expect(store.snapLastSeenVersion).toBe('1.0.0');
       expect(store.isSnapFirstRun).toBe(false);
+    });
+  });
+
+  describe('마이그레이션 온보딩 관련', () => {
+    it('markMigrationOnboardingSeen 호출 후 migrationOnboardingSeen이 true가 되어야 한다', () => {
+      expect(store.migrationOnboardingSeen).toBe(false);
+      store.markMigrationOnboardingSeen();
+      expect(store.migrationOnboardingSeen).toBe(true);
     });
   });
 });
