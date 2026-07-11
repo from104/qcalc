@@ -243,3 +243,102 @@ export function formatDecimalPlaces(number: string, decimalPlaces: number, curre
     return sign(`${finalInteger}.${roundedFraction}`);
   }
 }
+
+const localeSymbolCache = new Map<string, { group: string; decimal: string }>();
+const groupFormatterCache = new Map<string, Intl.NumberFormat>();
+
+/**
+ * 로케일별 그룹/소수 구분자 문자를 조회합니다 (캐시됨).
+ * @param locale - 2글자 로케일 코드
+ * @returns 그룹 구분자, 소수 구분자
+ */
+function getLocaleNumberSymbols(locale: string): { group: string; decimal: string } {
+  const key = locale || 'en';
+  const cached = localeSymbolCache.get(key);
+  if (cached) return cached;
+  let result: { group: string; decimal: string };
+  try {
+    const parts = new Intl.NumberFormat(key, { numberingSystem: 'latn' }).formatToParts(11111.1);
+    result = {
+      group: parts.find((p) => p.type === 'group')?.value ?? ',',
+      decimal: parts.find((p) => p.type === 'decimal')?.value ?? '.',
+    };
+  } catch {
+    result = { group: ',', decimal: '.' };
+  }
+  localeSymbolCache.set(key, result);
+  return result;
+}
+
+/**
+ * 로케일별 정수 그룹핑용 Intl.NumberFormat 인스턴스를 반환합니다 (캐시됨).
+ * @param locale - 2글자 로케일 코드
+ * @returns 그룹핑 포맷터
+ */
+function getGroupFormatter(locale: string): Intl.NumberFormat {
+  const key = locale || 'en';
+  const cached = groupFormatterCache.get(key);
+  if (cached) return cached;
+  let fmt: Intl.NumberFormat;
+  try {
+    fmt = new Intl.NumberFormat(key, { numberingSystem: 'latn', useGrouping: true, maximumFractionDigits: 0 });
+  } catch {
+    fmt = new Intl.NumberFormat('en', { numberingSystem: 'latn', useGrouping: true, maximumFractionDigits: 0 });
+  }
+  groupFormatterCache.set(key, fmt);
+  return fmt;
+}
+
+/**
+ * 이미 반올림된 '.'-소수점 숫자 문자열을 로케일 표기(그룹/소수 구분자)로 변환합니다.
+ * 값 자체를 Number로 변환하지 않으므로 BigNumber 정밀도를 잃지 않습니다.
+ * @param value - '.'-소수점 숫자 문자열 (이미 formatDecimalPlaces로 반올림됨)
+ * @param locale - 2글자 로케일 코드
+ * @param useGrouping - 정수부 그룹핑 여부
+ * @param groupingUnit - 그룹핑 단위 (3 또는 4)
+ * @returns 로케일화된 숫자 문자열
+ */
+export function formatNumberToLocale(
+  value: string,
+  locale: string,
+  useGrouping: boolean,
+  groupingUnit: number,
+): string {
+  if (!value) return value;
+  const isNegative = value.startsWith('-');
+  const absolute = isNegative ? value.slice(1) : value;
+  const [integerPart = '', fractionalPart = ''] = absolute.split('.');
+  const { group, decimal } = getLocaleNumberSymbols(locale);
+
+  let integerOut: string;
+  if (!useGrouping) {
+    integerOut = integerPart || '0';
+  } else if (groupingUnit === 4) {
+    integerOut = (integerPart || '0').replace(/\B(?=(\d{4})+(?!\d))/g, group);
+  } else {
+    integerOut = getGroupFormatter(locale).format(BigInt(integerPart || '0'));
+  }
+  const fractionalOut = fractionalPart ? decimal + fractionalPart : '';
+  return (isNegative ? '-' : '') + integerOut + fractionalOut;
+}
+
+/**
+ * 로케일 표기의 붙여넣기 입력을 내부 '.'-소수점 표현으로 정규화합니다.
+ * 그룹 구분자는 제거하고, 소수 구분자는 '.'로 치환합니다.
+ * @param input - 붙여넣기 원본 문자열
+ * @param locale - 2글자 로케일 코드
+ * @returns 정규화된 '.'-소수점 숫자 문자열
+ */
+export function parseLocaleNumber(input: string, locale: string): string {
+  if (!input) return input;
+  const { group, decimal } = getLocaleNumberSymbols(locale);
+  // 모든 공백류 제거 (JS \s 는 U+00A0·U+202F·U+2009 등 포함 → fr/ru 그룹 구분자 커버)
+  let s = input.replace(/\s/g, '');
+  if (group && !/\s/.test(group)) {
+    s = s.split(group).join(''); // 공백이 아닌 그룹 구분자(de/es '.', en/hi ',') 제거
+  }
+  if (decimal && decimal !== '.') {
+    s = s.split(decimal).join('.'); // 소수 구분자를 '.'로
+  }
+  return s;
+}
