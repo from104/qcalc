@@ -1,5 +1,5 @@
 <script setup lang="ts">
-  import { computed, toValue } from 'vue';
+  import { computed, ref, toValue } from 'vue';
   import { useI18n } from 'vue-i18n';
   import { useRouter, useRoute } from 'vue-router';
   import { useUIStore } from 'stores/uiStore';
@@ -55,6 +55,7 @@
   const visibleTabs = computed(() => props.tabs.slice(0, MAX_VISIBLE_TABS));
   const overflowTabs = computed(() => props.tabs.slice(MAX_VISIBLE_TABS));
   const isOverflowActive = computed(() => overflowTabs.value.some((tab) => tab.name === localCurrentTab.value));
+  const overflowMenuOpen = ref(false);
 
   // 서브 페이지 관련
   const currentSubPage = computed(() => {
@@ -144,8 +145,17 @@
           icon="expand_more"
           class="q-px-xs overflow-menu-btn"
           :color="isOverflowActive ? 'secondary' : undefined"
+          :aria-label="t('ariaLabel.overflowTabs')"
+          aria-haspopup="menu"
+          :aria-expanded="overflowMenuOpen"
         >
-          <q-menu anchor="bottom right" self="top right" :offset="[0, 14]" class="overflow-menu-wrapper">
+          <q-menu
+            v-model="overflowMenuOpen"
+            anchor="bottom right"
+            self="top right"
+            :offset="[0, 14]"
+            class="overflow-menu-wrapper"
+          >
             <q-list dense style="min-width: 160px" class="overflow-menu-list">
               <q-item
                 v-for="tab in overflowTabs"

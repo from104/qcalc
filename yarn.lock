@@ -2565,15 +2565,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/dompurify@npm:3.0.5":
-  version: 3.0.5
-  resolution: "@types/dompurify@npm:3.0.5"
-  dependencies:
-    "@types/trusted-types": "npm:*"
-  checksum: 10/e544b3ce53c41215cabff3d89256ff707c7ee8e0c9a1b5034b22014725d288b16e6942cdcdeeb4221c578c3421a6a4721aa0676431f55d7abd18c07368855c5e
-  languageName: node
-  linkType: hard
-
 "@types/esrecurse@npm:^4.3.1":
   version: 4.3.1
   resolution: "@types/esrecurse@npm:4.3.1"
@@ -2815,13 +2806,6 @@ __metadata:
   version: 4.0.0
   resolution: "@types/slice-ansi@npm:4.0.0"
   checksum: 10/343086bc4e686349382b386a6fb49d632fb4dd08ecc08f1b9872815199efe8db7648731e56c1d10dc0f596fe77a8fce6136e0067136f8e0cefda6b29797aa4f1
-  languageName: node
-  linkType: hard
-
-"@types/trusted-types@npm:*":
-  version: 2.0.7
-  resolution: "@types/trusted-types@npm:2.0.7"
-  checksum: 10/8e4202766a65877efcf5d5a41b7dd458480b36195e580a3b1085ad21e948bc417d55d6f8af1fd2a7ad008015d4117d5fdfe432731157da3c68678487174e4ba3
   languageName: node
   linkType: hard
 
@@ -4108,17 +4092,6 @@ __metadata:
   version: 4.11.1
   resolution: "axe-core@npm:4.11.1"
   checksum: 10/bbc8e8959258a229b92fbaa73437050825579815051cac7b0fdbb6752946fea226e403bfeeef3d60d712477bdd4c01afdc8455f27c3d85e4251df88b032b6250
-  languageName: node
-  linkType: hard
-
-"axios@npm:1.13.6":
-  version: 1.13.6
-  resolution: "axios@npm:1.13.6"
-  dependencies:
-    follow-redirects: "npm:^1.15.11"
-    form-data: "npm:^4.0.5"
-    proxy-from-env: "npm:^1.1.0"
-  checksum: 10/a7ed83c2af3ef21d64609df0f85e76893a915a864c5934df69241001d0578082d6521a0c730bf37518ee458821b5695957cb10db9fc705f2a8996c8686ea7a89
   languageName: node
   linkType: hard
 
@@ -6997,7 +6970,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"follow-redirects@npm:^1.0.0, follow-redirects@npm:^1.15.11":
+"follow-redirects@npm:^1.0.0":
   version: 1.15.11
   resolution: "follow-redirects@npm:1.15.11"
   peerDependenciesMeta:
@@ -10508,13 +10481,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"proxy-from-env@npm:^1.1.0":
-  version: 1.1.0
-  resolution: "proxy-from-env@npm:1.1.0"
-  checksum: 10/f0bb4a87cfd18f77bc2fba23ae49c3b378fb35143af16cc478171c623eebe181678f09439707ad80081d340d1593cd54a33a0113f3ccb3f4bc9451488780ee23
-  languageName: node
-  linkType: hard
-
 "pseudomap@npm:^1.0.1":
   version: 1.0.2
   resolution: "pseudomap@npm:1.0.2"
@@ -10573,7 +10539,6 @@ __metadata:
     "@quasar/quasar-ui-qmarkdown": "npm:^2.0.5"
     "@quasar/vite-plugin": "npm:1.11.0"
     "@rushstack/eslint-patch": "npm:1.16.1"
-    "@types/dompurify": "npm:3.0.5"
     "@types/node": "npm:25.5.0"
     "@types/papaparse": "npm:^5.5.2"
     "@typescript-eslint/eslint-plugin": "npm:8.57.1"
@@ -10586,7 +10551,6 @@ __metadata:
     "@vue/test-utils": "npm:^2.4.6"
     autoprefixer: "npm:10.4.27"
     axe-core: "npm:^4.11.1"
-    axios: "npm:1.13.6"
     dotenv: "npm:17.3.1"
     electron: "npm:^41.0.3"
     electron-builder: "npm:26.8.2"
@@ -10616,7 +10580,6 @@ __metadata:
     typescript: "npm:5.9.3"
     vite: "npm:8"
     vite-plugin-checker: "npm:0.12.0"
-    vite-plugin-env-types: "npm:^0.1.4"
     vitest: "npm:4.1.0"
     vitest-axe: "npm:^0.1.0"
     vue: "npm:3.5.30"
@@ -13087,17 +13050,6 @@ __metadata:
     vue-tsc:
       optional: true
   checksum: 10/a631e9e7b069310ad37708573c9125f63d8f8fecb35756b2f707bbd7373c38f99f763fbd03b13658e1726fd5b5825da22328a9c7b532a8c87e20d460d3915719
-  languageName: node
-  linkType: hard
-
-"vite-plugin-env-types@npm:^0.1.4":
-  version: 0.1.4
-  resolution: "vite-plugin-env-types@npm:0.1.4"
-  dependencies:
-    fast-glob: "npm:^3.2.12"
-  peerDependencies:
-    vite: ">=2.0.0"
-  checksum: 10/dc67bf632b0a905c22f8b1463f1187383c9a580548eb3f5f386fc05a2104b1ce49830cfe61cffc89207a86a80d8ed979b6aab789d09b7376019d807cf529910b
   languageName: node
   linkType: hard
 

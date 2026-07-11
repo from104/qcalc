@@ -8,7 +8,12 @@ import { Calculator } from 'core/calculator/Calculator';
 import { match } from 'ts-pattern';
 import { Operator } from 'core/calculator/Calculator';
 import { Radix, convertRadix } from 'core/converters/RadixConverter';
-import { numberGrouping, formatDecimalPlaces, formatExpressionNumbers } from '../utils/NumberUtils';
+import {
+  numberGrouping,
+  formatDecimalPlaces,
+  formatExpressionNumbers,
+  formatNumberToLocale,
+} from '../utils/NumberUtils';
 import { useSettingsStore } from './settingsStore';
 import { useRadixStore } from './radixStore';
 import { useUIStore } from './uiStore';
@@ -92,12 +97,18 @@ export const useCalcStore = defineStore('calc', {
       if (!value) return '';
 
       const currentSettings = settingsStore.getCurrentFormatSettings;
-      const formattedValue = formatDecimalPlaces(
-        value,
-        settingsStore.getDecimalPlaces,
-        radixStore.radixEnumToNumber(uiStore.currentTab === 'radix' ? radix : Radix.Decimal),
-      );
+      const radixNumber = radixStore.radixEnumToNumber(uiStore.currentTab === 'radix' ? radix : Radix.Decimal);
+      const formattedValue = formatDecimalPlaces(value, settingsStore.getDecimalPlaces, radixNumber);
 
+      // 10진수: 로케일 표기(그룹 구분자·소수 구분자). 2/8/16진수는 기존 그룹핑 유지.
+      if (radixNumber === 10) {
+        return formatNumberToLocale(
+          formattedValue,
+          settingsStore.locale || 'en',
+          currentSettings.useGrouping,
+          currentSettings.groupingUnit,
+        );
+      }
       return currentSettings.useGrouping
         ? numberGrouping(formattedValue, currentSettings.groupingUnit)
         : formattedValue;

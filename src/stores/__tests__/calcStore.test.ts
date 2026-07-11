@@ -214,6 +214,54 @@ describe('calcStore', () => {
       const result = store.toFormattedNumber('12345678');
       expect(result).toBe('1234,5678');
     });
+
+    it('locale이 de일 때 로케일 표기(그룹 "." / 소수 ",")가 적용되어야 한다', () => {
+      const store = useCalcStore();
+      const settingsStore = useSettingsStore();
+      settingsStore.$patch({
+        locale: 'de',
+        formatSettings: {
+          calc: { useGrouping: true, groupingUnit: 3, decimalPlaces: -1 },
+          unit: { useGrouping: true, groupingUnit: 3, decimalPlaces: -1 },
+          currency: { useGrouping: true, groupingUnit: 3, decimalPlaces: -1 },
+          radix: { useGrouping: true, groupingUnit: 3, decimalPlaces: -1 },
+        },
+      });
+      const result = store.toFormattedNumber('1234567.89');
+      expect(result).toBe('1.234.567,89');
+    });
+
+    it('locale이 de이고 useGrouping이 false여도 소수 구분자는 로케일화되어야 한다', () => {
+      const store = useCalcStore();
+      const settingsStore = useSettingsStore();
+      settingsStore.$patch({
+        locale: 'de',
+        formatSettings: {
+          calc: { useGrouping: false, groupingUnit: 3, decimalPlaces: -1 },
+          unit: { useGrouping: false, groupingUnit: 3, decimalPlaces: -1 },
+          currency: { useGrouping: false, groupingUnit: 3, decimalPlaces: -1 },
+          radix: { useGrouping: false, groupingUnit: 3, decimalPlaces: -1 },
+        },
+      });
+      const result = store.toFormattedNumber('1234567.89');
+      expect(result).toBe('1234567,89');
+    });
+
+    it('locale이 hi일 때 lakh 그룹핑이 적용되어야 한다', () => {
+      const store = useCalcStore();
+      const settingsStore = useSettingsStore();
+      settingsStore.$patch({
+        locale: 'hi',
+        formatSettings: {
+          calc: { useGrouping: true, groupingUnit: 3, decimalPlaces: -1 },
+          unit: { useGrouping: true, groupingUnit: 3, decimalPlaces: -1 },
+          currency: { useGrouping: true, groupingUnit: 3, decimalPlaces: -1 },
+          radix: { useGrouping: true, groupingUnit: 3, decimalPlaces: -1 },
+        },
+      });
+      const result = store.toFormattedNumber('1234567');
+      expect(result).toBe('12,34,567');
+    });
   });
 
   describe('getLeftSideInRecord / getRightSideInRecord', () => {
