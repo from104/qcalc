@@ -77,10 +77,8 @@
     nextTick(() => inputRef.value?.focus());
   };
 
-  const formatFormulaError = (info: FormulaErrorInfo): string => {
-    const base = getErrorMessage(info.key);
-    return info.detail ? `${base} (${info.detail})` : base;
-  };
+  const formatFormulaError = (info: FormulaErrorInfo): string =>
+    getErrorMessage(info.key, info.detail ? { detail: info.detail } : undefined);
 
   const evaluateAndClose = () => {
     // Enter keydown으로 편집 모드 진입 직후 Enter keyup 무시
