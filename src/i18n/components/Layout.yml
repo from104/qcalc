@@ -55,6 +55,7 @@ ko:
     tabSelected: '{name} 탭 선택됨'
     tabUnselected: '{name} 탭 선택되지 않음'
     record: '기록 화면 열기'
+    settings: '설정 화면 열기'
     help: '도움말 보기'
   tooltip:
     help: '도움말'
@@ -123,6 +124,7 @@ en:
     tabSelected: '{name} tab selected'
     tabUnselected: '{name} tab unselected'
     record: 'Open record screen'
+    settings: 'Open settings screen'
     help: 'View help'
   tooltip:
     help: 'Help'
@@ -191,6 +193,7 @@ ja:
     tabSelected: '{name} タブ選択中'
     tabUnselected: '{name} タブ未選択'
     record: '履歴画面を開く'
+    settings: '設定画面を開く'
     help: 'ヘルプを見る'
   tooltip:
     help: 'ヘルプ'
@@ -259,6 +262,7 @@ zh:
     tabSelected: '{name} 选项卡已选中'
     tabUnselected: '{name} 选项卡未选中'
     record: '打开记录页面'
+    settings: '打开设置页面'
     help: '查看帮助'
   tooltip:
     help: '帮助'
@@ -327,6 +331,7 @@ hi:
     tabSelected: '{name} टैब चयनित'
     tabUnselected: '{name} टैब अचयनित'
     record: 'रिकॉर्ड स्क्रीन खोलें'
+    settings: 'सेटिंग्स स्क्रीन खोलें'
     help: 'सहायता देखें'
   tooltip:
     help: 'सहायता'
@@ -395,6 +400,7 @@ de:
     tabSelected: '{name} Tab ausgewählt'
     tabUnselected: '{name} Tab nicht ausgewählt'
     record: 'Verlauf öffnen'
+    settings: 'Einstellungen öffnen'
     help: 'Hilfe anzeigen'
   tooltip:
     help: 'Hilfe'
@@ -463,6 +469,7 @@ es:
     tabSelected: 'Pestaña {name} seleccionada'
     tabUnselected: 'Pestaña {name} no seleccionada'
     record: 'Abrir pantalla de historial'
+    settings: 'Abrir pantalla de ajustes'
     help: 'Ver ayuda'
   tooltip:
     help: 'Ayuda'
@@ -531,6 +538,7 @@ fr:
     tabSelected: 'Onglet {name} sélectionné'
     tabUnselected: 'Onglet {name} non sélectionné'
     record: "Ouvrir l'écran d'historique"
+    settings: "Ouvrir l'écran des paramètres"
     help: "Voir l'aide"
   tooltip:
     help: 'Aide'
@@ -599,6 +607,7 @@ pt:
     tabSelected: 'Aba {name} selecionada'
     tabUnselected: 'Aba {name} não selecionada'
     record: 'Abrir a tela de histórico'
+    settings: 'Abrir a tela de configurações'
     help: 'Ver ajuda'
   tooltip:
     help: 'Ajuda'
@@ -667,6 +676,7 @@ ru:
     tabSelected: 'Вкладка {name} выбрана'
     tabUnselected: 'Вкладка {name} не выбрана'
     record: 'Открыть экран истории'
+    settings: 'Открыть экран настроек'
     help: 'Посмотреть справку'
   tooltip:
     help: 'Помощь'
