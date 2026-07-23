@@ -36,6 +36,35 @@ fn quit_app(app: tauri::AppHandle) {
   app.exit(0);
 }
 
+/// 스크린리더에게 텍스트를 직접 낭독시킨다 (Linux 전용, 그 외 플랫폼은 no-op).
+///
+/// Orca(46 기준)는 앱 toolkit이 'gtk'인 앱에 웹 스크립트를 배정하지 않으므로 WebKitGTK
+/// 문서 안의 aria-live 리전을 낭독할 코드 경로가 없다(gtk 스크립트의 onChildrenAdded는
+/// 캐시 정리만 하는 no-op이고 LiveRegionManager도 없다). 반면 어떤 스크립트든
+/// `object:announcement` 이벤트는 무조건 낭독하므로, GTK 창의 접근성 객체에서 ATK
+/// `announcement` 신호(ATK 2.46+)를 쏘는 것이 신뢰할 수 있는 유일한 경로다.
+/// DOM의 aria-live 리전은 다른 플랫폼(Windows/WebView2 등)을 위해 그대로 유지한다.
+#[tauri::command]
+fn announce_a11y(window: tauri::WebviewWindow, text: String) {
+  #[cfg(target_os = "linux")]
+  {
+    let win = window.clone();
+    // GTK 객체 접근은 메인 스레드에서만 허용된다.
+    let _ = window.run_on_main_thread(move || {
+      use gtk::prelude::*;
+      if let Ok(gtk_window) = win.gtk_window() {
+        if let Some(accessible) = gtk_window.accessible() {
+          accessible.emit_by_name::<()>("announcement", &[&text]);
+        }
+      }
+    });
+  }
+  #[cfg(not(target_os = "linux"))]
+  {
+    let _ = (window, text);
+  }
+}
+
 /// GNOME/KDE Wayland 세션에서 Tauri의 `setTitle`이 CSD 헤더바를 repaint하지 않고
 /// (tauri-apps/tauri#13749), `setAlwaysOnTop`은 Wayland 프로토콜 미지원으로 no-op이다
 /// (tauri-apps/tauri#3117 — wontfix, Wayland 프로토콜 확장 대기).
@@ -76,7 +105,7 @@ pub fn run() {
   let mut builder = tauri::Builder::default()
     .plugin(tauri_plugin_window_state::Builder::default().build())
     .plugin(tauri_plugin_opener::init())
-    .invoke_handler(tauri::generate_handler![get_package_env, quit_app]);
+    .invoke_handler(tauri::generate_handler![get_package_env, quit_app, announce_a11y]);
 
   if cfg!(debug_assertions) {
     builder = builder.plugin(

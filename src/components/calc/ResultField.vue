@@ -523,12 +523,36 @@
    */
   const announcementSeq = ref(0);
 
+  /**
+   * Linux(Tauri)에서 계산 결과를 스크린리더로 직접 낭독시킨다.
+   *
+   * Orca는 앱 toolkit이 'gtk'인 앱(Tauri 포함)에 웹 스크립트를 배정하지 않아
+   * WebKitGTK 문서 안의 aria-live 리전을 처리하는 코드 경로가 없다. 대신 모든
+   * 스크립트가 처리하는 `object:announcement` 이벤트를 Rust 측(announce_a11y
+   * 커맨드)에서 ATK 신호로 직접 발화시킨다. DOM 라이브 리전은 다른 플랫폼용으로
+   * 유지된다.
+   */
+  const announceViaTauri = async () => {
+    if (!window.globalVars?.isTauri) return;
+    const text = announcedResult.value;
+    if (!text) return;
+    try {
+      const { invoke } = await import('@tauri-apps/api/core');
+      await invoke('announce_a11y', { text });
+    } catch (err) {
+      console.warn('[ResultField] announce_a11y failed', err);
+    }
+  };
+
   watch(
     () => [isCalculationCompleted.value, displayedResult.value] as const,
     ([completed]) => {
       // 같은 값을 다시 계산해도(예: 2+2를 연속 두 번) 새 낭독이 필요하므로
       // 값 변화가 아니라 계산 확정 시점마다 증가시킨다.
-      if (completed) announcementSeq.value += 1;
+      if (completed) {
+        announcementSeq.value += 1;
+        void announceViaTauri();
+      }
     },
   );
 
@@ -1048,12 +1072,13 @@
    * 화면에서만 숨기고 접근성 트리에는 남기는 유틸리티.
    *
    * `clip: rect(0,0,0,0)`으로 잘라내는 고전 패턴은 WebKitGTK에서 자식 요소가
-   * 접근성 노드로 생성되지 않아 라이브 리전 갱신 이벤트가 발화되지 않는다.
-   * 화면 밖으로 밀어내는 방식은 요소가 정상 레이아웃을 거치므로 그 문제가 없다.
+   * 접근성 노드로 생성되지 않아 라이브 리전 갱신 이벤트가 발화되지 않고,
+   * `left: -10000px` 오프스크린 패턴은 요소가 AT-SPI에서 'showing' 상태를
+   * 잃어 스크린리더가 이벤트를 무시한다. 뷰포트 안 제자리에서 1×1px로
+   * 줄이고 overflow로 잘라내는 방식만 두 조건을 모두 통과한다.
    */
   .sr-only {
     position: absolute;
-    left: -10000px;
     width: 1px;
     height: 1px;
     padding: 0;
