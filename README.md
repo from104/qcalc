@@ -185,6 +185,8 @@ QCalc packs **5 specialized calculators (Standard, Unit, Currency, Radix, Formul
 | **Linux**   | `.deb` / `.rpm` / AppImage from [Releases](https://github.com/from104/qcalc/releases) (AppImage auto-updates), Snap (`snap install --beta qcalc`), or Flatpak |
 | **Android** | APK from [Releases](https://github.com/from104/qcalc/releases)                                                                                                |
 
+> **Linux package compatibility**: the `.deb` supports Ubuntu 22.04+ / Debian 12+ (and derivatives such as Mint 21+, Pop!\_OS 22.04+); the `.rpm` supports Fedora 37+ and openSUSE Leap 15.6+/Tumbleweed. RHEL/Alma/Rocky 9 and older Debian/Ubuntu are not supported by these packages (glibc/WebKitGTK too old) — use the AppImage (any distro with glibc 2.35+), Flatpak, or Snap instead; those bundle their own runtime.
+
 > macOS / iOS builds are not available at this time.
 
 > **Upgrading from 0.12.x or older (Electron)?** The old app cannot auto-update across the engine switch — download and install 0.13.0 manually, then bring your data over: in the old app export your history (CSV) and settings (JSON), and import them from the new app's first-run screen (or Settings). You can uninstall the old app afterwards.
