@@ -3,14 +3,28 @@
 ## 계획
 
 - [ ] 접근성 개선
-  - [ ] 결과 음성 출력
   - [ ] 계산기 음성 조작
+  - [ ] 결과 필드 hover(마우스 리뷰) 낭독 ([#108](https://github.com/from104/qcalc/issues/108))
+- [ ] WebKitGTK 클립보드 `readText` 수정 ([#109](https://github.com/from104/qcalc/issues/109))
+- [ ] CSP 강화 ([#110](https://github.com/from104/qcalc/issues/110))
 - [ ] 수식 자동 완성
 - [ ] 공학용 계산기
 - [ ] 설정 클라우드 동기화
 - [ ] iOS 앱 (Capacitor)
 - [ ] 스킨 / 커스텀 테마 기능
 - [ ] 수익화 (광고)
+
+## 완료 (v0.13.0)
+
+- [x] 데스크톱 프로덕션 Electron → Tauri 2 전환 (deb/rpm/AppImage/Flatpak/Snap/NSIS, CI 빌드)
+- [x] Tauri 자동 업데이트 파이프라인 (서명 아티팩트 + promote 워크플로)
+- [x] 계산 결과 스크린리더 낭독 (Linux는 AT-SPI announcement)
+- [x] WCAG AA 테마 대비 + 회귀 테스트
+- [x] 키보드 접근성 (오버플로 메뉴, 수식 필드, 메모리 토글)
+- [x] 기록 삭제 실행취소
+- [x] 기록 마이그레이션 + 첫 실행 온보딩
+- [x] 신규 2개 언어 (포르투갈어, 러시아어) — 총 10개
+- [x] CI 커버리지 게이트
 
 ## 완료 (v0.12.0)
 

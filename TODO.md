@@ -3,14 +3,28 @@
 ## Planned
 
 - [ ] Accessibility improvements
-  - [ ] Voice output of results
   - [ ] Voice control of calculator
+  - [ ] Hover (mouse review) reading of the result field ([#108](https://github.com/from104/qcalc/issues/108))
+- [ ] Clipboard `readText` fix on WebKitGTK ([#109](https://github.com/from104/qcalc/issues/109))
+- [ ] CSP hardening ([#110](https://github.com/from104/qcalc/issues/110))
 - [ ] Formula auto-completion
 - [ ] Engineering calculator
 - [ ] Settings sync to cloud
 - [ ] iOS app (Capacitor)
 - [ ] Skin / custom theme function
 - [ ] Monetization (ads)
+
+## Done (v0.13.0)
+
+- [x] Desktop production switched from Electron to Tauri 2 (deb/rpm/AppImage/Flatpak/Snap/NSIS via CI)
+- [x] Tauri auto-update pipeline (signed artifacts + promote workflow)
+- [x] Screen reader announcement of results (AT-SPI announcement on Linux)
+- [x] WCAG AA theme contrast + regression test
+- [x] Keyboard accessibility (overflow menu, formula field, memory toggle)
+- [x] Undo for record deletion
+- [x] History migration + first-run onboarding
+- [x] 2 new languages (Português, Русский) — 10 total
+- [x] Coverage gate in CI
 
 ## Done (v0.12.0)
 

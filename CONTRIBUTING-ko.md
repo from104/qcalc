@@ -17,7 +17,7 @@ QCalc에 관심을 가져주셔서 감사합니다!
 | `src/content/tips/{lang}/*.md`          | 팁 문서                              |
 | `*.vue` 파일의 `<i18n>` 블록            | 컴포넌트 로컬 메시지 (블록당 다국어) |
 
-> `{lang}` = 언어 코드: `ko`, `en`, `ja`, `zh`, `hi`, `de`, `es`, `fr`
+> `{lang}` = 언어 코드: `ko`, `en`, `ja`, `zh`, `hi`, `de`, `es`, `fr`, `pt`, `ru`
 
 ### 기존 번역 수정
 
@@ -39,14 +39,16 @@ QCalc에 관심을 가져주셔서 감사합니다!
 4. `.vue` 파일의 각 `<i18n>` 블록에 언어 섹션 추가
 5. `src/i18n/components/` 내 각 `.yml` 파일에 언어 섹션 추가
 6. `src/content/pages/AboutPage-{lang}.md` 생성
-7. `src/content/tips/{lang}/` 디렉토리 생성 및 팁 파일 작성
+7. `src/content/pages/HelpPage-{lang}.md` 생성
+8. `src/content/tips/{lang}/` 디렉토리 생성 및 팁 파일 작성
+9. 모든 로더에 새 언어 연결: `src/pages/HelpPage.vue`, `src/pages/AboutPage.vue`, `src/components/dialogs/ShowTips.vue`, `src/components/dialogs/VersionChangelogDialog.vue` (import 누락 시 조용히 영어로 폴백됨)
 
 ## 접근성
 
 QCalc은 모든 사용자가 접근할 수 있도록 노력하고 있습니다. 기여 시 다음 사항을 지켜주세요:
 
 - 모든 상호작용 요소(버튼, 토글, 셀렉트)에 `aria-label` 추가
-- 동적으로 변경되는 콘텐츠(계산 결과, 기록 목록)에 `aria-live="polite"` 사용
+- 동적으로 변경되는 콘텐츠(기록 목록, 상태 메시지)에 `aria-live="polite"` 사용. **예외 — 데스크톱 Linux의 계산 결과**: Orca는 Tauri 앱 내부의 웹 라이브 리전을 못 보므로 결과 낭독은 반드시 Rust `announce_a11y` 커맨드(AT-SPI announcement 이벤트)를 거쳐야 함. DOM 라이브 리전은 크로스 플랫폼 폴백으로 유지
 - 모든 다이얼로그에 `role="dialog"` + `aria-label` 추가
 - 확인 다이얼로그에는 `role="alertdialog"` 사용
 - 키보드 내비게이션 유지 — 기존 단축키 바인딩을 깨뜨리지 않기
