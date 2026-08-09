@@ -47,16 +47,21 @@
   <screenshots>
     <screenshot type="default">
       <caption>QCalc standard calculator view</caption>
-      <image>https://github.com/from104/qcalc/raw/main/assets/screenshot_v0.11.5.png</image>
+      <image>https://github.com/from104/qcalc/raw/main/assets/screenshot_v0.12.0.png</image>
     </screenshot>
   </screenshots>
 
   <content_rating type="oars-1.1" />
 
   <releases>
-    <release version="0.13.0" date="2026-07-12">
+    <release version="0.13.0" date="2026-08-09">
       <description>
-        <p>Desktop production build switched from Electron to Tauri, 2 additional languages (Portuguese, Russian), and a smaller, faster app.</p>
+        <p>Desktop production build switched from Electron to Tauri 2 with six package formats built in CI, activated auto-update, screen reader announcement of results on Linux, WCAG AA contrast, improved keyboard accessibility, and undo for record deletion.</p>
+      </description>
+    </release>
+    <release version="0.12.1" date="2026-04-11">
+      <description>
+        <p>2 additional languages (Portuguese, Russian) — 10 in total.</p>
       </description>
     </release>
     <release version="0.12.0" date="2026-03-22">
@@ -77,6 +82,6 @@
   </supports>
 
   <requires>
-    <display_length compare="ge">352</display_length>
+    <display_length compare="ge">480</display_length>
   </requires>
 </component>

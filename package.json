@@ -1,7 +1,7 @@
 {
   "name": "qcalc",
   "version": "0.13.0",
-  "description": "io.github.from104.qcalc",
+  "description": "A multi-purpose calculator for productivity and accessibility",
   "productName": "Q Calc",
   "desktopName": "io.github.from104.qcalc.desktop",
   "repository": {
@@ -18,7 +18,7 @@
     "url": "https://github.com/from104/qcalc/issues"
   },
   "homepage": "https://github.com/from104/qcalc#readme",
-  "keywords": ["calculator", "quasar", "vue", "electron", "typescript"],
+  "keywords": ["calculator", "quasar", "vue", "tauri", "electron", "typescript"],
   "type": "module",
   "scripts": {
     "postinstall": "quasar prepare",

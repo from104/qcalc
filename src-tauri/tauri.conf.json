@@ -31,7 +31,13 @@
     "active": true,
     "targets": "all",
     "icon": ["icons/32x32.png", "icons/128x128.png", "icons/128x128@2x.png", "icons/icon.icns", "icons/icon.ico"],
-    "createUpdaterArtifacts": true
+    "createUpdaterArtifacts": true,
+    "publisher": "Kihyun Seo",
+    "license": "MIT",
+    "homepage": "https://github.com/from104/qcalc",
+    "category": "Utility",
+    "shortDescription": "A multi-purpose calculator for productivity and accessibility",
+    "longDescription": "QCalc packs five specialized calculators (Standard, Unit, Currency, Radix, Formula) and 10 languages into one keyboard-friendly, screen-reader-accessible app."
   },
   "plugins": {
     "updater": {
