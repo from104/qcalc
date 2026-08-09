@@ -4,6 +4,51 @@ All notable changes to this project are recorded in this file.
 
 The format is based on [Keep a Changelog] and this project follows [Semantic Versioning].
 
+## [Unreleased]
+
+## [0.13.0] 2026-08-09
+
+### Changed
+
+- **Desktop production switched from Electron to Tauri 2**: Linux and Windows desktop builds now ship as Tauri 2 apps (WebKitGTK on Linux, WebView2 on Windows) instead of Electron. The existing `src/` codebase runs unmodified — `src/boot/tauri-shim.ts` bridges the `window.electron` / `window.electronUpdater` interfaces to Tauri APIs at runtime, and `window.globalVars` gained `isTauri` / `isFlatpak` flags (sandbox type detected via the Rust `get_package_env` command). GitHub CI builds all six desktop packages on `v*` tags: `.deb`, `.rpm`, AppImage, Flatpak and Snap for Linux, NSIS installer for Windows. The Electron target stays in the tree during the transition but is no longer the shipped desktop build; Android (Capacitor) is unchanged.
+- **Auto-update fully activated on Tauri**: updater artifacts are signed in CI and uploaded to a draft GitHub release, then promoted to the fixed rolling release (`tauri-updater/latest.json`) by the `tauri-updater-promote` workflow. The in-app update UI now works on Tauri as it did on Electron — real download percentages, quit-and-install wired to the Rust `quit_app` command, and release links opened via `tauri-plugin-opener`. Snap/Flatpak builds keep their store update mechanisms (updater excluded there).
+- **History migration + onboarding**: calculation history can be exported from the Electron build and imported during Tauri first-run onboarding (settings schema version 2).
+- **Native Wayland by default**: forcing `GDK_BACKEND=x11` (the previous workaround for [tauri#13749](https://github.com/tauri-apps/tauri/issues/13749) / [tauri#3117](https://github.com/tauri-apps/tauri/issues/3117)) was found to cause an intermittent WebKitGTK crash on real Wayland hardware and is now opt-in via `QCALC_FORCE_XWAYLAND=1`.
+- **Bigger default window**: default and minimum desktop window size grew from 352×604 to 480×756.
+
+### Added
+
+- **Screen reader announcement of results on Linux**: Orca cannot present web `aria-live` regions inside a Tauri app (it assigns its non-web script to GTK-toolkit apps, which has no live region support), so on calculation completion the app now emits an AT-SPI `announcement` event from the Rust side (`announce_a11y` command) — a path every Orca script reads unconditionally. The DOM live region is kept for other platforms and was reworked so it actually emits change events (no `clip:` hiding, on-screen 1×1px `.sr-only`, keyed block child recreated per calculation).
+- **Formula error announcements**: formula errors are classified into i18n categories and announced via `aria-live`.
+- **Undo for record deletion**: swipe/menu deletion of a history record shows an undo snackbar.
+- **Keyboard accessibility**: the overflow tab menu, formula field and memory toggle are now fully keyboard-operable.
+- **WCAG AA contrast**: theme colors raised to WCAG AA, guarded by a contrast regression test.
+- **Coverage gate**: vitest coverage thresholds are enforced in CI.
+
+### Fixed
+
+- **Accessibility**: restored screen-reader announcement of the calculation result; removed non-standard `role="text"` and a misapplied `role="textbox"` on the read-only result field; removed a nested interactive control in the formula field; `<html lang>` is now set and synced with the active locale; added missing `ariaLabel` translations (settings button, record toolbar search/export/import) in all 10 languages.
+- **Locale-aware numbers**: number display and paste parsing use `Intl.NumberFormat`; live input shows the locale's decimal separator.
+- **Formula calculator**: trig functions use degrees to match the basic calculator; keypad `=` errors go through the same error classifier; the `{detail}` placeholder in error messages is substituted.
+- **History**: restoring a record re-enforces the MAX_RECORDS bound.
+- **Stores**: cross-store dependencies in `calcStore` are lazily instantiated, fixing a "no active Pinia" crash at Tauri startup (audit CODE-01).
+- **Tauri/Linux**: guard against a zero/invalid monitor `scale_factor` during setup (window collapsed to 0×0 under native Wayland); WebKitGTK font-weight rendering workaround ([tauri#14286](https://github.com/tauri-apps/tauri/issues/14286)); packaged app icons fixed (placeholders replaced, icon scaled to full canvas); Flatpak manifest rewritten for Tauri; Snap packaging fixed (deb source path, WebKitGTK sandbox).
+- **i18n**: `unitDesc` namespace unified with runtime category ids; two Korean label typos fixed.
+
+### Known issues
+
+- Linux screen reader output is verified to the AT-SPI event level; audible end-to-end verification, hover (mouse review) reading, the WebKitGTK clipboard `readText` failure, and CSP hardening (`app.security.csp` is currently `null`) are tracked as follow-ups.
+
+## [0.12.1] 2026-04-11
+
+### Added
+
+- **2 New Languages (10 total)**: Portuguese (pt) and Russian (ru) join the existing 8 (Korean, English, Japanese, Chinese, Hindi, German, Spanish, French). Every screen is translated — menus, settings, unit names, currency names, help, about, tips, and error messages.
+
+### Fixed
+
+- **pt/ru markdown wiring**: the Help, About and Tips pages fell back to English because the pt/ru markdown modules were not imported and mapped.
+
 ## [0.12.0] 2026-03-22
 
 ### Added

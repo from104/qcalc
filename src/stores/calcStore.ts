@@ -18,10 +18,6 @@ import { useSettingsStore } from './settingsStore';
 import { useRadixStore } from './radixStore';
 import { useUIStore } from './uiStore';
 
-const settingsStore = useSettingsStore();
-const radixStore = useRadixStore();
-const uiStore = useUIStore();
-
 interface CalcState {
   calc: Calculator;
   isMemoryVisible: boolean;
@@ -96,6 +92,10 @@ export const useCalcStore = defineStore('calc', {
     toFormattedNumber(value: string, radix: Radix = Radix.Decimal): string {
       if (!value) return '';
 
+      const settingsStore = useSettingsStore();
+      const radixStore = useRadixStore();
+      const uiStore = useUIStore();
+
       const currentSettings = settingsStore.getCurrentFormatSettings;
       const radixNumber = radixStore.radixEnumToNumber(uiStore.currentTab === 'radix' ? radix : Radix.Decimal);
       const formattedValue = formatDecimalPlaces(value, settingsStore.getDecimalPlaces, radixNumber);
@@ -116,6 +116,10 @@ export const useCalcStore = defineStore('calc', {
 
     // 계산 기록 관련
     getLeftSideInRecord(result: CalculationResult, useLineBreak = false, expression?: string): string {
+      const settingsStore = useSettingsStore();
+      const radixStore = useRadixStore();
+      const uiStore = useUIStore();
+
       // formula 수식: 진수 변환 + 쉼표 포맷팅 적용
       if (expression) {
         const currentSettings = settingsStore.getCurrentFormatSettings;
@@ -214,6 +218,9 @@ export const useCalcStore = defineStore('calc', {
     },
 
     getRightSideInRecord(result: CalculationResult): string {
+      const radixStore = useRadixStore();
+      const uiStore = useUIStore();
+
       const radix = uiStore.currentTab === 'radix' ? radixStore.sourceRadix : Radix.Decimal;
       const radixPrefix =
         uiStore.currentTab === 'radix' && radixStore.showRadix && radixStore.radixType === 'prefix'

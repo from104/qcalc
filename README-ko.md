@@ -10,7 +10,7 @@
 
 QCalc은 **5가지 전문 계산기(표준, 단위, 통화, 진법, 수식)**와 **8개 언어(한국어, English, 日本語, 中文, हिन्दी, Deutsch, Español, Français)** 지원을 하나의 깔끔하고 키보드 친화적인 앱에 담았습니다. 일상적인 계산, 단위 변환, 환율 확인, 16진수/2진수 작업, 수학 수식 계산까지 — 탭 하나로 전환할 수 있습니다.
 
-**기술 스택** Vue 3 + Quasar + TypeScript + Electron + Capacitor
+**기술 스택** Vue 3 + Quasar + TypeScript + Tauri 2(데스크톱) + Capacitor(Android) — 기존 Electron 타겟은 전환기 동안 유지
 **지원 플랫폼** Windows, Linux (AppImage / Snap / Flatpak), Android
 
 ---

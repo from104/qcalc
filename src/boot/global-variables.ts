@@ -11,7 +11,7 @@ import { Platform } from 'quasar';
 import { version } from '../../package.json';
 
 // 불변 속성 정의 함수
-import { defineImmutableProperty } from 'src/utils/GlobalHelpers';
+import { defineImmutableProperty, shouldApplyTauriLinuxFontFix } from 'src/utils/GlobalHelpers';
 
 // 불변 속성 정의 함수
 // const defineImmutableProperty = <T>(obj: object, prop: string, value: T) => {
@@ -23,7 +23,25 @@ import { defineImmutableProperty } from 'src/utils/GlobalHelpers';
 //   });
 // };
 
-export default defineBoot(() => {
+export default defineBoot(async () => {
+  // Tauri 환경 여부: Tauri가 주입하는 내부 핸들 존재 여부로 판정한다.
+  const isTauri = typeof window !== 'undefined' && '__TAURI_INTERNALS__' in window;
+
+  // Tauri 환경에서는 Rust 측 get_package_env 커맨드로 샌드박스 타입을 조회한다.
+  type TauriPackageEnv = 'snap' | 'flatpak' | 'appimage' | 'native';
+  let tauriIsSnap = false;
+  let tauriIsFlatpak = false;
+  if (isTauri) {
+    try {
+      const { invoke } = await import('@tauri-apps/api/core');
+      const env = await invoke<TauriPackageEnv>('get_package_env');
+      tauriIsSnap = env === 'snap';
+      tauriIsFlatpak = env === 'flatpak';
+    } catch (err) {
+      console.warn('[global-variables] get_package_env failed', err);
+    }
+  }
+
   // globalVars 객체 생성
   const globalVars = {
     // 개발 모드 여부
@@ -39,6 +57,7 @@ export default defineBoot(() => {
     isIOS: Platform.is.ios,
     isElectron: Platform.is.electron,
     isCapacitor: Platform.is.capacitor,
+    isTauri,
 
     // 디바이스 타입 정보
     isTablet: false,
@@ -51,8 +70,9 @@ export default defineBoot(() => {
     navigationBarHeight: 0,
     isGestureNavigation: false,
 
-    // 스냅 여부
-    isSnap: window.electron?.isSnap ?? false,
+    // 샌드박스/패키징 여부 (Electron은 preload, Tauri는 Rust 커맨드로 감지)
+    isSnap: (window.electron?.isSnap ?? false) || tauriIsSnap,
+    isFlatpak: tauriIsFlatpak,
 
     // 버전 정보
     version: version,
@@ -70,6 +90,11 @@ export default defineBoot(() => {
     globalVars.apiLevel = window.androidInterface?.getApiLevel() ?? 0;
     globalVars.navigationBarHeight = window.androidInterface?.getNavigationBarHeight() ?? 0;
     globalVars.isGestureNavigation = window.androidInterface?.isGestureNavigation() ?? false;
+  }
+
+  // WebKitGTK(Linux) font-weight +100 버그 워크어라운드용 body 클래스 (tauri#14286)
+  if (shouldApplyTauriLinuxFontFix(isTauri, Platform.is.linux)) {
+    document.body.classList.add('body--tauri-linux');
   }
 
   // window.globalVars로 전역 변수 설정

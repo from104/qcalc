@@ -18,6 +18,7 @@ interface UIState {
   isSnapFirstRun: boolean;
   snapLastSeenVersion: string;
   lastSeenChangelogVersion: string;
+  migrationOnboardingSeen: boolean;
 }
 
 export const useUIStore = defineStore('ui', {
@@ -34,6 +35,7 @@ export const useUIStore = defineStore('ui', {
     isSnapFirstRun: false,
     snapLastSeenVersion: '',
     lastSeenChangelogVersion: '',
+    migrationOnboardingSeen: false,
   }),
 
   actions: {
@@ -71,6 +73,11 @@ export const useUIStore = defineStore('ui', {
     // Changelog 버전 관리
     updateLastSeenChangelogVersion(version: string): void {
       this.lastSeenChangelogVersion = version;
+    },
+
+    // 마이그레이션 온보딩(Tauri 첫 실행 데이터 가져오기 안내) 확인 처리
+    markMigrationOnboardingSeen(): void {
+      this.migrationOnboardingSeen = true;
     },
   },
 

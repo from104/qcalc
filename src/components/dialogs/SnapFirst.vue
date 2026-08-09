@@ -17,6 +17,7 @@
   import { useI18n } from 'vue-i18n';
   import { useUIStore } from 'stores/uiStore';
   import { useDialogStyle } from 'src/composables/useDialogStyle';
+  import { openExternalLink } from 'src/utils/ExternalLinkUtils';
 
   const $g = window.globalVars;
   const uiStore = useUIStore();
@@ -41,7 +42,7 @@
    * GitHub 이슈 페이지 열기
    */
   const openGitHubIssue = () => {
-    window.open('https://github.com/electron-userland/electron-builder/issues/5217', '_blank');
+    openExternalLink('https://github.com/electron-userland/electron-builder/issues/5217', $g.isTauri);
   };
 </script>
 

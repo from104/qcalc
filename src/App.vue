@@ -16,6 +16,7 @@
   import AutoUpdate from 'components/dialogs/AutoUpdate.vue';
   import SnapFirst from 'components/dialogs/SnapFirst.vue';
   import VersionChangelogDialog from 'components/dialogs/VersionChangelogDialog.vue';
+  import MigrationOnboarding from 'components/dialogs/MigrationOnboarding.vue';
 
   import { useKeyBinding } from './composables/useKeyBinding';
   import { useHtmlLangSync } from './composables/useHtmlLangSync';
@@ -52,7 +53,7 @@
 
   // ── 단축키 액션 ──
   const toggleAlwaysOnTop = () => {
-    if (!$g.isElectron) return;
+    if (!$g.isElectron && !$g.isTauri) return;
     settingsStore.toggleAlwaysOnTop();
     showMessage(settingsStore.alwaysOnTop ? t('alwaysOnTopOn') : t('alwaysOnTopOff'));
   };
@@ -64,7 +65,7 @@
   };
 
   const quitApp = () => {
-    if ($g.isElectron) window.electron.quitApp();
+    if ($g.isElectron || $g.isTauri) window.electron.quitApp();
   };
 
   // ── 전역 키 바인딩 ──
@@ -182,6 +183,7 @@
   <AutoUpdate />
   <SnapFirst />
   <VersionChangelogDialog />
+  <MigrationOnboarding />
 </template>
 
 <style scoped lang="scss">

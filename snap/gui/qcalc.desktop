@@ -1,0 +1,12 @@
+[Desktop Entry]
+Name=QCalc
+GenericName=Calculator
+Comment=A multi-purpose calculator for productivity and accessibility
+Exec=qcalc %U
+Icon=${SNAP}/meta/gui/qcalc.png
+Terminal=false
+Type=Application
+Categories=Utility;Calculator;
+Keywords=calculator;unit;currency;converter;programmer;math;
+StartupWMClass=qcalc
+MimeType=

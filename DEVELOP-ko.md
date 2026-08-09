@@ -6,7 +6,8 @@
 
 - **Vue 3** + **TypeScript** (strict 모드)
 - **Quasar 2** — UI 프레임워크
-- **Electron 40** — 데스크톱 앱
+- **Tauri 2** — 데스크톱 앱 (0.13.0부터 프로덕션)
+- **Electron 40** — 레거시 데스크톱 타겟, Tauri 전환기 동안 유지
 - **Capacitor** — 모바일 앱 (Android)
 - **Vite 7** — 빌드 도구
 
@@ -70,6 +71,17 @@ MY_JKS_KEY_PASSWORD=key_password
 ```bash
 quasar dev -m electron
 ```
+
+### 데스크톱 (Tauri, 프로덕션)
+
+사전 준비: Rust 1.88+ (`rustup update stable`), Linux 빌드 의존성 (`webkit2gtk-4.1`, `rsvg2`).
+
+```bash
+yarn dev:tauri     # 개발 모드 (devtools 자동 오픈)
+yarn build:tauri   # 프로덕션 번들 (.deb/.AppImage)
+```
+
+**Wayland 사용자 주의사항**: GNOME/KDE Wayland 세션에서 `setTitle` CSD 헤더바 repaint와 `setAlwaysOnTop`이 작동하지 않는 업스트림 버그([tauri#13749](https://github.com/tauri-apps/tauri/issues/13749), [tauri#3117](https://github.com/tauri-apps/tauri/issues/3117))가 있습니다. `src-tauri/src/lib.rs`의 `force_xwayland_if_needed()`로 `GDK_BACKEND=x11`을 강제하면 두 문제가 해결되지만, 실기기 Wayland에서 간헐적 WebKitGTK 크래시를 유발하는 것이 확인돼 기본값은 강제하지 않음(네이티브 Wayland)입니다. 두 기능이 필요하고 크래시 위험을 감수할 경우 `QCALC_FORCE_XWAYLAND=1 yarn dev:tauri`로 옵트인하세요.
 
 ### 안드로이드 (Capacitor)
 

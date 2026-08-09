@@ -67,6 +67,10 @@ mainToHead.txt
 # Settings files
 qcalc-settings*.json
 
+# Tauri build artifacts
+src-tauri/target
+src-tauri/gen
+
 # Flatpak build artifacts
 flatpak/.flatpak-builder
 flatpak/repo

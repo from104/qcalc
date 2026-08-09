@@ -1,4 +1,5 @@
 // app global css in SCSS form
+@import 'tauri-linux-fontfix.scss';
 
 .noselect {
   user-select: none;

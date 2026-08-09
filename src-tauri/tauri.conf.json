@@ -1,0 +1,42 @@
+{
+  "$schema": "../node_modules/@tauri-apps/cli/config.schema.json",
+  "productName": "Q Calc",
+  "version": "../package.json",
+  "identifier": "io.github.from104.qcalc",
+  "build": {
+    "frontendDist": "../dist/spa",
+    "devUrl": "http://localhost:9000",
+    "beforeDevCommand": "yarn quasar dev",
+    "beforeBuildCommand": "yarn quasar build"
+  },
+  "app": {
+    "windows": [
+      {
+        "label": "main",
+        "title": "Q Calc",
+        "width": 480,
+        "height": 756,
+        "minWidth": 480,
+        "minHeight": 756,
+        "resizable": true,
+        "maximizable": false,
+        "fullscreen": false
+      }
+    ],
+    "security": {
+      "csp": null
+    }
+  },
+  "bundle": {
+    "active": true,
+    "targets": "all",
+    "icon": ["icons/32x32.png", "icons/128x128.png", "icons/128x128@2x.png", "icons/icon.icns", "icons/icon.ico"],
+    "createUpdaterArtifacts": true
+  },
+  "plugins": {
+    "updater": {
+      "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IDk4MDVFQkYyODdCQzBDRDkKUldUWkRMeUg4dXNGbUhISFRyeDlYUUpQMGsxdUpHblRrWCtHSTZYVGpQdEpibGt3L2hIWndyQlMK",
+      "endpoints": ["https://github.com/from104/qcalc/releases/download/tauri-updater/latest.json"]
+    }
+  }
+}

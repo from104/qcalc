@@ -10,7 +10,7 @@
 
 QCalc packs **5 specialized calculators (Standard, Unit, Currency, Radix, Formula)** and **8 languages (한국어, English, 日本語, 中文, हिन्दी, Deutsch, Español, Français)** into one clean, keyboard-friendly app. Whether you're crunching everyday numbers, converting units, checking exchange rates, working with hex/binary, or evaluating math formulas — it's all one tab away.
 
-**Built with** Vue 3 + Quasar + TypeScript + Electron + Capacitor
+**Built with** Vue 3 + Quasar + TypeScript + Tauri 2 (desktop) + Capacitor (Android) — the legacy Electron target remains during the transition
 **Runs on** Windows, Linux (AppImage / Snap / Flatpak), Android
 
 ---

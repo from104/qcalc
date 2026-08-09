@@ -514,6 +514,48 @@
       : '',
   );
 
+  /**
+   * 라이브 리전 자식 요소를 강제로 교체하기 위한 시퀀스 번호.
+   *
+   * 이 값을 키로 물리면 계산이 확정될 때마다 자식 노드가 제거·재생성되어
+   * `object:children-changed`가 발생한다. 같은 값을 연속으로 계산해도
+   * (예: 2+2를 두 번) 낭독이 다시 트리거되도록 보장하는 것이 목적이다.
+   */
+  const announcementSeq = ref(0);
+
+  /**
+   * Linux(Tauri)에서 계산 결과를 스크린리더로 직접 낭독시킨다.
+   *
+   * Orca는 앱 toolkit이 'gtk'인 앱(Tauri 포함)에 웹 스크립트를 배정하지 않아
+   * WebKitGTK 문서 안의 aria-live 리전을 처리하는 코드 경로가 없다. 대신 모든
+   * 스크립트가 처리하는 `object:announcement` 이벤트를 Rust 측(announce_a11y
+   * 커맨드)에서 ATK 신호로 직접 발화시킨다. DOM 라이브 리전은 다른 플랫폼용으로
+   * 유지된다.
+   */
+  const announceViaTauri = async () => {
+    if (!window.globalVars?.isTauri) return;
+    const text = announcedResult.value;
+    if (!text) return;
+    try {
+      const { invoke } = await import('@tauri-apps/api/core');
+      await invoke('announce_a11y', { text });
+    } catch (err) {
+      console.warn('[ResultField] announce_a11y failed', err);
+    }
+  };
+
+  watch(
+    () => [isCalculationCompleted.value, displayedResult.value] as const,
+    ([completed]) => {
+      // 같은 값을 다시 계산해도(예: 2+2를 연속 두 번) 새 낭독이 필요하므로
+      // 값 변화가 아니라 계산 확정 시점마다 증가시킨다.
+      if (completed) {
+        announcementSeq.value += 1;
+        void announceViaTauri();
+      }
+    },
+  );
+
   // 결과 색상 관련 computed 속성 (themesStore 사용)
   const panelNormalTextColor = computed(() => themesStore.getPanelColor('text', 'normal'));
   const panelNormalTextColorAccent = computed(() => themesStore.getPanelColor('text', 'normal', true));
@@ -1015,7 +1057,7 @@
       </q-menu>
     </q-field>
     <div v-if="isMainField" class="sr-only" role="status" aria-live="polite" aria-atomic="true">
-      {{ announcedResult }}
+      <div v-if="announcedResult" :key="announcementSeq">{{ announcedResult }}</div>
     </div>
   </q-card-section>
 </template>
@@ -1026,14 +1068,21 @@
     src: url('/digital-7.monoitalic.ttf') format('truetype');
   }
 
+  /**
+   * 화면에서만 숨기고 접근성 트리에는 남기는 유틸리티.
+   *
+   * `clip: rect(0,0,0,0)`으로 잘라내는 고전 패턴은 WebKitGTK에서 자식 요소가
+   * 접근성 노드로 생성되지 않아 라이브 리전 갱신 이벤트가 발화되지 않고,
+   * `left: -10000px` 오프스크린 패턴은 요소가 AT-SPI에서 'showing' 상태를
+   * 잃어 스크린리더가 이벤트를 무시한다. 뷰포트 안 제자리에서 1×1px로
+   * 줄이고 overflow로 잘라내는 방식만 두 조건을 모두 통과한다.
+   */
   .sr-only {
     position: absolute;
     width: 1px;
     height: 1px;
     padding: 0;
-    margin: -1px;
     overflow: hidden;
-    clip: rect(0, 0, 0, 0);
     white-space: nowrap;
     border: 0;
   }

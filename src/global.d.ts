@@ -25,7 +25,9 @@ declare global {
       readonly isAndroid: boolean; // Android OS 여부
       readonly isElectron: boolean; // Electron 환경 여부
       readonly isCapacitor: boolean; // Capacitor 환경 여부
+      readonly isTauri: boolean; // Tauri 환경 여부
       readonly isSnap: boolean; // Snap 패키지 여부
+      readonly isFlatpak: boolean; // Flatpak 패키지 여부
 
       /**
        * 디바이스 타입 정보

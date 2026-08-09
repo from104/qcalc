@@ -264,4 +264,63 @@ describe('CalculatorRecord', () => {
       expect(() => record.findIndexById(999)).toThrow();
     });
   });
+
+  describe('loadRecords', () => {
+    it('라운드트립: getAllRecords 스냅샷을 다른 인스턴스에 로드하면 동일하게 복원', () => {
+      record.addRecord(makeResult('1', Operator.ADD, '2', '3'));
+      record.addRecord(makeResult('4', Operator.SUB, '1', '3'));
+      record.addRecord(makeResult('10', Operator.MUL, '5', '50'), 'formula', '10*5');
+      const snapshot = record.getAllRecords();
+
+      const restored = new CalculatorRecord();
+      restored.loadRecords(snapshot);
+
+      expect(restored.getAllRecords()).toEqual(snapshot);
+    });
+
+    it('잘못된 형식의 항목은 걸러내고 유효한 항목만 남김', () => {
+      const input = [
+        null,
+        { calculationResult: null },
+        { calculationResult: { previousNumber: 1, resultNumber: '3', operator: Operator.ADD } },
+        { calculationResult: { previousNumber: '1', resultNumber: '3', operator: Operator.ADD } },
+      ];
+      record.loadRecords(input);
+      expect(record.getCount()).toBe(1);
+      expect(record.getAllRecords()[0]!.calculationResult.resultNumber).toBe('3');
+    });
+
+    it('배열이 아닌 입력은 기존 기록을 유지 (early return)', () => {
+      record.addRecord(makeResult('1', Operator.ADD, '2', '3'));
+      record.loadRecords(undefined);
+      record.loadRecords({});
+      record.loadRecords('x');
+      expect(record.getCount()).toBe(1);
+    });
+
+    it('100개 초과 배열은 앞 100개로 잘림', () => {
+      const input = Array.from({ length: 150 }, (_, i) => ({
+        id: i + 1,
+        timestamp: Date.now(),
+        calculationResult: { previousNumber: `${i}`, operator: Operator.ADD, resultNumber: `${i + 1}` },
+      }));
+      record.loadRecords(input);
+      expect(record.getCount()).toBe(100);
+    });
+
+    it('formula 모드 기록의 expression을 보존', () => {
+      record.loadRecords([
+        {
+          id: 1,
+          timestamp: Date.now(),
+          mode: 'formula',
+          expression: '1+2*3',
+          calculationResult: { previousNumber: '', operator: [], resultNumber: '7' },
+        },
+      ]);
+      const all = record.getAllRecords();
+      expect(all[0]!.mode).toBe('formula');
+      expect(all[0]!.expression).toBe('1+2*3');
+    });
+  });
 });

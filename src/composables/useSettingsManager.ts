@@ -16,6 +16,8 @@ import { useCurrencyStore } from 'src/stores/currencyStore';
 import { useRadixStore } from 'src/stores/radixStore';
 import { useUnitStore } from 'src/stores/unitStore';
 import { useUIStore } from 'src/stores/uiStore';
+import { useFormulaStore } from 'src/stores/formulaStore';
+import type { Calculator } from 'core/calculator/Calculator';
 
 // 설정에 포함할 스토어 목록
 const stores = {
@@ -26,6 +28,7 @@ const stores = {
   radix: useRadixStore,
   unit: useUnitStore,
   ui: useUIStore,
+  formula: useFormulaStore,
 };
 
 type StoreKeys = keyof typeof stores;
@@ -34,11 +37,15 @@ export function useSettingsManager(t: Composer['t']) {
   const $q = useQuasar();
   const $g = window.globalVars;
 
-  const gatherSettings = (): Record<StoreKeys, unknown> => {
+  const gatherSettings = (): Record<string, unknown> => {
     const settingsToExport: { [K in StoreKeys]?: (state: Record<string, unknown>) => Record<string, unknown> } = {
       settings: (state) => ({ ...state }),
       themes: (state) => ({ ...state }),
-      calc: (state) => ({ isMemoryVisible: state.isMemoryVisible, isShiftLocked: state.isShiftLocked }),
+      calc: (state) => ({
+        isMemoryVisible: state.isMemoryVisible,
+        isShiftLocked: state.isShiftLocked,
+        records: (state.calc as Calculator).record.getAllRecords(),
+      }),
       currency: (state) => ({
         sourceCurrency: state.sourceCurrency,
         targetCurrency: state.targetCurrency,
@@ -54,6 +61,12 @@ export function useSettingsManager(t: Composer['t']) {
       }),
       unit: (state) => ({ ...state }),
       ui: (state) => ({ showTips: state.showTips, showTipsDialog: state.showTipsDialog, currentTab: state.currentTab }),
+      formula: (state) => ({
+        expression: state.expression,
+        lastExpression: state.lastExpression,
+        isEditDialogOpen: state.isEditDialogOpen,
+        isHelpOpen: state.isHelpOpen,
+      }),
     };
 
     const allSettings = {} as Record<StoreKeys, unknown>;
@@ -67,10 +80,11 @@ export function useSettingsManager(t: Composer['t']) {
         allSettings[storeKey] = stateAsRecord;
       }
     }
-    return allSettings;
+    return { schemaVersion: 2, app: 'qcalc', exportedAt: Date.now(), ...allSettings };
   };
 
   const applySettings = (newSettings: Record<string, unknown>): boolean => {
+    if (!newSettings || typeof newSettings !== 'object') return false;
     try {
       for (const key in newSettings) {
         const storeKey = key as StoreKeys;
@@ -79,9 +93,13 @@ export function useSettingsManager(t: Composer['t']) {
           const settingsForStore = newSettings[key];
 
           if (settingsForStore && typeof settingsForStore === 'object' && !Array.isArray(settingsForStore)) {
-            (store.$patch as (partialState: Record<string, unknown>) => void)(
-              settingsForStore as Record<string, unknown>,
-            );
+            let patch = settingsForStore as Record<string, unknown>;
+            if (storeKey === 'calc' && 'records' in patch) {
+              const { records, ...rest } = patch;
+              useCalcStore().calc.record.loadRecords(records);
+              patch = rest;
+            }
+            (store.$patch as (partialState: Record<string, unknown>) => void)(patch);
           }
         }
       }
@@ -209,6 +227,7 @@ export function useSettingsManager(t: Composer['t']) {
   };
 
   return {
+    gatherSettings,
     applySettings,
     resetSettings,
     exportSettings,

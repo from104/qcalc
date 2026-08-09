@@ -341,7 +341,7 @@
   <q-card-section class="full-height noselect column no-wrap">
     <q-list v-auto-blur dense class="full-width" role="list" :aria-label="t('ariaLabel.settingsList')">
       <!-- 항상 위에 표시 -->
-      <q-item v-if="$g.isElectron" class="q-mb-sm">
+      <q-item v-if="$g.isElectron || $g.isTauri" class="q-mb-sm">
         <q-item-label class="self-center">{{ t('alwaysOnTop') }} (Alt-T)</q-item-label>
         <q-space />
         <q-toggle
@@ -730,7 +730,7 @@
       <q-separator spaced="md" role="separator" />
 
       <!-- 자동 업데이트 설정 -->
-      <q-item v-if="$g.isElectron && !$g.isSnap" class="q-mb-sm">
+      <q-item v-if="($g.isElectron || $g.isTauri) && !$g.isSnap" class="q-mb-sm">
         <q-item-label class="self-center">
           {{ t('autoUpdate') }}
           <HelpIcon

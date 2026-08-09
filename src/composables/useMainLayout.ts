@@ -201,7 +201,7 @@ export function useMainLayout(t: (key: string) => string, recordManagerInstance?
     if (settingsStore.initPanel && calcStore.calc) {
       calcStore.calc.reset();
     }
-    if ($g.isElectron) {
+    if ($g.isElectron || $g.isTauri) {
       settingsStore.setAlwaysOnTop(settingsStore.alwaysOnTop);
     }
 

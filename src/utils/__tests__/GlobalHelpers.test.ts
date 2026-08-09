@@ -16,6 +16,7 @@ import {
   blurElement,
   clickButtonById,
   logDev,
+  shouldApplyTauriLinuxFontFix,
 } from '../GlobalHelpers';
 import { Screen } from 'quasar';
 
@@ -184,6 +185,15 @@ describe('GlobalHelpers', () => {
         expect(spy).toHaveBeenCalledWith('test message', 123);
       }
       spy.mockRestore();
+    });
+  });
+
+  describe('shouldApplyTauriLinuxFontFix', () => {
+    it('Tauri + Linux 조합에서만 true (그 외 워크어라운드 미적용)', () => {
+      expect(shouldApplyTauriLinuxFontFix(true, true)).toBe(true);
+      expect(shouldApplyTauriLinuxFontFix(true, false)).toBe(false);
+      expect(shouldApplyTauriLinuxFontFix(false, true)).toBe(false);
+      expect(shouldApplyTauriLinuxFontFix(false, false)).toBe(false);
     });
   });
 });
