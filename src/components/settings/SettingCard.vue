@@ -729,8 +729,9 @@
 
       <q-separator spaced="md" role="separator" />
 
-      <!-- 자동 업데이트 설정 -->
-      <q-item v-if="($g.isElectron || $g.isTauri) && !$g.isSnap" class="q-mb-sm">
+      <!-- 자동 업데이트 설정. Snap/Flatpak은 스토어가 업데이트를 담당하고
+           업데이터 플러그인 자체가 등록되지 않으므로 UI도 숨긴다. -->
+      <q-item v-if="($g.isElectron || $g.isTauri) && !$g.isSnap && !$g.isFlatpak" class="q-mb-sm">
         <q-item-label class="self-center">
           {{ t('autoUpdate') }}
           <HelpIcon
