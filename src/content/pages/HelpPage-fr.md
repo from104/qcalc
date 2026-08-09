@@ -9,7 +9,7 @@ Calculs de haute précision, conversion d'unités/devises/bases numériques et �
 - **Bases numériques et opérations sur les bits** : Convertit entre binaire/octal/décimal/hexadécimal et prend en charge les opérations professionnelles sur les bits (AND, OR, XOR, NOT) pour les programmeurs
 - **Expérience utilisateur intelligente** : Offre un environnement personnalisé avec des favoris d'unités/devises, divers thèmes de couleurs, et des notes d'historique de calcul avec export/import
 - **Support multiplateforme** : Offre une expérience cohérente sur Windows, Linux (ordinateur) et Android (mobile) avec prise en charge des mises à jour automatiques
-- **Conception axée sur l'accessibilité** : Continuellement améliorée pour un accès facile par tous les utilisateurs avec des raccourcis clavier, un retour haptique et des dispositions adaptatives
+- **Conception axée sur l'accessibilité** : Continuellement améliorée pour un accès facile par tous les utilisateurs avec l'annonce des résultats par le lecteur d'écran, des raccourcis clavier, un retour haptique et des dispositions adaptatives
 - **Gestion des paramètres** : Exportez ou importez tous les paramètres dans un fichier pour maintenir les mêmes réglages dans différents environnements
 
 ## Guide des fonctionnalités principales
@@ -22,9 +22,6 @@ Calculs de haute précision, conversion d'unités/devises/bases numériques et �
 - **Opérations de base** : Entrez les chiffres 0-9, +, -, \*, / touches
 - **Fonctions avancées** : Fonctions trigonométriques (q, w, e), carré (u), racine carrée (i), constantes (z : π, x : φ, c : e)
 - **Fonctions mémoire** : Ctrl+Enter (MS), Ctrl+Backspace (MR), Ctrl+Delete (MC)
-- **Mode édition** : Appuyez sur Space ou Enter (si vide) pour entrer, Esc pour effacer et quitter
-- **Navigation dans l'historique** : Utilisez les touches ↑/↓ en mode édition pour parcourir les expressions précédentes, réinitialisation automatique lors de l'édition
-- **Charger une expression** : Clic droit sur un enregistrement de formule → « Charger dans le champ de formule » pour réutiliser
 - **Calcul de pourcentage** : 'nombre, /, nombre, %(k)' calcule le pourcentage
 - **Appliquer un pourcentage** : 'nombre, \*, nombre, %(k)' applique le pourcentage
 
@@ -135,7 +132,7 @@ Calculs de haute précision, conversion d'unités/devises/bases numériques et �
 #### Disposition de l'écran
 
 - **Système de thèmes** : Choisissez parmi divers thèmes de couleurs au-delà du mode sombre/clair (modifier dans les Paramètres F3)
-- **Toujours au premier plan** : Basculer le mode toujours au premier plan avec la touche Alt+t
+- **Toujours au premier plan** : Basculer le mode toujours au premier plan avec la touche Alt+t (non disponible dans les sessions Wayland de Linux en raison d'une limitation du système)
 - **Redimensionner la fenêtre** : Le panneau latéral s'ajuste automatiquement en fonction de la taille de la fenêtre
 - **Réinitialiser le panneau** : Basculer la réinitialisation du panneau au démarrage avec la touche Alt+i
 - **(Dés)activer le mode sombre** : Basculer le mode sombre avec la touche Alt+d
@@ -247,7 +244,7 @@ Calculs de haute précision, conversion d'unités/devises/bases numériques et �
 
 | Raccourci | Fonction                                           |
 | --------- | -------------------------------------------------- |
-| A-t       | Basculer toujours au premier plan                  |
+| A-t       | Basculer toujours au premier plan (hors Wayland)   |
 | A-i       | Basculer l'initialisation du panneau au démarrage  |
 | A-d       | Basculer le mode sombre                            |
 | A-p       | Basculer le mode haptique                          |

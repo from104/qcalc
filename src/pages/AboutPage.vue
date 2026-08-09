@@ -46,7 +46,7 @@
     return match ? match[0] : '';
   });
 
-  const techStack = ['Vue 3', 'Quasar', 'TypeScript', 'Electron', 'Capacitor'];
+  const techStack = ['Vue 3', 'Quasar', 'TypeScript', 'Tauri', 'Capacitor'];
 
   const openExternal = (url: string) => {
     openExternalLink(url, $g.isTauri);

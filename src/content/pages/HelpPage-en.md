@@ -9,7 +9,7 @@ High-precision calculations, unit/currency/radix conversion, and formula evaluat
 - **Number Base & Bit Operations**: Converts between binary/octal/decimal/hexadecimal and supports professional bit operations (AND, OR, XOR, NOT) for programmers
 - **Smart User Experience**: Provides personalized environment with unit/currency favorites, various color themes, and calculation history notes and export/import
 - **Cross-platform Support**: Delivers consistent experience on Windows, Linux desktop and Android mobile with automatic update support
-- **Accessibility-focused Design**: Continuously improved for easy access by all users with keyboard shortcuts, haptic feedback, and adaptive layouts
+- **Accessibility-focused Design**: Continuously improved for easy access by all users with screen reader announcement of results, keyboard shortcuts, haptic feedback, and adaptive layouts
 - **Settings Management**: Export or import all settings to a file to maintain the same settings across different environments
 
 ## Guide to Main Features
@@ -132,7 +132,7 @@ High-precision calculations, unit/currency/radix conversion, and formula evaluat
 #### Screen Layout
 
 - **Theme System**: Choose from various color themes beyond dark/light mode (change in F3 Settings)
-- **Always on Top**: Toggle always-on-top with Alt+t key
+- **Always on Top**: Toggle always-on-top with Alt+t key (not available on Linux Wayland sessions due to a system limitation)
 - **Resize Window**: Side panel auto-adjusts based on window size
 - **Reset Panel**: Toggle panel reset at startup with Alt+i key
 - **(De)activate Dark Mode**: Switch dark mode with Alt+d key
@@ -244,7 +244,7 @@ High-precision calculations, unit/currency/radix conversion, and formula evaluat
 
 | Shortcut | Function                            |
 | -------- | ----------------------------------- |
-| A-t      | Toggle always on top                |
+| A-t      | Toggle always on top (no Wayland)   |
 | A-i      | Toggle init panel on startup        |
 | A-d      | Toggle dark mode                    |
 | A-p      | Toggle haptic mode                  |

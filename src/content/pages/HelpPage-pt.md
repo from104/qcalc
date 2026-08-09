@@ -9,7 +9,7 @@ Cálculos de alta precisão, conversão de unidades/moedas/bases numéricas e av
 - **Bases Numéricas e Operações de Bits**: Converte entre binário/octal/decimal/hexadecimal e suporta operações profissionais de bits (AND, OR, XOR, NOT) para programadores
 - **Experiência de Usuário Inteligente**: Oferece ambiente personalizado com favoritos de unidades/moedas, vários temas de cores, e notas no histórico de cálculos com exportação/importação
 - **Suporte Multiplataforma**: Oferece experiência consistente no Windows, desktop Linux e Android móvel com suporte a atualização automática
-- **Design Focado em Acessibilidade**: Continuamente aprimorado para fácil acesso por todos os usuários com atalhos de teclado, feedback háptico e layouts adaptativos
+- **Design Focado em Acessibilidade**: Continuamente aprimorado para fácil acesso por todos os usuários com leitura dos resultados pelo leitor de tela, atalhos de teclado, feedback háptico e layouts adaptativos
 - **Gerenciamento de Configurações**: Exporte ou importe todas as configurações para um arquivo para manter as mesmas configurações em diferentes ambientes
 
 ## Guia dos Principais Recursos
@@ -132,7 +132,7 @@ Cálculos de alta precisão, conversão de unidades/moedas/bases numéricas e av
 #### Layout da Tela
 
 - **Sistema de Temas**: Escolha entre vários temas de cores além do modo escuro/claro (alterar em Configurações F3)
-- **Sempre no Topo**: Alternar sempre no topo com a tecla Alt+t
+- **Sempre no Topo**: Alternar sempre no topo com a tecla Alt+t (não disponível em sessões Wayland do Linux devido a uma limitação do sistema)
 - **Redimensionar Janela**: O painel lateral se ajusta automaticamente com base no tamanho da janela
 - **Redefinir Painel**: Alternar redefinição do painel na inicialização com a tecla Alt+i
 - **(Des)ativar Modo Escuro**: Alternar modo escuro com a tecla Alt+d
@@ -244,7 +244,7 @@ Cálculos de alta precisão, conversão de unidades/moedas/bases numéricas e av
 
 | Atalho | Função                                       |
 | ------ | -------------------------------------------- |
-| A-t    | Alternar sempre no topo                      |
+| A-t    | Alternar sempre no topo (sem Wayland)        |
 | A-i    | Alternar inicializar painel na inicialização |
 | A-d    | Alternar modo escuro                         |
 | A-p    | Alternar modo háptico                        |

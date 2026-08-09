@@ -1,6 +1,6 @@
 #### Calculatrice de formules
 
-- **Comment y accéder** : Ctrl+5 ou sélectionner depuis le menu de débordement (⋯) dans les onglets supérieurs
+- **Comment y accéder** : Ctrl+5 ou sélectionner depuis le menu de débordement (▾) dans les onglets supérieurs
 - **Saisie d'expressions** : Saisir des expressions mathématiques directement en utilisant la syntaxe mathjs
 - **Opérations prises en charge** : Toutes les fonctions mathématiques mathjs incluant arithmétique, puissances, trigonométrie, logarithmes
 - **Référence à la valeur actuelle** : Utiliser le symbole @ pour inclure la valeur calculée actuelle dans les expressions

@@ -1,6 +1,6 @@
 # App info
 
-This app was created using vue+quasar+electron.
+This app was created using vue+quasar+tauri.
 
 Contact: Seo Kihyun <from104@gmail.com>,
 
@@ -12,23 +12,25 @@ All notable changes to this project are recorded in this file.
 
 The format is based on [Keep a Changelog] and this project follows [Semantic Versioning].
 
-## [0.12.0] 2026-03-22
-
-### Added
-
-- **Formula Calculator (5th Calculator)**: Type and evaluate math expressions directly — supports arithmetic, parentheses, functions (`sin`, `cos`, `sqrt`, `log`, `ln`, `abs`, `round`, `nthRoot`, etc.), and constants (`pi`, `e`, `phi`) via [mathjs](https://mathjs.org/) syntax.
-  - Press Space to open the inline formula editor for direct expression editing.
-  - Use `@` to reference the current value, `$` for the stored memory value.
-  - Full memory support (MC, MR, MS, M+, M−, M×, M÷) available through shift-function buttons.
-  - Evaluated results are saved to calculation history with the full expression displayed.
-  - Built-in help menu lists all available functions, constants, and placeholders.
-- **5 New Languages (8 total)**: Chinese (Simplified), Hindi, German, Spanish, and French join the existing Korean, English, and Japanese. Every screen is translated — menus, settings, unit names, currency names, help pages, about pages, tips, and error messages.
-- **Flatpak Packaging**: Install QCalc from Flatpak for broader Linux desktop support.
-- **Free Public Currency API Migration**: Switched from FreeCurrencyAPI (requires API key) to free public APIs (Frankfurter + fawazahmed0). Supports 340 currencies (fiat, precious metals, cryptocurrencies) with no API key required. Build-time rate snapshots enable currency conversion even on first launch without network.
+## [0.13.0] 2026-08-09
 
 ### Changed
 
-- **Smoother Language Switching**: If a translation is missing, the app now falls back to English automatically instead of showing raw key paths.
-- **Expanded Currency Coverage**: From 170 to 340 currencies — added major cryptocurrencies (ETH, SOL, XRP, etc.), precious metals (Palladium, Platinum), and historical currencies. Full i18n support for all 8 languages.
+- **Desktop app switched from Electron to Tauri 2**: a lighter, faster desktop app. Ships as deb, rpm, AppImage, Flatpak and Snap on Linux and an NSIS installer on Windows, with auto-update fully working on the new foundation.
+- **History migration**: export your calculation history from the previous (Electron) version and import it on the new version's first-run screen.
+- **Bigger default window**: default and minimum window size grew to 480×756.
+
+### Added
+
+- **Screen reader announcement of results (Linux)**: when a calculation completes, the result is read aloud by the screen reader (Orca).
+- **Formula error announcements**: formula errors are classified and announced via the screen reader.
+- **Undo for record deletion**: deleting a history record can be undone from a snackbar.
+- **Improved keyboard accessibility**: the overflow tab menu, formula field and memory toggle are fully keyboard-operable.
+- **Higher-contrast themes**: theme colors raised to WCAG AA contrast.
+- **New languages (10 total)**: Portuguese and Russian added (incl. 0.12.1).
+
+### Fixed
+
+- Locale-aware number display and paste, formula trig functions unified to degrees, and many more accessibility and translation fixes.
 
 For information about previous versions, please check [here](https://github.com/from104/qcalc/blob/main/CHANGELOG.md).
