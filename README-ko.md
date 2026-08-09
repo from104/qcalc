@@ -187,6 +187,8 @@ QCalc은 **5가지 전문 계산기(표준, 단위, 통화, 진법, 수식)**와
 
 > **Linux 패키지 호환성**: `.deb`는 Ubuntu 22.04 이상 / Debian 12 이상(Mint 21+, Pop!\_OS 22.04+ 등 파생판 포함), `.rpm`은 Fedora 37 이상과 openSUSE Leap 15.6+/Tumbleweed를 지원합니다. RHEL/Alma/Rocky 9 계열과 구형 Debian/Ubuntu는 glibc/WebKitGTK가 낡아 이 패키지들로는 지원되지 않습니다 — 런타임을 내장한 AppImage(glibc 2.35 이상 배포판), Flatpak, Snap을 사용하세요.
 
+> **Linux에서 스크린리더를 사용하신다면** `.deb`·`.rpm`·AppImage를 사용하세요. Flatpak 샌드박스 안에서는 WebKit UI가 보조기술에 노출되지 않는 문제가 있습니다(업스트림 한계, [#113](https://github.com/from104/qcalc/issues/113)).
+
 > macOS / iOS 빌드는 현재 제공되지 않습니다.
 
 > **0.12.x 이하(Electron)에서 올라오는 경우** 엔진 교체 때문에 구버전 앱은 자동 업데이트로 전환되지 않습니다 — 0.13.0을 직접 내려받아 설치한 뒤, 구버전에서 기록(CSV)과 설정(JSON)을 내보내고 새 앱의 첫 실행 화면(또는 설정)에서 가져오세요. 이후 구버전 앱은 제거해도 됩니다.
