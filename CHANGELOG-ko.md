@@ -6,16 +6,38 @@
 
 ## [Unreleased]
 
+## [0.13.0] 2026-08-09
+
+### 변경됨
+
+- **데스크톱 프로덕션을 Electron에서 Tauri 2로 전환**: Linux·Windows 데스크톱 빌드가 이제 Electron 대신 Tauri 2 앱(Linux는 WebKitGTK, Windows는 WebView2)으로 배포된다. 기존 `src/` 코드는 무수정으로 동작 — `src/boot/tauri-shim.ts`가 `window.electron` / `window.electronUpdater` 인터페이스를 Tauri API로 매핑하고, `window.globalVars`에 `isTauri` / `isFlatpak` 플래그가 추가됐다(샌드박스 타입은 Rust `get_package_env` 커맨드로 감지). GitHub CI가 `v*` 태그에서 데스크톱 패키지 6종을 모두 빌드한다: Linux용 `.deb`·`.rpm`·AppImage·Flatpak·Snap, Windows용 NSIS 인스톨러. Electron 타겟은 전환기 동안 트리에 남지만 더 이상 배포되는 데스크톱 빌드가 아니며, Android(Capacitor)는 변화 없다.
+- **Tauri 자동 업데이트 완전 활성화**: 업데이터 아티팩트를 CI에서 서명해 draft GitHub 릴리스에 업로드하고, 릴리스 publish 후 `tauri-updater-promote` 워크플로가 고정 롤링 릴리스(`tauri-updater/latest.json`)로 승격한다. 앱 내 업데이트 UI가 Electron 때처럼 Tauri에서도 동작 — 실제 다운로드 퍼센트 표시, 종료 후 설치가 Rust `quit_app` 커맨드에 연결, 릴리스 링크는 `tauri-plugin-opener`로 열림. Snap/Flatpak 빌드는 스토어 자체 업데이트를 쓰므로 업데이터에서 제외.
+- **기록 마이그레이션 + 온보딩**: Electron 빌드에서 계산 기록을 내보내고 Tauri 첫 실행 온보딩에서 가져올 수 있다(설정 스키마 버전 2).
+- **네이티브 Wayland 기본값**: `GDK_BACKEND=x11` 강제([tauri#13749](https://github.com/tauri-apps/tauri/issues/13749) / [tauri#3117](https://github.com/tauri-apps/tauri/issues/3117)의 기존 워크어라운드)가 실기기 Wayland에서 간헐적 WebKitGTK 크래시를 유발하는 것이 확인돼 `QCALC_FORCE_XWAYLAND=1` 옵트인으로 바뀌었다.
+- **기본 창 크기 확대**: 데스크톱 기본·최소 창 크기가 352×604에서 480×756으로 커졌다.
+
 ### 추가됨
 
-- **Tauri 2 데스크톱 빌드 (실험적)**: Electron과 공존하는 Tauri 2 기반 데스크톱 타겟 추가. `yarn dev:tauri` / `yarn build:tauri`로 실행. 기존 `src/` 코드는 무수정 유지하며, `src/boot/tauri-shim.ts`가 Tauri 환경에서 `window.electron` / `window.electronUpdater` 인터페이스를 Tauri API로 매핑함.
-  - **포팅된 기능**: 창 크기 제한(min/max), 창 위치·크기 저장(`tauri-plugin-window-state`), 샌드박스 환경 감지(Snap/Flatpak/AppImage), 항상 위 토글(Alt+T), 앱 종료, devtools 자동 오픈(dev 모드), 로캐일 전환 시 창 제목 동기화.
-  - **Wayland 워크어라운드**: GNOME/KDE Wayland 세션에서 `setTitle` CSD 헤더바 repaint 누락([tauri#13749](https://github.com/tauri-apps/tauri/issues/13749))과 `setAlwaysOnTop` 미지원([tauri#3117](https://github.com/tauri-apps/tauri/issues/3117), Wayland 프로토콜 한계) 문제는 `GDK_BACKEND=x11` 강제로 회피 가능하지만, 실기기 Wayland에서 간헐적 WebKitGTK 크래시를 유발하는 것이 확인돼 기본값은 강제하지 않음(네이티브 Wayland)으로 바뀌었다. 두 기능이 필요하고 크래시 위험을 감수할 경우 `QCALC_FORCE_XWAYLAND=1`로 옵트인.
-  - **보류**: `tauri-plugin-updater` 통합(endpoints + pubkey 준비 후 활성화 예정), Tauri용 Snap/Flatpak 매니페스트, Windows 크로스 빌드.
-- **전역 환경 플래그 확장**: `window.globalVars`에 `isTauri`, `isFlatpak` 추가. Rust 커맨드 `get_package_env`로 샌드박스 타입을 런타임에 조회.
-- **설정 페이지**: "항상 위" 토글이 Tauri 환경에서도 표시되도록 조건 확장.
-- **Tauri 자동 업데이트 준비**: `tauri-plugin-updater` 플러그인을 Rust 측에서 등록하고 (Snap/Flatpak 환경은 자체 업데이트 메커니즘을 위해 제외), JS shim에서 `window.electronUpdater` 인터페이스를 Tauri updater API(`check()` / `downloadAndInstall()`)로 매핑. `updater:default` capability 추가. 신규 `.github/workflows/tauri-release.yml`로 `tauri-v*` 태그 푸시 시 자동으로 아티팩트 빌드·서명·GitHub Release draft 업로드.
-  - **활성화 미완 (운영자 수동 작업 필요)**: 서명 키 생성(`yarn tauri signer generate -w ~/.tauri/qcalc.key`) → 공개키를 `src-tauri/tauri.conf.json`의 `plugins.updater.pubkey`에 붙여넣기 → GitHub Secrets에 `TAURI_SIGNING_PRIVATE_KEY` / `TAURI_SIGNING_PRIVATE_KEY_PASSWORD` 등록 → `bundle.createUpdaterArtifacts: true`와 `plugins.updater.endpoints` 추가. 이 네 단계가 완료되기 전까지는 `checkForUpdates()` 호출이 "업데이트 없음"으로 조용히 fallback 된다.
+- **Linux 스크린리더 결과 낭독**: Orca는 Tauri 앱 안의 웹 `aria-live` 리전을 낭독하지 못한다(GTK 툴킷 앱에는 라이브 리전 지원이 없는 비-웹 스크립트를 배정). 그래서 계산 확정 시 Rust 측(`announce_a11y` 커맨드)에서 AT-SPI `announcement` 이벤트를 직접 발화한다 — 모든 Orca 스크립트가 조건 없이 읽는 경로다. DOM 라이브 리전은 다른 플랫폼용으로 유지하되 실제로 이벤트가 발생하도록 재작업했다(`clip:` 숨김 제거, 화면 안 1×1px `.sr-only`, 계산마다 재생성되는 키 블록 자식).
+- **수식 오류 낭독**: 수식 오류를 i18n 카테고리로 분류해 `aria-live`로 낭독.
+- **기록 삭제 실행취소**: 기록을 스와이프/메뉴로 삭제하면 실행취소 스낵바 표시.
+- **키보드 접근성**: 오버플로 탭 메뉴, 수식 필드, 메모리 토글을 키보드만으로 조작 가능.
+- **WCAG AA 대비**: 테마 색상을 WCAG AA 기준으로 상향하고 대비 회귀 테스트로 보호.
+- **커버리지 게이트**: vitest 커버리지 임계값을 CI에서 강제.
+
+### 고쳐짐
+
+- **접근성**: 계산 결과의 스크린리더 낭독 복구; 비표준 `role="text"`와 읽기전용 결과 필드의 잘못된 `role="textbox"` 제거; 수식 필드의 중첩 인터랙티브 컨트롤 제거; `<html lang>`을 활성 로캐일과 동기화; 누락된 `ariaLabel` 번역(설정 버튼, 기록 툴바 검색/내보내기/불러오기)을 10개 언어에 추가.
+- **로캐일 숫자 처리**: 숫자 표시와 붙여넣기 파싱에 `Intl.NumberFormat` 사용; 입력 중 소수점 구분자를 로캐일에 맞게 표시.
+- **수식 계산기**: 삼각함수가 기본 계산기와 같은 도(degree) 단위 사용; 키패드 `=` 오류도 동일한 오류 분류기를 경유; 오류 메시지의 `{detail}` 플레이스홀더 치환.
+- **기록**: 기록 복원 후 MAX_RECORDS 상한 재적용.
+- **스토어**: `calcStore`의 스토어 간 의존을 지연 초기화해 Tauri 기동 시 "no active Pinia" 크래시 수정(감사 CODE-01).
+- **Tauri/Linux**: 기동 시 모니터 `scale_factor`가 0/비정상일 때 방어(네이티브 Wayland에서 창이 0×0으로 붕괴하던 문제); WebKitGTK font-weight 렌더링 워크어라운드([tauri#14286](https://github.com/tauri-apps/tauri/issues/14286)); 패키징 아이콘 수정(플레이스홀더 교체, 캔버스 크기에 맞게 확대); Flatpak 매니페스트를 Tauri용으로 재작성; Snap 패키징 수정(deb 소스 경로, WebKitGTK 샌드박스).
+- **i18n**: `unitDesc` 네임스페이스를 런타임 카테고리 id와 통일; 한국어 라벨 오타 2건 수정.
+
+### 알려진 이슈
+
+- Linux 스크린리더 출력은 AT-SPI 이벤트 레벨까지 검증됨. 실제 음성 최종 검증, hover(마우스 리뷰) 낭독, WebKitGTK 클립보드 `readText` 실패, CSP 강화(`app.security.csp`가 현재 `null`)는 후속 과제로 추적한다.
 
 ## [0.12.1] 2026-04-11
 

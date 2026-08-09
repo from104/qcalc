@@ -6,8 +6,8 @@
 
 - **Vue 3** + **TypeScript** (strict 모드)
 - **Quasar 2** — UI 프레임워크
-- **Electron 40** — 데스크톱 앱 (기본)
-- **Tauri 2** — 데스크톱 앱 (실험적, `feature/tauri-integration` 브랜치)
+- **Tauri 2** — 데스크톱 앱 (0.13.0부터 프로덕션)
+- **Electron 40** — 레거시 데스크톱 타겟, Tauri 전환기 동안 유지
 - **Capacitor** — 모바일 앱 (Android)
 - **Vite 7** — 빌드 도구
 
@@ -72,7 +72,7 @@ MY_JKS_KEY_PASSWORD=key_password
 quasar dev -m electron
 ```
 
-### 데스크톱 (Tauri, 실험적)
+### 데스크톱 (Tauri, 프로덕션)
 
 사전 준비: Rust 1.88+ (`rustup update stable`), Linux 빌드 의존성 (`webkit2gtk-4.1`, `rsvg2`).
 

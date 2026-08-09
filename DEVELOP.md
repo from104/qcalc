@@ -6,8 +6,8 @@
 
 - **Vue 3** + **TypeScript** (strict mode)
 - **Quasar 2** — UI framework
-- **Electron 40** — desktop app (default)
-- **Tauri 2** — desktop app (experimental, on `feature/tauri-integration` branch)
+- **Tauri 2** — desktop app (production since 0.13.0)
+- **Electron 40** — legacy desktop target, kept during the Tauri transition
 - **Capacitor** — mobile app (Android)
 - **Vite 7** — build tool
 
@@ -72,7 +72,7 @@ MY_JKS_KEY_PASSWORD=key_password
 quasar dev -m electron
 ```
 
-### Desktop (Tauri, experimental)
+### Desktop (Tauri, production)
 
 Prerequisites: Rust 1.88+ (`rustup update stable`), Linux build dependencies (`webkit2gtk-4.1`, `rsvg2`).
 
