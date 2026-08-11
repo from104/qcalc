@@ -131,7 +131,10 @@ jobs:
   build-flatpak:
     name: Build Flatpak bundle
     needs: build-tauri
-    runs-on: ubuntu-22.04
+    # 24.04 필수: 22.04의 flatpak-builder 1.2대는 구식 appstream-compose를 호출하는데
+    # GNOME SDK 49에는 그 바이너리가 없다(appstreamcli compose로 대체됨). 이 잡은
+    # 이미 빌드된 deb를 재패키징만 하므로 glibc 2.35 고정(빌드 잡)과 무관하다.
+    runs-on: ubuntu-24.04
     permissions:
       contents: write
     steps:
