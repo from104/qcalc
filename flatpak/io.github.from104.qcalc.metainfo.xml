@@ -36,6 +36,11 @@
       <li>Multiple color themes, dark mode, and keyboard-first design</li>
       <li>Settings and history export/import for consistent environments</li>
     </ul>
+    <p>
+      Note for screen reader users: due to an upstream sandbox limitation, the
+      interface is currently not exposed to assistive technologies when running
+      as a Flatpak. Please use the .deb, .rpm or AppImage package instead.
+    </p>
   </description>
 
   <launchable type="desktop-id">io.github.from104.qcalc.desktop</launchable>
