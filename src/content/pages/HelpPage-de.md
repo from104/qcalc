@@ -9,7 +9,7 @@ Hochpräzise Berechnungen, Einheiten-/Währungs-/Zahlensystemumrechnung und Form
 - **Zahlensysteme & Bit-Operationen**: Konvertiert zwischen Binär/Oktal/Dezimal/Hexadezimal und unterstützt professionelle Bit-Operationen (AND, OR, XOR, NOT) für Programmierer
 - **Intelligente Benutzererfahrung**: Bietet eine personalisierte Umgebung mit Einheiten-/Währungsfavoriten, verschiedenen Farbthemen sowie Notizen und Export/Import des Berechnungsverlaufs
 - **Plattformübergreifende Unterstützung**: Bietet ein einheitliches Erlebnis auf Windows, Linux-Desktop und Android-Mobilgeräten mit Unterstützung für automatische Updates
-- **Barrierefreies Design**: Kontinuierlich verbessert für einfachen Zugang aller Benutzer mit Tastenkombinationen, haptischem Feedback und adaptiven Layouts
+- **Barrierefreies Design**: Kontinuierlich verbessert für einfachen Zugang aller Benutzer mit Vorlesen der Ergebnisse durch den Screenreader, Tastenkombinationen, haptischem Feedback und adaptiven Layouts
 - **Einstellungsverwaltung**: Exportieren oder importieren Sie alle Einstellungen in eine Datei, um dieselben Einstellungen in verschiedenen Umgebungen beizubehalten
 
 ## Anleitung zu den Hauptfunktionen
@@ -22,9 +22,6 @@ Hochpräzise Berechnungen, Einheiten-/Währungs-/Zahlensystemumrechnung und Form
 - **Grundrechenarten**: Zahlen 0-9, +, -, \*, / Tasten eingeben
 - **Erweiterte Funktionen**: Trigonometrische Funktionen (q, w, e), Quadrat (u), Quadratwurzel (i), Konstanten (z: π, x: φ, c: e)
 - **Speicherfunktionen**: Ctrl+Enter (MS), Ctrl+Backspace (MR), Ctrl+Delete (MC)
-- **Bearbeitungsmodus**: Space oder Enter (wenn leer) zum Starten, Esc zum Löschen und Beenden
-- **Verlaufsnavigation**: Im Bearbeitungsmodus mit ↑/↓ Pfeiltasten vorherige Ausdrücke durchsuchen, bei Bearbeitung automatisch zurückgesetzt
-- **Ausdruck laden**: Rechtsklick auf Formelprotokoll → „In Formelfeld laden" zur Wiederverwendung
 - **Prozentrechnung**: 'Zahl, /, Zahl, %(k)' berechnet den Prozentsatz
 - **Prozent anwenden**: 'Zahl, \*, Zahl, %(k)' wendet den Prozentsatz an
 
@@ -135,7 +132,7 @@ Hochpräzise Berechnungen, Einheiten-/Währungs-/Zahlensystemumrechnung und Form
 #### Bildschirmlayout
 
 - **Themensystem**: Wählen Sie aus verschiedenen Farbthemen über den Dunkel-/Hell-Modus hinaus (Änderung in F3 Einstellungen)
-- **Immer im Vordergrund**: Immer-im-Vordergrund mit Alt+t Taste umschalten
+- **Immer im Vordergrund**: Immer-im-Vordergrund mit Alt+t Taste umschalten (in Linux-Wayland-Sitzungen aufgrund einer Systembeschränkung nicht verfügbar)
 - **Fenstergröße ändern**: Seitenpanel passt sich automatisch an die Fenstergröße an
 - **Panel zurücksetzen**: Panel-Zurücksetzung beim Start mit Alt+i Taste umschalten
 - **Dunkelmodus (de)aktivieren**: Dunkelmodus mit Alt+d Taste umschalten
@@ -245,18 +242,18 @@ Hochpräzise Berechnungen, Einheiten-/Währungs-/Zahlensystemumrechnung und Form
 
 ### UI-Einstellungen
 
-| Tastenkombination | Funktion                                    |
-| ----------------- | ------------------------------------------- |
-| A-t               | Immer im Vordergrund umschalten             |
-| A-i               | Panel-Initialisierung beim Start umschalten |
-| A-d               | Dunkelmodus umschalten                      |
-| A-p               | Haptischen Modus umschalten                 |
-| A-n               | Zahlenformat pro Rechner umschalten         |
-| ;                 | Zusätzliche Tastenfunktionen umschalten     |
-| ,                 | Zahlengruppierung umschalten                |
-| A-,               | Gruppierungseinheit ändern (3/4)            |
-| [, ]              | Dezimalstellen anpassen (∞~16)              |
-| q                 | Anwendung beenden                           |
+| Tastenkombination | Funktion                                       |
+| ----------------- | ---------------------------------------------- |
+| A-t               | Immer im Vordergrund umschalten (kein Wayland) |
+| A-i               | Panel-Initialisierung beim Start umschalten    |
+| A-d               | Dunkelmodus umschalten                         |
+| A-p               | Haptischen Modus umschalten                    |
+| A-n               | Zahlenformat pro Rechner umschalten            |
+| ;                 | Zusätzliche Tastenfunktionen umschalten        |
+| ,                 | Zahlengruppierung umschalten                   |
+| A-,               | Gruppierungseinheit ändern (3/4)               |
+| [, ]              | Dezimalstellen anpassen (∞~16)                 |
+| q                 | Anwendung beenden                              |
 
 ### Zwischenablage-Operationen
 

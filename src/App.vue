@@ -16,8 +16,10 @@
   import AutoUpdate from 'components/dialogs/AutoUpdate.vue';
   import SnapFirst from 'components/dialogs/SnapFirst.vue';
   import VersionChangelogDialog from 'components/dialogs/VersionChangelogDialog.vue';
+  import MigrationOnboarding from 'components/dialogs/MigrationOnboarding.vue';
 
   import { useKeyBinding } from './composables/useKeyBinding';
+  import { useHtmlLangSync } from './composables/useHtmlLangSync';
   import { showMessage } from './utils/NotificationUtils';
   import { isWideWidth } from './utils/GlobalHelpers';
 
@@ -37,7 +39,7 @@
 
   const $g = window.globalVars;
   const route = useRoute();
-  const { t } = useI18n();
+  const { t, locale } = useI18n();
   const $q = useQuasar();
 
   // ── 상태 ──
@@ -46,9 +48,12 @@
   const isWideLayout = ref(isWideWidth());
   const currentTransition = ref('');
 
+  // HTML lang 속성을 i18n locale과 동기화 (WCAG 3.1.1 Level A)
+  const { syncNow: syncHtmlLang } = useHtmlLangSync(locale);
+
   // ── 단축키 액션 ──
   const toggleAlwaysOnTop = () => {
-    if (!$g.isElectron) return;
+    if (!$g.isElectron && !$g.isTauri) return;
     settingsStore.toggleAlwaysOnTop();
     showMessage(settingsStore.alwaysOnTop ? t('alwaysOnTopOn') : t('alwaysOnTopOff'));
   };
@@ -60,7 +65,7 @@
   };
 
   const quitApp = () => {
-    if ($g.isElectron) window.electron.quitApp();
+    if ($g.isElectron || $g.isTauri) window.electron.quitApp();
   };
 
   // ── 전역 키 바인딩 ──
@@ -115,6 +120,9 @@
         });
       }, 2500);
     }
+
+    // HTML lang 속성을 i18n locale과 동기화
+    syncHtmlLang();
   });
 
   onUnmounted(async () => {
@@ -124,6 +132,7 @@
   });
 
   // ── 워처 ──
+  // (HTML lang ↔ i18n locale 동기화는 useHtmlLangSync 컴포저블이 담당)
 
   // 입력 필드 포커스 시 전역 단축키 비활성화
   watch(
@@ -174,6 +183,7 @@
   <AutoUpdate />
   <SnapFirst />
   <VersionChangelogDialog />
+  <MigrationOnboarding />
 </template>
 
 <style scoped lang="scss">
@@ -380,4 +390,28 @@ fr:
       light: 'Passé en mode clair.'
       dark: 'Passé en mode sombre.'
   persistedSettingsCorrected: "Certains paramètres enregistrés ont été réinitialisés suite à une mise à jour de l'application."
+pt:
+  targetToBeCopiedResult: 'o resultado do cálculo'
+  targetToBeCopiedSelected: 'o conteúdo selecionado'
+  copiedToClipboard: '{target} copiado para a área de transferência.'
+  alwaysOnTopOn: 'Sempre no topo foi ativado.'
+  alwaysOnTopOff: 'Sempre no topo foi desativado.'
+  darkMode:
+    message:
+      system: 'O modo escuro foi alterado para seguir as configurações do sistema.'
+      light: 'Alterado para o modo claro.'
+      dark: 'Alterado para o modo escuro.'
+  persistedSettingsCorrected: 'Algumas configurações salvas foram redefinidas devido a uma atualização do aplicativo.'
+ru:
+  targetToBeCopiedResult: 'результат вычисления'
+  targetToBeCopiedSelected: 'выбранное содержимое'
+  copiedToClipboard: '{target} скопировано в буфер обмена.'
+  alwaysOnTopOn: 'Режим «Всегда поверх» включён.'
+  alwaysOnTopOff: 'Режим «Всегда поверх» отключён.'
+  darkMode:
+    message:
+      system: 'Тёмный режим изменён на системные настройки.'
+      light: 'Переключено на светлый режим.'
+      dark: 'Переключено на тёмный режим.'
+  persistedSettingsCorrected: 'Некоторые сохранённые настройки были сброшены из-за обновления приложения.'
 </i18n>

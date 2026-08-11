@@ -9,7 +9,7 @@ Cálculos de alta precisión, conversión de unidades/divisas/bases numéricas y
 - **Bases Numéricas y Operaciones de Bits**: Convierte entre binario/octal/decimal/hexadecimal y soporta operaciones de bits profesionales (AND, OR, XOR, NOT) para programadores
 - **Experiencia de Usuario Inteligente**: Proporciona un entorno personalizado con favoritos de unidades/divisas, varios temas de colores, y notas del historial de cálculos con exportación/importación
 - **Soporte Multiplataforma**: Ofrece una experiencia consistente en Windows, escritorio Linux y móvil Android con soporte de actualización automática
-- **Diseño Centrado en la Accesibilidad**: Mejora continua para fácil acceso por todos los usuarios con atajos de teclado, retroalimentación háptica y diseños adaptativos
+- **Diseño Centrado en la Accesibilidad**: Mejora continua para fácil acceso por todos los usuarios con lectura de resultados por el lector de pantalla, atajos de teclado, retroalimentación háptica y diseños adaptativos
 - **Gestión de Configuración**: Exporte o importe todas las configuraciones a un archivo para mantener la misma configuración en diferentes entornos
 
 ## Guía de Características Principales
@@ -22,9 +22,6 @@ Cálculos de alta precisión, conversión de unidades/divisas/bases numéricas y
 - **Operaciones Básicas**: Introduzca números 0-9, +, -, \*, / teclas
 - **Funciones Avanzadas**: Funciones trigonométricas (q, w, e), cuadrado (u), raíz cuadrada (i), constantes (z: π, x: φ, c: e)
 - **Funciones de Memoria**: Ctrl+Enter (MS), Ctrl+Backspace (MR), Ctrl+Delete (MC)
-- **Modo Edición**: Presione Space o Enter (cuando esté vacío) para entrar, Esc para borrar y salir
-- **Navegación de Historial**: Use las teclas ↑/↓ en modo edición para explorar expresiones anteriores, se reinicia automáticamente al editar
-- **Cargar Expresión**: Clic derecho en un registro de fórmula → "Cargar en campo de fórmula" para reutilizar
 - **Cálculo de Porcentaje**: 'número, /, número, %(k)' calcula el porcentaje
 - **Aplicar Porcentaje**: 'número, \*, número, %(k)' aplica el porcentaje
 
@@ -135,7 +132,7 @@ Cálculos de alta precisión, conversión de unidades/divisas/bases numéricas y
 #### Disposición de Pantalla
 
 - **Sistema de Temas**: Elija entre varios temas de colores más allá del modo oscuro/claro (cambiar en F3 Configuración)
-- **Siempre Visible**: Alternar siempre visible con la tecla Alt+t
+- **Siempre Visible**: Alternar siempre visible con la tecla Alt+t (no disponible en sesiones Wayland de Linux debido a una limitación del sistema)
 - **Redimensionar Ventana**: El panel lateral se ajusta automáticamente según el tamaño de la ventana
 - **Restablecer Panel**: Alternar el restablecimiento del panel al inicio con la tecla Alt+i
 - **(Des)activar Modo Oscuro**: Cambiar el modo oscuro con la tecla Alt+d
@@ -247,7 +244,7 @@ Cálculos de alta precisión, conversión de unidades/divisas/bases numéricas y
 
 | Atajo | Función                                     |
 | ----- | ------------------------------------------- |
-| A-t   | Alternar siempre visible                    |
+| A-t   | Alternar siempre visible (sin Wayland)      |
 | A-i   | Alternar iniciar panel al inicio            |
 | A-d   | Alternar modo oscuro                        |
 | A-p   | Alternar modo háptico                       |

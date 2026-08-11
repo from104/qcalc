@@ -7,7 +7,9 @@
   import { computed } from 'vue';
   import { useI18n } from 'vue-i18n';
   import { version } from '../../package.json';
+  import { openExternalLink } from '../utils/ExternalLinkUtils';
 
+  const $g = window.globalVars;
   const { locale, t } = useI18n();
 
   import AboutMdEn from '../content/pages/AboutPage-en.md';
@@ -18,6 +20,8 @@
   import AboutMdDe from '../content/pages/AboutPage-de.md';
   import AboutMdEs from '../content/pages/AboutPage-es.md';
   import AboutMdFr from '../content/pages/AboutPage-fr.md';
+  import AboutMdPt from '../content/pages/AboutPage-pt.md';
+  import AboutMdRu from '../content/pages/AboutPage-ru.md';
 
   const aboutMdMap: Record<string, string> = {
     ko: AboutMdKo,
@@ -27,6 +31,8 @@
     de: AboutMdDe,
     es: AboutMdEs,
     fr: AboutMdFr,
+    pt: AboutMdPt,
+    ru: AboutMdRu,
   };
 
   const currentMd = computed(() => {
@@ -40,10 +46,10 @@
     return match ? match[0] : '';
   });
 
-  const techStack = ['Vue 3', 'Quasar', 'TypeScript', 'Electron', 'Capacitor'];
+  const techStack = ['Vue 3', 'Quasar', 'TypeScript', 'Tauri', 'Capacitor'];
 
   const openExternal = (url: string) => {
-    window.open(url, '_blank', 'noopener');
+    openExternalLink(url, $g.isTauri);
   };
 </script>
 
@@ -187,4 +193,16 @@ fr:
   license: 'Licence'
   contact: 'Contact'
   changelog: 'Journal des modifications'
+pt:
+  description: 'Uma calculadora multifuncional construída com tecnologias web modernas. Disponível em plataformas desktop e móveis.'
+  author: 'Desenvolvedor'
+  license: 'Licença'
+  contact: 'Contato'
+  changelog: 'Registro de alterações'
+ru:
+  description: 'Многофункциональный калькулятор, созданный с использованием современных веб-технологий. Доступен на настольных и мобильных платформах.'
+  author: 'Разработчик'
+  license: 'Лицензия'
+  contact: 'Контакты'
+  changelog: 'Журнал изменений'
 </i18n>

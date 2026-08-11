@@ -227,4 +227,10 @@ es:
 fr:
   openColorPicker: 'Ouvrir le sélecteur de couleurs'
   close: 'Fermer'
+pt:
+  openColorPicker: 'Abrir seletor de cores'
+  close: 'Fechar'
+ru:
+  openColorPicker: 'Открыть палитру цветов'
+  close: 'Закрыть'
 </i18n>

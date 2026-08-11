@@ -8,10 +8,10 @@
 
 ## QCalc을 선택하는 이유
 
-QCalc은 **5가지 전문 계산기(표준, 단위, 통화, 진법, 수식)**와 **8개 언어(한국어, English, 日本語, 中文, हिन्दी, Deutsch, Español, Français)** 지원을 하나의 깔끔하고 키보드 친화적인 앱에 담았습니다. 일상적인 계산, 단위 변환, 환율 확인, 16진수/2진수 작업, 수학 수식 계산까지 — 탭 하나로 전환할 수 있습니다.
+QCalc은 **5가지 전문 계산기(표준, 단위, 통화, 진법, 수식)**와 **10개 언어(한국어, English, 日本語, 中文, हिन्दी, Deutsch, Español, Français, Português, Русский)** 지원을 하나의 깔끔하고 키보드 친화적인 앱에 담았습니다. 일상적인 계산, 단위 변환, 환율 확인, 16진수/2진수 작업, 수학 수식 계산까지 — 탭 하나로 전환할 수 있습니다.
 
-**기술 스택** Vue 3 + Quasar + TypeScript + Electron + Capacitor
-**지원 플랫폼** Windows, Linux (AppImage / Snap / Flatpak), Android
+**기술 스택** Vue 3 + Quasar + TypeScript + Tauri 2(데스크톱) + Capacitor(Android) — 기존 Electron 타겟은 전환기 동안 유지
+**지원 플랫폼** Windows (NSIS 설치파일), Linux (deb / rpm / AppImage / Snap / Flatpak), Android
 
 ---
 
@@ -49,12 +49,12 @@ QCalc은 **5가지 전문 계산기(표준, 단위, 통화, 진법, 수식)**와
 
 - **테마** — 다크/라이트를 넘어 다양한 색상 테마
 - **적응형 레이아웃** — 넓은 화면에서 기록 패널 자동 표시
-- **접근성** — ARIA 레이블, 스크린리더 알림(aria-live), 키보드 포커스 표시, 모션 감소 지원
+- **접근성** — ARIA 레이블, 계산 결과 스크린리더 낭독(Linux는 AT-SPI announcement, 그 외는 aria-live), WCAG AA 대비, 키보드 포커스 표시, 모션 감소 지원
 - **키보드 우선** — 모든 기능에 단축키 지원
 - **모바일** — 스와이프로 모드 전환, 햅틱 피드백
-- **항상 위** — 다른 창 위에 계산기 고정
-- **8개 언어** — 한국어, 영어, 일본어, 중국어, 힌디어, 독일어, 스페인어, 프랑스어
-- **자동 업데이트** — Windows 설치파일, Linux AppImage 자동 업데이트
+- **항상 위** — 다른 창 위에 계산기 고정 (네이티브 Linux Wayland 세션에서는 미동작, `QCALC_FORCE_XWAYLAND=1`로 옵트인)
+- **10개 언어** — 한국어, 영어, 일본어, 중국어, 힌디어, 독일어, 스페인어, 프랑스어, 포르투갈어, 러시아어
+- **자동 업데이트** — Windows 설치파일, Linux AppImage 자동 업데이트 (deb/rpm은 수동, Snap/Flatpak은 스토어 업데이트)
 
 > 한국어를 제외한 번역은 AI로 생성되었습니다. 오류나 더 나은 표현이 있다면 [Issues](https://github.com/from104/qcalc/issues)로 알려주세요.
 
@@ -179,13 +179,19 @@ QCalc은 **5가지 전문 계산기(표준, 단위, 통화, 진법, 수식)**와
 
 ## 설치
 
-| 플랫폼      | 방법                                                                                              |
-| ----------- | ------------------------------------------------------------------------------------------------- |
-| **Windows** | [Releases](https://github.com/from104/qcalc/releases)에서 설치 파일 다운로드 (자동 업데이트 지원) |
-| **Linux**   | AppImage (자동 업데이트), Snap (`snap install --beta qcalc`), 또는 Flatpak                        |
-| **Android** | [Releases](https://github.com/from104/qcalc/releases)에서 APK 다운로드                            |
+| 플랫폼      | 방법                                                                                                                                                                       |
+| ----------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Windows** | [Releases](https://github.com/from104/qcalc/releases)에서 NSIS 설치 파일 다운로드 (자동 업데이트 지원)                                                                     |
+| **Linux**   | [Releases](https://github.com/from104/qcalc/releases)에서 `.deb` / `.rpm` / AppImage 다운로드 (AppImage는 자동 업데이트), Snap (`snap install --beta qcalc`), 또는 Flatpak |
+| **Android** | [Releases](https://github.com/from104/qcalc/releases)에서 APK 다운로드                                                                                                     |
+
+> **Linux 패키지 호환성**: `.deb`는 Ubuntu 22.04 이상 / Debian 12 이상(Mint 21+, Pop!\_OS 22.04+ 등 파생판 포함), `.rpm`은 Fedora 37 이상과 openSUSE Leap 15.6+/Tumbleweed를 지원합니다. RHEL/Alma/Rocky 9 계열과 구형 Debian/Ubuntu는 glibc/WebKitGTK가 낡아 이 패키지들로는 지원되지 않습니다 — 런타임을 내장한 AppImage(glibc 2.35 이상 배포판), Flatpak, Snap을 사용하세요.
+
+> **Linux에서 스크린리더를 사용하신다면** `.deb`·`.rpm`·AppImage를 사용하세요. Flatpak 샌드박스 안에서는 WebKit UI가 보조기술에 노출되지 않는 문제가 있습니다(업스트림 한계, [#113](https://github.com/from104/qcalc/issues/113)).
 
 > macOS / iOS 빌드는 현재 제공되지 않습니다.
+
+> **0.12.x 이하(Electron)에서 올라오는 경우** 엔진 교체 때문에 구버전 앱은 자동 업데이트로 전환되지 않습니다 — 0.13.0을 직접 내려받아 설치한 뒤, 구버전에서 기록(CSV)과 설정(JSON)을 내보내고 새 앱의 첫 실행 화면(또는 설정)에서 가져오세요. 이후 구버전 앱은 제거해도 됩니다.
 
 ---
 

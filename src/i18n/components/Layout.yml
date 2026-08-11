@@ -39,9 +39,13 @@ ko:
     cancelled: '계산 기록 불러오기를 취소했습니다.'
   ariaLabel:
     delete_outline: '모든 기록 삭제'
-    back: '이전 화면로 돌아가기'
-    backToRecord: '기록 화면로 돌아가기'
+    search: '기록 검색'
+    file_download: '기록 내보내기'
+    file_upload: '기록 불러오기'
+    back: '이전 화면으로 돌아가기'
+    backToRecord: '기록 화면으로 돌아가기'
     mainTabs: '메인 탭 목록'
+    overflowTabs: '추가 계산기'
     tab: '{name} 탭'
     subPageTitle: '{title} 화면'
     subPageButton: '{label} 버튼'
@@ -54,6 +58,7 @@ ko:
     tabSelected: '{name} 탭 선택됨'
     tabUnselected: '{name} 탭 선택되지 않음'
     record: '기록 화면 열기'
+    settings: '설정 화면 열기'
     help: '도움말 보기'
   tooltip:
     help: '도움말'
@@ -106,9 +111,13 @@ en:
     cancelled: 'Records import cancelled.'
   ariaLabel:
     delete_outline: 'Delete all records'
+    search: 'Search records'
+    file_download: 'Export records'
+    file_upload: 'Import records'
     back: 'Go back to previous screen'
     backToRecord: 'Return to record screen'
     mainTabs: 'Main tab list'
+    overflowTabs: 'More calculators'
     tab: '{name} tab'
     subPageTitle: '{title} screen'
     subPageButton: '{label} button'
@@ -121,6 +130,7 @@ en:
     tabSelected: '{name} tab selected'
     tabUnselected: '{name} tab unselected'
     record: 'Open record screen'
+    settings: 'Open settings screen'
     help: 'View help'
   tooltip:
     help: 'Help'
@@ -173,9 +183,13 @@ ja:
     cancelled: '計算履歴のインポートがキャンセルされました。'
   ariaLabel:
     delete_outline: 'すべての履歴を削除'
+    search: '履歴を検索'
+    file_download: '履歴をエクスポート'
+    file_upload: '履歴をインポート'
     back: '前の画面に戻る'
     backToRecord: '履歴画面に戻る'
     mainTabs: 'メインタブリスト'
+    overflowTabs: '追加の計算機'
     tab: '{name} タブ'
     subPageTitle: '{title} 画面'
     subPageButton: '{label} ボタン'
@@ -188,6 +202,7 @@ ja:
     tabSelected: '{name} タブ選択中'
     tabUnselected: '{name} タブ未選択'
     record: '履歴画面を開く'
+    settings: '設定画面を開く'
     help: 'ヘルプを見る'
   tooltip:
     help: 'ヘルプ'
@@ -240,9 +255,13 @@ zh:
     cancelled: '记录导入已取消。'
   ariaLabel:
     delete_outline: '删除所有记录'
+    search: '搜索记录'
+    file_download: '导出记录'
+    file_upload: '导入记录'
     back: '返回上一页'
     backToRecord: '返回记录页面'
     mainTabs: '主选项卡列表'
+    overflowTabs: '更多计算器'
     tab: '{name} 选项卡'
     subPageTitle: '{title} 页面'
     subPageButton: '{label} 按钮'
@@ -255,6 +274,7 @@ zh:
     tabSelected: '{name} 选项卡已选中'
     tabUnselected: '{name} 选项卡未选中'
     record: '打开记录页面'
+    settings: '打开设置页面'
     help: '查看帮助'
   tooltip:
     help: '帮助'
@@ -307,9 +327,13 @@ hi:
     cancelled: 'रिकॉर्ड आयात रद्द।'
   ariaLabel:
     delete_outline: 'सभी रिकॉर्ड हटाएँ'
+    search: 'रिकॉर्ड खोजें'
+    file_download: 'रिकॉर्ड निर्यात करें'
+    file_upload: 'रिकॉर्ड आयात करें'
     back: 'पिछली स्क्रीन पर वापस जाएँ'
     backToRecord: 'रिकॉर्ड स्क्रीन पर लौटें'
     mainTabs: 'मुख्य टैब सूची'
+    overflowTabs: 'अधिक कैलकुलेटर'
     tab: '{name} टैब'
     subPageTitle: '{title} स्क्रीन'
     subPageButton: '{label} बटन'
@@ -322,6 +346,7 @@ hi:
     tabSelected: '{name} टैब चयनित'
     tabUnselected: '{name} टैब अचयनित'
     record: 'रिकॉर्ड स्क्रीन खोलें'
+    settings: 'सेटिंग्स स्क्रीन खोलें'
     help: 'सहायता देखें'
   tooltip:
     help: 'सहायता'
@@ -374,9 +399,13 @@ de:
     cancelled: 'Import des Verlaufs abgebrochen.'
   ariaLabel:
     delete_outline: 'Alle Verläufe löschen'
+    search: 'Verlauf durchsuchen'
+    file_download: 'Verlauf exportieren'
+    file_upload: 'Verlauf importieren'
     back: 'Zurück zur vorherigen Seite'
     backToRecord: 'Zurück zum Verlauf'
     mainTabs: 'Haupttabliste'
+    overflowTabs: 'Weitere Rechner'
     tab: '{name} Tab'
     subPageTitle: '{title} Seite'
     subPageButton: '{label} Schaltfläche'
@@ -389,6 +418,7 @@ de:
     tabSelected: '{name} Tab ausgewählt'
     tabUnselected: '{name} Tab nicht ausgewählt'
     record: 'Verlauf öffnen'
+    settings: 'Einstellungen öffnen'
     help: 'Hilfe anzeigen'
   tooltip:
     help: 'Hilfe'
@@ -441,9 +471,13 @@ es:
     cancelled: 'Importación del historial cancelada.'
   ariaLabel:
     delete_outline: 'Eliminar todo el historial'
+    search: 'Buscar en el historial'
+    file_download: 'Exportar historial'
+    file_upload: 'Importar historial'
     back: 'Volver a la pantalla anterior'
     backToRecord: 'Volver a la pantalla de historial'
     mainTabs: 'Lista de pestañas principales'
+    overflowTabs: 'Más calculadoras'
     tab: 'Pestaña {name}'
     subPageTitle: 'Pantalla {title}'
     subPageButton: 'Botón {label}'
@@ -456,6 +490,7 @@ es:
     tabSelected: 'Pestaña {name} seleccionada'
     tabUnselected: 'Pestaña {name} no seleccionada'
     record: 'Abrir pantalla de historial'
+    settings: 'Abrir pantalla de ajustes'
     help: 'Ver ayuda'
   tooltip:
     help: 'Ayuda'
@@ -508,9 +543,13 @@ fr:
     cancelled: "Importation de l'historique annulée."
   ariaLabel:
     delete_outline: "Supprimer tout l'historique"
+    search: "Rechercher dans l'historique"
+    file_download: "Exporter l'historique"
+    file_upload: "Importer l'historique"
     back: "Retour à l'écran précédent"
     backToRecord: "Retour à l'écran d'historique"
     mainTabs: 'Liste des onglets principaux'
+    overflowTabs: 'Plus de calculatrices'
     tab: 'Onglet {name}'
     subPageTitle: 'Écran {title}'
     subPageButton: 'Bouton {label}'
@@ -523,6 +562,7 @@ fr:
     tabSelected: 'Onglet {name} sélectionné'
     tabUnselected: 'Onglet {name} non sélectionné'
     record: "Ouvrir l'écran d'historique"
+    settings: "Ouvrir l'écran des paramètres"
     help: "Voir l'aide"
   tooltip:
     help: 'Aide'
@@ -534,3 +574,147 @@ fr:
     search: 'Rechercher'
     menu: 'Ouvrir le menu'
     recordSwipeHelp: "Glissez vers la gauche pour ajouter ou modifier des notes, glissez vers la droite pour supprimer des enregistrements."
+pt:
+  calc: Base
+  unit: Unidade
+  currency: Moeda
+  radix: Base numérica
+  formula: Fórmula
+  help: Ajuda
+  about: Sobre
+  record: Histórico
+  settings: Configurações
+  message:
+    fileSavedTo: '(Salvo em: {path})'
+  tooltipTips: 'Exibir dicas.'
+  openRecordPage: 'Clique para abrir a tela de histórico.'
+  tooltipHelp: 'Exibir ajuda.'
+  clearRecords:
+    confirmTitle: 'Confirmar exclusão do histórico'
+    confirmMessage: 'Tem certeza de que deseja excluir todo o histórico de cálculos? Esta ação é irreversível.'
+    success: 'O histórico de cálculos foi excluído com sucesso.'
+  exportRecords:
+    success: 'O histórico de cálculos foi exportado com sucesso.'
+    fail: 'Falha ao exportar o histórico de cálculos.'
+    noData: 'Nenhum histórico de cálculo para exportar.'
+    cancelled: 'Exportação do histórico cancelada.'
+    shareTitle: 'Histórico de cálculos qcalc'
+    shareText: 'Confira meu histórico de cálculos qcalc.'
+    shareDialogTitle: 'Exportar histórico'
+    exportMethodTitle: 'Escolher método de exportação'
+    exportMethodMessage: 'Você pode salvar o histórico de cálculos no dispositivo ou compartilhá-lo com outros aplicativos.'
+    saveToDevice: 'Salvar no dispositivo'
+    shareFile: 'Compartilhar'
+    successMobile: 'Arquivo salvo com sucesso. ({fileName})'
+    mobileSaveLocation: 'Você pode encontrar o arquivo na pasta Documentos.'
+  importRecords:
+    confirmTitle: 'Confirmar importação do histórico'
+    confirmMessage: 'Tem certeza de que deseja substituir o histórico atual pelos registros do arquivo selecionado?'
+    success: 'O histórico de cálculos foi importado com sucesso.'
+    fail: 'Falha ao importar o histórico de cálculos. O arquivo pode estar corrompido ou em um formato incorreto.'
+    cancelled: 'Importação do histórico cancelada.'
+  ariaLabel:
+    delete_outline: 'Excluir todo o histórico'
+    search: 'Pesquisar no histórico'
+    file_download: 'Exportar histórico'
+    file_upload: 'Importar histórico'
+    back: 'Voltar à tela anterior'
+    backToRecord: 'Voltar à tela de histórico'
+    mainTabs: 'Lista de abas principais'
+    overflowTabs: 'Mais calculadoras'
+    tab: 'Aba {name}'
+    subPageTitle: 'Tela {title}'
+    subPageButton: 'Botão {label}'
+    closeSubPage: 'Fechar sub-tela'
+    calculatorSection: 'Seção da calculadora'
+    calculatorContent: 'Conteúdo da calculadora'
+    tabPanel: 'Painel da aba {name}'
+    subPageSection: 'Seção da sub-tela'
+    subPageContent: 'Conteúdo da sub-tela'
+    tabSelected: 'Aba {name} selecionada'
+    tabUnselected: 'Aba {name} não selecionada'
+    record: 'Abrir a tela de histórico'
+    settings: 'Abrir a tela de configurações'
+    help: 'Ver ajuda'
+  tooltip:
+    help: 'Ajuda'
+    about: 'Sobre'
+    settings: 'Configurações'
+    deleteRecord: 'Excluir todo o histórico'
+    exportRecords: 'Exportar histórico'
+    importRecords: 'Importar histórico'
+    search: 'Pesquisar'
+    menu: 'Abrir menu'
+    recordSwipeHelp: 'Deslize para a esquerda para adicionar ou editar notas, deslize para a direita para excluir registros.'
+ru:
+  calc: Основа
+  unit: Единица
+  currency: Валюта
+  radix: Система счисления
+  formula: Формула
+  help: Помощь
+  about: О программе
+  record: История
+  settings: Настройки
+  message:
+    fileSavedTo: '(Сохранено в: {path})'
+  tooltipTips: 'Показать подсказки.'
+  openRecordPage: 'Нажмите, чтобы открыть экран истории.'
+  tooltipHelp: 'Показать справку.'
+  clearRecords:
+    confirmTitle: 'Подтвердите удаление истории'
+    confirmMessage: 'Вы уверены, что хотите удалить всю историю вычислений? Это действие необратимо.'
+    success: 'История вычислений успешно удалена.'
+  exportRecords:
+    success: 'История вычислений успешно экспортирована.'
+    fail: 'Не удалось экспортировать историю вычислений.'
+    noData: 'Нет истории вычислений для экспорта.'
+    cancelled: 'Экспорт истории отменён.'
+    shareTitle: 'История вычислений qcalc'
+    shareText: 'Посмотрите мою историю вычислений qcalc.'
+    shareDialogTitle: 'Экспортировать историю'
+    exportMethodTitle: 'Выберите способ экспорта'
+    exportMethodMessage: 'Вы можете сохранить историю вычислений на устройство или поделиться ею с другими приложениями.'
+    saveToDevice: 'Сохранить на устройство'
+    shareFile: 'Поделиться'
+    successMobile: 'Файл успешно сохранён. ({fileName})'
+    mobileSaveLocation: 'Вы можете найти файл в папке «Документы».'
+  importRecords:
+    confirmTitle: 'Подтвердите импорт истории'
+    confirmMessage: 'Вы уверены, что хотите заменить текущую историю записями из выбранного файла?'
+    success: 'История вычислений успешно импортирована.'
+    fail: 'Не удалось импортировать историю вычислений. Файл может быть повреждён или иметь неправильный формат.'
+    cancelled: 'Импорт истории отменён.'
+  ariaLabel:
+    delete_outline: 'Удалить всю историю'
+    search: 'Поиск по истории'
+    file_download: 'Экспортировать историю'
+    file_upload: 'Импортировать историю'
+    back: 'Вернуться к предыдущему экрану'
+    backToRecord: 'Вернуться к экрану истории'
+    mainTabs: 'Список основных вкладок'
+    overflowTabs: 'Другие калькуляторы'
+    tab: 'Вкладка {name}'
+    subPageTitle: 'Экран {title}'
+    subPageButton: 'Кнопка {label}'
+    closeSubPage: 'Закрыть подстраницу'
+    calculatorSection: 'Раздел калькулятора'
+    calculatorContent: 'Содержимое калькулятора'
+    tabPanel: 'Панель вкладки {name}'
+    subPageSection: 'Раздел подстраницы'
+    subPageContent: 'Содержимое подстраницы'
+    tabSelected: 'Вкладка {name} выбрана'
+    tabUnselected: 'Вкладка {name} не выбрана'
+    record: 'Открыть экран истории'
+    settings: 'Открыть экран настроек'
+    help: 'Посмотреть справку'
+  tooltip:
+    help: 'Помощь'
+    about: 'О программе'
+    settings: 'Настройки'
+    deleteRecord: 'Удалить всю историю'
+    exportRecords: 'Экспортировать историю'
+    importRecords: 'Импортировать историю'
+    search: 'Поиск'
+    menu: 'Открыть меню'
+    recordSwipeHelp: 'Проведите влево, чтобы добавить или изменить заметки, проведите вправо, чтобы удалить записи.'

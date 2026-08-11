@@ -162,7 +162,7 @@
   // 컴포넌트가 마운트될 때 실행
   onMounted(() => {
     // Electron 환경에서만 업데이트 리스너 등록
-    if ($g.isElectron && !$g.isSnap) {
+    if (($g.isElectron || $g.isTauri) && !$g.isSnap) {
       window.electronUpdater.onUpdateStatus(handleUpdateStatus);
 
       // 개발 모드가 아닐 때만 업데이트 확인
@@ -175,7 +175,7 @@
   // 컴포넌트가 언마운트될 때 실행
   onUnmounted(() => {
     // Electron 환경에서만 리스너 제거
-    if ($g.isElectron && !$g.isSnap) {
+    if (($g.isElectron || $g.isTauri) && !$g.isSnap) {
       window.electronUpdater.removeUpdateStatusListener();
     }
   });
@@ -183,7 +183,7 @@
 
 <template>
   <!-- Electron 환경에서만 업데이트 관련 UI 표시 -->
-  <template v-if="$g.isElectron && !$g.isSnap">
+  <template v-if="($g.isElectron || $g.isTauri) && !$g.isSnap">
     <q-dialog v-model="updateDialog" persistent role="dialog" :aria-label="t('title')">
       <q-card class="update-dialog">
         <q-card-section class="dialog-header">
@@ -442,4 +442,40 @@ fr:
   restartMessage: "L'application doit être redémarrée pour appliquer la mise à jour."
   restart: 'Redémarrer'
   updateSimulationComplete: 'Simulation de mise à jour terminée.'
+pt:
+  title: 'Notificação de atualização'
+  newVersionMessage: 'Nova versão disponível: v{version}.'
+  newVersionAddedMessage: 'Para aplicar a atualização, ative as atualizações automáticas nas configurações e reinicie o aplicativo.'
+  confirmUpdate: 'Deseja prosseguir com a atualização?'
+  downloading: 'Baixando... {percent}%'
+  downloadComplete: 'A atualização foi baixada. Deseja instalá-la agora?'
+  error: 'Ocorreu um erro durante a atualização:'
+  errorMessage: 'Ocorreu um erro durante a atualização: Verifique o console.'
+  later: 'Mais tarde'
+  update: 'Atualizar'
+  installNow: 'Instalar agora'
+  close: 'Fechar'
+  testUpdate: 'Testar atualização'
+  restartTitle: 'Reinicialização necessária'
+  restartMessage: 'O aplicativo precisa ser reiniciado para aplicar a atualização.'
+  restart: 'Reiniciar'
+  updateSimulationComplete: 'Simulação de atualização concluída.'
+ru:
+  title: 'Уведомление об обновлении'
+  newVersionMessage: 'Доступна новая версия: v{version}.'
+  newVersionAddedMessage: 'Чтобы применить обновление, включите автоматические обновления в настройках и перезапустите приложение.'
+  confirmUpdate: 'Хотите продолжить обновление?'
+  downloading: 'Загрузка... {percent}%'
+  downloadComplete: 'Обновление загружено. Хотите установить его сейчас?'
+  error: 'Произошла ошибка при обновлении:'
+  errorMessage: 'Произошла ошибка при обновлении: Проверьте консоль.'
+  later: 'Позже'
+  update: 'Обновить'
+  installNow: 'Установить сейчас'
+  close: 'Закрыть'
+  testUpdate: 'Тестировать обновление'
+  restartTitle: 'Требуется перезапуск'
+  restartMessage: 'Приложение необходимо перезапустить для применения обновления.'
+  restart: 'Перезапустить'
+  updateSimulationComplete: 'Симуляция обновления завершена.'
 </i18n>

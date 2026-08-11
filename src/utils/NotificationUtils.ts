@@ -52,3 +52,29 @@ export function showError(message: string, duration = 2000, position: Notificati
     attrs: { role: 'alert', 'aria-live': 'assertive' },
   });
 }
+
+/**
+ * 실행취소(undo) 액션이 포함된 알림을 표시합니다.
+ * @param message - 표시할 메시지 내용
+ * @param undoLabel - 실행취소 버튼 라벨
+ * @param onUndo - 실행취소 버튼 클릭 시 실행할 콜백
+ * @param duration - 알림 표시 시간 (기본값: 8000ms)
+ * @param position - 알림 위치 (기본값: 'top')
+ */
+export function showUndo(
+  message: string,
+  undoLabel: string,
+  onUndo: () => void,
+  duration = 8000,
+  position: NotificationPosition = 'top',
+): void {
+  Notify.create({
+    message,
+    position,
+    timeout: duration,
+    color: 'warning',
+    html: true,
+    attrs: { role: 'alert', 'aria-live': 'assertive' },
+    actions: [{ label: undoLabel, color: 'white', handler: onUndo }],
+  });
+}

@@ -18,6 +18,8 @@
   import HelpMdDe from '../content/pages/HelpPage-de.md';
   import HelpMdEs from '../content/pages/HelpPage-es.md';
   import HelpMdFr from '../content/pages/HelpPage-fr.md';
+  import HelpMdPt from '../content/pages/HelpPage-pt.md';
+  import HelpMdRu from '../content/pages/HelpPage-ru.md';
 
   const helpMdMap: Record<string, string> = {
     ko: HelpMdKo,
@@ -27,6 +29,8 @@
     de: HelpMdDe,
     es: HelpMdEs,
     fr: HelpMdFr,
+    pt: HelpMdPt,
+    ru: HelpMdRu,
   };
 
   const currentMd = computed(() => {
@@ -184,4 +188,20 @@ fr:
     '2': 'Devise'
     '3': 'Base numérique'
     '4': 'Formule'
+pt:
+  title: 'Ajuda'
+  calc:
+    '0': 'Padrão'
+    '1': 'Unidade'
+    '2': 'Moeda'
+    '3': 'Base numérica'
+    '4': 'Fórmula'
+ru:
+  title: 'Справка'
+  calc:
+    '0': 'Стандартный'
+    '1': 'Единицы'
+    '2': 'Валюта'
+    '3': 'Система счисления'
+    '4': 'Формула'
 </i18n>

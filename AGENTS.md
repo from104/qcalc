@@ -1,6 +1,6 @@
 # QCalc
 
-Multi-purpose calculator — Vue 3 + Quasar 2 + TypeScript + Electron 40 + Capacitor.
+Multi-purpose calculator — Vue 3 + Quasar 2 + TypeScript + Tauri 2 (desktop production) + Capacitor (Android). Electron remains in-tree as a legacy desktop target during the Tauri transition.
 5 modes: Standard, Unit, Currency, Programmer (Radix), Formula (mathjs).
 
 ## Language
@@ -11,11 +11,12 @@ Always respond in **Korean**. Technical terms and code identifiers stay in Engli
 
 ```bash
 yarn install              # Install dependencies
-quasar dev -m electron    # Dev (desktop)
+yarn dev:tauri            # Dev (desktop, production target)
+yarn build:tauri          # Build desktop (deb/rpm/AppImage; NSIS on Windows)
 yarn lint                 # ESLint (flat config)
 yarn test                 # Vitest
 yarn test:coverage        # Vitest with v8 coverage
-quasar build -m electron  # Build Linux
+quasar dev -m electron    # Dev (legacy Electron target)
 ```
 
 ## Code Style
@@ -34,16 +35,19 @@ quasar build -m electron  # Build Linux
 
 ```text
 src/
-├── classes/           # Calculator, CalculatorMath, CalculatorState, Memory, etc.
+├── core/              # Calculator, CalculatorMath, CalculatorState, Memory, etc.
 ├── components/        # Vue SFCs — ResultField, CalcButton, FormulaField, etc.
 ├── composables/       # useCalcButtonActions, useRecordManager, useMainLayout, etc.
 ├── constants/         # CalcButtonSet (button definitions), unit/currency data
-├── i18n/              # vue-i18n — ko, en, ja (YAML locale files)
-├── pages/             # HelpPage, AboutPage, SettingPage, etc.
+├── content/           # In-app markdown — pages/{About,Help}Page-{lang}.md, tips/{lang}/
+├── i18n/              # vue-i18n — 10 languages (YAML locale files)
+├── pages/             # HelpPage, AboutPage, SettingPage, etc. (.vue)
 ├── stores/            # Pinia stores — calcStore, formulaStore, radixStore, etc.
 ├── types/             # TypeScript type definitions
 └── utils/             # Utility functions
-src-electron/          # electron-main.ts, electron-preload.ts
+src-tauri/             # Desktop production — src/lib.rs (announce_a11y, quit_app,
+                       #   get_package_env), tauri.conf.json, capabilities/, UPDATER.md
+src-electron/          # Legacy Electron target — electron-main.ts, electron-preload.ts
 src-capacitor/         # Capacitor Android project
 ```
 
@@ -57,13 +61,13 @@ src-capacitor/         # Capacitor Android project
 
 ## i18n
 
-- Central registry: `src/i18n/languages.ts` (`SUPPORTED_LANGUAGES`)
-- Locales: `src/i18n/ko/*.yaml`, `src/i18n/en/*.yaml`, `src/i18n/ja/*.yaml`
+- Central registry: `src/i18n/languages.ts` (`SUPPORTED_LANGUAGES`) — **10 languages: ko, en, ja, zh, hi, de, es, fr, pt, ru**
+- Locales: `src/i18n/messages/{lang}Messages.yml`, `src/i18n/errors/{lang}Errors.yml`, `src/i18n/components/*.yml` (per-component files hold all languages in one file)
 - Fallback: `en`
 - **Escape `@` as `{'@'}`** in YAML values (vue-i18n link syntax). Same for `{`, `}`, `|`.
 - If the YAML value contains special characters, always wrap it in double quotes: `key: "value with {'@'}"`
 - When adding a new language, you must register it in `SUPPORTED_LANGUAGES` in `src/i18n/languages.ts`
-- When adding or modifying i18n keys, always update all three language files (**ko, en, ja**) at the same time
+- When adding or modifying i18n keys, always update **all 10 languages** at the same time. Watch out for dynamically built keys (e.g. `t(\`ariaLabel.${button.icon}\`)` in the layouts) — a key missing from the YAML is spoken/shown as the raw key name.
 - If the translation is unclear, you may keep the `en` value as-is (since the fallback is `en`, it is better than missing values)
 
 ## Git Conventions
@@ -76,14 +80,15 @@ src-capacitor/         # Capacitor Android project
 
 1. Update `version` in `package.json`
 2. Update `CHANGELOG.md` and `CHANGELOG-ko.md`
-3. Sync all `src/pages/AboutPage-*.md` files with the changelog (include all supported language extensions)
-4. Sync all `src/pages/HelpPage-*.md` files with the README (include all supported language extensions)
-5. Run `yarn lint` and `yarn test`
-6. Ensure every document exists for each supported language pair (e.g., en/ko/ja) — always update all when adding or modifying
+3. Sync all `src/content/pages/AboutPage-*.md` files with the changelog (all 10 languages)
+4. Sync all `src/content/pages/HelpPage-*.md` files with the README (all 10 languages)
+5. Update the `<releases>` list in `flatpak/io.github.from104.qcalc.metainfo.xml`
+6. Run `yarn lint` and `yarn test`
+7. Tag `v<version>` on `main` — `.github/workflows/release.yml` builds all six desktop packages (deb/rpm/AppImage/Flatpak/Snap/NSIS) and creates a draft release; after publishing it, run the `tauri-updater-promote` workflow so auto-update clients see the new version
 
 ## Testing
 
 - **Framework**: Vitest (not Jest)
 - **Config**: `vitest.config.ts` — environment: node, globals: true
 - **Location**: `src/**/*.{test,spec}.ts` (e.g., `src/classes/__tests__/CalculatorMath.test.ts`)
-- **CI**: GitHub Actions runs lint → type-check → test on push to develop/main
+- **CI**: `ci.yml` runs lint → type-check → test (+ Electron build job) on push to develop/main; `release.yml` builds the six desktop packages on `v*` tags; `tauri-updater-promote.yml` promotes `latest.json` to the fixed `tauri-updater` rolling release

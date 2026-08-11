@@ -48,10 +48,10 @@
       <q-icon :name="icon" role="img" :aria-label="t('ariaLabel.icon', { name: title })" />
     </q-item-section>
     <q-item-section>
-      <q-item-label v-if="title" role="text" class="text-weight-bold">
+      <q-item-label v-if="title" class="text-weight-bold">
         {{ title }}
       </q-item-label>
-      <q-item-label v-if="caption" caption role="text" class="ellipsis">
+      <q-item-label v-if="caption" caption class="ellipsis">
         {{ caption }} {{ shortcut ? '(' + shortcut + ')' : '' }}
       </q-item-label>
     </q-item-section>
@@ -83,4 +83,10 @@ es:
 fr:
   ariaLabel:
     icon: 'Icône de menu {name}'
+pt:
+  ariaLabel:
+    icon: 'Ícone de menu {name}'
+ru:
+  ariaLabel:
+    icon: 'Значок меню {name}'
 </i18n>

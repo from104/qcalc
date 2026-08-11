@@ -15,6 +15,8 @@
   import { useUIStore } from 'stores/uiStore';
   import { useKeyBinding } from 'src/composables/useKeyBinding';
   import { showError } from 'src/utils/NotificationUtils';
+  import { getErrorMessage } from 'src/utils/ErrorUtils';
+  import { classifyFormulaError, type FormulaErrorInfo } from 'src/utils/FormulaError';
 
   const { t } = useI18n();
   const formulaStore = useFormulaStore();
@@ -75,6 +77,9 @@
     nextTick(() => inputRef.value?.focus());
   };
 
+  const formatFormulaError = (info: FormulaErrorInfo): string =>
+    getErrorMessage(info.key, info.detail ? { detail: info.detail } : undefined);
+
   const evaluateAndClose = () => {
     // Enter keydown으로 편집 모드 진입 직후 Enter keyup 무시
     if (Date.now() - formulaStore._editOpenedAt < 200) return;
@@ -82,14 +87,15 @@
       exitEditing();
       return;
     }
-    if (isWarning.value) {
-      showError(t('formulaEvaluationError'));
+    const errorInfo = formulaStore.expressionError();
+    if (errorInfo) {
+      showError(formatFormulaError(errorInfo));
       return;
     }
     try {
       formulaStore.evaluate();
-    } catch {
-      showError(t('formulaEvaluationError'));
+    } catch (e) {
+      showError(formatFormulaError(classifyFormulaError(e instanceof Error ? e.message : String(e))));
     }
     exitEditing();
   };
@@ -173,7 +179,11 @@
         'exp(x)',
       ],
     },
-    { label: t('help.trig'), items: ['sin(x)', 'cos(x)', 'tan(x)', 'asin(x)', 'acos(x)', 'atan(x)', 'atan2(y,x)'] },
+    {
+      label: t('help.trig'),
+      hint: t('help.trigHint'),
+      items: ['sin(x)', 'cos(x)', 'tan(x)', 'asin(x)', 'acos(x)', 'atan(x)', 'atan2(y,x)'],
+    },
     { label: t('help.constants'), items: ['pi', 'e', 'phi', 'Infinity'] },
     { label: t('help.other'), items: ['factorial(n)', 'gcd(a,b)', 'lcm(a,b)', 'mod(a,b)', 'sign(x)', 'fix(x)'] },
   ]);
@@ -248,12 +258,15 @@
               @click="appendFromHelp(item)"
             />
           </div>
+          <div v-if="'hint' in group" class="text-caption help-group-label q-mb-xs">
+            {{ (group as { hint: string }).hint }}
+          </div>
         </div>
       </q-card>
     </q-menu>
 
     <!-- 표시 모드 -->
-    <div v-if="!isEditing" class="cursor-pointer" :title="t('editExpression')" @click="startEditing">
+    <div v-if="!isEditing" class="cursor-pointer" @click="startEditing">
       <q-field
         class="shadow-1 formula-expression-field"
         filled
@@ -280,10 +293,20 @@
         <template #control>
           <div class="row items-center no-wrap full-width full-height overflow-hidden q-pt-xs">
             <span v-if="overflowLeft" class="formula-overflow-indicator">...</span>
+            <!--
+              role="button"는 clear 버튼(위 prepend)을 포함하지 않는 이 텍스트 요소에만 부여한다.
+              바깥 div에 부여하면 clear 버튼(q-btn)이 하위에 중첩된 인터랙티브 컨트롤이 되어
+              axe-core nested-interactive 위반이 발생한다.
+            -->
             <div
               ref="innerText"
               class="col no-outline text-right noselect formula-expression-text"
               :class="[isExpressionEmpty ? 'formula-expression-placeholder' : '', `text-${fieldTextColor}`]"
+              role="button"
+              tabindex="0"
+              :title="t('editExpression')"
+              @keydown.enter.prevent="startEditing"
+              @keydown.space.prevent.stop="startEditing"
             >
               {{ displayExpression }}
             </div>
@@ -384,7 +407,6 @@ ko:
   expressionPlaceholder: '수식을 입력하세요 (예: (1+3)*5)'
   editExpression: '수식 편집 (Space)'
   clearExpression: '수식 지우기'
-  formulaEvaluationError: '수식 평가 오류. 수식을 확인해 주세요.'
   ariaLabel:
     expressionField: '수식 입력 필드'
   help:
@@ -395,13 +417,13 @@ ko:
     arithmetic: '산술'
     functions: '함수'
     trig: '삼각함수'
+    trigHint: '각도는 도(°) 단위입니다'
     constants: '상수'
     other: '기타'
 en:
   expressionPlaceholder: 'Enter expression (e.g. (1+3)*5)'
   editExpression: 'Edit expression (Space)'
   clearExpression: 'Clear expression'
-  formulaEvaluationError: 'Formula evaluation error. Please check your expression.'
   ariaLabel:
     expressionField: 'Formula input field'
   help:
@@ -412,13 +434,13 @@ en:
     arithmetic: 'Arithmetic'
     functions: 'Functions'
     trig: 'Trigonometry'
+    trigHint: 'Angles are in degrees (°)'
     constants: 'Constants'
     other: 'Other'
 ja:
   expressionPlaceholder: '数式を入力 (例: (1+3)*5)'
   editExpression: '数式編集 (Space)'
   clearExpression: '数式をクリア'
-  formulaEvaluationError: '数式の評価エラー。数式を確認してください。'
   ariaLabel:
     expressionField: '数式入力フィールド'
   help:
@@ -429,13 +451,13 @@ ja:
     arithmetic: '算術'
     functions: '関数'
     trig: '三角関数'
+    trigHint: '角度は度(°)単位です'
     constants: '定数'
     other: 'その他'
 zh:
   expressionPlaceholder: '输入表达式 (例: (1+3)*5)'
   editExpression: '编辑表达式 (Space)'
   clearExpression: '清除表达式'
-  formulaEvaluationError: '公式求值错误。请检查您的表达式。'
   ariaLabel:
     expressionField: '公式输入字段'
   help:
@@ -446,13 +468,13 @@ zh:
     arithmetic: '算术'
     functions: '函数'
     trig: '三角函数'
+    trigHint: '角度以度(°)为单位'
     constants: '常数'
     other: '其他'
 hi:
   expressionPlaceholder: 'अभिव्यक्ति दर्ज करें (उदा: (1+3)*5)'
   editExpression: 'अभिव्यक्ति संपादित करें (Space)'
   clearExpression: 'अभिव्यक्ति साफ़ करें'
-  formulaEvaluationError: 'सूत्र मूल्यांकन त्रुटि। कृपया अपनी अभिव्यक्ति जाँचें।'
   ariaLabel:
     expressionField: 'सूत्र इनपुट फ़ील्ड'
   help:
@@ -463,13 +485,13 @@ hi:
     arithmetic: 'अंकगणित'
     functions: 'फ़ंक्शन'
     trig: 'त्रिकोणमिति'
+    trigHint: 'कोण डिग्री (°) में हैं'
     constants: 'स्थिरांक'
     other: 'अन्य'
 de:
   expressionPlaceholder: 'Ausdruck eingeben (z.B. (1+3)*5)'
   editExpression: 'Ausdruck bearbeiten (Space)'
   clearExpression: 'Ausdruck löschen'
-  formulaEvaluationError: 'Formelauswertungsfehler. Bitte überprüfen Sie Ihren Ausdruck.'
   ariaLabel:
     expressionField: 'Formeleingabefeld'
   help:
@@ -480,13 +502,13 @@ de:
     arithmetic: 'Arithmetik'
     functions: 'Funktionen'
     trig: 'Trigonometrie'
+    trigHint: 'Winkel in Grad (°)'
     constants: 'Konstanten'
     other: 'Sonstige'
 es:
   expressionPlaceholder: 'Ingrese expresión (ej: (1+3)*5)'
   editExpression: 'Editar expresión (Space)'
   clearExpression: 'Borrar expresión'
-  formulaEvaluationError: 'Error de evaluación de fórmula. Verifique su expresión.'
   ariaLabel:
     expressionField: 'Campo de entrada de fórmula'
   help:
@@ -497,13 +519,13 @@ es:
     arithmetic: 'Aritmética'
     functions: 'Funciones'
     trig: 'Trigonometría'
+    trigHint: 'Los ángulos están en grados (°)'
     constants: 'Constantes'
     other: 'Otros'
 fr:
   expressionPlaceholder: 'Entrez une expression (ex: (1+3)*5)'
   editExpression: "Modifier l'expression (Space)"
   clearExpression: "Effacer l'expression"
-  formulaEvaluationError: "Erreur d'évaluation de formule. Veuillez vérifier votre expression."
   ariaLabel:
     expressionField: 'Champ de saisie de formule'
   help:
@@ -514,6 +536,41 @@ fr:
     arithmetic: 'Arithmétique'
     functions: 'Fonctions'
     trig: 'Trigonométrie'
+    trigHint: 'Les angles sont en degrés (°)'
     constants: 'Constantes'
     other: 'Autres'
+pt:
+  expressionPlaceholder: 'Digite uma expressão (ex: (1+3)*5)'
+  editExpression: 'Editar expressão (Space)'
+  clearExpression: 'Limpar expressão'
+  ariaLabel:
+    expressionField: 'Campo de entrada de fórmula'
+  help:
+    title: 'Referência mathjs'
+    atHint: 'Valor atual da calculadora'
+    dollarHint: 'Valor da memória'
+    docsLink: 'Documentação mathjs'
+    arithmetic: 'Aritmética'
+    functions: 'Funções'
+    trig: 'Trigonometria'
+    trigHint: 'Ângulos em graus (°)'
+    constants: 'Constantes'
+    other: 'Outros'
+ru:
+  expressionPlaceholder: 'Введите выражение (напр. (1+3)*5)'
+  editExpression: 'Редактировать выражение (Space)'
+  clearExpression: 'Очистить выражение'
+  ariaLabel:
+    expressionField: 'Поле ввода формулы'
+  help:
+    title: 'Справочник mathjs'
+    atHint: 'Текущее значение калькулятора'
+    dollarHint: 'Значение памяти'
+    docsLink: 'Документация mathjs'
+    arithmetic: 'Арифметика'
+    functions: 'Функции'
+    trig: 'Тригонометрия'
+    trigHint: 'Углы в градусах (°)'
+    constants: 'Константы'
+    other: 'Прочее'
 </i18n>

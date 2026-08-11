@@ -20,6 +20,8 @@
   import AboutMdDe from '../../content/pages/AboutPage-de.md';
   import AboutMdEs from '../../content/pages/AboutPage-es.md';
   import AboutMdFr from '../../content/pages/AboutPage-fr.md';
+  import AboutMdPt from '../../content/pages/AboutPage-pt.md';
+  import AboutMdRu from '../../content/pages/AboutPage-ru.md';
 
   const uiStore = useUIStore();
   const { getButtonTextColor } = useDialogStyle();
@@ -38,6 +40,8 @@
     de: AboutMdDe,
     es: AboutMdEs,
     fr: AboutMdFr,
+    pt: AboutMdPt,
+    ru: AboutMdRu,
   };
 
   const currentMd = computed(() => {
@@ -205,4 +209,14 @@ fr:
   currentVersionMessage: 'Version actuelle : v{version}'
   confirm: 'OK'
   testChangelog: 'Tester le CHANGELOG'
+pt:
+  dialogTitle: 'Novidades'
+  currentVersionMessage: 'Versão atual: v{version}'
+  confirm: 'OK'
+  testChangelog: 'Testar CHANGELOG'
+ru:
+  dialogTitle: 'Что нового'
+  currentVersionMessage: 'Текущая версия: v{version}'
+  confirm: 'OK'
+  testChangelog: 'Тестировать CHANGELOG'
 </i18n>

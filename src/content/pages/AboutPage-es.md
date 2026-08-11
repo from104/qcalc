@@ -1,6 +1,6 @@
 # Información de la aplicación
 
-Esta aplicación fue creada usando vue+quasar+electron.
+Esta aplicación fue creada usando vue+quasar+tauri.
 
 Contacto: Seo Kihyun <from104@gmail.com>,
 
@@ -12,23 +12,25 @@ Todos los cambios notables de este proyecto se registran en este archivo.
 
 El formato se basa en [Keep a Changelog] y este proyecto sigue [Versionado Semántico].
 
-## [0.12.0] 2026-03-22
-
-### Añadido
-
-- **Calculadora de Fórmulas (5.ª calculadora)**: Escriba y evalúe expresiones matemáticas directamente — soporta aritmética, paréntesis, funciones (`sin`, `cos`, `sqrt`, `log`, `ln`, `abs`, `round`, `nthRoot`, etc.) y constantes (`pi`, `e`, `phi`) mediante sintaxis de [mathjs](https://mathjs.org/).
-  - Presione Espacio para abrir el editor de fórmulas en línea para editar expresiones directamente.
-  - Use `@` para referenciar el valor actual y `$` para el valor almacenado en memoria.
-  - Soporte completo de memoria (MC, MR, MS, M+, M−, M×, M÷) disponible a través de los botones de función con Shift.
-  - Los resultados evaluados se guardan en el historial de cálculos con la expresión completa mostrada.
-  - El menú de ayuda integrado lista todas las funciones, constantes y marcadores de posición disponibles.
-- **5 nuevos idiomas (8 en total)**: Chino (simplificado), hindi, alemán, español y francés se unen a los existentes coreano, inglés y japonés. Todas las pantallas están traducidas — menús, configuraciones, nombres de unidades, nombres de monedas, páginas de ayuda, páginas de información, consejos y mensajes de error.
-- **Empaquetado Flatpak**: Instale QCalc desde Flatpak para un soporte más amplio en escritorios Linux.
-- **Migración a APIs de divisas públicas gratuitas**: Cambio de FreeCurrencyAPI (requiere clave API) a APIs públicas gratuitas (Frankfurter + fawazahmed0). Soporte para 340 divisas (fiat, metales preciosos, criptomonedas) sin clave API. Las instantáneas de tipos de cambio en tiempo de compilación permiten la conversión de divisas incluso en el primer inicio sin conexión.
+## [0.13.0] 2026-08-09
 
 ### Cambiado
 
-- **Cambio de idioma más fluido**: Si falta una traducción, la aplicación ahora recurre automáticamente al inglés en lugar de mostrar las rutas de claves sin procesar.
-- **Cobertura de divisas ampliada**: De 170 a 340 divisas — se añadieron criptomonedas principales (ETH, SOL, XRP, etc.), metales preciosos (paladio, platino) y divisas históricas. Soporte i18n completo para los 8 idiomas.
+- **La aplicación de escritorio pasa de Electron a Tauri 2**: una aplicación de escritorio más ligera y rápida. Se distribuye como deb, rpm, AppImage, Flatpak y Snap en Linux y como instalador NSIS en Windows, con la actualización automática plenamente funcional sobre la nueva base.
+- **Migración del historial**: Exporte su historial de cálculos desde la versión anterior (Electron) e impórtelo en la pantalla de primer inicio de la nueva versión.
+- **Ventana predeterminada más grande**: El tamaño de ventana predeterminado y mínimo aumentó a 480×756.
+
+### Añadido
+
+- **Lectura de resultados con lector de pantalla (Linux)**: Cuando se completa un cálculo, el lector de pantalla (Orca) lee el resultado en voz alta.
+- **Anuncio de errores de fórmula**: Los errores de fórmula se clasifican por tipo y se anuncian mediante el lector de pantalla.
+- **Deshacer la eliminación de registros**: La eliminación de un registro del historial puede deshacerse desde una barra de notificaciones.
+- **Accesibilidad por teclado mejorada**: El menú de pestañas desbordadas, el campo de fórmula y el conmutador de memoria son totalmente operables con el teclado.
+- **Temas de mayor contraste**: Los colores de los temas se elevaron al contraste WCAG AA.
+- **Nuevos idiomas (10 en total)**: Se añadieron portugués y ruso (incl. 0.12.1).
+
+### Corregido
+
+- Visualización y pegado de números según la configuración regional, unificación en grados de las funciones trigonométricas de la calculadora de fórmulas y muchas otras correcciones de accesibilidad y traducción.
 
 Para información sobre versiones anteriores, por favor consulte [aquí](https://github.com/from104/qcalc/blob/main/CHANGELOG.md).

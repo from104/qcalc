@@ -1,6 +1,6 @@
 # App-Informationen
 
-Diese App wurde mit vue+quasar+electron erstellt.
+Diese App wurde mit vue+quasar+tauri erstellt.
 
 Kontakt: Seo Kihyun <from104@gmail.com>,
 
@@ -12,23 +12,25 @@ Alle wichtigen Änderungen an diesem Projekt werden in dieser Datei festgehalten
 
 Das Format basiert auf [Keep a Changelog] und dieses Projekt folgt der [Semantischen Versionierung].
 
-## [0.12.0] 2026-03-22
-
-### Hinzugefügt
-
-- **Formelrechner (5. Rechner)**: Mathematische Ausdrücke direkt eingeben und auswerten — unterstützt Arithmetik, Klammern, Funktionen (`sin`, `cos`, `sqrt`, `log`, `ln`, `abs`, `round`, `nthRoot` usw.) und Konstanten (`pi`, `e`, `phi`) über [mathjs](https://mathjs.org/)-Syntax.
-  - Drücken Sie die Leertaste, um den Inline-Formeleditor zur direkten Ausdrucksbearbeitung zu öffnen.
-  - Verwenden Sie `@`, um auf den aktuellen Wert zu verweisen, und `$` für den gespeicherten Speicherwert.
-  - Volle Speicherunterstützung (MC, MR, MS, M+, M−, M×, M÷) über Shift-Funktionstasten verfügbar.
-  - Ausgewertete Ergebnisse werden mit dem vollständigen Ausdruck im Berechnungsverlauf gespeichert.
-  - Das integrierte Hilfemenü listet alle verfügbaren Funktionen, Konstanten und Platzhalter auf.
-- **5 neue Sprachen (8 insgesamt)**: Chinesisch (vereinfacht), Hindi, Deutsch, Spanisch und Französisch ergänzen die bestehenden Sprachen Koreanisch, Englisch und Japanisch. Jeder Bildschirm ist übersetzt — Menüs, Einstellungen, Einheitsnamen, Währungsnamen, Hilfeseiten, Info-Seiten, Tipps und Fehlermeldungen.
-- **Flatpak-Paketierung**: Installieren Sie QCalc über Flatpak für breitere Linux-Desktop-Unterstützung.
-- **Migration zu kostenlosen öffentlichen Währungs-APIs**: Umstellung von FreeCurrencyAPI (API-Schlüssel erforderlich) auf kostenlose öffentliche APIs (Frankfurter + fawazahmed0). Unterstützung von 340 Währungen (Fiat, Edelmetalle, Kryptowährungen) ohne API-Schlüssel. Build-Zeit-Kurs-Snapshots ermöglichen Währungsumrechnung auch beim ersten Offline-Start.
+## [0.13.0] 2026-08-09
 
 ### Geändert
 
-- **Reibungsloserer Sprachwechsel**: Wenn eine Übersetzung fehlt, fällt die App jetzt automatisch auf Englisch zurück, anstatt rohe Schlüsselpfade anzuzeigen.
-- **Erweiterte Währungsabdeckung**: Von 170 auf 340 Währungen — wichtige Kryptowährungen (ETH, SOL, XRP usw.), Edelmetalle (Palladium, Platin) und historische Währungen hinzugefügt. Vollständige i18n-Unterstützung für alle 8 Sprachen.
+- **Desktop-App von Electron auf Tauri 2 umgestellt**: eine leichtere und schnellere Desktop-App. Sie wird unter Linux als deb, rpm, AppImage, Flatpak und Snap sowie unter Windows als NSIS-Installer ausgeliefert; die automatische Aktualisierung funktioniert auf der neuen Grundlage vollständig.
+- **Verlaufsmigration**: Exportieren Sie Ihren Berechnungsverlauf aus der bisherigen (Electron-)Version und importieren Sie ihn im Erststart-Bildschirm der neuen Version.
+- **Größeres Standardfenster**: Standard- und Mindestfenstergröße wurden auf 480×756 vergrößert.
+
+### Hinzugefügt
+
+- **Vorlesen der Ergebnisse durch den Screenreader (Linux)**: Sobald eine Berechnung abgeschlossen ist, wird das Ergebnis vom Screenreader (Orca) vorgelesen.
+- **Ansage von Formelfehlern**: Formelfehler werden nach Typ klassifiziert und über den Screenreader angesagt.
+- **Rückgängig machen beim Löschen von Einträgen**: Das Löschen eines Verlaufseintrags lässt sich über eine Snackbar rückgängig machen.
+- **Verbesserte Tastaturbedienbarkeit**: Überlauf-Tab-Menü, Formelfeld und Speicher-Umschalter sind vollständig mit der Tastatur bedienbar.
+- **Themes mit höherem Kontrast**: Die Theme-Farben wurden auf WCAG-AA-Kontrast angehoben.
+- **Neue Sprachen (10 insgesamt)**: Portugiesisch und Russisch hinzugefügt (inkl. 0.12.1).
+
+### Behoben
+
+- Gebietsschemagerechte Zahlendarstellung und -einfügung, einheitliche Winkeleinheit (Grad) für die trigonometrischen Funktionen des Formelrechners sowie viele weitere Korrekturen bei Barrierefreiheit und Übersetzung.
 
 Informationen zu früheren Versionen finden Sie [hier](https://github.com/from104/qcalc/blob/main/CHANGELOG.md).

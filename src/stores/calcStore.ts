@@ -8,14 +8,15 @@ import { Calculator } from 'core/calculator/Calculator';
 import { match } from 'ts-pattern';
 import { Operator } from 'core/calculator/Calculator';
 import { Radix, convertRadix } from 'core/converters/RadixConverter';
-import { numberGrouping, formatDecimalPlaces, formatExpressionNumbers } from '../utils/NumberUtils';
+import {
+  numberGrouping,
+  formatDecimalPlaces,
+  formatExpressionNumbers,
+  formatNumberToLocale,
+} from '../utils/NumberUtils';
 import { useSettingsStore } from './settingsStore';
 import { useRadixStore } from './radixStore';
 import { useUIStore } from './uiStore';
-
-const settingsStore = useSettingsStore();
-const radixStore = useRadixStore();
-const uiStore = useUIStore();
 
 interface CalcState {
   calc: Calculator;
@@ -91,13 +92,23 @@ export const useCalcStore = defineStore('calc', {
     toFormattedNumber(value: string, radix: Radix = Radix.Decimal): string {
       if (!value) return '';
 
-      const currentSettings = settingsStore.getCurrentFormatSettings;
-      const formattedValue = formatDecimalPlaces(
-        value,
-        settingsStore.getDecimalPlaces,
-        radixStore.radixEnumToNumber(uiStore.currentTab === 'radix' ? radix : Radix.Decimal),
-      );
+      const settingsStore = useSettingsStore();
+      const radixStore = useRadixStore();
+      const uiStore = useUIStore();
 
+      const currentSettings = settingsStore.getCurrentFormatSettings;
+      const radixNumber = radixStore.radixEnumToNumber(uiStore.currentTab === 'radix' ? radix : Radix.Decimal);
+      const formattedValue = formatDecimalPlaces(value, settingsStore.getDecimalPlaces, radixNumber);
+
+      // 10진수: 로케일 표기(그룹 구분자·소수 구분자). 2/8/16진수는 기존 그룹핑 유지.
+      if (radixNumber === 10) {
+        return formatNumberToLocale(
+          formattedValue,
+          settingsStore.locale || 'en',
+          currentSettings.useGrouping,
+          currentSettings.groupingUnit,
+        );
+      }
       return currentSettings.useGrouping
         ? numberGrouping(formattedValue, currentSettings.groupingUnit)
         : formattedValue;
@@ -105,6 +116,10 @@ export const useCalcStore = defineStore('calc', {
 
     // 계산 기록 관련
     getLeftSideInRecord(result: CalculationResult, useLineBreak = false, expression?: string): string {
+      const settingsStore = useSettingsStore();
+      const radixStore = useRadixStore();
+      const uiStore = useUIStore();
+
       // formula 수식: 진수 변환 + 쉼표 포맷팅 적용
       if (expression) {
         const currentSettings = settingsStore.getCurrentFormatSettings;
@@ -203,6 +218,9 @@ export const useCalcStore = defineStore('calc', {
     },
 
     getRightSideInRecord(result: CalculationResult): string {
+      const radixStore = useRadixStore();
+      const uiStore = useUIStore();
+
       const radix = uiStore.currentTab === 'radix' ? radixStore.sourceRadix : Radix.Decimal;
       const radixPrefix =
         uiStore.currentTab === 'radix' && radixStore.showRadix && radixStore.radixType === 'prefix'

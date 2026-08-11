@@ -32,7 +32,7 @@
   import { useKeyBinding } from '../../composables/useKeyBinding';
 
   // 알림 관련 유틸리티 함수
-  import { showMessage, showError } from 'src/utils/NotificationUtils';
+  import { showMessage, showError, showUndo } from 'src/utils/NotificationUtils';
 
   // 전역 window 객체에 접근하기 위한 상수 선언
   const $g = window.globalVars;
@@ -314,9 +314,15 @@
     if (!isWideWidth()) navigateToPath('/', route, router);
   };
 
-  // 히스토리 항목 삭제 함수
+  // 히스토리 항목 삭제 함수 (실행취소 지원)
   const deleteRecordItem = (id: number) => {
+    // 삭제 직전에 원본 객체와 인덱스를 캡처(복원용)
+    const index = calcStore.calc.record.findIndexById(id);
+    const deletedRecord = calcStore.calc.record.getRecordByIndex(index);
     calcStore.calc.record.deleteRecord(id);
+    showUndo(t('recordDeleted'), t('undo'), () => {
+      calcStore.calc.record.restoreRecord(deletedRecord, index);
+    });
   };
 
   // 헤더의 높이를 동적으로 계산하는 computed 속성입니다.
@@ -1035,6 +1041,8 @@ ko:
   loadToMainPanel: '메인 패널에 불러오기'
   loadToSubPanel: '서브 패널에 불러오기'
   deleteResult: '결과 삭제'
+  recordDeleted: '기록을 삭제했습니다.'
+  undo: '실행취소'
   copyTime: '시간 복사'
   copyExpression: '수식 복사'
   loadToFormulaField: '수식 필드에 불러오기'
@@ -1066,6 +1074,8 @@ en:
   loadToMainPanel: 'Load to main panel'
   loadToSubPanel: 'Load to sub panel'
   deleteResult: 'Delete result'
+  recordDeleted: 'Record deleted.'
+  undo: 'Undo'
   copyTime: 'Copy time'
   copyExpression: 'Copy expression'
   loadToFormulaField: 'Load to formula field'
@@ -1097,6 +1107,8 @@ ja:
   loadToMainPanel: 'メインパネルに読み込む'
   loadToSubPanel: 'サブパネルに読み込む'
   deleteResult: '結果を削除'
+  recordDeleted: '記録を削除しました。'
+  undo: '元に戻す'
   copyTime: '時間をコピー'
   copyExpression: '数式をコピー'
   loadToFormulaField: '数式フィールドに読み込む'
@@ -1128,6 +1140,8 @@ zh:
   loadToMainPanel: '加载到主面板'
   loadToSubPanel: '加载到子面板'
   deleteResult: '删除结果'
+  recordDeleted: '已删除记录。'
+  undo: '撤销'
   copyTime: '复制时间'
   copyExpression: '复制表达式'
   loadToFormulaField: '加载到公式字段'
@@ -1159,6 +1173,8 @@ hi:
   loadToMainPanel: 'मुख्य पैनल में लोड करें'
   loadToSubPanel: 'सब पैनल में लोड करें'
   deleteResult: 'परिणाम हटाएं'
+  recordDeleted: 'रिकॉर्ड हटा दिया गया।'
+  undo: 'पूर्ववत करें'
   copyTime: 'समय कॉपी करें'
   copyExpression: 'सूत्र कॉपी करें'
   loadToFormulaField: 'सूत्र फ़ील्ड में लोड करें'
@@ -1190,6 +1206,8 @@ de:
   loadToMainPanel: 'In Hauptpanel laden'
   loadToSubPanel: 'In Unterpanel laden'
   deleteResult: 'Ergebnis löschen'
+  recordDeleted: 'Eintrag gelöscht.'
+  undo: 'Rückgängig'
   copyTime: 'Zeit kopieren'
   copyExpression: 'Formel kopieren'
   loadToFormulaField: 'In Formelfeld laden'
@@ -1221,6 +1239,8 @@ es:
   loadToMainPanel: 'Cargar en panel principal'
   loadToSubPanel: 'Cargar en panel secundario'
   deleteResult: 'Eliminar resultado'
+  recordDeleted: 'Registro eliminado.'
+  undo: 'Deshacer'
   copyTime: 'Copiar hora'
   copyExpression: 'Copiar expresión'
   loadToFormulaField: 'Cargar en campo de fórmula'
@@ -1252,6 +1272,8 @@ fr:
   loadToMainPanel: 'Charger dans le panneau principal'
   loadToSubPanel: 'Charger dans le sous-panneau'
   deleteResult: 'Supprimer le résultat'
+  recordDeleted: 'Enregistrement supprimé.'
+  undo: 'Annuler'
   copyTime: "Copier l'heure"
   copyExpression: "Copier l'expression"
   loadToFormulaField: 'Charger dans le champ de formule'
@@ -1265,4 +1287,70 @@ fr:
     searchInput: 'Rechercher'
     dragHandle: 'Déplacer la fenêtre de recherche'
     closeSearch: 'Fermer la fenêtre de recherche'
+pt:
+  record: 'Histórico de cálculos'
+  noRecord: 'Nenhum histórico de cálculos.'
+  noSearchResult: 'Nenhum resultado de pesquisa.'
+  search: 'Pesquisar'
+  doYouDeleteRecord: 'Deseja excluir todo o histórico de cálculos?'
+  memo: 'Nota'
+  copySuccess: 'Copiado para a área de transferência.'
+  copyFailure: 'Falha ao copiar para a área de transferência.'
+  addMemo: 'Adicionar nota'
+  editMemo: 'Editar nota'
+  copyMemo: 'Copiar nota'
+  deleteMemo: 'Excluir nota'
+  copyDisplayedResult: 'Copiar resultado exibido'
+  copyResultNumber: 'Copiar número do resultado'
+  loadToMainPanel: 'Carregar no painel principal'
+  loadToSubPanel: 'Carregar no painel secundário'
+  deleteResult: 'Excluir resultado'
+  recordDeleted: 'Registro excluído.'
+  undo: 'Desfazer'
+  copyTime: 'Copiar hora'
+  copyExpression: 'Copiar expressão'
+  loadToFormulaField: 'Carregar no campo de fórmula'
+  fontSize:
+    increase: 'Aumentar tamanho da fonte'
+    decrease: 'Diminuir tamanho da fonte'
+  ariaLabel:
+    scrollToTop: 'Rolar para o topo'
+    editMemo: 'Editar nota'
+    deleteRecord: 'Excluir registro'
+    searchInput: 'Pesquisar'
+    dragHandle: 'Mover janela de pesquisa'
+    closeSearch: 'Fechar janela de pesquisa'
+ru:
+  record: 'История вычислений'
+  noRecord: 'Нет истории вычислений.'
+  noSearchResult: 'Нет результатов поиска.'
+  search: 'Поиск'
+  doYouDeleteRecord: 'Вы хотите удалить всю историю вычислений?'
+  memo: 'Заметка'
+  copySuccess: 'Скопировано в буфер обмена.'
+  copyFailure: 'Не удалось скопировать в буфер обмена.'
+  addMemo: 'Добавить заметку'
+  editMemo: 'Редактировать заметку'
+  copyMemo: 'Копировать заметку'
+  deleteMemo: 'Удалить заметку'
+  copyDisplayedResult: 'Копировать отображённый результат'
+  copyResultNumber: 'Копировать число результата'
+  loadToMainPanel: 'Загрузить в основную панель'
+  loadToSubPanel: 'Загрузить в дополнительную панель'
+  deleteResult: 'Удалить результат'
+  recordDeleted: 'Запись удалена.'
+  undo: 'Отменить'
+  copyTime: 'Копировать время'
+  copyExpression: 'Копировать выражение'
+  loadToFormulaField: 'Загрузить в поле формулы'
+  fontSize:
+    increase: 'Увеличить размер шрифта'
+    decrease: 'Уменьшить размер шрифта'
+  ariaLabel:
+    scrollToTop: 'Прокрутить наверх'
+    editMemo: 'Редактировать заметку'
+    deleteRecord: 'Удалить запись'
+    searchInput: 'Поиск'
+    dragHandle: 'Переместить окно поиска'
+    closeSearch: 'Закрыть окно поиска'
 </i18n>

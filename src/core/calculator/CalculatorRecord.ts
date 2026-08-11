@@ -154,11 +154,67 @@ export class CalculatorRecord {
   }
 
   /**
+   * 삭제된 기록 항목을 원래 인덱스 위치에 복원합니다.
+   * 실행취소(undo) 동작에 사용됩니다. 삭제 후 새 기록이 추가되어
+   * 동일 ID가 재사용된 경우, ID 충돌을 피하기 위해 새 ID를 부여합니다.
+   *
+   * @param {ResultRecord} record - 복원할 기록 항목(삭제 시점에 캡처한 객체)
+   * @param {number} index - 복원할 배열 인덱스(삭제 직전 위치)
+   */
+  public restoreRecord(record: ResultRecord, index: number): void {
+    // ID 충돌 방지: 삭제 후 새 기록이 같은 ID를 재사용했으면 새 ID 부여
+    if (record.id !== undefined && this.records.some((r) => r.id === record.id)) {
+      record.id = this.generateNewId();
+    }
+    // 인덱스를 유효 범위로 클램프(배열 축소/확대에 대한 방어)
+    const clampedIndex = Math.max(0, Math.min(index, this.records.length));
+    this.records.splice(clampedIndex, 0, record);
+    // 복원으로 인해 최대 저장 개수를 초과하지 않도록 방어
+    this.trimRecordsIfNeeded();
+  }
+
+  /**
    * 저장된 모든 기록 항목을 삭제합니다.
    * 기록 배열을 빈 배열로 초기화합니다.
    */
   public clearRecords(): void {
     this.records = [];
+  }
+
+  /**
+   * 외부(설정 가져오기/마이그레이션)에서 받은 기록 배열로 통째로 교체합니다.
+   * 유효하지 않은 항목은 건너뛰고, 배열 순서(최신 우선)를 유지하며 최대 MAX_RECORDS로 제한합니다.
+   *
+   * @param records 가져온 기록 배열(신뢰할 수 없는 입력)
+   */
+  public loadRecords(records: unknown): void {
+    if (!Array.isArray(records)) return;
+    const valid: ResultRecord[] = [];
+    let nextId = 1;
+    for (const raw of records) {
+      if (!raw || typeof raw !== 'object') continue;
+      const rec = raw as Partial<ResultRecord>;
+      const cr = rec.calculationResult as CalculationResult | undefined;
+      if (!cr || typeof cr !== 'object') continue;
+      if (typeof cr.previousNumber !== 'string' || typeof cr.resultNumber !== 'string') continue;
+      if (cr.operator === undefined || cr.operator === null) continue;
+      const id = typeof rec.id === 'number' ? rec.id : nextId;
+      nextId = Math.max(nextId, id) + 1;
+      valid.push({
+        id,
+        calculationResult: {
+          previousNumber: cr.previousNumber,
+          operator: cr.operator,
+          ...(cr.argumentNumber !== undefined && { argumentNumber: cr.argumentNumber }),
+          resultNumber: cr.resultNumber,
+        },
+        memo: typeof rec.memo === 'string' ? rec.memo : '',
+        timestamp: typeof rec.timestamp === 'number' ? rec.timestamp : Date.now(),
+        mode: rec.mode === 'formula' ? 'formula' : 'calc',
+        ...(typeof rec.expression === 'string' && { expression: rec.expression }),
+      });
+    }
+    this.records = valid.slice(0, this.MAX_RECORDS);
   }
 
   /**

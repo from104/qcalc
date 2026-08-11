@@ -24,6 +24,36 @@ export const MathB = create(all as FactoryFunctionMap, {
 export const toBigNumber = MathB.bignumber;
 
 /**
+ * 수식 계산기용 삼각함수 스코프 (도 단위)
+ * @description mathjs 기본 삼각함수는 라디안 기준이지만, 기본 계산기(CalculatorMath.sin 등)는
+ *              도(degree)를 사용한다. 수식 계산기가 기본 계산기와 동일한 각도 기준을 쓰도록
+ *              sin/cos/tan/asin/acos/atan/atan2를 도 단위로 오버라이드한 스코프를 반환한다.
+ *              - 순삼각(sin/cos/tan): 입력을 도로 간주하여 라디안 변환 후 계산
+ *              - 역삼각(asin/acos/atan/atan2): 라디안 결과를 도로 변환하여 반환
+ *              반환값은 BigNumber로 유지되어 정밀도 손실이 없다.
+ *              매 평가마다 새 객체를 반환하여 스코프 변수 대입에 의한 상태 누적을 방지한다.
+ * @returns mathjs evaluate scope에 주입할 함수 맵
+ */
+export function createFormulaTrigScope(): Record<string, (...args: BigNumber[]) => BigNumber> {
+  const degToRad = (x: BigNumber): BigNumber => toBigNumber(x).times(MathB.pi).div(180);
+  const radToDeg = (x: BigNumber): BigNumber => toBigNumber(x).times(180).div(MathB.pi);
+  return {
+    sin: (x) => degToRad(x).sin(),
+    cos: (x) => degToRad(x).cos(),
+    tan: (x) => degToRad(x).tan(),
+    asin: (x) => radToDeg(toBigNumber(x).asin()),
+    acos: (x) => radToDeg(toBigNumber(x).acos()),
+    atan: (x) => radToDeg(toBigNumber(x).atan()),
+    atan2: (y, x) => radToDeg(MathB.evaluate('atan2(y, x)', { y, x }) as BigNumber),
+  };
+}
+
+/**
+ * 비트 연산의 기본 워드 크기 (바이트 단위)
+ */
+const DEFAULT_WORD_SIZE = 8;
+
+/**
  * 수학 상수 정의 객체
  */
 const CONSTANTS: { [key: string]: string } = {
@@ -260,7 +290,7 @@ export class CalculatorMath {
    * @param wordSize 비트 크기 (기본값: 8)
    * @returns 비트 크기로 자른 결과 (문자열)
    */
-  public truncateToBitSize(value: string, wordSize: number = 8): string {
+  public truncateToBitSize(value: string, wordSize: number = DEFAULT_WORD_SIZE): string {
     this.validateNonNegativeNumbers(value);
     return wordSize === 0
       ? toBigNumber(value).floor().toFixed()
@@ -274,7 +304,7 @@ export class CalculatorMath {
    * @param wordSize 비트 크기 (기본값: 8)
    * @returns 시프트 연산 결과 (문자열)
    */
-  public bitwiseLeftShift(value: string, shiftAmount: string, wordSize: number = 8): string {
+  public bitwiseLeftShift(value: string, shiftAmount: string, wordSize: number = DEFAULT_WORD_SIZE): string {
     this.validateNonNegativeNumbers(value, shiftAmount);
     return this.truncateToBitSize(
       toBigNumber(value)
@@ -293,7 +323,7 @@ export class CalculatorMath {
    * @param wordSize 비트 크기 (기본값: 8)
    * @returns 시프트 연산 결과 (문자열)
    */
-  public bitwiseRightShift(value: string, shiftAmount: string, wordSize: number = 8): string {
+  public bitwiseRightShift(value: string, shiftAmount: string, wordSize: number = DEFAULT_WORD_SIZE): string {
     this.validateNonNegativeNumbers(value, shiftAmount);
     return this.truncateToBitSize(
       toBigNumber(value)
@@ -317,7 +347,7 @@ export class CalculatorMath {
     firstValue: string,
     secondValue: string,
     operation: 'and' | 'or' | 'xor',
-    wordSize: number = 8,
+    wordSize: number = DEFAULT_WORD_SIZE,
   ): string {
     this.validateNonNegativeNumbers(firstValue, secondValue);
     const [firstBinary, secondBinary] = [firstValue, secondValue].map((n) =>
@@ -351,7 +381,7 @@ export class CalculatorMath {
    * @param wordSize 비트 크기 (기본값: 8)
    * @returns AND 연산 결과 (문자열)
    */
-  public bitwiseAnd(firstValue: string, secondValue: string, wordSize: number = 8): string {
+  public bitwiseAnd(firstValue: string, secondValue: string, wordSize: number = DEFAULT_WORD_SIZE): string {
     return this.performBitOperation(firstValue, secondValue, 'and', wordSize);
   }
 
@@ -362,7 +392,7 @@ export class CalculatorMath {
    * @param wordSize 비트 크기 (기본값: 8)
    * @returns OR 연산 결과 (문자열)
    */
-  public bitwiseOr(firstValue: string, secondValue: string, wordSize: number = 8): string {
+  public bitwiseOr(firstValue: string, secondValue: string, wordSize: number = DEFAULT_WORD_SIZE): string {
     return this.performBitOperation(firstValue, secondValue, 'or', wordSize);
   }
 
@@ -373,7 +403,7 @@ export class CalculatorMath {
    * @param wordSize 비트 크기 (기본값: 8)
    * @returns XOR 연산 결과 (문자열)
    */
-  public bitwiseXor(firstValue: string, secondValue: string, wordSize: number = 8): string {
+  public bitwiseXor(firstValue: string, secondValue: string, wordSize: number = DEFAULT_WORD_SIZE): string {
     return this.performBitOperation(firstValue, secondValue, 'xor', wordSize);
   }
 
@@ -383,7 +413,7 @@ export class CalculatorMath {
    * @param wordSize 비트 크기 (기본값: 8)
    * @returns NOT 연산 결과 (문자열)
    */
-  public bitwiseNot(value: string, wordSize: number = 8): string {
+  public bitwiseNot(value: string, wordSize: number = DEFAULT_WORD_SIZE): string {
     this.validateNonNegativeNumbers(value);
     const binary = convertRadix(this.int(this.abs(value)), Radix.Decimal, Radix.Binary);
     const paddedBinary = binary.padStart(Math.max(binary.length, wordSize), '0');
@@ -401,15 +431,15 @@ export class CalculatorMath {
    * @returns 비트 연산 결과 (문자열)
    */
 
-  public bitwiseNand(firstValue: string, secondValue: string, wordSize: number = 8): string {
+  public bitwiseNand(firstValue: string, secondValue: string, wordSize: number = DEFAULT_WORD_SIZE): string {
     return this.bitwiseNot(this.bitwiseAnd(firstValue, secondValue, wordSize), wordSize);
   }
 
-  public bitwiseNor(firstValue: string, secondValue: string, wordSize: number = 8): string {
+  public bitwiseNor(firstValue: string, secondValue: string, wordSize: number = DEFAULT_WORD_SIZE): string {
     return this.bitwiseNot(this.bitwiseOr(firstValue, secondValue, wordSize), wordSize);
   }
 
-  public bitwiseXnor(firstValue: string, secondValue: string, wordSize: number = 8): string {
+  public bitwiseXnor(firstValue: string, secondValue: string, wordSize: number = DEFAULT_WORD_SIZE): string {
     return this.bitwiseNot(this.bitwiseXor(firstValue, secondValue, wordSize), wordSize);
   }
 

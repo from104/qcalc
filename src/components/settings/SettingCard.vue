@@ -341,8 +341,8 @@
   <q-card-section class="full-height noselect column no-wrap">
     <q-list v-auto-blur dense class="full-width" role="list" :aria-label="t('ariaLabel.settingsList')">
       <!-- 항상 위에 표시 -->
-      <q-item v-if="$g.isElectron" class="q-mb-sm">
-        <q-item-label class="self-center" role="text">{{ t('alwaysOnTop') }} (Alt-T)</q-item-label>
+      <q-item v-if="$g.isElectron || $g.isTauri" class="q-mb-sm">
+        <q-item-label class="self-center">{{ t('alwaysOnTop') }} (Alt-T)</q-item-label>
         <q-space />
         <q-toggle
           v-model="settingsStore.alwaysOnTop"
@@ -357,7 +357,7 @@
 
       <!-- 시작 시 패널 초기화 -->
       <q-item class="q-mb-sm">
-        <q-item-label class="self-center" role="text">{{ t('initPanel') }} (Alt-I)</q-item-label>
+        <q-item-label class="self-center">{{ t('initPanel') }} (Alt-I)</q-item-label>
         <q-space />
         <q-toggle
           v-model="settingsStore.initPanel"
@@ -372,7 +372,7 @@
 
       <!-- 진동 모드 -->
       <q-item v-if="$g.isCapacitor" class="q-mb-sm">
-        <q-item-label class="self-center" role="text">{{ t('hapticsMode') }} (Alt-P)</q-item-label>
+        <q-item-label class="self-center">{{ t('hapticsMode') }} (Alt-P)</q-item-label>
         <q-space />
         <q-toggle
           v-model="settingsStore.hapticsMode"
@@ -389,7 +389,7 @@
 
       <!-- 다크 모드 -->
       <q-item class="q-mb-md">
-        <q-item-label class="self-center" role="text">{{ t('darkMode.title') }} (Alt-D)</q-item-label>
+        <q-item-label class="self-center">{{ t('darkMode.title') }} (Alt-D)</q-item-label>
         <q-space />
         <q-select
           v-model="themesStore.darkMode"
@@ -416,7 +416,7 @@
 
       <!-- 색상 테마 선택 -->
       <q-item class="q-mb-md">
-        <q-item-label class="self-center" role="text">{{ t('colorTheme') }}</q-item-label>
+        <q-item-label class="self-center">{{ t('colorTheme') }}</q-item-label>
         <q-space />
         <q-select
           v-model="themesStore.currentTheme"
@@ -508,7 +508,7 @@
 
       <!-- 숫자 형식 계산기별 적용 -->
       <q-item class="q-mb-sm">
-        <q-item-label class="self-center" role="text">{{ t('numberFormatPerCalculator') }} (Alt-N)</q-item-label>
+        <q-item-label class="self-center">{{ t('numberFormatPerCalculator') }} (Alt-N)</q-item-label>
         <q-space />
         <q-toggle
           v-model="settingsStore.numberFormatPerCalculator"
@@ -524,7 +524,7 @@
 
       <!-- 숫자 묶음 표시 -->
       <q-item class="q-mb-xs">
-        <q-item-label class="self-center" role="text">{{ t('useGrouping') }} (,)</q-item-label>
+        <q-item-label class="self-center">{{ t('useGrouping') }} (,)</q-item-label>
         <q-space />
         <q-toggle
           v-model="currentUseGrouping"
@@ -538,7 +538,7 @@
 
       <!-- 숫자 묶음 단위 -->
       <q-item class="q-mb-sm">
-        <q-item-label class="self-center" role="text">{{ t('groupingUnit') }} (Alt-,)</q-item-label>
+        <q-item-label class="self-center">{{ t('groupingUnit') }} (Alt-,)</q-item-label>
         <q-space />
         <q-slider
           v-model="currentGroupingUnit"
@@ -600,7 +600,7 @@
         <q-separator spaced="md" role="separator" />
 
         <q-item class="q-mb-sm">
-          <q-item-label class="self-center" role="text"> {{ t('showUnit') }} (Alt-\\) </q-item-label>
+          <q-item-label class="self-center"> {{ t('showUnit') }} (Alt-\\) </q-item-label>
           <q-space />
           <q-toggle
             v-model="unitStore.showUnit"
@@ -617,7 +617,7 @@
         <q-separator spaced="md" role="separator" />
 
         <q-item class="q-mb-sm">
-          <q-item-label class="self-center" role="text"> {{ t('showSymbol') }} (Alt-\) </q-item-label>
+          <q-item-label class="self-center"> {{ t('showSymbol') }} (Alt-\) </q-item-label>
           <q-space />
           <q-toggle
             v-model="currencyStore.showSymbol"
@@ -634,7 +634,7 @@
         <q-separator spaced="md" role="separator" />
 
         <q-item class="q-mb-sm">
-          <q-item-label class="self-center" role="text"> {{ t('showRadix') }} (Alt-\) </q-item-label>
+          <q-item-label class="self-center"> {{ t('showRadix') }} (Alt-\) </q-item-label>
           <q-space />
           <q-toggle
             v-model="radixStore.showRadix"
@@ -647,7 +647,7 @@
 
         <!-- 진법 형식 -->
         <q-item class="q-mb-md">
-          <q-item-label class="self-center" role="text"> {{ t('radixType') }} (Alt-Ctrl-\) </q-item-label>
+          <q-item-label class="self-center"> {{ t('radixType') }} (Alt-Ctrl-\) </q-item-label>
           <q-space />
           <q-select
             v-model="radixStore.radixType"
@@ -674,7 +674,7 @@
 
       <!-- 버튼 추가 라벨 표시 -->
       <q-item class="q-mb-sm">
-        <q-item-label class="self-center" role="text">{{ t('showButtonAddedLabel') }} (;)</q-item-label>
+        <q-item-label class="self-center">{{ t('showButtonAddedLabel') }} (;)</q-item-label>
         <q-space />
         <q-toggle
           v-model="settingsStore.showButtonAddedLabel"
@@ -690,7 +690,7 @@
 
       <!-- 시스템 언어 사용 -->
       <q-item class="q-mb-sm">
-        <q-item-label class="self-center" role="text">{{ t('useSystemLocale') }}</q-item-label>
+        <q-item-label class="self-center">{{ t('useSystemLocale') }}</q-item-label>
         <q-space />
         <q-toggle
           v-model="settingsStore.useSystemLocale"
@@ -704,7 +704,7 @@
 
       <!-- 언어 -->
       <q-item class="q-mb-md">
-        <q-item-label class="self-center" role="text">
+        <q-item-label class="self-center">
           {{ t('language') }}
         </q-item-label>
         <q-space />
@@ -729,9 +729,10 @@
 
       <q-separator spaced="md" role="separator" />
 
-      <!-- 자동 업데이트 설정 -->
-      <q-item v-if="$g.isElectron && !$g.isSnap" class="q-mb-sm">
-        <q-item-label class="self-center" role="text">
+      <!-- 자동 업데이트 설정. Snap/Flatpak은 스토어가 업데이트를 담당하고
+           업데이터 플러그인 자체가 등록되지 않으므로 UI도 숨긴다. -->
+      <q-item v-if="($g.isElectron || $g.isTauri) && !$g.isSnap && !$g.isFlatpak" class="q-mb-sm">
+        <q-item-label class="self-center">
           {{ t('autoUpdate') }}
           <HelpIcon
             :text-color="themesStore.getDarkColor()"
@@ -1539,4 +1540,170 @@ fr:
     cancelled: "L'importation des paramètres a été annulée."
   confirmDeleteTitle: 'Confirmer la suppression du thème'
   confirmDeleteMessage: 'Êtes-vous sûr de vouloir supprimer le thème \''{themeName}\'' ?'
+pt:
+  alwaysOnTop: 'Sempre no topo'
+  initPanel: 'Inicializar painel ao iniciar'
+  darkMode:
+    title: 'Modo escuro'
+    light: 'Claro'
+    dark: 'Escuro'
+    system: 'Sistema'
+  hapticsMode: 'Modo de vibração'
+  showButtonAddedLabel: 'Mostrar rótulo adicional do botão'
+  numberFormatPerCalculator: 'Aplicar formato numérico por calculadora'
+  useGrouping: 'Exibir agrupamento de números'
+  groupingUnit: 'Unidade de agrupamento'
+  decimalPlaces: 'Decimal'
+  decimalPlacesStat: 'Casas decimais'
+  noLimit: 'Sem limite'
+  toNDecimalPlaces: 'casas'
+  showUnit: 'Mostrar unidade'
+  showSymbol: 'Mostrar símbolo'
+  showRadix: 'Mostrar base'
+  radixType: 'Tipo de base'
+  prefix: 'Prefixo'
+  suffix: 'Sufixo'
+  useSystemLocale: 'Usar idioma do sistema'
+  language: 'Idioma'
+  autoUpdate: 'Atualização automática'
+  autoUpdateHelp: 'Para aplicar a atualização, ative as atualizações automáticas nas configurações e reinicie o aplicativo.'
+  ariaLabel:
+    settingsList: 'Lista de configurações'
+    alwaysOnTop: 'Configuração sempre no topo'
+    initPanel: 'Configuração inicializar painel ao iniciar'
+    hapticsMode: 'Configuração modo de vibração'
+    darkMode: 'Configuração modo escuro'
+    showButtonAddedLabel: 'Configuração rótulo adicional do botão'
+    numberFormatPerCalculator: 'Configuração formato numérico por calculadora'
+    useGrouping: 'Configuração agrupamento de números'
+    groupingUnit: 'Configuração unidade de agrupamento'
+    decimalPlaces: 'Configuração casas decimais'
+    showUnit: 'Configuração mostrar unidade'
+    showSymbol: 'Configuração mostrar símbolo'
+    showRadix: 'Configuração mostrar base'
+    radixType: 'Configuração tipo de base'
+    useSystemLocale: 'Configuração idioma do sistema'
+    language: 'Configuração de idioma'
+    autoUpdate: 'Configuração atualização automática'
+    colorTheme: 'Tema de cores'
+    editTheme: 'Editar tema {themeName}'
+    deleteTheme: 'Excluir tema {themeName}'
+    createNewTheme: 'Criar novo tema'
+    resetSettings: 'Redefinir configurações'
+    exportSettings: 'Exportar configurações'
+    importSettings: 'Importar configurações'
+  colorTheme: 'Tema de cores'
+  createNewTheme: 'Criar novo tema'
+  reset: 'Redefinir'
+  export: 'Exportar'
+  import: 'Importar'
+  settingsManagement: 'Gerenciamento de configurações'
+  resetSettings:
+    confirmTitle: 'Confirmar redefinição'
+    confirmMessage: 'Tem certeza de que deseja redefinir todas as configurações? Esta ação não pode ser desfeita.'
+    success: 'As configurações foram redefinidas com sucesso.'
+  exportSettings:
+    exportMethodTitle: 'Método de exportação'
+    exportMethodMessage: 'Como deseja exportar as configurações?'
+    saveToDevice: 'Salvar no dispositivo'
+    shareFile: 'Compartilhar arquivo'
+    successMobile: 'Configurações exportadas para {fileName}.'
+    mobileSaveLocation: 'Salvo na pasta Documents.'
+    fail: 'Falha ao exportar configurações.'
+    shareTitle: 'Configurações do QCalc'
+    shareText: 'Compartilhar arquivo de configurações do QCalc.'
+    shareDialogTitle: 'Compartilhar configurações'
+    cancelled: 'Exportação de configurações cancelada.'
+    success: 'As configurações foram exportadas com sucesso.'
+  importSettings:
+    confirmTitle: 'Confirmar importação'
+    confirmMessage: 'Tem certeza de que deseja substituir as configurações atuais pelas do arquivo selecionado?'
+    success: 'As configurações foram importadas com sucesso.'
+    fail: 'Falha ao importar configurações. O arquivo pode estar corrompido ou em formato incorreto.'
+    cancelled: 'Importação de configurações cancelada.'
+  confirmDeleteTitle: 'Confirmar exclusão do tema'
+  confirmDeleteMessage: 'Tem certeza de que deseja excluir o tema \''{themeName}\''?'
+ru:
+  alwaysOnTop: 'Всегда поверх'
+  initPanel: 'Инициализировать панель при запуске'
+  darkMode:
+    title: 'Тёмный режим'
+    light: 'Светлый'
+    dark: 'Тёмный'
+    system: 'Системный'
+  hapticsMode: 'Режим вибрации'
+  showButtonAddedLabel: 'Показывать дополнительную метку кнопки'
+  numberFormatPerCalculator: 'Применять формат чисел для каждого калькулятора'
+  useGrouping: 'Группировка чисел'
+  groupingUnit: 'Единица группировки'
+  decimalPlaces: 'Десятичные'
+  decimalPlacesStat: 'Десятичные знаки'
+  noLimit: 'Без ограничений'
+  toNDecimalPlaces: 'знаков'
+  showUnit: 'Показывать единицу'
+  showSymbol: 'Показывать символ'
+  showRadix: 'Показывать основание'
+  radixType: 'Тип основания'
+  prefix: 'Префикс'
+  suffix: 'Суффикс'
+  useSystemLocale: 'Использовать язык системы'
+  language: 'Язык'
+  autoUpdate: 'Автообновление'
+  autoUpdateHelp: 'Чтобы применить обновление, включите автоматические обновления в настройках и перезапустите приложение.'
+  ariaLabel:
+    settingsList: 'Список настроек'
+    alwaysOnTop: 'Настройка «Всегда поверх»'
+    initPanel: 'Настройка инициализации панели при запуске'
+    hapticsMode: 'Настройка режима вибрации'
+    darkMode: 'Настройка тёмного режима'
+    showButtonAddedLabel: 'Настройка дополнительной метки кнопки'
+    numberFormatPerCalculator: 'Настройка формата чисел по калькулятору'
+    useGrouping: 'Настройка группировки чисел'
+    groupingUnit: 'Настройка единицы группировки'
+    decimalPlaces: 'Настройка десятичных знаков'
+    showUnit: 'Настройка показа единицы'
+    showSymbol: 'Настройка показа символа'
+    showRadix: 'Настройка показа основания'
+    radixType: 'Настройка типа основания'
+    useSystemLocale: 'Настройка языка системы'
+    language: 'Настройка языка'
+    autoUpdate: 'Настройка автообновления'
+    colorTheme: 'Цветовая тема'
+    editTheme: 'Редактировать тему {themeName}'
+    deleteTheme: 'Удалить тему {themeName}'
+    createNewTheme: 'Создать новую тему'
+    resetSettings: 'Сбросить настройки'
+    exportSettings: 'Экспортировать настройки'
+    importSettings: 'Импортировать настройки'
+  colorTheme: 'Цветовая тема'
+  createNewTheme: 'Создать новую тему'
+  reset: 'Сбросить'
+  export: 'Экспорт'
+  import: 'Импорт'
+  settingsManagement: 'Управление настройками'
+  resetSettings:
+    confirmTitle: 'Подтвердить сброс'
+    confirmMessage: 'Вы уверены, что хотите сбросить все настройки? Это действие нельзя отменить.'
+    success: 'Настройки успешно сброшены.'
+  exportSettings:
+    exportMethodTitle: 'Метод экспорта'
+    exportMethodMessage: 'Как вы хотите экспортировать настройки?'
+    saveToDevice: 'Сохранить на устройство'
+    shareFile: 'Поделиться файлом'
+    successMobile: 'Настройки экспортированы в {fileName}.'
+    mobileSaveLocation: 'Сохранено в папке Documents.'
+    fail: 'Не удалось экспортировать настройки.'
+    shareTitle: 'Настройки QCalc'
+    shareText: 'Поделиться файлом настроек QCalc.'
+    shareDialogTitle: 'Поделиться настройками'
+    cancelled: 'Экспорт настроек отменён.'
+    success: 'Настройки успешно экспортированы.'
+  importSettings:
+    confirmTitle: 'Подтвердить импорт'
+    confirmMessage: 'Вы уверены, что хотите заменить текущие настройки настройками из выбранного файла?'
+    success: 'Настройки успешно импортированы.'
+    fail: 'Не удалось импортировать настройки. Файл может быть повреждён или иметь неверный формат.'
+    cancelled: 'Импорт настроек отменён.'
+  confirmDeleteTitle: 'Подтвердить удаление темы'
+  confirmDeleteMessage: 'Вы уверены, что хотите удалить тему \''{themeName}\''?'
 </i18n>

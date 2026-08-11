@@ -74,3 +74,9 @@ export const logDev = (message: string, ...args: unknown[]): void => {
     console.log(message, ...args);
   }
 };
+
+/**
+ * WebKitGTK(Linux) font-weight +100 렌더링 버그 워크어라운드 적용 여부.
+ * Tauri + Linux 조합에서만 true. 업스트림: tauri-apps/tauri#14286
+ */
+export const shouldApplyTauriLinuxFontFix = (isTauri: boolean, isLinux: boolean): boolean => isTauri && isLinux;

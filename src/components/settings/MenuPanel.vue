@@ -441,4 +441,72 @@ fr:
       caption: "À propos de l'application"
   ariaLabel:
     menu: 'Menu principal'
+pt:
+  item:
+    calc:
+      title: 'Calculadora'
+      caption: 'Calculadora'
+    unit:
+      title: 'Conversão de unidades'
+      caption: 'Conversor de unidades'
+    currency:
+      title: 'Conversão de moeda'
+      caption: 'Conversor de moeda'
+    radix:
+      title: 'Conversão de base'
+      caption: 'Conversor de base'
+    formula:
+      title: 'Calculadora de fórmulas'
+      caption: 'Calculadora de fórmulas'
+    record:
+      title: 'Histórico'
+      caption: 'Tela de histórico'
+    settings:
+      title: 'Configurações'
+      caption: 'Configurações'
+    tips:
+      title: 'Dicas'
+      caption: 'Diálogo de dicas'
+    help:
+      title: 'Ajuda'
+      caption: 'Funcionalidades e utilização'
+    about:
+      title: 'Sobre'
+      caption: 'Sobre o aplicativo'
+  ariaLabel:
+    menu: 'Menu principal'
+ru:
+  item:
+    calc:
+      title: 'Калькулятор'
+      caption: 'Калькулятор'
+    unit:
+      title: 'Конвертер единиц'
+      caption: 'Конвертер единиц'
+    currency:
+      title: 'Конвертер валют'
+      caption: 'Конвертер валют'
+    radix:
+      title: 'Конвертер систем счисления'
+      caption: 'Конвертер систем счисления'
+    formula:
+      title: 'Калькулятор формул'
+      caption: 'Калькулятор формул'
+    record:
+      title: 'История'
+      caption: 'Экран истории'
+    settings:
+      title: 'Настройки'
+      caption: 'Настройки'
+    tips:
+      title: 'Советы'
+      caption: 'Диалог советов'
+    help:
+      title: 'Помощь'
+      caption: 'Функции и использование'
+    about:
+      title: 'О приложении'
+      caption: 'О приложении'
+  ariaLabel:
+    menu: 'Главное меню'
 </i18n>
