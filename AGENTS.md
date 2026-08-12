@@ -84,11 +84,12 @@ src-capacitor/         # Capacitor Android project
 4. Sync all `src/content/pages/HelpPage-*.md` files with the README (all 10 languages)
 5. Update the `<releases>` list in `flatpak/io.github.from104.qcalc.metainfo.xml`
 6. Run `yarn lint` and `yarn test`
-7. Tag `v<version>` on `main` — `.github/workflows/release.yml` builds all six desktop packages (deb/rpm/AppImage/Flatpak/Snap/NSIS) and creates a draft release; after publishing it, run the `tauri-updater-promote` workflow so auto-update clients see the new version
+7. Tag `v<version>` on `main` — `.github/workflows/release.yml` builds all six desktop packages (deb/rpm/AppImage/Flatpak/Snap/NSIS) and the Android APK, then creates a draft release; after publishing it, run the `tauri-updater-promote` workflow so auto-update clients see the new version
 
 ## Testing
 
 - **Framework**: Vitest (not Jest)
 - **Config**: `vitest.config.ts` — environment: node, globals: true
 - **Location**: `src/**/*.{test,spec}.ts` (e.g., `src/classes/__tests__/CalculatorMath.test.ts`)
-- **CI**: `ci.yml` runs lint → type-check → test (+ Electron build job) on push to develop/main; `release.yml` builds the six desktop packages on `v*` tags; `tauri-updater-promote.yml` promotes `latest.json` to the fixed `tauri-updater` rolling release
+- **CI**: `ci.yml` runs lint → type-check → test (+ Electron build job) on push to develop/main; `release.yml` builds the six desktop packages and the Android APK on `v*` tags; `tauri-updater-promote.yml` promotes `latest.json` to the fixed `tauri-updater` rolling release
+- **Android versions**: never hand-edit `versionCode`/`versionName` — `src-capacitor/android/app/build.gradle` derives both from the root `package.json` (`major*10000 + minor*100 + patch`). Capacitor does not sync them, which is how the APK once sat at 0.11.3 for four releases
