@@ -1,5 +1,35 @@
 apply plugin: 'com.android.application'
 
+import groovy.json.JsonSlurper
+
+// 앱 버전은 프로젝트 루트의 package.json 하나만 보고 정한다.
+// Capacitor/Quasar는 build.gradle의 버전을 동기화해 주지 않아, 손으로 관리하면
+// 릴리스를 거듭해도 APK 버전만 과거에 고정된다(실제로 0.11.3에 멈춰 있었다).
+//
+// versionCode는 major*10000 + minor*100 + patch 로 만든다.
+//   0.13.0 -> 1300,  0.13.1 -> 1301,  1.0.0 -> 10000
+// 버전이 오르면 반드시 커지므로 안드로이드의 업그레이드 판정을 만족한다.
+// (minor/patch가 100 이상이 되면 자릿수가 겹치므로 그때 규칙을 넓혀야 한다.)
+ext.qcalcVersionName = { ->
+    def pkg = file("$rootDir/../../package.json")
+    if (!pkg.exists()) {
+        throw new GradleException("package.json을 찾을 수 없습니다: ${pkg.absolutePath}")
+    }
+    def version = new JsonSlurper().parse(pkg).version
+    if (!(version ==~ /\d+\.\d+\.\d+/)) {
+        throw new GradleException("package.json의 version이 major.minor.patch 형식이 아닙니다: ${version}")
+    }
+    return version
+}()
+
+ext.qcalcVersionCode = { ->
+    def (major, minor, patch) = qcalcVersionName.tokenize('.').collect { it.toInteger() }
+    if (minor >= 100 || patch >= 100) {
+        throw new GradleException("minor/patch가 100 이상이면 versionCode 규칙이 깨집니다: ${qcalcVersionName}")
+    }
+    return major * 10000 + minor * 100 + patch
+}()
+
 android {
     namespace "com.atit.qcalc"
     compileSdk rootProject.ext.compileSdkVersion
@@ -12,8 +42,8 @@ android {
         applicationId "com.atit.qcalc"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 2
-        versionName "0.11.3"
+        versionCode project.ext.qcalcVersionCode
+        versionName project.ext.qcalcVersionName
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         aaptOptions {
              // Files and dirs to omit from the packaged assets dir, modified to accommodate modern web apps.
