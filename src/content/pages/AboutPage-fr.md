@@ -27,7 +27,7 @@ Le format est basé sur [Keep a Changelog] et ce projet suit le [Versionnage sé
 - **Annulation de la suppression d'un enregistrement** : La suppression d'un enregistrement de l'historique peut être annulée depuis une barre de notification.
 - **Accessibilité au clavier améliorée** : Le menu des onglets débordants, le champ de formule et le bouton mémoire sont entièrement utilisables au clavier.
 - **Thèmes plus contrastés** : Les couleurs des thèmes ont été relevées au contraste WCAG AA.
-- **Nouvelles langues (10 au total)** : Ajout du portugais et du russe (0.12.1 inclus).
+- **Nouvelles langues (10 au total)** : Ajout du portugais et du russe.
 
 ### Corrigé
 
