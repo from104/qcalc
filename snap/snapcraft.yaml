@@ -10,7 +10,10 @@ description: |
   exchange, programmer/radix math, and formula evaluation.
 grade: stable
 confinement: strict
-compression: lzo
+# 압축은 기본값(xz)을 쓴다. `compression: lzo`로 올리면 스토어 자동심사의
+# squashfs_repack_checksum 검사가 재압축 결과를 재현하지 못해 실패하고,
+# 리비전이 수동 심사 대기로 묶여 채널에 반영되지 않는다(rev 12에서 실제 발생).
+# lzo는 기동이 조금 빠른 대신 용량이 128MB -> 171MB로 커지기도 한다.
 architectures:
   - build-on: amd64
 
