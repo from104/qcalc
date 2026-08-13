@@ -18,8 +18,8 @@ finish-args:
   - --device=dri
   # 네트워크 (환율 정보 업데이트용)
   - --share=network
-  # 오디오 (버튼 사운드)
-  - --socket=pulseaudio
+  # 오디오 권한(--socket=pulseaudio)은 두지 않는다. 앱에 소리를 내는 코드도
+  # 오디오 에셋도 없다(배포 deb 안에도 0개). Flathub는 쓰지 않는 권한을 지적한다.
   # WebKitGTK가 샌드박스 안에서 DMA-BUF 렌더러를 사용하면 빈 화면이 뜨는
   # 알려진 문제 회피 (https://gitlab.gnome.org/GNOME/epiphany/-/issues/2074 등)
   - --env=WEBKIT_DISABLE_DMABUF_RENDERER=1
