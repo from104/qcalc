@@ -27,7 +27,7 @@ The format is based on [Keep a Changelog] and this project follows [Semantic Ver
 - **Undo for record deletion**: deleting a history record can be undone from a snackbar.
 - **Improved keyboard accessibility**: the overflow tab menu, formula field and memory toggle are fully keyboard-operable.
 - **Higher-contrast themes**: theme colors raised to WCAG AA contrast.
-- **New languages (10 total)**: Portuguese and Russian added (incl. 0.12.1).
+- **New languages (10 total)**: Portuguese and Russian added.
 
 ### Fixed
 

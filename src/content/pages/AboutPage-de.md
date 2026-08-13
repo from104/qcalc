@@ -27,7 +27,7 @@ Das Format basiert auf [Keep a Changelog] und dieses Projekt folgt der [Semantis
 - **Rückgängig machen beim Löschen von Einträgen**: Das Löschen eines Verlaufseintrags lässt sich über eine Snackbar rückgängig machen.
 - **Verbesserte Tastaturbedienbarkeit**: Überlauf-Tab-Menü, Formelfeld und Speicher-Umschalter sind vollständig mit der Tastatur bedienbar.
 - **Themes mit höherem Kontrast**: Die Theme-Farben wurden auf WCAG-AA-Kontrast angehoben.
-- **Neue Sprachen (10 insgesamt)**: Portugiesisch und Russisch hinzugefügt (inkl. 0.12.1).
+- **Neue Sprachen (10 insgesamt)**: Portugiesisch und Russisch hinzugefügt.
 
 ### Behoben
 

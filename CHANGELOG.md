@@ -18,6 +18,7 @@ The format is based on [Keep a Changelog] and this project follows [Semantic Ver
 
 ### Added
 
+- **2 new languages (10 total)**: Portuguese (pt) and Russian (ru) join the existing 8 (Korean, English, Japanese, Chinese, Hindi, German, Spanish, French). Every screen is translated — menus, settings, unit names, currency names, help, about, tips, and error messages.
 - **Screen reader announcement of results on Linux**: Orca cannot present web `aria-live` regions inside a Tauri app (it assigns its non-web script to GTK-toolkit apps, which has no live region support), so on calculation completion the app now emits an AT-SPI `announcement` event from the Rust side (`announce_a11y` command) — a path every Orca script reads unconditionally. The DOM live region is kept for other platforms and was reworked so it actually emits change events (no `clip:` hiding, on-screen 1×1px `.sr-only`, keyed block child recreated per calculation).
 - **Formula error announcements**: formula errors are classified into i18n categories and announced via `aria-live`.
 - **Undo for record deletion**: swipe/menu deletion of a history record shows an undo snackbar.
@@ -33,21 +34,12 @@ The format is based on [Keep a Changelog] and this project follows [Semantic Ver
 - **History**: restoring a record re-enforces the MAX_RECORDS bound.
 - **Stores**: cross-store dependencies in `calcStore` are lazily instantiated, fixing a "no active Pinia" crash at Tauri startup (audit CODE-01).
 - **Tauri/Linux**: guard against a zero/invalid monitor `scale_factor` during setup (window collapsed to 0×0 under native Wayland); WebKitGTK font-weight rendering workaround ([tauri#14286](https://github.com/tauri-apps/tauri/issues/14286)); packaged app icons fixed (placeholders replaced, icon scaled to full canvas); Flatpak manifest rewritten for Tauri; Snap packaging fixed (deb source path, WebKitGTK sandbox).
+- **pt/ru markdown wiring**: the Help, About and Tips pages fell back to English because the pt/ru markdown modules were not imported and mapped.
 - **i18n**: `unitDesc` namespace unified with runtime category ids; two Korean label typos fixed.
 
 ### Known issues
 
 - Linux screen reader output is verified to the AT-SPI event level; audible end-to-end verification, hover (mouse review) reading, the WebKitGTK clipboard `readText` failure, and CSP hardening (`app.security.csp` is currently `null`) are tracked as follow-ups.
-
-## [0.12.1] 2026-04-11
-
-### Added
-
-- **2 New Languages (10 total)**: Portuguese (pt) and Russian (ru) join the existing 8 (Korean, English, Japanese, Chinese, Hindi, German, Spanish, French). Every screen is translated — menus, settings, unit names, currency names, help, about, tips, and error messages.
-
-### Fixed
-
-- **pt/ru markdown wiring**: the Help, About and Tips pages fell back to English because the pt/ru markdown modules were not imported and mapped.
 
 ## [0.12.0] 2026-03-22
 

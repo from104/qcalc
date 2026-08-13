@@ -159,7 +159,7 @@ quasar build -m capacitor -T android
 ## CI/CD
 
 - **`ci.yml`** — 모든 푸시마다 린트 → 타입 체크(`vue-tsc`) → 커버리지 임계값을 적용한 테스트를 실행하고, Electron 빌드 잡도 수행합니다
-- **`release.yml`** — `v*` 태그에서 6종 데스크톱 패키지(Linux의 deb/rpm/AppImage/Flatpak/Snap, Windows의 NSIS)를 빌드·서명해 초안 GitHub 릴리즈에 업로드합니다
+- **`release.yml`** — `v*` 태그에서 6종 데스크톱 패키지(Linux의 deb/rpm/AppImage/Flatpak/Snap, Windows의 NSIS)와 안드로이드 APK를 빌드·서명해 초안 GitHub 릴리즈에 업로드합니다. 안드로이드 잡은 `MY_JKS_BASE64`·`MY_JKS_STORE_PASSWORD`·`MY_JKS_KEY_ALIAS`·`MY_JKS_KEY_PASSWORD` 시크릿이 필요하며, 하나라도 없으면 서명 안 된 APK를 내보내는 대신 어떤 것이 비었는지 찍고 실패합니다
 - **`tauri-updater-promote.yml`** — 릴리즈 게시 후 수동으로 실행하며, `latest.json`을 고정된 `tauri-updater` 롤링 릴리즈로 승격합니다. **자동 업데이트 클라이언트는 이 단계를 거쳐야 새 버전을 인식합니다.**
 - **husky + lint-staged** — 커밋 전 ESLint 및 포맷팅 검사 자동 실행
 

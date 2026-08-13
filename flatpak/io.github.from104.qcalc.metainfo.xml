@@ -61,12 +61,7 @@
   <releases>
     <release version="0.13.0" date="2026-08-09">
       <description>
-        <p>Desktop production build switched from Electron to Tauri 2 with six package formats built in CI, activated auto-update, screen reader announcement of results on Linux, WCAG AA contrast, improved keyboard accessibility, and undo for record deletion.</p>
-      </description>
-    </release>
-    <release version="0.12.1" date="2026-04-11">
-      <description>
-        <p>2 additional languages (Portuguese, Russian) — 10 in total.</p>
+        <p>Desktop production build switched from Electron to Tauri 2 with six package formats built in CI, activated auto-update, 2 additional languages (Portuguese, Russian) for 10 in total, screen reader announcement of results on Linux, WCAG AA contrast, improved keyboard accessibility, and undo for record deletion.</p>
       </description>
     </release>
     <release version="0.12.0" date="2026-03-22">

@@ -159,7 +159,7 @@ Release builds require a signed keystore. Set the `MY_JKS_*` variables in your `
 ## CI/CD
 
 - **`ci.yml`** — on every push: lint → type-check (`vue-tsc`) → tests with coverage thresholds, plus an Electron build job
-- **`release.yml`** — on `v*` tags: builds and signs all six desktop packages (deb/rpm/AppImage/Flatpak/Snap on Linux, NSIS on Windows) and uploads them to a draft GitHub release
+- **`release.yml`** — on `v*` tags: builds and signs all six desktop packages (deb/rpm/AppImage/Flatpak/Snap on Linux, NSIS on Windows) plus the Android APK, and uploads them to a draft GitHub release. The Android job needs the `MY_JKS_BASE64`, `MY_JKS_STORE_PASSWORD`, `MY_JKS_KEY_ALIAS` and `MY_JKS_KEY_PASSWORD` secrets; if any is missing it prints which ones and fails rather than shipping an unsigned APK
 - **`tauri-updater-promote.yml`** — run manually after publishing a release: promotes `latest.json` to the fixed `tauri-updater` rolling release. **Auto-update clients only see the new version after this step.**
 - **husky + lint-staged** runs ESLint and formatting checks before each commit
 

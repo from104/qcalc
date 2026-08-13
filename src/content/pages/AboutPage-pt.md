@@ -27,7 +27,7 @@ O formato é baseado no [Keep a Changelog] e este projeto segue o [Versionamento
 - **Desfazer Exclusão de Registro**: A exclusão de um registro do histórico pode ser desfeita por uma snackbar.
 - **Acessibilidade por Teclado Aprimorada**: O menu de abas excedentes, o campo de fórmula e o alternador de memória são totalmente operáveis pelo teclado.
 - **Temas com Maior Contraste**: As cores dos temas foram elevadas ao contraste WCAG AA.
-- **Novos Idiomas (10 no total)**: Adicionados Português e Russo (incl. 0.12.1).
+- **Novos Idiomas (10 no total)**: Adicionados Português e Russo.
 
 ### Corrigido
 

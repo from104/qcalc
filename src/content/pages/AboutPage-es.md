@@ -27,7 +27,7 @@ El formato se basa en [Keep a Changelog] y este proyecto sigue [Versionado Semá
 - **Deshacer la eliminación de registros**: La eliminación de un registro del historial puede deshacerse desde una barra de notificaciones.
 - **Accesibilidad por teclado mejorada**: El menú de pestañas desbordadas, el campo de fórmula y el conmutador de memoria son totalmente operables con el teclado.
 - **Temas de mayor contraste**: Los colores de los temas se elevaron al contraste WCAG AA.
-- **Nuevos idiomas (10 en total)**: Se añadieron portugués y ruso (incl. 0.12.1).
+- **Nuevos idiomas (10 en total)**: Se añadieron portugués y ruso.
 
 ### Corregido
 
