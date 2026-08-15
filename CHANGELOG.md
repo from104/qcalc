@@ -39,6 +39,8 @@ The format is based on [Keep a Changelog] and this project follows [Semantic Ver
 
 ### Known issues
 
+- **The Snap package in this release does not start.** Its `usr/bin/qcalc` is bubblewrap rather than the app binary, and the bundled Mesa/EGL stack conflicts with the GNOME platform snap. Use the `.deb`, `.rpm`, AppImage or Flatpak build instead ([#117](https://github.com/from104/qcalc/issues/117)).
+- Screen readers cannot see the interface in the Flatpak build — an upstream sandbox limitation. Use the `.deb`, `.rpm` or AppImage build ([#113](https://github.com/from104/qcalc/issues/113)).
 - Linux screen reader output is verified to the AT-SPI event level; audible end-to-end verification, hover (mouse review) reading, the WebKitGTK clipboard `readText` failure, and CSP hardening (`app.security.csp` is currently `null`) are tracked as follow-ups.
 
 ## [0.12.0] 2026-03-22

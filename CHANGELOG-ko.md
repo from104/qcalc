@@ -39,6 +39,8 @@
 
 ### 알려진 이슈
 
+- **이 릴리스의 Snap 패키지는 실행되지 않는다.** `usr/bin/qcalc`에 앱 대신 bubblewrap이 들어갔고, 함께 실린 Mesa/EGL 스택이 GNOME 플랫폼 snap과 충돌한다. `.deb`·`.rpm`·AppImage·Flatpak을 사용할 것([#117](https://github.com/from104/qcalc/issues/117)).
+- Flatpak 빌드에서는 스크린리더가 화면을 읽지 못한다(업스트림 샌드박스 한계). `.deb`·`.rpm`·AppImage를 사용할 것([#113](https://github.com/from104/qcalc/issues/113)).
 - Linux 스크린리더 출력은 AT-SPI 이벤트 레벨까지 검증됨. 실제 음성 최종 검증, hover(마우스 리뷰) 낭독, WebKitGTK 클립보드 `readText` 실패, CSP 강화(`app.security.csp`가 현재 `null`)는 후속 과제로 추적한다.
 
 ## [0.12.0] 2026-03-22
