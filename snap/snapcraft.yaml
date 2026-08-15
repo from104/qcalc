@@ -55,12 +55,30 @@ parts:
     stage-packages:
       - libwebkit2gtk-4.1-0
       - libayatana-appindicator3-1
+    # GL/EGL 스택은 gnome extension(gnome-42-2204)이 제공한다. libwebkit2gtk가
+    # 딸고 오는 Mesa를 함께 실으면 snap 쪽이 LD_LIBRARY_PATH 앞자리라 먼저 로드되고,
+    # 플랫폼의 DRI 드라이버와 어긋나 EGL 초기화가 실패한다:
+    #   libEGL fatal: did not find extension DRI_Mesa version 1
+    # 그러면 앱이 창을 띄우지 못하고 종료한다. 빼면 플랫폼 것을 쓰고 정상 기동한다.
+    stage:
+      - -usr/lib/x86_64-linux-gnu/dri
+      - -usr/lib/x86_64-linux-gnu/libEGL*
+      - -usr/lib/x86_64-linux-gnu/libGL*
+      - -usr/lib/x86_64-linux-gnu/libGLES*
+      - -usr/lib/x86_64-linux-gnu/libGLX*
+      - -usr/lib/x86_64-linux-gnu/libglapi*
+      - -usr/lib/x86_64-linux-gnu/libgbm*
     override-build: |
       craftctl default
       craftctl set version="$(grep -m1 '"version"' "$CRAFT_PROJECT_DIR/package.json" | cut -d'"' -f4)"
-      # productName("Q Calc")에 공백이 있어 mainBinaryName 설정 여부에 따라
-      # usr/bin/ 안의 실제 파일명이 달라질 수 있으므로, 없으면 찾아서 고정 이름으로 옮긴다.
-      if [ ! -e "$CRAFT_PART_INSTALL/usr/bin/qcalc" ]; then
-        bin="$(find "$CRAFT_PART_INSTALL/usr/bin" -maxdepth 1 -type f | head -n1)"
-        mv "$bin" "$CRAFT_PART_INSTALL/usr/bin/qcalc"
-      fi
+      # deb가 설치하는 실행 파일 이름은 src-tauri/Cargo.toml의 package.name인 `app`이다.
+      #
+      # 여기서 절대 "usr/bin/의 첫 번째 파일"을 고르면 안 된다. stage-packages가 같은
+      # 디렉터리에 bwrap·fc-cache·debconf 등을 함께 넣기 때문이다. 실제로 예전 로직이
+      # bubblewrap을 집어 qcalc으로 이름을 바꿨고, 그래서 command가 인자 없는 bwrap을
+      # 실행해 **앱이 한 번도 뜨지 않았다**(strict에서는 bwrap이 /proc/sys/kernel/overflowuid
+      # 접근 실패로, devmode에서는 bwrap 사용법을 출력하며 종료).
+      #
+      # 이름을 명시하고, 없으면 조용히 엉뚱한 것을 싣는 대신 빌드를 실패시킨다.
+      test -x "$CRAFT_PART_INSTALL/usr/bin/app"
+      mv "$CRAFT_PART_INSTALL/usr/bin/app" "$CRAFT_PART_INSTALL/usr/bin/qcalc"
