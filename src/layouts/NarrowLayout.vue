@@ -253,8 +253,14 @@
     <q-page-container class="row no-padding-bottom">
       <!-- 메인 화면 컨텐츠 -->
       <template v-if="!isSubPage">
+        <!--
+          col: q-page-container가 row(flex)라 폭을 지정하지 않으면 이 패널이 내용 폭으로
+          잡힌다. 계산기 카드는 .calc-card로 절대 배치되어 흐름에 남는 내용이 없으므로
+          그대로 두면 폭이 0으로 무너진다(WebKitGTK 실측).
+        -->
         <q-tab-panels
           v-model="localCurrentTab"
+          class="col"
           animated
           infinite
           :swipeable="$g.isMobile"

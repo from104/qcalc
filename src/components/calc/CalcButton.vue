@@ -8,25 +8,16 @@
    * @props {string} type - 버튼의 유형 (기본값: 'calc')
    */
 
+  import { computed } from 'vue';
   import { useI18n } from 'vue-i18n';
 
-  import { useCalcButtonLayout } from '../../composables/useCalcButtonLayout';
   import { useCalcButtonActions } from '../../composables/useCalcButtonActions';
   import { useCalcButtonStyle } from '../../composables/useCalcButtonStyle';
-
-  import { useUIStore } from 'stores/uiStore';
 
   import ToolTip from 'src/components/common/ToolTip.vue';
 
   const props = withDefaults(defineProps<{ type?: string }>(), { type: 'calc' });
   const { t } = useI18n();
-  const uiStore = useUIStore();
-
-  // 컴포저블 사용
-  const { baseHeight, labelScalingFactor, labelSizeAdjustmentRatio, rowCount } = useCalcButtonLayout(
-    () => props.type,
-    () => uiStore.currentTab,
-  );
 
   const {
     activeButtonSet,
@@ -44,160 +35,187 @@
 
   const { themesStore, calcStore, settingsStore, getFinalButtonStyle } = useCalcButtonStyle();
 
-  const getFinalStyle = (id: string, colorType: 'important' | 'function' | 'normal') =>
-    getFinalButtonStyle(id, colorType, shiftButtonId.value);
+  const COLUMN_COUNT = 4;
+
+  // 행 수는 버튼 개수에서 그대로 나온다. 예전에는 formula만 7, 나머지는 6으로 적어 두었다.
+  const rowCount = computed(() => Math.ceil(Object.keys(activeButtonSet.value).length / COLUMN_COUNT));
+
+  // Android에서는 앱이 WebView 전체의 textZoom(75~125)을 화면 크기에 맞춰 직접 설정한다
+  // (DeviceManager.calculateTextZoom). 키패드 레이블은 이미 버튼 상자에 맞춰 커지므로
+  // 그 줌을 상쇄하지 않으면 이중으로 확대된다.
+  const textZoomCancel = computed(() => (window.globalVars.isCapacitor ? 100 / window.globalVars.textZoom : 1));
+
+  /**
+   * 버튼 한 개를 그리는 데 필요한 표시용 값을 한 번에 계산한다.
+   * 템플릿에서 같은 조건식을 label/icon/class/style 네 군데에 되풀이하던 것을 모았다.
+   */
+  const view = computed(() => {
+    // 시프트가 켜졌고 보조 레이블 표시가 꺼져 있으면 본 레이블 자리를 확장 기능이 차지한다.
+    const shiftActive = calcStore.isShiftPressed && !settingsStore.showButtonAddedLabel;
+
+    return Object.fromEntries(
+      Object.entries(activeButtonSet.value).map(([id, button]) => {
+        const extended = extendedFunctionSet.value[id];
+        const extendedDisabled = resolveDisabled(extended?.isDisabled);
+        const swapped = shiftActive && id !== shiftButtonId.value;
+        const raw = swapped ? (extended?.label ?? '') : button.label;
+        // '@' 접두사는 문자 대신 아이콘으로 그리라는 표시다. 시프트로 바뀐 레이블은 항상 문자.
+        const isIcon = !swapped && raw.charAt(0) === '@';
+        const style = getFinalButtonStyle(id, button.color as 'important' | 'function' | 'normal', shiftButtonId.value);
+
+        return [
+          id,
+          {
+            isIcon,
+            text: isIcon ? raw.slice(1) : raw,
+            // 시프트 버튼은 확장 레이블이 빈 문자열이라 보조 레이블을 달지 않는다.
+            topLabel: settingsStore.showButtonAddedLabel && extended?.label ? extended.label : '',
+            background: style.background,
+            color: style.textColor,
+            dimmed:
+              shiftActive && !extendedDisabled ? false : resolveDisabled(button.isDisabled) || calcStore.isShiftPressed,
+            topDimmed: extendedDisabled,
+            topShifted: calcStore.isShiftPressed && !extendedDisabled,
+          },
+        ];
+      }),
+    );
+  });
 </script>
 
 <template>
-  <q-card-section
-    v-auto-blur
-    class="row wrap justify-center q-pt-xs q-pb-none q-px-none"
-    :style="{
-      '--base-height': baseHeight,
-      '--label-size-ratio': labelSizeAdjustmentRatio,
-      '--label-scale': labelScalingFactor,
-      '--row-count': rowCount,
-    }"
-  >
-    <div v-for="(button, id) in activeButtonSet" :key="id" class="col-3 row wrap justify-center q-pa-sm">
-      <q-btn
-        :id="'btn-' + id"
-        v-touch-hold.mouse="() => handleLongPress(id)"
-        class="shadow-2 noselect col-12 button"
-        no-caps
-        push
-        :label="
-          calcStore.isShiftPressed && !settingsStore.showButtonAddedLabel && id !== shiftButtonId
-            ? (extendedFunctionSet[id]?.label ?? '')
-            : button.label.charAt(0) === '@'
-              ? undefined
-              : button.label
-        "
-        :icon="
-          calcStore.isShiftPressed && !settingsStore.showButtonAddedLabel && id !== shiftButtonId
-            ? undefined
-            : button.label.charAt(0) === '@'
-              ? button.label.slice(1)
-              : undefined
-        "
-        :class="[
-          calcStore.isShiftPressed && !settingsStore.showButtonAddedLabel && id !== shiftButtonId
-            ? 'char'
-            : button.label.charAt(0) === '@'
-              ? 'icon'
-              : 'char',
-          calcStore.isShiftPressed &&
-          !settingsStore.showButtonAddedLabel &&
-          !resolveDisabled(extendedFunctionSet[id]?.isDisabled)
-            ? ''
-            : resolveDisabled(button.isDisabled) || calcStore.isShiftPressed
-              ? 'disabled-button'
-              : '',
-        ]"
-        :style="{
-          background: getFinalStyle(String(id), button.color as 'important' | 'function' | 'normal').background,
-          color: getFinalStyle(String(id), button.color as 'important' | 'function' | 'normal').textColor,
-          paddingTop:
-            !settingsStore.showButtonAddedLabel || !(extendedFunctionSet[id]?.label ?? '') ? '4px' : undefined,
+  <q-card-section v-auto-blur class="keypad" :style="{ '--row-count': rowCount, '--text-zoom-cancel': textZoomCancel }">
+    <q-btn
+      v-for="(button, id) in activeButtonSet"
+      :id="'btn-' + id"
+      :key="id"
+      v-touch-hold.mouse="() => handleLongPress(id)"
+      class="shadow-2 noselect button"
+      :class="{ 'is-dimmed': view[id]?.dimmed }"
+      no-caps
+      push
+      :style="{ background: view[id]?.background, color: view[id]?.color }"
+      :aria-label="getAriaLabel(id, button)"
+      @click="() => (resolveDisabled(button.isDisabled) ? displayDisabledButtonNotification() : handleClickBtn(id))"
+      @touchstart="() => hapticFeedbackLight()"
+    >
+      <span
+        v-if="view[id]?.topLabel"
+        class="top-label"
+        :class="{
+          'top-label--dimmed': view[id]?.topDimmed,
+          'top-label--shifted': view[id]?.topShifted,
         }"
-        :aria-label="getAriaLabel(id, button)"
-        @click="() => (resolveDisabled(button.isDisabled) ? displayDisabledButtonNotification() : handleClickBtn(id))"
-        @touchstart="() => hapticFeedbackLight()"
+        >{{ view[id]?.topLabel }}</span
       >
-        <span
-          v-if="settingsStore.showButtonAddedLabel && extendedFunctionSet[id]"
-          class="top-label"
-          :class="[
-            `top-label-${button.label.charAt(0) === '@' ? 'icon' : 'char'}`,
-            resolveDisabled(extendedFunctionSet[id]?.isDisabled) ? 'disabled-button-added-label' : '',
-            calcStore.isShiftPressed && !resolveDisabled(extendedFunctionSet[id]?.isDisabled)
-              ? 'shifted-button-added-label'
-              : '',
-          ]"
-        >
-          {{ extendedFunctionSet[id].label }}
-        </span>
-        <q-tooltip
-          :model-value="tooltipTimers[id] ?? false"
-          no-parent-event
-          class="noselect"
-          :style="`background: ${themesStore.getButtonColor(button.color as 'normal' | 'important' | 'function')}; border: 2px outset ${themesStore.getButtonColor(button.color as 'normal' | 'important' | 'function')}; border-radius: 10px;`"
-          anchor="top middle"
-          self="center middle"
-          transition-show="jump-up"
-          transition-hide="jump-down"
-          transition-duration="200"
-        >
-          {{ extendedFunctionSet[id]?.label ?? '' }}
-        </q-tooltip>
-        <ToolTip
-          :text-color="themesStore.getDarkColor()"
-          :bg-color="themesStore.getCurrentThemeColors.ui.warning"
-          :text="
-            calcStore.isShiftPressed
-              ? resolveDisabled(extendedFunctionSet[id]?.isDisabled)
-                ? t('disabledButton')
-                : getTooltipsOfKeys(id, true)
-              : resolveDisabled(activeButtonSet[id]?.isDisabled)
-                ? t('disabledButton')
-                : getTooltipsOfKeys(id, false)
-          "
-        />
-      </q-btn>
-    </div>
+      <span class="main-label" :class="{ 'main-label--icon': view[id]?.isIcon }">
+        <q-icon v-if="view[id]?.isIcon" :name="view[id]?.text ?? ''" />
+        <template v-else>{{ view[id]?.text }}</template>
+      </span>
+      <q-tooltip
+        :model-value="tooltipTimers[id] ?? false"
+        no-parent-event
+        class="noselect"
+        :style="`background: ${themesStore.getButtonColor(button.color as 'normal' | 'important' | 'function')}; border: 2px outset ${themesStore.getButtonColor(button.color as 'normal' | 'important' | 'function')}; border-radius: 10px;`"
+        anchor="top middle"
+        self="center middle"
+        transition-show="jump-up"
+        transition-hide="jump-down"
+        transition-duration="200"
+      >
+        {{ extendedFunctionSet[id]?.label ?? '' }}
+      </q-tooltip>
+      <ToolTip
+        :text-color="themesStore.getDarkColor()"
+        :bg-color="themesStore.getCurrentThemeColors.ui.warning"
+        :text="
+          calcStore.isShiftPressed
+            ? resolveDisabled(extendedFunctionSet[id]?.isDisabled)
+              ? t('disabledButton')
+              : getTooltipsOfKeys(id, true)
+            : resolveDisabled(activeButtonSet[id]?.isDisabled)
+              ? t('disabledButton')
+              : getTooltipsOfKeys(id, false)
+        "
+      />
+    </q-btn>
   </q-card-section>
 </template>
 
 <style scoped lang="scss">
+  // 키패드는 카드에 남은 높이를 그대로 가져가고, 버튼은 그리드 칸을 채운다.
+  //
+  // 예전에는 JS가 형제 요소들의 높이를 합산해 --base-height를 만들고, CSS가
+  // (100vh - base) / 행수 로 버튼 높이를 역산했다. 100vh는 키패드가 실제로 쓸 수
+  // 있는 높이가 아니어서 그 차이를 매번 재야 했고(계산기 페이지 5종이 헤더 구성이
+  // 제각각이다), 어긋난 값이 글자 크기까지 그대로 전파됐다. 레이아웃 계산을 통째로
+  // 브라우저에 넘겨 그 경로를 없앴다.
+  .keypad {
+    flex: 1;
+    min-height: 0;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    grid-template-rows: repeat(var(--row-count), 1fr);
+    gap: 16px;
+    padding: 4px 8px 8px;
+  }
+
   .button {
-    min-height: calc((100vh - var(--base-height)) / var(--row-count) - 20px);
-    max-height: calc((100vh - var(--base-height)) / var(--row-count) - 20px);
+    // 버튼 자신이 글자 크기의 기준 상자가 된다(cqh/cqw). 크기는 그리드 칸에서
+    // 오므로 내용이 크기에 영향을 주지 않는 size 컨테인먼트가 안전하다.
+    container-type: size;
+    min-width: 0;
+    min-height: 0;
+    padding: 0;
     font-weight: 700;
-    position: relative;
+
+    :deep(.q-btn__content) {
+      height: 100%;
+      flex-direction: column;
+      flex-wrap: nowrap;
+      justify-content: center;
+      gap: 2cqh;
+    }
   }
 
-  // padding-top은 버튼 높이에 대한 고정 비율이어야 한다. --label-scale과
-  // --label-size-ratio의 곱은 원래 1로 상쇄되도록 설계된 값이지만(Capacitor에서
-  // scale=textZoom/100, ratio=100/textZoom), 데스크톱은 ratio가 1로 고정이라
-  // 곱이 scale로 남았다. scale이 1이 되는 창은 352x604 하나뿐이라 그보다 큰
-  // 창에서는 패딩이 버튼보다 빨리 자라 본 레이블을 아래로 밀어냈다.
-  .icon {
-    font-size: calc(((100vh - var(--base-height)) / var(--row-count) - 20px) * 0.25 * var(--label-size-ratio));
-    padding-top: calc(((100vh - var(--base-height)) / var(--row-count) - 13px) * 0.27);
+  // 글자 크기는 버튼의 높이와 폭을 모두 본다. 높이만 보면 넓은 레이아웃에서 계산기
+  // 페인이 창 폭의 절반으로 줄어들 때 글자가 버튼을 넘긴다.
+  //
+  // 계수는 옛 높이 역산 방식이 실제로 그리던 크기에 맞춰 잡았다(352x604에서 22/15px,
+  // 1111x765 넓은 레이아웃에서 33/21px). clamp의 바닥은 가독성을 지키고, 천장은 그보다
+  // 큰 창에서 글자만 계속 비대해지는 것을 막는다. 보조 레이블 천장을 본 레이블보다
+  // 낮게 둬서 힌트가 본 레이블만큼 커지지 않게 했다.
+  .main-label {
+    line-height: 1.1;
+    font-size: clamp(14px, calc(min(34cqh, 34cqw) * var(--text-zoom-cancel)), 36px);
   }
 
-  .char {
-    font-size: calc(((100vh - var(--base-height)) / var(--row-count) - 20px) * 0.38 * var(--label-size-ratio));
-    padding-top: calc(((100vh - var(--base-height)) / var(--row-count) - 13px) * 0.26);
+  // 아이콘은 같은 font-size에서 문자보다 크게 보이므로 계수를 낮춘다.
+  .main-label--icon {
+    font-size: clamp(12px, calc(min(22cqh, 22cqw) * var(--text-zoom-cancel)), 24px);
+
+    :deep(.q-icon) {
+      font-size: inherit;
+    }
   }
 
   .top-label {
-    text-align: center;
-    position: absolute;
-    font-size: calc(((100vh - var(--base-height)) / var(--row-count) - 20px) * 0.25 * var(--label-size-ratio));
+    line-height: 1.1;
     color: inherit;
     opacity: 0.7;
-    width: 100%;
+    font-size: clamp(9px, calc(min(22cqh, 23cqw) * var(--text-zoom-cancel)), 20px);
   }
 
-  .top-label-icon {
-    top: 6%;
+  .top-label--dimmed {
+    opacity: 0.5;
   }
 
-  .top-label-char {
-    top: -6%;
+  .top-label--shifted {
+    opacity: 0.85;
   }
 
-  .disabled-button {
+  .is-dimmed {
     opacity: 0.6;
-  }
-
-  .disabled-button-added-label {
-    opacity: 0.5 !important;
-  }
-
-  .shifted-button-added-label {
-    opacity: 0.85 !important;
   }
 </style>
 

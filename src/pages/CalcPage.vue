@@ -12,7 +12,7 @@
 
 <template>
   <q-page>
-    <q-card flat class="q-px-md q-pt-xs q-pb-md">
+    <q-card flat class="calc-card q-px-md q-pt-xs q-pb-md">
       <ResultField field="main" />
       <CalcButton type="calc" />
     </q-card>
