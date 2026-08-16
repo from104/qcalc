@@ -6,6 +6,10 @@ The format is based on [Keep a Changelog] and this project follows [Semantic Ver
 
 ## [Unreleased]
 
+### Fixed
+
+- **Keypad labels no longer grow out of their buttons.** The button labels were sized from the window height alone, with no upper bound and no regard for the button's width, and their vertical offset grew faster than the button did. In a large or side-by-side window the main label drifted toward the bottom edge and crowded the small hint label above it; a 1920x1200 window produced a 60px digit. Labels are now sized from the button itself — both its height and its width — with a floor and a ceiling, and the two labels are laid out so they cannot collide at any window size.
+
 ## [0.13.0] 2026-08-09
 
 ### Changed
