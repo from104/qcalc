@@ -108,7 +108,7 @@
         }"
         >{{ view[id]?.topLabel }}</span
       >
-      <span class="main-label" :class="{ 'main-label--icon': view[id]?.isIcon }">
+      <span class="main-label">
         <q-icon v-if="view[id]?.isIcon" :name="view[id]?.text ?? ''" />
         <template v-else>{{ view[id]?.text }}</template>
       </span>
@@ -185,14 +185,11 @@
   // 1111x765 넓은 레이아웃에서 33/21px). clamp의 바닥은 가독성을 지키고, 천장은 그보다
   // 큰 창에서 글자만 계속 비대해지는 것을 막는다. 보조 레이블 천장을 본 레이블보다
   // 낮게 둬서 힌트가 본 레이블만큼 커지지 않게 했다.
+  // 아이콘 레이블도 같은 크기를 쓴다. 옛 코드는 아이콘 계수를 문자의 2/3(0.25 대 0.38)로
+  // 낮춰 뒀지만, 그러면 ÷ x - + 나 지우기 아이콘이 숫자보다 눈에 띄게 작아진다.
   .main-label {
     line-height: 1.1;
     font-size: clamp(14px, calc(min(34cqh, 34cqw) * var(--text-zoom-cancel)), 36px);
-  }
-
-  // 아이콘은 같은 font-size에서 문자보다 크게 보이므로 계수를 낮춘다.
-  .main-label--icon {
-    font-size: clamp(12px, calc(min(22cqh, 22cqw) * var(--text-zoom-cancel)), 24px);
 
     :deep(.q-icon) {
       font-size: inherit;
