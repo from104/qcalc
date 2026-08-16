@@ -156,18 +156,19 @@
     position: relative;
   }
 
+  // padding-top은 버튼 높이에 대한 고정 비율이어야 한다. --label-scale과
+  // --label-size-ratio의 곱은 원래 1로 상쇄되도록 설계된 값이지만(Capacitor에서
+  // scale=textZoom/100, ratio=100/textZoom), 데스크톱은 ratio가 1로 고정이라
+  // 곱이 scale로 남았다. scale이 1이 되는 창은 352x604 하나뿐이라 그보다 큰
+  // 창에서는 패딩이 버튼보다 빨리 자라 본 레이블을 아래로 밀어냈다.
   .icon {
     font-size: calc(((100vh - var(--base-height)) / var(--row-count) - 20px) * 0.25 * var(--label-size-ratio));
-    padding-top: calc(
-      ((100vh - var(--base-height)) / var(--row-count) - 13px) * 0.27 * var(--label-scale) * var(--label-size-ratio)
-    );
+    padding-top: calc(((100vh - var(--base-height)) / var(--row-count) - 13px) * 0.27);
   }
 
   .char {
     font-size: calc(((100vh - var(--base-height)) / var(--row-count) - 20px) * 0.38 * var(--label-size-ratio));
-    padding-top: calc(
-      ((100vh - var(--base-height)) / var(--row-count) - 13px) * 0.26 * var(--label-scale) * var(--label-size-ratio)
-    );
+    padding-top: calc(((100vh - var(--base-height)) / var(--row-count) - 13px) * 0.26);
   }
 
   .top-label {
