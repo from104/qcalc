@@ -8,6 +8,7 @@ The format is based on [Keep a Changelog] and this project follows [Semantic Ver
 
 ### Fixed
 
+- **Window size limits now follow the desktop's text scaling (Linux).** WebKitGTK zooms the whole page by the GTK text scaling factor, so at 125% scaling the 480×756 minimum window gave the app only a 384×604 canvas — less room than the window size promised. The minimum and maximum window sizes are now multiplied by that factor (and capped to the screen), so the app gets the same amount of room at any scaling. On a 125% desktop the minimum window becomes 600×945, which is exactly a 480×756 canvas.
 - **Keypad labels no longer grow out of their buttons.** The button labels were sized from the window height alone, with no upper bound and no regard for the button's width, and their vertical offset grew faster than the button did. In a large or side-by-side window the main label drifted toward the bottom edge and crowded the small hint label above it; a 1920x1200 window produced a 60px digit. Labels are now sized from the button itself — both its height and its width — with a floor and a ceiling, and the two labels are laid out so they cannot collide at any window size.
 
 ## [0.13.0] 2026-08-09

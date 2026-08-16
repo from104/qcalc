@@ -1,5 +1,44 @@
 use serde::Serialize;
-use tauri::{Manager, PhysicalSize, Size};
+use tauri::{LogicalSize, Manager, Size};
+
+/// tauri.conf.json의 minWidth/minHeight와 같은 값. 확대 비율 1.0 기준이며 아래 창 크기
+/// 계산의 바닥이 된다. 한쪽만 고치면 좁은 화면에서 max_size가 min_size보다 작아진다.
+const BASE_MIN_WIDTH: f64 = 480.0;
+const BASE_MIN_HEIGHT: f64 = 756.0;
+
+/// 데스크톱의 텍스트 확대 비율 (Linux 전용, 그 외 플랫폼은 항상 1.0).
+///
+/// WebKitGTK는 GTK의 텍스트 배율만큼 페이지 전체를 확대하므로, 창의 논리 크기가 같아도
+/// 웹 콘텐츠가 받는 CSS 뷰포트는 그만큼 좁아진다. 실측(배율 1.25):
+///
+/// | 창 크기   | CSS 뷰포트 |
+/// |-----------|------------|
+/// | 480x756   | 384x604    |
+/// | 600x945   | 480x756    |
+///
+/// 즉 배율을 반영하지 않으면 최소 창이 의도한 480x756이 아니라 384x604짜리 캔버스만
+/// 준다. 창의 최소/최대 크기를 이 비율만큼 키워야 어느 배율에서든 같은 CSS 공간이 나온다.
+///
+/// gtk-xft-dpi는 dpi를 1024배한 정수이고 기본값 96dpi가 배율 1.0이다(-1은 미설정).
+/// monitor.scale_factor()와는 다른 값이다 — 그쪽은 HiDPI 배율이고 Tauri의 논리 좌표계가
+/// 이미 반영하고 있다. 비정상 값이 창을 붕괴시키지 않도록 범위를 제한한다.
+fn ui_scale() -> f64 {
+  #[cfg(target_os = "linux")]
+  {
+    use gtk::prelude::*;
+    if let Some(settings) = gtk::Settings::default() {
+      let xft_dpi = settings.property::<i32>("gtk-xft-dpi");
+      if xft_dpi > 0 {
+        let scale = (xft_dpi as f64 / 1024.0) / 96.0;
+        if scale.is_finite() && (0.5..=4.0).contains(&scale) {
+          return scale;
+        }
+        log::warn!("gtk-xft-dpi={xft_dpi} yields an out-of-range UI scale ({scale}); using 1.0");
+      }
+    }
+  }
+  1.0
+}
 
 #[derive(Debug, Clone, Copy, Serialize)]
 #[serde(rename_all = "lowercase")]
@@ -140,33 +179,61 @@ pub fn run() {
           // 2026-07-12). 비정상 범위면 1.0으로 대체한다.
           let raw_scale = monitor.scale_factor();
           let scale = if raw_scale.is_finite() && raw_scale > 0.0 { raw_scale } else { 1.0 };
+          let ui = ui_scale();
           log::info!(
-            "monitor: size={}x{} raw_scale_factor={raw_scale} used_scale={scale}{}",
+            "monitor: size={}x{} raw_scale_factor={raw_scale} used_scale={scale} ui_scale={ui}{}",
             size.width,
             size.height,
             if scale == raw_scale { "" } else { " (FALLBACK — raw value was invalid)" },
           );
-          let work_width = (size.width as f64 / scale) as u32;
-          let work_height = (size.height as f64 / scale) as u32;
+          let work_width = size.width as f64 / scale;
+          let work_height = size.height as f64 / scale;
           let is_landscape = work_width > work_height;
 
           let max_height = if is_landscape {
-            (work_height as f64 * 2.0 / 3.0) as u32
+            work_height * 2.0 / 3.0
           } else {
-            work_height / 3
+            work_height / 3.0
           };
           let max_width = if is_landscape {
-            work_width / 2
+            work_width / 2.0
           } else {
-            (work_width as f64 * 2.0 / 3.0) as u32
+            work_width * 2.0 / 3.0
           };
 
-          // 바닥값(480/756)은 tauri.conf.json의 minWidth/minHeight와 반드시 일치해야 한다
-          // — 안 그러면 좁은 화면에서 max_size가 min_size보다 작아지는 모순이 생긴다.
-          let _ = window.set_max_size(Some(Size::Physical(PhysicalSize {
-            width: (max_width.max(480) as f64 * scale) as u32,
-            height: (max_height.max(756) as f64 * scale) as u32,
+          // 최소·최대 모두 화면 확대 비율만큼 키운다. 그래야 배율이 얼마든 웹 콘텐츠가
+          // 받는 CSS 공간이 같아진다. 다만 화면보다 큰 창을 요구하면 창을 못 쓰게 되므로
+          // 작업 영역으로 자른다.
+          let min_width = (BASE_MIN_WIDTH * ui).min(work_width);
+          let min_height = (BASE_MIN_HEIGHT * ui).min(work_height);
+          let _ = window.set_min_size(Some(Size::Logical(LogicalSize {
+            width: min_width,
+            height: min_height,
           })));
+
+          // 최대는 최소보다 작을 수 없다 — 좁은 화면에서 둘이 뒤집히면 창 크기가 붕괴한다.
+          let capped_max_width = (max_width * ui).min(work_width).max(min_width);
+          let capped_max_height = (max_height * ui).min(work_height).max(min_height);
+          let _ = window.set_max_size(Some(Size::Logical(LogicalSize {
+            width: capped_max_width,
+            height: capped_max_height,
+          })));
+
+          log::info!(
+            "window bounds (logical): min={min_width}x{min_height} max={capped_max_width}x{capped_max_height} work={work_width}x{work_height}"
+          );
+
+          // tauri-plugin-window-state가 복원한 크기는 config의 minWidth/minHeight를
+          // 무시하므로, 새 최소값보다 작게 복원됐으면 끌어올린다.
+          if let (Ok(inner), Ok(win_scale)) = (window.inner_size(), window.scale_factor()) {
+            let logical = inner.to_logical::<f64>(win_scale);
+            if logical.width + 0.5 < min_width || logical.height + 0.5 < min_height {
+              let _ = window.set_size(Size::Logical(LogicalSize {
+                width: logical.width.max(min_width),
+                height: logical.height.max(min_height),
+              }));
+            }
+          }
         }
       }
       Ok(())
