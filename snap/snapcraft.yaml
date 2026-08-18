@@ -71,14 +71,11 @@ parts:
     override-build: |
       craftctl default
       craftctl set version="$(grep -m1 '"version"' "$CRAFT_PROJECT_DIR/package.json" | cut -d'"' -f4)"
-      # deb가 설치하는 실행 파일 이름은 src-tauri/Cargo.toml의 package.name인 `app`이다.
+      # deb는 tauri.conf.json의 mainBinaryName대로 usr/bin/qcalc을 설치한다. 이름이
+      # 이미 맞으므로 여기서 옮길 것은 없고, 있는지만 확인한다.
       #
-      # 여기서 절대 "usr/bin/의 첫 번째 파일"을 고르면 안 된다. stage-packages가 같은
-      # 디렉터리에 bwrap·fc-cache·debconf 등을 함께 넣기 때문이다. 실제로 예전 로직이
-      # bubblewrap을 집어 qcalc으로 이름을 바꿨고, 그래서 command가 인자 없는 bwrap을
-      # 실행해 **앱이 한 번도 뜨지 않았다**(strict에서는 bwrap이 /proc/sys/kernel/overflowuid
-      # 접근 실패로, devmode에서는 bwrap 사용법을 출력하며 종료).
-      #
-      # 이름을 명시하고, 없으면 조용히 엉뚱한 것을 싣는 대신 빌드를 실패시킨다.
-      test -x "$CRAFT_PART_INSTALL/usr/bin/app"
-      mv "$CRAFT_PART_INSTALL/usr/bin/app" "$CRAFT_PART_INSTALL/usr/bin/qcalc"
+      # 확인을 지우지 말 것. 예전에는 이 자리에서 "usr/bin/의 첫 번째 파일"을 qcalc으로
+      # 이름을 바꿨는데, stage-packages가 같은 디렉터리에 bwrap·fc-cache·debconf를 함께
+      # 넣는 탓에 bubblewrap이 뽑혀 **앱이 한 번도 뜨지 않은 채 릴리스됐다**(#117).
+      # 빌드는 그때도 성공했다 — 실패해야 할 곳에서 실패하게 만드는 것이 이 한 줄이다.
+      test -x "$CRAFT_PART_INSTALL/usr/bin/qcalc"

@@ -44,10 +44,11 @@ modules:
       # .deb 압축 해제 (data.tar.*는 zstd/gz/xz 등 압축 방식에 따라 확장자가 다름)
       - ar -x qcalc.deb
       - tar -xf data.tar.*
-      # 바이너리 설치. productName("Q Calc")에 공백이 포함되어 있어 usr/bin/ 안의
-      # 실제 파일명이 mainBinaryName 설정 여부에 따라 달라질 수 있으므로, glob으로
-      # 단일 바이너리를 찾아 고정 이름(qcalc)으로 설치한다.
-      - install -Dm755 usr/bin/* /app/bin/qcalc
+      # 바이너리 설치. tauri.conf.json의 mainBinaryName이 usr/bin/qcalc을 보장하므로
+      # 이름을 명시한다. 예전에는 glob(usr/bin/*)을 썼는데, deb에 실행 파일이 둘 이상
+      # 들어오는 순간 엉뚱한 것이 qcalc으로 설치된다 — Snap이 같은 방식으로 bubblewrap을
+      # 집어 앱이 뜨지 않은 채 릴리스된 적이 있다(#117).
+      - install -Dm755 usr/bin/qcalc /app/bin/qcalc
       # desktop 파일 설치 (deb에 포함된 것 대신 이 매니페스트의 것을 사용)
       - install -Dm644 io.github.from104.qcalc.desktop /app/share/applications/io.github.from104.qcalc.desktop
       # metainfo 설치
