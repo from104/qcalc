@@ -6,20 +6,47 @@ The format is based on [Keep a Changelog] and this project follows [Semantic Ver
 
 ## [Unreleased]
 
+## [0.13.1] 2026-08-18
+
+### Changed
+
+- **Package naming unified on QCalc.** The space is gone from the product name (`Q Calc` → `QCalc`). The executable installs as `/usr/bin/qcalc` rather than `/usr/bin/app`, the desktop entry is `QCalc.desktop`, and downloads are named like `QCalc_0.13.1_amd64.deb`. The workarounds Snap and Flatpak carried to correct the executable name are gone with it.
+  - If you installed 0.13.0 on Windows, the new version will not recognise that install and will sit alongside it. Uninstall the old `Q Calc` entry first.
+
+### Added
+
+- **The Android APK is built and signed by CI and attached to each release.** Every APK used to be a local build someone had to remember to attach, and 0.13.0 shipped without one while the README pointed Android users at the release page.
+
+### Fixed
+
+- **The Snap package starts ([#117](https://github.com/from104/qcalc/issues/117)).** The 0.13.0 Snap launched bubblewrap instead of QCalc, because packaging renamed the first file it found in `usr/bin` and that was not the app. With the right binary in place the bundled Mesa/EGL stack then aborted startup, so it is no longer bundled — the platform's own is used. The package is also 47 MB smaller.
+- **Fixed 0.12.x never seeing this update (Windows, AppImage).** Releases stopped carrying the update manifest the Electron builds read, so those installs got a 404 on every update check and were never told a newer version existed. Releases now publish it again alongside the Tauri one.
+- **The Windows installer now removes the files the Electron build left behind.** Upgrading from 0.12.x kept the old application data in place — around 150 MB — along with a stale entry in Apps & features.
+- **Fixed the AppImage exiting immediately on Wayland (Linux).** The AppImage bundle's GTK hook forced `GDK_BACKEND=x11`, which crashes WebKitGTK; the app now resets the backend to native Wayland at startup. The `.deb` and `.rpm` installs were unaffected.
+- **Fixed the result field showing its warning colour when nothing was cut off.** Overflow is now measured from unrounded widths instead of comparing the integer-rounded `offsetWidth` and `scrollWidth`. The formula field's clipping indicator and the settings search tooltips, which used the same check, now share one implementation.
+- **The desktop text scaling is now applied to the window size (Linux).** WebKitGTK's page zoom, which made text, icons, the result field and the settings dialog larger than in other apps, is cancelled out; the minimum and maximum window sizes are multiplied by the scaling factor instead. Raising the scaling now widens the window rather than magnifying everything on screen.
+- **Fixed keypad labels growing out of their buttons.** Label sizes are now derived from the button's own height and width instead of the window height, with a floor and a ceiling, so labels no longer overflow the button or collide with each other in large or side-by-side windows.
+- **Flatpak no longer asks for audio access.** The sandbox requested the audio server for button sounds the app does not have, and the desktop entry advertised URL handling it does not implement.
+
+### Known issues
+
+- Screen readers cannot see the interface in the Flatpak build — an upstream sandbox limitation. Use the `.deb`, `.rpm` or AppImage build ([#113](https://github.com/from104/qcalc/issues/113)).
+- Reading the clipboard can fail on Linux, so pasting into the calculator may do nothing.
+
 ## [0.13.0] 2026-08-09
 
 ### Changed
 
-- **Desktop production switched from Electron to Tauri 2**: Linux and Windows desktop builds now ship as Tauri 2 apps (WebKitGTK on Linux, WebView2 on Windows) instead of Electron. The existing `src/` codebase runs unmodified — `src/boot/tauri-shim.ts` bridges the `window.electron` / `window.electronUpdater` interfaces to Tauri APIs at runtime, and `window.globalVars` gained `isTauri` / `isFlatpak` flags (sandbox type detected via the Rust `get_package_env` command). GitHub CI builds all six desktop packages on `v*` tags: `.deb`, `.rpm`, AppImage, Flatpak and Snap for Linux, NSIS installer for Windows. The Electron target stays in the tree during the transition but is no longer the shipped desktop build; Android (Capacitor) is unchanged.
-- **Auto-update fully activated on Tauri**: updater artifacts are signed in CI and uploaded to a draft GitHub release, then promoted to the fixed rolling release (`tauri-updater/latest.json`) by the `tauri-updater-promote` workflow. The in-app update UI now works on Tauri as it did on Electron — real download percentages, quit-and-install wired to the Rust `quit_app` command, and release links opened via `tauri-plugin-opener`. Snap/Flatpak builds keep their store update mechanisms (updater excluded there).
-- **History migration + onboarding**: calculation history can be exported from the Electron build and imported during Tauri first-run onboarding (settings schema version 2).
-- **Native Wayland by default**: forcing `GDK_BACKEND=x11` (the previous workaround for [tauri#13749](https://github.com/tauri-apps/tauri/issues/13749) / [tauri#3117](https://github.com/tauri-apps/tauri/issues/3117)) was found to cause an intermittent WebKitGTK crash on real Wayland hardware and is now opt-in via `QCALC_FORCE_XWAYLAND=1`.
+- **Desktop production switched from Electron to Tauri 2**: Linux and Windows desktop builds now ship as Tauri 2 apps (WebKitGTK on Linux, WebView2 on Windows). The existing `src/` codebase runs unmodified behind a shim, and CI builds all six packages: `.deb`, `.rpm`, AppImage, Flatpak, Snap and an NSIS installer. Android (Capacitor) is unchanged.
+- **Auto-update fully activated on Tauri**: the in-app update UI works as it did on Electron, with real download percentages and quit-and-install. Snap and Flatpak keep their store update mechanisms and are excluded.
+- **History migration + onboarding**: calculation history can be exported from the Electron build and imported during Tauri first-run onboarding.
+- **Native Wayland by default**: forcing `GDK_BACKEND=x11` was found to crash WebKitGTK on real hardware and is now opt-in via `QCALC_FORCE_XWAYLAND=1` ([tauri#13749](https://github.com/tauri-apps/tauri/issues/13749) / [tauri#3117](https://github.com/tauri-apps/tauri/issues/3117)).
 - **Bigger default window**: default and minimum desktop window size grew from 352×604 to 480×756.
 
 ### Added
 
-- **2 new languages (10 total)**: Portuguese (pt) and Russian (ru) join the existing 8 (Korean, English, Japanese, Chinese, Hindi, German, Spanish, French). Every screen is translated — menus, settings, unit names, currency names, help, about, tips, and error messages.
-- **Screen reader announcement of results on Linux**: Orca cannot present web `aria-live` regions inside a Tauri app (it assigns its non-web script to GTK-toolkit apps, which has no live region support), so on calculation completion the app now emits an AT-SPI `announcement` event from the Rust side (`announce_a11y` command) — a path every Orca script reads unconditionally. The DOM live region is kept for other platforms and was reworked so it actually emits change events (no `clip:` hiding, on-screen 1×1px `.sr-only`, keyed block child recreated per calculation).
+- **2 new languages (10 total)**: Portuguese (pt) and Russian (ru). Every screen is translated — menus, settings, unit names, currency names, help, about, tips, and error messages.
+- **Screen reader announcement of results on Linux**: Orca cannot present web `aria-live` regions inside a Tauri app, so the app now emits an AT-SPI `announcement` event from the Rust side when a calculation completes. The DOM live region is kept for other platforms.
 - **Formula error announcements**: formula errors are classified into i18n categories and announced via `aria-live`.
 - **Undo for record deletion**: swipe/menu deletion of a history record shows an undo snackbar.
 - **Keyboard accessibility**: the overflow tab menu, formula field and memory toggle are now fully keyboard-operable.
@@ -28,18 +55,20 @@ The format is based on [Keep a Changelog] and this project follows [Semantic Ver
 
 ### Fixed
 
-- **Accessibility**: restored screen-reader announcement of the calculation result; removed non-standard `role="text"` and a misapplied `role="textbox"` on the read-only result field; removed a nested interactive control in the formula field; `<html lang>` is now set and synced with the active locale; added missing `ariaLabel` translations (settings button, record toolbar search/export/import) in all 10 languages.
+- **Accessibility**: restored screen-reader announcement of the calculation result; removed misapplied `role` attributes and a nested interactive control; `<html lang>` is now synced with the active locale; added missing `ariaLabel` translations in all 10 languages.
 - **Locale-aware numbers**: number display and paste parsing use `Intl.NumberFormat`; live input shows the locale's decimal separator.
 - **Formula calculator**: trig functions use degrees to match the basic calculator; keypad `=` errors go through the same error classifier; the `{detail}` placeholder in error messages is substituted.
 - **History**: restoring a record re-enforces the MAX_RECORDS bound.
-- **Stores**: cross-store dependencies in `calcStore` are lazily instantiated, fixing a "no active Pinia" crash at Tauri startup (audit CODE-01).
-- **Tauri/Linux**: guard against a zero/invalid monitor `scale_factor` during setup (window collapsed to 0×0 under native Wayland); WebKitGTK font-weight rendering workaround ([tauri#14286](https://github.com/tauri-apps/tauri/issues/14286)); packaged app icons fixed (placeholders replaced, icon scaled to full canvas); Flatpak manifest rewritten for Tauri; Snap packaging fixed (deb source path, WebKitGTK sandbox).
+- **Stores**: cross-store dependencies in `calcStore` are lazily instantiated, fixing a "no active Pinia" crash at Tauri startup.
+- **Tauri/Linux**: guard against an invalid monitor `scale_factor` collapsing the window at startup; WebKitGTK font-weight rendering workaround ([tauri#14286](https://github.com/tauri-apps/tauri/issues/14286)); packaged app icons fixed; Flatpak manifest rewritten; Snap packaging fixed.
 - **pt/ru markdown wiring**: the Help, About and Tips pages fell back to English because the pt/ru markdown modules were not imported and mapped.
 - **i18n**: `unitDesc` namespace unified with runtime category ids; two Korean label typos fixed.
 
 ### Known issues
 
-- Linux screen reader output is verified to the AT-SPI event level; audible end-to-end verification, hover (mouse review) reading, the WebKitGTK clipboard `readText` failure, and CSP hardening (`app.security.csp` is currently `null`) are tracked as follow-ups.
+- **The Snap package in this release does not start.** Use the `.deb`, `.rpm`, AppImage or Flatpak build instead ([#117](https://github.com/from104/qcalc/issues/117)).
+- Screen readers cannot see the interface in the Flatpak build — an upstream sandbox limitation. Use the `.deb`, `.rpm` or AppImage build ([#113](https://github.com/from104/qcalc/issues/113)).
+- Linux screen reader output is verified only to the AT-SPI event level; audible verification, hover reading, the WebKitGTK clipboard `readText` failure, and CSP hardening are tracked as follow-ups.
 
 ## [0.12.0] 2026-03-22
 

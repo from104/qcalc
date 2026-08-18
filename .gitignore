@@ -78,5 +78,18 @@ flatpak/build-dir
 flatpak/linux-unpacked
 flatpak/icons
 flatpak/generated-sources.json
+
+# 패키징에 투입되는 .deb — 빌드 산출물이지 소스가 아니다.
+# 매니페스트가 고정 이름을 요구해 저장소 안에 놓이므로 여기서 막지 않으면
+# `git add -A` 한 번에 90MB짜리가 이력에 영구히 박힌다. Snap도 같은 이유.
+flatpak/qcalc.deb
+snap/local/
+*.snap
+
+# 릴리스 전 로컬 검증 로그 (scripts/verify-release.sh)
+.verify-*.log
+
 .claude/settings.local.json
+# 로컬 작업용 git worktree 사본 (3.6GB)
+.claude/worktrees/
 .github/hooks/context-mode.json

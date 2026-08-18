@@ -17,6 +17,7 @@
   import { showError } from 'src/utils/NotificationUtils';
   import { getErrorMessage } from 'src/utils/ErrorUtils';
   import { classifyFormulaError, type FormulaErrorInfo } from 'src/utils/FormulaError';
+  import { isTextOverflowing } from 'src/utils/OverflowUtils';
 
   const { t } = useI18n();
   const formulaStore = useFormulaStore();
@@ -32,8 +33,7 @@
   // 표시 모드 텍스트 오버플로우 감지 (오른쪽 정렬 → 왼쪽 클리핑)
   const overflowLeft = ref(false);
   const checkOverflow = () => {
-    const el = innerTextRef.value;
-    overflowLeft.value = !!el && el.scrollWidth > el.clientWidth;
+    overflowLeft.value = isTextOverflowing(innerTextRef.value);
   };
 
   watch([() => formulaStore.expression, isEditing], () => nextTick(checkOverflow));

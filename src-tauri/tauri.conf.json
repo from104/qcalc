@@ -1,6 +1,7 @@
 {
   "$schema": "../node_modules/@tauri-apps/cli/config.schema.json",
-  "productName": "Q Calc",
+  "productName": "QCalc",
+  "mainBinaryName": "qcalc",
   "version": "../package.json",
   "identifier": "io.github.from104.qcalc",
   "build": {
@@ -13,7 +14,7 @@
     "windows": [
       {
         "label": "main",
-        "title": "Q Calc",
+        "title": "QCalc",
         "width": 480,
         "height": 756,
         "minWidth": 480,
@@ -37,7 +38,12 @@
     "homepage": "https://github.com/from104/qcalc",
     "category": "Utility",
     "shortDescription": "A multi-purpose calculator for productivity and accessibility",
-    "longDescription": "QCalc packs five specialized calculators (Standard, Unit, Currency, Radix, Formula) and 10 languages into one keyboard-friendly, screen-reader-accessible app."
+    "longDescription": "QCalc packs five specialized calculators (Standard, Unit, Currency, Radix, Formula) and 10 languages into one keyboard-friendly, screen-reader-accessible app.",
+    "windows": {
+      "nsis": {
+        "installerHooks": "installer-hooks.nsh"
+      }
+    }
   },
   "plugins": {
     "updater": {

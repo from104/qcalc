@@ -56,6 +56,7 @@
   import ToolTip from 'src/components/common/ToolTip.vue';
   import { showError, showMessage } from 'src/utils/NotificationUtils';
   import { formatNumberToLocale, parseLocaleNumber, getLocaleNumberSymbols } from 'src/utils/NumberUtils';
+  import { isTextOverflowing } from 'src/utils/OverflowUtils';
 
   type PropsType = {
     field?: 'main' | 'sub';
@@ -87,7 +88,7 @@
    * 필드 툴팁 표시 여부를 결정하는 함수
    *
    * @description
-   * - 필드 요소의 실제 너비(offsetWidth)가 내용 너비(scrollWidth)보다 작은 경우 텍스트가 넘친 것으로 판단
+   * - 글자가 잘릴 만큼 넘쳤는지는 isTextOverflowing이 판정한다 (판정 근거는 OverflowUtils 참고)
    * - DOM 업데이트가 완료된 후 정확한 크기를 측정하기 위해 nextTick 사용
    * - 정확한 측정을 위해 requestAnimationFrame을 사용하여 렌더링 완료 후 체크
    * @returns 넘침 상태 체크 성공 여부
@@ -106,10 +107,7 @@
           return;
         }
 
-        // 요소의 실제 표시 너비와 스크롤 가능한 전체 너비를 비교
-        // offsetWidth: 요소의 표시 너비 (padding 포함, 스크롤바 제외)
-        // scrollWidth: 요소의 내용 전체 너비 (스크롤 가능한 너비)
-        const isOverflowing = element.offsetWidth < element.scrollWidth;
+        const isOverflowing = isTextOverflowing(element);
 
         // 상태가 실제로 변경된 경우에만 업데이트 (불필요한 반응성 트리거 방지)
         if (needFieldTooltip.value !== isOverflowing) {

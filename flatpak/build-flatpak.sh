@@ -50,14 +50,22 @@ check_prerequisites() {
 
     # 런타임 및 SDK 설치 확인 (org.freedesktop.* 에는 WebKitGTK가 없으므로
     # org.gnome.Platform/Sdk를 사용한다 — GNOME 런타임이 webkit2gtk-4.1을 내장)
-    if ! flatpak info org.gnome.Platform//46 &> /dev/null; then
-        warn "org.gnome.Platform//46이 설치되지 않았습니다. 설치합니다..."
-        flatpak install -y --user flathub org.gnome.Platform//46
+    #
+    # 버전은 **매니페스트에서 읽는다.** 여기에 숫자를 박아 두면 매니페스트를 올릴 때
+    # 같이 올리는 것을 잊게 되고, 그러면 빌드에 쓰지도 않는 옛 런타임을 1.9GB씩
+    # 내려받는다. 실제로 매니페스트가 49로 올라간 뒤에도 여기만 46으로 남아 있었다.
+    local rt
+    rt=$(sed -n "s/^runtime-version: *['\"]\?\([^'\"]*\)['\"]\?/\1/p" "$MANIFEST" | head -n1)
+    [ -n "$rt" ] || error "매니페스트에서 runtime-version을 읽지 못했습니다: $MANIFEST"
+
+    if ! flatpak info "org.gnome.Platform//$rt" &> /dev/null; then
+        warn "org.gnome.Platform//$rt이 설치되지 않았습니다. 설치합니다..."
+        flatpak install -y --user flathub "org.gnome.Platform//$rt"
     fi
 
-    if ! flatpak info org.gnome.Sdk//46 &> /dev/null; then
-        warn "org.gnome.Sdk//46이 설치되지 않았습니다. 설치합니다..."
-        flatpak install -y --user flathub org.gnome.Sdk//46
+    if ! flatpak info "org.gnome.Sdk//$rt" &> /dev/null; then
+        warn "org.gnome.Sdk//$rt이 설치되지 않았습니다. 설치합니다..."
+        flatpak install -y --user flathub "org.gnome.Sdk//$rt"
     fi
 
     info "사전 조건 확인 완료."

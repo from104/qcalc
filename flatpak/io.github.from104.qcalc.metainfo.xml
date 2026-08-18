@@ -59,6 +59,11 @@
   <content_rating type="oars-1.1" />
 
   <releases>
+    <release version="0.13.1" date="2026-08-18">
+      <description>
+        <p>Fixes the Snap package failing to start, restores update notifications for users still on the Electron build, removes the leftovers of that build when upgrading on Windows, and corrects window sizing under desktop text scaling and keypad label sizing on Linux.</p>
+      </description>
+    </release>
     <release version="0.13.0" date="2026-08-09">
       <description>
         <p>Desktop production build switched from Electron to Tauri 2 with six package formats built in CI, activated auto-update, 2 additional languages (Portuguese, Russian) for 10 in total, screen reader announcement of results on Linux, WCAG AA contrast, improved keyboard accessibility, and undo for record deletion.</p>

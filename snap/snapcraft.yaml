@@ -10,7 +10,14 @@ description: |
   exchange, programmer/radix math, and formula evaluation.
 grade: stable
 confinement: strict
-compression: lzo
+# 압축은 기본값(xz)을 쓴다. lzo는 기동이 조금 빠른 대신 이 앱에서 용량이
+# 128MB -> 171MB로 커진다(실측). 계산기 앱에서 그 43MB를 정당화할 만한
+# 이득이 아니다.
+#
+# 주의: 스토어 자동심사의 squashfs_repack_checksum 실패는 이 설정과 무관하다.
+# 한때 그렇게 판단했으나 xz 재빌드에서 그대로 재현되어 반증됐다. 실제 원인은
+# CI의 패키징 방식이다 — 같은 파일 트리를 `snapcraft pack`으로 다시 묶으면
+# 통과한다. qcalc#118 참조.
 architectures:
   - build-on: amd64
 
@@ -48,12 +55,27 @@ parts:
     stage-packages:
       - libwebkit2gtk-4.1-0
       - libayatana-appindicator3-1
+    # GL/EGL 스택은 gnome extension(gnome-42-2204)이 제공한다. libwebkit2gtk가
+    # 딸고 오는 Mesa를 함께 실으면 snap 쪽이 LD_LIBRARY_PATH 앞자리라 먼저 로드되고,
+    # 플랫폼의 DRI 드라이버와 어긋나 EGL 초기화가 실패한다:
+    #   libEGL fatal: did not find extension DRI_Mesa version 1
+    # 그러면 앱이 창을 띄우지 못하고 종료한다. 빼면 플랫폼 것을 쓰고 정상 기동한다.
+    stage:
+      - -usr/lib/x86_64-linux-gnu/dri
+      - -usr/lib/x86_64-linux-gnu/libEGL*
+      - -usr/lib/x86_64-linux-gnu/libGL*
+      - -usr/lib/x86_64-linux-gnu/libGLES*
+      - -usr/lib/x86_64-linux-gnu/libGLX*
+      - -usr/lib/x86_64-linux-gnu/libglapi*
+      - -usr/lib/x86_64-linux-gnu/libgbm*
     override-build: |
       craftctl default
       craftctl set version="$(grep -m1 '"version"' "$CRAFT_PROJECT_DIR/package.json" | cut -d'"' -f4)"
-      # productName("Q Calc")에 공백이 있어 mainBinaryName 설정 여부에 따라
-      # usr/bin/ 안의 실제 파일명이 달라질 수 있으므로, 없으면 찾아서 고정 이름으로 옮긴다.
-      if [ ! -e "$CRAFT_PART_INSTALL/usr/bin/qcalc" ]; then
-        bin="$(find "$CRAFT_PART_INSTALL/usr/bin" -maxdepth 1 -type f | head -n1)"
-        mv "$bin" "$CRAFT_PART_INSTALL/usr/bin/qcalc"
-      fi
+      # deb는 tauri.conf.json의 mainBinaryName대로 usr/bin/qcalc을 설치한다. 이름이
+      # 이미 맞으므로 여기서 옮길 것은 없고, 있는지만 확인한다.
+      #
+      # 확인을 지우지 말 것. 예전에는 이 자리에서 "usr/bin/의 첫 번째 파일"을 qcalc으로
+      # 이름을 바꿨는데, stage-packages가 같은 디렉터리에 bwrap·fc-cache·debconf를 함께
+      # 넣는 탓에 bubblewrap이 뽑혀 **앱이 한 번도 뜨지 않은 채 릴리스됐다**(#117).
+      # 빌드는 그때도 성공했다 — 실패해야 할 곳에서 실패하게 만드는 것이 이 한 줄이다.
+      test -x "$CRAFT_PART_INSTALL/usr/bin/qcalc"

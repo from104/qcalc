@@ -191,7 +191,9 @@ QCalc packs **5 specialized calculators (Standard, Unit, Currency, Radix, Formul
 
 > macOS / iOS builds are not available at this time.
 
-> **Upgrading from 0.12.x or older (Electron)?** The old app cannot auto-update across the engine switch — download and install 0.13.0 manually, then bring your data over: in the old app export your history (CSV) and settings (JSON), and import them from the new app's first-run screen (or Settings). You can uninstall the old app afterwards.
+> **Upgrading from 0.12.x or older (Electron)?** On Windows and the AppImage the old app's update check reaches 0.13.1 and installs it for you; on Windows the old installation is removed in the process. Every other package (`.deb`, `.rpm`, Snap, Flatpak) has to be installed by hand. Either way, bring your data over: in the old app export your history (CSV) and settings (JSON), and import them from the new app's first-run screen (or Settings).
+>
+> 0.13.0 itself was published without the file the old app's updater reads, so an install still on 0.12.x will only be offered 0.13.1 or later.
 
 ---
 

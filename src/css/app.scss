@@ -110,6 +110,24 @@ body {
   }
 }
 
+// 계산기 5종 페이지(CalcPage/UnitPage/CurrencyPage/RadixPage/FormulaPage) 공통.
+// 카드가 페이지를 정확히 채우고, 그 안에서 키패드가 남은 높이를 flex로 가져간다.
+// 이 규칙이 있어야 CalcButton이 100vh 기반 높이 역산 없이 동작한다.
+//
+// - q-page는 height가 auto이고 min-height만 지정돼 있어 자식의 height:100%가
+//   해석되지 않는다(실측: 카드가 721px 대신 372px로 붕괴). q-page가
+//   position:relative이므로 절대 배치로 확정 높이를 만든다.
+// - .q-card가 같은 특이도로 position:relative/display:block을 주므로 클래스를
+//   겹쳐 특이도를 올린다.
+// - layout.scss가 아니라 여기 있는 이유: layout.scss는 Wide/NarrowLayout의
+//   scoped 스타일 안에서 import돼 [data-v-*]가 붙고, 페이지 카드에는 닿지 않는다.
+.q-card.calc-card {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+}
+
 // 오버플로우 탭 메뉴 스타일 (q-menu는 body에 포탈 렌더링되므로 글로벌 스타일 필요)
 .overflow-menu-wrapper {
   border-radius: 12px;

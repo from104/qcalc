@@ -14,7 +14,7 @@
 
 <template>
   <q-page>
-    <q-card flat class="q-px-md q-pt-xs q-pb-md">
+    <q-card flat class="calc-card q-px-md q-pt-xs q-pb-md">
       <!-- 메인 결과 필드: calc.currentNumber 공유 -->
       <ResultField field="main" addon="none" />
 
