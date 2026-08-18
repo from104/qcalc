@@ -76,6 +76,22 @@ src-capacitor/         # Capacitor Android project
 - **Commits**: Conventional Commits — `feat:`, `fix:`, `refactor:`, `chore:`, `docs:`
 - **Never commit** `.env`, keystore files, or credentials
 
+## Changelog
+
+- Two files, kept in sync: `CHANGELOG.md` (English) and `CHANGELOG-ko.md` (Korean)
+- **Keep entries short** — a bold title plus one or two sentences. The 0.12.0 and earlier sections are the reference for length; read one before writing a new entry
+- Say what changed and what the user sees. Leave out root-cause narration, internal implementation detail (file, command and workflow names), measured numbers, and audit item ids — those belong in commit messages and code comments
+- Keep issue links, and let a link stand in for the explanation of a known issue
+
+## GitHub Release Notes
+
+`release.yml` only creates the draft; the body is written by hand.
+
+- Body is that version's section from `CHANGELOG.md`, used as-is — do not rewrite, summarise or expand it
+- Put **Known issues** at the top, above the other sections
+- Do not inline installation instructions — link to the README
+- English throughout — do not append or link `CHANGELOG-ko.md`
+
 ## Release Checklist
 
 1. Update `version` in `package.json`
@@ -83,8 +99,8 @@ src-capacitor/         # Capacitor Android project
 3. Sync all `src/content/pages/AboutPage-*.md` files with the changelog (all 10 languages)
 4. Sync all `src/content/pages/HelpPage-*.md` files with the README (all 10 languages)
 5. Update the `<releases>` list in `flatpak/io.github.from104.qcalc.metainfo.xml`
-6. Run `yarn lint` and `yarn test`
-7. Tag `v<version>` on `main` — `.github/workflows/release.yml` builds all six desktop packages (deb/rpm/AppImage/Flatpak/Snap/NSIS) and the Android APK, then creates a draft release; after publishing it, run the `tauri-updater-promote` workflow so auto-update clients see the new version
+6. Run `yarn lint` and `yarn test`, then `scripts/verify-release.sh` — it builds each package, installs it in a clean container, and checks the app actually starts. CI only proves the build succeeded; 0.13.0 shipped a Snap that built fine and could not launch ([#117](https://github.com/from104/qcalc/issues/117))
+7. Tag `v<version>` on `main` — `.github/workflows/release.yml` builds all six desktop packages (deb/rpm/AppImage/Flatpak/Snap/NSIS) and the Android APK, then creates a draft release; write its body (see **GitHub Release Notes**), publish it, then run the `tauri-updater-promote` workflow so auto-update clients see the new version
 
 ## Testing
 
