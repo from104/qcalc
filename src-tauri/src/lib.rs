@@ -1,10 +1,17 @@
 use serde::Serialize;
 use tauri::{LogicalSize, Manager, Size};
 
-/// tauri.conf.json의 minWidth/minHeight와 같은 값. 확대 비율 1.0 기준이며 아래 창 크기
-/// 계산의 바닥이 된다. 한쪽만 고치면 좁은 화면에서 max_size가 min_size보다 작아진다.
-const BASE_MIN_WIDTH: f64 = 480.0;
-const BASE_MIN_HEIGHT: f64 = 756.0;
+/// 앱이 쓸 만해지는 최소 크기 — **확대 비율 1.0 기준**이다. 실제 최소 창 크기는 여기에
+/// 데스크톱 확대 비율을 곱해 정한다. `.setup()`에서 페이지 줌을 상쇄하므로 CSS 픽셀과
+/// 창의 논리 픽셀이 같고, 따라서 이 값은 두 단위 어느 쪽으로 읽어도 된다.
+/// Electron 빌드의 같은 성격의 값은 352x604다(`src-electron/electron-main.ts`).
+///
+/// 이 수치는 실기기에서 나왔다: 사용자가 직접 늘려 쓸 만하다고 판단한 창이 978x1536 물리
+/// 픽셀이었고(모니터 배율 2 → 489x768 논리), 텍스트 배율 1.25가 걸려 CSS로는 384x604였다.
+/// 즉 예전 상수 480x756은 이미 1.25가 반영된 논리 크기였고, 그걸 CSS 값으로 착각해 배율을
+/// 다시 곱하는 바람에 창이 1.5배 넘게 커진 적이 있다(2026-08-16). 단위를 헷갈리지 말 것.
+const BASE_MIN_WIDTH: f64 = 384.0;
+const BASE_MIN_HEIGHT: f64 = 604.0;
 
 /// 데스크톱의 텍스트 확대 비율 (Linux 전용, 그 외 플랫폼은 항상 1.0).
 ///
@@ -16,8 +23,9 @@ const BASE_MIN_HEIGHT: f64 = 756.0;
 /// | 480x756   | 384x604    |
 /// | 600x945   | 480x756    |
 ///
-/// 즉 배율을 반영하지 않으면 최소 창이 의도한 480x756이 아니라 384x604짜리 캔버스만
-/// 준다. 창의 최소/최대 크기를 이 비율만큼 키워야 어느 배율에서든 같은 CSS 공간이 나온다.
+/// 그래서 `.setup()`에서 역수 줌(`set_zoom(1/배율)`)을 걸어 이 확대를 상쇄한다. 그러면
+/// CSS 픽셀 = 창 논리 픽셀이 되어, 창 크기 계산에서 배율을 신경 쓸 필요가 없어지고
+/// 화면에 그려지는 크기도 Chromium을 쓰는 Electron 빌드와 같아진다.
 ///
 /// gtk-xft-dpi는 dpi를 1024배한 정수이고 기본값 96dpi가 배율 1.0이다(-1은 미설정).
 /// monitor.scale_factor()와는 다른 값이다 — 그쪽은 HiDPI 배율이고 Tauri의 논리 좌표계가
@@ -120,18 +128,33 @@ fn announce_a11y(window: tauri::WebviewWindow, text: String) {
 /// 헤더바 미갱신·항상위 no-op은 남지만 크래시보다 낫다. 두 기능이 꼭 필요하고 크래시
 /// 위험을 감수할 사용자는 `QCALC_FORCE_XWAYLAND=1`로 옵트인할 수 있다(단 위 재현 결과상
 /// `WEBKIT_DISABLE_DMABUF_RENDERER=1`을 같이 줘도 크래시가 완전히 없어진다는 보장은 없다).
+///
+/// 반대로 **환경이 밖에서 x11을 강제하고 있으면 되돌린다.** AppImage 번들은
+/// linuxdeploy-plugin-gtk이 자동 생성하는 AppRun 훅에서 `export GDK_BACKEND=x11`을
+/// 무조건 내보내므로(tauri-apps/tauri#8541 회피용), 이 바이너리가 실행되기도 전에 위 크래시
+/// 조건이 성립한다 — 실제로 0.13.0 릴리스 AppImage가 GNOME/Wayland에서 창이 뜨자마자
+/// SIGSEGV로 죽는 것을 재현했다(2026-08-16). 훅은 빌드 산출물이라 우리가 지울 수 없으니
+/// GTK가 초기화되기 전인 여기서 네이티브 Wayland로 되돌린다.
 #[cfg(target_os = "linux")]
-fn force_xwayland_if_needed() {
-  if std::env::var_os("WAYLAND_DISPLAY").is_some()
-    && std::env::var_os("QCALC_FORCE_XWAYLAND").is_some()
-  {
+fn configure_gdk_backend() {
+  // Wayland 세션이 아니면(순수 X11 등) 백엔드 선택을 건드릴 이유가 없다.
+  if std::env::var_os("WAYLAND_DISPLAY").is_none() {
+    return;
+  }
+
+  if std::env::var_os("QCALC_FORCE_XWAYLAND").is_some() {
     std::env::set_var("GDK_BACKEND", "x11");
     std::env::set_var("WEBKIT_DISABLE_DMABUF_RENDERER", "1");
+    return;
   }
+
+  // 옵트인이 없으면 네이티브 Wayland가 기본이다. 값을 지우지 않고 명시적으로 박는 이유는,
+  // 지우면 GDK가 후보를 순회하다 결국 x11로 떨어져 같은 크래시로 돌아갈 수 있기 때문이다.
+  std::env::set_var("GDK_BACKEND", "wayland");
 }
 
 #[cfg(not(target_os = "linux"))]
-fn force_xwayland_if_needed() {}
+fn configure_gdk_backend() {}
 
 // TODO: CSP 설정 — tauri.conf.json의 `app.security.csp`(현재 null)에 실기기 런타임 검증과 함께
 // 값을 채워야 한다. currency API·GitHub updater 엔드포인트용 connect-src 허용이 필요.
@@ -139,7 +162,7 @@ fn force_xwayland_if_needed() {}
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
   // 반드시 tauri::Builder::default() 이전에 호출. Builder 초기화가 GTK 세션 백엔드를 확정한다.
-  force_xwayland_if_needed();
+  configure_gdk_backend();
 
   let mut builder = tauri::Builder::default()
     .plugin(tauri_plugin_window_state::Builder::default().build())
@@ -169,17 +192,30 @@ pub fn run() {
         #[cfg(debug_assertions)]
         window.open_devtools();
 
+        // WebKitGTK는 데스크톱 텍스트 배율만큼 페이지 전체를 확대한다. 그대로 두면 두 가지가
+        // 어긋난다: (1) 화면에 그려지는 글자와 버튼이 같은 데스크톱의 다른 앱보다 그 비율만큼
+        // 커지고(Chromium 기반인 Electron 빌드는 이 배율을 적용하지 않는다), (2) CSS 픽셀과
+        // 창의 논리 픽셀이 달라져 아래 창 크기 계산이 전부 배율에 얽힌다.
+        //
+        // 역수 줌을 걸어 상쇄하면 CSS 픽셀 = 창 논리 픽셀이 되어 두 문제가 함께 사라진다.
+        // Linux 외 플랫폼에서는 ui_scale()이 1.0이라 무동작이다.
+        let ui = ui_scale();
+        if (ui - 1.0).abs() > f64::EPSILON {
+          if let Err(err) = window.set_zoom(1.0 / ui) {
+            log::warn!("failed to neutralise the {ui}x desktop text scaling: {err}");
+          }
+        }
+
         if let Ok(Some(monitor)) = window.current_monitor() {
           let size = monitor.size();
           // 네이티브 Wayland에서는 `.setup()` 시점에 컴포지터가 아직 출력(output) 협상을
           // 끝내지 않아 scale_factor()가 0/비정상값을 반환할 수 있다(XWayland는 X11 API가
-          // 동기식이라 이 문제가 없었다 — force_xwayland_if_needed()가 항상 켜져 있던
+          // 동기식이라 이 문제가 없었다 — XWayland 강제가 항상 켜져 있던
           // 시절엔 드러나지 않던 경로). scale이 0이면 아래 연산이 전부 0으로 붕괴해
           // set_max_size(0, 0)이 호출되고 창이 거의 안 보일 만큼 쪼그라든다(실기기 재현,
           // 2026-07-12). 비정상 범위면 1.0으로 대체한다.
           let raw_scale = monitor.scale_factor();
           let scale = if raw_scale.is_finite() && raw_scale > 0.0 { raw_scale } else { 1.0 };
-          let ui = ui_scale();
           log::info!(
             "monitor: size={}x{} raw_scale_factor={raw_scale} used_scale={scale} ui_scale={ui}{}",
             size.width,
@@ -201,9 +237,11 @@ pub fn run() {
             work_width * 2.0 / 3.0
           };
 
-          // 최소·최대 모두 화면 확대 비율만큼 키운다. 그래야 배율이 얼마든 웹 콘텐츠가
-          // 받는 CSS 공간이 같아진다. 다만 화면보다 큰 창을 요구하면 창을 못 쓰게 되므로
-          // 작업 영역으로 자른다.
+          // 데스크톱 확대 비율은 **창 크기로** 반영한다. 위에서 페이지 줌을 상쇄했으므로
+          // 글자·아이콘·결과 필드·설정창처럼 CSS로 크기가 고정된 UI는 배율과 무관하게
+          // 일정하게 그려지고, 대신 창이 그만큼 넓어져 키패드가 쓸 공간이 커진다.
+          // 즉 "배율을 높였으니 앱을 크게 쓰겠다"는 의도는 살리되 화면 요소를 통째로
+          // 확대하지는 않는다. 화면보다 큰 창은 쓸 수 없으므로 작업 영역으로 자른다.
           let min_width = (BASE_MIN_WIDTH * ui).min(work_width);
           let min_height = (BASE_MIN_HEIGHT * ui).min(work_height);
           let _ = window.set_min_size(Some(Size::Logical(LogicalSize {
@@ -211,7 +249,8 @@ pub fn run() {
             height: min_height,
           })));
 
-          // 최대는 최소보다 작을 수 없다 — 좁은 화면에서 둘이 뒤집히면 창 크기가 붕괴한다.
+          // 최대도 같은 이유로 배율만큼 천장을 올린다. 최대는 최소보다 작을 수 없다 —
+          // 좁은 화면에서 둘이 뒤집히면 창 크기가 붕괴한다.
           let capped_max_width = (max_width * ui).min(work_width).max(min_width);
           let capped_max_height = (max_height * ui).min(work_height).max(min_height);
           let _ = window.set_max_size(Some(Size::Logical(LogicalSize {

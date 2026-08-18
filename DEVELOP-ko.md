@@ -75,7 +75,9 @@ yarn dev:tauri     # 개발 모드 (devtools 자동 오픈)
 yarn build:tauri   # 프로덕션 번들 (Linux는 .deb/.rpm/AppImage, Windows는 NSIS .exe)
 ```
 
-**Wayland 사용자 주의사항**: GNOME/KDE Wayland 세션에서 `setTitle` CSD 헤더바 repaint와 `setAlwaysOnTop`이 작동하지 않는 업스트림 버그([tauri#13749](https://github.com/tauri-apps/tauri/issues/13749), [tauri#3117](https://github.com/tauri-apps/tauri/issues/3117))가 있습니다. `src-tauri/src/lib.rs`의 `force_xwayland_if_needed()`로 `GDK_BACKEND=x11`을 강제하면 두 문제가 해결되지만, 실기기 Wayland에서 간헐적 WebKitGTK 크래시를 유발하는 것이 확인돼 기본값은 강제하지 않음(네이티브 Wayland)입니다. 두 기능이 필요하고 크래시 위험을 감수할 경우 `QCALC_FORCE_XWAYLAND=1 yarn dev:tauri`로 옵트인하세요.
+**Wayland 사용자 주의사항**: GNOME/KDE Wayland 세션에서 `setTitle` CSD 헤더바 repaint와 `setAlwaysOnTop`이 작동하지 않는 업스트림 버그([tauri#13749](https://github.com/tauri-apps/tauri/issues/13749), [tauri#3117](https://github.com/tauri-apps/tauri/issues/3117))가 있습니다. `src-tauri/src/lib.rs`의 `configure_gdk_backend()`로 `GDK_BACKEND=x11`을 강제하면 두 문제가 해결되지만, 실기기 Wayland에서 간헐적 WebKitGTK 크래시를 유발하는 것이 확인돼 기본값은 강제하지 않음(네이티브 Wayland)입니다. 두 기능이 필요하고 크래시 위험을 감수할 경우 `QCALC_FORCE_XWAYLAND=1 yarn dev:tauri`로 옵트인하세요.
+
+같은 함수가 반대 방향도 처리합니다: AppImage 번들은 linuxdeploy-plugin-gtk이 생성한 AppRun 훅에서 `export GDK_BACKEND=x11`을 무조건 내보내므로, 그대로 두면 Wayland 세션에서 위 크래시가 확정적으로 발생합니다(0.13.0 릴리스 AppImage에서 재현). 훅은 빌드 산출물이라 수정할 수 없어, GTK 초기화 전에 네이티브 Wayland로 되돌립니다.
 
 ### 데스크톱 (Electron, 레거시)
 
