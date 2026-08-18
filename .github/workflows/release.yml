@@ -116,6 +116,50 @@ jobs:
           # deb/rpm/AppImage(Linux)·NSIS(Windows) 번들 타깃은 matrix.platform.args 로 지정.
           args: ${{ matrix.platform.args }}
 
+      # 0.12.0까지 배포한 Electron 빌드는 electron-updater를 쓴다. 그쪽은 릴리스에서
+      # latest.yml(Windows)·latest-linux.yml(AppImage)을 읽는데, Tauri 업데이터는
+      # latest.json을 쓴다. 이 파일이 없으면 옛 사용자는 업데이트 확인 때마다 404를
+      # 보고 **새 버전이 나온 사실을 영영 모른다** — 0.13.0이 실제로 그랬다.
+      # 그래서 Tauri 산출물을 가리키는 electron-updater 매니페스트를 함께 올린다.
+      # 옛 설치 폴더와 같은 자리에 덮어써지므로(installer-hooks.nsh 참조) 제자리
+      # 업그레이드가 된다. Electron 트랙 사용자가 모두 넘어오면 지워도 된다.
+      - name: Publish electron-updater manifest (legacy 0.12.x clients)
+        if: startsWith(github.ref, 'refs/tags/v')
+        shell: bash
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          version="${GITHUB_REF_NAME#v}"
+          if [ "${{ matrix.platform.os }}" = "windows-latest" ]; then
+            manifest=latest.yml
+            artifact=$(ls src-tauri/target/release/bundle/nsis/*-setup.exe)
+          else
+            manifest=latest-linux.yml
+            artifact=$(ls src-tauri/target/release/bundle/appimage/*.AppImage)
+          fi
+          name=$(basename "$artifact")
+          # GitHub은 자산 이름의 공백을 점으로 바꿔 저장한다. 매니페스트의 url은
+          # 실제 자산 이름과 같아야 하므로 여기서도 같은 치환을 한다.
+          url=${name// /.}
+          # 크기와 해시는 node로 구한다. electron-updater는 sha512를 base64로 읽는데,
+          # 셸 도구로 hex→binary→base64를 거치면 Windows 러너의 Git Bash에 xxd나
+          # base64가 있느냐에 릴리스가 걸린다. 없으면 set -e로 잡 전체가 죽는다.
+          # node는 위 setup-node 단계가 두 러너 모두에 보장한다.
+          size=$(node -e 'console.log(require("fs").statSync(process.argv[1]).size)' "$artifact")
+          sha=$(node -e 'const c=require("crypto"),f=require("fs");console.log(c.createHash("sha512").update(f.readFileSync(process.argv[1])).digest("base64"))' "$artifact")
+          cat > "$manifest" <<EOF
+          version: $version
+          files:
+            - url: $url
+              sha512: $sha
+              size: $size
+          path: $url
+          sha512: $sha
+          releaseDate: '$(date -u +%Y-%m-%dT%H:%M:%S.000Z)'
+          EOF
+          gh release upload "$GITHUB_REF_NAME" "$manifest" --clobber
+
       - name: Upload bundles as artifacts (test build)
         if: ${{ !startsWith(github.ref, 'refs/tags/v') }}
         uses: actions/upload-artifact@v4
@@ -176,20 +220,20 @@ jobs:
         run: |
           cd flatpak
           VER=$(node -p "require('../package.json').version")
-          flatpak build-bundle repo "Q-Calc-${VER}-linux.flatpak" io.github.from104.qcalc
+          flatpak build-bundle repo "QCalc-${VER}-linux.flatpak" io.github.from104.qcalc
 
       - name: Attach to release (tag push)
         if: startsWith(github.ref, 'refs/tags/v')
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: gh release upload "${{ github.ref_name }}" flatpak/Q-Calc-*.flatpak --clobber
+        run: gh release upload "${{ github.ref_name }}" flatpak/QCalc-*.flatpak --clobber
 
       - name: Upload artifact (test build)
         if: ${{ !startsWith(github.ref, 'refs/tags/v') }}
         uses: actions/upload-artifact@v4
         with:
           name: flatpak-bundle
-          path: flatpak/Q-Calc-*.flatpak
+          path: flatpak/QCalc-*.flatpak
           retention-days: 7
 
   build-snap:
