@@ -13,6 +13,7 @@
   import { h, ref, onMounted, watch, onUnmounted } from 'vue';
 
   import { useUIStore } from 'stores/uiStore';
+  import { isTextOverflowing } from 'src/utils/OverflowUtils';
 
   const uiStore = useUIStore();
 
@@ -37,12 +38,9 @@
   // 텍스트가 줄임표로 표시되는지 확인
   const checkTextOverflow = () => {
     for (const id of textIDs.value) {
-      const textElement = document.getElementById(id);
-      if (textElement) {
-        if (textElement.scrollWidth > textElement.clientWidth) {
-          emit('show-tooltip', true);
-          return;
-        }
+      if (isTextOverflowing(document.getElementById(id))) {
+        emit('show-tooltip', true);
+        return;
       }
     }
     emit('show-tooltip', false);

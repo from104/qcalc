@@ -4,4 +4,5 @@ export * from './GlobalHelpers';
 export * from './NavigationUtils';
 export * from './NotificationUtils';
 export * from './NumberUtils';
+export * from './OverflowUtils';
 export * from './TauriUpdaterUtils';
