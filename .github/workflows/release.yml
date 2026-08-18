@@ -372,7 +372,26 @@ jobs:
         if: startsWith(github.ref, 'refs/tags/v')
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: gh release upload "${{ github.ref_name }}" "${{ steps.apk.outputs.path }}" --clobber
+        run: |
+          set -euo pipefail
+          # 이 잡은 데스크톱 빌드와 병렬로 돌지만, draft 릴리스를 만드는 것은 build-tauri 의
+          # tauri-action 이다. APK 는 4분, 데스크톱은 8~10분이 걸려 여기까지 먼저 도착하고,
+          # 그러면 업로드가 `release not found` 로 죽는다 — 0.13.1 에서 실제로 그랬다.
+          # (flatpak·snap 잡은 deb 아티팩트 때문에 build-tauri 를 needs 로 걸어 두어 이
+          # 문제가 없었다. 여기만 독립적이라 드러났다.)
+          #
+          # 릴리스가 생길 때까지 기다린다. 잡 전체를 needs 로 묶으면 APK 빌드까지 10분
+          # 늦어지므로, 병렬 빌드는 그대로 두고 업로드만 늦춘다.
+          for i in $(seq 1 60); do
+            if gh release view "$GITHUB_REF_NAME" >/dev/null 2>&1; then
+              gh release upload "$GITHUB_REF_NAME" "${{ steps.apk.outputs.path }}" --clobber
+              exit 0
+            fi
+            echo "draft 릴리스를 기다리는 중... ($i/60)"
+            sleep 30
+          done
+          echo "::error::30분을 기다려도 릴리스 $GITHUB_REF_NAME 이 생기지 않았다"
+          exit 1
 
       - name: Upload artifact (test build)
         if: ${{ !startsWith(github.ref, 'refs/tags/v') }}
