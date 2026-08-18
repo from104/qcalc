@@ -12,6 +12,24 @@ Todos los cambios notables de este proyecto se registran en este archivo.
 
 El formato se basa en [Keep a Changelog] y este proyecto sigue [Versionado Semántico].
 
+## [0.13.1] 2026-08-18
+
+### Cambiado
+
+- **Nombre del paquete unificado como QCalc**: si instaló 0.13.0 en Windows, desinstale primero la entrada antigua «Q Calc»: la nueva versión no reconoce esa instalación.
+
+### Añadido
+
+- **APK de Android en cada versión**: ahora se compila, se firma y se adjunta automáticamente.
+
+### Corregido
+
+- **El paquete Snap arranca**: el Snap de 0.13.0 ejecutaba el programa equivocado y la aplicación nunca se abría.
+- **Las actualizaciones vuelven a llegar a 0.12.x (Windows, AppImage)**: esas instalaciones fallaban en cada comprobación y nunca supieron que existía una versión más reciente.
+- **Instalar en Windows retira la aplicación anterior**: instalar sobre 0.12.x dejaba sus archivos y su entrada en Aplicaciones y características.
+- **La AppImage ya no se cierra nada más arrancar en Wayland (Linux)**.
+- **Tamaños en Linux**: la ventana sigue la escala de texto del escritorio en lugar de agrandarlo todo, y las etiquetas del teclado no se salen de sus botones.
+
 ## [0.13.0] 2026-08-09
 
 ### Cambiado

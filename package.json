@@ -1,8 +1,8 @@
 {
   "name": "qcalc",
-  "version": "0.13.0",
+  "version": "0.13.1",
   "description": "A multi-purpose calculator for productivity and accessibility",
-  "productName": "Q Calc",
+  "productName": "QCalc",
   "desktopName": "io.github.from104.qcalc.desktop",
   "repository": {
     "type": "git",
