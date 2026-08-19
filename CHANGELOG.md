@@ -6,6 +6,10 @@ The format is based on [Keep a Changelog] and this project follows [Semantic Ver
 
 ## [Unreleased]
 
+### Fixed
+
+- **Fixed the minimum window size differing when the monitor could not be read (desktop).** The size declared in the configuration and the one the app applies at startup disagreed, so a window that started before the monitor was known had a different floor from every other.
+
 ## [0.13.1] 2026-08-18
 
 ### Changed
