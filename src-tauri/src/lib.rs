@@ -6,6 +6,10 @@ use tauri::{LogicalSize, Manager, Size};
 /// 창의 논리 픽셀이 같고, 따라서 이 값은 두 단위 어느 쪽으로 읽어도 된다.
 /// Electron 빌드의 같은 성격의 값은 352x604다(`src-electron/electron-main.ts`).
 ///
+/// `tauri.conf.json`의 minWidth/minHeight와 **같은 값으로 유지할 것.** 저쪽은 아래
+/// set_min_size가 도는 정상 경로에서는 덮어써지지만, `current_monitor()`가 실패하면
+/// 그대로 남아 유일한 바닥값이 된다. 둘이 어긋나 있으면 그 경로에서만 다른 창이 뜬다.
+///
 /// 이 수치는 실기기에서 나왔다: 사용자가 직접 늘려 쓸 만하다고 판단한 창이 978x1536 물리
 /// 픽셀이었고(모니터 배율 2 → 489x768 논리), 텍스트 배율 1.25가 걸려 CSS로는 384x604였다.
 /// 즉 예전 상수 480x756은 이미 1.25가 반영된 논리 크기였고, 그걸 CSS 값으로 착각해 배율을
@@ -164,6 +168,11 @@ pub fn run() {
   // 반드시 tauri::Builder::default() 이전에 호출. Builder 초기화가 GTK 세션 백엔드를 확정한다.
   configure_gdk_backend();
 
+  // 창은 config에서 visible:false로 만든다. window-state 플러그인이 on_window_ready에서
+  // 저장된 위치·크기를 복원한 뒤 직접 show() 하므로, 처음부터 보이게 만들면 Windows에서
+  // OS 기본 좌표에 떴다가 WebView2 초기화 후(2~3초) 저장 위치로 점프하는 게 보인다.
+  // (Wayland는 앱이 창 위치를 못 정해 증상이 없다.) 플러그인을 빼거나 denylist에 넣으면
+  // 창이 영영 안 보이니 주의.
   let mut builder = tauri::Builder::default()
     .plugin(tauri_plugin_window_state::Builder::default().build())
     .plugin(tauri_plugin_opener::init())

@@ -51,7 +51,9 @@
     set: (value) => uiStore.setCurrentTab(value),
   });
 
-  const MAX_VISIBLE_TABS = 3;
+  // 계산기 5개는 전부 탭 줄에 놓는다. 오버플로 메뉴에 들어간 것은 한 번 더 눌러야 닿고,
+  // 어느 계산기가 있는지도 열어 보기 전엔 알 수 없다. 6번째가 생기면 그때 넘긴다.
+  const MAX_VISIBLE_TABS = 5;
   const visibleTabs = computed(() => props.tabs.slice(0, MAX_VISIBLE_TABS));
   const overflowTabs = computed(() => props.tabs.slice(MAX_VISIBLE_TABS));
   const isOverflowActive = computed(() => overflowTabs.value.some((tab) => tab.name === localCurrentTab.value));
@@ -101,7 +103,7 @@
 
     <q-header id="header" class="z-top noselect" elevated>
       <!-- 좁은 화면 메인 헤더 -->
-      <q-toolbar v-if="!isSubPage" v-auto-blur :class="{ 'q-pt-lg': $g.isAndroid && $g.apiLevel >= 35 }">
+      <q-toolbar v-if="!isSubPage" v-auto-blur class="safe-area-top">
         <q-btn flat dense round class="q-mr-none" icon="menu" aria-label="Menu" @click="emit('toggleLeftDrawer')">
           <ToolTip
             :text-color="themesStore.getDarkColor()"
@@ -204,7 +206,7 @@
       </q-toolbar>
 
       <!-- 좁은 화면 서브 헤더 -->
-      <q-toolbar v-else v-auto-blur class="q-px-sm" :class="{ 'q-pt-lg': $g.isAndroid && $g.apiLevel >= 35 }">
+      <q-toolbar v-else v-auto-blur class="q-px-sm safe-area-top">
         <q-btn
           flat
           dense

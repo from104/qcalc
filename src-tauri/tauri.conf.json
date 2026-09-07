@@ -17,11 +17,12 @@
         "title": "QCalc",
         "width": 480,
         "height": 756,
-        "minWidth": 480,
-        "minHeight": 756,
+        "minWidth": 384,
+        "minHeight": 604,
         "resizable": true,
         "maximizable": false,
-        "fullscreen": false
+        "fullscreen": false,
+        "visible": false
       }
     ],
     "security": {
