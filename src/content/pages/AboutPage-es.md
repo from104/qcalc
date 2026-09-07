@@ -12,6 +12,18 @@ Todos los cambios notables de este proyecto se registran en este archivo.
 
 El formato se basa en [Keep a Changelog] y este proyecto sigue [Versionado Semántico].
 
+## [0.13.2] 2026-09-08
+
+### Cambiado
+
+- Las cinco calculadoras mostradas como pestañas también en pantallas estrechas (sin menú `▾`)
+
+### Corregido
+
+- Corregido el solapamiento de la barra de estado y la barra de navegación con el teclado y la pantalla [Historial] en Android 15
+- Corregido el tamaño mínimo de ventana distinto cuando no se podía leer el monitor (escritorio)
+- Corregida la ventana que aparecía brevemente en una posición aleatoria antes de ir a la guardada en Windows
+
 ## [0.13.1] 2026-08-18
 
 ### Cambiado

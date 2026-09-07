@@ -12,6 +12,18 @@ Todas as alterações notáveis deste projeto são registradas neste arquivo.
 
 O formato é baseado no [Keep a Changelog] e este projeto segue o [Versionamento Semântico].
 
+## [0.13.2] 2026-09-08
+
+### Alterado
+
+- As cinco calculadoras exibidas como abas também em telas estreitas (sem o menu `▾`)
+
+### Corrigido
+
+- Corrigida a sobreposição da barra de status e da barra de navegação sobre o teclado e a tela [Histórico] no Android 15
+- Corrigido o tamanho mínimo da janela diferente quando o monitor não podia ser lido (desktop)
+- Corrigida a janela que aparecia brevemente em um local aleatório antes de ir para a posição salva no Windows
+
 ## [0.13.1] 2026-08-18
 
 ### Alterado

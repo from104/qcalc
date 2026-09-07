@@ -12,6 +12,18 @@ Alle wichtigen Änderungen an diesem Projekt werden in dieser Datei festgehalten
 
 Das Format basiert auf [Keep a Changelog] und dieses Projekt folgt der [Semantischen Versionierung].
 
+## [0.13.2] 2026-09-08
+
+### Geändert
+
+- Alle fünf Rechner auch auf schmalen Bildschirmen als Tabs angezeigt (kein `▾`-Menü mehr)
+
+### Behoben
+
+- Überlappung von Statusleiste und Navigationsleiste mit Tastenfeld und [Verlauf]-Ansicht unter Android 15 behoben
+- Abweichende Mindestfenstergröße behoben, wenn der Monitor nicht ausgelesen werden konnte (Desktop)
+- Kurzes Erscheinen des Fensters an zufälliger Stelle vor dem Sprung zur gespeicherten Position unter Windows behoben
+
 ## [0.13.1] 2026-08-18
 
 ### Geändert

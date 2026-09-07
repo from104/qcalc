@@ -12,6 +12,18 @@ Tous les changements notables de ce projet sont enregistrés dans ce fichier.
 
 Le format est basé sur [Keep a Changelog] et ce projet suit le [Versionnage sémantique].
 
+## [0.13.2] 2026-09-08
+
+### Modifié
+
+- Les cinq calculatrices affichées en onglets même sur écran étroit (plus de menu `▾`)
+
+### Corrigé
+
+- Correction du chevauchement de la barre d'état et de la barre de navigation avec le clavier et l'écran [Historique] sous Android 15
+- Correction de la taille minimale de fenêtre différente lorsque l'écran ne pouvait pas être lu (bureau)
+- Correction de la fenêtre apparaissant brièvement à un endroit aléatoire avant de rejoindre sa position enregistrée sous Windows
+
 ## [0.13.1] 2026-08-18
 
 ### Modifié

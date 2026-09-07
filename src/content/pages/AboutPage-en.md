@@ -12,6 +12,18 @@ All notable changes to this project are recorded in this file.
 
 The format is based on [Keep a Changelog] and this project follows [Semantic Versioning].
 
+## [0.13.2] 2026-09-08
+
+### Changed
+
+- All five calculators shown as tabs on narrow screens (no more `▾` menu)
+
+### Fixed
+
+- Fixed the Android 15 status bar and navigation bar overlapping the keypad and [Record] screen
+- Fixed the minimum window size differing when the monitor could not be read (desktop)
+- Fixed the window briefly appearing at a random spot before moving to its saved position on Windows
+
 ## [0.13.1] 2026-08-18
 
 ### Changed
