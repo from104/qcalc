@@ -44,7 +44,7 @@ const directives = { 'auto-blur': {}, 'close-popup': {} };
 
 type LayoutComponent = DefineComponent<Record<string, unknown>>;
 
-// 각 레이아웃의 MAX_VISIBLE_TABS(Wide:5, Narrow:3)보다 많은 탭을 제공해 오버플로 메뉴를 활성화한다
+// 각 레이아웃의 MAX_VISIBLE_TABS(Wide:5, Narrow:5)보다 많은 탭을 제공해 오버플로 메뉴를 활성화한다
 const makeTabs = (count: number): Tab[] =>
   Array.from({ length: count }, (_, i) => ({
     name: `tab${i}`,
@@ -57,7 +57,7 @@ const subPageConfig: SubPageConfig = {};
 
 describe.each([
   ['WideLayout', () => import('../../../layouts/WideLayout.vue'), 6],
-  ['NarrowLayout', () => import('../../../layouts/NarrowLayout.vue'), 4],
+  ['NarrowLayout', () => import('../../../layouts/NarrowLayout.vue'), 6],
 ])('%s 탭 오버플로 메뉴 접근성 (mount)', (name, loadComponent, tabCount) => {
   let Layout: LayoutComponent;
 

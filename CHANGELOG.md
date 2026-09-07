@@ -6,6 +6,10 @@ The format is based on [Keep a Changelog] and this project follows [Semantic Ver
 
 ## [Unreleased]
 
+### Changed
+
+- All five calculators shown as tabs on narrow screens (no more `▾` menu)
+
 ### Fixed
 
 - Fixed the minimum window size differing when the monitor could not be read (desktop)
