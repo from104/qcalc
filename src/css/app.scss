@@ -1,6 +1,27 @@
 // app global css in SCSS form
 @import 'tauri-linux-fontfix.scss';
 
+// 화면 아래쪽에서 쓸 수 없는 높이. Android 15+(targetSdk 35)는 앱이 시스템 바 뒤까지
+// 그리도록 강제해서(edge-to-edge) 100vh 안에 내비게이션 바 영역이 들어온다 — 3버튼
+// 모드의 48dp 바가 키패드 마지막 줄을 덮은 이유다. 값은 Capacitor SystemBars 플러그인이
+// 실제 인셋을 재서 <html>에 넣어 주는 --safe-area-inset-bottom이고, 그게 없는 환경
+// (데스크톱, Android 14 이하)에서는 env()가 0을 준다. 바 높이를 짐작해 박지 말고
+// 아래쪽에 닿는 것은 전부 이 변수를 뺄 것.
+:root {
+  --top-inset: var(--safe-area-inset-top, env(safe-area-inset-top, 0px));
+  --bottom-inset: var(
+    --safe-area-inset-bottom,
+    env(safe-area-inset-bottom, 0px)
+  );
+}
+
+// 헤더 툴바가 상태 바 아래로 내려앉게 한다. 예전엔 API 35 이상이면 q-pt-lg(24px)를
+// 붙였는데, 상태 바는 기기마다 달라서(Pixel 7 에뮬레이터 ~41dp) 시계가 탭 아이콘 위에
+// 겹쳤다. q-header 는 자기 높이를 재서 페이지 상단 여백을 맞추므로 여기만 바꾸면 된다.
+.safe-area-top {
+  padding-top: var(--top-inset);
+}
+
 .noselect {
   user-select: none;
 }
@@ -123,7 +144,8 @@ body {
 //   scoped 스타일 안에서 import돼 [data-v-*]가 붙고, 페이지 카드에는 닿지 않는다.
 .q-card.calc-card {
   position: absolute;
-  inset: 0;
+  // 아래쪽만 내비게이션 바만큼 비운다. 카드 바깥의 페이지 바탕이 바 뒤로 이어진다.
+  inset: 0 0 var(--bottom-inset) 0;
   display: flex;
   flex-direction: column;
 }
@@ -151,7 +173,7 @@ body {
 }
 
 .body--android .q-notification {
-  margin-bottom: var(--notify-bottom-margin, 0px);
+  margin-bottom: calc(var(--bottom-inset) + 10px);
 }
 
 // 접근성: 키보드 포커스 표시

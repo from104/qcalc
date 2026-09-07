@@ -32,9 +32,6 @@
   const uiStore = useUIStore();
   const settingsStore = useSettingsStore();
 
-  // 전역 변수 가져오기
-  const $g = window.globalVars;
-
   // 메뉴 아이템 인터페이스 정의
   interface MenuItem {
     id: string;
@@ -158,12 +155,7 @@
 </script>
 
 <template>
-  <q-list
-    v-auto-blur
-    role="menu"
-    :aria-label="t('ariaLabel.menu')"
-    :style="{ paddingTop: $g.isAndroid && $g.apiLevel >= 35 ? '70px' : '60px' }"
-  >
+  <q-list v-auto-blur role="menu" :aria-label="t('ariaLabel.menu')" style="padding-top: calc(60px + var(--top-inset))">
     <MenuItem v-for="item in items" :key="item.id" v-bind="item" />
   </q-list>
 </template>

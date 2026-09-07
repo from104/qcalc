@@ -56,8 +56,12 @@
   }
 }
 
+// 50px 는 툴바 높이. 헤더는 거기에 상태 바만큼(--top-inset) 더 커지므로 같이 뺀다 —
+// 안 빼면 그만큼 페이지가 넘쳐 스크롤이 생긴다.
 .sub-scroll-area {
-  height: calc(100vh - 50px) !important;
+  height: calc(
+    100vh - 50px - var(--top-inset) - var(--bottom-inset)
+  ) !important;
 }
 
 .hide-scrollbar {
@@ -102,6 +106,9 @@
   }
 
   .sub-scroll-area {
-    height: calc(100vh - 50px - var(--ad-banner-height));
+    height: calc(
+      100vh -
+        50px - var(--ad-banner-height) - var(--top-inset) - var(--bottom-inset)
+    );
   }
 }

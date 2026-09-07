@@ -12,6 +12,7 @@ The format is based on [Keep a Changelog] and this project follows [Semantic Ver
 
 ### Fixed
 
+- Fixed the Android 15 status bar and navigation bar overlapping the keypad and [Record] screen
 - Fixed the minimum window size differing when the monitor could not be read (desktop)
 
 ## [0.13.1] 2026-08-18
