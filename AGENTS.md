@@ -7,6 +7,20 @@ Multi-purpose calculator — Vue 3 + Quasar 2 + TypeScript + Tauri 2 (desktop pr
 
 Always respond in **Korean**. Technical terms and code identifiers stay in English.
 
+## Model Selection
+
+Pick the model by the _kind_ of work and its difficulty, not by how large the task looks.
+
+| Model      | Use for                                                 |
+| ---------- | ------------------------------------------------------- |
+| **fable**  | Planning, judging how hard a task is, hard verification |
+| **opus**   | Easy verification, hard implementation                  |
+| **sonnet** | Easy implementation, hard search and research           |
+| **haiku**  | Easy search and research                                |
+
+Judging the difficulty is itself a `fable` job — when it is unclear which tier a task
+belongs to, decide that first and then delegate.
+
 ## Commands
 
 ```bash
@@ -78,10 +92,32 @@ src-capacitor/         # Capacitor Android project
 
 ## Changelog
 
-- Two files, kept in sync: `CHANGELOG.md` (English) and `CHANGELOG-ko.md` (Korean)
-- **Keep entries short** — a bold title plus one or two sentences. The 0.12.0 and earlier sections are the reference for length; read one before writing a new entry
-- Say what changed and what the user sees. Leave out root-cause narration, internal implementation detail (file, command and workflow names), measured numbers, and audit item ids — those belong in commit messages and code comments
-- Keep issue links, and let a link stand in for the explanation of a known issue
+> _"일단 현재의 체인지로그는 초기부터 너무 길었다. 단문으로 핵심만. 명사형 어미, 개발자가
+> 아닌 철저한 이용자 관점으로."_ — the rule set SPIN adopted on 2026-09-03; applied here as-is on 2026-09-06.
+
+Users read this directly: each release's section is copied into `src/content/pages/AboutPage-*.md`
+and the What's New dialog shows it on first launch. Every entry follows these rules.
+
+- **One entry = one line.** No continuation lines, no nested bullets (` -`).
+- **End in a noun phrase, never a sentence.** Korean ends with 지원·추가·개선·수정·변경·제거·이동 —
+  not ~습니다/~합니다/~됩니다 ("다크모드 지원", "로그인 오류 수정"). English is a short noun phrase
+  or past participle ("Added dark mode", "Fixed login error"). Each language follows its own
+  convention; do not translate the other word-for-word.
+- **Strictly the user's point of view.** Say only _what_ changed. Leave out why, how it was built,
+  who asked, which test was fixed, which plan or audit item — those belong in commit messages and
+  code comments. Name screens and buttons in square brackets using that language's actual UI
+  string (`[설정]` / `[Settings]`).
+- **Only the gist.** Do not enumerate cases. One body of change (a screen rewritten, say) is one
+  line; split only when the changes mean different things.
+- **No bold, no emphasis marks.** The line is already short.
+- Keep the format: `## [x.y.z] YYYY-MM-DD` (`## [Unreleased]`, no date, for unshipped work) →
+  `### Category` (Keep a Changelog: Added / Changed / Removed / Fixed; Korean 추가됨 / 변경됨 /
+  제거됨 / 수정됨) → `- one line`. Use each category at most once per version. Keep issue links;
+  a link may stand in for the explanation of a known issue.
+- `CHANGELOG.md` (English) and `CHANGELOG-ko.md` (Korean) are one document in two languages, not
+  two documents: same version headings, same categories, same number of entries, filled in the same
+  commit. A count mismatch means a translation is missing or a fact slipped into one side only.
+- Do not imitate older entries. Where they break these rules they are unfixed, not a style to copy.
 
 ## GitHub Release Notes
 
