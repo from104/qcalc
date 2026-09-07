@@ -168,6 +168,11 @@ pub fn run() {
   // 반드시 tauri::Builder::default() 이전에 호출. Builder 초기화가 GTK 세션 백엔드를 확정한다.
   configure_gdk_backend();
 
+  // 창은 config에서 visible:false로 만든다. window-state 플러그인이 on_window_ready에서
+  // 저장된 위치·크기를 복원한 뒤 직접 show() 하므로, 처음부터 보이게 만들면 Windows에서
+  // OS 기본 좌표에 떴다가 WebView2 초기화 후(2~3초) 저장 위치로 점프하는 게 보인다.
+  // (Wayland는 앱이 창 위치를 못 정해 증상이 없다.) 플러그인을 빼거나 denylist에 넣으면
+  // 창이 영영 안 보이니 주의.
   let mut builder = tauri::Builder::default()
     .plugin(tauri_plugin_window_state::Builder::default().build())
     .plugin(tauri_plugin_opener::init())
