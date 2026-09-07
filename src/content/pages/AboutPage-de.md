@@ -16,39 +16,60 @@ Das Format basiert auf [Keep a Changelog] und dieses Projekt folgt der [Semantis
 
 ### Geändert
 
-- **Paketname auf QCalc vereinheitlicht**: Wenn Sie 0.13.0 unter Windows installiert haben, deinstallieren Sie zuerst den alten Eintrag „Q Calc“ — die neue Version erkennt diese Installation nicht.
+- Paketname auf QCalc vereinheitlicht (Windows: alten Eintrag „Q Calc” vorher deinstallieren)
 
 ### Hinzugefügt
 
-- **Android-APK bei jeder Veröffentlichung**: Sie wird jetzt automatisch gebaut, signiert und angehängt.
+- Android-APK bei jeder Veröffentlichung veröffentlicht
 
 ### Behoben
 
-- **Das Snap-Paket startet**: Das Snap von 0.13.0 startete das falsche Programm, die App öffnete sich nie.
-- **Aktualisierungen erreichen 0.12.x wieder (Windows, AppImage)**: Diese Installationen scheiterten bei jeder Update-Prüfung und erfuhren nie von einer neueren Version.
-- **Die Installation unter Windows räumt die alte App weg**: Eine Installation über 0.12.x ließ deren Dateien und den Eintrag unter „Apps & Features“ zurück.
-- **Das AppImage beendet sich unter Wayland nicht mehr sofort nach dem Start (Linux)**.
-- **Größen unter Linux**: Das Fenster folgt jetzt der Textskalierung des Desktops, statt alles zu vergrößern, und die Tastenbeschriftungen bleiben in ihren Schaltflächen.
+- Snap-Paket-Start behoben ([#117](https://github.com/from104/qcalc/issues/117))
+- Update-Benachrichtigungen von 0.12.x-Builds sichtbar (Windows, AppImage)
+- Windows-Installer bereinigt alte Electron-Dateien
+- AppImage beendet sich auf Wayland nicht mehr sofort (Linux)
+- Ergebnisfeld falsch hervorgehoben behoben
+- Desktop-Textskalierung auf Fenstergröße angewendet (Linux)
+- Tastenbeschriftungen überlasten nicht mehr Tasten
+- Flatpak-Audioberechtigung nicht erforderlich
+
+### Bekannte Probleme
+
+- Screenreader können Oberfläche im Flatpak-Build nicht sehen — Upstream-Sandbox-Einschränkung. Verwenden Sie `.deb`, `.rpm` oder AppImage ([#113](https://github.com/from104/qcalc/issues/113))
+- Clipboard lesen kann unter Linux fehlschlagen
 
 ## [0.13.0] 2026-08-09
 
 ### Geändert
 
-- **Desktop-App von Electron auf Tauri 2 umgestellt**: eine leichtere und schnellere Desktop-App. Sie wird unter Linux als deb, rpm, AppImage, Flatpak und Snap sowie unter Windows als NSIS-Installer ausgeliefert; die automatische Aktualisierung funktioniert auf der neuen Grundlage vollständig.
-- **Verlaufsmigration**: Exportieren Sie Ihren Berechnungsverlauf aus der bisherigen (Electron-)Version und importieren Sie ihn im Erststart-Bildschirm der neuen Version.
-- **Größeres Standardfenster**: Standard- und Mindestfenstergröße wurden auf 480×756 vergrößert.
+- Desktop-Produktion von Electron auf Tauri 2 umgestellt
+- Automatische Updates auf Tauri aktiviert
+- Verlaufsmigration und Onboarding hinzugefügt
+- Natives Wayland als Standard ([tauri#13749](https://github.com/tauri-apps/tauri/issues/13749) / [tauri#3117](https://github.com/tauri-apps/tauri/issues/3117))
+- Standardfenstergröße vergrößert (352×604 → 480×756)
 
 ### Hinzugefügt
 
-- **Vorlesen der Ergebnisse durch den Screenreader (Linux)**: Sobald eine Berechnung abgeschlossen ist, wird das Ergebnis vom Screenreader (Orca) vorgelesen.
-- **Ansage von Formelfehlern**: Formelfehler werden nach Typ klassifiziert und über den Screenreader angesagt.
-- **Rückgängig machen beim Löschen von Einträgen**: Das Löschen eines Verlaufseintrags lässt sich über eine Snackbar rückgängig machen.
-- **Verbesserte Tastaturbedienbarkeit**: Überlauf-Tab-Menü, Formelfeld und Speicher-Umschalter sind vollständig mit der Tastatur bedienbar.
-- **Themes mit höherem Kontrast**: Die Theme-Farben wurden auf WCAG-AA-Kontrast angehoben.
-- **Neue Sprachen (10 insgesamt)**: Portugiesisch und Russisch hinzugefügt.
+- 2 neue Sprachen (Portugiesisch, Russisch) insgesamt 10
+- Screenreader-Ankündigung von Ergebnissen unter Linux
+- Formelfehlermeldungen
+- Rückgängigmachen beim Löschen von Datensätzen
+- Tastaturzugriff für Tabs, Formelfeld und Speichertoggle
+- WCAG-AA-Kontrastthemenfarben
 
 ### Behoben
 
-- Gebietsschemagerechte Zahlendarstellung und -einfügung, einheitliche Winkeleinheit (Grad) für die trigonometrischen Funktionen des Formelrechners sowie viele weitere Korrekturen bei Barrierefreiheit und Übersetzung.
+- Screenreader-Unterstützung verbessert
+- Zahlendarstellung nach Sprache
+- Formelrechner Grad, Fehlerklassifizierung und Platzhalter-Ersetzung
+- Datensatzverlauf beachtet maximale Anzahl nach Wiederherstellung
+- Desktop-App hängt beim Start
+- Tauri/Linux Fenstergröße, Textrendering, Symbole, Flatpak- und Snap-Paketierung verbessert
+- Portugiesische und russische Hilfeseiten öffnen sich jetzt
+- Koreanische Sprachetiketten korrigiert
 
-Informationen zu früheren Versionen finden Sie [hier](https://github.com/from104/qcalc/blob/main/CHANGELOG.md).
+### Bekannte Probleme
+
+- Snap-Paket startet nicht ([#117](https://github.com/from104/qcalc/issues/117))
+- Screenreader können Oberfläche im Flatpak-Build nicht sehen — Upstream-Sandbox-Einschränkung. Verwenden Sie `.deb`, `.rpm` oder AppImage ([#113](https://github.com/from104/qcalc/issues/113))
+- Linux-Screenreader-Validierung unvollständig (Sprache, hover, Clipboard, CSP)

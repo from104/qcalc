@@ -16,39 +16,62 @@ El formato se basa en [Keep a Changelog] y este proyecto sigue [Versionado Semá
 
 ### Cambiado
 
-- **Nombre del paquete unificado como QCalc**: si instaló 0.13.0 en Windows, desinstale primero la entrada antigua «Q Calc»: la nueva versión no reconoce esa instalación.
+- Nombre del paquete unificado como QCalc (en Windows, retire primero la entrada anterior)
 
 ### Añadido
 
-- **APK de Android en cada versión**: ahora se compila, se firma y se adjunta automáticamente.
+- APK de Android en cada versión
 
 ### Corregido
 
-- **El paquete Snap arranca**: el Snap de 0.13.0 ejecutaba el programa equivocado y la aplicación nunca se abría.
-- **Las actualizaciones vuelven a llegar a 0.12.x (Windows, AppImage)**: esas instalaciones fallaban en cada comprobación y nunca supieron que existía una versión más reciente.
-- **Instalar en Windows retira la aplicación anterior**: instalar sobre 0.12.x dejaba sus archivos y su entrada en Aplicaciones y características.
-- **La AppImage ya no se cierra nada más arrancar en Wayland (Linux)**.
-- **Tamaños en Linux**: la ventana sigue la escala de texto del escritorio en lugar de agrandarlo todo, y las etiquetas del teclado no se salen de sus botones.
+- Paquete Snap iniciado correctamente (#117)
+- Notificaciones de actualización visibles desde versiones 0.12.x (Windows, AppImage)
+- Instalador de Windows elimina restos de compilación de Electron
+- AppImage en Wayland ya no sale inmediatamente (Linux)
+- Campo de resultado sin resalte incorrecto cuando el contenido cabe
+- Escala de texto aplicada al tamaño de ventana (Linux)
+- Etiquetas del teclado sin desbordamiento de botones
+- Requisito de permiso de audio de Flatpak eliminado
+
+### Problemas conocidos
+
+- Los lectores de pantalla no ven la interfaz en la compilación Flatpak — limitación de sandbox de upstream. Use `.deb`, `.rpm` o AppImage (#113)
+- La lectura del portapapeles puede fallar en Linux, así que pegar en la calculadora puede no funcionar
 
 ## [0.13.0] 2026-08-09
 
 ### Cambiado
 
-- **La aplicación de escritorio pasa de Electron a Tauri 2**: una aplicación de escritorio más ligera y rápida. Se distribuye como deb, rpm, AppImage, Flatpak y Snap en Linux y como instalador NSIS en Windows, con la actualización automática plenamente funcional sobre la nueva base.
-- **Migración del historial**: Exporte su historial de cálculos desde la versión anterior (Electron) e impórtelo en la pantalla de primer inicio de la nueva versión.
-- **Ventana predeterminada más grande**: El tamaño de ventana predeterminado y mínimo aumentó a 480×756.
+- Producción de escritorio cambiada de Electron a Tauri 2
+- Actualización automática activada completamente en Tauri
+- Migración del historial e incorporación de nuevos usuarios agregadas
+- Wayland nativo predeterminado (tauri#13749 / tauri#3117)
+- Tamaño de ventana predeterminado aumentado (352×604 → 480×756)
 
 ### Añadido
 
-- **Lectura de resultados con lector de pantalla (Linux)**: Cuando se completa un cálculo, el lector de pantalla (Orca) lee el resultado en voz alta.
-- **Anuncio de errores de fórmula**: Los errores de fórmula se clasifican por tipo y se anuncian mediante el lector de pantalla.
-- **Deshacer la eliminación de registros**: La eliminación de un registro del historial puede deshacerse desde una barra de notificaciones.
-- **Accesibilidad por teclado mejorada**: El menú de pestañas desbordadas, el campo de fórmula y el conmutador de memoria son totalmente operables con el teclado.
-- **Temas de mayor contraste**: Los colores de los temas se elevaron al contraste WCAG AA.
-- **Nuevos idiomas (10 en total)**: Se añadieron portugués y ruso.
+- 2 nuevos idiomas (portugués, ruso) para 10 total
+- Anuncio de resultados con lector de pantalla en Linux
+- Anuncios de errores de fórmula
+- Deshacer eliminación de registros
+- Accesibilidad por teclado para pestañas, campo de fórmula y conmutador de memoria
+- Colores de tema con contraste WCAG AA
 
 ### Corregido
 
-- Visualización y pegado de números según la configuración regional, unificación en grados de las funciones trigonométricas de la calculadora de fórmulas y muchas otras correcciones de accesibilidad y traducción.
+- Soporte mejorado para lectores de pantalla
+- Formato de número por idioma
+- Grados de calculadora de fórmula, clasificador de errores y sustitución de marcador de posición
+- Historial de registros respeta el recuento máximo después de la restauración
+- Aplicación de escritorio se congela en el inicio
+- Mejoras de Tauri/Linux en tamaño de ventana, representación de texto, iconos, Flatpak y empaquetado de Snap
+- Páginas de ayuda en portugués y ruso ahora se abren
+- Etiquetas de idioma coreano corregidas
+
+### Problemas conocidos
+
+- El paquete Snap no inicia (#117)
+- Los lectores de pantalla no ven la interfaz en la compilación Flatpak — limitación de sandbox de upstream. Use `.deb`, `.rpm` o AppImage (#113)
+- Verificación incompleta del lector de pantalla en Linux (audible, hover, portapapeles, CSP)
 
 Para información sobre versiones anteriores, por favor consulte [aquí](https://github.com/from104/qcalc/blob/main/CHANGELOG.md).
