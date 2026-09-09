@@ -4,6 +4,12 @@ All notable changes to this project are recorded in this file.
 
 The format is based on [Keep a Changelog] and this project follows [Semantic Versioning].
 
+## [Unreleased]
+
+### Fixed
+
+- Fixed the title bar buttons not responding on Linux since 0.13.2
+
 ## [0.13.2] 2026-09-08
 
 ### Changed

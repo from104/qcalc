@@ -4,6 +4,12 @@
 
 형식은 [Keep a Changelog (korean)]를 기반으로 하며 이 프로젝트는 [Semantic Versioning (korean)]을 따릅니다.
 
+## [Unreleased]
+
+### 수정됨
+
+- 0.13.2부터 Linux에서 타이틀바의 최소화·닫기 버튼이 눌리지 않던 문제 수정
+
 ## [0.13.2] 2026-09-08
 
 ### 변경됨
