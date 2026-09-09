@@ -1,0 +1,18 @@
+{
+  "app": {
+    "windows": [
+      {
+        "label": "main",
+        "title": "QCalc",
+        "width": 480,
+        "height": 756,
+        "minWidth": 384,
+        "minHeight": 604,
+        "resizable": true,
+        "maximizable": false,
+        "fullscreen": false,
+        "visible": false
+      }
+    ]
+  }
+}

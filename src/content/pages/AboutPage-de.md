@@ -12,6 +12,14 @@ Alle wichtigen Änderungen an diesem Projekt werden in dieser Datei festgehalten
 
 Das Format basiert auf [Keep a Changelog] und dieses Projekt folgt der [Semantischen Versionierung].
 
+## [0.13.3] 2026-09-10
+
+### Behoben
+
+- Titelleisten-Schaltflächen reagierten unter Linux seit 0.13.2 nicht – behoben
+- Fenster wuchs unter Linux bei jedem Start etwas, bis es die Maximalgröße erreichte – behoben
+- Minimale und maximale Fenstergröße galten unter Linux nicht für den Inhaltsbereich (seit 0.13.2 gar nicht) – behoben
+
 ## [0.13.2] 2026-09-08
 
 ### Geändert

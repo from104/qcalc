@@ -21,8 +21,7 @@
         "minHeight": 604,
         "resizable": true,
         "maximizable": false,
-        "fullscreen": false,
-        "visible": false
+        "fullscreen": false
       }
     ],
     "security": {
