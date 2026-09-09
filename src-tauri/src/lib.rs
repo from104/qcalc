@@ -160,6 +160,125 @@ fn configure_gdk_backend() {
 #[cfg(not(target_os = "linux"))]
 fn configure_gdk_backend() {}
 
+/// Linux(GTK) 창 크기 보정. GNOME Wayland는 서버 장식(SSD)이 없어 GTK가 CSD로 그림자와
+/// 타이틀바를 그리는데, 그 상태에서 tao의 크기 API가 서로 다른 기준을 쓴다(2026-09-09 실측,
+/// 배율 2·텍스트 1.25 환경에서 프레임−내용 = 90×138 논리px, X11/SSD에서는 0×0):
+/// - `set_size`는 **내용** 크기를 정한다.
+/// - `inner_size`·`Resized` 이벤트·`set_min_size`/`set_max_size` 힌트는 **프레임**(내용+그림자+
+///   타이틀바) 기준이다. GTK `geometry_widget`을 지정해도 힌트는 프레임에 걸린다(실험 확인).
+///
+/// 그대로 두면 두 가지가 어긋난다. (1) 최소 480×755로 잡아도 내용은 390×617이 된다.
+/// (2) tauri-plugin-window-state가 종료 때 프레임 크기를 저장하고 다음 실행에 내용 크기로
+/// 복원하므로 **실행할 때마다 창이 델타만큼 자라다 최대에서 멈춘다**.
+///
+/// 그래서 Linux에서는 내용 크기를 `gtk_window.size()`로 직접 읽고, 힌트는 실측한 델타를 더해
+/// 프레임 기준으로 다시 걸며, 크기 저장·복원은 플러그인 대신 여기서 한다(플러그인은 SIZE
+/// 플래그를 뺀 나머지만 담당).
+#[cfg(target_os = "linux")]
+mod linux_geometry {
+  use std::sync::Mutex;
+  use tauri::{LogicalSize, Manager, PhysicalSize, Size};
+
+  /// 내용 기준 논리 픽셀 경계.
+  #[derive(Clone, Copy, Debug)]
+  pub struct Bounds {
+    pub min: (f64, f64),
+    pub max: (f64, f64),
+  }
+
+  #[derive(Default)]
+  pub struct State {
+    pub bounds: Mutex<Option<Bounds>>,
+    /// 프레임 − 내용(논리 px). 첫 Resized 이벤트에서 알 수 있고, 최대화 등으로 바뀔 수 있다.
+    pub delta: Mutex<Option<(f64, f64)>>,
+    /// 마지막으로 본 내용 크기(논리 px). 종료 때 저장한다.
+    pub content: Mutex<Option<(f64, f64)>>,
+  }
+
+  const FILE_NAME: &str = "window-size.json";
+
+  #[derive(serde::Serialize, serde::Deserialize)]
+  struct Saved {
+    width: f64,
+    height: f64,
+  }
+
+  pub fn load(app: &tauri::AppHandle) -> Option<(f64, f64)> {
+    let path = app.path().app_config_dir().ok()?.join(FILE_NAME);
+    let saved: Saved = serde_json::from_str(&std::fs::read_to_string(path).ok()?).ok()?;
+    (saved.width.is_finite() && saved.width > 0.0 && saved.height.is_finite() && saved.height > 0.0)
+      .then_some((saved.width, saved.height))
+  }
+
+  pub fn save(app: &tauri::AppHandle, (width, height): (f64, f64)) {
+    let Ok(dir) = app.path().app_config_dir() else { return };
+    if let Err(err) = std::fs::create_dir_all(&dir) {
+      log::warn!("failed to create the config dir for the window size: {err}");
+      return;
+    }
+    match serde_json::to_string(&Saved { width, height }) {
+      Ok(text) => {
+        if let Err(err) = std::fs::write(dir.join(FILE_NAME), text) {
+          log::warn!("failed to save the window size: {err}");
+        }
+      }
+      Err(err) => log::warn!("failed to serialise the window size: {err}"),
+    }
+  }
+
+  /// GTK가 아는 내용 크기(논리 px). CSD 그림자·타이틀바를 뺀 값이다.
+  pub fn content_size(window: &tauri::WebviewWindow) -> Option<(f64, f64)> {
+    use gtk::prelude::*;
+    let (width, height) = window.gtk_window().ok()?.size();
+    (width > 0 && height > 0).then_some((width as f64, height as f64))
+  }
+
+  /// 내용 기준 경계에 델타를 더해 프레임 기준 힌트로 건다.
+  pub fn apply_hints(window: &tauri::WebviewWindow, bounds: Bounds, delta: (f64, f64)) {
+    let _ = window.set_min_size(Some(Size::Logical(LogicalSize {
+      width: bounds.min.0 + delta.0,
+      height: bounds.min.1 + delta.1,
+    })));
+    let _ = window.set_max_size(Some(Size::Logical(LogicalSize {
+      width: bounds.max.0 + delta.0,
+      height: bounds.max.1 + delta.1,
+    })));
+  }
+
+  /// Resized 이벤트마다 내용 크기를 기억하고, 프레임−내용 델타가 바뀌면 힌트를 다시 건다.
+  pub fn on_resized(window: &tauri::WebviewWindow, frame: PhysicalSize<u32>) {
+    let Some(content) = content_size(window) else { return };
+    let state = window.state::<State>();
+    *state.content.lock().unwrap() = Some(content);
+
+    let Ok(scale) = window.scale_factor() else { return };
+    let frame = frame.to_logical::<f64>(scale);
+    let delta = (
+      (frame.width - content.0).max(0.0),
+      (frame.height - content.1).max(0.0),
+    );
+    let changed = {
+      let mut current = state.delta.lock().unwrap();
+      if *current == Some(delta) {
+        false
+      } else {
+        *current = Some(delta);
+        true
+      }
+    };
+    if changed {
+      if let Some(bounds) = *state.bounds.lock().unwrap() {
+        apply_hints(window, bounds, delta);
+        log::info!(
+          "window frame-content delta (logical): {}x{} — size hints re-applied",
+          delta.0,
+          delta.1
+        );
+      }
+    }
+  }
+}
+
 // TODO: CSP 설정 — tauri.conf.json의 `app.security.csp`(현재 null)에 실기기 런타임 검증과 함께
 // 값을 채워야 한다. currency API·GitHub updater 엔드포인트용 connect-src 허용이 필요.
 // (JSON 설정 파일은 주석을 지원하지 않아 이 메모를 여기 남긴다.)
@@ -177,8 +296,26 @@ pub fn run() {
   // 재현). 근본 수정은 tao 0.36(tauri-apps/tao#1218, Tauri 2.12 예정). Wayland는 어차피
   // 앱이 창 위치를 못 정하니 점프 문제도 없다. 플러그인을 빼거나 denylist에 넣으면 Windows
   // 창이 영영 안 보이니 주의.
+  // Linux에서는 크기 저장·복원을 linux_geometry가 맡는다(플러그인은 프레임 크기를 저장해
+  // 내용 크기로 복원하므로 실행마다 창이 자란다 — 모듈 주석 참고).
+  let state_flags = {
+    use tauri_plugin_window_state::StateFlags;
+    #[cfg(target_os = "linux")]
+    {
+      StateFlags::all() & !StateFlags::SIZE
+    }
+    #[cfg(not(target_os = "linux"))]
+    {
+      StateFlags::all()
+    }
+  };
+
   let mut builder = tauri::Builder::default()
-    .plugin(tauri_plugin_window_state::Builder::default().build())
+    .plugin(
+      tauri_plugin_window_state::Builder::default()
+        .with_state_flags(state_flags)
+        .build(),
+    )
     .plugin(tauri_plugin_opener::init())
     .invoke_handler(tauri::generate_handler![get_package_env, quit_app, announce_a11y]);
 
@@ -219,7 +356,19 @@ pub fn run() {
           }
         }
 
-        if let Ok(Some(monitor)) = window.current_monitor() {
+        // visible:false로 만든 창은 setup 시점에 아직 realize되지 않아(GdkWindow 없음)
+        // current_monitor()가 None을 돌려준다. 그러면 아래 최소·최대 크기 계산이 통째로
+        // 건너뛰어져 config의 minWidth/minHeight만 남는다 — 0.13.2 snap/dev에서 실측.
+        // 창이 속한 모니터를 모르면 첫 모니터로 대신한다.
+        let monitor = window.current_monitor().ok().flatten().or_else(|| {
+          window
+            .available_monitors()
+            .ok()
+            .and_then(|monitors| monitors.into_iter().next())
+        });
+
+        // 내용 기준 논리 픽셀 경계 (min, max). 모니터를 못 읽으면 None — config 값이 남는다.
+        let bounds = monitor.map(|monitor| {
           let size = monitor.size();
           // 네이티브 Wayland에서는 `.setup()` 시점에 컴포지터가 아직 출력(output) 협상을
           // 끝내지 않아 scale_factor()가 0/비정상값을 반환할 수 있다(XWayland는 X11 API가
@@ -275,8 +424,38 @@ pub fn run() {
             "window bounds (logical): min={min_width}x{min_height} max={capped_max_width}x{capped_max_height} work={work_width}x{work_height}"
           );
 
-          // tauri-plugin-window-state가 복원한 크기는 config의 minWidth/minHeight를
-          // 무시하므로, 새 최소값보다 작게 복원됐으면 끌어올린다.
+          ((min_width, min_height), (capped_max_width, capped_max_height))
+        });
+
+        #[cfg(target_os = "linux")]
+        {
+          let bounds = bounds.map(|(min, max)| linux_geometry::Bounds { min, max });
+          let state = linux_geometry::State::default();
+          *state.bounds.lock().unwrap() = bounds;
+          app.manage(state);
+
+          // 지난번 내용 크기를 복원한다. 경계 밖이면 잘라 넣는다.
+          if let Some((width, height)) = linux_geometry::load(app.handle()) {
+            let (width, height) = match bounds {
+              Some(b) => (width.clamp(b.min.0, b.max.0), height.clamp(b.min.1, b.max.1)),
+              None => (width, height),
+            };
+            let _ = window.set_size(Size::Logical(LogicalSize { width, height }));
+            log::info!("restored window content size (logical): {width}x{height}");
+          }
+
+          let tracked = window.clone();
+          window.on_window_event(move |event| {
+            if let tauri::WindowEvent::Resized(size) = event {
+              linux_geometry::on_resized(&tracked, *size);
+            }
+          });
+        }
+
+        // Linux 외: tauri-plugin-window-state가 복원한 크기는 config의 minWidth/minHeight를
+        // 무시하므로, 새 최소값보다 작게 복원됐으면 끌어올린다.
+        #[cfg(not(target_os = "linux"))]
+        if let Some(((min_width, min_height), _)) = bounds {
           if let (Ok(inner), Ok(win_scale)) = (window.inner_size(), window.scale_factor()) {
             let logical = inner.to_logical::<f64>(win_scale);
             if logical.width + 0.5 < min_width || logical.height + 0.5 < min_height {
@@ -290,6 +469,19 @@ pub fn run() {
       }
       Ok(())
     })
-    .run(tauri::generate_context!())
-    .expect("error while running tauri application");
+    .build(tauri::generate_context!())
+    .expect("error while building tauri application")
+    .run(|app, event| {
+      // Linux: 종료 직전에 마지막 내용 크기를 저장한다(창 닫기·앱 종료 명령 모두 여기로 온다).
+      #[cfg(target_os = "linux")]
+      if let tauri::RunEvent::Exit = event {
+        if let Some(state) = app.try_state::<linux_geometry::State>() {
+          if let Some(content) = *state.content.lock().unwrap() {
+            linux_geometry::save(app, content);
+          }
+        }
+      }
+      #[cfg(not(target_os = "linux"))]
+      let _ = (app, event);
+    });
 }
