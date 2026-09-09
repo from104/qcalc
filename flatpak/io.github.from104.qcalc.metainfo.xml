@@ -59,6 +59,11 @@
   <content_rating type="oars-1.1" />
 
   <releases>
+    <release version="0.13.3" date="2026-09-10">
+      <description>
+        <p>Linux fixes: the title bar buttons respond again, the window no longer grows on every start, and the minimum and maximum window size apply to the content area.</p>
+      </description>
+    </release>
     <release version="0.13.2" date="2026-09-08">
       <description>
         <p>Shows all five calculators as tabs on narrow screens, keeps the Android 15 system bars off the keypad and record screen, and stops the window jumping to its saved position after launch on Windows.</p>

@@ -12,6 +12,14 @@ All notable changes to this project are recorded in this file.
 
 The format is based on [Keep a Changelog] and this project follows [Semantic Versioning].
 
+## [0.13.3] 2026-09-10
+
+### Fixed
+
+- Fixed the title bar buttons not responding on Linux since 0.13.2
+- Fixed the window growing slightly on every start on Linux until it reached the maximum size
+- Fixed the minimum and maximum window size not applying to the content area on Linux (and not at all since 0.13.2)
+
 ## [0.13.2] 2026-09-08
 
 ### Changed

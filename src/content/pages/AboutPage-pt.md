@@ -12,6 +12,14 @@ Todas as alterações notáveis deste projeto são registradas neste arquivo.
 
 O formato é baseado no [Keep a Changelog] e este projeto segue o [Versionamento Semântico].
 
+## [0.13.3] 2026-09-10
+
+### Corrigido
+
+- Corrigidos os botões da barra de título que não respondiam no Linux desde a 0.13.2
+- Corrigida a janela que crescia um pouco a cada início no Linux até atingir o tamanho máximo
+- Corrigido o tamanho mínimo e máximo da janela que não se aplicava à área de conteúdo no Linux (e não se aplicava de todo desde a 0.13.2)
+
 ## [0.13.2] 2026-09-08
 
 ### Alterado

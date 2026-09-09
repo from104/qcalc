@@ -1,6 +1,6 @@
 {
   "name": "qcalc",
-  "version": "0.13.2",
+  "version": "0.13.3",
   "description": "A multi-purpose calculator for productivity and accessibility",
   "productName": "QCalc",
   "desktopName": "io.github.from104.qcalc.desktop",
