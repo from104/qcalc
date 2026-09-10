@@ -1,8 +1,28 @@
-# QCalc
+<p align="center">
+  <img src="assets/qcalc_icon_512x512.png" alt="" width="96" height="96">
+</p>
 
-> 생산성을 위한 모던 크로스 플랫폼 계산기
+<h1 align="center">QCalc</h1>
 
-[![Get it from the Snap Store](https://snapcraft.io/en/dark/install.svg)](https://snapcraft.io/qcalc)
+<p align="center">
+  <strong>생산성과 접근성을 위한 다목적 계산기</strong> — 표준 · 단위 · 통화 · 진법 · 수식<br>
+  키보드 우선, 스크린리더 친화, 10개 언어. 데스크톱(Linux · Windows)과 Android.
+</p>
+
+<p align="center">
+  <a href="LICENSE"><img alt="License: MIT" src="https://img.shields.io/badge/license-MIT-blue.svg"></a>
+  <a href="https://github.com/from104/qcalc/releases/latest"><img alt="version 0.13.3" src="https://img.shields.io/badge/version-0.13.3-informational"></a>
+  <img alt="10 languages" src="https://img.shields.io/badge/i18n-10%20languages-success">
+  <a href="CONTRIBUTING.md"><img alt="contributions welcome" src="https://img.shields.io/badge/contributions-welcome-brightgreen"></a>
+</p>
+
+<p align="center">
+  <a href="https://snapcraft.io/qcalc"><img alt="Get it from the Snap Store" src="https://snapcraft.io/en/dark/install.svg"></a>
+</p>
+
+<p align="center"><a href="README.md">English</a></p>
+
+---
 
 ![Screenshot](https://github.com/from104/qcalc/raw/main/assets/screenshot_v0.12.0-ko.png)
 
@@ -10,8 +30,8 @@
 
 QCalc은 **5가지 전문 계산기(표준, 단위, 통화, 진법, 수식)**와 **10개 언어(한국어, English, 日本語, 中文, हिन्दी, Deutsch, Español, Français, Português, Русский)** 지원을 하나의 깔끔하고 키보드 친화적인 앱에 담았습니다. 일상적인 계산, 단위 변환, 환율 확인, 16진수/2진수 작업, 수학 수식 계산까지 — 탭 하나로 전환할 수 있습니다.
 
-**기술 스택** Vue 3 + Quasar + TypeScript + Tauri 2(데스크톱) + Capacitor(Android) — 기존 Electron 타겟은 전환기 동안 유지
-**지원 플랫폼** Windows (NSIS 설치파일), Linux (deb / rpm / AppImage / Snap / Flatpak), Android
+- **기술 스택** — Vue 3 + Quasar + TypeScript + Tauri 2(데스크톱) + Capacitor(Android) — 기존 Electron 타겟은 전환기 동안 유지
+- **지원 플랫폼** — Windows (NSIS 설치파일), Linux (deb / rpm / AppImage / Snap / Flatpak), Android
 
 ---
 

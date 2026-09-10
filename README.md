@@ -1,8 +1,28 @@
-# QCalc
+<p align="center">
+  <img src="assets/qcalc_icon_512x512.png" alt="" width="96" height="96">
+</p>
 
-> A modern, cross-platform calculator built for productivity.
+<h1 align="center">QCalc</h1>
 
-[![Get it from the Snap Store](https://snapcraft.io/en/dark/install.svg)](https://snapcraft.io/qcalc)
+<p align="center">
+  <strong>A multi-purpose calculator for productivity and accessibility</strong> — standard · unit · currency · radix · formula<br>
+  Keyboard first, screen-reader friendly, 10 languages. Desktop (Linux · Windows) and Android.
+</p>
+
+<p align="center">
+  <a href="LICENSE"><img alt="License: MIT" src="https://img.shields.io/badge/license-MIT-blue.svg"></a>
+  <a href="https://github.com/from104/qcalc/releases/latest"><img alt="version 0.13.3" src="https://img.shields.io/badge/version-0.13.3-informational"></a>
+  <img alt="10 languages" src="https://img.shields.io/badge/i18n-10%20languages-success">
+  <a href="CONTRIBUTING.md"><img alt="contributions welcome" src="https://img.shields.io/badge/contributions-welcome-brightgreen"></a>
+</p>
+
+<p align="center">
+  <a href="https://snapcraft.io/qcalc"><img alt="Get it from the Snap Store" src="https://snapcraft.io/en/dark/install.svg"></a>
+</p>
+
+<p align="center"><a href="README-ko.md">한국어</a></p>
+
+---
 
 ![Screenshot](https://github.com/from104/qcalc/raw/main/assets/screenshot_v0.12.0.png)
 
@@ -10,8 +30,8 @@
 
 QCalc packs **5 specialized calculators (Standard, Unit, Currency, Radix, Formula)** and **10 languages (한국어, English, 日本語, 中文, हिन्दी, Deutsch, Español, Français, Português, Русский)** into one clean, keyboard-friendly app. Whether you're crunching everyday numbers, converting units, checking exchange rates, working with hex/binary, or evaluating math formulas — it's all one tab away.
 
-**Built with** Vue 3 + Quasar + TypeScript + Tauri 2 (desktop) + Capacitor (Android) — the legacy Electron target remains during the transition
-**Runs on** Windows (NSIS installer), Linux (deb / rpm / AppImage / Snap / Flatpak), Android
+- **Built with** — Vue 3 + Quasar + TypeScript + Tauri 2 (desktop) + Capacitor (Android) — the legacy Electron target remains during the transition
+- **Runs on** — Windows (NSIS installer), Linux (deb / rpm / AppImage / Snap / Flatpak), Android
 
 ---
 

@@ -130,7 +130,7 @@ and the What's New dialog shows it on first launch. Every entry follows these ru
 
 ## Release Checklist
 
-1. Update `version` in `package.json`
+1. Update `version` in `package.json` and the version badge at the top of `README.md` / `README-ko.md`
 2. Update `CHANGELOG.md` and `CHANGELOG-ko.md`
 3. Sync all `src/content/pages/AboutPage-*.md` files with the changelog (all 10 languages)
 4. Sync all `src/content/pages/HelpPage-*.md` files with the README (all 10 languages)
