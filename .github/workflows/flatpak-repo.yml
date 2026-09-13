@@ -1,0 +1,157 @@
+# 자체 Flatpak 저장소 — GitHub Pages(gh-pages 브랜치)에 ostree repo 를 게시한다.
+#
+# Flathub 은 AI 생성물 공개 범위를 이유로 QCalc 을 받지 않았다(flathub/flathub#10151, 2026-09-13).
+# 그래서 릴리스가 게시될 때마다 여기서 Flatpak 을 만들어 우리 저장소에 올린다. 사용자는
+#   flatpak install --user https://from104.github.io/qcalc/flatpak/qcalc.flatpakref
+# 한 번이면 이후 `flatpak update` 로 자동 갱신된다.
+#
+# 서명: 시크릿 FLATPAK_GPG_PRIVATE_KEY(ASCII-armored, 암호 없는 서명 전용 키)가 있으면 커밋과
+# 요약을 서명하고 flatpakref 에 공개키를 싣는다. 없으면 서명 없이 만들고 flatpakref 에서
+# gpg-verify 를 끈다(테스트용 — 실제 배포는 반드시 서명).
+#
+# gh-pages 는 매번 고아 커밋 하나로 강제 push 한다. ostree 객체가 git 이력에 쌓이면 저장소가
+# 한없이 커지므로, 트리에는 직전 2개 버전만 남기고(prune-depth=2) 이력은 갖지 않는다.
+name: Flatpak repo
+
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Flatpak 을 만들 릴리스 태그 (예: v0.13.3)'
+        required: true
+
+permissions:
+  contents: write
+
+concurrency:
+  group: flatpak-repo
+  cancel-in-progress: false
+
+env:
+  APP_ID: io.github.from104.qcalc
+  PAGES_URL: https://from104.github.io/qcalc
+  BRANCH: stable
+
+jobs:
+  publish:
+    name: Build and publish to gh-pages
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Resolve tag
+        id: tag
+        run: |
+          TAG="${{ github.event.inputs.tag || github.event.release.tag_name }}"
+          echo "tag=$TAG" >> "$GITHUB_OUTPUT"
+          echo "version=${TAG#v}" >> "$GITHUB_OUTPUT"
+
+      - name: Download the release deb
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release download "${{ steps.tag.outputs.tag }}" -p '*_amd64.deb' -D flatpak/
+          mv flatpak/*.deb flatpak/qcalc.deb
+          mkdir -p flatpak/icons
+          cp src-tauri/icons/128x128@2x.png flatpak/icons/io.github.from104.qcalc.png
+
+      - name: Setup Flatpak
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y flatpak flatpak-builder
+          flatpak remote-add --user --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
+          RUNTIME=$(grep -oP "^runtime-version: '\K[0-9]+" flatpak/io.github.from104.qcalc.yml)
+          flatpak install -y --user flathub "org.gnome.Platform//$RUNTIME" "org.gnome.Sdk//$RUNTIME"
+
+      - name: Import the signing key
+        id: gpg
+        env:
+          KEY: ${{ secrets.FLATPAK_GPG_PRIVATE_KEY }}
+        run: |
+          if [ -z "$KEY" ]; then
+            echo "::warning::FLATPAK_GPG_PRIVATE_KEY 시크릿이 없어 서명 없이 만든다 — 테스트 용도로만 쓸 것"
+            echo "keyid=" >> "$GITHUB_OUTPUT"; exit 0
+          fi
+          export GNUPGHOME="$RUNNER_TEMP/gnupg"; mkdir -p "$GNUPGHOME"; chmod 700 "$GNUPGHOME"
+          printf '%s\n' "$KEY" | gpg --batch --import
+          KEYID=$(gpg --batch --list-secret-keys --with-colons | awk -F: '$1=="sec"{print $5; exit}')
+          [ -n "$KEYID" ] || { echo "::error::비밀키를 읽지 못했다"; exit 1; }
+          echo "GNUPGHOME=$GNUPGHOME" >> "$GITHUB_ENV"
+          echo "keyid=$KEYID" >> "$GITHUB_OUTPUT"
+
+      - name: Fetch the published repo (keeps the previous version for deltas)
+        run: |
+          mkdir -p pages
+          if git fetch --depth=1 origin gh-pages 2>/dev/null; then
+            git archive origin/gh-pages | tar -x -C pages
+          fi
+          mkdir -p pages/flatpak
+
+      - name: Build into the repo
+        working-directory: flatpak
+        run: |
+          SIGN=()
+          if [ -n "${{ steps.gpg.outputs.keyid }}" ]; then
+            SIGN=(--gpg-sign="${{ steps.gpg.outputs.keyid }}" --gpg-homedir="$GNUPGHOME")
+          fi
+          flatpak-builder --force-clean --user --install-deps-from=flathub --disable-updates \
+            --default-branch="$BRANCH" --repo=../pages/flatpak/repo "${SIGN[@]}" \
+            .flatpak-builder/build io.github.from104.qcalc.yml
+
+      - name: Update repo metadata
+        run: |
+          SIGN=()
+          if [ -n "${{ steps.gpg.outputs.keyid }}" ]; then
+            SIGN=(--gpg-sign="${{ steps.gpg.outputs.keyid }}" --gpg-homedir="$GNUPGHOME")
+          fi
+          flatpak build-update-repo --title="QCalc" --default-branch="$BRANCH" \
+            --generate-static-deltas --prune --prune-depth=2 "${SIGN[@]}" pages/flatpak/repo
+          rm -rf pages/flatpak/repo/tmp pages/flatpak/repo/.lock
+
+      - name: Write flatpakref, flatpakrepo, and the install page
+        run: |
+          cd pages/flatpak
+          GPGKEY=""
+          if [ -n "${{ steps.gpg.outputs.keyid }}" ]; then
+            gpg --batch --export "${{ steps.gpg.outputs.keyid }}" > qcalc.gpg
+            GPGKEY=$(base64 -w0 qcalc.gpg)
+          fi
+          {
+            echo "[Flatpak Ref]"
+            echo "Name=$APP_ID"
+            echo "Branch=$BRANCH"
+            echo "Title=QCalc"
+            echo "Url=$PAGES_URL/flatpak/repo"
+            echo "Homepage=https://github.com/from104/qcalc"
+            echo "IsRuntime=false"
+            echo "RuntimeRepo=https://dl.flathub.org/repo/flathub.flatpakrepo"
+            [ -n "$GPGKEY" ] && echo "GPGKey=$GPGKEY"
+          } > qcalc.flatpakref
+          {
+            echo "[Flatpak Repo]"
+            echo "Title=QCalc"
+            echo "Url=$PAGES_URL/flatpak/repo"
+            echo "Homepage=https://github.com/from104/qcalc"
+            echo "Comment=QCalc self-hosted Flatpak repository"
+            [ -n "$GPGKEY" ] && echo "GPGKey=$GPGKEY"
+          } > qcalc.flatpakrepo
+          sed -e "s|__VERSION__|${{ steps.tag.outputs.version }}|g" \
+              -e "s|__DATE__|$(date -u +%Y-%m-%d)|g" \
+              -e "s|__SIGNED__|$([ -n "$GPGKEY" ] && echo 'GPG-signed' || echo 'unsigned (test build)')|g" \
+              "$GITHUB_WORKSPACE/flatpak/pages-index.html" > index.html
+          cd ..
+          touch .nojekyll
+          [ -f index.html ] || printf '<meta http-equiv="refresh" content="0; url=flatpak/">\n' > index.html
+
+      - name: Publish gh-pages (single orphan commit)
+        run: |
+          cd pages
+          git init -q -b gh-pages
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -q -m "flatpak repo: ${{ steps.tag.outputs.tag }}"
+          git push --force "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.git" gh-pages
+          echo "published $APP_ID ${{ steps.tag.outputs.tag }} → $PAGES_URL/flatpak/" >> "$GITHUB_STEP_SUMMARY"

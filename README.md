@@ -199,11 +199,11 @@ QCalc packs **5 specialized calculators (Standard, Unit, Currency, Radix, Formul
 
 ## Installation
 
-| Platform    | Method                                                                                                                                                        |
-| ----------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Windows** | Download NSIS installer from [Releases](https://github.com/from104/qcalc/releases) (auto-update supported)                                                    |
-| **Linux**   | `.deb` / `.rpm` / AppImage from [Releases](https://github.com/from104/qcalc/releases) (AppImage auto-updates), Snap (`snap install --beta qcalc`), or Flatpak |
-| **Android** | APK from [Releases](https://github.com/from104/qcalc/releases)                                                                                                |
+| Platform    | Method                                                                                                                                                                                                                                                                           |
+| ----------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Windows** | Download NSIS installer from [Releases](https://github.com/from104/qcalc/releases) (auto-update supported)                                                                                                                                                                       |
+| **Linux**   | `.deb` / `.rpm` / AppImage from [Releases](https://github.com/from104/qcalc/releases) (AppImage auto-updates), Snap (`snap install qcalc`), or Flatpak from our own repository: `flatpak install --user https://from104.github.io/qcalc/flatpak/qcalc.flatpakref` (auto-updates) |
+| **Android** | APK from [Releases](https://github.com/from104/qcalc/releases)                                                                                                                                                                                                                   |
 
 > **Linux package compatibility**: the `.deb` supports Ubuntu 22.04+ / Debian 12+ (and derivatives such as Mint 21+, Pop!\_OS 22.04+); the `.rpm` supports Fedora 37+ and openSUSE Leap 15.6+/Tumbleweed. RHEL/Alma/Rocky 9 and older Debian/Ubuntu are not supported by these packages (glibc/WebKitGTK too old) — use the AppImage (any distro with glibc 2.35+), Flatpak, or Snap instead; those bundle their own runtime.
 
