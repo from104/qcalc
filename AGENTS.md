@@ -136,7 +136,7 @@ and the What's New dialog shows it on first launch. Every entry follows these ru
 4. Sync all `src/content/pages/HelpPage-*.md` files with the README (all 10 languages)
 5. Update the `<releases>` list in `flatpak/io.github.from104.qcalc.metainfo.xml`
 6. Run `yarn lint` and `yarn test`, then `scripts/verify-release.sh` — it builds each package, installs it in a clean container, and checks the app actually starts. CI only proves the build succeeded; 0.13.0 shipped a Snap that built fine and could not launch ([#117](https://github.com/from104/qcalc/issues/117))
-7. Tag `v<version>` on `main` — `.github/workflows/release.yml` builds all six desktop packages (deb/rpm/AppImage/Flatpak/Snap/NSIS) and the Android APK, then creates a draft release; write its body (see **GitHub Release Notes**), publish it, then run the `tauri-updater-promote` workflow so auto-update clients see the new version
+7. Tag `v<version>` on `main` — `.github/workflows/release.yml` builds all six desktop packages (deb/rpm/AppImage/Flatpak/Snap/NSIS) and the Android APK, then creates a draft release; write its body (see **GitHub Release Notes**), publish it, then run the `tauri-updater-promote` workflow so auto-update clients see the new version. Publishing also triggers `flatpak-repo.yml`, which rebuilds the Flatpak from the release deb and pushes the signed ostree repo to `gh-pages` (https://from104.github.io/qcalc/flatpak/) — Flathub declined the app over its AI-assisted development (flathub/flathub#10151), so this repository is the Flatpak channel
 
 ## Testing
 

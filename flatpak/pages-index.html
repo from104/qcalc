@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>QCalc — Flatpak repository</title>
+    <style>
+      :root {
+        color-scheme: light dark;
+      }
+      body {
+        font:
+          16px/1.55 system-ui,
+          sans-serif;
+        max-width: 42rem;
+        margin: 3rem auto;
+        padding: 0 1.25rem;
+      }
+      h1 {
+        font-size: 1.6rem;
+        margin-bottom: 0.25rem;
+      }
+      .meta {
+        opacity: 0.7;
+        margin-top: 0;
+      }
+      pre {
+        background: rgba(127, 127, 127, 0.12);
+        padding: 0.75rem 1rem;
+        overflow-x: auto;
+        border-radius: 6px;
+      }
+      code {
+        font-size: 0.95em;
+      }
+      h2 {
+        font-size: 1.15rem;
+        margin-top: 2rem;
+      }
+      a {
+        color: inherit;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>QCalc — Flatpak repository</h1>
+    <p class="meta">Version __VERSION__ · published __DATE__ · __SIGNED__ · x86_64</p>
+
+    <p>
+      QCalc is a keyboard-friendly, screen-reader-accessible multi-purpose calculator (standard, unit, currency, radix,
+      formula) in 10 languages. Source and other packages:
+      <a href="https://github.com/from104/qcalc">github.com/from104/qcalc</a>.
+    </p>
+
+    <h2>Install</h2>
+    <pre><code>flatpak install --user https://from104.github.io/qcalc/flatpak/qcalc.flatpakref</code></pre>
+    <p>
+      This adds the repository and installs the app. Later versions arrive through the normal
+      <code>flatpak update</code>.
+    </p>
+
+    <h2>Add the repository only</h2>
+    <pre><code>flatpak remote-add --user --if-not-exists qcalc https://from104.github.io/qcalc/flatpak/qcalc.flatpakrepo
+flatpak install --user qcalc io.github.from104.qcalc</code></pre>
+
+    <h2>Run</h2>
+    <pre><code>flatpak run io.github.from104.qcalc</code></pre>
+
+    <h2>Notes</h2>
+    <ul>
+      <li>
+        Screen reader users: the WebKit UI inside the Flatpak sandbox is currently not exposed to AT-SPI. Use the
+        <code>.deb</code>, <code>.rpm</code>, Snap or AppImage instead.
+      </li>
+      <li>
+        The repository keeps the two most recent versions. The GPG public key is
+        <a href="qcalc.gpg">qcalc.gpg</a> (embedded in the .flatpakref).
+      </li>
+    </ul>
+  </body>
+</html>
