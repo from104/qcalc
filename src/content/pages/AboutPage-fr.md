@@ -12,6 +12,12 @@ Tous les changements notables de ce projet sont enregistrés dans ce fichier.
 
 Le format est basé sur [Keep a Changelog] et ce projet suit le [Versionnage sémantique].
 
+## [0.13.4] 2026-09-17
+
+### Corrigé
+
+- Correction de l'icône AppImage non reconnue par les outils d'intégration au bureau
+
 ## [0.13.3] 2026-09-10
 
 ### Corrigé
