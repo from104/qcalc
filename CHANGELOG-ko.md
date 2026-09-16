@@ -4,6 +4,12 @@
 
 형식은 [Keep a Changelog (korean)]를 기반으로 하며 이 프로젝트는 [Semantic Versioning (korean)]을 따릅니다.
 
+## [Unreleased]
+
+### 수정됨
+
+- Firejail 같은 샌드박스 안에서 AppImage가 실행되지 않던 문제 수정
+
 ## [0.13.4] 2026-09-17
 
 ### 수정됨
