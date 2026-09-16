@@ -4,6 +4,12 @@ All notable changes to this project are recorded in this file.
 
 The format is based on [Keep a Changelog] and this project follows [Semantic Versioning].
 
+## [Unreleased]
+
+### Fixed
+
+- Fixed the AppImage icon not being picked up by desktop integration tools
+
 ## [0.13.3] 2026-09-10
 
 ### Fixed
