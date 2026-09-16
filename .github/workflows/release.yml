@@ -214,8 +214,12 @@ jobs:
           echo "AppImage: $old → $new"
 
           # 자산 이름만 바꾼다(재업로드 없음). .sig 도 같은 규칙으로 따라간다.
+          # `gh release view --json assets` 의 id 는 GraphQL 노드 ID(RA_…)라 REST PATCH 에 404 를
+          # 낸다 — 0.13.4 에서 실제로 그랬다. 드래프트는 tags/ 경로로 못 찾으니 목록에서 고른다.
+          release_id=$(gh api "repos/$REPO/releases?per_page=20" -q ".[] | select(.tag_name == \"$TAG\") | .id")
+          [ -n "$release_id" ] || { echo "::error::릴리스 $TAG 를 찾지 못했다"; exit 1; }
           for suffix in "" ".sig"; do
-            id=$(gh release view "$TAG" -R "$REPO" --json assets \
+            id=$(gh api "repos/$REPO/releases/$release_id" \
                    -q ".assets[] | select(.name == \"${old}${suffix}\") | .id")
             [ -n "$id" ] || continue
             gh api -X PATCH "repos/$REPO/releases/assets/$id" -f "name=${new}${suffix}" --silent
