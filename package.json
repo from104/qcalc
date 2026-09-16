@@ -1,6 +1,6 @@
 {
   "name": "qcalc",
-  "version": "0.13.3",
+  "version": "0.13.4",
   "description": "A multi-purpose calculator for productivity and accessibility",
   "productName": "QCalc",
   "desktopName": "io.github.from104.qcalc.desktop",
@@ -86,7 +86,7 @@
     "@quasar/cli": "2.5.0",
     "@quasar/quasar-app-extension-qmarkdown": "^2.0.5",
     "@rushstack/eslint-patch": "1.16.1",
-    "@tauri-apps/cli": "^2",
+    "@tauri-apps/cli": "^2.11.4",
     "@types/node": "25.5.0",
     "@types/papaparse": "^5.5.2",
     "@typescript-eslint/eslint-plugin": "8.57.1",

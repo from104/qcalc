@@ -179,6 +179,63 @@ jobs:
           path: src-tauri/target/release/bundle/deb/*.deb
           retention-days: 3
 
+  # AppImage 카탈로그(appimage.github.io)는 새 버전을 자동으로 물어올 때 파일명이
+  # `App-버전-x86_64.AppImage` 형식이라고 가정한다. Tauri 는 `{productName}_{version}_{arch}`
+  # 로 고정 생성하므로(QCalc_0.13.3_amd64.AppImage) 그대로 두면 **등록은 되는데 버전이 그
+  # 자리에 멈춘다** — 카탈로그 검사는 내용물만 보므로 초록이 떠서 놓치기 쉽다.
+  #
+  # 별도 잡인 이유: 이름을 바꾸면 latest.json 의 URL 도 같이 고쳐야 하는데, 그 파일은
+  # build-tauri 의 두 매트릭스 레그가 **각자 병합해 올린다**. 빌드 잡 안에서 고치면 나중에
+  # 끝난 레그가 옛 URL 로 덮어쓸 수 있다. 두 레그가 모두 끝난 뒤 한 번만 고친다.
+  #
+  # 파일은 내려받지 않는다 — GitHub 자산 이름 변경 API(PATCH)로 바꾸므로 내용·서명·해시가
+  # 그대로 유지된다. 0.13.3 은 이 잡이 없던 때라 릴리스 후 같은 작업을 손으로 했다.
+  rename-appimage:
+    name: Rename the AppImage to the catalog convention
+    needs: build-tauri
+    if: startsWith(github.ref, 'refs/tags/v')
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: write
+    steps:
+      - name: Rename the asset and fix the updater manifests
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REPO: ${{ github.repository }}
+          TAG: ${{ github.ref_name }}
+        run: |
+          set -euo pipefail
+          new="QCalc-${TAG#v}-x86_64.AppImage"
+          old=$(gh release view "$TAG" -R "$REPO" --json assets \
+                  -q '.assets[].name | select(endswith(".AppImage"))')
+          # 빈 값이면 아래 치환이 모든 글자 사이에 새 이름을 끼워 넣는다 — 반드시 먼저 막는다.
+          if [ -z "$old" ]; then echo "::error::릴리스에 .AppImage 자산이 없다"; exit 1; fi
+          if [ "$old" = "$new" ]; then echo "이미 규칙에 맞는 이름이다: $old"; exit 0; fi
+          echo "AppImage: $old → $new"
+
+          # 자산 이름만 바꾼다(재업로드 없음). .sig 도 같은 규칙으로 따라간다.
+          for suffix in "" ".sig"; do
+            id=$(gh release view "$TAG" -R "$REPO" --json assets \
+                   -q ".assets[] | select(.name == \"${old}${suffix}\") | .id")
+            [ -n "$id" ] || continue
+            gh api -X PATCH "repos/$REPO/releases/assets/$id" -f "name=${new}${suffix}" --silent
+          done
+
+          # 매니페스트의 URL 을 새 이름으로 맞춘다. 내용이 그대로라 sha512·size 는 손대지 않는다.
+          for manifest in latest.json latest-linux.yml; do
+            gh release download "$TAG" -R "$REPO" -p "$manifest" --clobber
+            python3 - "$manifest" "$old" "$new" <<'PY'
+          import sys
+          path, old, new = sys.argv[1:4]
+          text = open(path, encoding="utf-8").read()
+          if old in text:
+              open(path, "w", encoding="utf-8").write(text.replace(old, new))
+              print(f"  {path}: {text.count(old)}곳 치환")
+          PY
+            gh release upload "$TAG" -R "$REPO" "$manifest" --clobber
+            rm -f "$manifest"
+          done
+
   build-flatpak:
     name: Build Flatpak bundle
     needs: build-tauri

@@ -59,6 +59,11 @@
   <content_rating type="oars-1.1" />
 
   <releases>
+    <release version="0.13.4" date="2026-09-17">
+      <description>
+        <p>Fixes the AppImage icon not being picked up by desktop integration tools.</p>
+      </description>
+    </release>
     <release version="0.13.3" date="2026-09-10">
       <description>
         <p>Linux fixes: the title bar buttons respond again, the window no longer grows on every start, and the minimum and maximum window size apply to the content area.</p>

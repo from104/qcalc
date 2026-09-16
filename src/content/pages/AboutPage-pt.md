@@ -12,6 +12,12 @@ Todas as alterações notáveis deste projeto são registradas neste arquivo.
 
 O formato é baseado no [Keep a Changelog] e este projeto segue o [Versionamento Semântico].
 
+## [0.13.4] 2026-09-17
+
+### Corrigido
+
+- Corrigido o ícone do AppImage que as ferramentas de integração ao desktop não reconheciam
+
 ## [0.13.3] 2026-09-10
 
 ### Corrigido
