@@ -12,6 +12,12 @@ Todas as alterações notáveis deste projeto são registradas neste arquivo.
 
 O formato é baseado no [Keep a Changelog] e este projeto segue o [Versionamento Semântico].
 
+## [0.13.5] 2026-09-17
+
+### Corrigido
+
+- Corrigido o AppImage que não iniciava dentro de sandboxes como o Firejail
+
 ## [0.13.4] 2026-09-17
 
 ### Corrigido

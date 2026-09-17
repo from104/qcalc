@@ -12,6 +12,12 @@ Tous les changements notables de ce projet sont enregistrés dans ce fichier.
 
 Le format est basé sur [Keep a Changelog] et ce projet suit le [Versionnage sémantique].
 
+## [0.13.5] 2026-09-17
+
+### Corrigé
+
+- Correction de l'AppImage qui ne démarrait pas dans les bacs à sable comme Firejail
+
 ## [0.13.4] 2026-09-17
 
 ### Corrigé
