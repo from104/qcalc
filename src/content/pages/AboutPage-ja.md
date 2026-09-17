@@ -12,6 +12,12 @@ Copyright © 2022 Seo Kihyun. MIT License.
 
 フォーマットは[Keep a Changelog]に基づいており、このプロジェクトは[Semantic Versioning]に従っています。
 
+## [0.13.5] 2026-09-17
+
+### 修正
+
+- Firejail などのサンドボックス内で AppImage が起動しなかった問題を修正
+
 ## [0.13.4] 2026-09-17
 
 ### 修正

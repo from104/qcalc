@@ -12,6 +12,12 @@ Alle wichtigen Änderungen an diesem Projekt werden in dieser Datei festgehalten
 
 Das Format basiert auf [Keep a Changelog] und dieses Projekt folgt der [Semantischen Versionierung].
 
+## [0.13.5] 2026-09-17
+
+### Behoben
+
+- AppImage startete nicht in Sandboxes wie Firejail – behoben
+
 ## [0.13.4] 2026-09-17
 
 ### Behoben

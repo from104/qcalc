@@ -88,6 +88,12 @@ jobs:
             git archive origin/gh-pages | tar -x -C pages
           fi
           mkdir -p pages/flatpak
+          # git 은 빈 디렉터리를 저장하지 않는다. ostree 는 refs/remotes·refs/mirrors·tmp 가
+          # 없으면 "Listing refs: opendir(refs/remotes)" 로 죽는다 — 0.13.4 두 번째 실행에서 실제로.
+          if [ -d pages/flatpak/repo ]; then
+            mkdir -p pages/flatpak/repo/refs/heads pages/flatpak/repo/refs/remotes \
+                     pages/flatpak/repo/refs/mirrors pages/flatpak/repo/tmp
+          fi
 
       - name: Build into the repo
         working-directory: flatpak

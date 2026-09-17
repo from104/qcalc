@@ -12,6 +12,12 @@ Copyright © 2022 Seo Kihyun. MIT License.
 
 格式基于 [Keep a Changelog]，本项目遵循[语义化版本]。
 
+## [0.13.5] 2026-09-17
+
+### 修复
+
+- 修复 AppImage 在 Firejail 等沙箱中无法启动的问题
+
 ## [0.13.4] 2026-09-17
 
 ### 修复

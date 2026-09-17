@@ -96,6 +96,20 @@ jobs:
       - name: Install JS dependencies
         run: yarn install --immutable
 
+      # tauri-bundler 는 AppImage 용 AppRun 을 ~/.cache/tauri 에 내려받으며 권한을 **0o770** 으로
+      # 박는다(write_and_make_executable). 그 파일이 AppDir 의 AppRun 이 되고 linuxdeploy 가
+      # AppRun.wrapped 로 이름만 바꾸므로, 결과 AppImage 를 root 가 마운트하고 다른 사용자가
+      # 실행하면(firejail, appimage.github.io CI) "AppRun.wrapped: Permission denied" 로 죽는다.
+      # 번들러는 캐시에 파일이 있으면 내려받지 않으므로, 같은 URL 에서 미리 받아 0755 로 둔다.
+      - name: Pre-seed AppRun with world-executable permissions
+        if: matrix.platform.os == 'ubuntu-22.04'
+        run: |
+          mkdir -p ~/.cache/tauri
+          curl -sSfL -o ~/.cache/tauri/AppRun-x86_64 \
+            https://github.com/tauri-apps/binary-releases/releases/download/apprun-old/AppRun-x86_64
+          chmod 755 ~/.cache/tauri/AppRun-x86_64
+          ls -l ~/.cache/tauri/AppRun-x86_64
+
       - name: Build Tauri bundle
         id: tauri
         uses: tauri-apps/tauri-action@v0
@@ -214,8 +228,12 @@ jobs:
           echo "AppImage: $old → $new"
 
           # 자산 이름만 바꾼다(재업로드 없음). .sig 도 같은 규칙으로 따라간다.
+          # `gh release view --json assets` 의 id 는 GraphQL 노드 ID(RA_…)라 REST PATCH 에 404 를
+          # 낸다 — 0.13.4 에서 실제로 그랬다. 드래프트는 tags/ 경로로 못 찾으니 목록에서 고른다.
+          release_id=$(gh api "repos/$REPO/releases?per_page=20" -q ".[] | select(.tag_name == \"$TAG\") | .id")
+          [ -n "$release_id" ] || { echo "::error::릴리스 $TAG 를 찾지 못했다"; exit 1; }
           for suffix in "" ".sig"; do
-            id=$(gh release view "$TAG" -R "$REPO" --json assets \
+            id=$(gh api "repos/$REPO/releases/$release_id" \
                    -q ".assets[] | select(.name == \"${old}${suffix}\") | .id")
             [ -n "$id" ] || continue
             gh api -X PATCH "repos/$REPO/releases/assets/$id" -f "name=${new}${suffix}" --silent

@@ -59,6 +59,11 @@
   <content_rating type="oars-1.1" />
 
   <releases>
+    <release version="0.13.5" date="2026-09-17">
+      <description>
+        <p>Fixes the AppImage not starting inside sandboxes such as Firejail.</p>
+      </description>
+    </release>
     <release version="0.13.4" date="2026-09-17">
       <description>
         <p>Fixes the AppImage icon not being picked up by desktop integration tools.</p>
