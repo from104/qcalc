@@ -34,6 +34,8 @@
 - JS 합계 2421KB(원본) · CSS 480KB(원본, `index.css` 476KB — 아이콘 폰트 2벌 추정)
 - 초기 청크: `index` 299KB + `MainLayout` 246KB + `vite-register` 62KB + vue 40KB ≈ **650KB gz**
 - 모듈별 상위: **mathjs 371KB** · quasar 140KB · markdown-it 76KB(+imsize 14KB) · i18n 73KB · content/tips 67KB · content/pages 66KB
+- **1-2 완료 후**: `index` 299→**182KB**, mathjs 전체는 별도 `math` chunk(169KB)로 분리돼 수식 계산기 진입·유휴 프리페치 때만 로드. 초기 청크 ≈ **530KB gz (−120KB)**
+  - 구현: `CalculatorMath.ts` 경량 인스턴스(함수 15개) + `FormulaMath.ts` 지연 로드. 전체판은 `mathjs/lib/browser/math.js`(자체 완결 번들) — ESM 진입점을 쓰면 Rollup이 공유 모듈을 시작 chunk에 붙여 분리가 안 됨. 이 번들은 `create()`의 config 인자를 무시하므로 생성 후 `config()` 호출 필수
 - → 우선순위 재조정: mathjs(1-2) > 도움말·팁 markdown 지연 로드(신규 1-9) > i18n(1-1) > 아이콘 CSS(1-5)
 
 ## Phase 1 — 속도 (0.14, 약 1주)

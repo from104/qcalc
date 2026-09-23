@@ -48,3 +48,10 @@ declare module 'tinykeys' {
    */
   export function tinykeys(target: Window | HTMLElement, keyBindingMap: KeyBindingMap): () => void;
 }
+
+// mathjs 자체 완결형 브라우저 번들 (수식 엔진 지연 로드용, FormulaMath.ts)
+declare module 'mathjs/lib/browser/math.js' {
+  import type { MathJsInstance } from 'mathjs';
+  const math: MathJsInstance;
+  export default math;
+}

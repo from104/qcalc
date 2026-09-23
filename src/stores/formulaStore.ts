@@ -5,12 +5,14 @@
  */
 
 import { defineStore } from 'pinia';
-import { MathB, createFormulaTrigScope } from '../core/calculator/CalculatorMath';
+import { getFormulaMath, loadFormulaMath, createFormulaTrigScope } from '../core/calculator/FormulaMath';
 import { useCalcStore } from './calcStore';
 import { formatDecimalPlaces } from '../utils/NumberUtils';
 import { classifyFormulaError, type FormulaErrorInfo } from '../utils/FormulaError';
 
 interface FormulaState {
+  /** 수식용 mathjs 전체 인스턴스 로드 완료 여부 (지연 로드, 영속화 안 함) */
+  mathReady: boolean;
   expression: string; // 현재 입력 중인 수식 (@는 currentNumber, $는 메모리 값 플레이스홀더)
   lastExpression: string; // 직전 평가된 수식 (ResultField label 표시용)
   isEditDialogOpen: boolean; // 인라인 편집 모드 활성화 여부
@@ -23,6 +25,7 @@ interface FormulaState {
 
 export const useFormulaStore = defineStore('formula', {
   state: (): FormulaState => ({
+    mathReady: getFormulaMath() !== null,
     expression: '',
     lastExpression: '',
     isEditDialogOpen: false,
@@ -93,14 +96,23 @@ export const useFormulaStore = defineStore('formula', {
      * - 성공 시 calc.currentNumber 에 결과를 반영하고 히스토리에 저장
      * - 실패 시 Error를 throw (호출부에서 노티 처리)
      */
+    /** 수식용 mathjs 전체 인스턴스를 로드합니다 (수식 계산기 진입·유휴 프리페치 시 호출). */
+    async ensureMath(): Promise<void> {
+      if (this.mathReady) return;
+      await loadFormulaMath();
+      this.mathReady = true;
+    },
+
     evaluate(): void {
       this.expression = this.expression.trim();
       if (!this.expression) return;
 
       const resolved = this._resolvePlaceholders(this.expression);
 
-      // mathjs 평가 (실패 시 throw)
-      const raw: unknown = MathB.evaluate(resolved, createFormulaTrigScope());
+      // mathjs 평가 (실패 시 throw) — 엔진 로드 전이면 평가하지 않는다
+      const math = getFormulaMath();
+      if (!math) throw new Error('formula engine not loaded');
+      const raw: unknown = math.evaluate(resolved, createFormulaTrigScope(math));
 
       // BigNumber / 일반 number → string 변환
       const resultStr: string =
@@ -336,9 +348,12 @@ export const useFormulaStore = defineStore('formula', {
       if (!this._hasValidPlaceholders(expr)) {
         return { key: 'error.formula.syntax' };
       }
+      // 엔진 로드 전에는 판정 보류 (mathReady 변경 시 다시 계산된다)
+      const math = this.mathReady ? getFormulaMath() : null;
+      if (!math) return null;
       try {
         const resolved = this._resolvePlaceholders(expr);
-        MathB.evaluate(resolved, createFormulaTrigScope());
+        math.evaluate(resolved, createFormulaTrigScope(math));
         return null;
       } catch (e) {
         return classifyFormulaError(e instanceof Error ? e.message : String(e));

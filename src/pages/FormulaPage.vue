@@ -10,6 +10,10 @@
   import ResultField from 'components/calc/ResultField.vue';
   import CalcButton from 'components/calc/CalcButton.vue';
   import FormulaField from 'components/calc/FormulaField.vue';
+  import { useFormulaStore } from 'stores/formulaStore';
+
+  // 수식 엔진(mathjs 전체) 지연 로드 — 유휴 프리페치가 끝났으면 즉시 반환
+  void useFormulaStore().ensureMath();
 </script>
 
 <template>

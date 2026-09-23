@@ -29,6 +29,7 @@
   import { useUnitStore } from './stores/unitStore';
   import { useCurrencyStore } from './stores/currencyStore';
   import { useRadixStore } from './stores/radixStore';
+  import { useFormulaStore } from './stores/formulaStore';
 
   const uiStore = useUIStore();
   const settingsStore = useSettingsStore();
@@ -101,6 +102,11 @@
   });
 
   onMounted(() => {
+    // 첫 화면이 뜬 뒤 유휴 시간에 수식 엔진(mathjs 전체)을 미리 불러온다 — 시작 경로에서는 제외
+    const prefetchFormulaMath = () => void useFormulaStore().ensureMath();
+    if ('requestIdleCallback' in window) requestIdleCallback(prefetchFormulaMath, { timeout: 3000 });
+    else setTimeout(prefetchFormulaMath, 1500);
+
     // 앱 업데이트 후 유효하지 않은 저장 설정 자동 보정
     // 모두 실행해야 하므로 개별 호출 후 합산 (|| 단축 평가 방지)
     const u = unitStore.validateAndCorrectUnits();
