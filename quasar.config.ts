@@ -86,6 +86,17 @@ export default defineConfig((/* ctx */) => {
       vueRouterMode: 'hash', // 라우터 모드: 'hash' 또는 'history'
 
       // Vite 플러그인 설정
+      // 지연 로드 모듈을 dev 서버 시작 시 미리 사전 번들링 — 런타임에 새로 발견되면 Vite가 재최적화하며
+      // 이미 로드된 모듈이 무효화돼 'Importing a module script failed'로 부팅이 깨진다
+      extendViteConf(viteConf) {
+        viteConf.optimizeDeps ??= {};
+        viteConf.optimizeDeps.include = [
+          ...(viteConf.optimizeDeps.include ?? []),
+          'mathjs/lib/browser/math.js',
+          '@quasar/quasar-ui-qmarkdown/src/components/QMarkdown.js',
+        ];
+      },
+
       // QMarkdown 슬롯 텍스트의 공백 보존 (qmarkdown 앱 확장 설정 대체)
       viteVuePluginOptions: {
         template: {
