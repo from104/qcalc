@@ -98,6 +98,15 @@ export default defineConfig((/* ctx */) => {
         ],
         // 타입스크립트 및 ESLint 검사 플러그인
         ['vite-plugin-checker', { vueTsc: true }, { server: false }],
+        // 번들 분석 리포트 — ANALYZE=1 일 때만 dist/stats.html 생성
+        ...(process.env.ANALYZE
+          ? [
+              ['rollup-plugin-visualizer', { filename: 'dist/stats.html', gzipSize: true, template: 'treemap' }] as [
+                string,
+                object,
+              ],
+            ]
+          : []),
       ],
       typescript: {
         strict: true, // (recommended) enables strict settings for TypeScript
