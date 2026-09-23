@@ -40,6 +40,9 @@
 - **1-5 완료 후**: 아이콘 웹폰트(mdi-v5·material-icons) 제거 → 사용 아이콘 76개만 SVG(`boot/icons.ts` iconMapFn + `scripts/gen-icon-map.mjs` 자동 생성, 불일치 시 테스트 실패), Quasar `iconSet: 'svg-material-icons'`. 시작 CSS **78→36KB gz**, 아이콘 폰트 파일 번들 제외. 브라우저 전 화면 스캔(495개) 누락 0
 - **1-1 i18n 재평가**: 전역 번역 YAML은 전 언어 합쳐 ~14KB gz라 지연 로드 이득 ~12KB → **보류**. 실제 덩어리는 SFC `<i18n>` 블록 23개(~73KB gz, 컴포넌트마다 10개 언어) → 언어별 파일로 이전하는 1-10으로 대체
 - **1-3 완료 후**: 첫 chunk 실측 결과 i18n 덩어리는 SFC 블록이 아니라 `CurrencyPanel.yml`(45KB)·`UnitPanel.yml`(17.5KB)·`Layout.yml`(10KB)였음 → 1-10(SFC 이전) 대신 단위·통화·진법·수식·설정 페이지와 업데이트·Snap·마이그레이션 다이얼로그를 비동기화 + 유휴 프리페치. **시작 JS 312KB gz(정적 import 그래프 40파일 실측)**, 시작 CSS 37KB. (앞선 650·530·375KB는 주요 chunk 합산 추정치라 직접 비교 불가 — 이후는 정적 그래프 실측으로 통일)
+- **정밀 재측정 (2026-09-24, `scripts/measure-bundle.mjs` — 정적 import 그래프, gzip)**: 기준선 `e5787192` **JS 617KB / CSS 78KB** → 현재 **JS 312KB (−49%) / CSS 35KB (−55%)**
+- **시작 시간 (`scripts/measure-startup.mjs`, 헤드리스 Chrome, 캐시 끔, CPU 4배 감속, 10회 중앙값 ×3회 교차)**: 계산기 버튼 렌더 완료까지 기준선 **~1110ms → ~830ms (−25%)**. 로컬 서버라 네트워크 영향 제외 — 모바일에선 차이 더 큼. Tauri 네이티브 프로세스 시작은 미포함
+- **CI 예산 게이트**: `yarn perf:budget`(JS 330KB·CSS 40KB) — ci.yml lint-test 잡에 SPA 빌드 후 검사 추가
 - → 우선순위 재조정: mathjs(1-2) > 도움말·팁 markdown 지연 로드(신규 1-9) > i18n(1-1) > 아이콘 CSS(1-5)
 
 ## Phase 1 — 속도 (0.14, 약 1주)
