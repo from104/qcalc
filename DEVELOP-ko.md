@@ -71,7 +71,7 @@ MY_JKS_KEY_PASSWORD=key_password
 사전 준비: Rust stable (`src-tauri/Cargo.toml` 기준 최소 `rust-version = 1.77.2`이며 최신 stable 권장 — `rustup update stable`), Linux 빌드 의존성 (`webkit2gtk-4.1`, `rsvg2`).
 
 ```bash
-yarn dev:tauri     # 개발 모드 (devtools 자동 오픈)
+yarn dev:tauri     # 개발 모드 (devtools: QCALC_DEVTOOLS=1 yarn dev:tauri)
 yarn build:tauri   # 프로덕션 번들 (Linux는 .deb/.rpm/AppImage, Windows는 NSIS .exe)
 ```
 

@@ -339,8 +339,12 @@ pub fn run() {
   builder
     .setup(|app| {
       if let Some(window) = app.get_webview_window("main") {
+        // 개발 빌드에서도 웹 검사기는 자동으로 열지 않는다(메인 창을 가림).
+        // 필요하면 QCALC_DEVTOOLS=1 yarn dev:tauri 로 켜거나, 창에서 우클릭 → 요소 검사.
         #[cfg(debug_assertions)]
-        window.open_devtools();
+        if std::env::var_os("QCALC_DEVTOOLS").is_some() {
+          window.open_devtools();
+        }
 
         // WebKitGTK는 데스크톱 텍스트 배율만큼 페이지 전체를 확대한다. 그대로 두면 두 가지가
         // 어긋난다: (1) 화면에 그려지는 글자와 버튼이 같은 데스크톱의 다른 앱보다 그 비율만큼
