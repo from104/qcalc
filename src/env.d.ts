@@ -55,3 +55,10 @@ declare module 'mathjs/lib/browser/math.js' {
   const math: MathJsInstance;
   export default math;
 }
+
+// QMarkdown 컴포넌트 소스 직접 import (지연 등록용, boot/qmarkdown-lazy.ts)
+declare module '@quasar/quasar-ui-qmarkdown/src/components/QMarkdown.js' {
+  import type { Component } from 'vue';
+  const QMarkdown: Component;
+  export default QMarkdown;
+}

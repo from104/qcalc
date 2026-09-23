@@ -3,7 +3,11 @@
  * @description MainLayout.vue에서 사용되는 핵심 로직과 레이아웃 설정을 관리하는 컴포저블
  */
 
-import { onBeforeUnmount, onMounted, watch, computed, ref, reactive, shallowRef } from 'vue';
+import { onBeforeUnmount, onMounted, watch, computed, ref, reactive, shallowRef, defineAsyncComponent } from 'vue';
+
+// 도움말·정보 페이지는 md 콘텐츠(10개 언어)가 커서 열 때 불러온다
+const HelpPage = defineAsyncComponent(() => import('src/pages/HelpPage.vue'));
+const AboutPage = defineAsyncComponent(() => import('src/pages/AboutPage.vue'));
 import { useRouter, useRoute } from 'vue-router';
 import { useI18n } from 'vue-i18n';
 import { useMeta } from 'quasar';
@@ -19,8 +23,6 @@ import UnitPage from 'pages/UnitPage.vue';
 import CurrencyPage from 'pages/CurrencyPage.vue';
 import RadixPage from 'pages/RadixPage.vue';
 import FormulaPage from 'pages/FormulaPage.vue';
-import HelpPage from 'src/pages/HelpPage.vue';
-import AboutPage from 'src/pages/AboutPage.vue';
 import RecordPage from 'src/pages/RecordPage.vue';
 import SettingPage from 'src/pages/SettingPage.vue';
 

@@ -31,7 +31,7 @@ export default defineConfig((/* ctx */) => {
 
     // 앱 부트 파일 (/src/boot)
     // 부트 파일은 "main.js"의 일부입니다
-    boot: ['i18n', 'auto-blur', 'global-variables', 'android', 'themes', 'admob', 'tauri-shim'],
+    boot: ['i18n', 'auto-blur', 'global-variables', 'android', 'themes', 'admob', 'tauri-shim', 'qmarkdown-lazy'],
 
     // CSS 파일
     css: ['app.scss'],
@@ -86,6 +86,15 @@ export default defineConfig((/* ctx */) => {
       vueRouterMode: 'hash', // 라우터 모드: 'hash' 또는 'history'
 
       // Vite 플러그인 설정
+      // QMarkdown 슬롯 텍스트의 공백 보존 (qmarkdown 앱 확장 설정 대체)
+      viteVuePluginOptions: {
+        template: {
+          compilerOptions: {
+            isPreTag: (tag: string) => tag === 'pre' || tag === 'q-markdown' || tag === 'QMarkdown',
+          },
+        },
+      },
+
       vitePlugins: [
         // Vue I18n 플러그인
         [
@@ -98,6 +107,20 @@ export default defineConfig((/* ctx */) => {
         ],
         // 타입스크립트 및 ESLint 검사 플러그인
         ['vite-plugin-checker', { vueTsc: true }, { server: false }],
+        // *.md 를 문자열로 import (qmarkdown 앱 확장의 import_md 대체)
+        [
+          () => ({
+            name: 'md-raw-importer',
+            transform(code: string, id: string) {
+              if (!id.endsWith('.md')) return;
+              const json = JSON.stringify(code)
+                .replace(/\u2028/g, '\\u2028')
+                .replace(/\u2029/g, '\\u2029');
+              return { code: `export default ${json}`, map: null };
+            },
+          }),
+          {},
+        ],
         // 번들 분석 리포트 — ANALYZE=1 일 때만 dist/stats.html 생성
         ...(process.env.ANALYZE
           ? [
@@ -135,7 +158,7 @@ export default defineConfig((/* ctx */) => {
     // Quasar 프레임워크 설정
     framework: {
       config: {},
-      plugins: ['Notify', 'Meta', 'Dialog'],
+      plugins: ['Notify', 'Meta', 'Dialog', 'Dark'],
 
       /**
        * Auto import - how to detect components in your vue files
