@@ -31,13 +31,23 @@ export default defineConfig((/* ctx */) => {
 
     // 앱 부트 파일 (/src/boot)
     // 부트 파일은 "main.js"의 일부입니다
-    boot: ['i18n', 'auto-blur', 'global-variables', 'android', 'themes', 'admob', 'tauri-shim', 'qmarkdown-lazy'],
+    boot: [
+      'icons',
+      'i18n',
+      'auto-blur',
+      'global-variables',
+      'android',
+      'themes',
+      'admob',
+      'tauri-shim',
+      'qmarkdown-lazy',
+    ],
 
     // CSS 파일
     css: ['app.scss'],
 
     // Quasar 추가 기능
-    extras: ['mdi-v5', 'roboto-font', 'material-icons'],
+    extras: ['roboto-font'], // 아이콘은 SVG(boot/icons.ts)로 대체 — 웹폰트 미사용
 
     // 빌드 설정
     build: {
@@ -169,6 +179,7 @@ export default defineConfig((/* ctx */) => {
     // Quasar 프레임워크 설정
     framework: {
       config: {},
+      iconSet: 'svg-material-icons', // Quasar 내부 아이콘(드롭다운 화살표 등)도 SVG로
       plugins: ['Notify', 'Meta', 'Dialog', 'Dark'],
 
       /**

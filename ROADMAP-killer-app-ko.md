@@ -37,6 +37,8 @@
 - **1-2 완료 후**: `index` 299→**182KB**, mathjs 전체는 별도 `math` chunk(169KB)로 분리돼 수식 계산기 진입·유휴 프리페치 때만 로드. 초기 청크 ≈ **530KB gz (−120KB)**
   - 구현: `CalculatorMath.ts` 경량 인스턴스(함수 15개) + `FormulaMath.ts` 지연 로드. 전체판은 `mathjs/lib/browser/math.js`(자체 완결 번들) — ESM 진입점을 쓰면 Rollup이 공유 모듈을 시작 chunk에 붙여 분리가 안 됨. 이 번들은 `create()`의 config 인자를 무시하므로 생성 후 `config()` 호출 필수
 - **1-9 완료 후**: qmarkdown 앱 확장 제거 → `QMarkdown`(markdown-it·prism) 전역 비동기 등록(`boot/qmarkdown-lazy.ts`), 도움말·정보 페이지·팁·변경로그 다이얼로그 비동기화. 초기 청크 `index` 152 + `MainLayout` 168 + vue 40 ≈ **375KB gz (기준선 대비 −42%)**. 브라우저 실측: 수식(`det` 등 전체 함수)·도움말 렌더 정상, 콘솔 에러 0
+- **1-5 완료 후**: 아이콘 웹폰트(mdi-v5·material-icons) 제거 → 사용 아이콘 76개만 SVG(`boot/icons.ts` iconMapFn + `scripts/gen-icon-map.mjs` 자동 생성, 불일치 시 테스트 실패), Quasar `iconSet: 'svg-material-icons'`. 시작 CSS **78→36KB gz**, 아이콘 폰트 파일 번들 제외. 브라우저 전 화면 스캔(495개) 누락 0
+- **1-1 i18n 재평가**: 전역 번역 YAML은 전 언어 합쳐 ~14KB gz라 지연 로드 이득 ~12KB → **보류**. 실제 덩어리는 SFC `<i18n>` 블록 23개(~73KB gz, 컴포넌트마다 10개 언어) → 언어별 파일로 이전하는 1-10으로 대체
 - → 우선순위 재조정: mathjs(1-2) > 도움말·팁 markdown 지연 로드(신규 1-9) > i18n(1-1) > 아이콘 CSS(1-5)
 
 ## Phase 1 — 속도 (0.14, 약 1주)
