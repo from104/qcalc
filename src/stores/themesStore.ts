@@ -174,6 +174,17 @@ export const useThemesStore = defineStore('themes', {
       // 스크롤바 색상 설정 (ui.primary 기반)
       this.setScrollbarColors(primaryHexColor, isDark);
 
+      // 다음 실행의 첫 페인트용 배경색 저장 — public/boot-bg.js 가 CSS·JS 로드 전에 칠해
+      // 흰 화면 깜빡임을 없앤다. 테마·다크 모드 적용이 끝난 뒤의 실제 배경을 기록한다.
+      // (rAF는 백그라운드 탭·숨은 창에서 돌지 않으므로 setTimeout)
+      setTimeout(() => {
+        try {
+          localStorage.setItem('qcalc-boot-bg', getComputedStyle(document.body).backgroundColor);
+        } catch {
+          /* 저장소 접근 불가 시 무시 — 첫 페인트만 기본색 */
+        }
+      }, 0);
+
       // 상태바 배경색을 동적으로 계산된 dark 색상으로 설정
       this.setStatusBarColor(darkHexColor);
     },
