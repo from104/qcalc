@@ -77,9 +77,18 @@ ${body}
 `;
 
 if (process.argv.includes('--check')) {
+  // prettier가 커밋 시 서식을 바꾸므로 글자 비교 대신 아이콘 이름 집합을 비교한다
   const cur = readFileSync(OUT, 'utf8');
-  if (cur !== out) {
-    console.error('IconMap.generated.ts 가 소스와 다르다 — node scripts/gen-icon-map.mjs 실행 필요');
+  const curNames = [...cur.matchAll(/^\s*(?:['"]([^'"]+)['"]|([A-Za-z_$][\w$]*)):\s*['"]/gm)]
+    .map((m) => m[1] ?? m[2])
+    .sort();
+  const missing = names.filter((n) => !curNames.includes(n));
+  const extra = curNames.filter((n) => !names.includes(n));
+  if (missing.length || extra.length) {
+    console.error(
+      `IconMap.generated.ts 불일치 — 누락: ${missing.join(', ') || '-'} / 불필요: ${extra.join(', ') || '-'}`,
+    );
+    console.error('node scripts/gen-icon-map.mjs 로 재생성 필요');
     process.exit(1);
   }
   console.log(`icon map OK (${names.length})`);

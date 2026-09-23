@@ -5,9 +5,6 @@
 
 import { onBeforeUnmount, onMounted, watch, computed, ref, reactive, shallowRef, defineAsyncComponent } from 'vue';
 
-// 도움말·정보 페이지는 md 콘텐츠(10개 언어)가 커서 열 때 불러온다
-const HelpPage = defineAsyncComponent(() => import('src/pages/HelpPage.vue'));
-const AboutPage = defineAsyncComponent(() => import('src/pages/AboutPage.vue'));
 import { useRouter, useRoute } from 'vue-router';
 import { useI18n } from 'vue-i18n';
 import { useMeta } from 'quasar';
@@ -19,12 +16,39 @@ import { isWideWidth } from '../utils/GlobalHelpers';
 
 // === 화면 컴포넌트 임포트 ===
 import CalcPage from 'pages/CalcPage.vue';
-import UnitPage from 'pages/UnitPage.vue';
-import CurrencyPage from 'pages/CurrencyPage.vue';
-import RadixPage from 'pages/RadixPage.vue';
-import FormulaPage from 'pages/FormulaPage.vue';
 import RecordPage from 'src/pages/RecordPage.vue';
-import SettingPage from 'src/pages/SettingPage.vue';
+
+// 첫 화면(기본 계산기·기록)만 정적으로 싣고, 나머지 화면은 열 때 불러온다.
+// 통화·단위 이름 번역(수십 KB)과 설정 UI가 시작 번들에서 빠진다. 유휴 시간에 미리 불러와 첫 전환 지연을 없앤다.
+const pageLoaders = {
+  unit: () => import('pages/UnitPage.vue'),
+  currency: () => import('pages/CurrencyPage.vue'),
+  radix: () => import('pages/RadixPage.vue'),
+  formula: () => import('pages/FormulaPage.vue'),
+  settings: () => import('src/pages/SettingPage.vue'),
+  help: () => import('src/pages/HelpPage.vue'),
+  about: () => import('src/pages/AboutPage.vue'),
+};
+const UnitPage = defineAsyncComponent(pageLoaders.unit);
+const CurrencyPage = defineAsyncComponent(pageLoaders.currency);
+const RadixPage = defineAsyncComponent(pageLoaders.radix);
+const FormulaPage = defineAsyncComponent(pageLoaders.formula);
+const SettingPage = defineAsyncComponent(pageLoaders.settings);
+const HelpPage = defineAsyncComponent(pageLoaders.help);
+const AboutPage = defineAsyncComponent(pageLoaders.about);
+
+/** 첫 화면이 뜬 뒤 유휴 시간에 화면 chunk들을 차례로 미리 불러온다 */
+function prefetchPages(): void {
+  const queue = Object.values(pageLoaders);
+  const next = () => {
+    const load = queue.shift();
+    if (!load) return;
+    void load().finally(() => schedule());
+  };
+  const schedule = () =>
+    'requestIdleCallback' in window ? requestIdleCallback(next, { timeout: 4000 }) : setTimeout(next, 300);
+  schedule();
+}
 
 // === 스토어 임포트 ===
 import { useCalcStore } from 'src/stores/calcStore';
@@ -189,6 +213,7 @@ export function useMainLayout(t: (key: string) => string, recordManagerInstance?
 
   // 컴포넌트 마운트 시 초기화
   onMounted(() => {
+    prefetchPages();
     // 로케일 설정
     if (!settingsStore.locale) {
       settingsStore.useSystemLocale = true;

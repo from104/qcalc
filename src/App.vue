@@ -11,14 +11,14 @@
 
   // 버전 변경 로그 다이얼로그(정보 md 10개 언어 포함)는 첫 화면 뒤에 별도 chunk로 불러온다
   const VersionChangelogDialog = defineAsyncComponent(() => import('components/dialogs/VersionChangelogDialog.vue'));
+  // 업데이트·Snap 안내·마이그레이션 다이얼로그도 첫 화면 뒤 별도 chunk로
+  const AutoUpdate = defineAsyncComponent(() => import('components/dialogs/AutoUpdate.vue'));
+  const SnapFirst = defineAsyncComponent(() => import('components/dialogs/SnapFirst.vue'));
+  const MigrationOnboarding = defineAsyncComponent(() => import('components/dialogs/MigrationOnboarding.vue'));
   import { useRoute } from 'vue-router';
   import { useI18n } from 'vue-i18n';
   import { ScreenOrientation } from '@capacitor/screen-orientation';
   import { useQuasar } from 'quasar';
-
-  import AutoUpdate from 'components/dialogs/AutoUpdate.vue';
-  import SnapFirst from 'components/dialogs/SnapFirst.vue';
-  import MigrationOnboarding from 'components/dialogs/MigrationOnboarding.vue';
 
   import { useKeyBinding } from './composables/useKeyBinding';
   import { useHtmlLangSync } from './composables/useHtmlLangSync';

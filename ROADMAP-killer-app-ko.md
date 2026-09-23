@@ -39,6 +39,7 @@
 - **1-9 완료 후**: qmarkdown 앱 확장 제거 → `QMarkdown`(markdown-it·prism) 전역 비동기 등록(`boot/qmarkdown-lazy.ts`), 도움말·정보 페이지·팁·변경로그 다이얼로그 비동기화. 초기 청크 `index` 152 + `MainLayout` 168 + vue 40 ≈ **375KB gz (기준선 대비 −42%)**. 브라우저 실측: 수식(`det` 등 전체 함수)·도움말 렌더 정상, 콘솔 에러 0
 - **1-5 완료 후**: 아이콘 웹폰트(mdi-v5·material-icons) 제거 → 사용 아이콘 76개만 SVG(`boot/icons.ts` iconMapFn + `scripts/gen-icon-map.mjs` 자동 생성, 불일치 시 테스트 실패), Quasar `iconSet: 'svg-material-icons'`. 시작 CSS **78→36KB gz**, 아이콘 폰트 파일 번들 제외. 브라우저 전 화면 스캔(495개) 누락 0
 - **1-1 i18n 재평가**: 전역 번역 YAML은 전 언어 합쳐 ~14KB gz라 지연 로드 이득 ~12KB → **보류**. 실제 덩어리는 SFC `<i18n>` 블록 23개(~73KB gz, 컴포넌트마다 10개 언어) → 언어별 파일로 이전하는 1-10으로 대체
+- **1-3 완료 후**: 첫 chunk 실측 결과 i18n 덩어리는 SFC 블록이 아니라 `CurrencyPanel.yml`(45KB)·`UnitPanel.yml`(17.5KB)·`Layout.yml`(10KB)였음 → 1-10(SFC 이전) 대신 단위·통화·진법·수식·설정 페이지와 업데이트·Snap·마이그레이션 다이얼로그를 비동기화 + 유휴 프리페치. **시작 JS 312KB gz(정적 import 그래프 40파일 실측)**, 시작 CSS 37KB. (앞선 650·530·375KB는 주요 chunk 합산 추정치라 직접 비교 불가 — 이후는 정적 그래프 실측으로 통일)
 - → 우선순위 재조정: mathjs(1-2) > 도움말·팁 markdown 지연 로드(신규 1-9) > i18n(1-1) > 아이콘 CSS(1-5)
 
 ## Phase 1 — 속도 (0.14, 약 1주)
