@@ -375,6 +375,10 @@ export const useThemesStore = defineStore('themes', {
      * 이 함수는 앱이 시작될 때 한 번 호출되어야 합니다.
      */
     initializeTheme(): void {
+      // 0.14 에서 정리된(삭제된) 기본 테마를 쓰던 사용자는 기본 테마로 옮긴다 (사용자 테마는 그대로)
+      if (!(this.currentTheme in themes) && !(this.currentTheme in this.userThemes)) {
+        this.currentTheme = 'default';
+      }
       // 시스템 다크모드 변경 감지 리스너 등록
       if (typeof window !== 'undefined' && window.matchMedia) {
         const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
