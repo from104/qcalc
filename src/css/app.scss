@@ -213,3 +213,49 @@ body {
 html.motion-reduced {
   @include reduced-motion;
 }
+
+// 좁은↔넓은 레이아웃 전환 (MainLayout 의 document.startViewTransition)
+#header {
+  view-transition-name: app-header;
+}
+
+.calc-pane {
+  view-transition-name: calc-pane;
+}
+
+.sub-pane {
+  view-transition-name: sub-pane;
+}
+
+::view-transition-group(*) {
+  animation-duration: var(--motion-slow);
+  animation-timing-function: var(--ease-out);
+}
+
+::view-transition-old(*),
+::view-transition-new(*) {
+  animation-duration: var(--motion-slow);
+}
+
+// 넓은 화면의 보조 패널은 오른쪽에서 밀려 들어오고, 좁아질 때 오른쪽으로 빠진다
+::view-transition-new(sub-pane):only-child {
+  animation: vt-slide-in-right var(--motion-slow) var(--ease-out);
+}
+
+::view-transition-old(sub-pane):only-child {
+  animation: vt-slide-out-right var(--motion-slow) var(--ease-in-out);
+}
+
+@keyframes vt-slide-in-right {
+  from {
+    transform: translateX(40%);
+    opacity: 0;
+  }
+}
+
+@keyframes vt-slide-out-right {
+  to {
+    transform: translateX(40%);
+    opacity: 0;
+  }
+}

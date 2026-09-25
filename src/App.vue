@@ -7,7 +7,7 @@
    *   - 모바일 화면 잠금, 다크모드 초기화, 저장 설정 검증
    */
 
-  import { ref, onBeforeMount, watch, computed, onMounted, onUnmounted, defineAsyncComponent } from 'vue';
+  import { ref, onBeforeMount, watch, computed, onMounted, onUnmounted, defineAsyncComponent, nextTick } from 'vue';
 
   // 버전 변경 로그 다이얼로그(정보 md 10개 언어 포함)는 첫 화면 뒤에 별도 chunk로 불러온다
   const VersionChangelogDialog = defineAsyncComponent(() => import('components/dialogs/VersionChangelogDialog.vue'));
@@ -150,13 +150,37 @@
   );
 
   // 레이아웃 전환 (넓은 ↔ 좁은)
+  // View Transitions로 교체 전후 화면을 잇는다: 헤더·계산기·보조 패널(view-transition-name, app.scss)이
+  // 제자리에서 크기·위치를 바꾸고 보조 패널은 옆에서 들어온다. 예전 scaleX 늘이기는 글자가 찌그러졌다.
+  // 미지원 환경은 짧은 페이드, 모션 감소 환경은 즉시 교체.
+  let layoutTransition: ViewTransition | null = null;
   watch(
     () => isWideWidth(),
     (wide) => {
-      if (isWideLayout.value !== wide) {
-        currentTransition.value = wide ? 'expand-layout' : 'collapse-layout';
+      if (isWideLayout.value === wide) return;
+      const root = document.documentElement;
+      const reduceMotion =
+        root.classList.contains('motion-reduced') || window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      if (!document.startViewTransition || reduceMotion) {
+        currentTransition.value = reduceMotion ? '' : 'fade';
         isWideLayout.value = wide;
+        return;
       }
+      // 창을 끌며 경계를 오가면 전환이 겹친다 — 진행 중인 것은 끝 상태로 건너뛴다
+      layoutTransition?.skipTransition();
+      currentTransition.value = '';
+      root.dataset.layoutSwap = wide ? 'to-wide' : 'to-narrow';
+      const transition = document.startViewTransition(async () => {
+        isWideLayout.value = wide;
+        await nextTick();
+      });
+      layoutTransition = transition;
+      void transition.finished.finally(() => {
+        if (layoutTransition === transition) {
+          layoutTransition = null;
+          delete root.dataset.layoutSwap;
+        }
+      });
     },
   );
 
@@ -184,7 +208,9 @@
       Wide: 고정 키('wide-layout')로 레이아웃 유지, 서브페이지만 전환
       Narrow: routeProps.path를 키로 사용하여 페이지 전환 애니메이션
     -->
-    <transition :name="transitionName" mode="default">
+    <!-- 이름이 비면(:css=false) 떠나는 화면을 즉시 제거 — View Transition 캡처 때 옛·새 레이아웃이 겹쳐
+         view-transition-name 이 중복되면 전환이 InvalidStateError 로 중단된다 -->
+    <transition :name="transitionName" :css="!!transitionName" mode="default">
       <component :is="Component" :key="isWideLayout ? 'wide-layout' : routeProps.path" />
     </transition>
   </router-view>
@@ -252,52 +278,6 @@
   .fade-enter-to,
   .fade-leave-from {
     opacity: 1;
-  }
-
-  // 레이아웃 확장
-  .expand-layout-enter-active,
-  .expand-layout-leave-active {
-    @extend %transition-base;
-    transition: transform var(--motion-base) var(--ease-out);
-  }
-
-  .expand-layout-enter-from {
-    transform: scaleX(2);
-    transform-origin: left;
-  }
-
-  .expand-layout-enter-to,
-  .expand-layout-leave-from {
-    transform: scaleX(1);
-    transform-origin: left;
-  }
-
-  .expand-layout-leave-to {
-    transform: scaleX(0.5);
-    transform-origin: left;
-  }
-
-  // 레이아웃 축소
-  .collapse-layout-enter-active,
-  .collapse-layout-leave-active {
-    @extend %transition-base;
-    transition: transform var(--motion-base) var(--ease-out);
-  }
-
-  .collapse-layout-enter-from {
-    transform: scaleX(0.5);
-    transform-origin: left;
-  }
-
-  .collapse-layout-enter-to,
-  .collapse-layout-leave-from {
-    transform: scaleX(1);
-    transform-origin: left;
-  }
-
-  .collapse-layout-leave-to {
-    transform: scaleX(2);
-    transform-origin: left;
   }
 </style>
 
