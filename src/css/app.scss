@@ -26,6 +26,17 @@
   user-select: none;
 }
 
+:root {
+  /* 모션 토큰 — 앱 전체 전환 시간·곡선의 단일 출처 (ROADMAP Phase 2).
+     transform·opacity 만 움직이는 것을 원칙으로 한다(레이아웃 속성 애니메이션 금지). */
+  --motion-press: 60ms; /* 눌림 */
+  --motion-fast: 120ms; /* 작은 상태 변화: 호버·색·아이콘 */
+  --motion-base: 160ms; /* 요소 등장·퇴장 */
+  --motion-slow: 220ms; /* 화면 전환 */
+  --ease-out: cubic-bezier(0.2, 0.8, 0.2, 1);
+  --ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
 .scrollbar-custom {
   position: relative;
   overflow-y: overlay;
@@ -50,7 +61,7 @@
   &::-webkit-scrollbar-thumb {
     background-color: var(--q-scrollbar-thumb-color, transparent);
     border-radius: 2px;
-    transition: background-color 0.2s ease;
+    transition: background-color var(--motion-fast) ease;
 
     &:hover {
       background-color: var(

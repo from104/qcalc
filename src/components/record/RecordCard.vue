@@ -837,7 +837,7 @@
     /* 전역 .scrollbar-custom 이 padding-right 를 0 으로 둔다. 오버레이 스크롤바(WebKitGTK·모바일)는
        폭이 0 이라 오른쪽 여백이 사라지므로 왼쪽(16px)과 맞춘다 */
     padding-right: 16px;
-    transition: padding-top 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: padding-top var(--motion-base) var(--ease-in-out);
   }
 
   /* 맨 위로 버튼: fixed 의 정적 위치에 기대면 목록 구조에 따라 좌우로 밀린다 — 좌우 0 + margin auto 로 가운데 고정.
@@ -866,7 +866,9 @@
 
   .slide-fade-enter-active,
   .slide-fade-leave-active {
-    transition: all 0.3s ease-out;
+    transition:
+      transform var(--motion-base) var(--ease-out),
+      opacity var(--motion-base) var(--ease-out);
   }
 
   .slide-fade-enter-from {
@@ -882,7 +884,7 @@
   /* 새 기록만 CSS 애니메이션으로 등장시킨다. <transition-group>은 갱신마다 전 항목 위치를
      getBoundingClientRect 로 재서(FLIP) 기록 100개에서 '=' 한 번에 65~127ms 가 들었다. */
   .record-enter {
-    animation: record-enter 160ms cubic-bezier(0.2, 0.8, 0.2, 1);
+    animation: record-enter var(--motion-base) var(--ease-out);
   }
 
   @keyframes record-enter {
@@ -911,7 +913,9 @@
     left: 0;
     z-index: 2000;
     background: var(--q-primary);
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    transition:
+      transform var(--motion-base) var(--ease-in-out),
+      opacity var(--motion-base) var(--ease-in-out);
 
     .search-input {
       position: absolute;
@@ -951,7 +955,9 @@
 
   .search-bar-enter-active,
   .search-bar-leave-active {
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    transition:
+      transform var(--motion-base) var(--ease-in-out),
+      opacity var(--motion-base) var(--ease-in-out);
   }
 
   .search-bar-enter-from,
@@ -993,7 +999,7 @@
     .menu-btn {
       opacity: var(--menu-btn-opacity);
       visibility: var(--menu-btn-visibility);
-      transition: all 0.3s ease-in-out;
+      transition: opacity var(--motion-fast) ease;
     }
   }
 

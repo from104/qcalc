@@ -208,7 +208,7 @@
   .slide-forward-enter-active,
   .slide-forward-leave-active {
     @extend %transition-base;
-    transition: transform 0.2s ease;
+    transition: transform var(--motion-base) var(--ease-out);
   }
 
   .slide-back-enter-from {
@@ -241,7 +241,7 @@
   .fade-enter-active,
   .fade-leave-active {
     @extend %transition-base;
-    transition: opacity 0.2s ease;
+    transition: opacity var(--motion-base) ease;
   }
 
   .fade-enter-from,
@@ -258,7 +258,7 @@
   .expand-layout-enter-active,
   .expand-layout-leave-active {
     @extend %transition-base;
-    transition: transform 0.2s ease;
+    transition: transform var(--motion-base) var(--ease-out);
   }
 
   .expand-layout-enter-from {
@@ -281,7 +281,7 @@
   .collapse-layout-enter-active,
   .collapse-layout-leave-active {
     @extend %transition-base;
-    transition: transform 0.2s ease;
+    transition: transform var(--motion-base) var(--ease-out);
   }
 
   .collapse-layout-enter-from {

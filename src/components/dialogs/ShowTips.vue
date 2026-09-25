@@ -288,7 +288,7 @@
 
   // 애니메이션 클래스
   .animated {
-    animation-duration: 0.3s;
+    animation-duration: var(--motion-slow);
     animation-fill-mode: both;
     position: absolute;
     width: 100%;

@@ -358,7 +358,9 @@
   .select-option--move,
   .select-option--enter-active,
   .select-option--leave-active {
-    transition: all 3s ease;
+    transition:
+      transform var(--motion-base) var(--ease-out),
+      opacity var(--motion-base) var(--ease-out);
   }
 
   .select-option--leave-active {
@@ -373,8 +375,10 @@
 
   // 옵션 목록 전체의 부드러운 재정렬 효과
   .q-select-popup .q-item {
-    transition: all 0.3s ease;
-    will-change: transform, opacity;
+    transition:
+      background-color var(--motion-fast) ease,
+      transform var(--motion-fast) var(--ease-out),
+      opacity var(--motion-fast) ease;
 
     // 호버 효과
     &:hover {
