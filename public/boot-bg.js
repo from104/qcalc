@@ -6,3 +6,13 @@ try {
 } catch {
   /* 무시 */
 }
+
+// 저사양 기기(코어 2개 이하 또는 메모리 2GB 이하)는 애니메이션을 자동으로 줄인다 — app.scss 의 html.motion-reduced
+try {
+  var n = navigator;
+  if ((n.hardwareConcurrency && n.hardwareConcurrency <= 2) || (n.deviceMemory && n.deviceMemory <= 2)) {
+    document.documentElement.classList.add('motion-reduced');
+  }
+} catch {
+  /* 무시 */
+}

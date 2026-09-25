@@ -65,11 +65,11 @@
 ## Phase 2 — 매끄러움 (0.14 후반~0.15, 약 4~5일)
 
 1. ~~즉시 입력(pointerdown 처리)~~ — **보류**(길게 누르기 충돌). 입력은 `@click` 유지.
-2. **눌림 피드백**: `:active` + `data-pressed` 클래스로 `transform: translateY(1px) scale(.98)`, 60ms. ripple은 스킨이 선택.
-3. **모션 토큰**: `src/css/motion.scss` — `--dur-fast:120ms`, `--dur-base:160ms`, `--ease-out: cubic-bezier(.2,.8,.2,1)`. 기존 0.2~0.3s 전환을 토큰으로 치환(`layout.scss:28`, `app.scss:53`, 툴팁 200ms).
+2. ✅ **눌림 피드백** (`11a0f1ca`: Quasar push의 0.3s margin·border 애니메이션 → transform만 60/120ms): `:active` + `data-pressed` 클래스로 `transform: translateY(1px) scale(.98)`, 60ms. ripple은 스킨이 선택.
+3. ✅ **모션 토큰** (`app.scss :root`, `transition: all`·3s 전환 전부 제거): `src/css/motion.scss` — `--dur-fast:120ms`, `--dur-base:160ms`, `--ease-out: cubic-bezier(.2,.8,.2,1)`. 기존 0.2~0.3s 전환을 토큰으로 치환(`layout.scss:28`, `app.scss:53`, 툴팁 200ms).
 4. **결과 표시**: 기본 즉시. 옵션 설정 "숫자 롤링" 추가 시 `transform`만 사용.
-5. **제스처(모바일)**: 계산기 탭 좌우 스와이프 — Quasar `v-touch-swipe`, 기록 패널 관성 스크롤은 네이티브에 맡김.
-6. **저사양 모드**: `navigator.hardwareConcurrency <= 4` 또는 프레임 드롭 감지 시 모션 축소. 기존 `app.scss:191` reduced-motion 규칙 재사용.
+5. ✅ **제스처(모바일)** (이미 `swipeable` — 전환 300→180ms): 계산기 탭 좌우 스와이프 — Quasar `v-touch-swipe`, 기록 패널 관성 스크롤은 네이티브에 맡김.
+6. ✅ **저사양 모드** (`boot-bg.js`: 코어≤2 또는 메모리≤2GB → `html.motion-reduced`, 기존 reduced-motion 규칙 공유): `navigator.hardwareConcurrency <= 4` 또는 프레임 드롭 감지 시 모션 축소. 기존 `app.scss:191` reduced-motion 규칙 재사용.
 
 **리스크**: 눌림 피드백·제스처가 스크린리더 조작에 영향 없는지 Orca·TalkBack 수동 확인.
 

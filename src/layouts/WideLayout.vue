@@ -264,6 +264,7 @@
           animated
           infinite
           :swipeable="$g.isMobile"
+          :transition-duration="180"
           role="tabpanel"
           :aria-label="t('ariaLabel.calculatorContent')"
         >

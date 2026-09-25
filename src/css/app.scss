@@ -194,8 +194,8 @@ body {
   border-radius: 4px;
 }
 
-// 접근성: 모션 감소 설정 존중
-@media (prefers-reduced-motion: reduce) {
+// 접근성: 모션 감소 설정 존중 + 저사양 기기 자동 축소(.motion-reduced — public/boot-bg.js 가 판정)
+@mixin reduced-motion {
   *,
   *::before,
   *::after {
@@ -204,4 +204,12 @@ body {
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
   }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  @include reduced-motion;
+}
+
+html.motion-reduced {
+  @include reduced-motion;
 }
