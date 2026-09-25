@@ -474,8 +474,7 @@
         glossy
         color="secondary"
         icon="publish"
-        class="fixed q-ma-md"
-        style="z-index: 15"
+        class="fixed scroll-top-btn"
         :aria-label="t('ariaLabel.scrollToTop')"
         @click="scrollToRecord('top')"
       />
@@ -835,7 +834,20 @@
   #record-card {
     max-height: calc(100vh - var(--header-height) - var(--bottom-inset));
     overflow: auto;
+    /* 전역 .scrollbar-custom 이 padding-right 를 0 으로 둔다. 오버레이 스크롤바(WebKitGTK·모바일)는
+       폭이 0 이라 오른쪽 여백이 사라지므로 왼쪽(16px)과 맞춘다 */
+    padding-right: 16px;
     transition: padding-top 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  /* 맨 위로 버튼: fixed 의 정적 위치에 기대면 목록 구조에 따라 좌우로 밀린다 — 좌우 0 + margin auto 로 가운데 고정.
+     (QScrollArea 가 contain: strict 라 fixed 기준은 뷰포트가 아니라 스크롤 영역이다) */
+  .scroll-top-btn {
+    z-index: 15;
+    left: 0;
+    right: 0;
+    width: fit-content;
+    margin: 16px auto 0;
   }
 
   .record-text {
