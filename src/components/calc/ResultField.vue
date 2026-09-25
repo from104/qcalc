@@ -1101,7 +1101,8 @@
   }
 
   #result,
-  #subResult {
+  #subResult,
+  .calc-ghost {
     font-family: 'resultFont';
     font-size: 36px;
   }

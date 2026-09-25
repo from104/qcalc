@@ -9,6 +9,7 @@ import { StatusBar, Style } from '@capacitor/status-bar';
 
 import type { ButtonType } from '../types/store';
 import {
+  SKIN_VARIANTS,
   SKINS,
   themes,
   type DarkModeType,
@@ -22,6 +23,7 @@ interface ThemesState {
   darkMode: DarkModeType;
   userThemes: Record<string, ThemeColors>;
   skin: SkinType;
+  skinVariant: string;
 }
 
 export const useThemesStore = defineStore('themes', {
@@ -30,6 +32,7 @@ export const useThemesStore = defineStore('themes', {
     darkMode: 'system',
     userThemes: {},
     skin: 'modern',
+    skinVariant: '',
   }),
 
   getters: {
@@ -389,14 +392,29 @@ export const useThemesStore = defineStore('themes', {
      */
     setSkin(skin: SkinType): void {
       this.skin = SKINS.includes(skin) ? skin : 'modern';
+      this.skinVariant = SKIN_VARIANTS[this.skin][0] ?? '';
+      this.applySkin();
+    },
+
+    /**
+     * 스킨 색 변형 설정 — <html data-skin-variant>
+     * @param variant - 현재 스킨의 변형 이름
+     */
+    setSkinVariant(variant: string): void {
+      if (SKIN_VARIANTS[this.skin].includes(variant)) this.skinVariant = variant;
       this.applySkin();
     },
 
     applySkin(): void {
       if (typeof document === 'undefined') return;
       const root = document.documentElement;
+      if (!SKINS.includes(this.skin)) this.skin = 'modern';
+      const variants = SKIN_VARIANTS[this.skin];
+      if (!variants.includes(this.skinVariant)) this.skinVariant = variants[0] ?? '';
       if (this.skin === 'modern') delete root.dataset.skin;
       else root.dataset.skin = this.skin;
+      if (this.skinVariant) root.dataset.skinVariant = this.skinVariant;
+      else delete root.dataset.skinVariant;
     },
 
     initializeTheme(): void {

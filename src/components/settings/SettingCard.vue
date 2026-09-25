@@ -22,7 +22,7 @@
   import { useUnitStore } from 'stores/unitStore';
   import { useRadixStore } from 'stores/radixStore';
   import { useCurrencyStore } from 'stores/currencyStore';
-  import { SKINS } from 'src/constants/ThemesData';
+  import { SKIN_VARIANTS, SKINS } from 'src/constants/ThemesData';
   import { useThemesStore } from 'stores/themesStore';
   import { themes, type ThemeType } from 'src/constants/ThemesData';
   import { useSettingsManager } from 'src/composables/useSettingsManager';
@@ -435,6 +435,29 @@
           :color="selectTextColor"
           :bg-color="selectBackgroundColor"
           @update:model-value="themesStore.setSkin"
+        />
+      </q-item>
+
+      <!-- 스킨 색상 (스킨마다 표시창 색 변형) -->
+      <q-item v-if="SKIN_VARIANTS[themesStore.skin].length > 1" class="q-mb-md">
+        <q-item-label class="self-center">{{ t('skinVariant') }}</q-item-label>
+        <q-space />
+        <q-select
+          :model-value="themesStore.skinVariant"
+          :options="SKIN_VARIANTS[themesStore.skin].map((value) => ({ label: t(`skinColors.${value}`), value }))"
+          role="combobox"
+          :aria-label="t('ariaLabel.skinVariant')"
+          dense
+          options-dense
+          emit-value
+          map-options
+          :label-color="selectTextColor"
+          :options-selected-class="`text-${selectTextColor}`"
+          :popup-content-class="`bg-${selectBackgroundColor} noselect`"
+          :class="`bg-${selectBackgroundColor}`"
+          :color="selectTextColor"
+          :bg-color="selectBackgroundColor"
+          @update:model-value="themesStore.setSkinVariant"
         />
       </q-item>
 
@@ -946,6 +969,7 @@ ko:
     autoUpdate: '자동 업데이트 설정'
     colorTheme: '색상 테마'
     skin: '스킨 선택'
+    skinVariant: '스킨 색상 선택'
     editTheme: '{themeName} 테마 편집'
     deleteTheme: '{themeName} 테마 삭제'
     createNewTheme: '새 테마 만들기'
@@ -958,6 +982,17 @@ ko:
     modern: '모던'
     lcd: 'LCD 액정'
     vfd: 'VFD 형광관'
+    led: 'LED 세그먼트'
+    pocket: '포켓 계산기'
+    crt: 'CRT 모니터'
+  skinVariant: '스킨 색상'
+  skinColors:
+    green: '녹색'
+    amber: '호박색'
+    blue: '파란색'
+    cyan: '청록색'
+    red: '빨간색'
+    white: '흰색'
   createNewTheme: '새 테마 만들기'
   reset: '초기화'
   export: '내보내기'
@@ -1035,6 +1070,7 @@ en:
     autoUpdate: 'Auto update setting'
     colorTheme: 'Color Theme'
     skin: 'Skin'
+    skinVariant: 'Skin color'
     editTheme: 'Edit {themeName} theme'
     deleteTheme: 'Delete {themeName} theme'
     createNewTheme: 'Create a new theme'
@@ -1047,6 +1083,17 @@ en:
     modern: 'Modern'
     lcd: 'LCD'
     vfd: 'VFD'
+    led: 'LED'
+    pocket: 'Pocket'
+    crt: 'CRT'
+  skinVariant: 'Skin color'
+  skinColors:
+    green: 'Green'
+    amber: 'Amber'
+    blue: 'Blue'
+    cyan: 'Cyan'
+    red: 'Red'
+    white: 'White'
   createNewTheme: 'Create New Theme'
   reset: 'Reset'
   export: 'Export'
@@ -1124,6 +1171,7 @@ ja:
     autoUpdate: '自動アップデート設定'
     colorTheme: 'カラーテーマ'
     skin: 'スキンの選択'
+    skinVariant: 'スキンの色の選択'
     editTheme: '{themeName}テーマを編集'
     deleteTheme: '{themeName}テーマを削除'
     createNewTheme: '新しいテーマを作成'
@@ -1136,6 +1184,17 @@ ja:
     modern: 'モダン'
     lcd: '液晶 (LCD)'
     vfd: '蛍光表示管 (VFD)'
+    led: 'LED'
+    pocket: 'ポケット電卓'
+    crt: 'CRT'
+  skinVariant: 'スキンの色'
+  skinColors:
+    green: 'グリーン'
+    amber: 'アンバー'
+    blue: 'ブルー'
+    cyan: 'シアン'
+    red: 'レッド'
+    white: 'ホワイト'
   createNewTheme: '新しいテーマを作成'
   reset: 'リセット'
   export: 'エクスポート'
@@ -1213,6 +1272,7 @@ zh:
     autoUpdate: '自动更新设置'
     colorTheme: '颜色主题'
     skin: '选择皮肤'
+    skinVariant: '选择皮肤颜色'
     editTheme: '编辑{themeName}主题'
     deleteTheme: '删除{themeName}主题'
     createNewTheme: '创建新主题'
@@ -1225,6 +1285,17 @@ zh:
     modern: '现代'
     lcd: '液晶 (LCD)'
     vfd: '荧光显示管 (VFD)'
+    led: 'LED 数码管'
+    pocket: '袖珍计算器'
+    crt: 'CRT 显示器'
+  skinVariant: '皮肤颜色'
+  skinColors:
+    green: '绿色'
+    amber: '琥珀色'
+    blue: '蓝色'
+    cyan: '青色'
+    red: '红色'
+    white: '白色'
   createNewTheme: '创建新主题'
   reset: '重置'
   export: '导出'
@@ -1302,6 +1373,7 @@ hi:
     autoUpdate: 'स्वचालित अपडेट सेटिंग'
     colorTheme: 'रंग थीम'
     skin: 'स्किन चुनें'
+    skinVariant: 'स्किन रंग चुनें'
     editTheme: '{themeName} थीम संपादित करें'
     deleteTheme: '{themeName} थीम हटाएं'
     createNewTheme: 'नई थीम बनाएं'
@@ -1314,6 +1386,17 @@ hi:
     modern: 'आधुनिक'
     lcd: 'LCD'
     vfd: 'VFD'
+    led: 'LED'
+    pocket: 'पॉकेट कैलकुलेटर'
+    crt: 'CRT'
+  skinVariant: 'स्किन रंग'
+  skinColors:
+    green: 'हरा'
+    amber: 'एम्बर'
+    blue: 'नीला'
+    cyan: 'सियान'
+    red: 'लाल'
+    white: 'सफ़ेद'
   createNewTheme: 'नई थीम बनाएं'
   reset: 'रीसेट'
   export: 'निर्यात'
@@ -1391,6 +1474,7 @@ de:
     autoUpdate: 'Automatische Updates Einstellung'
     colorTheme: 'Farbthema'
     skin: 'Skin auswählen'
+    skinVariant: 'Skin-Farbe auswählen'
     editTheme: '{themeName}-Theme bearbeiten'
     deleteTheme: '{themeName}-Theme löschen'
     createNewTheme: 'Neues Theme erstellen'
@@ -1403,6 +1487,17 @@ de:
     modern: 'Modern'
     lcd: 'LCD'
     vfd: 'VFD'
+    led: 'LED'
+    pocket: 'Taschenrechner'
+    crt: 'CRT'
+  skinVariant: 'Skin-Farbe'
+  skinColors:
+    green: 'Grün'
+    amber: 'Bernstein'
+    blue: 'Blau'
+    cyan: 'Cyan'
+    red: 'Rot'
+    white: 'Weiß'
   createNewTheme: 'Neues Theme erstellen'
   reset: 'Zurücksetzen'
   export: 'Exportieren'
@@ -1480,6 +1575,7 @@ es:
     autoUpdate: 'Configuración actualización automática'
     colorTheme: 'Tema de color'
     skin: 'Seleccionar aspecto'
+    skinVariant: 'Seleccionar color del aspecto'
     editTheme: 'Editar tema {themeName}'
     deleteTheme: 'Eliminar tema {themeName}'
     createNewTheme: 'Crear nuevo tema'
@@ -1492,6 +1588,17 @@ es:
     modern: 'Moderno'
     lcd: 'LCD'
     vfd: 'VFD'
+    led: 'LED'
+    pocket: 'Calculadora de bolsillo'
+    crt: 'CRT'
+  skinVariant: 'Color del aspecto'
+  skinColors:
+    green: 'Verde'
+    amber: 'Ámbar'
+    blue: 'Azul'
+    cyan: 'Cian'
+    red: 'Rojo'
+    white: 'Blanco'
   createNewTheme: 'Crear nuevo tema'
   reset: 'Restablecer'
   export: 'Exportar'
@@ -1569,6 +1676,7 @@ fr:
     autoUpdate: 'Paramètre mise à jour automatique'
     colorTheme: 'Thème de couleur'
     skin: "Choisir l'apparence"
+    skinVariant: "Choisir la couleur de l'apparence"
     editTheme: 'Modifier le thème {themeName}'
     deleteTheme: 'Supprimer le thème {themeName}'
     createNewTheme: 'Créer un nouveau thème'
@@ -1581,6 +1689,17 @@ fr:
     modern: 'Moderne'
     lcd: 'LCD'
     vfd: 'VFD'
+    led: 'LED'
+    pocket: 'Calculatrice de poche'
+    crt: 'CRT'
+  skinVariant: "Couleur de l'apparence"
+  skinColors:
+    green: 'Vert'
+    amber: 'Ambre'
+    blue: 'Bleu'
+    cyan: 'Cyan'
+    red: 'Rouge'
+    white: 'Blanc'
   createNewTheme: 'Créer un nouveau thème'
   reset: 'Réinitialiser'
   export: 'Exporter'
@@ -1658,6 +1777,7 @@ pt:
     autoUpdate: 'Configuração atualização automática'
     colorTheme: 'Tema de cores'
     skin: 'Selecionar aparência'
+    skinVariant: 'Selecionar cor da aparência'
     editTheme: 'Editar tema {themeName}'
     deleteTheme: 'Excluir tema {themeName}'
     createNewTheme: 'Criar novo tema'
@@ -1670,6 +1790,17 @@ pt:
     modern: 'Moderno'
     lcd: 'LCD'
     vfd: 'VFD'
+    led: 'LED'
+    pocket: 'Calculadora de bolso'
+    crt: 'CRT'
+  skinVariant: 'Cor da aparência'
+  skinColors:
+    green: 'Verde'
+    amber: 'Âmbar'
+    blue: 'Azul'
+    cyan: 'Ciano'
+    red: 'Vermelho'
+    white: 'Branco'
   createNewTheme: 'Criar novo tema'
   reset: 'Redefinir'
   export: 'Exportar'
@@ -1747,6 +1878,7 @@ ru:
     autoUpdate: 'Настройка автообновления'
     colorTheme: 'Цветовая тема'
     skin: 'Выбор оформления'
+    skinVariant: 'Выбор цвета оформления'
     editTheme: 'Редактировать тему {themeName}'
     deleteTheme: 'Удалить тему {themeName}'
     createNewTheme: 'Создать новую тему'
@@ -1759,6 +1891,17 @@ ru:
     modern: 'Современное'
     lcd: 'ЖК (LCD)'
     vfd: 'ВЛИ (VFD)'
+    led: 'LED-индикатор'
+    pocket: 'Карманный калькулятор'
+    crt: 'ЭЛТ (CRT)'
+  skinVariant: 'Цвет оформления'
+  skinColors:
+    green: 'Зелёный'
+    amber: 'Янтарный'
+    blue: 'Синий'
+    cyan: 'Бирюзовый'
+    red: 'Красный'
+    white: 'Белый'
   createNewTheme: 'Создать новую тему'
   reset: 'Сбросить'
   export: 'Экспорт'
