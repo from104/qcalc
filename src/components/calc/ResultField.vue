@@ -457,11 +457,6 @@
     }
   });
 
-  // 스킨 잔상: 표시 값의 숫자(0-9, 16진 A-F 포함)를 모두 켜진 세그먼트 '8'로 바꾼 같은 길이 문자열
-  const ghostText = computed(() =>
-    String(calcStore.isMemoryVisible ? memoryValue.value : result.value).replace(/[0-9A-Fa-f]/g, '8'),
-  );
-
   /**
    * 계산 인자나 계산 결과에 대한 식을 문자열로 생성하는 함수
    *
@@ -936,7 +931,7 @@
 <template>
   <q-card-section class="col-12 q-px-sm" :class="field == 'main' ? 'q-pt-md q-pb-sm' : 'q-py-none'">
     <q-field
-      class="shadow-2 justify-end self-center calc-display"
+      class="shadow-2 justify-end self-center"
       :class="[isMainField ? '' : 'q-mt-none q-mb-xs']"
       filled
       dense
@@ -1011,12 +1006,8 @@
         >
           <span v-if="currentTab === 'radix'" id="radixPrefix">{{ radixPrefix }}</span>
           <span v-if="currentTab === 'currency'" id="symbol">{{ symbol }}</span>
-          <span class="calc-display-value">
-            <!-- 스킨(LCD·VFD)의 꺼진 세그먼트 잔상 — 숫자를 8로 바꾼 같은 폭의 문자열 (skins.scss) -->
-            <span v-if="themesStore.skin !== 'modern'" class="calc-ghost" aria-hidden="true">{{ ghostText }}</span>
-            <span :id="isMainField ? 'result' : 'subResult'">
-              {{ calcStore.isMemoryVisible ? memoryValue : result }}
-            </span>
+          <span :id="isMainField ? 'result' : 'subResult'">
+            {{ calcStore.isMemoryVisible ? memoryValue : result }}
           </span>
           <span v-if="currentTab === 'unit'" id="unit">{{ unit }}</span>
           <span
@@ -1101,8 +1092,7 @@
   }
 
   #result,
-  #subResult,
-  .calc-ghost {
+  #subResult {
     font-family: 'resultFont';
     font-size: 36px;
   }

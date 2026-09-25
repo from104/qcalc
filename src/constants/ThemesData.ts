@@ -6,23 +6,6 @@
 // 다크모드 타입 정의
 export type DarkModeType = 'light' | 'dark' | 'system';
 
-/**
- * 스킨 — 색 테마와 별개로 표시창·버튼의 모양과 질감을 바꾼다 (src/css/skins.scss, <html data-skin>).
- * modern 은 기본 모습이다. 버튼 색은 색 테마를 그대로 따른다.
- */
-export const SKINS = ['modern', 'lcd', 'vfd', 'led', 'pocket', 'crt'] as const;
-export type SkinType = (typeof SKINS)[number];
-
-/** 스킨별 표시창 색 변형 (첫 항목이 기본값). 변형이 하나뿐이거나 없으면 선택 항목을 숨긴다. */
-export const SKIN_VARIANTS: Record<SkinType, readonly string[]> = {
-  modern: [],
-  lcd: ['green', 'amber', 'blue'],
-  vfd: ['cyan', 'green', 'amber'],
-  led: ['red', 'green'],
-  pocket: [],
-  crt: ['green', 'amber', 'white'],
-};
-
 // 테마 타입 정의
 export type ThemeType =
   | 'default'
