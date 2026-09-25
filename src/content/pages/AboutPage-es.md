@@ -12,6 +12,27 @@ Todos los cambios notables de este proyecto se registran en este archivo.
 
 El formato se basa en [Keep a Changelog] y este proyecto sigue [Versionado Semántico].
 
+## [0.13.6] 2026-09-26
+
+### Añadido
+
+- Pantalla de inicio mientras se abre la aplicación
+
+### Cambiado
+
+- Inicio de la aplicación más rápido
+- Transiciones de botones, pestañas y pantallas más rápidas y fluidas
+- La calculadora crece y se reduce con suavidad al cambiar entre diseño estrecho y ancho
+- Respuesta más rápida a [=] con un historial de cálculo largo
+- Mejor rendimiento de pantalla en Linux con gráficos NVIDIA
+- Animaciones reducidas automáticamente en dispositivos de gama baja
+
+### Corregido
+
+- Corregido el destello blanco al iniciar la aplicación
+- Corregido que la aplicación se quedara a veces en la pantalla de inicio
+- Corregido el margen derecho ausente en [Historial]
+
 ## [0.13.5] 2026-09-17
 
 ### Corregido

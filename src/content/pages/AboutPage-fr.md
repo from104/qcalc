@@ -12,6 +12,27 @@ Tous les changements notables de ce projet sont enregistrés dans ce fichier.
 
 Le format est basé sur [Keep a Changelog] et ce projet suit le [Versionnage sémantique].
 
+## [0.13.6] 2026-09-26
+
+### Ajouté
+
+- Écran de démarrage affiché à l'ouverture de l'application
+
+### Modifié
+
+- Démarrage de l'application plus rapide
+- Transitions des boutons, onglets et écrans plus rapides et fluides
+- La calculatrice grandit et rétrécit en douceur en passant de la disposition étroite à la large
+- Réponse plus rapide à [=] avec un long historique de calcul
+- Meilleures performances d'affichage sous Linux avec une carte NVIDIA
+- Animations réduites automatiquement sur les appareils peu puissants
+
+### Corrigé
+
+- Flash blanc au démarrage de l'application corrigé
+- Blocage occasionnel sur l'écran de démarrage corrigé
+- Marge droite manquante dans [Historique] corrigée
+
 ## [0.13.5] 2026-09-17
 
 ### Corrigé

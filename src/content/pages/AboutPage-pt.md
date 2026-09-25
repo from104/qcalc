@@ -12,6 +12,27 @@ Todas as alterações notáveis deste projeto são registradas neste arquivo.
 
 O formato é baseado no [Keep a Changelog] e este projeto segue o [Versionamento Semântico].
 
+## [0.13.6] 2026-09-26
+
+### Adicionado
+
+- Tela inicial exibida enquanto o aplicativo abre
+
+### Alterado
+
+- Inicialização do aplicativo mais rápida
+- Transições de botões, abas e telas mais rápidas e suaves
+- A calculadora cresce e encolhe suavemente ao alternar entre layout estreito e largo
+- Resposta mais rápida ao [=] com histórico de cálculo longo
+- Melhor desempenho de exibição no Linux com placa NVIDIA
+- Animações reduzidas automaticamente em dispositivos modestos
+
+### Corrigido
+
+- Corrigido o clarão branco ao iniciar o aplicativo
+- Corrigido o aplicativo ficar às vezes parado na tela inicial
+- Corrigida a falta de margem direita em [Histórico]
+
 ## [0.13.5] 2026-09-17
 
 ### Corrigido
