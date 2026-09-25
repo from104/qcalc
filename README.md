@@ -11,7 +11,7 @@
 
 <p align="center">
   <a href="LICENSE"><img alt="License: MIT" src="https://img.shields.io/badge/license-MIT-blue.svg"></a>
-  <a href="https://github.com/from104/qcalc/releases/latest"><img alt="version 0.13.5" src="https://img.shields.io/badge/version-0.13.5-informational"></a>
+  <a href="https://github.com/from104/qcalc/releases/latest"><img alt="version 0.13.6" src="https://img.shields.io/badge/version-0.13.6-informational"></a>
   <img alt="10 languages" src="https://img.shields.io/badge/i18n-10%20languages-success">
   <a href="CONTRIBUTING.md"><img alt="contributions welcome" src="https://img.shields.io/badge/contributions-welcome-brightgreen"></a>
 </p>

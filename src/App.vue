@@ -7,16 +7,18 @@
    *   - 모바일 화면 잠금, 다크모드 초기화, 저장 설정 검증
    */
 
-  import { ref, onBeforeMount, watch, computed, onMounted, onUnmounted } from 'vue';
+  import { ref, onBeforeMount, watch, computed, onMounted, onUnmounted, defineAsyncComponent, nextTick } from 'vue';
+
+  // 버전 변경 로그 다이얼로그(정보 md 10개 언어 포함)는 첫 화면 뒤에 별도 chunk로 불러온다
+  const VersionChangelogDialog = defineAsyncComponent(() => import('components/dialogs/VersionChangelogDialog.vue'));
+  // 업데이트·Snap 안내·마이그레이션 다이얼로그도 첫 화면 뒤 별도 chunk로
+  const AutoUpdate = defineAsyncComponent(() => import('components/dialogs/AutoUpdate.vue'));
+  const SnapFirst = defineAsyncComponent(() => import('components/dialogs/SnapFirst.vue'));
+  const MigrationOnboarding = defineAsyncComponent(() => import('components/dialogs/MigrationOnboarding.vue'));
   import { useRoute } from 'vue-router';
   import { useI18n } from 'vue-i18n';
   import { ScreenOrientation } from '@capacitor/screen-orientation';
   import { useQuasar } from 'quasar';
-
-  import AutoUpdate from 'components/dialogs/AutoUpdate.vue';
-  import SnapFirst from 'components/dialogs/SnapFirst.vue';
-  import VersionChangelogDialog from 'components/dialogs/VersionChangelogDialog.vue';
-  import MigrationOnboarding from 'components/dialogs/MigrationOnboarding.vue';
 
   import { useKeyBinding } from './composables/useKeyBinding';
   import { useHtmlLangSync } from './composables/useHtmlLangSync';
@@ -29,6 +31,7 @@
   import { useUnitStore } from './stores/unitStore';
   import { useCurrencyStore } from './stores/currencyStore';
   import { useRadixStore } from './stores/radixStore';
+  import { useFormulaStore } from './stores/formulaStore';
 
   const uiStore = useUIStore();
   const settingsStore = useSettingsStore();
@@ -101,6 +104,11 @@
   });
 
   onMounted(() => {
+    // 첫 화면이 뜬 뒤 유휴 시간에 수식 엔진(mathjs 전체)을 미리 불러온다 — 시작 경로에서는 제외
+    const prefetchFormulaMath = () => void useFormulaStore().ensureMath();
+    if ('requestIdleCallback' in window) requestIdleCallback(prefetchFormulaMath, { timeout: 3000 });
+    else setTimeout(prefetchFormulaMath, 1500);
+
     // 앱 업데이트 후 유효하지 않은 저장 설정 자동 보정
     // 모두 실행해야 하므로 개별 호출 후 합산 (|| 단축 평가 방지)
     const u = unitStore.validateAndCorrectUnits();
@@ -142,13 +150,73 @@
   );
 
   // 레이아웃 전환 (넓은 ↔ 좁은)
+  // 경계를 넘는 즉시 레이아웃을 바꾸고, 계산기 영역의 실제 폭을 옛 폭 → 새 폭(%)으로 애니메이션한다.
+  // 버튼 글자는 컨테이너 쿼리로 크기가 정해지므로 폭이 변하는 동안 찌그러지지 않고 자연스럽게 커지고
+  // 줄어든다. 넓은 화면의 보조 패널은 옆에서 밀려 들어온다. % 목표라 창을 끄는 중에도 끊기지 않는다.
+  // 폭 애니메이션은 매 프레임 재배치라 WebKitGTK 에서 프레임당 30~100ms 가 들어 조금 끊기지만, 형태가
+  // 이어지는 쪽을 택했다(기현님 결정). 버린 방식: scaleX 늘이기(글자 찌그러짐), View Transition(창 크기가
+  // 바뀌는 중엔 건너뛰어져 순간 교체), 투명도·확대 페이드(부드럽지만 형태가 이어지지 않음).
+  // 시작 직후 한 번 ~90ms 멈칫하므로(새 레이아웃 첫 GPU 래스터, 릴리스 실측) 앞쪽이 급한 ease-out 대신
+  // 느리게 출발하는 ease-in-out 을 조금 길게 쓴다.
+  const PANE_MS = 260;
+  const PANE_EASE = 'cubic-bezier(0.4, 0, 0.2, 1)';
+  const nextFrame = () => new Promise<void>((resolve) => requestAnimationFrame(() => resolve()));
+
+  const swapLayout = async (wide: boolean) => {
+    const root = document.documentElement;
+    const reduceMotion =
+      root.classList.contains('motion-reduced') || window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    currentTransition.value = '';
+    const oldWidth = document.querySelector<HTMLElement>('.calc-pane')?.getBoundingClientRect().width;
+    isWideLayout.value = wide;
+    if (reduceMotion || !oldWidth) return;
+    await nextTick();
+    const pane = document.querySelector<HTMLElement>('.calc-pane');
+    const side = wide ? document.querySelector<HTMLElement>('.sub-pane') : null;
+    if (!pane) return;
+    // 새 레이아웃 마운트로 메인 스레드가 100ms 넘게 막히므로(WebKitGTK 실측), 곧바로 애니메이션을 걸면
+    // 첫 페인트 때 이미 끝나 있다. 옛 폭에 고정한 채 새 레이아웃이 그려지고 한가해진 뒤 시작한다.
+    const style = pane.style;
+    style.transition = 'none';
+    style.flex = '0 0 auto';
+    style.width = `${oldWidth}px`;
+    if (side) side.style.opacity = '0';
+    await nextFrame();
+    await nextFrame();
+    await new Promise<void>((resolve) =>
+      'requestIdleCallback' in window
+        ? requestIdleCallback(() => resolve(), { timeout: 200 })
+        : setTimeout(resolve, 60),
+    );
+    // 폭이 처음 바뀔 때의 비싼 재배치(컨테이너 쿼리·탭 바 측정)를 시작 전에 치러 둔다
+    style.width = `${oldWidth + 1}px`;
+    void pane.offsetWidth;
+    style.width = `${oldWidth}px`;
+    void pane.offsetWidth;
+    await nextFrame();
+    style.transition = `width ${PANE_MS}ms ${PANE_EASE}`;
+    style.width = wide ? '50%' : '100%';
+    const cleanup = () => {
+      style.transition = style.flex = style.width = '';
+    };
+    pane.addEventListener('transitionend', cleanup, { once: true });
+    setTimeout(cleanup, PANE_MS + 100); // transitionend 누락 대비
+    if (side) {
+      side.style.opacity = '';
+      side.animate(
+        [
+          { transform: 'translateX(40%)', opacity: 0 },
+          { transform: 'none', opacity: 1 },
+        ],
+        { duration: PANE_MS, easing: PANE_EASE },
+      );
+    }
+  };
+
   watch(
     () => isWideWidth(),
     (wide) => {
-      if (isWideLayout.value !== wide) {
-        currentTransition.value = wide ? 'expand-layout' : 'collapse-layout';
-        isWideLayout.value = wide;
-      }
+      if (wide !== isWideLayout.value) void swapLayout(wide);
     },
   );
 
@@ -176,7 +244,9 @@
       Wide: 고정 키('wide-layout')로 레이아웃 유지, 서브페이지만 전환
       Narrow: routeProps.path를 키로 사용하여 페이지 전환 애니메이션
     -->
-    <transition :name="transitionName" mode="default">
+    <!-- 이름이 비면(:css=false) 떠나는 화면을 즉시 제거 — 레이아웃 전환 때 옛·새 레이아웃이 겹치면
+         새 계산기 영역(.calc-pane)을 찾아 폭 애니메이션을 거는 대상이 옛 화면으로 어긋난다 -->
+    <transition :name="transitionName" :css="!!transitionName" mode="default">
       <component :is="Component" :key="isWideLayout ? 'wide-layout' : routeProps.path" />
     </transition>
   </router-view>
@@ -200,7 +270,7 @@
   .slide-forward-enter-active,
   .slide-forward-leave-active {
     @extend %transition-base;
-    transition: transform 0.2s ease;
+    transition: transform var(--motion-base) var(--ease-out);
   }
 
   .slide-back-enter-from {
@@ -233,7 +303,7 @@
   .fade-enter-active,
   .fade-leave-active {
     @extend %transition-base;
-    transition: opacity 0.2s ease;
+    transition: opacity var(--motion-base) ease;
   }
 
   .fade-enter-from,
@@ -244,52 +314,6 @@
   .fade-enter-to,
   .fade-leave-from {
     opacity: 1;
-  }
-
-  // 레이아웃 확장
-  .expand-layout-enter-active,
-  .expand-layout-leave-active {
-    @extend %transition-base;
-    transition: transform 0.2s ease;
-  }
-
-  .expand-layout-enter-from {
-    transform: scaleX(2);
-    transform-origin: left;
-  }
-
-  .expand-layout-enter-to,
-  .expand-layout-leave-from {
-    transform: scaleX(1);
-    transform-origin: left;
-  }
-
-  .expand-layout-leave-to {
-    transform: scaleX(0.5);
-    transform-origin: left;
-  }
-
-  // 레이아웃 축소
-  .collapse-layout-enter-active,
-  .collapse-layout-leave-active {
-    @extend %transition-base;
-    transition: transform 0.2s ease;
-  }
-
-  .collapse-layout-enter-from {
-    transform: scaleX(0.5);
-    transform-origin: left;
-  }
-
-  .collapse-layout-enter-to,
-  .collapse-layout-leave-from {
-    transform: scaleX(1);
-    transform-origin: left;
-  }
-
-  .collapse-layout-leave-to {
-    transform: scaleX(2);
-    transform-origin: left;
   }
 </style>
 

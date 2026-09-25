@@ -121,7 +121,7 @@
         self="center middle"
         transition-show="jump-up"
         transition-hide="jump-down"
-        transition-duration="200"
+        transition-duration="160"
       >
         {{ extendedFunctionSet[id]?.label ?? '' }}
       </q-tooltip>
@@ -158,6 +158,21 @@
     grid-template-rows: repeat(var(--row-count), 1fr);
     gap: 16px;
     padding: 4px 8px 8px;
+  }
+
+  // 눌림 피드백: Quasar push 기본값은 0.3s 동안 내용 margin(레이아웃)·테두리 두께(페인트)까지
+  // 애니메이션해 연타 시 굼뜨다. transform 만 짧게 움직이고 나머지는 즉시 바꾼다.
+  .button.q-btn--push.q-btn--actionable {
+    transition: transform var(--motion-fast) var(--ease-out);
+
+    &:active {
+      transition-duration: var(--motion-press);
+    }
+
+    &::before,
+    :deep(.q-btn__content) {
+      transition: none;
+    }
   }
 
   .button {

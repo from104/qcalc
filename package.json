@@ -1,6 +1,6 @@
 {
   "name": "qcalc",
-  "version": "0.13.5",
+  "version": "0.13.6",
   "description": "A multi-purpose calculator for productivity and accessibility",
   "productName": "QCalc",
   "desktopName": "io.github.from104.qcalc.desktop",
@@ -27,6 +27,8 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "test:coverage": "vitest run --coverage",
+    "perf:budget": "node scripts/measure-bundle.mjs dist/spa --budget-js=330 --budget-css=40",
+    "perf:startup": "node scripts/measure-startup.mjs",
     "fetch-rates": "tsx scripts/fetch-fallback-rates.ts",
     "dev": "quasar dev -m electron",
     "dev:android": "quasar dev -m capacitor -T android",

@@ -4,6 +4,27 @@ All notable changes to this project are recorded in this file.
 
 The format is based on [Keep a Changelog] and this project follows [Semantic Versioning].
 
+## [0.13.6] 2026-09-26
+
+### Added
+
+- Startup screen shown while the app opens
+
+### Changed
+
+- Faster app startup
+- Faster, smoother button, tab and screen transitions
+- Calculator grows and shrinks smoothly when switching between narrow and wide layouts
+- Faster response to [=] with a long calculation history
+- Better display performance on Linux with NVIDIA graphics
+- Animations reduced automatically on low-end devices
+
+### Fixed
+
+- Fixed a white flash when the app starts
+- Fixed the app occasionally staying on the startup screen
+- Fixed the missing right margin in [Record]
+
 ## [0.13.5] 2026-09-17
 
 ### Fixed

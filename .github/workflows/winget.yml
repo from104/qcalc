@@ -1,0 +1,29 @@
+name: Publish to winget
+
+# 릴리스가 게시되면 winget-pkgs 에 매니페스트 갱신 PR 을 자동으로 연다.
+#
+# 처음 한 번은 사람이 올려야 한다 — 이 액션은 이미 등록된 패키지의 새 버전만 처리한다.
+# (0.13.1 은 손으로 제출했다. 이후 버전부터 이 워크플로가 이어받는다.)
+#
+# 준비물(1회):
+#   1. https://github.com/microsoft/winget-pkgs 를 자기 계정으로 fork
+#   2. classic PAT(scope: public_repo) 를 만들어 저장소 시크릿 WINGET_TOKEN 에 저장
+#      — 액션이 그 토큰으로 fork 에 브랜치를 밀고 upstream 에 PR 을 연다.
+#
+# draft 상태에서는 돌지 않는다(`released` 는 게시 시점에만 발화). 릴리스 자산 중
+# x64 NSIS 인스톨러 하나만 집는다 — MSI 를 병행하면 자동 업데이트가 갈리므로 안 만든다.
+on:
+  release:
+    types: [released]
+
+jobs:
+  winget:
+    name: Update winget manifest
+    runs-on: ubuntu-latest
+    steps:
+      - uses: vedantmgoyal9/winget-releaser@main
+        with:
+          identifier: from104.QCalc
+          installers-regex: '_x64-setup\.exe$'
+          # version 은 지정하지 않는다 — 액션이 태그 v0.13.2 에서 v 를 떼어 0.13.2 로 쓴다.
+          token: ${{ secrets.WINGET_TOKEN }}

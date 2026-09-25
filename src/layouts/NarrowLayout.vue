@@ -262,10 +262,11 @@
         -->
         <q-tab-panels
           v-model="localCurrentTab"
-          class="col"
+          class="col calc-pane"
           animated
           infinite
           :swipeable="$g.isMobile"
+          :transition-duration="180"
           role="tabpanel"
           :aria-label="t('ariaLabel.calculatorContent')"
         >

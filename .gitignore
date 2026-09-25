@@ -93,3 +93,9 @@ snap/local/
 # 로컬 작업용 git worktree 사본 (3.6GB)
 .claude/worktrees/
 .github/hooks/context-mode.json
+
+# graft's local graph cache — regenerable, not committed (run `graft build`).
+/graft/
+
+# 릴리스/CI 감시 출력 로그 (gh run watch 등)
+/.*.log

@@ -258,12 +258,13 @@
 
     <q-page-container class="row" style="padding-bottom: 0px">
       <!-- 넓은 화면 계산기 영역 -->
-      <div class="col-6 calc-content" role="region" :aria-label="t('ariaLabel.calculatorSection')">
+      <div class="col-6 calc-content calc-pane" role="region" :aria-label="t('ariaLabel.calculatorSection')">
         <q-tab-panels
           v-model="localCurrentTab"
           animated
           infinite
           :swipeable="$g.isMobile"
+          :transition-duration="180"
           role="tabpanel"
           :aria-label="t('ariaLabel.calculatorContent')"
         >
@@ -282,7 +283,11 @@
       </div>
 
       <!-- 넓은 화면 서브 영역 -->
-      <div class="col-6 relative-position sub-content" role="complementary" :aria-label="t('ariaLabel.subPageSection')">
+      <div
+        class="col-6 relative-position sub-content sub-pane"
+        role="complementary"
+        :aria-label="t('ariaLabel.subPageSection')"
+      >
         <q-scroll-area
           class="sub-scroll-area"
           :class="{ 'hide-scrollbar': currentSubPage === 'record' }"

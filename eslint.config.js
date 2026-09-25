@@ -24,6 +24,8 @@ export default [
       'quasar.config.*.temporary.compiled*',
       'src-tauri/target/**',
       'src-tauri/gen/**',
+      // graft 도구가 생성·관리하는 Claude Code 훅 헬퍼 (CommonJS)
+      '.claude/helpers/**',
     ],
   },
 

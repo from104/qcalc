@@ -25,15 +25,15 @@
 
 .animate-sub-page-enter-active[data-page='record'],
 .animate-sub-page-leave-active[data-page='record'] {
-  transition: opacity 0.3s ease;
+  transition: opacity var(--motion-slow) ease;
 }
 
 .animate-sub-page-enter-active:not([data-page='record']) {
-  animation: slideFromRight 0.3s ease-out;
+  animation: slideFromRight var(--motion-slow) var(--ease-out);
 }
 
 .animate-sub-page-leave-active:not([data-page='record']) {
-  animation: slideToRight 0.3s ease-out;
+  animation: slideToRight var(--motion-slow) var(--ease-in-out);
 }
 
 @keyframes slideFromRight {

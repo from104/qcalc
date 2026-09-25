@@ -160,6 +160,45 @@ fn configure_gdk_backend() {
 #[cfg(not(target_os = "linux"))]
 fn configure_gdk_backend() {}
 
+/// NVIDIA 독점 드라이버에서 WebKitGTK GPU 렌더링을 되살린다.
+///
+/// WebKitGTK(2.52 실측)는 NVIDIA 독점 드라이버를 만나면 DMA-BUF 렌더러를 스스로 끄고,
+/// 그 결과 하드웨어 가속 정책이 `Never`(CPU 페인팅)로 떨어진다. Chromium(Electron)은 같은
+/// 기계에서 GPU로 합성하므로, 탭 전환·화면 전환 애니메이션이 Electron보다 눈에 띄게 끊겼다.
+/// 2026-09-26 gofu(RTX 5060 Ti, 595.91, GNOME Wayland) 실측, dev 빌드 탭 전환 중 rAF:
+/// - 기본: 정책 Never, 9.7fps
+/// - `WEBKIT_FORCE_DMABUF_RENDERER=1`만: 정책 Always지만 리소스 로드가 내부 오류로 실패
+/// - `+ WEBKIT_DMABUF_RENDERER_DISABLE_GBM=1`: 렌더링 안 됨
+/// - `+ WEBKIT_DMABUF_RENDERER_FORCE_SHM=1`: 정책 Always, **47fps**, 오류 0
+/// SHM 경로는 웹 프로세스가 GPU(Skia)로 그린 결과를 공유 메모리로 UI 프로세스에 넘겨,
+/// NVIDIA에서 문제가 되는 DMA-BUF 버퍼 공유만 피한다.
+///
+/// Mesa(AMD·Intel)는 기본값에서 이미 가속되므로 건드리지 않는다. 사용자가 WebKit 렌더러
+/// 변수를 직접 줬으면 그대로 두고, 문제가 생기면 `QCALC_NO_GPU_FORCE=1`로 끈다.
+#[cfg(target_os = "linux")]
+fn configure_webkit_gpu() {
+  if std::env::var_os("QCALC_NO_GPU_FORCE").is_some() || std::env::var_os("QCALC_FORCE_XWAYLAND").is_some() {
+    return;
+  }
+  let user_configured = [
+    "WEBKIT_FORCE_DMABUF_RENDERER",
+    "WEBKIT_DISABLE_DMABUF_RENDERER",
+    "WEBKIT_DMABUF_RENDERER_FORCE_SHM",
+    "WEBKIT_DISABLE_COMPOSITING_MODE",
+  ]
+  .iter()
+  .any(|name| std::env::var_os(name).is_some());
+  let nvidia_proprietary = std::path::Path::new("/proc/driver/nvidia/version").exists();
+  if user_configured || !nvidia_proprietary {
+    return;
+  }
+  std::env::set_var("WEBKIT_FORCE_DMABUF_RENDERER", "1");
+  std::env::set_var("WEBKIT_DMABUF_RENDERER_FORCE_SHM", "1");
+}
+
+#[cfg(not(target_os = "linux"))]
+fn configure_webkit_gpu() {}
+
 /// Linux(GTK) 창 크기 보정. GNOME Wayland는 서버 장식(SSD)이 없어 GTK가 CSD로 그림자와
 /// 타이틀바를 그리는데, 그 상태에서 tao의 크기 API가 서로 다른 기준을 쓴다(2026-09-09 실측,
 /// 배율 2·텍스트 1.25 환경에서 프레임−내용 = 90×138 논리px, X11/SSD에서는 0×0):
@@ -279,6 +318,69 @@ mod linux_geometry {
   }
 }
 
+/// 첫 페인트 배경색. 웹 쪽 localStorage는 WebView가 HTML을 읽은 뒤에야 쓸 수 있어,
+/// 창이 뜨고 HTML을 파싱하기 전 구간(WebKitGTK 기본 흰색)이 그대로 번쩍인다.
+/// 그래서 테마를 적용할 때마다 웹이 실제 배경색을 여기로 넘겨 파일로 두고,
+/// 다음 실행의 `.setup()`에서 창·WebView 배경으로 먼저 칠한다.
+mod boot_background {
+  use tauri::{window::Color, Manager};
+
+  const FILE_NAME: &str = "boot-bg.txt";
+
+  /// `rgb(r, g, b)` / `rgba(r, g, b, a)` (getComputedStyle 형식)을 불투명 색으로 해석한다.
+  pub fn parse(css: &str) -> Option<Color> {
+    let inner = css.trim().strip_prefix("rgba(").or_else(|| css.trim().strip_prefix("rgb("))?;
+    let mut parts = inner.trim_end_matches(')').split(',').map(|p| p.trim());
+    let mut channel = || parts.next()?.parse::<f64>().ok().filter(|v| (0.0..=255.0).contains(v)).map(|v| v.round() as u8);
+    let (r, g, b) = (channel()?, channel()?, channel()?);
+    // 투명(알파 0)은 "배경 없음"이라 불투명으로 바꾸면 엉뚱한 색(검정)이 된다 — 거부
+    if parts.next().and_then(|a| a.parse::<f64>().ok()).is_some_and(|a| a <= 0.0) {
+      return None;
+    }
+    Some(Color(r, g, b, 255))
+  }
+
+  pub fn load(app: &tauri::AppHandle) -> Option<Color> {
+    let path = app.path().app_config_dir().ok()?.join(FILE_NAME);
+    parse(&std::fs::read_to_string(path).ok()?)
+  }
+
+  pub fn save(app: &tauri::AppHandle, css: &str) {
+    if parse(css).is_none() {
+      return;
+    }
+    let Ok(dir) = app.path().app_config_dir() else { return };
+    let path = dir.join(FILE_NAME);
+    // 테마 적용마다 불리므로 값이 같으면 쓰지 않는다
+    if std::fs::read_to_string(&path).is_ok_and(|cur| cur == css) {
+      return;
+    }
+    if let Err(err) = std::fs::create_dir_all(&dir).and_then(|()| std::fs::write(path, css)) {
+      log::warn!("failed to save the boot background: {err}");
+    }
+  }
+
+  #[cfg(test)]
+  mod tests {
+    use super::*;
+
+    #[test]
+    fn parses_computed_style_colors() {
+      assert_eq!(parse("rgb(29, 29, 29)"), Some(Color(29, 29, 29, 255)));
+      assert_eq!(parse("rgba(255, 0, 10, 0.5)"), Some(Color(255, 0, 10, 255)));
+      assert_eq!(parse("rgba(0, 0, 0, 0)"), None);
+      assert_eq!(parse("#1d1d1d"), None);
+      assert_eq!(parse("rgb(300, 0, 0)"), None);
+    }
+  }
+}
+
+/// 웹이 테마 적용 후 실제 페이지 배경색을 알려 준다 (다음 실행의 첫 페인트용).
+#[tauri::command]
+fn set_boot_background(app: tauri::AppHandle, color: String) {
+  boot_background::save(&app, &color);
+}
+
 // TODO: CSP 설정 — tauri.conf.json의 `app.security.csp`(현재 null)에 실기기 런타임 검증과 함께
 // 값을 채워야 한다. currency API·GitHub updater 엔드포인트용 connect-src 허용이 필요.
 // (JSON 설정 파일은 주석을 지원하지 않아 이 메모를 여기 남긴다.)
@@ -286,6 +388,7 @@ mod linux_geometry {
 pub fn run() {
   // 반드시 tauri::Builder::default() 이전에 호출. Builder 초기화가 GTK 세션 백엔드를 확정한다.
   configure_gdk_backend();
+  configure_webkit_gpu();
 
   // Windows에서만 창을 숨긴 채 만든다(tauri.windows.conf.json의 visible:false — JSON merge patch는
   // 배열을 통째로 바꾸므로 main 창 항목 전체가 거기 반복돼 있다). window-state 플러그인이
@@ -317,7 +420,7 @@ pub fn run() {
         .build(),
     )
     .plugin(tauri_plugin_opener::init())
-    .invoke_handler(tauri::generate_handler![get_package_env, quit_app, announce_a11y]);
+    .invoke_handler(tauri::generate_handler![get_package_env, quit_app, announce_a11y, set_boot_background]);
 
   if cfg!(debug_assertions) {
     builder = builder.plugin(
@@ -339,8 +442,19 @@ pub fn run() {
   builder
     .setup(|app| {
       if let Some(window) = app.get_webview_window("main") {
+        // 이벤트 루프가 첫 프레임을 그리기 전에 직전 테마 배경으로 칠한다 (흰 화면 깜빡임 방지)
+        if let Some(color) = boot_background::load(app.handle()) {
+          if let Err(err) = window.set_background_color(Some(color)) {
+            log::warn!("failed to set the boot background: {err}");
+          }
+        }
+
+        // 개발 빌드에서도 웹 검사기는 자동으로 열지 않는다(메인 창을 가림).
+        // 필요하면 QCALC_DEVTOOLS=1 yarn dev:tauri 로 켜거나, 창에서 우클릭 → 요소 검사.
         #[cfg(debug_assertions)]
-        window.open_devtools();
+        if std::env::var_os("QCALC_DEVTOOLS").is_some() {
+          window.open_devtools();
+        }
 
         // WebKitGTK는 데스크톱 텍스트 배율만큼 페이지 전체를 확대한다. 그대로 두면 두 가지가
         // 어긋난다: (1) 화면에 그려지는 글자와 버튼이 같은 데스크톱의 다른 앱보다 그 비율만큼

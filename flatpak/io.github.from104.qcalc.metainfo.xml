@@ -59,6 +59,11 @@
   <content_rating type="oars-1.1" />
 
   <releases>
+    <release version="0.13.6" date="2026-09-26">
+      <description>
+        <p>Faster startup with a new startup screen, smoother animations and layout switching, and better display performance on Linux with NVIDIA graphics.</p>
+      </description>
+    </release>
     <release version="0.13.5" date="2026-09-17">
       <description>
         <p>Fixes the AppImage not starting inside sandboxes such as Firejail.</p>
