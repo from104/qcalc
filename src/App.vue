@@ -153,36 +153,53 @@
   // View Transitions로 교체 전후 화면을 잇는다: 헤더·계산기·보조 패널(view-transition-name, app.scss)이
   // 제자리에서 크기·위치를 바꾸고 보조 패널은 옆에서 들어온다. 예전 scaleX 늘이기는 글자가 찌그러졌다.
   // 미지원 환경은 짧은 페이드, 모션 감소 환경은 즉시 교체.
+  // WebKit·Chromium 모두 전환 중 뷰포트 크기가 바뀌면 전환을 건너뛴다("viewport size changed").
+  // 창을 끄는 동안 경계를 넘으면 매번 취소돼 순간 교체로 보였으므로, 크기 변화가 멈춘 뒤 전환한다.
+  // 끄는 동안에는 기존 레이아웃이 그대로 늘어나거나 줄어든다.
+  const RESIZE_SETTLE_MS = 150;
   let layoutTransition: ViewTransition | null = null;
-  watch(
-    () => isWideWidth(),
-    (wide) => {
-      if (isWideLayout.value === wide) return;
-      const root = document.documentElement;
-      const reduceMotion =
-        root.classList.contains('motion-reduced') || window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-      if (!document.startViewTransition || reduceMotion) {
-        currentTransition.value = reduceMotion ? '' : 'fade';
-        isWideLayout.value = wide;
+  let lastResizeAt = 0;
+  let settleTimer: ReturnType<typeof setTimeout> | undefined;
+  window.addEventListener('resize', () => (lastResizeAt = performance.now()), { passive: true });
+
+  const swapLayout = (wide: boolean) => {
+    const root = document.documentElement;
+    const reduceMotion =
+      root.classList.contains('motion-reduced') || window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (!document.startViewTransition || reduceMotion) {
+      currentTransition.value = reduceMotion ? '' : 'fade';
+      isWideLayout.value = wide;
+      return;
+    }
+    // 창을 끌며 경계를 오가면 전환이 겹친다 — 진행 중인 것은 끝 상태로 건너뛴다
+    layoutTransition?.skipTransition();
+    currentTransition.value = '';
+    root.dataset.layoutSwap = wide ? 'to-wide' : 'to-narrow';
+    const transition = document.startViewTransition(async () => {
+      isWideLayout.value = wide;
+      await nextTick();
+    });
+    layoutTransition = transition;
+    void transition.finished.finally(() => {
+      if (layoutTransition === transition) {
+        layoutTransition = null;
+        delete root.dataset.layoutSwap;
+      }
+    });
+  };
+
+  const scheduleLayoutSwap = () => {
+    clearTimeout(settleTimer);
+    settleTimer = setTimeout(() => {
+      if (performance.now() - lastResizeAt < RESIZE_SETTLE_MS) {
+        scheduleLayoutSwap();
         return;
       }
-      // 창을 끌며 경계를 오가면 전환이 겹친다 — 진행 중인 것은 끝 상태로 건너뛴다
-      layoutTransition?.skipTransition();
-      currentTransition.value = '';
-      root.dataset.layoutSwap = wide ? 'to-wide' : 'to-narrow';
-      const transition = document.startViewTransition(async () => {
-        isWideLayout.value = wide;
-        await nextTick();
-      });
-      layoutTransition = transition;
-      void transition.finished.finally(() => {
-        if (layoutTransition === transition) {
-          layoutTransition = null;
-          delete root.dataset.layoutSwap;
-        }
-      });
-    },
-  );
+      const wide = isWideWidth();
+      if (wide !== isWideLayout.value) swapLayout(wide);
+    }, RESIZE_SETTLE_MS);
+  };
+  watch(() => isWideWidth(), scheduleLayoutSwap);
 
   // 라우트 전환 애니메이션
   watch(
