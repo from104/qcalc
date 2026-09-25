@@ -72,5 +72,35 @@ export default defineRouter(function (/* { store, ssrContext } */) {
   });
 
   // 생성된 라우터 인스턴스 반환
+  // 지연 로드 모듈(라우트 청크)을 못 받으면 페이지를 한 번만 새로 연다. 그대로 두면 라우터가 시작되지
+  // 않아 부팅 스플래시에서 멈춘다. dev 에서는 Vite 가 시작 직후 의존성을 다시 묶는 사이 옛 해시로
+  // 요청하면(WebKit: "Importing a module script failed"), 배포본에서는 업데이트 뒤 사라진 청크를
+  // 요청하면 생긴다. sessionStorage 로 연속 새로고침을 막는다.
+  const RELOAD_KEY = 'qcalc-chunk-reload-at';
+  const isChunkLoadError = (err: unknown) =>
+    /Importing a module script failed|Failed to fetch dynamically imported module|error loading dynamically imported module/i.test(
+      String((err as Error)?.message ?? err),
+    );
+  const reloadOnce = () => {
+    try {
+      const last = Number(sessionStorage.getItem(RELOAD_KEY) ?? 0);
+      if (Date.now() - last < 10_000) return;
+      sessionStorage.setItem(RELOAD_KEY, String(Date.now()));
+    } catch {
+      /* 저장소를 못 쓰면 새로고침하지 않는다 (무한 루프 방지) */
+      return;
+    }
+    window.location.reload();
+  };
+  Router.onError((err) => {
+    if (isChunkLoadError(err)) reloadOnce();
+  });
+  if (typeof window !== 'undefined') {
+    window.addEventListener('vite:preloadError', (event) => {
+      event.preventDefault();
+      reloadOnce();
+    });
+  }
+
   return Router;
 });
