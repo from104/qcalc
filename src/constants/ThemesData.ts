@@ -9,13 +9,13 @@ export type DarkModeType = 'light' | 'dark' | 'system';
 // 테마 타입 정의
 export type ThemeType =
   | 'default'
-  | 'gold'
-  | 'redled'
-  | 'navy'
-  | 'teal'
-  | 'chocolate'
-  | 'yellow'
+  | 'azalea'
+  | 'autumn'
+  | 'forest'
+  | 'ocean'
+  | 'amethyst'
   | 'slate'
+  | 'grey'
   | 'highcontrast';
 
 // 테마 이름 다국어 인터페이스 정의
@@ -68,167 +68,34 @@ export interface ThemeColors {
 
 // 테마 팔레트 정의 (dark 속성 제거)
 export const themes: Record<ThemeType, ThemeColors> = {
-  // Braun ET66(1987, 디터 람스) 풍 — 검정·짙은 회색·갈색에 노란 = 키, 회색 액정
   default: {
     name: {
       ko: '기본',
       en: 'Default',
     },
     ui: {
-      primary: 'grey-10',
-      secondary: 'grey-8',
-      accent: 'yellow-8',
-      positive: 'green-7',
-      negative: 'red-8',
-      info: 'blue-grey-6',
-      warning: 'amber-8',
-    },
-    button: {
-      important: 'yellow-8',
-      function: 'brown-6',
-      normal: 'grey-9',
-    },
-    panel: {
-      text: {
-        normal: 'grey-10',
-        warning: 'brown-10',
-        normalAccent: 'grey-10',
-        warningAccent: 'brown-10',
-      },
-      background: {
-        normal: 'grey-4',
-        warning: 'amber-2',
-      },
-    },
-    select: {
-      text: {
-        light: 'grey-10',
-        dark: 'grey-1',
-      },
-      background: {
-        light: 'grey-4',
-        dark: 'grey-9',
-      },
-    },
-  },
-
-  // HP-12C(1981) 풍 — 짙은 갈색·금색 판, 주황 포인트, 회색 액정
-  gold: {
-    name: {
-      ko: '골드 파이낸셜',
-      en: 'Gold Financial',
-    },
-    ui: {
-      primary: 'brown-10',
-      secondary: 'amber-8',
-      accent: 'orange-8',
-      positive: 'green-7',
-      negative: 'red-8',
-      info: 'blue-7',
-      warning: 'amber-8',
-    },
-    button: {
-      important: 'orange-9',
-      function: 'amber-8',
-      normal: 'brown-9',
-    },
-    panel: {
-      text: {
-        normal: 'brown-10',
-        warning: 'brown-10',
-        normalAccent: 'brown-10',
-        warningAccent: 'brown-10',
-      },
-      background: {
-        normal: 'grey-4',
-        warning: 'orange-2',
-      },
-    },
-    select: {
-      text: {
-        light: 'grey-10',
-        dark: 'grey-1',
-      },
-      background: {
-        light: 'grey-4',
-        dark: 'grey-9',
-      },
-    },
-  },
-
-  // HP-35(1972) 풍 — 검정 몸체, 파랑 키, 빨간 LED 표시
-  redled: {
-    name: {
-      ko: '레드 LED',
-      en: 'Red LED',
-    },
-    ui: {
-      primary: 'grey-10',
-      secondary: 'blue-8',
-      accent: 'red-4',
-      positive: 'green-7',
-      negative: 'red-8',
-      info: 'blue-6',
-      warning: 'amber-8',
-    },
-    button: {
-      important: 'blue-grey-6',
-      function: 'blue-8',
-      normal: 'grey-10',
-    },
-    panel: {
-      text: {
-        normal: 'red-4',
-        warning: 'grey-1',
-        normalAccent: 'red-4',
-        warningAccent: 'grey-1',
-      },
-      background: {
-        normal: 'grey-10',
-        warning: 'red-10',
-      },
-    },
-    select: {
-      text: {
-        light: 'grey-10',
-        dark: 'grey-1',
-      },
-      background: {
-        light: 'grey-4',
-        dark: 'grey-9',
-      },
-    },
-  },
-
-  // 카시오 fx 계열 풍 — 남색 몸체, 회청색 키, 주황 AC, 녹회색 액정
-  navy: {
-    name: {
-      ko: '스쿨 네이비',
-      en: 'School Navy',
-    },
-    ui: {
-      primary: 'indigo-10',
-      secondary: 'blue-7',
-      accent: 'orange-8',
-      positive: 'green-7',
-      negative: 'red-8',
-      info: 'blue-6',
-      warning: 'amber-8',
+      primary: 'green-10',
+      secondary: 'green-6',
+      accent: 'light-green-5',
+      positive: 'cyan-7',
+      negative: 'red-9',
+      info: 'light-blue-5',
+      warning: 'amber-7',
     },
     button: {
       important: 'orange-8',
-      function: 'blue-7',
-      normal: 'blue-grey-7',
+      function: 'cyan-7',
+      normal: 'grey-6',
     },
     panel: {
       text: {
-        normal: 'grey-10',
-        warning: 'brown-10',
-        normalAccent: 'grey-10',
+        normal: 'light-green-10',
+        warning: 'brown-9',
+        normalAccent: 'light-green-10',
         warningAccent: 'brown-10',
       },
       background: {
-        normal: 'light-green-2',
+        normal: 'light-green-3',
         warning: 'deep-orange-2',
       },
     },
@@ -243,139 +110,216 @@ export const themes: Record<ThemeType, ThemeColors> = {
       },
     },
   },
-
-  // 카시오 VFD(형광관) 계열 풍 — 검정 표시창에 청록 글자
-  teal: {
+  azalea: {
     name: {
-      ko: '청록 형광',
-      en: 'Teal Glow',
+      ko: '진달래',
+      en: 'Azalea',
     },
     ui: {
-      primary: 'blue-grey-10',
-      secondary: 'teal-7',
-      accent: 'teal-4',
-      positive: 'green-7',
-      negative: 'red-8',
+      primary: 'pink-8',
+      secondary: 'pink-4',
+      accent: 'pink-6',
+      positive: 'green-6',
+      negative: 'red-6',
       info: 'blue-6',
-      warning: 'amber-8',
+      warning: 'orange-6',
     },
     button: {
-      important: 'deep-orange-8',
-      function: 'teal-8',
-      normal: 'blue-grey-9',
+      important: 'pink-8',
+      function: 'pink-6',
+      normal: 'pink-4',
     },
     panel: {
       text: {
-        normal: 'teal-11',
-        warning: 'grey-1',
-        normalAccent: 'teal-11',
-        warningAccent: 'grey-1',
+        normal: 'pink-10',
+        warning: 'cyan-10',
+        normalAccent: 'pink-10',
+        warningAccent: 'cyan-10',
       },
       background: {
-        normal: 'grey-10',
-        warning: 'deep-orange-10',
+        normal: 'pink-2',
+        warning: 'cyan-2',
       },
     },
     select: {
       text: {
-        light: 'grey-10',
-        dark: 'grey-1',
+        light: 'pink-10',
+        dark: 'pink-1',
       },
       background: {
-        light: 'grey-4',
-        dark: 'grey-9',
+        light: 'pink-1',
+        dark: 'pink-9',
       },
     },
   },
-
-  // TI-30(1976) 풍 — 흑갈색 몸체, 빨간 LED 표시
-  chocolate: {
+  autumn: {
     name: {
-      ko: '초콜릿 LED',
-      en: 'Chocolate LED',
+      ko: '가을',
+      en: 'Autumn',
     },
     ui: {
-      primary: 'brown-9',
-      secondary: 'brown-5',
-      accent: 'red-5',
-      positive: 'green-7',
-      negative: 'red-8',
-      info: 'blue-6',
-      warning: 'amber-8',
-    },
-    button: {
-      important: 'red-8',
-      function: 'grey-7',
-      normal: 'brown-7',
-    },
-    panel: {
-      text: {
-        normal: 'red-4',
-        warning: 'grey-1',
-        normalAccent: 'red-4',
-        warningAccent: 'grey-1',
-      },
-      background: {
-        normal: 'grey-10',
-        warning: 'red-10',
-      },
-    },
-    select: {
-      text: {
-        light: 'grey-10',
-        dark: 'grey-1',
-      },
-      background: {
-        light: 'grey-4',
-        dark: 'grey-9',
-      },
-    },
-  },
-
-  // 올리베티 Divisumma 18(1972) 풍 — 노랑·주황 고무 키
-  yellow: {
-    name: {
-      ko: '이탈리안 옐로',
-      en: 'Italian Yellow',
-    },
-    ui: {
-      primary: 'deep-orange-9',
-      secondary: 'amber-7',
-      accent: 'amber-6',
-      positive: 'green-7',
-      negative: 'red-8',
-      info: 'blue-6',
-      warning: 'amber-8',
+      primary: 'brown-7',
+      secondary: 'orange-4',
+      accent: 'brown-5',
+      positive: 'deep-orange-5',
+      negative: 'red-10',
+      info: 'amber-6',
+      warning: 'amber-5',
     },
     button: {
       important: 'brown-8',
-      function: 'orange-8',
-      normal: 'amber-3',
+      function: 'brown-6',
+      normal: 'brown-4',
     },
     panel: {
       text: {
-        normal: 'grey-10',
-        warning: 'brown-10',
-        normalAccent: 'grey-10',
-        warningAccent: 'brown-10',
+        normal: 'brown-7',
+        warning: 'blue-10',
+        normalAccent: 'brown-9',
+        warningAccent: 'blue-10',
       },
       background: {
-        normal: 'grey-3',
-        warning: 'orange-2',
+        normal: 'brown-2',
+        warning: 'blue-2',
       },
     },
     select: {
       text: {
-        light: 'grey-10',
-        dark: 'grey-1',
+        light: 'brown-10',
+        dark: 'brown-1',
       },
       background: {
-        light: 'grey-4',
-        dark: 'grey-9',
+        light: 'brown-1',
+        dark: 'brown-7',
       },
     },
   },
-
+  forest: {
+    name: {
+      ko: '숲',
+      en: 'Forest',
+    },
+    ui: {
+      primary: 'green-9',
+      secondary: 'green-7',
+      accent: 'green-7',
+      positive: 'green-6',
+      negative: 'brown-7',
+      info: 'green-5',
+      warning: 'amber-5',
+    },
+    button: {
+      important: 'green-9',
+      function: 'green-7',
+      normal: 'green-5',
+    },
+    panel: {
+      text: {
+        normal: 'green-10',
+        warning: 'purple-8',
+        normalAccent: 'green-10',
+        warningAccent: 'purple-10',
+      },
+      background: {
+        normal: 'green-2',
+        warning: 'purple-2',
+      },
+    },
+    select: {
+      text: {
+        light: 'green-10',
+        dark: 'grey-1',
+      },
+      background: {
+        light: 'green-1',
+        dark: 'green-9',
+      },
+    },
+  },
+  ocean: {
+    name: {
+      ko: '바다',
+      en: 'Ocean',
+    },
+    ui: {
+      primary: 'blue-8',
+      secondary: 'teal-4',
+      accent: 'blue-6',
+      positive: 'cyan-6',
+      negative: 'red-5',
+      info: 'light-blue-5',
+      warning: 'yellow-4',
+    },
+    button: {
+      important: 'blue-8',
+      function: 'blue-6',
+      normal: 'blue-4',
+    },
+    panel: {
+      text: {
+        normal: 'light-blue-10',
+        warning: 'brown-9',
+        normalAccent: 'light-blue-10',
+        warningAccent: 'brown-10',
+      },
+      background: {
+        normal: 'light-blue-2',
+        warning: 'amber-2',
+      },
+    },
+    select: {
+      text: {
+        light: 'light-blue-10',
+        dark: 'light-blue-1',
+      },
+      background: {
+        light: 'light-blue-1',
+        dark: 'light-blue-10',
+      },
+    },
+  },
+  amethyst: {
+    name: {
+      ko: '자수정',
+      en: 'Amethyst',
+    },
+    ui: {
+      primary: 'purple-8',
+      secondary: 'purple-5',
+      accent: 'purple-6',
+      positive: 'green-6',
+      negative: 'red-6',
+      info: 'blue-6',
+      warning: 'orange-6',
+    },
+    button: {
+      important: 'purple-8',
+      function: 'purple-6',
+      normal: 'purple-5',
+    },
+    panel: {
+      text: {
+        normal: 'deep-purple-7',
+        warning: 'brown-9',
+        normalAccent: 'deep-purple-9',
+        warningAccent: 'brown-10',
+      },
+      background: {
+        normal: 'deep-purple-2',
+        warning: 'yellow-2',
+      },
+    },
+    select: {
+      text: {
+        light: 'deep-purple-10',
+        dark: 'deep-purple-1',
+      },
+      background: {
+        light: 'deep-purple-1',
+        dark: 'deep-purple-9',
+      },
+    },
+  },
   slate: {
     name: {
       ko: '잿빛',
@@ -415,6 +359,48 @@ export const themes: Record<ThemeType, ThemeColors> = {
       background: {
         light: 'blue-grey-1',
         dark: 'blue-grey-9',
+      },
+    },
+  },
+  grey: {
+    name: {
+      ko: '회색',
+      en: 'Grey',
+    },
+    ui: {
+      primary: 'grey-9',
+      secondary: 'grey-7',
+      accent: 'grey-5',
+      positive: 'green-6',
+      negative: 'red-6',
+      info: 'blue-6',
+      warning: 'orange-6',
+    },
+    button: {
+      important: 'grey-8',
+      function: 'grey-7',
+      normal: 'grey-6',
+    },
+    panel: {
+      text: {
+        normal: 'grey-8',
+        warning: 'brown-8',
+        normalAccent: 'grey-10',
+        warningAccent: 'brown-10',
+      },
+      background: {
+        normal: 'grey-4',
+        warning: 'brown-2',
+      },
+    },
+    select: {
+      text: {
+        light: 'grey-10',
+        dark: 'grey-1',
+      },
+      background: {
+        light: 'grey-3',
+        dark: 'grey-9',
       },
     },
   },
