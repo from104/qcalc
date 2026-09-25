@@ -8,12 +8,20 @@ import { setCssVar, colors, Dark, Platform } from 'quasar';
 import { StatusBar, Style } from '@capacitor/status-bar';
 
 import type { ButtonType } from '../types/store';
-import { themes, type DarkModeType, type ThemeType, type ThemeColors } from '../constants/ThemesData';
+import {
+  SKINS,
+  themes,
+  type DarkModeType,
+  type SkinType,
+  type ThemeType,
+  type ThemeColors,
+} from '../constants/ThemesData';
 
 interface ThemesState {
   currentTheme: ThemeType | string;
   darkMode: DarkModeType;
   userThemes: Record<string, ThemeColors>;
+  skin: SkinType;
 }
 
 export const useThemesStore = defineStore('themes', {
@@ -21,6 +29,7 @@ export const useThemesStore = defineStore('themes', {
     currentTheme: 'default',
     darkMode: 'system',
     userThemes: {},
+    skin: 'modern',
   }),
 
   getters: {
@@ -374,7 +383,24 @@ export const useThemesStore = defineStore('themes', {
      * 애플리케이션 초기화 시 테마와 다크모드를 설정합니다.
      * 이 함수는 앱이 시작될 때 한 번 호출되어야 합니다.
      */
+    /**
+     * 스킨 설정 — <html data-skin> 으로 적용한다 (modern 이면 속성을 지운다)
+     * @param skin - 적용할 스킨
+     */
+    setSkin(skin: SkinType): void {
+      this.skin = SKINS.includes(skin) ? skin : 'modern';
+      this.applySkin();
+    },
+
+    applySkin(): void {
+      if (typeof document === 'undefined') return;
+      const root = document.documentElement;
+      if (this.skin === 'modern') delete root.dataset.skin;
+      else root.dataset.skin = this.skin;
+    },
+
     initializeTheme(): void {
+      this.applySkin();
       // 시스템 다크모드 변경 감지 리스너 등록
       if (typeof window !== 'undefined' && window.matchMedia) {
         const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');

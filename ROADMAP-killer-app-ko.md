@@ -75,7 +75,9 @@
 
 ## Phase 3 — 레트로 스킨 (0.15~0.16, 약 2주)
 
-### 3-1. 스킨 엔진 (기존 `themesStore` 확장)
+### 3-1. 스킨 엔진 (기존 `themesStore` 확장) — ✅ 1차
+
+- **구현(2026-09-26)**: 색 테마와 별개 축. `themesStore.skin`(`modern`·`lcd`·`vfd`, 영속) → `<html data-skin>`, 스타일은 `src/css/skins.scss` 한 곳. 버튼 색은 색 테마 유지, 스킨은 질감·모서리·그림자만. 설정 화면에 스킨 선택(10개 언어). 결과창 꺼진 세그먼트 잔상(`.calc-ghost`, aria-hidden)
 
 - 현재 `ThemeColors`(색만) → **`Skin` 타입**으로 확장: `colors` + `display`(배경·글자색·폰트·glow·ghost) + `button`(모양·그림자·눌림·radius) + `sound?` + `effects`(scanline 등).
 - 적용 방식: CSS 변수 + `<html data-skin="lcd">` 속성. 스킨별 CSS는 `src/css/skins/<name>.scss`로 **지연 로드**(Phase 1 원칙 유지).

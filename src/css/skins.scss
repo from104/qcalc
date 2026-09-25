@@ -1,0 +1,106 @@
+// 스킨 — 색 테마와 별개로 표시창·버튼의 모양과 질감을 바꾼다.
+// <html data-skin="lcd|vfd"> 로 적용되며(themesStore.applySkin), modern(기본)은 속성이 없다.
+// 버튼 색은 색 테마(인라인 background)를 그대로 쓰고, 여기서는 질감(그라디언트·그림자·모서리)만 얹는다.
+// 표시창 글자 대비는 WCAG AA 이상을 유지한다(LCD #22301b/#c1cda5 ≈ 10:1, VFD #62f5e0/#0b0f0e ≈ 14:1).
+
+// 꺼진 세그먼트 잔상 레이어 — 스킨이 켜졌을 때만 보인다 (ResultField 의 .calc-ghost)
+.calc-ghost {
+  display: none;
+}
+
+html[data-skin='lcd'],
+html[data-skin='vfd'] {
+  .calc-display-value {
+    position: relative;
+  }
+
+  .calc-ghost {
+    display: inline;
+    position: absolute;
+    right: 0;
+    top: 0;
+    pointer-events: none;
+    user-select: none;
+  }
+}
+
+// ── LCD: 회녹색 액정 ─────────────────────────────────────────
+html[data-skin='lcd'] {
+  .calc-display {
+    .q-field__control {
+      background: linear-gradient(180deg, #cbd6b2 0%, #b8c69c 100%) !important;
+      border-radius: 6px;
+      box-shadow:
+        inset 0 2px 5px rgba(0, 0, 0, 0.35),
+        inset 0 0 0 2px #7f8c68;
+    }
+
+    .q-field__control,
+    .q-field__control *,
+    .q-field__label,
+    .q-field__label * {
+      color: #22301b !important;
+    }
+
+    .calc-ghost {
+      color: rgba(34, 48, 27, 0.16) !important;
+    }
+  }
+
+  .keypad .button {
+    border-radius: 10px;
+    background-image: linear-gradient(
+      180deg,
+      rgba(255, 255, 255, 0.22),
+      rgba(0, 0, 0, 0.12)
+    ) !important;
+    box-shadow:
+      0 2px 0 rgba(0, 0, 0, 0.35),
+      inset 0 1px 0 rgba(255, 255, 255, 0.25) !important;
+  }
+}
+
+// ── VFD: 검은 바탕 청록 형광관 ────────────────────────────────
+html[data-skin='vfd'] {
+  .calc-display {
+    .q-field__control {
+      background: #0b0f0e !important;
+      border-radius: 6px;
+      box-shadow:
+        inset 0 2px 8px rgba(0, 0, 0, 0.8),
+        inset 0 0 0 2px #1c2624;
+    }
+
+    .q-field__control,
+    .q-field__control *,
+    .q-field__label,
+    .q-field__label * {
+      color: #62f5e0 !important;
+    }
+
+    .q-field__control,
+    .q-field__label {
+      text-shadow:
+        0 0 4px rgba(98, 245, 224, 0.75),
+        0 0 12px rgba(98, 245, 224, 0.35);
+    }
+
+    .calc-ghost {
+      color: rgba(98, 245, 224, 0.12) !important;
+      text-shadow: none;
+    }
+  }
+
+  .keypad .button {
+    border-radius: 6px;
+    background-image: linear-gradient(
+      180deg,
+      rgba(255, 255, 255, 0.28) 0%,
+      rgba(255, 255, 255, 0) 45%,
+      rgba(0, 0, 0, 0.28) 100%
+    ) !important;
+    box-shadow:
+      inset 0 -2px 0 rgba(0, 0, 0, 0.4),
+      0 1px 2px rgba(0, 0, 0, 0.5) !important;
+  }
+}

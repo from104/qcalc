@@ -22,6 +22,7 @@
   import { useUnitStore } from 'stores/unitStore';
   import { useRadixStore } from 'stores/radixStore';
   import { useCurrencyStore } from 'stores/currencyStore';
+  import { SKINS } from 'src/constants/ThemesData';
   import { useThemesStore } from 'stores/themesStore';
   import { themes, type ThemeType } from 'src/constants/ThemesData';
   import { useSettingsManager } from 'src/composables/useSettingsManager';
@@ -411,6 +412,29 @@
           :color="selectTextColor"
           :bg-color="selectBackgroundColor"
           @update:model-value="themesStore.setDarkMode"
+        />
+      </q-item>
+
+      <!-- 스킨 (표시창·버튼 모양) -->
+      <q-item class="q-mb-md">
+        <q-item-label class="self-center">{{ t('skin') }}</q-item-label>
+        <q-space />
+        <q-select
+          :model-value="themesStore.skin"
+          :options="SKINS.map((value) => ({ label: t(`skinNames.${value}`), value }))"
+          role="combobox"
+          :aria-label="t('ariaLabel.skin')"
+          dense
+          options-dense
+          emit-value
+          map-options
+          :label-color="selectTextColor"
+          :options-selected-class="`text-${selectTextColor}`"
+          :popup-content-class="`bg-${selectBackgroundColor} noselect`"
+          :class="`bg-${selectBackgroundColor}`"
+          :color="selectTextColor"
+          :bg-color="selectBackgroundColor"
+          @update:model-value="themesStore.setSkin"
         />
       </q-item>
 
@@ -921,6 +945,7 @@ ko:
     language: '언어 설정'
     autoUpdate: '자동 업데이트 설정'
     colorTheme: '색상 테마'
+    skin: '스킨 선택'
     editTheme: '{themeName} 테마 편집'
     deleteTheme: '{themeName} 테마 삭제'
     createNewTheme: '새 테마 만들기'
@@ -928,6 +953,11 @@ ko:
     exportSettings: '설정 내보내기'
     importSettings: '설정 불러오기'
   colorTheme: '색상 테마'
+  skin: '스킨'
+  skinNames:
+    modern: '모던'
+    lcd: 'LCD 액정'
+    vfd: 'VFD 형광관'
   createNewTheme: '새 테마 만들기'
   reset: '초기화'
   export: '내보내기'
@@ -1004,6 +1034,7 @@ en:
     language: 'Language setting'
     autoUpdate: 'Auto update setting'
     colorTheme: 'Color Theme'
+    skin: 'Skin'
     editTheme: 'Edit {themeName} theme'
     deleteTheme: 'Delete {themeName} theme'
     createNewTheme: 'Create a new theme'
@@ -1011,6 +1042,11 @@ en:
     exportSettings: 'Export settings'
     importSettings: 'Import settings'
   colorTheme: 'Color Theme'
+  skin: 'Skin'
+  skinNames:
+    modern: 'Modern'
+    lcd: 'LCD'
+    vfd: 'VFD'
   createNewTheme: 'Create New Theme'
   reset: 'Reset'
   export: 'Export'
@@ -1087,6 +1123,7 @@ ja:
     language: '言語設定'
     autoUpdate: '自動アップデート設定'
     colorTheme: 'カラーテーマ'
+    skin: 'スキンの選択'
     editTheme: '{themeName}テーマを編集'
     deleteTheme: '{themeName}テーマを削除'
     createNewTheme: '新しいテーマを作成'
@@ -1094,6 +1131,11 @@ ja:
     exportSettings: '設定をエクスポート'
     importSettings: '設定をインポート'
   colorTheme: 'カラーテーマ'
+  skin: 'スキン'
+  skinNames:
+    modern: 'モダン'
+    lcd: '液晶 (LCD)'
+    vfd: '蛍光表示管 (VFD)'
   createNewTheme: '新しいテーマを作成'
   reset: 'リセット'
   export: 'エクスポート'
@@ -1170,6 +1212,7 @@ zh:
     language: '语言设置'
     autoUpdate: '自动更新设置'
     colorTheme: '颜色主题'
+    skin: '选择皮肤'
     editTheme: '编辑{themeName}主题'
     deleteTheme: '删除{themeName}主题'
     createNewTheme: '创建新主题'
@@ -1177,6 +1220,11 @@ zh:
     exportSettings: '导出设置'
     importSettings: '导入设置'
   colorTheme: '颜色主题'
+  skin: '皮肤'
+  skinNames:
+    modern: '现代'
+    lcd: '液晶 (LCD)'
+    vfd: '荧光显示管 (VFD)'
   createNewTheme: '创建新主题'
   reset: '重置'
   export: '导出'
@@ -1253,6 +1301,7 @@ hi:
     language: 'भाषा सेटिंग'
     autoUpdate: 'स्वचालित अपडेट सेटिंग'
     colorTheme: 'रंग थीम'
+    skin: 'स्किन चुनें'
     editTheme: '{themeName} थीम संपादित करें'
     deleteTheme: '{themeName} थीम हटाएं'
     createNewTheme: 'नई थीम बनाएं'
@@ -1260,6 +1309,11 @@ hi:
     exportSettings: 'सेटिंग्स निर्यात करें'
     importSettings: 'सेटिंग्स आयात करें'
   colorTheme: 'रंग थीम'
+  skin: 'स्किन'
+  skinNames:
+    modern: 'आधुनिक'
+    lcd: 'LCD'
+    vfd: 'VFD'
   createNewTheme: 'नई थीम बनाएं'
   reset: 'रीसेट'
   export: 'निर्यात'
@@ -1336,6 +1390,7 @@ de:
     language: 'Sprache Einstellung'
     autoUpdate: 'Automatische Updates Einstellung'
     colorTheme: 'Farbthema'
+    skin: 'Skin auswählen'
     editTheme: '{themeName}-Theme bearbeiten'
     deleteTheme: '{themeName}-Theme löschen'
     createNewTheme: 'Neues Theme erstellen'
@@ -1343,6 +1398,11 @@ de:
     exportSettings: 'Einstellungen exportieren'
     importSettings: 'Einstellungen importieren'
   colorTheme: 'Farbthema'
+  skin: 'Skin'
+  skinNames:
+    modern: 'Modern'
+    lcd: 'LCD'
+    vfd: 'VFD'
   createNewTheme: 'Neues Theme erstellen'
   reset: 'Zurücksetzen'
   export: 'Exportieren'
@@ -1419,6 +1479,7 @@ es:
     language: 'Configuración de idioma'
     autoUpdate: 'Configuración actualización automática'
     colorTheme: 'Tema de color'
+    skin: 'Seleccionar aspecto'
     editTheme: 'Editar tema {themeName}'
     deleteTheme: 'Eliminar tema {themeName}'
     createNewTheme: 'Crear nuevo tema'
@@ -1426,6 +1487,11 @@ es:
     exportSettings: 'Exportar configuración'
     importSettings: 'Importar configuración'
   colorTheme: 'Tema de color'
+  skin: 'Aspecto'
+  skinNames:
+    modern: 'Moderno'
+    lcd: 'LCD'
+    vfd: 'VFD'
   createNewTheme: 'Crear nuevo tema'
   reset: 'Restablecer'
   export: 'Exportar'
@@ -1502,6 +1568,7 @@ fr:
     language: 'Paramètre de langue'
     autoUpdate: 'Paramètre mise à jour automatique'
     colorTheme: 'Thème de couleur'
+    skin: "Choisir l'apparence"
     editTheme: 'Modifier le thème {themeName}'
     deleteTheme: 'Supprimer le thème {themeName}'
     createNewTheme: 'Créer un nouveau thème'
@@ -1509,6 +1576,11 @@ fr:
     exportSettings: 'Exporter les paramètres'
     importSettings: 'Importer les paramètres'
   colorTheme: 'Thème de couleur'
+  skin: 'Apparence'
+  skinNames:
+    modern: 'Moderne'
+    lcd: 'LCD'
+    vfd: 'VFD'
   createNewTheme: 'Créer un nouveau thème'
   reset: 'Réinitialiser'
   export: 'Exporter'
@@ -1585,6 +1657,7 @@ pt:
     language: 'Configuração de idioma'
     autoUpdate: 'Configuração atualização automática'
     colorTheme: 'Tema de cores'
+    skin: 'Selecionar aparência'
     editTheme: 'Editar tema {themeName}'
     deleteTheme: 'Excluir tema {themeName}'
     createNewTheme: 'Criar novo tema'
@@ -1592,6 +1665,11 @@ pt:
     exportSettings: 'Exportar configurações'
     importSettings: 'Importar configurações'
   colorTheme: 'Tema de cores'
+  skin: 'Aparência'
+  skinNames:
+    modern: 'Moderno'
+    lcd: 'LCD'
+    vfd: 'VFD'
   createNewTheme: 'Criar novo tema'
   reset: 'Redefinir'
   export: 'Exportar'
@@ -1668,6 +1746,7 @@ ru:
     language: 'Настройка языка'
     autoUpdate: 'Настройка автообновления'
     colorTheme: 'Цветовая тема'
+    skin: 'Выбор оформления'
     editTheme: 'Редактировать тему {themeName}'
     deleteTheme: 'Удалить тему {themeName}'
     createNewTheme: 'Создать новую тему'
@@ -1675,6 +1754,11 @@ ru:
     exportSettings: 'Экспортировать настройки'
     importSettings: 'Импортировать настройки'
   colorTheme: 'Цветовая тема'
+  skin: 'Оформление'
+  skinNames:
+    modern: 'Современное'
+    lcd: 'ЖК (LCD)'
+    vfd: 'ВЛИ (VFD)'
   createNewTheme: 'Создать новую тему'
   reset: 'Сбросить'
   export: 'Экспорт'

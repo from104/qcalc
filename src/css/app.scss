@@ -1,5 +1,6 @@
 // app global css in SCSS form
 @import 'tauri-linux-fontfix.scss';
+@import 'skins.scss';
 
 // 화면 아래쪽에서 쓸 수 없는 높이. Android 15+(targetSdk 35)는 앱이 시스템 바 뒤까지
 // 그리도록 강제해서(edge-to-edge) 100vh 안에 내비게이션 바 영역이 들어온다 — 3버튼
