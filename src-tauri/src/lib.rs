@@ -160,6 +160,45 @@ fn configure_gdk_backend() {
 #[cfg(not(target_os = "linux"))]
 fn configure_gdk_backend() {}
 
+/// NVIDIA 독점 드라이버에서 WebKitGTK GPU 렌더링을 되살린다.
+///
+/// WebKitGTK(2.52 실측)는 NVIDIA 독점 드라이버를 만나면 DMA-BUF 렌더러를 스스로 끄고,
+/// 그 결과 하드웨어 가속 정책이 `Never`(CPU 페인팅)로 떨어진다. Chromium(Electron)은 같은
+/// 기계에서 GPU로 합성하므로, 탭 전환·화면 전환 애니메이션이 Electron보다 눈에 띄게 끊겼다.
+/// 2026-09-26 gofu(RTX 5060 Ti, 595.91, GNOME Wayland) 실측, dev 빌드 탭 전환 중 rAF:
+/// - 기본: 정책 Never, 9.7fps
+/// - `WEBKIT_FORCE_DMABUF_RENDERER=1`만: 정책 Always지만 리소스 로드가 내부 오류로 실패
+/// - `+ WEBKIT_DMABUF_RENDERER_DISABLE_GBM=1`: 렌더링 안 됨
+/// - `+ WEBKIT_DMABUF_RENDERER_FORCE_SHM=1`: 정책 Always, **47fps**, 오류 0
+/// SHM 경로는 웹 프로세스가 GPU(Skia)로 그린 결과를 공유 메모리로 UI 프로세스에 넘겨,
+/// NVIDIA에서 문제가 되는 DMA-BUF 버퍼 공유만 피한다.
+///
+/// Mesa(AMD·Intel)는 기본값에서 이미 가속되므로 건드리지 않는다. 사용자가 WebKit 렌더러
+/// 변수를 직접 줬으면 그대로 두고, 문제가 생기면 `QCALC_NO_GPU_FORCE=1`로 끈다.
+#[cfg(target_os = "linux")]
+fn configure_webkit_gpu() {
+  if std::env::var_os("QCALC_NO_GPU_FORCE").is_some() || std::env::var_os("QCALC_FORCE_XWAYLAND").is_some() {
+    return;
+  }
+  let user_configured = [
+    "WEBKIT_FORCE_DMABUF_RENDERER",
+    "WEBKIT_DISABLE_DMABUF_RENDERER",
+    "WEBKIT_DMABUF_RENDERER_FORCE_SHM",
+    "WEBKIT_DISABLE_COMPOSITING_MODE",
+  ]
+  .iter()
+  .any(|name| std::env::var_os(name).is_some());
+  let nvidia_proprietary = std::path::Path::new("/proc/driver/nvidia/version").exists();
+  if user_configured || !nvidia_proprietary {
+    return;
+  }
+  std::env::set_var("WEBKIT_FORCE_DMABUF_RENDERER", "1");
+  std::env::set_var("WEBKIT_DMABUF_RENDERER_FORCE_SHM", "1");
+}
+
+#[cfg(not(target_os = "linux"))]
+fn configure_webkit_gpu() {}
+
 /// Linux(GTK) 창 크기 보정. GNOME Wayland는 서버 장식(SSD)이 없어 GTK가 CSD로 그림자와
 /// 타이틀바를 그리는데, 그 상태에서 tao의 크기 API가 서로 다른 기준을 쓴다(2026-09-09 실측,
 /// 배율 2·텍스트 1.25 환경에서 프레임−내용 = 90×138 논리px, X11/SSD에서는 0×0):
@@ -349,6 +388,7 @@ fn set_boot_background(app: tauri::AppHandle, color: String) {
 pub fn run() {
   // 반드시 tauri::Builder::default() 이전에 호출. Builder 초기화가 GTK 세션 백엔드를 확정한다.
   configure_gdk_backend();
+  configure_webkit_gpu();
 
   // Windows에서만 창을 숨긴 채 만든다(tauri.windows.conf.json의 visible:false — JSON merge patch는
   // 배열을 통째로 바꾸므로 main 창 항목 전체가 거기 반복돼 있다). window-state 플러그인이

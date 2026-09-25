@@ -77,6 +77,8 @@ yarn build:tauri   # 프로덕션 번들 (Linux는 .deb/.rpm/AppImage, Windows�
 
 **Wayland 사용자 주의사항**: GNOME/KDE Wayland 세션에서 `setTitle` CSD 헤더바 repaint와 `setAlwaysOnTop`이 작동하지 않는 업스트림 버그([tauri#13749](https://github.com/tauri-apps/tauri/issues/13749), [tauri#3117](https://github.com/tauri-apps/tauri/issues/3117))가 있습니다. `src-tauri/src/lib.rs`의 `configure_gdk_backend()`로 `GDK_BACKEND=x11`을 강제하면 두 문제가 해결되지만, 실기기 Wayland에서 간헐적 WebKitGTK 크래시를 유발하는 것이 확인돼 기본값은 강제하지 않음(네이티브 Wayland)입니다. 두 기능이 필요하고 크래시 위험을 감수할 경우 `QCALC_FORCE_XWAYLAND=1 yarn dev:tauri`로 옵트인하세요.
 
+**NVIDIA 독점 드라이버 GPU 렌더링**: WebKitGTK는 NVIDIA 독점 드라이버에서 DMA-BUF 렌더러를 스스로 꺼 하드웨어 가속이 `Never`(CPU 페인팅)로 떨어지고, 애니메이션이 Electron보다 크게 끊깁니다. `configure_webkit_gpu()`가 NVIDIA를 감지하면 `WEBKIT_FORCE_DMABUF_RENDERER=1` + `WEBKIT_DMABUF_RENDERER_FORCE_SHM=1`로 GPU 렌더링을 되살립니다(탭 전환 중 9.7→47fps 실측). 렌더링 문제가 생기면 `QCALC_NO_GPU_FORCE=1`로 끄세요. 직접 준 `WEBKIT_*` 렌더러 변수는 그대로 존중합니다.
+
 같은 함수가 반대 방향도 처리합니다: AppImage 번들은 linuxdeploy-plugin-gtk이 생성한 AppRun 훅에서 `export GDK_BACKEND=x11`을 무조건 내보내므로, 그대로 두면 Wayland 세션에서 위 크래시가 확정적으로 발생합니다(0.13.0 릴리스 AppImage에서 재현). 훅은 빌드 산출물이라 수정할 수 없어, GTK 초기화 전에 네이티브 Wayland로 되돌립니다.
 
 ### 데스크톱 (Electron, 레거시)
