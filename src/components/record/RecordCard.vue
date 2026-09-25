@@ -345,8 +345,25 @@
     return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}.${milliseconds}`;
   };
 
-  // 이 시각 이후 생긴 기록만 등장 애니메이션을 준다 (페이지 진입 시 기존 기록은 가만히)
-  const listMountedAt = Date.now();
+  // 새로 생긴 기록만 잠깐 등장 애니메이션을 준다. 가상 스크롤은 스크롤할 때 행을 다시 마운트하므로
+  // 타임스탬프 기준이면 되돌아올 때마다 애니메이션이 다시 돈다 — 등장 직후 잠깐만 id 를 들고 있는다.
+  const enteringIds = reactive(new Set<number>());
+  let knownIds: Set<number> | null = null;
+  watch(
+    () => records.value.map((r: Record) => r.id as number),
+    (ids) => {
+      if (knownIds) {
+        for (const id of ids) {
+          if (!knownIds.has(id)) {
+            enteringIds.add(id);
+            setTimeout(() => enteringIds.delete(id), 300);
+          }
+        }
+      }
+      knownIds = new Set(ids);
+    },
+    { immediate: true },
+  );
 
   const recordStrings = computed<RecordString[]>(() => {
     // 기본 레코드 문자열 생성
@@ -527,9 +544,20 @@
         </q-item-section>
       </q-item>
       <!-- 기록이 있을 경우 -->
-      <q-list
+      <!--
+        가상 스크롤: 보이는 행(+버퍼)만 DOM에 둔다. 100행을 전부 그리면 맨 앞에 기록이 끼어들 때
+        전 행 스타일 재계산이 일어나 '=' 한 번에 ~45ms 가 들었다. 스크롤 컨테이너는 #record-card.
+        화면 밖 행은 DOM에 없으므로 aria-setsize/posinset 으로 전체 개수·위치를 스크린리더에 알린다.
+      -->
+      <q-virtual-scroll
         v-else
         id="record-list"
+        v-slot="{ item: record, index }"
+        component="q-list"
+        :items="recordStrings"
+        scroll-target="#record-card"
+        :virtual-scroll-item-size="88"
+        :virtual-scroll-slice-size="12"
         separator
         class="full-width q-pt-md"
         role="list"
@@ -537,12 +565,13 @@
         :class="recordFontClass"
       >
         <q-slide-item
-          v-for="record in recordStrings"
           :key="record.id"
-          :class="{ 'record-enter': record.timestamp > listMountedAt }"
+          :class="{ 'record-enter': enteringIds.has(record.id) }"
           left-color="negative"
           right-color="positive"
           role="listitem"
+          :aria-setsize="recordStrings.length"
+          :aria-posinset="index + 1"
           @left="deleteRecordItem(record.id as number)"
           @right="(event: QSlideEvent) => slideToOpenMemoDialog(event.reset, record.id)"
         >
@@ -694,7 +723,7 @@
             </q-item-section>
           </q-item>
         </q-slide-item>
-      </q-list>
+      </q-virtual-scroll>
     </transition>
 
     <div v-if="fabOpen" class="backdrop" @click="fabOpen = false"></div>
