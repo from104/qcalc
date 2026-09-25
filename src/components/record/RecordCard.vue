@@ -345,6 +345,9 @@
     return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}.${milliseconds}`;
   };
 
+  // 이 시각 이후 생긴 기록만 등장 애니메이션을 준다 (페이지 진입 시 기존 기록은 가만히)
+  const listMountedAt = Date.now();
+
   const recordStrings = computed<RecordString[]>(() => {
     // 기본 레코드 문자열 생성
     const strings = records.value.map((record: Record) => {
@@ -533,168 +536,164 @@
         aria-live="polite"
         :class="recordFontClass"
       >
-        <transition-group name="record-list">
-          <q-slide-item
-            v-for="record in recordStrings"
-            :key="record.id"
-            left-color="negative"
-            right-color="positive"
+        <q-slide-item
+          v-for="record in recordStrings"
+          :key="record.id"
+          :class="{ 'record-enter': record.timestamp > listMountedAt }"
+          left-color="negative"
+          right-color="positive"
+          role="listitem"
+          @left="deleteRecordItem(record.id as number)"
+          @right="(event: QSlideEvent) => slideToOpenMemoDialog(event.reset, record.id)"
+        >
+          <template v-if="$g.isMobile" #left>
+            <q-icon name="delete_outline" :aria-label="t('ariaLabel.deleteRecord')" role="button" />
+          </template>
+          <template v-if="$g.isMobile" #right>
+            <q-icon name="edit_note" :aria-label="t('ariaLabel.editMemo')" role="button" />
+          </template>
+          <q-item
+            v-touch-hold.mouse="() => (recordMenu[record.id as number] = true)"
+            class="text-right q-pa-sm record-item"
             role="listitem"
-            @left="deleteRecordItem(record.id as number)"
-            @right="(event: QSlideEvent) => slideToOpenMemoDialog(event.reset, record.id)"
           >
-            <template v-if="$g.isMobile" #left>
-              <q-icon name="delete_outline" :aria-label="t('ariaLabel.deleteRecord')" role="button" />
-            </template>
-            <template v-if="$g.isMobile" #right>
-              <q-icon name="edit_note" :aria-label="t('ariaLabel.editMemo')" role="button" />
-            </template>
-            <q-item
-              v-touch-hold.mouse="() => (recordMenu[record.id as number] = true)"
-              class="text-right q-pa-sm record-item"
-              role="listitem"
-            >
-              <q-item-section class="q-mr-none q-px-none">
-                <q-item-label v-if="record.memo" class="memo-text">
-                  <HighlightText
-                    :text="record.memo"
-                    :search-term="uiStore.searchKeyword"
-                    @show-tooltip="(isShow: boolean) => handleMemoTooltip(record.id, isShow)"
-                  />
-                  <ToolTip
-                    v-if="isShowMemoTooltip[record.id]"
-                    :text-color="themesStore.getDarkColor()"
-                    :bg-color="themesStore.getCurrentThemeColors.ui.warning"
-                    :delay="1000"
-                    :text="record.memo"
-                  />
-                </q-item-label>
-                <q-item-label class="record-text">
-                  <HighlightText
-                    :text="record.displayText"
-                    :search-term="uiStore.searchKeyword"
-                    allow-line-break
-                    @show-tooltip="(isShow: boolean) => handleResultTooltip(record.id, isShow)"
-                  />
-                  <ToolTip
-                    v-if="isShowResultTooltip[record.id]"
-                    :text-color="themesStore.getDarkColor()"
-                    :bg-color="themesStore.getCurrentThemeColors.ui.warning"
-                    :delay="1000"
-                    :text="record.displayText"
-                  />
-                </q-item-label>
-                <q-item-label class="row justify-between q-pa-none q-ma-none">
-                  <div class="col-6 text-left record-menu-btn">
-                    <q-btn
-                      class="q-px-xs q-py-none menu-btn"
-                      :class="themesStore.darkMode ? 'body--dark' : 'body--light'"
-                      icon="more_vert"
-                      size="sm"
-                      flat
-                      rounded
-                      @click="() => $g.isDesktop && openRecordMenu(record.id as number)"
+            <q-item-section class="q-mr-none q-px-none">
+              <q-item-label v-if="record.memo" class="memo-text">
+                <HighlightText
+                  :text="record.memo"
+                  :search-term="uiStore.searchKeyword"
+                  @show-tooltip="(isShow: boolean) => handleMemoTooltip(record.id, isShow)"
+                />
+                <ToolTip
+                  v-if="isShowMemoTooltip[record.id]"
+                  :text-color="themesStore.getDarkColor()"
+                  :bg-color="themesStore.getCurrentThemeColors.ui.warning"
+                  :delay="1000"
+                  :text="record.memo"
+                />
+              </q-item-label>
+              <q-item-label class="record-text">
+                <HighlightText
+                  :text="record.displayText"
+                  :search-term="uiStore.searchKeyword"
+                  allow-line-break
+                  @show-tooltip="(isShow: boolean) => handleResultTooltip(record.id, isShow)"
+                />
+                <ToolTip
+                  v-if="isShowResultTooltip[record.id]"
+                  :text-color="themesStore.getDarkColor()"
+                  :bg-color="themesStore.getCurrentThemeColors.ui.warning"
+                  :delay="1000"
+                  :text="record.displayText"
+                />
+              </q-item-label>
+              <q-item-label class="row justify-between q-pa-none q-ma-none">
+                <div class="col-6 text-left record-menu-btn">
+                  <q-btn
+                    class="q-px-xs q-py-none menu-btn"
+                    :class="themesStore.darkMode ? 'body--dark' : 'body--light'"
+                    icon="more_vert"
+                    size="sm"
+                    flat
+                    rounded
+                    @click="() => $g.isDesktop && openRecordMenu(record.id as number)"
+                  >
+                    <q-menu
+                      :model-value="recordMenu[record.id] ?? false"
+                      class="shadow-6"
+                      :context-menu="$g.isDesktop"
+                      auto-close
+                      anchor="bottom left"
+                      self="top left"
+                      @update:model-value="
+                        (val) => {
+                          recordMenu[record.id] = val;
+                        }
+                      "
                     >
-                      <q-menu
-                        :model-value="recordMenu[record.id] ?? false"
-                        class="shadow-6"
-                        :context-menu="$g.isDesktop"
-                        auto-close
-                        anchor="bottom left"
-                        self="top left"
-                        @update:model-value="
-                          (val) => {
-                            recordMenu[record.id] = val;
-                          }
-                        "
+                      <q-list
+                        dense
+                        class="noselect q-py-sm"
+                        :style="{
+                          backgroundColor: menuBackgroundColor,
+                        }"
+                        style="max-width: 200px"
+                        role="list"
+                        :dark="themesStore.isDarkMode()"
                       >
-                        <q-list
-                          dense
-                          class="noselect q-py-sm"
-                          :style="{
-                            backgroundColor: menuBackgroundColor,
-                          }"
-                          style="max-width: 200px"
-                          role="list"
-                          :dark="themesStore.isDarkMode()"
-                        >
-                          <MenuItem
-                            v-if="record.memo"
-                            :title="t('copyMemo')"
-                            :action="() => copyRecordItem(record.id as number, 'memo')"
-                          />
-                          <MenuItem v-if="record.memo" separator />
-                          <MenuItem
-                            :title="t('copyDisplayedResult')"
-                            :action="() => copyRecordItem(record.id as number, 'formattedNumber')"
-                            :caption="calcStore.getRightSideInRecord(record.origResult)"
-                          />
-                          <MenuItem
-                            :title="t('copyResultNumber')"
-                            :action="() => copyRecordItem(record.id as number, 'onlyNumber')"
-                            :caption="record.origResult.resultNumber"
-                          />
-                          <MenuItem separator />
-                          <MenuItem
-                            :title="t('copyTime')"
-                            :action="() => copyRecordItem(record.id as number, 'time')"
-                            :caption="formatDateTime(record.timestamp)"
-                          />
-                          <MenuItem v-if="record.mode === 'formula' && record.expression" separator />
-                          <MenuItem
-                            v-if="record.mode === 'formula' && record.expression"
-                            :title="t('copyExpression')"
-                            :action="() => copyRecordItem(record.id as number, 'expression')"
-                            :caption="record.expression"
-                          />
-                          <MenuItem
-                            v-if="record.mode === 'formula' && record.expression && uiStore.currentTab === 'formula'"
-                            :title="t('loadToFormulaField')"
-                            :action="() => loadToFormulaField(record.id as number)"
-                          />
-                          <MenuItem separator />
-                          <MenuItem
-                            :title="t('loadToMainPanel')"
-                            :action="() => loadToMainPanel(record.id as number)"
-                          />
-                          <MenuItem
-                            v-if="uiStore.currentTab === 'unit' || uiStore.currentTab === 'currency'"
-                            :title="t('loadToSubPanel')"
-                            :action="() => loadToSubPanel(record.id as number)"
-                          />
-                          <MenuItem v-if="$g.isDesktop" separator />
-                          <MenuItem
-                            v-if="$g.isDesktop"
-                            :title="t('deleteResult')"
-                            :action="() => deleteRecordItem(record.id as number)"
-                          />
-                        </q-list>
-                      </q-menu>
-                    </q-btn>
-                    <q-btn
-                      v-if="$g.isDesktop"
-                      class="q-px-xs menu-btn"
-                      :class="themesStore.darkMode ? 'body--dark' : 'body--light'"
-                      icon="edit_note"
-                      size="sm"
-                      flat
-                      rounded
-                      @click="() => openMemoDialog(record.id as number)"
-                    />
-                  </div>
-                  <div class="col-6 text-right text-caption record-timestamp">
-                    <HighlightText
-                      class="self-center"
-                      :class="themesStore.darkMode ? 'body--dark' : 'body--light'"
-                      :text="formatDateTime(record.timestamp)"
-                      :search-term="uiStore.searchKeyword"
-                    />
-                  </div>
-                </q-item-label>
-              </q-item-section>
-            </q-item>
-          </q-slide-item>
-        </transition-group>
+                        <MenuItem
+                          v-if="record.memo"
+                          :title="t('copyMemo')"
+                          :action="() => copyRecordItem(record.id as number, 'memo')"
+                        />
+                        <MenuItem v-if="record.memo" separator />
+                        <MenuItem
+                          :title="t('copyDisplayedResult')"
+                          :action="() => copyRecordItem(record.id as number, 'formattedNumber')"
+                          :caption="calcStore.getRightSideInRecord(record.origResult)"
+                        />
+                        <MenuItem
+                          :title="t('copyResultNumber')"
+                          :action="() => copyRecordItem(record.id as number, 'onlyNumber')"
+                          :caption="record.origResult.resultNumber"
+                        />
+                        <MenuItem separator />
+                        <MenuItem
+                          :title="t('copyTime')"
+                          :action="() => copyRecordItem(record.id as number, 'time')"
+                          :caption="formatDateTime(record.timestamp)"
+                        />
+                        <MenuItem v-if="record.mode === 'formula' && record.expression" separator />
+                        <MenuItem
+                          v-if="record.mode === 'formula' && record.expression"
+                          :title="t('copyExpression')"
+                          :action="() => copyRecordItem(record.id as number, 'expression')"
+                          :caption="record.expression"
+                        />
+                        <MenuItem
+                          v-if="record.mode === 'formula' && record.expression && uiStore.currentTab === 'formula'"
+                          :title="t('loadToFormulaField')"
+                          :action="() => loadToFormulaField(record.id as number)"
+                        />
+                        <MenuItem separator />
+                        <MenuItem :title="t('loadToMainPanel')" :action="() => loadToMainPanel(record.id as number)" />
+                        <MenuItem
+                          v-if="uiStore.currentTab === 'unit' || uiStore.currentTab === 'currency'"
+                          :title="t('loadToSubPanel')"
+                          :action="() => loadToSubPanel(record.id as number)"
+                        />
+                        <MenuItem v-if="$g.isDesktop" separator />
+                        <MenuItem
+                          v-if="$g.isDesktop"
+                          :title="t('deleteResult')"
+                          :action="() => deleteRecordItem(record.id as number)"
+                        />
+                      </q-list>
+                    </q-menu>
+                  </q-btn>
+                  <q-btn
+                    v-if="$g.isDesktop"
+                    class="q-px-xs menu-btn"
+                    :class="themesStore.darkMode ? 'body--dark' : 'body--light'"
+                    icon="edit_note"
+                    size="sm"
+                    flat
+                    rounded
+                    @click="() => openMemoDialog(record.id as number)"
+                  />
+                </div>
+                <div class="col-6 text-right text-caption record-timestamp">
+                  <HighlightText
+                    class="self-center"
+                    :class="themesStore.darkMode ? 'body--dark' : 'body--light'"
+                    :text="formatDateTime(record.timestamp)"
+                    :search-term="uiStore.searchKeyword"
+                  />
+                </div>
+              </q-item-label>
+            </q-item-section>
+          </q-item>
+        </q-slide-item>
       </q-list>
     </transition>
 
@@ -839,21 +838,17 @@
     transform: translateY(-100%);
   }
 
-  .record-list-move,
-  .record-list-enter-active,
-  .record-list-leave-active {
-    transition: all 0.3s ease;
+  /* 새 기록만 CSS 애니메이션으로 등장시킨다. <transition-group>은 갱신마다 전 항목 위치를
+     getBoundingClientRect 로 재서(FLIP) 기록 100개에서 '=' 한 번에 65~127ms 가 들었다. */
+  .record-enter {
+    animation: record-enter 160ms cubic-bezier(0.2, 0.8, 0.2, 1);
   }
 
-  .record-list-leave-active {
-    position: absolute;
-  }
-
-  .record-list-enter-from,
-  .record-list-leave-to {
-    opacity: 0;
-    transform: translateY(-50%);
-    width: 100%;
+  @keyframes record-enter {
+    from {
+      opacity: 0;
+      transform: translateY(-8px);
+    }
   }
 
   #record-list {
