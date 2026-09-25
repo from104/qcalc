@@ -258,7 +258,7 @@
 
     <q-page-container class="row" style="padding-bottom: 0px">
       <!-- 넓은 화면 계산기 영역 -->
-      <div class="col-6 calc-content calc-pane" role="region" :aria-label="t('ariaLabel.calculatorSection')">
+      <div class="col-6 calc-content" role="region" :aria-label="t('ariaLabel.calculatorSection')">
         <q-tab-panels
           v-model="localCurrentTab"
           animated

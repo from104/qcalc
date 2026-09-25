@@ -150,56 +150,47 @@
   );
 
   // 레이아웃 전환 (넓은 ↔ 좁은)
-  // View Transitions로 교체 전후 화면을 잇는다: 헤더·계산기·보조 패널(view-transition-name, app.scss)이
-  // 제자리에서 크기·위치를 바꾸고 보조 패널은 옆에서 들어온다. 예전 scaleX 늘이기는 글자가 찌그러졌다.
-  // 미지원 환경은 짧은 페이드, 모션 감소 환경은 즉시 교체.
-  // WebKit·Chromium 모두 전환 중 뷰포트 크기가 바뀌면 전환을 건너뛴다("viewport size changed").
-  // 창을 끄는 동안 경계를 넘으면 매번 취소돼 순간 교체로 보였으므로, 크기 변화가 멈춘 뒤 전환한다.
-  // 끄는 동안에는 기존 레이아웃이 그대로 늘어나거나 줄어든다.
-  const RESIZE_SETTLE_MS = 150;
-  let layoutTransition: ViewTransition | null = null;
-  let lastResizeAt = 0;
-  let settleTimer: ReturnType<typeof setTimeout> | undefined;
-  window.addEventListener('resize', () => (lastResizeAt = performance.now()), { passive: true });
+  // 경계를 넘는 즉시 레이아웃을 바꾸고, 새 화면은 살짝 확대되며 나타나고 넓은 화면의 보조 패널은 옆에서
+  // 밀려 들어온다. transform·opacity 만 쓰는 컴포지터 애니메이션이라 메인 스레드가 막혀도 끊기지 않는다.
+  // 시도했다 버린 방식 (WebKitGTK 릴리스 실측):
+  // - scaleX 늘이기: 글자가 찌그러짐
+  // - View Transition: 창 크기가 바뀌는 중이면 "viewport size changed"로 건너뛰어져 순간 교체
+  // - 계산기 폭(width) 애니메이션: 버튼 컨테이너 쿼리 재배치가 프레임당 30~100ms 라 뚝뚝 끊김
+  const LAYOUT_MS = 200;
+  const LAYOUT_EASE = 'cubic-bezier(0.2, 0.8, 0.2, 1)';
 
-  const swapLayout = (wide: boolean) => {
+  const swapLayout = async (wide: boolean) => {
     const root = document.documentElement;
     const reduceMotion =
       root.classList.contains('motion-reduced') || window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    if (!document.startViewTransition || reduceMotion) {
-      currentTransition.value = reduceMotion ? '' : 'fade';
-      isWideLayout.value = wide;
-      return;
-    }
-    // 창을 끌며 경계를 오가면 전환이 겹친다 — 진행 중인 것은 끝 상태로 건너뛴다
-    layoutTransition?.skipTransition();
     currentTransition.value = '';
-    root.dataset.layoutSwap = wide ? 'to-wide' : 'to-narrow';
-    const transition = document.startViewTransition(async () => {
-      isWideLayout.value = wide;
-      await nextTick();
-    });
-    layoutTransition = transition;
-    void transition.finished.finally(() => {
-      if (layoutTransition === transition) {
-        layoutTransition = null;
-        delete root.dataset.layoutSwap;
-      }
-    });
+    isWideLayout.value = wide;
+    if (reduceMotion) return;
+    await nextTick();
+    document.querySelector<HTMLElement>('.main-layout')?.animate(
+      [
+        { opacity: 0.4, transform: 'scale(0.985)' },
+        { opacity: 1, transform: 'none' },
+      ],
+      { duration: LAYOUT_MS, easing: LAYOUT_EASE },
+    );
+    if (wide) {
+      document.querySelector<HTMLElement>('.sub-pane')?.animate(
+        [
+          { transform: 'translateX(24px)', opacity: 0 },
+          { transform: 'none', opacity: 1 },
+        ],
+        { duration: LAYOUT_MS + 60, easing: LAYOUT_EASE },
+      );
+    }
   };
 
-  const scheduleLayoutSwap = () => {
-    clearTimeout(settleTimer);
-    settleTimer = setTimeout(() => {
-      if (performance.now() - lastResizeAt < RESIZE_SETTLE_MS) {
-        scheduleLayoutSwap();
-        return;
-      }
-      const wide = isWideWidth();
-      if (wide !== isWideLayout.value) swapLayout(wide);
-    }, RESIZE_SETTLE_MS);
-  };
-  watch(() => isWideWidth(), scheduleLayoutSwap);
+  watch(
+    () => isWideWidth(),
+    (wide) => {
+      if (wide !== isWideLayout.value) void swapLayout(wide);
+    },
+  );
 
   // 라우트 전환 애니메이션
   watch(
@@ -225,8 +216,8 @@
       Wide: 고정 키('wide-layout')로 레이아웃 유지, 서브페이지만 전환
       Narrow: routeProps.path를 키로 사용하여 페이지 전환 애니메이션
     -->
-    <!-- 이름이 비면(:css=false) 떠나는 화면을 즉시 제거 — View Transition 캡처 때 옛·새 레이아웃이 겹쳐
-         view-transition-name 이 중복되면 전환이 InvalidStateError 로 중단된다 -->
+    <!-- 이름이 비면(:css=false) 떠나는 화면을 즉시 제거 — 레이아웃 전환 때 옛·새 레이아웃이 겹치면
+         새 화면(.main-layout)에 거는 등장 애니메이션 대상이 옛 화면으로 어긋난다 -->
     <transition :name="transitionName" :css="!!transitionName" mode="default">
       <component :is="Component" :key="isWideLayout ? 'wide-layout' : routeProps.path" />
     </transition>
