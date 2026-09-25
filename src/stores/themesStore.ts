@@ -178,8 +178,21 @@ export const useThemesStore = defineStore('themes', {
       // 흰 화면 깜빡임을 없앤다. 테마·다크 모드 적용이 끝난 뒤의 실제 배경을 기록한다.
       // (rAF는 백그라운드 탭·숨은 창에서 돌지 않으므로 setTimeout)
       setTimeout(() => {
+        // 라이트 모드에선 body 배경이 투명(rgba(0, 0, 0, 0))이고 실제로 보이는 건 기본 흰색이다.
+        // html 배경은 boot-bg.js 가 칠한 직전 값이라 참고하지 않는다.
+        const bodyBg = getComputedStyle(document.body).backgroundColor;
+        const bg = bodyBg === 'transparent' || /rgba\(.*,\s*0\)$/.test(bodyBg) ? 'rgb(255, 255, 255)' : bodyBg;
+        // boot-bg.js 가 칠한 html 배경을 현재 테마로 맞춘다 — 안 그러면 body가 투명한 라이트 모드에서
+        // 내용이 짧은 화면(빈 기록 등) 아래로 직전 테마 색이 비친다
+        document.documentElement.style.backgroundColor = bg;
+        // Tauri: WebView가 HTML을 읽기 전 구간까지 칠하도록 Rust에도 넘긴다 (다음 실행의 창 배경)
+        if (window.globalVars?.isTauri) {
+          void import('@tauri-apps/api/core')
+            .then(({ invoke }) => invoke('set_boot_background', { color: bg }))
+            .catch((err: unknown) => console.warn('[themes] set_boot_background failed', err));
+        }
         try {
-          localStorage.setItem('qcalc-boot-bg', getComputedStyle(document.body).backgroundColor);
+          localStorage.setItem('qcalc-boot-bg', bg);
         } catch {
           /* 저장소 접근 불가 시 무시 — 첫 페인트만 기본색 */
         }

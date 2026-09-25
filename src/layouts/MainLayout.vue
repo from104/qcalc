@@ -5,8 +5,24 @@
   import NarrowLayout from './NarrowLayout.vue';
   import WideLayout from './WideLayout.vue';
   import { useI18n } from 'vue-i18n';
-  import { computed, defineAsyncComponent, ref, watch } from 'vue';
+  import { computed, defineAsyncComponent, onMounted, ref, watch } from 'vue';
   import { useRecordManager } from '../composables/useRecordManager';
+
+  // index.html 부팅 스플래시는 계산기 화면이 실제로 그려진 뒤(다음 프레임) 걷어낸다.
+  // App 마운트 시점에 걷으면 비동기 라우트(이 레이아웃)가 뜨기 전 빈 화면 텀이 생긴다.
+  onMounted(() => {
+    const splash = document.getElementById('boot-splash');
+    if (!splash) return;
+    let done = false;
+    const leave = () => {
+      if (done) return;
+      done = true;
+      splash.classList.add('is-leaving');
+      setTimeout(() => splash.remove(), 200);
+    };
+    requestAnimationFrame(() => requestAnimationFrame(leave));
+    setTimeout(leave, 100); // rAF가 돌지 않는 숨은 창 대비
+  });
 
   // Layout.yml의 메시지들을 가져와서 useMainLayout에 전달
   const { t } = useI18n();

@@ -26,20 +26,100 @@
       <link rel="icon" type="image/png" sizes="128x128" href="icons/favicon-128x128.png">
       <link rel="icon" type="image/png" sizes="96x96" href="icons/favicon-96x96.png">
     -->
-    <!-- 첫 페인트 배경: 첫 실행은 시스템 다크 설정을 따르고, 이후엔 boot-bg.js 가 직전 테마 배경을 칠한다 -->
-    <style>
-      @media (prefers-color-scheme: dark) {
-        html {
-          background-color: #1d1d1d;
-        }
-      }
-    </style>
+    <!-- 첫 페인트 배경: 직전 실행의 테마 배경을 CSS·앱 JS보다 먼저 칠한다 (public/boot-bg.js) -->
     <script src="boot-bg.js"></script>
     <link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32x32.png" />
     <link rel="icon" type="image/png" sizes="16x16" href="icons/favicon-16x16.png" />
     <link rel="icon" type="image/ico" href="favicon.ico" />
   </head>
   <body>
+    <!-- 부팅 스플래시: 앱 JS가 뜨기 전 0.3~0.7초 동안 아이콘 키가 차례로 눌린다.
+         App.vue 가 마운트 후 페이드아웃·제거한다. 순수 CSS라 CSP·앱 번들에 영향 없음 -->
+    <div id="boot-splash" aria-hidden="true">
+      <div class="icon">
+        <span class="k">+</span><span class="k">M<sup>2</sup></span
+        ><span class="k">$</span><span class="k">C</span>
+      </div>
+    </div>
+    <style>
+      /* HTML 요소 + transform/opacity 만 써서 컴포지터에서 돈다 — 앱 JS가 메인 스레드를 잡아도 끊기지 않음 */
+      #boot-splash {
+        position: fixed;
+        inset: 0;
+        z-index: 9999;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        pointer-events: none;
+        animation: boot-in 120ms ease-out 80ms both;
+        transition: opacity 180ms ease-out;
+      }
+      #boot-splash.is-leaving {
+        opacity: 0;
+      }
+      #boot-splash .icon {
+        box-sizing: border-box;
+        width: 96px;
+        height: 96px;
+        padding: 12px;
+        border-radius: 21px;
+        background: #5cc56b;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 6px;
+        font:
+          700 22px/1 system-ui,
+          sans-serif;
+        color: #fff;
+      }
+      #boot-splash .k {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 7px;
+        background: #1f5e2a;
+        will-change: transform, opacity;
+        animation: boot-press 900ms cubic-bezier(0.3, 0.7, 0.4, 1) infinite;
+      }
+      #boot-splash .k sup {
+        font-size: 9px;
+        margin-top: -10px;
+      }
+      /* 시계 방향: + → M² → C → $ */
+      #boot-splash .k:nth-child(2) {
+        animation-delay: 110ms;
+      }
+      #boot-splash .k:nth-child(4) {
+        animation-delay: 220ms;
+      }
+      #boot-splash .k:nth-child(3) {
+        animation-delay: 330ms;
+      }
+      @keyframes boot-in {
+        from {
+          opacity: 0;
+          transform: scale(0.94);
+        }
+      }
+      @keyframes boot-press {
+        0%,
+        45%,
+        100% {
+          transform: scale(1);
+          opacity: 1;
+        }
+        18% {
+          transform: scale(0.84);
+          opacity: 0.7;
+        }
+      }
+      @media (prefers-reduced-motion: reduce) {
+        #boot-splash,
+        #boot-splash .k {
+          animation: none;
+        }
+      }
+    </style>
     <!-- quasar:entry-point -->
   </body>
 </html>
