@@ -150,37 +150,65 @@
   );
 
   // 레이아웃 전환 (넓은 ↔ 좁은)
-  // 경계를 넘는 즉시 레이아웃을 바꾸고, 새 화면은 살짝 확대되며 나타나고 넓은 화면의 보조 패널은 옆에서
-  // 밀려 들어온다. transform·opacity 만 쓰는 컴포지터 애니메이션이라 메인 스레드가 막혀도 끊기지 않는다.
-  // 시도했다 버린 방식 (WebKitGTK 릴리스 실측):
-  // - scaleX 늘이기: 글자가 찌그러짐
-  // - View Transition: 창 크기가 바뀌는 중이면 "viewport size changed"로 건너뛰어져 순간 교체
-  // - 계산기 폭(width) 애니메이션: 버튼 컨테이너 쿼리 재배치가 프레임당 30~100ms 라 뚝뚝 끊김
-  const LAYOUT_MS = 200;
-  const LAYOUT_EASE = 'cubic-bezier(0.2, 0.8, 0.2, 1)';
+  // 경계를 넘는 즉시 레이아웃을 바꾸고, 계산기 영역의 실제 폭을 옛 폭 → 새 폭(%)으로 애니메이션한다.
+  // 버튼 글자는 컨테이너 쿼리로 크기가 정해지므로 폭이 변하는 동안 찌그러지지 않고 자연스럽게 커지고
+  // 줄어든다. 넓은 화면의 보조 패널은 옆에서 밀려 들어온다. % 목표라 창을 끄는 중에도 끊기지 않는다.
+  // 폭 애니메이션은 매 프레임 재배치라 WebKitGTK 에서 프레임당 30~100ms 가 들어 조금 끊기지만, 형태가
+  // 이어지는 쪽을 택했다(기현님 결정). 버린 방식: scaleX 늘이기(글자 찌그러짐), View Transition(창 크기가
+  // 바뀌는 중엔 건너뛰어져 순간 교체), 투명도·확대 페이드(부드럽지만 형태가 이어지지 않음).
+  // 시작 직후 한 번 ~90ms 멈칫하므로(새 레이아웃 첫 GPU 래스터, 릴리스 실측) 앞쪽이 급한 ease-out 대신
+  // 느리게 출발하는 ease-in-out 을 조금 길게 쓴다.
+  const PANE_MS = 260;
+  const PANE_EASE = 'cubic-bezier(0.4, 0, 0.2, 1)';
+  const nextFrame = () => new Promise<void>((resolve) => requestAnimationFrame(() => resolve()));
 
   const swapLayout = async (wide: boolean) => {
     const root = document.documentElement;
     const reduceMotion =
       root.classList.contains('motion-reduced') || window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     currentTransition.value = '';
+    const oldWidth = document.querySelector<HTMLElement>('.calc-pane')?.getBoundingClientRect().width;
     isWideLayout.value = wide;
-    if (reduceMotion) return;
+    if (reduceMotion || !oldWidth) return;
     await nextTick();
-    document.querySelector<HTMLElement>('.main-layout')?.animate(
-      [
-        { opacity: 0.4, transform: 'scale(0.985)' },
-        { opacity: 1, transform: 'none' },
-      ],
-      { duration: LAYOUT_MS, easing: LAYOUT_EASE },
+    const pane = document.querySelector<HTMLElement>('.calc-pane');
+    const side = wide ? document.querySelector<HTMLElement>('.sub-pane') : null;
+    if (!pane) return;
+    // 새 레이아웃 마운트로 메인 스레드가 100ms 넘게 막히므로(WebKitGTK 실측), 곧바로 애니메이션을 걸면
+    // 첫 페인트 때 이미 끝나 있다. 옛 폭에 고정한 채 새 레이아웃이 그려지고 한가해진 뒤 시작한다.
+    const style = pane.style;
+    style.transition = 'none';
+    style.flex = '0 0 auto';
+    style.width = `${oldWidth}px`;
+    if (side) side.style.opacity = '0';
+    await nextFrame();
+    await nextFrame();
+    await new Promise<void>((resolve) =>
+      'requestIdleCallback' in window
+        ? requestIdleCallback(() => resolve(), { timeout: 200 })
+        : setTimeout(resolve, 60),
     );
-    if (wide) {
-      document.querySelector<HTMLElement>('.sub-pane')?.animate(
+    // 폭이 처음 바뀔 때의 비싼 재배치(컨테이너 쿼리·탭 바 측정)를 시작 전에 치러 둔다
+    style.width = `${oldWidth + 1}px`;
+    void pane.offsetWidth;
+    style.width = `${oldWidth}px`;
+    void pane.offsetWidth;
+    await nextFrame();
+    style.transition = `width ${PANE_MS}ms ${PANE_EASE}`;
+    style.width = wide ? '50%' : '100%';
+    const cleanup = () => {
+      style.transition = style.flex = style.width = '';
+    };
+    pane.addEventListener('transitionend', cleanup, { once: true });
+    setTimeout(cleanup, PANE_MS + 100); // transitionend 누락 대비
+    if (side) {
+      side.style.opacity = '';
+      side.animate(
         [
-          { transform: 'translateX(24px)', opacity: 0 },
+          { transform: 'translateX(40%)', opacity: 0 },
           { transform: 'none', opacity: 1 },
         ],
-        { duration: LAYOUT_MS + 60, easing: LAYOUT_EASE },
+        { duration: PANE_MS, easing: PANE_EASE },
       );
     }
   };
@@ -217,7 +245,7 @@
       Narrow: routeProps.path를 키로 사용하여 페이지 전환 애니메이션
     -->
     <!-- 이름이 비면(:css=false) 떠나는 화면을 즉시 제거 — 레이아웃 전환 때 옛·새 레이아웃이 겹치면
-         새 화면(.main-layout)에 거는 등장 애니메이션 대상이 옛 화면으로 어긋난다 -->
+         새 계산기 영역(.calc-pane)을 찾아 폭 애니메이션을 거는 대상이 옛 화면으로 어긋난다 -->
     <transition :name="transitionName" :css="!!transitionName" mode="default">
       <component :is="Component" :key="isWideLayout ? 'wide-layout' : routeProps.path" />
     </transition>

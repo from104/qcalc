@@ -262,7 +262,7 @@
         -->
         <q-tab-panels
           v-model="localCurrentTab"
-          class="col"
+          class="col calc-pane"
           animated
           infinite
           :swipeable="$g.isMobile"
