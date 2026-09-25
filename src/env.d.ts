@@ -48,3 +48,17 @@ declare module 'tinykeys' {
    */
   export function tinykeys(target: Window | HTMLElement, keyBindingMap: KeyBindingMap): () => void;
 }
+
+// mathjs 자체 완결형 브라우저 번들 (수식 엔진 지연 로드용, FormulaMath.ts)
+declare module 'mathjs/lib/browser/math.js' {
+  import type { MathJsInstance } from 'mathjs';
+  const math: MathJsInstance;
+  export default math;
+}
+
+// QMarkdown 컴포넌트 소스 직접 import (지연 등록용, boot/qmarkdown-lazy.ts)
+declare module '@quasar/quasar-ui-qmarkdown/src/components/QMarkdown.js' {
+  import type { Component } from 'vue';
+  const QMarkdown: Component;
+  export default QMarkdown;
+}

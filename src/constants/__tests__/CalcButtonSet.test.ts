@@ -5,6 +5,7 @@
  *              generic 메시지만 보여주던 결함(UX-06 부분 미해결)이 재발하지 않는지 검증한다.
  */
 import { describe, it, expect, beforeEach, vi } from 'vitest';
+
 import { setActivePinia, createPinia } from 'pinia';
 
 import { getErrorMessage } from 'src/utils/ErrorUtils';
@@ -34,6 +35,7 @@ describe('수식 계산기 "=" 키패드 (d6) 오류 처리', () => {
 
     ({ createCalcButtonSet } = await import('../CalcButtonSet'));
     ({ useFormulaStore } = await import('../../stores/formulaStore'));
+    await useFormulaStore().ensureMath(); // 수식 엔진은 지연 로드
     ({ showError } = (await import('src/utils/NotificationUtils')) as unknown as {
       showError: ReturnType<typeof vi.fn>;
     });

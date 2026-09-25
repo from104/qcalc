@@ -1,4 +1,5 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
+
 import { setActivePinia, createPinia } from 'pinia';
 import { CalculatorMath } from '../../core/calculator/CalculatorMath';
 
@@ -18,6 +19,7 @@ describe('formulaStore 삼각함수 도 단위 기준 (BENCH-02)', () => {
     vi.resetModules();
     setActivePinia(createPinia());
     useFormulaStore = (await import('../formulaStore')).useFormulaStore;
+    await useFormulaStore().ensureMath(); // 수식 엔진은 지연 로드
     useCalcStore = (await import('../calcStore')).useCalcStore;
   });
 
@@ -81,6 +83,7 @@ describe('formulaStore.expressionError (UX-06)', () => {
     vi.resetModules();
     setActivePinia(createPinia());
     useFormulaStore = (await import('../formulaStore')).useFormulaStore;
+    await useFormulaStore().ensureMath(); // 수식 엔진은 지연 로드
   });
 
   it('빈 수식은 오류 없이 null을 반환한다', () => {

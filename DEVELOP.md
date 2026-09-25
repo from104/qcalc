@@ -71,7 +71,7 @@ MY_JKS_KEY_PASSWORD=key_password
 Prerequisites: Rust stable (`rust-version = 1.77.2` minimum per `src-tauri/Cargo.toml`; current stable recommended — `rustup update stable`), Linux build dependencies (`webkit2gtk-4.1`, `rsvg2`).
 
 ```bash
-yarn dev:tauri     # dev mode (devtools auto-open)
+yarn dev:tauri     # dev mode (devtools: QCALC_DEVTOOLS=1 yarn dev:tauri)
 yarn build:tauri   # production bundles (.deb/.rpm/AppImage on Linux, NSIS .exe on Windows)
 ```
 

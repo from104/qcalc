@@ -1,10 +1,12 @@
 import { describe, it, expect } from 'vitest';
 import { classifyFormulaError } from '../FormulaError';
-import { MathB } from '../../core/calculator/CalculatorMath';
+import { loadFormulaMath } from '../../core/calculator/FormulaMath';
+
+const MathF = await loadFormulaMath();
 
 const classifyOf = (expr: string) => {
   try {
-    MathB.evaluate(expr);
+    MathF.evaluate(expr);
     return null;
   } catch (e) {
     return classifyFormulaError(e instanceof Error ? e.message : String(e));

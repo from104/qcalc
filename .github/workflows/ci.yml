@@ -33,6 +33,12 @@ jobs:
       - name: Test with coverage
         run: yarn test:coverage
 
+      # 시작 번들 예산 — 첫 화면에 받는 JS/CSS(gzip)가 늘면 실패 (ROADMAP-killer-app-ko.md Phase 0)
+      - name: Startup bundle budget
+        run: |
+          npx quasar build -m spa
+          yarn perf:budget
+
   build-electron:
     runs-on: ubuntu-latest
     needs: lint-test

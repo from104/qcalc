@@ -7,46 +7,57 @@
  */
 
 import { match } from 'ts-pattern';
-import { all, create } from 'mathjs';
-import { checkError } from '../../utils/ErrorUtils';
-
+import {
+  create,
+  absDependencies,
+  addDependencies,
+  bignumberDependencies,
+  divideDependencies,
+  eDependencies,
+  equalDependencies,
+  factorialDependencies,
+  floorDependencies,
+  logDependencies,
+  multiplyDependencies,
+  phiDependencies,
+  piDependencies,
+  powDependencies,
+  smallerDependencies,
+  subtractDependencies,
+} from 'mathjs';
 import type { FactoryFunctionMap } from 'mathjs';
+import { checkError } from '../../utils/ErrorUtils';
 
 import { convertRadix, Radix } from '../converters/RadixConverter';
 
-// MathJS 라이브러리 설정
-export const MathB = create(all as FactoryFunctionMap, {
-  number: 'BigNumber',
-  precision: 64,
-});
+// MathJS 라이브러리 설정 — 시작 속도를 위해 기본 계산기에 필요한 함수만 담은 경량 인스턴스.
+// 수식 계산기용 전체 인스턴스는 FormulaMath.ts에서 지연 로드한다.
+export const MathB = create(
+  {
+    absDependencies,
+    addDependencies,
+    bignumberDependencies,
+    divideDependencies,
+    eDependencies,
+    equalDependencies,
+    factorialDependencies,
+    floorDependencies,
+    logDependencies,
+    multiplyDependencies,
+    phiDependencies,
+    piDependencies,
+    powDependencies,
+    smallerDependencies,
+    subtractDependencies,
+  } as FactoryFunctionMap,
+  {
+    number: 'BigNumber',
+    precision: 64,
+  },
+);
 
 // BigNumber 타입 정의
 export const toBigNumber = MathB.bignumber;
-
-/**
- * 수식 계산기용 삼각함수 스코프 (도 단위)
- * @description mathjs 기본 삼각함수는 라디안 기준이지만, 기본 계산기(CalculatorMath.sin 등)는
- *              도(degree)를 사용한다. 수식 계산기가 기본 계산기와 동일한 각도 기준을 쓰도록
- *              sin/cos/tan/asin/acos/atan/atan2를 도 단위로 오버라이드한 스코프를 반환한다.
- *              - 순삼각(sin/cos/tan): 입력을 도로 간주하여 라디안 변환 후 계산
- *              - 역삼각(asin/acos/atan/atan2): 라디안 결과를 도로 변환하여 반환
- *              반환값은 BigNumber로 유지되어 정밀도 손실이 없다.
- *              매 평가마다 새 객체를 반환하여 스코프 변수 대입에 의한 상태 누적을 방지한다.
- * @returns mathjs evaluate scope에 주입할 함수 맵
- */
-export function createFormulaTrigScope(): Record<string, (...args: BigNumber[]) => BigNumber> {
-  const degToRad = (x: BigNumber): BigNumber => toBigNumber(x).times(MathB.pi).div(180);
-  const radToDeg = (x: BigNumber): BigNumber => toBigNumber(x).times(180).div(MathB.pi);
-  return {
-    sin: (x) => degToRad(x).sin(),
-    cos: (x) => degToRad(x).cos(),
-    tan: (x) => degToRad(x).tan(),
-    asin: (x) => radToDeg(toBigNumber(x).asin()),
-    acos: (x) => radToDeg(toBigNumber(x).acos()),
-    atan: (x) => radToDeg(toBigNumber(x).atan()),
-    atan2: (y, x) => radToDeg(MathB.evaluate('atan2(y, x)', { y, x }) as BigNumber),
-  };
-}
 
 /**
  * 비트 연산의 기본 워드 크기 (바이트 단위)
