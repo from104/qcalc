@@ -189,11 +189,33 @@ fn configure_webkit_gpu() {
   .iter()
   .any(|name| std::env::var_os(name).is_some());
   let nvidia_proprietary = std::path::Path::new("/proc/driver/nvidia/version").exists();
-  if user_configured || !nvidia_proprietary {
+  if user_configured || !nvidia_proprietary || !nvidia_gl_available() {
     return;
   }
   std::env::set_var("WEBKIT_FORCE_DMABUF_RENDERER", "1");
   std::env::set_var("WEBKIT_DMABUF_RENDERER_FORCE_SHM", "1");
+}
+
+/// 샌드박스 안에서 NVIDIA 사용자 공간 GL 라이브러리를 쓸 수 있는지.
+/// `/proc/driver/nvidia/version` 은 샌드박스 안에서도 보이지만, 드라이버 라이브러리가 없으면 EGL 이
+/// 초기화에 실패하고("egl: failed to create dri2 screen") GPU 강제가 오히려 렌더링을 더 느리게 만든다
+/// (0.13.6 Snap 실측 — gnome-42-2204 런타임엔 NVIDIA 라이브러리가 없다).
+/// - Snap: 쓸 수 없다고 본다
+/// - Flatpak: NVIDIA GL 확장(org.freedesktop.Platform.GL.nvidia-*)이 연결된 경우만
+/// - deb·rpm·AppImage: 호스트 드라이버를 그대로 쓴다
+#[cfg(target_os = "linux")]
+fn nvidia_gl_available() -> bool {
+  match detect_package_env() {
+    PackageEnv::Snap => false,
+    PackageEnv::Flatpak => std::fs::read_dir("/usr/lib/x86_64-linux-gnu/GL")
+      .map(|entries| {
+        entries
+          .flatten()
+          .any(|entry| entry.file_name().to_string_lossy().starts_with("nvidia"))
+      })
+      .unwrap_or(false),
+    PackageEnv::AppImage | PackageEnv::Native => true,
+  }
 }
 
 #[cfg(not(target_os = "linux"))]
