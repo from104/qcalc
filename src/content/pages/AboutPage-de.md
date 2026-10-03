@@ -12,7 +12,7 @@ Alle wichtigen Änderungen an diesem Projekt werden in dieser Datei festgehalten
 
 Das Format basiert auf [Keep a Changelog] und dieses Projekt folgt der [Semantischen Versionierung].
 
-## [0.13.6] 2026-09-26
+## [0.13.6] 2026-10-03
 
 ### Hinzugefügt
 
@@ -22,7 +22,7 @@ Das Format basiert auf [Keep a Changelog] und dieses Projekt folgt der [Semantis
 
 - Schnellerer App-Start
 - Schnellere, flüssigere Übergänge bei Tasten, Tabs und Bildschirmen
-- Rechner wächst und schrumpft beim Wechsel zwischen schmalem und breitem Layout fließend
+- Rechner, [Verlauf] und andere Ansichten wachsen und schrumpfen samt Kopfzeile beim Wechsel zwischen schmalem und breitem Layout fließend
 - Schnellere Reaktion auf [=] bei langem Rechenverlauf
 - Bessere Anzeigeleistung unter Linux mit NVIDIA-Grafik
 - Animationen auf leistungsschwachen Geräten automatisch reduziert
@@ -32,6 +32,7 @@ Das Format basiert auf [Keep a Changelog] und dieses Projekt folgt der [Semantis
 - Weißes Aufblitzen beim App-Start behoben
 - Gelegentliches Hängenbleiben auf dem Startbildschirm behoben
 - Fehlender rechter Rand in [Verlauf] behoben
+- Beenden der App beim Drücken von [=] im Linux-AppImage und -Snap behoben
 
 ## [0.13.5] 2026-09-17
 

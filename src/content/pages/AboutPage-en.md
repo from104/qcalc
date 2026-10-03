@@ -12,7 +12,7 @@ All notable changes to this project are recorded in this file.
 
 The format is based on [Keep a Changelog] and this project follows [Semantic Versioning].
 
-## [0.13.6] 2026-09-26
+## [0.13.6] 2026-10-03
 
 ### Added
 
@@ -22,7 +22,7 @@ The format is based on [Keep a Changelog] and this project follows [Semantic Ver
 
 - Faster app startup
 - Faster, smoother button, tab and screen transitions
-- Calculator grows and shrinks smoothly when switching between narrow and wide layouts
+- Calculator, [Record] and other screens grow and shrink smoothly with their header when switching between narrow and wide layouts
 - Faster response to [=] with a long calculation history
 - Better display performance on Linux with NVIDIA graphics
 - Animations reduced automatically on low-end devices
@@ -32,6 +32,7 @@ The format is based on [Keep a Changelog] and this project follows [Semantic Ver
 - Fixed a white flash when the app starts
 - Fixed the app occasionally staying on the startup screen
 - Fixed the missing right margin in [Record]
+- Fixed the app closing when pressing [=] in the Linux AppImage and Snap
 
 ## [0.13.5] 2026-09-17
 
