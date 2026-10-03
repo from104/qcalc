@@ -213,3 +213,10 @@ body {
 html.motion-reduced {
   @include reduced-motion;
 }
+
+// 단위·통화·진법 패널의 위/아래 방향 꺽쇠. 칸은 col-1(8.33%)이라 창 폭을 따라 넓어지는데,
+// SVG 아이콘은 요소 폭을 가득 채워 함께 커진다. 칸 폭은 두고 아이콘만 글자 크기(1em)로 묶는다.
+.q-icon.direction-icon > svg {
+  width: 1em;
+  height: 1em;
+}
