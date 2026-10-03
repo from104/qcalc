@@ -30,6 +30,10 @@ export function loadFormulaMath(): Promise<MathJsInstance> {
     instance.config({ number: 'BigNumber', precision: 64 });
     return instance;
   });
+  // 실패한 Promise 를 붙잡아 두면 다시 시도할 수 없다 — 다음 호출이 새로 불러오게 비운다
+  loading.catch(() => {
+    loading = null;
+  });
   return loading;
 }
 
