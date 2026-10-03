@@ -12,7 +12,7 @@ Todas as alterações notáveis deste projeto são registradas neste arquivo.
 
 O formato é baseado no [Keep a Changelog] e este projeto segue o [Versionamento Semântico].
 
-## [0.13.6] 2026-09-26
+## [0.13.6] 2026-10-03
 
 ### Adicionado
 
@@ -22,7 +22,7 @@ O formato é baseado no [Keep a Changelog] e este projeto segue o [Versionamento
 
 - Inicialização do aplicativo mais rápida
 - Transições de botões, abas e telas mais rápidas e suaves
-- A calculadora cresce e encolhe suavemente ao alternar entre layout estreito e largo
+- A calculadora, o [Histórico] e outras telas crescem e encolhem suavemente, com o cabeçalho, ao alternar entre layout estreito e largo
 - Resposta mais rápida ao [=] com histórico de cálculo longo
 - Melhor desempenho de exibição no Linux com placa NVIDIA
 - Animações reduzidas automaticamente em dispositivos modestos
@@ -32,6 +32,7 @@ O formato é baseado no [Keep a Changelog] e este projeto segue o [Versionamento
 - Corrigido o clarão branco ao iniciar o aplicativo
 - Corrigido o aplicativo ficar às vezes parado na tela inicial
 - Corrigida a falta de margem direita em [Histórico]
+- Corrigido o fechamento do app ao pressionar [=] no AppImage e no Snap do Linux
 
 ## [0.13.5] 2026-09-17
 

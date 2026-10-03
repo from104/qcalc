@@ -224,7 +224,13 @@
 <template>
   <q-card-section class="row q-px-sm q-pt-none q-pb-sm">
     <!-- 원본 방향 -->
-    <q-icon name="keyboard_double_arrow_up" class="col-1" role="img" :aria-label="t('ariaLabel.sourceDirection')" />
+    <q-icon
+      name="keyboard_double_arrow_up"
+      size="xs"
+      class="col-1 direction-icon"
+      role="img"
+      :aria-label="t('ariaLabel.sourceDirection')"
+    />
 
     <!-- 원본 통화 -->
     <q-select
@@ -388,7 +394,7 @@
     <q-icon
       name="keyboard_double_arrow_down"
       size="xs"
-      class="col-1 q-px-none"
+      class="col-1 direction-icon q-px-none"
       role="img"
       :aria-label="t('ariaLabel.targetDirection')"
     />

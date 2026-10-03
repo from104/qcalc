@@ -105,7 +105,11 @@
 
   onMounted(() => {
     // 첫 화면이 뜬 뒤 유휴 시간에 수식 엔진(mathjs 전체)을 미리 불러온다 — 시작 경로에서는 제외
-    const prefetchFormulaMath = () => void useFormulaStore().ensureMath();
+    // 미리 받기는 실패해도 그만이다 — 수식 계산기에 들어갈 때 다시 불러온다
+    const prefetchFormulaMath = () =>
+      void useFormulaStore()
+        .ensureMath()
+        .catch(() => undefined);
     if ('requestIdleCallback' in window) requestIdleCallback(prefetchFormulaMath, { timeout: 3000 });
     else setTimeout(prefetchFormulaMath, 1500);
 
@@ -152,7 +156,7 @@
   // 레이아웃 전환 (넓은 ↔ 좁은)
   // 경계를 넘는 즉시 레이아웃을 바꾸고, 계산기 영역의 실제 폭을 옛 폭 → 새 폭(%)으로 애니메이션한다.
   // 버튼 글자는 컨테이너 쿼리로 크기가 정해지므로 폭이 변하는 동안 찌그러지지 않고 자연스럽게 커지고
-  // 줄어든다. 넓은 화면의 보조 패널은 옆에서 밀려 들어온다. % 목표라 창을 끄는 중에도 끊기지 않는다.
+  // 줄어든다. 넓은 화면에만 있는 패널은 옆에서 밀려 들어온다. % 목표라 창을 끄는 중에도 끊기지 않는다.
   // 폭 애니메이션은 매 프레임 재배치라 WebKitGTK 에서 프레임당 30~100ms 가 들어 조금 끊기지만, 형태가
   // 이어지는 쪽을 택했다(기현님 결정). 버린 방식: scaleX 늘이기(글자 찌그러짐), View Transition(창 크기가
   // 바뀌는 중엔 건너뛰어져 순간 교체), 투명도·확대 페이드(부드럽지만 형태가 이어지지 않음).
@@ -162,25 +166,50 @@
   const PANE_EASE = 'cubic-bezier(0.4, 0, 0.2, 1)';
   const nextFrame = () => new Promise<void>((resolve) => requestAnimationFrame(() => resolve()));
 
+  // 본문 패널과 그 위 헤더 툴바를 같은 짝으로 함께 움직인다
+  const PANE_GROUPS = [
+    { calc: '.calc-pane', sub: '.sub-pane' },
+    { calc: '.calc-head', sub: '.sub-head' },
+  ];
+  const widthOf = (selector: string) => document.querySelector<HTMLElement>(selector)?.getBoundingClientRect().width;
+
   const swapLayout = async (wide: boolean) => {
     const root = document.documentElement;
     const reduceMotion =
       root.classList.contains('motion-reduced') || window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     currentTransition.value = '';
-    const oldWidth = document.querySelector<HTMLElement>('.calc-pane')?.getBoundingClientRect().width;
+    // 좁은 화면은 계산기와 서브 화면 중 하나만 보여 준다. 그쪽 패널(본문·헤더)이 넓은 화면과 이어지므로
+    // 폭을 애니메이션하고, 넓은 화면에서만 있는 나머지 패널은 옆에서 밀려 들어온다.
+    const oldWidths = PANE_GROUPS.map((g) => ({ calc: widthOf(g.calc), sub: widthOf(g.sub) }));
+    const narrowShowedCalc = !!document.querySelector('.calc-pane');
     isWideLayout.value = wide;
-    if (reduceMotion || !oldWidth) return;
+    if (reduceMotion || (!oldWidths[0]!.calc && !oldWidths[0]!.sub)) return;
     await nextTick();
-    const pane = document.querySelector<HTMLElement>('.calc-pane');
-    const side = wide ? document.querySelector<HTMLElement>('.sub-pane') : null;
-    if (!pane) return;
+    const keepSub = wide ? !narrowShowedCalc : !document.querySelector('.calc-pane');
+    const targets = PANE_GROUPS.flatMap((g, i) => {
+      const pane = document.querySelector<HTMLElement>(keepSub ? g.sub : g.calc);
+      const oldWidth = keepSub ? oldWidths[i]!.sub : oldWidths[i]!.calc;
+      const row = pane?.parentElement;
+      if (!pane || !row || !oldWidth) return [];
+      const side = wide ? document.querySelector<HTMLElement>(keepSub ? g.calc : g.sub) : null;
+      return [{ pane, row, side, oldWidth }];
+    });
+    if (!targets.length) return;
     // 새 레이아웃 마운트로 메인 스레드가 100ms 넘게 막히므로(WebKitGTK 실측), 곧바로 애니메이션을 걸면
     // 첫 페인트 때 이미 끝나 있다. 옛 폭에 고정한 채 새 레이아웃이 그려지고 한가해진 뒤 시작한다.
-    const style = pane.style;
-    style.transition = 'none';
-    style.flex = '0 0 auto';
-    style.width = `${oldWidth}px`;
-    if (side) side.style.opacity = '0';
+    // 줄바꿈을 막고 넘치는 쪽을 잘라, 옆 패널이 제 폭(50%) 그대로 화면 밖에서 밀려 들어오게 한다.
+    // 서브 화면이 이어질 때는 오른쪽 끝에 붙여 두어 계산기가 왼쪽에서 나타난다.
+    // 좁은 화면 헤더는 flex 가 아니라서 이 동안만 flex 로 바꾼다.
+    for (const { pane, row, side, oldWidth } of targets) {
+      Object.assign(row.style, {
+        display: 'flex',
+        flexWrap: 'nowrap',
+        overflow: 'hidden',
+        justifyContent: keepSub ? 'flex-end' : '',
+      });
+      Object.assign(pane.style, { transition: 'none', flex: '0 0 auto', width: `${oldWidth}px` });
+      if (side) Object.assign(side.style, { flex: '0 0 auto', opacity: '0' });
+    }
     await nextFrame();
     await nextFrame();
     await new Promise<void>((resolve) =>
@@ -189,27 +218,34 @@
         : setTimeout(resolve, 60),
     );
     // 폭이 처음 바뀔 때의 비싼 재배치(컨테이너 쿼리·탭 바 측정)를 시작 전에 치러 둔다
-    style.width = `${oldWidth + 1}px`;
-    void pane.offsetWidth;
-    style.width = `${oldWidth}px`;
-    void pane.offsetWidth;
+    for (const { pane, oldWidth } of targets) {
+      pane.style.width = `${oldWidth + 1}px`;
+      void pane.offsetWidth;
+      pane.style.width = `${oldWidth}px`;
+      void pane.offsetWidth;
+    }
     await nextFrame();
-    style.transition = `width ${PANE_MS}ms ${PANE_EASE}`;
-    style.width = wide ? '50%' : '100%';
-    const cleanup = () => {
-      style.transition = style.flex = style.width = '';
-    };
-    pane.addEventListener('transitionend', cleanup, { once: true });
-    setTimeout(cleanup, PANE_MS + 100); // transitionend 누락 대비
-    if (side) {
-      side.style.opacity = '';
-      side.animate(
-        [
-          { transform: 'translateX(40%)', opacity: 0 },
-          { transform: 'none', opacity: 1 },
-        ],
-        { duration: PANE_MS, easing: PANE_EASE },
-      );
+    for (const { pane, row, side } of targets) {
+      pane.style.transition = `width ${PANE_MS}ms ${PANE_EASE}`;
+      pane.style.width = wide ? '50%' : '100%';
+      const onEnd = (e: TransitionEvent) => {
+        if (e.target === pane) cleanup(); // 자식(버튼 등)의 transitionend 버블은 무시
+      };
+      let done = false;
+      const cleanup = () => {
+        if (done) return; // 다음 전환이 걸어 둔 스타일을 늦은 타이머가 지우지 않게
+        done = true;
+        pane.removeEventListener('transitionend', onEnd);
+        Object.assign(pane.style, { transition: '', flex: '', width: '' });
+        Object.assign(row.style, { display: '', flexWrap: '', overflow: '', justifyContent: '' });
+        if (side) side.style.flex = '';
+      };
+      pane.addEventListener('transitionend', onEnd);
+      setTimeout(cleanup, PANE_MS + 100); // transitionend 누락 대비
+      if (side) {
+        side.style.opacity = '';
+        side.animate([{ opacity: 0 }, { opacity: 1 }], { duration: PANE_MS, easing: PANE_EASE });
+      }
     }
   };
 
