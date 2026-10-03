@@ -103,7 +103,7 @@
 
     <q-header id="header" class="z-top noselect" elevated>
       <!-- 좁은 화면 메인 헤더 -->
-      <q-toolbar v-if="!isSubPage" v-auto-blur class="safe-area-top">
+      <q-toolbar v-if="!isSubPage" v-auto-blur class="calc-head safe-area-top">
         <q-btn flat dense round class="q-mr-none" icon="menu" aria-label="Menu" @click="emit('toggleLeftDrawer')">
           <ToolTip
             :text-color="themesStore.getDarkColor()"
@@ -206,7 +206,7 @@
       </q-toolbar>
 
       <!-- 좁은 화면 서브 헤더 -->
-      <q-toolbar v-else v-auto-blur class="q-px-sm safe-area-top">
+      <q-toolbar v-else v-auto-blur class="sub-head q-px-sm safe-area-top">
         <q-btn
           flat
           dense
@@ -286,7 +286,7 @@
 
       <!-- 서브 화면 컨텐츠 -->
       <template v-else>
-        <div class="col-12 sub-content">
+        <div class="col-12 sub-content sub-pane">
           <q-scroll-area class="sub-scroll-area" :class="{ 'hide-scrollbar': currentSubPage === 'record' }">
             <component :is="props.subPageConfig[currentSubPage]?.component" class="sub-page" />
           </q-scroll-area>

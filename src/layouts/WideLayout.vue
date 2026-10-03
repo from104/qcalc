@@ -100,7 +100,7 @@
 
     <q-header id="header" class="z-top noselect row" elevated>
       <!-- 넓은 화면 계산기 영역 헤더 -->
-      <q-toolbar v-auto-blur class="col-6 calc-header safe-area-top">
+      <q-toolbar v-auto-blur class="col-6 calc-header calc-head safe-area-top">
         <q-btn flat dense round class="q-mr-none" icon="menu" aria-label="Menu" @click="emit('toggleLeftDrawer')">
           <ToolTip
             :text-color="themesStore.getDarkColor()"
@@ -174,7 +174,7 @@
       </q-toolbar>
 
       <!-- 넓은 화면 서브 헤더 -->
-      <q-toolbar v-auto-blur class="col-6 sub-header safe-area-top">
+      <q-toolbar v-auto-blur class="col-6 sub-header sub-head safe-area-top">
         <transition name="animate-sub-page">
           <div :key="currentSubPage" :data-page="currentSubPage" class="header-content full-width row items-center">
             <q-toolbar-title
