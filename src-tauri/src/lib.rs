@@ -105,7 +105,12 @@ fn announce_a11y(window: tauri::WebviewWindow, text: String) {
       use gtk::prelude::*;
       if let Ok(gtk_window) = win.gtk_window() {
         if let Some(accessible) = gtk_window.accessible() {
-          accessible.emit_by_name::<()>("announcement", &[&text]);
+          // ATK 2.46 미만(AppImage·Snap 이 싣는 Ubuntu 22.04 ATK 2.36)에는 이 신호가 없다. 없는 신호를
+          // emit_by_name 하면 패닉이 나고, IPC 콜백 안이라 풀리지 못해 앱이 통째로 죽는다('=' 누르면 종료).
+          // 그때는 낭독을 건너뛴다 — DOM aria-live 리전이 남아 있다.
+          if gtk::glib::subclass::SignalId::lookup("announcement", accessible.type_()).is_some() {
+            accessible.emit_by_name::<()>("announcement", &[&text]);
+          }
         }
       }
     });
