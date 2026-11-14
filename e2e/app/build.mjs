@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 /**
- * Build (only when needed) the Tauri debug binary the app layer tests: `src-tauri/target/e2e-app/qcalc`.
+ * Build (only when needed) the Tauri debug binary the app layer tests: `src-tauri/target/e2e-app/qcalc`
+ * (`qcalc.exe` on Windows).
  *
  * It must embed the production frontend (dist/spa). A plain `cargo build` leaves out the `custom-protocol`
  * feature and loads devUrl (localhost:9000) instead, so this goes through `tauri build --debug --no-bundle`.
@@ -23,6 +24,7 @@ import {
   rmSync,
   statSync,
   utimesSync,
+  writeFileSync,
 } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -63,7 +65,8 @@ function newerThan(target, time) {
 }
 
 function run(cmd, args, log) {
-  const r = spawnSync(cmd, args, { cwd: root, stdio: ['ignore', log, log] });
+  // Windows: yarn is yarn.cmd, which only a shell can start (args here are plain words — no JSON on the command line)
+  const r = spawnSync(cmd, args, { cwd: root, stdio: ['ignore', log, log], shell: process.platform === 'win32' });
   if (r.status !== 0) {
     console.error(`[app] ${cmd} ${args.join(' ')} failed (exit ${r.status}) — see test-results/app-build-tauri.log`);
     process.exit(1);
@@ -95,11 +98,12 @@ console.log(
   `[app] building the Tauri debug binary (${typeof stale === 'string' && stale.startsWith(root) ? `${path.relative(root, stale)} changed` : stale})`,
 );
 const started = Date.now();
-run(
-  'yarn',
-  ['tauri', 'build', '--debug', '--no-bundle', '--config', JSON.stringify({ build: { beforeBuildCommand: '' } })],
-  log,
-);
+// the config override goes in as a file: JSON on a Windows command line loses its quotes in cmd.exe
+const overrideFile = path.join(root, 'test-results/app-tauri-config.json');
+writeFileSync(overrideFile, JSON.stringify({ build: { beforeBuildCommand: '' } }));
+// (with a shell, node joins the args with plain spaces — quote the path for cmd.exe)
+const configArg = process.platform === 'win32' ? `"${overrideFile}"` : overrideFile;
+run('yarn', ['tauri', 'build', '--debug', '--no-bundle', '--config', configArg], log);
 
 // 3. keep our own link to it
 mkdirSync(path.dirname(output), { recursive: true });

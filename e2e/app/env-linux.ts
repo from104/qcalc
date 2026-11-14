@@ -16,44 +16,19 @@
 import { spawn, type ChildProcess } from 'node:child_process';
 import { randomUUID } from 'node:crypto';
 import { chmodSync, existsSync, mkdirSync, mkdtempSync, openSync, rmSync, writeFileSync } from 'node:fs';
-import { createServer } from 'node:net';
 import { homedir, tmpdir } from 'node:os';
 import path from 'node:path';
 
+import type { AppEnv, ProfileDirs } from './platform';
+import { freePort, waitHttp, which } from './util';
 import { MARKER, describePid, descendants, markedPids, terminate } from './procs';
 
 export const SCREEN = { width: 2560, height: 1440 };
 
-export interface ProfileDirs {
-  root: string;
-  home: string;
-  config: string;
-  data: string;
-  cache: string;
-  runtime: string;
-}
-
-export interface LinuxEnv {
-  token: string;
+export interface LinuxEnv extends AppEnv {
   display: string;
   dbusAddress: string;
-  driverPort: number;
-  driverPid: number;
-  profile: ProfileDirs;
-  /** environment for helper processes that must live in the same isolated session (clipboard, AT-SPI) */
-  env: NodeJS.ProcessEnv;
-  stop(): Promise<{ orphans: string[] }>;
 }
-
-const freePort = () =>
-  new Promise<number>((resolve, reject) => {
-    const server = createServer();
-    server.once('error', reject);
-    server.listen(0, '127.0.0.1', () => {
-      const { port } = server.address() as { port: number };
-      server.close(() => resolve(port));
-    });
-  });
 
 function firstLine(stream: NodeJS.ReadableStream, what: string, timeoutMs = 10_000): Promise<string> {
   return new Promise((resolve, reject) => {
@@ -72,27 +47,6 @@ function firstLine(stream: NodeJS.ReadableStream, what: string, timeoutMs = 10_0
       reject(new Error(`${what}: exited before printing anything`));
     });
   });
-}
-
-async function waitHttp(url: string, timeoutMs: number): Promise<void> {
-  const deadline = Date.now() + timeoutMs;
-  for (;;) {
-    try {
-      const res = await fetch(url);
-      if (res.ok) return;
-    } catch {
-      // not listening yet
-    }
-    if (Date.now() > deadline) throw new Error(`${url} did not come up within ${timeoutMs}ms`);
-    await new Promise((resolve) => setTimeout(resolve, 100));
-  }
-}
-
-function which(name: string): string | null {
-  for (const dir of (process.env.PATH ?? '').split(':')) {
-    if (dir && existsSync(path.join(dir, name))) return path.join(dir, name);
-  }
-  return null;
 }
 
 export function tauriDriverPath(): string | null {
@@ -228,7 +182,17 @@ export async function startLinuxEnv({ logDir }: StartOptions): Promise<LinuxEnv>
     started.push(driver);
     await waitHttp(`http://127.0.0.1:${driverPort}/status`, 15_000);
 
-    return { token, display, dbusAddress, driverPort, driverPid: driver.pid!, profile, env, stop };
+    return {
+      token,
+      display,
+      dbusAddress,
+      driverPort,
+      driverPid: driver.pid!,
+      profile,
+      env,
+      describe: `isolated session: DISPLAY=${display}, profile ${profile.root}`,
+      stop,
+    };
   } catch (error) {
     await stop();
     throw error;

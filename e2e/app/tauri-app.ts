@@ -8,11 +8,11 @@ import { existsSync, readdirSync, readFileSync } from 'node:fs';
 import path from 'node:path';
 
 import { WdioApp, type WdioAppOptions } from '../drivers/WdioApp';
-import type { ProfileDirs } from './env-linux';
-import { AnnouncementListener, type ClipboardHelper } from './helpers';
+import { AnnouncementListener } from './helpers';
+import { IDENTIFIER, type AppClipboard, type ProfileDirs } from './platform';
 import type { AppSession } from './session';
 
-export const IDENTIFIER = 'io.github.from104.qcalc'; // src-tauri/tauri.conf.json
+export { IDENTIFIER };
 /** default window (tauri.conf.json width/height) and the content minimum at UI scale 1.0 (lib.rs BASE_MIN_*) */
 export const DEFAULT_SIZE = { width: 480, height: 756 };
 export const MIN_SIZE = { width: 384, height: 604 };
@@ -26,9 +26,9 @@ export interface NativeWindow {
 
 export interface TauriAppOptions extends Omit<WdioAppOptions, 'browser' | 'origin'> {
   session: AppSession;
-  clipboardHelper: ClipboardHelper;
+  clipboardHelper: AppClipboard;
   profile: ProfileDirs;
-  /** environment of the isolated session (DISPLAY, private bus) for outside tools */
+  /** environment of the isolated session (Linux: DISPLAY, private bus) for outside tools */
   sessionEnv: NodeJS.ProcessEnv;
 }
 
@@ -112,7 +112,7 @@ export class TauriApp extends WdioApp {
     return this.session.appPid();
   }
 
-  /** a file in the app's config dir ($XDG_CONFIG_HOME/<identifier>), or null */
+  /** a file in the app's config dir ($XDG_CONFIG_HOME/<identifier>, Windows %APPDATA%\<identifier>), or null */
   configFile(name: string): string | null {
     const file = path.join(this.profile.config, IDENTIFIER, name);
     return existsSync(file) ? readFileSync(file, 'utf8') : null;

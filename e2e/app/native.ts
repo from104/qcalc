@@ -1,6 +1,9 @@
 /**
  * native — what only the real desktop app can show: Tauri commands, the native window, the app process,
- * the on-disk profile, the system clipboard and the accessibility bus. App layer only (Linux: Xvfb).
+ * the on-disk profile, the system clipboard and the accessibility bus. App layer only.
+ * Linux: Xvfb, runs everything. Windows (CI): the scenarios that need X windows ('xwindow') or AT-SPI ('atspi') skip
+ * with that reason; the rest run against WebView2 — the clipboard through PowerShell, and Control+v through
+ * navigator.clipboard (read_clipboard_text is Linux-only, lib.rs), so Windows outcomes there are unmeasured until CI says.
  *
  * Expected values come from the code:
  * - window: tauri.conf.json width/height 480×756; lib.rs BASE_MIN 384×604 × UI scale (1.0 under Xvfb: no
@@ -35,7 +38,8 @@ const expectNativeWindow = (app: TauriApp, expected: { width: number; height: nu
 
 export default defineGroup<TauriApp>('native', [
   {
-    title: '부팅: X 창 하나 · 창 제목 = 문서 제목 · Tauri IPC 연결 · 둘러보는 동안 오류 없음',
+    title: '부팅: X 창 하나가 480×756 으로 뜨고 창 제목 = 문서 제목',
+    needs: ['xwindow'],
     run: async (app) => {
       await app.step('X 창이 하나 뜨고 크기는 480×756', () => expectNativeWindow(app, DEFAULT_SIZE));
       await app.step('창 제목(_NET_WM_NAME)이 document.title 과 같다 (tauri-shim setTitle)', async () => {
@@ -44,6 +48,11 @@ export default defineGroup<TauriApp>('native', [
         const [win] = app.nativeWindows();
         await eventually('창 제목', async () => app.nativeTitle(win!.id), title);
       });
+    },
+  },
+  {
+    title: '부팅: Tauri IPC 연결 · 둘러보는 동안 오류 없음',
+    run: async (app) => {
       await app.step('window.globalVars: isTauri · isE2E', async () => {
         const flags = await app.browser.execute(() => {
           const g = (window as unknown as { globalVars?: { isTauri?: boolean; isE2E?: boolean } }).globalVars;
@@ -137,6 +146,7 @@ export default defineGroup<TauriApp>('native', [
   },
   {
     title: '창: 첫 실행 크기 480×756 — 웹뷰 = X 창, 저장 파일 없음',
+    needs: ['xwindow'],
     run: async (app) => {
       await app.relaunch({ fresh: true });
       await expectInner(app, DEFAULT_SIZE);
@@ -146,6 +156,7 @@ export default defineGroup<TauriApp>('native', [
   },
   {
     title: '창: 최소 384×604 · 최대(작업 영역 1/2 × 2/3) 밖으로는 커지거나 줄지 않는다',
+    needs: ['xwindow'],
     run: async (app) => {
       await app.step('200×200 요청 → 최소 384×604', async () => {
         await app.requestWindowSize(200, 200);
@@ -165,6 +176,7 @@ export default defineGroup<TauriApp>('native', [
   },
   {
     title: '창 크기: q 로 끝내고 다시 켜면 그 크기로 뜬다 (window-size.json)',
+    needs: ['xwindow'],
     run: async (app) => {
       await app.relaunch({ fresh: true });
       await app.seed(); // e2e page without first-run dialogs, so 'q' reaches the app's key binding

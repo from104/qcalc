@@ -25,5 +25,6 @@ export default defineConfig({
     ['json', { outputFile: 'test-results/app-report.json' }],
     ['html', { outputFolder: 'test-results/app-html-report', open: 'never' }],
   ],
-  projects: [{ name: 'tauri-linux' }],
+  // the project name is the driver platform of the host (e2e/app/platform.ts APP_PLATFORM)
+  projects: [{ name: process.platform === 'win32' ? 'tauri-windows' : 'tauri-linux' }],
 });

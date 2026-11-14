@@ -1,6 +1,8 @@
 /**
  * Process bookkeeping for the app layer — we never kill by name or pattern.
  *
+ * (Windows: procs-win.ts — tracked PIDs + taskkill, no marker.)
+ *
  * Every process the app layer starts (Xvfb, dbus-daemon, tauri-driver, the clipboard helper) gets a unique
  * environment marker `QCALC_E2E_RUN=<token>`. Environment variables are inherited, so the marker also lands on
  * everything *they* start: WebKitWebDriver, the app, WebKit's helper processes, D-Bus-activated a11y daemons —
@@ -8,6 +10,10 @@
  * processes are readable) and kills exactly the processes carrying this run's token, nothing else.
  */
 import { readdirSync, readFileSync, readlinkSync } from 'node:fs';
+
+import { isAliveWin, killTree, listProcesses, treeOf } from './procs-win';
+
+const win = process.platform === 'win32';
 
 export const MARKER = 'QCALC_E2E_RUN';
 
@@ -18,6 +24,7 @@ const pidsInProc = (): number[] =>
 
 /** PIDs whose environment carries `QCALC_E2E_RUN=<token>` (excluding the calling process) */
 export function markedPids(token: string): number[] {
+  if (win) return []; // no readable environments on Windows — env-windows.ts tracks PIDs instead
   const needle = `${MARKER}=${token}`;
   const found: number[] = [];
   for (const pid of pidsInProc()) {
@@ -34,6 +41,10 @@ export function markedPids(token: string): number[] {
 
 /** short description for reports: `1234 Xvfb` */
 export function describePid(pid: number): string {
+  if (win) {
+    const p = listProcesses().find((x) => x.pid === pid);
+    return p ? `${pid} ${p.name}` : `${pid} (gone)`;
+  }
   try {
     const exe = readlinkSync(`/proc/${pid}/exe`).split('/').pop();
     return `${pid} ${exe}`;
@@ -47,6 +58,7 @@ export function describePid(pid: number): string {
 }
 
 export function isAlive(pid: number): boolean {
+  if (win) return isAliveWin(pid);
   try {
     // a zombie still answers kill(0); treat it as gone
     const stat = readFileSync(`/proc/${pid}/stat`, 'utf8');
@@ -58,6 +70,10 @@ export function isAlive(pid: number): boolean {
 
 /** direct and indirect children of `root` that are still alive */
 export function descendants(root: number): number[] {
+  if (win)
+    return treeOf([root])
+      .filter((p) => p.pid !== root)
+      .map((p) => p.pid);
   const children = new Map<number, number[]>();
   for (const pid of pidsInProc()) {
     try {
@@ -84,6 +100,13 @@ const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 /** SIGTERM the given PIDs, wait up to `graceMs`, SIGKILL whatever is left. Returns the PIDs that needed SIGKILL. */
 export async function terminate(pids: number[], graceMs = 3000): Promise<number[]> {
   const targets = pids.filter(isAlive);
+  if (win) {
+    // no SIGTERM on Windows: end each tree outright (children first is the caller's order, /T covers the rest)
+    for (const pid of targets) killTree(pid);
+    const until = Date.now() + graceMs;
+    while (Date.now() < until && targets.some(isAlive)) await sleep(50);
+    return targets.filter(isAlive);
+  }
   for (const pid of targets) {
     try {
       process.kill(pid, 'SIGTERM');

@@ -1,9 +1,10 @@
 /**
  * One WebDriver session = one running app process. Relaunching = a new session (tauri-driver starts the app again).
  *
- * The app's profile (config, WebKit localStorage, cache) lives in the isolated temp dirs set up by env-linux.ts;
- * every launch of the worker uses the same profile, so "relaunch" really tests persistence. `wipeProfile()` gives
- * a first-install state.
+ * The app's profile (config, WebKit/WebView2 localStorage, cache) lives in the isolated temp dirs set up by
+ * env-linux.ts (Windows: the runner's real %APPDATA%/%LOCALAPPDATA% folders of the app, env-windows.ts); every launch
+ * of the worker uses the same profile, so "relaunch" really tests persistence. `wipeProfile()` gives a
+ * first-install state.
  */
 import { readlinkSync, readdirSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
@@ -11,8 +12,10 @@ import path from 'node:path';
 
 import { remote } from 'webdriverio';
 
-import type { ProfileDirs } from './env-linux';
+import { recordPids, wipeAppData } from './env-windows';
+import { isWindows, type ProfileDirs } from './platform';
 import { descendants, isAlive, terminate, waitExit } from './procs';
+import { treeOf } from './procs-win';
 
 export interface SessionOptions {
   driverPort: number;
@@ -26,6 +29,8 @@ export class AppSession {
   /** e.g. 'tauri://localhost' — read from the first document of every launch */
   origin = '';
   launches = 0;
+  /** Windows: asking for the process list costs ~1s, so remember the app PID while it is alive */
+  private cachedPid: number | null = null;
 
   constructor(readonly options: SessionOptions) {}
 
@@ -44,7 +49,7 @@ export class AppSession {
       connectionRetryTimeout: 30_000,
       capabilities: {
         'tauri:options': { application: this.options.binary },
-        // classic WebDriver only — WebKitWebDriver's BiDi support is partial
+        // classic WebDriver only — WebKitWebDriver's BiDi support is partial (msedgedriver: not needed either)
         'wdio:enforceWebDriverClassic': true,
       } as WebdriverIO.Capabilities,
     });
@@ -52,11 +57,23 @@ export class AppSession {
     // URL.origin is 'null' for non-special schemes such as tauri:
     this.origin = `${url.protocol}//${url.host}`;
     this.launches++;
+    this.cachedPid = null;
+    if (isWindows) {
+      const pid = this.appPid();
+      if (pid) recordPids(path.resolve('test-results'), [pid, ...descendants(pid)]);
+    }
   }
 
   /** PID of the app process (child of WebKitWebDriver, under our tauri-driver), or null */
   appPid(): number | null {
     const binary = path.resolve(this.options.binary);
+    if (isWindows) {
+      if (this.cachedPid !== null && isAlive(this.cachedPid)) return this.cachedPid;
+      const wanted = binary.toLowerCase();
+      const found = treeOf([this.options.driverPid]).find((p) => p.exe?.toLowerCase() === wanted);
+      this.cachedPid = found?.pid ?? null;
+      return this.cachedPid;
+    }
     for (const pid of descendants(this.options.driverPid)) {
       try {
         if (readlinkSync(`/proc/${pid}/exe`).replace(/ \(deleted\)$/, '') === binary) return pid;
@@ -82,6 +99,7 @@ export class AppSession {
       // the app may already be gone
     }
     this.current = null;
+    this.cachedPid = null;
     if (pid && !(await waitExit(pid, 5000))) await terminate([pid]);
     const deadline = Date.now() + 2000;
     while (helpers.some(isAlive) && Date.now() < deadline) await new Promise((resolve) => setTimeout(resolve, 50));
@@ -104,6 +122,7 @@ export class AppSession {
 
   /** first-install state: empty config, data (WebKit storage) and cache. Only while the app is not running. */
   wipeProfile(): void {
+    if (isWindows) return wipeAppData(this.options.profile);
     const { root } = this.options.profile;
     // belt and braces: only ever delete inside our own temp profile
     if (!path.resolve(root).startsWith(path.join(tmpdir(), 'qcalc-e2e-app-'))) {

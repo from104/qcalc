@@ -19,8 +19,9 @@ import type { LangCode, SeedState } from '../fixtures/seed';
  * - reload    : 저장소를 유지한 채 앱을 다시 띄울 수 있다(기록 영속성)
  * - touch     : 탭·스와이프 같은 터치 입력을 보낸다
  * - atspi     : 접근성 버스(AT-SPI)에서 스크린리더가 듣는 알림을 들을 수 있다 (Linux 실제 앱, 호스트 ATK 2.46+)
+ * - xwindow   : X 창(xwininfo/xprop)으로 네이티브 창 크기·제목을 읽고, 창 크기를 알려진 가상 화면에서 시험할 수 있다 (Linux 실제 앱)
  */
-export type Capability = 'keyboard' | 'clipboard' | 'netMock' | 'reload' | 'touch' | 'atspi';
+export type Capability = 'keyboard' | 'clipboard' | 'netMock' | 'reload' | 'touch' | 'atspi' | 'xwindow';
 
 /** 주소(해시)로 여는 화면 — 'calc' 는 계산기 본 화면으로 돌아간다 */
 export type ScreenName = 'calc' | 'record' | 'settings' | 'help' | 'about';

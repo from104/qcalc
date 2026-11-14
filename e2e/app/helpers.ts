@@ -9,7 +9,7 @@ import path from 'node:path';
 import { createInterface } from 'node:readline';
 import { fileURLToPath } from 'node:url';
 
-import type { ClipboardAccess } from '../drivers/WdioApp';
+import type { AppClipboard } from './platform';
 import { terminate } from './procs';
 
 const SUPPORT = path.join(path.dirname(fileURLToPath(import.meta.url)), 'support');
@@ -63,7 +63,7 @@ class LineProcess {
   }
 }
 
-export class ClipboardHelper implements ClipboardAccess {
+export class ClipboardHelper implements AppClipboard {
   private queue: Promise<unknown> = Promise.resolve();
 
   private constructor(private readonly proc: LineProcess) {}

@@ -62,7 +62,11 @@ if (reason) {
   const log = openSync(logPath, 'w');
   console.error(`[e2e] SPA 빌드 시작 (${reason}) — 로그: ${path.relative(root, logPath)}`);
   const started = Date.now();
-  const r = spawnSync('yarn', ['quasar', 'build', '-m', 'spa'], { cwd: root, stdio: ['ignore', log, log] });
+  const r = spawnSync('yarn', ['quasar', 'build', '-m', 'spa'], {
+    cwd: root,
+    stdio: ['ignore', log, log],
+    shell: process.platform === 'win32', // yarn is yarn.cmd on Windows
+  });
   if (r.status !== 0) {
     console.error(`[e2e] SPA 빌드 실패 (exit ${r.status}) — ${logPath}`);
     process.exit(1);
