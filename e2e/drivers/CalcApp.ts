@@ -3,7 +3,7 @@
  *
  * 시나리오(e2e/scenarios/*.ts)는 이 인터페이스만 안다. 같은 시나리오를
  *   - 웹 빌드: PlaywrightApp (e2e/drivers/PlaywrightApp.ts)
- *   - Tauri 데스크톱: WebdriverIO 드라이버 (예정)
+ *   - Tauri 데스크톱: WdioApp (e2e/drivers/WdioApp.ts, tauri-driver + WebdriverIO)
  *   - Android: Playwright `_android` 드라이버 (예정)
  * 에서 그대로 돌리기 위해서다. 드라이버마다 할 수 있는 일이 달라서, 시나리오는 필요한 능력을
  * `needs` 로 밝히고, 드라이버는 `capabilities` 로 가진 능력을 밝힌다. 모자라면 실행기가 건너뛰고
@@ -18,8 +18,9 @@ import type { LangCode, SeedState } from '../fixtures/seed';
  * - netMock   : HTTP 요청을 가로채 고정 응답을 주거나 실패시킬 수 있다(환율·수식 엔진 청크)
  * - reload    : 저장소를 유지한 채 앱을 다시 띄울 수 있다(기록 영속성)
  * - touch     : 탭·스와이프 같은 터치 입력을 보낸다
+ * - atspi     : 접근성 버스(AT-SPI)에서 스크린리더가 듣는 알림을 들을 수 있다 (Linux 실제 앱, 호스트 ATK 2.46+)
  */
-export type Capability = 'keyboard' | 'clipboard' | 'netMock' | 'reload' | 'touch';
+export type Capability = 'keyboard' | 'clipboard' | 'netMock' | 'reload' | 'touch' | 'atspi';
 
 /** 주소(해시)로 여는 화면 — 'calc' 는 계산기 본 화면으로 돌아간다 */
 export type ScreenName = 'calc' | 'record' | 'settings' | 'help' | 'about';

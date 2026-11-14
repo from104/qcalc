@@ -17,6 +17,12 @@
  */
 import { defineGroup, expectClipboard, expectMain, expectSub, tapKeys, typeKeys } from './kit';
 
+/** Tauri Linux 의 Control+c 버그 — 공유 시나리오와 app 층 native 시나리오가 같은 설명을 쓴다 */
+export const TAURI_LINUX_COPY_BUG =
+  'Tauri Linux 에서 Control+c 가 "복사되었습니다" 알림만 띄우고 클립보드를 비운다 — ResultField 의 단축키가 ' +
+  'keydown 기본 동작을 막지 않아, 앱의 navigator.clipboard.writeText 뒤에 WebKitGTK 기본 "복사"(선택 없음)가 ' +
+  '클립보드를 텍스트 없는 내용으로 덮는다 (preventDefault 하면 정상 — 2026-11-15 Xvfb 실측). Shift+Control+c 는 정상';
+
 export default defineGroup('keyboard', [
   {
     title: '키 입력 · Enter · Backspace · Delete',
@@ -52,6 +58,7 @@ export default defineGroup('keyboard', [
   {
     title: '기본 탭: Control+v 붙여넣기 · Control+c 복사',
     needs: ['keyboard', 'clipboard'],
+    knownBugOn: { 'tauri-linux': { bug: TAURI_LINUX_COPY_BUG, symptom: /클립보드: .*"1,235\.5".*마지막 값 ""/ } },
     run: async (app) => {
       await app.step('클립보드 1234.5 → Control+v → 메인 1,234.5', async () => {
         await app.setClipboard('1234.5');
@@ -73,6 +80,7 @@ export default defineGroup('keyboard', [
   {
     title: '단위 탭: 메인/보조 칸 붙여넣기 · 복사',
     needs: ['keyboard', 'clipboard'],
+    knownBugOn: { 'tauri-linux': { bug: TAURI_LINUX_COPY_BUG, symptom: /클립보드: .*"3 m".*마지막 값 ""/ } },
     run: async (app) => {
       await app.tab('unit');
       await app.step('Control+v 2 → 메인 2 m, 보조 200 cm', async () => {
