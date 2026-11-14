@@ -124,7 +124,8 @@
     "vitest": "4.1.0",
     "vitest-axe": "^0.1.0",
     "vue-eslint-parser": "10.4.0",
-    "vue-tsc": "3.2.6"
+    "vue-tsc": "3.2.6",
+    "yaml": "^2.8.2"
   },
   "engines": {
     "node": ">=20",

@@ -10336,6 +10336,7 @@ __metadata:
     vue-i18n: "npm:11.3.0"
     vue-router: "npm:5.0.4"
     vue-tsc: "npm:3.2.6"
+    yaml: "npm:^2.8.2"
   languageName: unknown
   linkType: soft
 
