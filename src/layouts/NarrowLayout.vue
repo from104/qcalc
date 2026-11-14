@@ -127,6 +127,7 @@
             v-for="tab in visibleTabs"
             :id="`tab-${tab.name}`"
             :key="tab.name"
+            :data-testid="`tab-${tab.name}`"
             :icon="tab.icon"
             :name="tab.name"
             class="q-px-xs"
@@ -146,6 +147,7 @@
           dense
           icon="expand_more"
           class="q-px-xs overflow-menu-btn"
+          data-testid="tab-overflow"
           :color="isOverflowActive ? 'secondary' : undefined"
           :aria-label="t('ariaLabel.overflowTabs')"
           aria-haspopup="menu"
@@ -163,6 +165,7 @@
                 v-for="tab in overflowTabs"
                 :key="tab.name"
                 v-close-popup
+                :data-testid="`tab-menu-${tab.name}`"
                 clickable
                 :active="localCurrentTab === tab.name"
                 active-class="text-secondary"

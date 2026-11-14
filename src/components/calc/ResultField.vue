@@ -967,6 +967,7 @@
       <template v-if="isMainField" #prepend>
         <div
           v-if="!isMemoryEmpty"
+          data-testid="memory-indicator"
           class="noselect full-height q-mt-xs q-pt-sm"
           role="button"
           tabindex="0"
@@ -1024,7 +1025,7 @@
         >
           <span v-if="currentTab === 'radix'" id="radixPrefix">{{ radixPrefix }}</span>
           <span v-if="currentTab === 'currency'" id="symbol">{{ symbol }}</span>
-          <span :id="isMainField ? 'result' : 'subResult'">
+          <span :id="isMainField ? 'result' : 'subResult'" :data-testid="isMainField ? 'result-main' : 'result-sub'">
             {{ calcStore.isMemoryVisible ? memoryValue : result }}
           </span>
           <span v-if="currentTab === 'unit'" id="unit">{{ unit }}</span>
