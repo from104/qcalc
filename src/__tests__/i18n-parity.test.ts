@@ -1,6 +1,6 @@
 /**
  * @file i18n-parity.test.ts
- * @description 전역 메시지(src/i18n/**)와 SFC `<i18n>` 블록 전부에서 10개 언어가 기준 언어(ko)의 키를 빠짐없이
+ * @description 전역 메시지(src/i18n/**)와 SFC `<i18n>` 블록 전부에서 10개 언어가 모든 언어 키의 합집합(어느 언어에 있든)을 빠짐없이
  *              갖고 있는지 검사합니다. fallbackLocale 이 'en' 이라 한 언어에서 번역이 빠져도 화면에는 영어가 나와서
  *              E2E 로는 드러나지 않기 때문입니다.
  *
@@ -8,7 +8,7 @@
  *              기준선에 있던 빈틈이 채워지면 기준선을 줄이라고 알립니다(실패). 기준선 갱신:
  *                UPDATE_I18N_BASELINE=1 yarn test src/__tests__/i18n-parity.test.ts
  *
- *              빈틈 = 기준 언어에 있는 키가 해당 언어에 없거나, 문자열이 아니거나, 빈 문자열인 경우.
+ *              빈틈 = 어떤 언어에든 있는 키가 해당 언어에 없거나, 문자열이 아니거나, 빈 문자열인 경우.
  */
 import { readdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { join, relative } from 'node:path';
@@ -19,7 +19,6 @@ import { SUPPORTED_LANGUAGES } from '../i18n/languages';
 const ROOT = join(__dirname, '..', '..');
 const SRC = join(ROOT, 'src');
 const BASELINE_FILE = join(__dirname, 'i18n-parity-baseline.json');
-const REFERENCE = 'ko';
 const LANGS = SUPPORTED_LANGUAGES.map((l) => l.code);
 
 type Tree = Record<string, unknown>;
@@ -91,10 +90,10 @@ const isMissing = (value: unknown) => typeof value !== 'string' || value.trim() 
 function findGaps(sources: Record<string, Source>): Record<string, Record<string, string[]>> {
   const gaps: Record<string, Record<string, string[]>> = {};
   for (const [name, source] of Object.entries(sources)) {
-    const reference = source[REFERENCE]!;
+    // 기준 = 모든 언어 키의 합집합 — ko 에만 없는 키(ko 사용자가 영어 fallback 을 보는 경우)도 빈틈으로 잡는다
+    const reference = new Set(LANGS.flatMap((lang) => [...source[lang]!.keys()]));
     for (const lang of LANGS) {
-      if (lang === REFERENCE) continue;
-      const missing = [...reference.keys()].filter((key) => isMissing(source[lang]!.get(key))).sort();
+      const missing = [...reference].filter((key) => isMissing(source[lang]!.get(key))).sort();
       if (missing.length) (gaps[name] ??= {})[lang] = missing;
     }
   }
@@ -109,16 +108,16 @@ const countByLang = (g: Record<string, Record<string, string[]>>) =>
   Object.fromEntries(LANGS.map((lang) => [lang, Object.values(g).reduce((n, s) => n + (s[lang]?.length ?? 0), 0)]));
 
 describe('i18n 키 패리티 (전역 메시지 + SFC <i18n>)', () => {
-  it('기준 언어(ko)의 키가 각 출처에 있고 최소 한 출처는 읽혔다', () => {
+  it('ko 키가 각 출처에 있고 최소 한 출처는 읽혔다', () => {
     expect(Object.keys(sources).length).toBeGreaterThan(20);
-    for (const source of Object.values(sources)) expect(source[REFERENCE]!.size).toBeGreaterThan(0);
+    for (const source of Object.values(sources)) expect(source['ko']!.size).toBeGreaterThan(0);
   });
 
   it('현재 빈틈 현황 (기준선과 비교)', () => {
     const now = countByLang(gaps);
     const base = countByLang(baseline);
     console.info(
-      `[i18n parity] 언어별 번역 누락 (기준 ${REFERENCE}) — 현재 ${JSON.stringify(now)} / 기준선 ${JSON.stringify(base)}`,
+      `[i18n parity] 언어별 번역 누락 (기준 = 전 언어 키의 합집합) — 현재 ${JSON.stringify(now)} / 기준선 ${JSON.stringify(base)}`,
     );
     expect(Object.keys(now)).toEqual(LANGS);
   });

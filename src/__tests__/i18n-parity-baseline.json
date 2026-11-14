@@ -1,1 +1,5 @@
-{}
+{
+  "src/i18n/components/CurrencyPanel.yml": {
+    "ko": ["currency"]
+  }
+}
