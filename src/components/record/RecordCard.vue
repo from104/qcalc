@@ -583,6 +583,7 @@
           <q-item
             v-touch-hold.mouse="() => (recordMenu[record.id as number] = true)"
             class="text-right q-pa-sm record-item"
+            data-testid="record-item"
             role="listitem"
           >
             <q-item-section class="q-mr-none q-px-none">
@@ -600,7 +601,7 @@
                   :text="record.memo"
                 />
               </q-item-label>
-              <q-item-label class="record-text">
+              <q-item-label class="record-text" data-testid="record-text">
                 <HighlightText
                   :text="record.displayText"
                   :search-term="uiStore.searchKeyword"
@@ -619,6 +620,7 @@
                 <div class="col-6 text-left record-menu-btn">
                   <q-btn
                     class="q-px-xs q-py-none menu-btn"
+                    data-testid="record-menu-btn"
                     :class="themesStore.darkMode ? 'body--dark' : 'body--light'"
                     icon="more_vert"
                     size="sm"
@@ -684,7 +686,11 @@
                           :action="() => loadToFormulaField(record.id as number)"
                         />
                         <MenuItem separator />
-                        <MenuItem :title="t('loadToMainPanel')" :action="() => loadToMainPanel(record.id as number)" />
+                        <MenuItem
+                          data-testid="record-load-main"
+                          :title="t('loadToMainPanel')"
+                          :action="() => loadToMainPanel(record.id as number)"
+                        />
                         <MenuItem
                           v-if="uiStore.currentTab === 'unit' || uiStore.currentTab === 'currency'"
                           :title="t('loadToSubPanel')"
@@ -693,6 +699,7 @@
                         <MenuItem v-if="$g.isDesktop" separator />
                         <MenuItem
                           v-if="$g.isDesktop"
+                          data-testid="record-delete"
                           :title="t('deleteResult')"
                           :action="() => deleteRecordItem(record.id as number)"
                         />

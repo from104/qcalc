@@ -236,6 +236,7 @@
         <q-btn
           v-for="button in props.subPageConfig[currentSubPage]?.buttons"
           :key="button.icon"
+          :data-testid="`subpage-${button.icon}`"
           dense
           flat
           size="md"

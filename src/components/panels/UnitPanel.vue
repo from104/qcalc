@@ -157,6 +157,7 @@
     <!-- 카테고리 -->
     <q-select
       v-model="unitStore.selectedCategory"
+      data-testid="unit-category"
       :options="categoryList"
       :label="t('category')"
       role="combobox"
@@ -212,6 +213,7 @@
     <!-- 원본 단위 -->
     <q-select
       v-model="unitStore.sourceUnits[unitStore.selectedCategory]"
+      data-testid="unit-source"
       :options="sourceUnitOptions"
       :label="t(`unitDesc.${unitStore.selectedCategory}.${unitStore.sourceUnits[unitStore.selectedCategory]}`)"
       role="combobox"
@@ -289,6 +291,7 @@
     <!-- 대상 단위 -->
     <q-select
       v-model="unitStore.targetUnits[unitStore.selectedCategory]"
+      data-testid="unit-target"
       :options="targetUnitOptions"
       :label="t(`unitDesc.${unitStore.selectedCategory}.${unitStore.targetUnits[unitStore.selectedCategory]}`)"
       role="combobox"
