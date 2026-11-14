@@ -1,0 +1,136 @@
+/**
+ * basic — 기본 계산기 키패드 (참조 구현).
+ *
+ * 기대값의 근거: src/core/calculator/CalculatorOperationHandler.ts
+ * - 연속 계산: 연산자를 다시 누르면 앞 계산을 먼저 끝낸다(performPreCalculation). '=' 뒤 연산자는 결과에 이어진다.
+ * - 퍼센트: × 나 ÷ 가 걸려 있을 때만 동작한다. 200×15% = 200·15/100 = 30, 50÷200% = 50/200·100 = 25.
+ * - 메모리: MS 저장, M+/M- 가감, MR 불러오기, MC 비우기. 메모리 연산 직후 3초 동안은 메인 칸에
+ *   메모리 값이 대신 보인다(calcStore.showMemoryTemporarily) — 그래서 그 뒤 단언은 시간을 넉넉히 준다.
+ */
+import { defineGroup, expectMain, expectMemory, shifted, tapKeys } from './kit';
+
+/** 메모리 표시(3초) 가 끝날 때까지 넉넉히 */
+const AFTER_MEMORY_DISPLAY = { timeout: 6000 };
+
+export default defineGroup('basic', [
+  {
+    title: '사칙연산과 소수',
+    run: async (app) => {
+      await app.step('7 × 6 = 42', async () => {
+        await tapKeys(app, '7*6=');
+        await expectMain(app, '42');
+      });
+      await app.step('9 − 12 = −3', async () => {
+        await tapKeys(app, 'C9-12=');
+        await expectMain(app, '-3');
+      });
+      await app.step('1 ÷ 4 = 0.25', async () => {
+        await tapKeys(app, 'C1/4=');
+        await expectMain(app, '0.25');
+      });
+      await app.step('1.5 + 2.25 = 3.75', async () => {
+        await tapKeys(app, 'C1.5+2.25=');
+        await expectMain(app, '3.75');
+      });
+      await app.step('자릿수 묶음: 1234 × 2 = 2,468', async () => {
+        await tapKeys(app, 'C1234*2=');
+        await expectMain(app, '2,468');
+      });
+    },
+  },
+  {
+    title: '연속 계산',
+    run: async (app) => {
+      await app.step('2 + 3 = 뒤 × 4 = → 20', async () => {
+        await tapKeys(app, '2+3=');
+        await expectMain(app, '5');
+        await tapKeys(app, '*4=');
+        await expectMain(app, '20');
+      });
+      await app.step('연산자 연쇄: 2 + 3 + 는 중간 결과 5, 이어서 4 = → 9', async () => {
+        await tapKeys(app, 'C2+3+');
+        await expectMain(app, '5');
+        await tapKeys(app, '4=');
+        await expectMain(app, '9');
+      });
+      await app.step('= 뒤 숫자를 누르면 새 계산', async () => {
+        await tapKeys(app, '7');
+        await expectMain(app, '7');
+        await tapKeys(app, '+1=');
+        await expectMain(app, '8');
+      });
+    },
+  },
+  {
+    title: '퍼센트',
+    run: async (app) => {
+      await app.step('200 × 15 % → 30', async () => {
+        await tapKeys(app, '200*15%');
+        await expectMain(app, '30');
+      });
+      await app.step('50 ÷ 200 % → 25', async () => {
+        await tapKeys(app, 'C50/200%');
+        await expectMain(app, '25');
+      });
+      await app.step('퍼센트 결과에 이어서 계산: + 5 = → 30', async () => {
+        await tapKeys(app, '+5=');
+        await expectMain(app, '30');
+      });
+    },
+  },
+  {
+    title: '메모리 MS · M+ · M- · MR · MC',
+    run: async (app) => {
+      await app.step('처음에는 메모리 표시 없음', () => expectMemory(app, false));
+      await app.step('5 MS → 메모리 5', async () => {
+        await tapKeys(app, '5');
+        await shifted(app, 'MS');
+        await expectMemory(app, true);
+        await expectMain(app, '5');
+      });
+      await app.step('3 M+ → 메모리 8, MR 로 확인', async () => {
+        await tapKeys(app, 'C3');
+        await shifted(app, 'M+');
+        await tapKeys(app, 'C');
+        await shifted(app, 'MR');
+        await expectMain(app, '8');
+      });
+      await app.step('불러온 값으로 계산: + 2 = → 10 (메모리 표시가 끝난 뒤)', async () => {
+        await tapKeys(app, '+2=');
+        await expectMain(app, '10', AFTER_MEMORY_DISPLAY);
+      });
+      await app.step('4 M- → 메모리 4, MR 로 확인', async () => {
+        await tapKeys(app, 'C4');
+        await shifted(app, 'M-');
+        await tapKeys(app, 'C');
+        await shifted(app, 'MR');
+        await expectMain(app, '4', AFTER_MEMORY_DISPLAY);
+      });
+      await app.step('MC → 메모리 표시 사라짐', async () => {
+        await shifted(app, 'MC');
+        await expectMemory(app, false);
+      });
+    },
+  },
+  {
+    title: '리셋과 지우기',
+    run: async (app) => {
+      await app.step('12 + 3 입력 중 C → 0', async () => {
+        await tapKeys(app, '12+3');
+        await expectMain(app, '3');
+        await tapKeys(app, 'C');
+        await expectMain(app, '0');
+      });
+      await app.step('C 는 걸려 있던 연산도 지운다: 4 = → 4', async () => {
+        await tapKeys(app, '4=');
+        await expectMain(app, '4');
+      });
+      await app.step('⌫ 는 한 글자씩: 123 ⌫ → 12, ⌫⌫ → 0', async () => {
+        await tapKeys(app, 'C123<');
+        await expectMain(app, '12');
+        await tapKeys(app, '<<');
+        await expectMain(app, '0');
+      });
+    },
+  },
+]);
