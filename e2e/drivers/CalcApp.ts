@@ -67,6 +67,11 @@ export interface CalcApp {
   seed(state?: SeedState): Promise<void>;
   /** 저장소를 유지한 채 앱을 다시 띄운다 (needs: reload) */
   reload(): Promise<void>;
+  /**
+   * 앱이 스스로 다시 불러오는 중이면(지연 로드 실패 시 router/index.ts 의 reloadOnce 가 페이지를 한 번 새로 연다)
+   * 그게 끝나고 앱이 다시 뜰 때까지 기다린다. 청크를 끊고 reload() 한 뒤 입력하기 전에 부른다 (needs: reload)
+   */
+  settleSelfReload(): Promise<void>;
 
   /** 키패드 버튼 하나를 누른다 (터치 기기는 탭) */
   press(id: ButtonId): Promise<void>;

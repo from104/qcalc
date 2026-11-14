@@ -43,8 +43,8 @@ export interface SeedState {
   lang?: LangCode;
   /** 계산 기록 — 최신 항목이 앞. 형식은 실제 저장·복원과 대조해 검증됨(HistoryEntry 참고) */
   history?: HistoryEntry[];
-  /** 스토어별 원시 덮어쓰기 — 기본 시드 위에 얕게 합쳐진다 */
-  stores?: Partial<Record<StoreKey, Record<string, unknown>>>;
+  /** 스토어별 원시 덮어쓰기 — 기본 시드 위에 얕게 합쳐진다. `null` 이면 그 스토어의 시드를 아예 뺀다(완전 첫 실행) */
+  stores?: Partial<Record<StoreKey, Record<string, unknown> | null>>;
 }
 
 /** 기본 시드 — 첫 실행 방해 요소를 끄고 저장값 검증기가 아무 것도 고치지 않을 값만 넣는다 */
@@ -70,7 +70,11 @@ function defaultStores(lang: LangCode): Partial<Record<StoreKey, Record<string, 
 export function buildSeed(state: SeedState = {}): Record<string, string> {
   const lang = state.lang ?? 'ko';
   const stores = defaultStores(lang);
-  for (const [key, value] of Object.entries(state.stores ?? {}) as [StoreKey, Record<string, unknown>][]) {
+  for (const [key, value] of Object.entries(state.stores ?? {}) as [StoreKey, Record<string, unknown> | null][]) {
+    if (value === null) {
+      delete stores[key];
+      continue;
+    }
     stores[key] = { ...(stores[key] ?? {}), ...value };
   }
   if (state.history) {

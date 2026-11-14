@@ -167,7 +167,7 @@ export default defineGroup('convert', [
   {
     title: '진법: 메인 칸 붙여넣기는 원본 진법(10진)으로 읽는다',
     needs: ['keyboard', 'clipboard'],
-    fixme:
+    knownBug:
       '진법 탭 Control+v(메인 붙여넣기)가 보조 붙여넣기와 같은 코드(ResultField.vue handlePaste)를 타서 ' +
       '원본 진법이 아니라 대상 진법(16진)으로 읽는다 — 10진 메인에 255 를 붙이면 597(0x255)이 된다',
     run: async (app) => {

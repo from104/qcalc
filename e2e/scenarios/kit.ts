@@ -19,8 +19,12 @@ export interface Scenario {
   needs?: Capability[];
   /** 앱을 띄울 때의 저장소 상태 (기본: 한국어, 첫 실행 안내 없음) */
   seed?: SeedState;
-  /** 앱 버그로 지금은 실패하는 시나리오 — 버그 설명을 적으면 실행기가 fixme 로 표시한다(시험을 약하게 고치지 말 것) */
-  fixme?: string;
+  /**
+   * 알려진 앱 버그 — 이 시나리오는 지금 **실패해야 정상**이다(버그 설명을 적는다. 시험을 약하게 고치지 말 것).
+   * 실행기가 시나리오를 그대로 돌려, 실패하면 "known-bug"(기대된 실패)로 보고하고, 통과하면 버그가 고쳐진 것이므로
+   * "bug fixed — remove the known-bug mark" 로 빨갛게 만든다. 그때 이 줄(과 관련 예외 처리)을 지운다.
+   */
+  knownBug?: string;
   /** 아직 안 만든 시나리오 — 무엇을 다룰지 적어 두면 실행기가 건너뛰고 보고한다 */
   todo?: string;
   run(app: CalcApp): Promise<void>;

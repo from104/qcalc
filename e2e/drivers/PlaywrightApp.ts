@@ -62,8 +62,40 @@ export class PlaywrightApp implements CalcApp {
   }
 
   async reload(): Promise<void> {
-    await this.page.reload();
-    await this.waitReady();
+    try {
+      await this.page.reload();
+    } catch (error) {
+      // 청크를 끊어 둔 채면 앱이 로드 중에 스스로 한 번 더 새로고침해(router/index.ts reloadOnce) 이 호출을 끊을 수 있다(WebKit)
+      if (!/interrupted|navigation/i.test(String(error))) throw error;
+    }
+    await this.waitReadyAfterNavigation();
+  }
+
+  /** 새로고침 도중에는 실행 문맥이 사라져 예외가 날 수 있다 — 앱이 뜰 때까지 다시 시도 */
+  private async waitReadyAfterNavigation(): Promise<void> {
+    for (let attempt = 0; ; attempt++) {
+      try {
+        await this.page.waitForLoadState('load');
+        await this.waitReady();
+        return;
+      } catch (error) {
+        if (attempt >= 5) throw error;
+        await this.page.waitForTimeout(200);
+      }
+    }
+  }
+
+  async settleSelfReload(): Promise<void> {
+    // router/index.ts reloadOnce: 지연 로드 실패 → sessionStorage 에 시각을 적고 곧바로 location.reload().
+    // 시각이 적히기를 (유휴 프리페치 최대 3초 + 여유) 기다리고, 적혔다면 새 문서가 앱을 다시 띄울 때까지 기다린다.
+    const key = 'qcalc-chunk-reload-at';
+    const fired = await this.page
+      .waitForFunction((k) => sessionStorage.getItem(k) !== null, key, { timeout: 5000 })
+      .then(() => true)
+      .catch(() => false);
+    if (!fired) return;
+    await this.page.waitForTimeout(500); // 시각을 적은 뒤 실제 이동이 시작될 때까지
+    await this.waitReadyAfterNavigation();
   }
 
   async press(id: ButtonId): Promise<void> {
