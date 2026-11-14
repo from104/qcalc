@@ -5,7 +5,8 @@
  * 입력 (있는 것만 읽는다)
  * - test-results/.steps.jsonl   : 단계별 {layer, step, status, seconds, detail, log}
  * - test-results/vitest.json    : vitest JSON 보고서
- * - test-results/e2e-report.json: Playwright JSON 보고서
+ * - test-results/e2e-report.json: Playwright JSON 보고서 (web 층)
+ * - test-results/app-report.json: Playwright JSON 보고서 (app 층 — 실제 Tauri 앱, playwright.app.config.ts)
  * 종료 코드: 실패한 단계가 하나라도 있으면 1
  */
 import { existsSync, readFileSync, statSync, writeFileSync } from 'node:fs';
@@ -56,67 +57,84 @@ for (const s of steps) {
   else if (s.status === 'fail') s.detail = 'did not run tests (build error?)';
 }
 
-// Playwright 보고서 → 프로젝트별 집계
-const projects = {};
-const e2eFailures = [];
-const knownBugs = [];
-const report = read('e2e-report.json');
-const walk = (suite, trail) => {
-  for (const spec of suite.specs ?? []) {
-    for (const t of spec.tests ?? []) {
-      const p = (projects[t.projectName] ??= {
-        passed: 0,
-        failed: 0,
-        flaky: 0,
-        skipped: 0,
-        todo: 0,
-        capability: 0,
-        knownBug: 0,
-        ms: 0,
-      });
-      for (const r of t.results ?? []) p.ms += r.duration ?? 0;
-      const ann = t.annotations ?? [];
-      if (t.status === 'skipped') {
-        p.skipped++;
-        if (ann.some((a) => String(a.description ?? '').startsWith('TODO'))) p.todo++;
-        else p.capability++;
-      } else if (t.status === 'expected' && ann.some((a) => a.type === 'known-bug')) {
-        p.knownBug++;
-        knownBugs.push({
-          project: t.projectName,
-          title: [...trail, spec.title].filter(Boolean).join(' › '),
-          bug: ann.find((a) => a.type === 'known-bug')?.description ?? '',
-          error: ann.find((a) => a.type === 'known-bug-error')?.description ?? '',
+// Playwright 보고서 → 프로젝트별 집계 (web 층 e2e-report.json, app 층 app-report.json)
+function parseReport(report) {
+  const projects = {};
+  const failures = [];
+  const knownBugs = [];
+  const walk = (suite, trail) => {
+    for (const spec of suite.specs ?? []) {
+      for (const t of spec.tests ?? []) {
+        const p = (projects[t.projectName] ??= {
+          passed: 0,
+          failed: 0,
+          flaky: 0,
+          skipped: 0,
+          todo: 0,
+          capability: 0,
+          knownBug: 0,
+          ms: 0,
         });
-      } else if (t.status === 'expected') p.passed++;
-      else if (t.status === 'flaky') p.flaky++;
-      else {
-        p.failed++;
-        const last = t.results?.[t.results.length - 1];
-        const trace = last?.attachments?.find((a) => a.name === 'trace')?.path;
-        e2eFailures.push({
-          project: t.projectName,
-          title: [...trail, spec.title].filter(Boolean).join(' › '),
-          error: String(last?.error?.message ?? '')
-            // eslint-disable-next-line no-control-regex -- ANSI 색상 코드 제거
-            .replace(/\u001b\[[0-9;]*m/g, '')
-            .split('\n')[0]
-            .slice(0, 160),
-          trace: trace ? path.relative(process.cwd(), trace) : null,
-        });
+        for (const r of t.results ?? []) p.ms += r.duration ?? 0;
+        const ann = t.annotations ?? [];
+        if (t.status === 'skipped') {
+          p.skipped++;
+          if (ann.some((a) => String(a.description ?? '').startsWith('TODO'))) p.todo++;
+          else p.capability++;
+        } else if (t.status === 'expected' && ann.some((a) => a.type === 'known-bug')) {
+          p.knownBug++;
+          knownBugs.push({
+            project: t.projectName,
+            title: [...trail, spec.title].filter(Boolean).join(' › '),
+            bug: ann.find((a) => a.type === 'known-bug')?.description ?? '',
+            error: ann.find((a) => a.type === 'known-bug-error')?.description ?? '',
+          });
+        } else if (t.status === 'expected') p.passed++;
+        else if (t.status === 'flaky') p.flaky++;
+        else {
+          p.failed++;
+          const last = t.results?.[t.results.length - 1];
+          const trace = last?.attachments?.find((a) => a.name === 'trace')?.path;
+          failures.push({
+            project: t.projectName,
+            title: [...trail, spec.title].filter(Boolean).join(' › '),
+            error: String(last?.error?.message ?? '')
+              // eslint-disable-next-line no-control-regex -- ANSI 색상 코드 제거
+              .replace(/\u001b\[[0-9;]*m/g, '')
+              .split('\n')[0]
+              .slice(0, 160),
+            trace: trace ? path.relative(process.cwd(), trace) : null,
+          });
+        }
       }
     }
-  }
-  for (const child of suite.suites ?? []) walk(child, [...trail, child.title]);
-};
-for (const suite of report?.suites ?? []) walk(suite, []);
+    for (const child of suite.suites ?? []) walk(child, [...trail, child.title]);
+  };
+  for (const suite of report?.suites ?? []) walk(suite, []);
+  return { projects, failures, knownBugs };
+}
 
+/** Playwright 를 돌린 단계 → 그 보고서 파일 (app 층의 build·cleanup 단계는 아님) */
+const reportFileOf = (s) =>
+  s.layer === 'web' && s.step === 'playwright'
+    ? 'e2e-report.json'
+    : s.layer === 'app' && !['build', 'cleanup'].includes(s.step) && s.status !== 'skip'
+      ? 'app-report.json'
+      : null;
+
+const e2eFailures = [];
+const knownBugs = [];
 for (const s of steps) {
-  if (s.layer !== 'web' || s.step !== 'playwright') continue;
-  s.projects = projects;
-  s.failures = e2eFailures;
-  s.knownBugs = knownBugs;
-  const total = Object.values(projects).reduce((n, p) => n + p.passed + p.failed + p.flaky + p.skipped, 0);
+  const file = reportFileOf(s);
+  if (!file) continue;
+  const report = read(file);
+  const parsed = parseReport(report);
+  s.projects = parsed.projects;
+  s.failures = parsed.failures;
+  s.knownBugs = parsed.knownBugs;
+  e2eFailures.push(...parsed.failures);
+  knownBugs.push(...parsed.knownBugs);
+  const total = Object.values(parsed.projects).reduce((n, p) => n + p.passed + p.failed + p.flaky + p.skipped, 0);
   if (report && total === 0) s.detail = 'no tests ran';
 }
 
@@ -139,8 +157,12 @@ const summary = {
   steps,
   reports: {
     junit: existsSync(path.join(out, 'e2e-junit.xml')) ? path.join(out, 'e2e-junit.xml') : null,
+    appJunit: existsSync(path.join(out, 'app-junit.xml')) ? path.join(out, 'app-junit.xml') : null,
     // 이번 실행이 만든 보고서만 링크한다(Playwright 가 죽었으면 이전 실행의 것이 남아 있을 수 있다)
     html: producedThisRun('playwright-report/index.html') ? 'playwright-report/index.html' : null,
+    appHtml: producedThisRun(path.join(out, 'app-html-report/index.html'))
+      ? path.join(out, 'app-html-report/index.html')
+      : null,
   },
 };
 writeFileSync(path.join(out, 'summary.json'), JSON.stringify(summary, null, 2) + '\n');
@@ -150,11 +172,12 @@ const lines = [
   `# QCalc 테스트 요약 — ${summary.result} (${totalSeconds}s)`,
   `돌린 층: ${ranLayers.join(', ') || '(없음)'} · 안 돌린 층: ${summary.layersNotRun.join(', ') || '(없음)'}`,
   '',
-  '| layer | step | result | detail | time (web 프로젝트는 시험 시간 합 Σ) |',
+  '| layer | step | result | detail | time (Playwright 프로젝트는 시험 시간 합 Σ) |',
   '|---|---|---|---|---|',
 ];
 for (const s of steps) {
-  if (s.layer === 'web' && s.step === 'playwright' && Object.keys(projects).length) {
+  const projects = s.projects ?? {};
+  if (reportFileOf(s) && Object.keys(projects).length) {
     for (const [name, p] of Object.entries(projects)) {
       const skip = p.skipped
         ? ` · ${p.skipped} skipped (${[p.todo && `${p.todo} todo`, p.capability && `${p.capability} capability`].filter(Boolean).join(', ')})`
@@ -163,11 +186,11 @@ for (const s of steps) {
       const flaky = p.flaky ? ` · ${p.flaky} flaky` : '';
       const res = p.failed ? 'fail' : 'pass';
       lines.push(
-        `| web | ${name} | ${res} | ${p.passed} passed · ${p.failed} failed${flaky}${known}${skip} | Σ${Math.round(p.ms / 1000)}s |`,
+        `| ${s.layer} | ${name} | ${res} | ${p.passed} passed · ${p.failed} failed${flaky}${known}${skip} | Σ${Math.round(p.ms / 1000)}s (${s.seconds}s) |`,
       );
     }
-    if (s.status === 'fail' && !e2eFailures.length)
-      lines.push(`| web | playwright | fail | ${s.detail || 'see log'} — ${s.log} | ${s.seconds}s |`);
+    if (s.status === 'fail' && !s.failures?.length)
+      lines.push(`| ${s.layer} | ${s.step} | fail | ${s.detail || 'see log'} — ${s.log} | ${s.seconds}s |`);
   } else {
     lines.push(
       `| ${s.layer} | ${s.step} | ${s.status} | ${s.detail || ''}${s.status === 'fail' && s.log ? ` — ${s.log}` : ''} | ${s.seconds}s |`,
@@ -178,7 +201,7 @@ const allFailures = [
   ...steps.filter((s) => s.step === 'vitest').flatMap((s) => (s.failures ?? []).map((f) => `- [vitest] ${f}`)),
   ...e2eFailures.map((f) => `- [${f.project}] ${f.title} — ${f.error}${f.trace ? ` — trace: ${f.trace}` : ''}`),
 ];
-const footer = `보고서: ${[summary.reports.junit, summary.reports.html, path.join(out, 'summary.json')].filter(Boolean).join(' · ')}`;
+const footer = `보고서: ${[summary.reports.junit, summary.reports.html, summary.reports.appJunit, summary.reports.appHtml, path.join(out, 'summary.json')].filter(Boolean).join(' · ')}`;
 // 알려진 버그(기대된 실패): 증상 확인용으로 실제 오류 첫 줄을 보인다 — 시험별 한 줄(프로젝트 중복 제거)
 const bugLines = [...new Map(knownBugs.map((b) => [b.title, b])).values()].map(
   (b) => `- ${b.title.slice(0, 50)} — ${b.error.replace(/^Error: /, '').slice(0, 90)}`,

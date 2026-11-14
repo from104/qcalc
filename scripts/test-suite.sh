@@ -9,13 +9,13 @@
 #   --layer code|web|app    여러 번 줄 수 있다 (기본: code + web)
 #                           code = yarn lint + vue-tsc + vitest + cargo test(src-tauri)
 #                           web  = Playwright (운영 웹 빌드, 3개 프로젝트)
-#                           app  = 실제 앱(Tauri/Android) — 아직 없음
-#   --platform web|linux|windows|android   app 층의 대상 (기본 web)
+#                           app  = 실제 Tauri 앱 (Linux: Xvfb + tauri-driver + WebdriverIO, playwright.app.config.ts)
+#   --platform linux|windows|android   app 층의 대상 (기본: 이 기계의 OS). 지금은 linux 만 — 나머지는 skip
 #   --setup                 브라우저 설치 후 끝낸다 (다른 층은 돌지 않음)
-#   --rebuild               dist/spa 를 강제로 다시 빌드 (E2E_REBUILD=1)
-#   -- <args>               뒤의 인자는 그대로 playwright test 에 넘긴다
+#   --rebuild               dist/spa 와 app 층 바이너리를 강제로 다시 빌드 (E2E_REBUILD=1)
+#   -- <args>               뒤의 인자는 그대로 playwright test 에 넘긴다 (web·app 층 모두)
 #
-# 결과: test-results/summary.md(30줄 이하, 시작할 때 지우고 끝에 새로 씀 — 어떤 층을 돌렸는지 포함), summary.json, e2e-junit.xml, 단계별 *.log
+# 결과: test-results/summary.md(30줄 이하, 시작할 때 지우고 끝에 새로 씀 — 어떤 층을 돌렸는지 포함), summary.json, *-junit.xml, 단계별 *.log
 # 종료 코드: 실패한 층이 하나라도 있으면 1
 set -euo pipefail
 
@@ -26,7 +26,7 @@ OUT=test-results
 usage() { sed -n '2,20p' "$0" | sed 's/^# \{0,1\}//'; }
 
 LAYERS=()
-PLATFORM=web
+PLATFORM=
 SETUP=0
 PW_ARGS=()
 while [[ $# -gt 0 ]]; do
@@ -37,7 +37,7 @@ while [[ $# -gt 0 ]]; do
       shift 2 ;;
     --platform)
       [[ $# -ge 2 ]] || { echo "--platform 값이 없음" >&2; exit 2; }
-      case "$2" in web | linux | windows | android) PLATFORM="$2" ;; *) echo "알 수 없는 플랫폼: $2" >&2; exit 2 ;; esac
+      case "$2" in linux | windows | android) PLATFORM="$2" ;; *) echo "알 수 없는 플랫폼: $2 (linux|windows|android)" >&2; exit 2 ;; esac
       shift 2 ;;
     --setup) SETUP=1; shift ;;
     --rebuild) export E2E_REBUILD=1; shift ;;
@@ -110,7 +110,8 @@ STEPS="$OUT/.steps.jsonl"
 : >"$STEPS"
 touch "$OUT/.started"
 # 낡은 결과가 이번 실행의 요약으로 남지 않게 모두 지운다 (summary 는 맨 마지막에 새로 쓴다)
-rm -f "$OUT/vitest.json" "$OUT/e2e-report.json" "$OUT/e2e-junit.xml" "$OUT/summary.md" "$OUT/summary.json"
+rm -f "$OUT/vitest.json" "$OUT/e2e-report.json" "$OUT/e2e-junit.xml" "$OUT/app-report.json" "$OUT/app-junit.xml" \
+  "$OUT/app-orphans.json" "$OUT/summary.md" "$OUT/summary.json"
 
 # 이전 실행이 SIGKILL 로 죽어 남긴 e2e 서버(serve.mjs)만 정리한다 — pid 파일의 PID 이고 cmdline 이 serve.mjs 일 때만
 PIDFILE="$OUT/.e2e-server.pid"
@@ -126,6 +127,50 @@ kill_stale_server() {
   rm -f "$PIDFILE"
 }
 trap kill_stale_server EXIT
+
+# ─── app 층 정리 — 이름·패턴이 아니라 이번 실행의 고유 표지로만 ─────────────────────
+# e2e/app/env-linux.ts 가 띄우는 모든 프로세스(Xvfb·dbus·tauri-driver → WebKitWebDriver → 앱 → WebKit 하위
+# 프로세스)는 환경변수 QCALC_E2E_RUN=<토큰> 을 물려받는다. 토큰은 test-results/.app-run.json 에 있다.
+# 러너가 SIGKILL 등으로 정리를 못 하고 죽었을 때를 대비해, 앱 층 앞뒤로 그 토큰을 가진 프로세스만 찾아 끝낸다.
+APP_RUN="$OUT/.app-run.json"
+app_marked_pids() {
+  local token pid env
+  [[ -f "$APP_RUN" ]] || return 0
+  token=$(node -e 'process.stdout.write(JSON.parse(require("fs").readFileSync(process.argv[1], "utf8")).token || "")' "$APP_RUN" 2>/dev/null) || return 0
+  [[ "$token" =~ ^[0-9a-f-]{36}$ ]] || return 0
+  for env in /proc/[0-9]*/environ; do
+    pid=${env#/proc/}
+    pid=${pid%/environ}
+    [[ "$pid" == "$$" ]] && continue
+    grep -qzxF "QCALC_E2E_RUN=$token" "$env" 2>/dev/null && echo "$pid"
+  done
+}
+# 남은 표지 프로세스를 끝내고 그 수를 출력한다. 임시 프로필(qcalc-e2e-app-*)도 남았으면 지운다.
+sweep_app_leftovers() {
+  local pids profile
+  mapfile -t pids < <(app_marked_pids)
+  if [[ ${#pids[@]} -gt 0 ]]; then
+    kill "${pids[@]}" 2>/dev/null || true
+    sleep 1
+    kill -9 "${pids[@]}" 2>/dev/null || true
+  fi
+  if [[ -f "$APP_RUN" ]]; then
+    profile=$(node -e 'process.stdout.write(JSON.parse(require("fs").readFileSync(process.argv[1], "utf8")).profile || "")' "$APP_RUN" 2>/dev/null || true)
+    if [[ -n "$profile" && -d "$profile" && "$(basename "$profile")" == qcalc-e2e-app-* && -z "${E2E_KEEP_PROFILE:-}" ]]; then
+      rm -rf -- "$profile"
+    fi
+  fi
+  echo "${#pids[@]}"
+}
+
+host_platform() {
+  case "$(uname -s)" in
+    Linux) echo linux ;;
+    Darwin) echo macos ;;
+    MINGW* | MSYS* | CYGWIN*) echo windows ;;
+    *) uname -s ;;
+  esac
+}
 
 # record <layer> <step> <pass|fail|skip> <seconds> <detail> <log>
 record() {
@@ -166,8 +211,31 @@ for layer in "${LAYERS[@]}"; do
       fi
       ;;
     app)
-      echo "[app] $PLATFORM … not implemented yet (Tauri: WebdriverIO, Android: Playwright _android — e2e/README.md 로드맵)"
-      record app "$PLATFORM" skip 0 "not implemented yet" ""
+      plat="${PLATFORM:-$(host_platform)}"
+      if [[ "$plat" != linux || "$(host_platform)" != linux ]]; then
+        # Windows 는 Phase 3(gh workflow — e2e-app.yml), Android 는 Phase 4
+        echo "[app] $plat … not implemented on this host ($(host_platform))"
+        record app "$plat" skip 0 "not implemented on this host ($(host_platform))" ""
+        continue
+      fi
+      stale=$(sweep_app_leftovers)
+      [[ "$stale" == 0 ]] || echo "[app] 이전 실행이 남긴 프로세스 ${stale}개를 정리했다"
+      run_step app build node e2e/app/build.mjs
+      if grep -q '"step":"build","status":"fail"' "$STEPS"; then
+        record app linux skip 0 "app build failed — test-results/app-build.log" ""
+      else
+        run_step app linux npx playwright test -c playwright.app.config.ts ${PW_ARGS[@]+"${PW_ARGS[@]}"}
+      fi
+      # 정상이면 globalSetup 의 teardown 이 이미 다 끝냈다 — 여기서 찾으면 정리 실패다
+      start=$SECONDS
+      left=$(sweep_app_leftovers)
+      orphans=$(cat "$OUT/app-orphans.json" 2>/dev/null || echo '[]')
+      if [[ "$left" == 0 ]]; then
+        record app cleanup pass "$((SECONDS - start))" "0 leftover processes (teardown killed outside the tree: $orphans)" ""
+      else
+        echo "  ! 앱 층이 끝난 뒤 남은 프로세스 ${left}개를 정리했다" >&2
+        record app cleanup fail "$((SECONDS - start))" "$left leftover processes had to be killed after the run" ""
+      fi
       ;;
   esac
 done
