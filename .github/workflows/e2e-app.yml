@@ -2,13 +2,19 @@ name: E2E app
 
 # app 층 — 실제 Tauri 앱 E2E (scripts/test-suite.sh --layer app). 안내: e2e/README.md 「app 층」
 # 무겁고(Rust 디버그 빌드) 느려서 PR 게이트(ci.yml)에는 넣지 않는다: 야간·수동 실행, 다른 워크플로에서 호출.
-# 지금은 Linux(Xvfb + tauri-driver + WebKitWebDriver)만. Windows 잡은 Phase 3 에서 더한다.
+# 두 잡은 서로 독립이다(needs 없음, 한쪽이 실패해도 다른 쪽은 끝까지 돈다):
+#   linux   — Xvfb + tauri-driver + WebKitWebDriver (ubuntu-24.04)
+#   windows — 러너의 실제 데스크톱 + tauri-driver + msedgedriver(WebView2 와 같은 버전). 앱 데이터가 격리되지 않아 CI 에서만 돈다
 
 on:
   schedule:
     - cron: '30 18 * * *' # 매일 03:30 KST (기본 브랜치)
   workflow_dispatch:
   workflow_call:
+  # TEMP: validate before merge — remove before merging to develop
+  # (이 워크플로가 기본 브랜치에 아직 없어서 workflow_dispatch 로는 돌릴 수 없다)
+  push:
+    branches: [feature/e2e-suite]
 
 # 토큰은 읽기 전용 — 이 워크플로는 쓰기 권한이 필요 없다
 permissions:
@@ -100,6 +106,90 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: app-e2e-linux-failure
+          path: |
+            test-results/
+          retention-days: 7
+
+  windows:
+    runs-on: windows-latest
+    timeout-minutes: 60
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Enable Corepack
+        run: corepack enable
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: yarn
+
+      - name: Setup Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+
+      # tauri-driver 와 msedgedriver-tool 바이너리도 같이 캐시한다(cargo install 은 1~2분씩)
+      - name: Cache Cargo
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            ~/.cargo/bin/tauri-driver.exe
+            ~/.cargo/bin/msedgedriver-tool.exe
+            src-tauri/target
+          key: ${{ runner.os }}-e2e-app-${{ hashFiles('src-tauri/Cargo.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-e2e-app-
+
+      - name: Install tauri-driver
+        shell: bash
+        run: command -v tauri-driver || cargo install tauri-driver --version 2.1.0 --locked
+
+      # tauri-driver 는 WebView2 와 같은 버전의 msedgedriver 가 있어야 앱에 붙는다.
+      # 방법은 v2.tauri.app/develop/tests/webdriver/ci 의 Windows 예시와 같다: msedgedriver-tool 이 설치된 WebView2/Edge 버전에
+      # 맞는 드라이버를 내려받아 현재 폴더에 msedgedriver.exe 로 둔다. 경로는 QCALC_E2E_NATIVE_DRIVER 로 넘긴다.
+      - name: Install msedgedriver (matching WebView2)
+        shell: pwsh
+        run: |
+          $dir = Join-Path $env:RUNNER_TEMP 'msedgedriver'
+          New-Item -ItemType Directory -Force $dir | Out-Null
+          $tool = Join-Path $HOME '.cargo/bin/msedgedriver-tool.exe'
+          if (-not (Test-Path $tool)) { cargo install --git https://github.com/chippers/msedgedriver-tool }
+          Push-Location $dir
+          & $tool
+          Pop-Location
+          $driver = Join-Path $dir 'msedgedriver.exe'
+          if (-not (Test-Path $driver)) { throw "msedgedriver.exe was not downloaded to $dir" }
+          "QCALC_E2E_NATIVE_DRIVER=$driver" >> $env:GITHUB_ENV
+          # 맞는지 한눈에: WebView2 런타임 버전과 드라이버 버전
+          $wv = Get-ItemPropertyValue 'HKLM:\SOFTWARE\WOW6432Node\Microsoft\EdgeUpdate\Clients\{F3017226-FE2A-4295-8BDF-00C3A9A7E4C5}' pv -ErrorAction SilentlyContinue
+          Write-Host "WebView2 runtime: $wv"
+          & $driver --version
+
+      - name: Install dependencies
+        run: yarn install --immutable
+
+      # 웹 빌드(dist/spa)와 디버그 바이너리(qcalc.exe)는 e2e/app/build.mjs 가 필요할 때만 만든다.
+      # 앱 데이터(%APPDATA%·%LOCALAPPDATA% 의 io.github.from104.qcalc)는 격리할 수 없어서 CI=true 일 때만 돈다 — 이 러너는 일회용이다.
+      - name: App E2E (Windows)
+        shell: bash
+        run: scripts/test-suite.sh --layer app --platform windows
+
+      - name: Job summary
+        if: always()
+        shell: bash
+        run: |
+          if [ -f test-results/summary.md ]; then cat test-results/summary.md >> "$GITHUB_STEP_SUMMARY"
+          else echo "test-results/summary.md 없음 — 실행기가 요약을 쓰기 전에 죽었다" >> "$GITHUB_STEP_SUMMARY"; fi
+
+      # 첫 실행들은 환경 문제(드라이버·클립보드·창)를 가려야 하므로 통과해도 올린다
+      - name: Upload reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: app-e2e-windows
           path: |
             test-results/
           retention-days: 7
