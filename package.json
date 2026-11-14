@@ -22,12 +22,13 @@
   "type": "module",
   "scripts": {
     "postinstall": "quasar prepare",
-    "lint": "eslint -c ./eslint.config.js \"./src*/**/*.{ts,js,cjs,mjs,vue}\" \"./e2e/**/*.{ts,mjs}\" ./playwright.config.ts",
+    "lint": "eslint -c ./eslint.config.js \"./src*/**/*.{ts,js,cjs,mjs,vue}\" \"./e2e/**/*.{ts,mjs}\" ./playwright.config.ts ./playwright.app.config.ts",
     "format": "prettier --write \"**/*.{js,mjs,cjs,ts,vue,scss,html,md,json}\" --ignore-path .gitignore",
     "test": "vitest run",
     "test:watch": "vitest",
     "test:coverage": "vitest run --coverage",
     "test:e2e": "playwright test",
+    "test:e2e:app": "playwright test -c playwright.app.config.ts",
     "test:all": "bash scripts/test-suite.sh",
     "perf:budget": "node scripts/measure-bundle.mjs dist/spa --budget-js=330 --budget-css=40",
     "perf:startup": "node scripts/measure-startup.mjs",
@@ -125,6 +126,7 @@
     "vitest-axe": "^0.1.0",
     "vue-eslint-parser": "10.4.0",
     "vue-tsc": "3.2.6",
+    "webdriverio": "9.32.0",
     "yaml": "^2.8.2"
   },
   "engines": {
@@ -142,5 +144,13 @@
   "lint-staged": {
     "*.{ts,js,cjs,mjs,vue}": ["eslint -c ./eslint.config.js --fix"],
     "*.{ts,js,cjs,mjs,vue,scss,html,md,json}": ["prettier --write"]
+  },
+  "dependenciesMeta": {
+    "edgedriver": {
+      "built": false
+    },
+    "geckodriver": {
+      "built": false
+    }
   }
 }
