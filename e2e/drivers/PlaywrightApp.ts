@@ -78,6 +78,10 @@ export class PlaywrightApp implements CalcApp {
     return normalize(await this.visible('[data-testid="result-main"]').textContent());
   }
 
+  async formulaExpression(): Promise<string> {
+    return normalize(await this.visible('[data-testid="formula-expression"]').textContent());
+  }
+
   async sub(): Promise<string> {
     return normalize(await this.visible('[data-testid="result-sub"]').textContent());
   }

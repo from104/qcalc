@@ -74,6 +74,8 @@ export interface CalcApp {
 
   /** 메인 결과 칸의 숫자 부분 (단위·통화 기호·진법 접두/접미 제외, 공백 정리) */
   main(): Promise<string>;
+  /** 수식 탭의 수식 입력 칸 글 — 비어 있으면 안내 문구(placeholder)가 보인다 */
+  formulaExpression(): Promise<string>;
   /** 보조 결과 칸의 숫자 부분 — 단위·환율·진법 탭에만 있다 */
   sub(): Promise<string>;
   /** 메모리 표시(칩 아이콘)가 보이는가 = 메모리에 값이 있는가 */
