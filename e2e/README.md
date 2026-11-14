@@ -155,7 +155,7 @@ Ubuntu 에서 Playwright WebKit 은 `libmanette-0.2-0`(+`libhidapi-hidraw0`)이 
 ## app 층 (실제 Tauri 앱, Linux)
 
 ```
-scripts/test-suite.sh --layer app        # = --platform <이 기계의 OS>. linux 외에는 "not implemented on this host" 로 skip
+scripts/test-suite.sh --layer app        # = --platform <이 기계의 OS>. windows 는 Windows 호스트(CI)에서만, 그 외 호스트는 skip
   1. app build   node e2e/app/build.mjs  — dist/spa(serve.mjs --build-only) + `tauri build --debug --no-bundle`
                  (beforeBuildCommand 끔). 입력(src·public·src-tauri/src·Cargo.*·tauri.conf.json…)이 바이너리보다
                  새로울 때만. 첫 빌드 수 분, 그 뒤 재사용 0초 · 변경 시 ~20초. 강제: --rebuild. 로그 app-build-tauri.log
@@ -190,6 +190,30 @@ scripts/test-suite.sh --layer app        # = --platform <이 기계의 OS>. linu
   무엇이 없는지 말하고 실패한다.
 - **CI**: `.github/workflows/e2e-app.yml` — 야간(03:30 KST)·수동·`workflow_call`, linux 잡(ubuntu-24.04). PR 게이트에는 없다.
 
+## app 층 — Windows (CI 전용)
+
+`.github/workflows/e2e-app.yml` 의 `windows` 잡(windows-latest) 이 `scripts/test-suite.sh --layer app --platform windows` 를 Git Bash 에서 돌린다.
+로컬(Linux)에서는 skip 되고 CI 안내만 나온다. 실행: `gh workflow run e2e-app.yml` (기본 브랜치에 워크플로가 올라간 뒤) — 그 전에는
+`feature/e2e-suite` 로 push 하면 도는 **임시 push 트리거**(`# TEMP: … remove before merging to develop`)를 쓴다.
+
+- **구성**: tauri-driver `--native-driver msedgedriver.exe` → 앱(WebView2). msedgedriver 는 WebView2 런타임과 **같은 버전**이어야 해서
+  워크플로가 [Tauri CI 가이드](https://v2.tauri.app/develop/tests/webdriver/ci/) 대로 `msedgedriver-tool` 로 받아 `QCALC_E2E_NATIVE_DRIVER` 에 경로를 넣는다
+  (WebView2 버전·드라이버 버전을 로그에 찍는다). 바이너리 `src-tauri/target/e2e-app/qcalc.exe`(`tauri build --debug --no-bundle`, 프런트 내장).
+- **격리 불가 → CI 전용**(env-windows.ts): Tauri/WebView2 는 앱 폴더를 환경변수가 아니라 Known Folder API 로 찾아서 XDG 처럼 돌릴 수 없다
+  (`%APPDATA%\io.github.from104.qcalc` = 설정·`.window-state.json`·`boot-bg.txt`, `%LOCALAPPDATA%\io.github.from104.qcalc` = 로그·WebView2 저장소).
+  그래서 `CI=true` 가 아니면(또는 `QCALC_E2E_ALLOW_REAL_PROFILE=1` 을 주지 않으면) 시작을 거부한다. 거부를 풀면 그 두 폴더를
+  실행 전·"새 프로필" 재실행 때마다·끝난 뒤 지운다(그 두 폴더만 — 다른 경로는 코드가 거부).
+- **프로세스**: `/proc` 도 환경 표지도 없다. tauri-driver(와 그 아래 msedgedriver·앱·WebView2 보조)를 PID 로 추적하고 `taskkill /T /F /PID` 로
+  끝낸다(이름으로는 절대 안 끝냄). PID 는 `test-results/.app-run.json` 에 적히고, 러너가 죽었을 때는 `e2e/app/sweep-windows.mjs` 가 그 PID 를
+  (아직 살아 있고 이미지 이름이 우리 것일 때만) 정리한다. `flock` 이 없으면 단일 실행 락은 건너뛴다.
+- **능력**: `keyboard`·`clipboard`(PowerShell `Set-Clipboard`/`Get-Clipboard`, base64 로 전달)·`reload`. **`xwindow`·`atspi` 없음** →
+  X 창 크기·제목 시나리오 4개와 스크린리더 알림 시나리오는 "드라이버(tauri-windows)에 없는 능력" 으로 skip. 러너의 화면 크기·DPI 를 정할 수 없어
+  정확한 창 크기는 단언하지 않는다 — 픽스처는 첫 실행에서 잰 크기를 "기본 창" 기준으로 쓴다. 출처는 `http://tauri.localhost`.
+- **Control+v**: `read_clipboard_text` 는 Linux 전용(`Err("unsupported")`)이라 WebView2 의 `navigator.clipboard.readText()` 로 돌아간다 —
+  권한 프롬프트 등으로 결과가 Linux 와 다를 수 있다. Windows 의 known-bug 는 **첫 CI 결과를 본 뒤** 증거와 함께 붙인다(`knownBugOn['tauri-windows']`).
+- **읽기**: Actions 실행 화면의 Job summary(summary.md) → 아티팩트 `app-e2e-windows`(성공해도 올린다): `app-html-report/`(실패 스크린샷·앱 로그),
+  `app-driver.log`·`app-driver-stderr.log`(tauri-driver·msedgedriver·앱 stderr), `app-build-tauri.log`.
+
 ## 발견 사항 (Phase 2, 앱 층)
 
 - **Control+c 복사가 클립보드를 비운다(Tauri Linux)** — "복사되었습니다" 알림은 뜨지만 클립보드에 텍스트가 없다. 단축키가 keydown 기본
@@ -204,6 +228,6 @@ scripts/test-suite.sh --layer app        # = --platform <이 기계의 OS>. linu
 
 ## 로드맵
 
-- Windows(Phase 3): 같은 WdioApp + tauri-driver(msedgedriver) — e2e-app.yml 에 windows 잡을 더한다. 출처는 `http://tauri.localhost`.
+- Windows(Phase 3): 구현됨(위) — 첫 CI 실행으로 기대값·known-bug 를 다듬는다. 남은 일: Windows 창 크기 시험(window-state 플러그인), UIA 로 스크린리더 알림.
 - Android(Phase 4): Playwright `_android` 로 WebView 에 붙어 `CalcApp` 구현 (`touch` 능력, keyboard 는 기기 따라).
 - 모든 드라이버가 `e2e/scenarios/*` 를 그대로 import 한다.
