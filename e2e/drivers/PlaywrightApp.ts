@@ -280,7 +280,9 @@ export class PlaywrightApp implements CalcApp {
       await this.page.waitForTimeout(900);
       await this.page.mouse.up();
     } else {
-      await this.visible('[data-testid="record-menu-btn"]').nth(index).click();
+      // ⋮ 버튼은 항목에 마우스를 올려야 보인다(visibility: hidden → hover)
+      await this.visible('[data-testid="record-item"]').nth(index).hover();
+      await this.page.locator('[data-testid="record-menu-btn"]').nth(index).click();
     }
     await this.visible('.q-menu [role="menuitem"]').first().waitFor();
   }

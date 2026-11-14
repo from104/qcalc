@@ -24,9 +24,14 @@ export type LangCode = (typeof LANGS)[number];
 
 export type StoreKey = 'ui' | 'settings' | 'calc' | 'unit' | 'currency' | 'radix' | 'formula' | 'themes';
 
-/** 계산 기록 한 줄 — calcStore 의 calc.record.records 항목에서 calculationResult 부분 */
+/**
+ * 계산 기록 한 줄 — calcStore 의 calc.record.records 항목에서 calculationResult 부분.
+ * 실제 저장 모양과 대조해 확인했다(history 시나리오): localStorage 'calc' = { calc: { record: { records: [...], MAX_RECORDS } } },
+ * 기록 = { id, calculationResult, memo, timestamp, mode } 이고 최신이 앞이다.
+ */
 export interface HistoryEntry {
   previousNumber: string;
+  /** Operator 열거값(src/core/calculator/Calculator.ts) 그대로: '+' '-' '×' '÷' 등 — '*' '/' 가 아니다 */
   operator: string;
   argumentNumber?: string;
   resultNumber: string;
@@ -36,7 +41,7 @@ export interface HistoryEntry {
 export interface SeedState {
   /** 화면 언어 (기본 'ko') — settings.locale/userLocale 로 들어간다 */
   lang?: LangCode;
-  /** 계산 기록 — 최신 항목이 앞. TODO(history 시나리오): 실제 복원 형식을 검증할 것 */
+  /** 계산 기록 — 최신 항목이 앞. 형식은 실제 저장·복원과 대조해 검증됨(HistoryEntry 참고) */
   history?: HistoryEntry[];
   /** 스토어별 원시 덮어쓰기 — 기본 시드 위에 얕게 합쳐진다 */
   stores?: Partial<Record<StoreKey, Record<string, unknown>>>;
