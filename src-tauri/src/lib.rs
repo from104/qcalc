@@ -62,11 +62,16 @@ enum PackageEnv {
 }
 
 fn detect_package_env() -> PackageEnv {
-  if std::env::var_os("SNAP").is_some() {
+  package_env_from(|name| std::env::var_os(name).is_some())
+}
+
+/// 환경 변수 조회를 주입받는 순수 판별 함수 — 전역 환경을 건드리지 않고 시험할 수 있다.
+fn package_env_from(is_set: impl Fn(&str) -> bool) -> PackageEnv {
+  if is_set("SNAP") {
     PackageEnv::Snap
-  } else if std::env::var_os("FLATPAK_ID").is_some() {
+  } else if is_set("FLATPAK_ID") {
     PackageEnv::Flatpak
-  } else if std::env::var_os("APPIMAGE").is_some() {
+  } else if is_set("APPIMAGE") {
     PackageEnv::AppImage
   } else {
     PackageEnv::Native
@@ -75,6 +80,38 @@ fn detect_package_env() -> PackageEnv {
 
 fn is_sandboxed(env: PackageEnv) -> bool {
   matches!(env, PackageEnv::Snap | PackageEnv::Flatpak)
+}
+
+#[cfg(test)]
+mod package_env_tests {
+  use super::*;
+
+  fn with(vars: &'static [&'static str]) -> PackageEnv {
+    package_env_from(|name| vars.contains(&name))
+  }
+
+  #[test]
+  fn detects_each_package_format() {
+    assert!(matches!(with(&["SNAP"]), PackageEnv::Snap));
+    assert!(matches!(with(&["FLATPAK_ID"]), PackageEnv::Flatpak));
+    assert!(matches!(with(&["APPIMAGE"]), PackageEnv::AppImage));
+    assert!(matches!(with(&[]), PackageEnv::Native));
+  }
+
+  #[test]
+  fn snap_wins_over_other_markers() {
+    // 우선순위: SNAP > FLATPAK_ID > APPIMAGE
+    assert!(matches!(with(&["SNAP", "FLATPAK_ID", "APPIMAGE"]), PackageEnv::Snap));
+    assert!(matches!(with(&["FLATPAK_ID", "APPIMAGE"]), PackageEnv::Flatpak));
+  }
+
+  #[test]
+  fn only_snap_and_flatpak_are_sandboxed() {
+    assert!(is_sandboxed(PackageEnv::Snap));
+    assert!(is_sandboxed(PackageEnv::Flatpak));
+    assert!(!is_sandboxed(PackageEnv::AppImage));
+    assert!(!is_sandboxed(PackageEnv::Native));
+  }
 }
 
 #[tauri::command]
