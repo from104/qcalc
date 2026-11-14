@@ -28,6 +28,7 @@
     "test:watch": "vitest",
     "test:coverage": "vitest run --coverage",
     "test:e2e": "playwright test",
+    "test:all": "bash scripts/test-suite.sh",
     "perf:budget": "node scripts/measure-bundle.mjs dist/spa --budget-js=330 --budget-css=40",
     "perf:startup": "node scripts/measure-startup.mjs",
     "fetch-rates": "tsx scripts/fetch-fallback-rates.ts",
