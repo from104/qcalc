@@ -117,14 +117,17 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Enable Corepack
-        run: corepack enable
-
+      # 순서는 release.yml 과 같다(setup-node → corepack). Windows 러너에서는 C:\npm\prefix 의 Yarn 1 이 PATH 에서
+      # 기본 Node 폴더(corepack 심)보다 앞이라, corepack 을 먼저 켜면 setup-node 의 yarn 캐시 감지와 yarn install 이
+      # Yarn 1 로 돌아 packageManager(yarn@4) 검사에 걸린다. setup-node 뒤에 켜면 심이 새 Node 폴더(PATH 맨 앞)에 놓인다.
+      # 그래서 setup-node 의 yarn 캐시는 쓰지 않는다.
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 22
-          cache: yarn
+
+      - name: Enable Corepack
+        run: corepack enable
 
       - name: Setup Rust toolchain
         uses: dtolnay/rust-toolchain@stable

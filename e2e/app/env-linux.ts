@@ -115,7 +115,7 @@ export async function startLinuxEnv({ logDir }: StartOptions): Promise<LinuxEnv>
     'SESSION_MANAGER',
     // a Wayland desktop's input-method setup does not belong on an X display: GTK_IM_MODULE=wayland loads
     // im-wayland.so, which calls gdk_wayland_display_get_wl_display() on the X11 display and the app segfaults
-    // while creating the webview (reproduced on gofu, 2026-11-15)
+    // while creating the webview (reproduced on a GNOME Wayland dev machine, 2026-11-15)
     'XMODIFIERS',
     'QT_IM_MODULE',
     'QT_IM_MODULES',
