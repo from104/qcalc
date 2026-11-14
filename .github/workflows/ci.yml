@@ -9,9 +9,14 @@ on:
   pull_request:
     branches: [develop, main]
 
+# 토큰은 읽기 전용 — 이 워크플로는 쓰기 권한이 필요 없다
+permissions:
+  contents: read
+
+# PR 은 새 푸시가 오면 이전 실행을 취소하지만, develop/main 푸시는 연속 머지에서도 결과를 남긴다
 concurrency:
   group: ci-${{ github.ref }}
-  cancel-in-progress: true
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
   # (a) lint + 타입 + vitest(커버리지 게이트 + i18n 패리티 포함) + 시작 번들 예산
