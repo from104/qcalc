@@ -9,6 +9,7 @@ import { test, type Locator, type Page, type Route } from '@playwright/test';
 import type { ButtonId, CalcApp, Capability, ScreenName, SelectField, TabName, UiSnapshot } from './CalcApp';
 import { applySeed, buildSeed, type LangCode, type SeedState } from '../fixtures/seed';
 import { getClipboard, setClipboard } from '../fixtures/clipboard';
+import { snapshotUiInPage } from './page-functions';
 
 export const APP_PATH = '/?e2e=1#/';
 /** 같은 출처의 빈 문서 — 앱을 띄우기 전에 저장소를 심는 자리 (e2e/support/serve.mjs 가 404 로 내준다) */
@@ -187,86 +188,7 @@ export class PlaywrightApp implements CalcApp {
   }
 
   snapshotUi(): Promise<UiSnapshot> {
-    return this.page.evaluate(() => {
-      const isVisible = (el: Element): boolean => {
-        const rect = el.getBoundingClientRect();
-        if (rect.width === 0 || rect.height === 0) return false;
-        const style = getComputedStyle(el);
-        return style.visibility !== 'hidden' && style.display !== 'none' && Number(style.opacity) > 0;
-      };
-      const clean = (text: string | null | undefined) => (text ?? '').replace(/\s+/g, ' ').trim();
-      const nameOf = (el: Element): string => {
-        const label = clean(el.getAttribute('aria-label'));
-        if (label) return label;
-        const by = el.getAttribute('aria-labelledby');
-        if (by) {
-          const text = clean(
-            by
-              .split(/\s+/)
-              .map((id) => document.getElementById(id)?.textContent ?? '')
-              .join(' '),
-          );
-          if (text) return text;
-        }
-        // 아이콘 글리프(.q-icon)는 글자가 아니라 그림이다 — 이름에 세지 않는다
-        const clone = el.cloneNode(true) as Element;
-        clone.querySelectorAll('.q-icon, .q-focus-helper, .q-ripple, .q-tooltip').forEach((n) => n.remove());
-        const text = clean(clone.textContent);
-        if (text) return text;
-        return clean(el.getAttribute('title'));
-      };
-      const whereOf = (el: Element): string => {
-        const icon = el.querySelector('.q-icon')?.textContent?.trim() || el.querySelector('.q-icon')?.className || '';
-        return [
-          el.id && `#${el.id}`,
-          el.getAttribute('data-testid') && `[${el.getAttribute('data-testid')}]`,
-          icon && `icon:${String(icon).slice(0, 40)}`,
-        ]
-          .filter(Boolean)
-          .join(' ');
-      };
-      const kinds: [string, string][] = [
-        ['button', 'button, [role="button"]'],
-        ['tab', '[role="tab"]'],
-        ['heading', 'h1, h2, h3, h4, h5, h6, [role="heading"]'],
-        ['combobox', '[role="combobox"]'],
-        ['menuitem', '[role="menuitem"]'],
-        ['link', 'a[href]'],
-        ['textbox', 'input:not([type="hidden"]):not([type="file"]), textarea, [role="textbox"], [role="searchbox"]'],
-      ];
-      const seen = new Set<Element>();
-      const controls: { kind: string; name: string; where: string }[] = [];
-      for (const [kind, selector] of kinds) {
-        for (const el of document.querySelectorAll(selector)) {
-          if (seen.has(el) || !isVisible(el)) continue;
-          seen.add(el);
-          // 보조기기에서 숨긴 것(aria-hidden)과 파일 선택용 숨김 입력은 제외
-          if (el.closest('[aria-hidden="true"]')) continue;
-          // 입력칸은 이름 대신 placeholder 도 인정한다
-          const name = nameOf(el) || (kind === 'textbox' ? clean(el.getAttribute('placeholder')) : '');
-          controls.push({ kind, name, where: whereOf(el) });
-        }
-      }
-      const texts: string[] = [];
-      const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
-      for (let node = walker.nextNode(); node; node = walker.nextNode()) {
-        const value = clean(node.textContent);
-        const parent = node.parentElement;
-        if (!value || !parent) continue;
-        if (parent.closest('script, style, noscript, .q-icon, [aria-hidden="true"]')) continue;
-        if (!isVisible(parent)) continue;
-        texts.push(value);
-      }
-      // aria-label·title·placeholder 도 사용자에게 읽히는 글이다
-      for (const el of document.querySelectorAll('[aria-label], [title], [placeholder]')) {
-        if (!isVisible(el)) continue;
-        for (const attr of ['aria-label', 'title', 'placeholder']) {
-          const value = clean(el.getAttribute(attr));
-          if (value) texts.push(value);
-        }
-      }
-      return { controls, texts } as UiSnapshot;
-    });
+    return this.page.evaluate(snapshotUiInPage);
   }
 
   async recordTexts(): Promise<string[]> {

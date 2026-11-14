@@ -4,6 +4,7 @@
  *
  * 1. dist/spa 가 없거나 소스보다 오래됐으면(또는 E2E_REBUILD=1) `quasar build -m spa` 로 다시 만든다.
  * 2. dist/spa 를 127.0.0.1:E2E_PORT(기본 4178)에서 그대로 내준다 — 운영 빌드를 시험한다.
+ *    `--build-only` 면 1 만 하고 끝낸다(app 층이 Tauri 바이너리에 넣을 dist/spa 를 준비할 때).
  *
  * 의존성 없이 node 내장 모듈만 쓴다. 빌드 로그는 test-results/e2e-build.log 로 남긴다.
  */
@@ -70,6 +71,8 @@ if (reason) {
 } else {
   console.error('[e2e] 기존 dist/spa 재사용 (강제 재빌드: E2E_REBUILD=1)');
 }
+// app 층(e2e/app/build.mjs)은 빌드만 맡기고 서버는 띄우지 않는다
+if (process.argv.includes('--build-only')) process.exit(0);
 
 const TYPES = {
   '.html': 'text/html; charset=utf-8',

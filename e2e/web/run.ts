@@ -4,9 +4,11 @@
  *   import basic from '../scenarios/basic';
  *   import { runGroup } from './run';
  *   runGroup(basic);
+ *
+ * known-bug 판정은 드라이버 중립인 kit.ts 의 executeScenario 가 한다(app 층과 공유).
  */
 import { test } from '../fixtures/test';
-import { missingCapabilities, type ScenarioGroup } from '../scenarios/kit';
+import { executeScenario, missingCapabilities, type ScenarioGroup } from '../scenarios/kit';
 
 export function runGroup(group: ScenarioGroup): void {
   test.describe(group.name, () => {
@@ -17,30 +19,9 @@ export function runGroup(group: ScenarioGroup): void {
         test.skip(missing.length > 0, `드라이버(${app.platform})에 없는 능력: ${missing.join(', ')}`);
 
         await app.step('앱 띄우기 (seed)', () => app.seed(scenario.seed));
-        if (!scenario.knownBug) return scenario.run(app);
-
-        // 알려진 앱 버그: 실패해야 정상. 통과하면 버그가 고쳐진 것 → 표시를 지우라고 빨갛게 알린다.
-        // (test.fail() 과 같은 의미지만 메시지를 우리가 정하고, 요약이 known-bug 를 따로 센다)
-        test.info().annotations.push({ type: 'known-bug', description: scenario.knownBug });
-        let failure: unknown;
-        try {
-          await scenario.run(app);
-        } catch (error) {
-          failure = error;
-        }
-        if (!scenario.symptom) throw new Error('knownBug 에는 symptom(기대하는 오류 모양)이 함께 있어야 한다');
-        if (failure === undefined) {
-          throw new Error(`bug fixed — remove the known-bug mark (scenario.knownBug): ${scenario.knownBug}`);
-        }
-        const message = String((failure as Error)?.message ?? failure);
-        if (!scenario.symptom.test(message)) {
-          throw new Error(
-            `known-bug 의 증상이 아닌 실패 — 기대 ${scenario.symptom} / 실제: ${message.split('\n')[0]!.slice(0, 200)}`,
-          );
-        }
-        test
-          .info()
-          .annotations.push({ type: 'known-bug-error', description: String(failure).split('\n')[0]!.slice(0, 200) });
+        await executeScenario(app, scenario, (type, description) =>
+          test.info().annotations.push({ type, description }),
+        );
       });
     }
   });

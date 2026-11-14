@@ -12,7 +12,17 @@
 import type { ButtonId, CalcApp, Capability } from '../drivers/CalcApp';
 import type { SeedState } from '../fixtures/seed';
 
-export interface Scenario {
+/** 한 플랫폼에서만 나는 알려진 버그 — knownBug/symptom 과 같은 뜻 */
+export interface PlatformBug {
+  bug: string;
+  symptom: RegExp;
+}
+
+/**
+ * 시나리오. 공유 시나리오는 `Scenario`(= CalcApp 만 아는 것)이고, 앱 층 전용 시나리오(e2e/app/native.ts)는
+ * 드라이버 고유 기능이 필요해 `Scenario<TauriApp>` 처럼 더 좁은 앱 타입을 쓴다.
+ */
+export interface Scenario<A extends CalcApp = CalcApp> {
   /** 보고서에 나오는 이름 */
   title: string;
   /** 필요한 드라이버 능력 — 하나라도 없으면 건너뛰고 이유를 남긴다 */
@@ -27,17 +37,67 @@ export interface Scenario {
   knownBug?: string;
   /** knownBug 와 함께 필수 — 그 버그로 생기는 오류 메시지의 모양. 메시지가 맞지 않는 실패는 "기대된 실패"가 아니라 진짜 실패다 */
   symptom?: RegExp;
+  /**
+   * 특정 플랫폼(CalcApp.platform — 'tauri-linux' 등)에서만 나는 알려진 버그. 그 플랫폼에서는 knownBug 대신 이것이 적용되고,
+   * 다른 플랫폼에서는 시나리오가 평소대로(통과해야 정상) 돈다. 예: Tauri Linux 에서만 Control+c 복사가 비는 버그.
+   */
+  knownBugOn?: Partial<Record<string, PlatformBug>>;
   /** 아직 안 만든 시나리오 — 무엇을 다룰지 적어 두면 실행기가 건너뛰고 보고한다 */
   todo?: string;
-  run(app: CalcApp): Promise<void>;
+  run(app: A): Promise<void>;
 }
 
-export interface ScenarioGroup {
+export interface ScenarioGroup<A extends CalcApp = CalcApp> {
   name: string;
-  scenarios: Scenario[];
+  scenarios: Scenario<A>[];
 }
 
-export const defineGroup = (name: string, scenarios: Scenario[]): ScenarioGroup => ({ name, scenarios });
+export const defineGroup = <A extends CalcApp = CalcApp>(name: string, scenarios: Scenario<A>[]): ScenarioGroup<A> => ({
+  name,
+  scenarios,
+});
+
+/** 이 플랫폼에 적용되는 알려진 버그 표시 (없으면 null) */
+export function knownBugFor<A extends CalcApp>(scenario: Scenario<A>, platform: string): Partial<PlatformBug> | null {
+  const specific = scenario.knownBugOn?.[platform];
+  if (specific) return specific;
+  if (scenario.knownBug) return { bug: scenario.knownBug, ...(scenario.symptom ? { symptom: scenario.symptom } : {}) };
+  return null;
+}
+
+/**
+ * 시나리오 하나를 실행하고 known-bug 표시를 판정한다 — 실행기(e2e/web/run.ts, e2e/app/run.ts)가 앱을 띄운 뒤 부른다.
+ * 알려진 앱 버그가 있으면 실패해야 정상: 실패하면 증상(symptom)과 맞는지 확인하고 `known-bug` 로 기록,
+ * 통과하면 버그가 고쳐진 것이므로 "bug fixed — remove the known-bug mark" 로 실패시킨다.
+ * (test.fail() 과 같은 뜻이지만 메시지를 우리가 정하고, 요약이 known-bug 를 따로 센다)
+ */
+export async function executeScenario<A extends CalcApp>(
+  app: A,
+  scenario: Scenario<A>,
+  annotate: (type: 'known-bug' | 'known-bug-error', description: string) => void,
+): Promise<void> {
+  const mark = knownBugFor(scenario, app.platform);
+  if (!mark) return scenario.run(app);
+
+  annotate('known-bug', mark.bug ?? '');
+  let failure: unknown;
+  try {
+    await scenario.run(app);
+  } catch (error) {
+    failure = error;
+  }
+  if (!mark.symptom) throw new Error('knownBug 에는 symptom(기대하는 오류 모양)이 함께 있어야 한다');
+  if (failure === undefined) {
+    throw new Error(`bug fixed — remove the known-bug mark (${app.platform}): ${mark.bug}`);
+  }
+  const message = String((failure as Error)?.message ?? failure);
+  if (!mark.symptom.test(message)) {
+    throw new Error(
+      `known-bug 의 증상이 아닌 실패 — 기대 ${mark.symptom} / 실제: ${message.split('\n')[0]!.slice(0, 200)}`,
+    );
+  }
+  annotate('known-bug-error', String(failure).split('\n')[0]!.slice(0, 200));
+}
 
 /** 아직 구현하지 않은 시나리오 자리 */
 export const todo = (title: string, what: string, needs: Capability[] = []): Scenario => ({
@@ -48,7 +108,7 @@ export const todo = (title: string, what: string, needs: Capability[] = []): Sce
 });
 
 /** 시나리오 needs 중 드라이버에 없는 능력 */
-export const missingCapabilities = (scenario: Scenario, app: CalcApp): Capability[] =>
+export const missingCapabilities = <A extends CalcApp>(scenario: Scenario<A>, app: A): Capability[] =>
   (scenario.needs ?? []).filter((need) => !app.capabilities.has(need));
 
 // ─── 키패드 ───────────────────────────────────────────────────────────────
