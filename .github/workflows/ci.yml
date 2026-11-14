@@ -1,25 +1,36 @@
 name: CI
 
+# PR 게이트 = code(lint·타입·vitest·cargo test) + web(Playwright E2E). 안내: e2e/README.md
+# Electron 빌드 잡은 Tauri 전환(PR #107)으로 뺐다. 릴리스 빌드는 release.yml 이 맡는다.
+
 on:
   push:
     branches: [develop, main]
   pull_request:
     branches: [develop, main]
 
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
+  # (a) lint + 타입 + vitest(커버리지 게이트 + i18n 패리티 포함) + 시작 번들 예산
   lint-test:
     runs-on: ubuntu-latest
+    timeout-minutes: 15
 
     steps:
       - uses: actions/checkout@v4
+
+      # corepack 을 먼저 켜야 setup-node 의 yarn 캐시가 동작한다
+      - name: Enable Corepack
+        run: corepack enable
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 22
-
-      - name: Enable Corepack
-        run: corepack enable
+          cache: yarn
 
       - name: Install dependencies
         run: yarn install --immutable
@@ -39,33 +50,103 @@ jobs:
           npx quasar build -m spa
           yarn perf:budget
 
-  build-electron:
-    runs-on: ubuntu-latest
-    needs: lint-test
+  # (b) Rust 단위 시험 — Tauri 의존성은 release.yml 의 Linux 빌드와 같은 apt 패키지
+  cargo-test:
+    runs-on: ubuntu-22.04 # release.yml 과 같은 glibc/WebKitGTK(4.1) 환경
+    timeout-minutes: 15
 
     steps:
       - uses: actions/checkout@v4
+
+      - name: Setup Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Cache Cargo
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            src-tauri/target
+          key: ${{ runner.os }}-cargo-test-${{ hashFiles('src-tauri/Cargo.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-cargo-test-
+
+      - name: Install Linux build dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            libwebkit2gtk-4.1-dev \
+            libgtk-3-dev \
+            librsvg2-dev \
+            libayatana-appindicator3-dev \
+            libssl-dev \
+            patchelf \
+            build-essential
+
+      # tauri::generate_context! 는 tauri.conf.json 의 frontendDist(../dist/spa)가 있어야 컴파일된다.
+      # 시험에는 실제 웹 빌드가 필요 없으니 빈 자리만 만든다.
+      - name: Stub frontendDist
+        run: |
+          mkdir -p dist/spa
+          echo '<!doctype html><title>stub</title>' > dist/spa/index.html
+
+      - name: cargo test
+        working-directory: src-tauri
+        run: cargo test --locked
+
+  # (c) 웹 빌드 E2E — Playwright 3개 프로젝트(chromium-desktop, webkit-desktop, chromium-mobile)
+  web-e2e:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Enable Corepack
+        run: corepack enable
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 22
-
-      - name: Enable Corepack
-        run: corepack enable
+          cache: yarn
 
       - name: Install dependencies
         run: yarn install --immutable
 
-      - name: Build Electron (linux-unpacked)
-        run: npx quasar build -m electron --publish never
+      - name: Get Playwright version
+        id: pw
+        run: echo "version=$(node -p "require('@playwright/test/package.json').version")" >> "$GITHUB_OUTPUT"
 
-      - name: Verify build output
-        run: test -d dist/electron/Packaged/linux-unpacked
+      - name: Cache Playwright browsers
+        id: pw-cache
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-${{ runner.os }}-${{ steps.pw.outputs.version }}
 
-      - name: Upload linux-unpacked artifact
+      # 캐시가 있어도 OS 라이브러리(apt)는 매번 필요하다 — 브라우저 내려받기만 캐시로 건너뛴다
+      - name: Install Playwright browsers and system dependencies
+        run: npx playwright install --with-deps chromium webkit
+
+      # 웹 빌드(dist/spa)는 e2e/support/serve.mjs 가 없거나 낡았으면 알아서 만든다
+      - name: Web E2E
+        run: scripts/test-suite.sh --layer web
+
+      - name: Job summary
+        if: always()
+        run: |
+          if [ -f test-results/summary.md ]; then cat test-results/summary.md >> "$GITHUB_STEP_SUMMARY"
+          else echo "test-results/summary.md 없음 — 실행기가 요약을 쓰기 전에 죽었다" >> "$GITHUB_STEP_SUMMARY"; fi
+
+      # 통과 때는 올리지 않는다(실패한 시험의 trace·스크린샷은 test-results/e2e-artifacts 에 남는다)
+      - name: Upload reports on failure
+        if: failure()
         uses: actions/upload-artifact@v4
         with:
-          name: linux-unpacked
-          path: dist/electron/Packaged/linux-unpacked/
-          retention-days: 3
+          name: playwright-failure
+          path: |
+            playwright-report/
+            test-results/
+          retention-days: 7
