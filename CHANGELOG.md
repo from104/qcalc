@@ -4,6 +4,12 @@ All notable changes to this project are recorded in this file.
 
 The format is based on [Keep a Changelog] and this project follows [Semantic Versioning].
 
+## [Unreleased]
+
+### Fixed
+
+- Paste from the clipboard did nothing on Linux
+
 ## [0.13.6] 2026-10-03
 
 ### Added

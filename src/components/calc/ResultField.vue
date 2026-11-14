@@ -737,11 +737,29 @@
   // 결과 패널 메뉴 표시 여부
   const showPanelMenu = ref(false);
 
+  /**
+   * Tauri(Linux)에서는 Rust 측 GTK 클립보드로 읽는다 — WebKitGTK의
+   * `navigator.clipboard.readText()`가 거부되기 때문이다(#109).
+   * 커맨드가 지원되지 않는 플랫폼이면 undefined를 돌려 웹 API로 되돌아가게 한다.
+   */
+  const readClipboardViaTauri = async (): Promise<string | undefined> => {
+    if (!$g.isTauri) return undefined;
+    try {
+      const { invoke } = await import('@tauri-apps/api/core');
+      return (await invoke<string | null>('read_clipboard_text')) ?? '';
+    } catch {
+      return undefined;
+    }
+  };
+
   // 클립보드에서 텍스트 가져오기 함수
   const getClipboardText = async (): Promise<string> => {
     try {
       let clipboardText = '';
-      if ($g.isCapacitor) {
+      const tauriText = await readClipboardViaTauri();
+      if (tauriText !== undefined) {
+        clipboardText = tauriText;
+      } else if ($g.isCapacitor) {
         clipboardText = (await window.androidInterface?.getFromClipboard()) ?? '';
       } else {
         clipboardText = await navigator.clipboard.readText();

@@ -121,6 +121,38 @@ fn announce_a11y(window: tauri::WebviewWindow, text: String) {
   }
 }
 
+/// 클립보드의 텍스트를 GTK에서 직접 읽는다 (Linux 전용, #109).
+///
+/// WebKitGTK 안의 `navigator.clipboard.readText()`는 Tauri에서 거부되어 붙여넣기가 늘
+/// "클립보드가 비어 있음"으로 끝났다. GTK 클립보드는 Wayland·X11 어느 쪽에서도 창이 포커스를
+/// 가진 동안 읽을 수 있고, gtk 크레이트는 이미 announce_a11y 때문에 의존성에 있다.
+/// 텍스트가 없으면 `None`, Linux가 아니면 `Err` — 프론트엔드는 Err일 때 웹 API로 되돌아간다.
+#[tauri::command]
+async fn read_clipboard_text(window: tauri::WebviewWindow) -> Result<Option<String>, String> {
+  #[cfg(target_os = "linux")]
+  {
+    let (tx, rx) = std::sync::mpsc::channel();
+    // GTK 객체 접근은 메인 스레드에서만 허용된다. wait_for_text 대신 비동기 request_text를 써서
+    // IPC 처리 중에 중첩 메인 루프를 돌리지 않는다.
+    window
+      .run_on_main_thread(move || {
+        gtk::Clipboard::get(&gtk::gdk::SELECTION_CLIPBOARD).request_text(move |_, text| {
+          let _ = tx.send(text.map(str::to_owned));
+        });
+      })
+      .map_err(|e| e.to_string())?;
+    tauri::async_runtime::spawn_blocking(move || rx.recv_timeout(std::time::Duration::from_secs(2)))
+      .await
+      .map_err(|e| e.to_string())?
+      .map_err(|e| e.to_string())
+  }
+  #[cfg(not(target_os = "linux"))]
+  {
+    let _ = window;
+    Err("unsupported".into())
+  }
+}
+
 /// GNOME/KDE Wayland 세션에서 Tauri의 `setTitle`이 CSD 헤더바를 repaint하지 않고
 /// (tauri-apps/tauri#13749), `setAlwaysOnTop`은 Wayland 프로토콜 미지원으로 no-op이다
 /// (tauri-apps/tauri#3117 — wontfix, Wayland 프로토콜 확장 대기).
@@ -447,7 +479,7 @@ pub fn run() {
         .build(),
     )
     .plugin(tauri_plugin_opener::init())
-    .invoke_handler(tauri::generate_handler![get_package_env, quit_app, announce_a11y, set_boot_background]);
+    .invoke_handler(tauri::generate_handler![get_package_env, quit_app, announce_a11y, read_clipboard_text, set_boot_background]);
 
   if cfg!(debug_assertions) {
     builder = builder.plugin(

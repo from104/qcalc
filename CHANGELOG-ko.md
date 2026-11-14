@@ -4,6 +4,12 @@
 
 형식은 [Keep a Changelog (korean)]를 기반으로 하며 이 프로젝트는 [Semantic Versioning (korean)]을 따릅니다.
 
+## [Unreleased]
+
+### 수정됨
+
+- Linux에서 클립보드 붙여넣기가 동작하지 않던 문제 수정
+
 ## [0.13.6] 2026-10-03
 
 ### 추가됨
