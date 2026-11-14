@@ -1,0 +1,105 @@
+name: E2E app
+
+# app 층 — 실제 Tauri 앱 E2E (scripts/test-suite.sh --layer app). 안내: e2e/README.md 「app 층」
+# 무겁고(Rust 디버그 빌드) 느려서 PR 게이트(ci.yml)에는 넣지 않는다: 야간·수동 실행, 다른 워크플로에서 호출.
+# 지금은 Linux(Xvfb + tauri-driver + WebKitWebDriver)만. Windows 잡은 Phase 3 에서 더한다.
+
+on:
+  schedule:
+    - cron: '30 18 * * *' # 매일 03:30 KST (기본 브랜치)
+  workflow_dispatch:
+  workflow_call:
+
+# 토큰은 읽기 전용 — 이 워크플로는 쓰기 권한이 필요 없다
+permissions:
+  contents: read
+
+concurrency:
+  group: e2e-app-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  linux:
+    # 24.04: ATK 2.52 라 스크린리더 알림(announce_a11y → AT-SPI) 시나리오까지 돈다.
+    # 22.04 의 ATK 2.36 에서는 그 시나리오만 'atspi' 능력 없음으로 건너뛴다(앱이 의도적으로 알림을 생략).
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+
+    steps:
+      - uses: actions/checkout@v4
+
+      # corepack 을 먼저 켜야 setup-node 의 yarn 캐시가 동작한다
+      - name: Enable Corepack
+        run: corepack enable
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: yarn
+
+      - name: Setup Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+
+      # tauri-driver 바이너리도 같이 캐시한다(cargo install 은 1~2분)
+      - name: Cache Cargo
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            ~/.cargo/bin/tauri-driver
+            src-tauri/target
+          key: ${{ runner.os }}-e2e-app-${{ hashFiles('src-tauri/Cargo.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-e2e-app-
+
+      # Tauri 빌드 의존성(ci.yml cargo-test 와 같음) + 앱 층 도구:
+      #   webkit2gtk-driver(WebKitWebDriver — 새 Ubuntu 의 webkitgtk-webdriver 와 같은 것), xvfb, x11-utils(xwininfo·xprop),
+      #   dbus(사설 세션 버스), at-spi2-core·python3-gi·gir(클립보드 도우미·AT-SPI 리스너)
+      - name: Install system dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            libwebkit2gtk-4.1-dev \
+            libgtk-3-dev \
+            librsvg2-dev \
+            libayatana-appindicator3-dev \
+            libssl-dev \
+            patchelf \
+            build-essential \
+            webkit2gtk-driver \
+            xvfb \
+            x11-utils \
+            dbus \
+            at-spi2-core \
+            python3-gi \
+            gir1.2-gtk-3.0 \
+            gir1.2-atk-1.0 \
+            gir1.2-atspi-2.0
+
+      - name: Install tauri-driver
+        run: command -v tauri-driver || cargo install tauri-driver --version 2.1.0 --locked
+
+      - name: Install dependencies
+        run: yarn install --immutable
+
+      # 웹 빌드(dist/spa)와 디버그 바이너리는 e2e/app/build.mjs 가 필요할 때만 만든다
+      - name: App E2E (Linux)
+        run: scripts/test-suite.sh --layer app --platform linux
+
+      - name: Job summary
+        if: always()
+        run: |
+          if [ -f test-results/summary.md ]; then cat test-results/summary.md >> "$GITHUB_STEP_SUMMARY"
+          else echo "test-results/summary.md 없음 — 실행기가 요약을 쓰기 전에 죽었다" >> "$GITHUB_STEP_SUMMARY"; fi
+
+      # 통과 때는 올리지 않는다 — 실패한 시험의 스크린샷·앱 로그는 보고서(app-html-report)에, 환경 로그는 app-*.log 에
+      - name: Upload reports on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: app-e2e-linux-failure
+          path: |
+            test-results/
+          retention-days: 7
