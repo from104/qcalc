@@ -9,24 +9,24 @@ description: QCalc 자동 테스트(code·web E2E·app 층)를 돌리고 결과�
 
 ## 명령
 
-| 하고 싶은 것             | 명령                                                                               |
-| ------------------------ | ---------------------------------------------------------------------------------- |
-| 전부(code + web)         | `yarn test:all`                                                                    |
-| 한 층만                  | `scripts/test-suite.sh --layer code` / `--layer web` (`--layer` 여러 번 가능)      |
-| 실제 앱 층 (미구현)      | `--layer app --platform linux\|windows\|android`                                   |
-| 처음 한 번 브라우저 설치 | `scripts/test-suite.sh --setup` (chromium·webkit, sudo 없는 WebKit 우회 포함)      |
-| 웹 빌드 강제 재빌드      | `--rebuild` (또는 `E2E_REBUILD=1`) — src 가 바뀌면 자동 재빌드됨                   |
-| 플레이키 확인            | `scripts/test-suite.sh --layer web -- --repeat-each=3` (`--` 뒤는 playwright 인자) |
-| 한 프로젝트·한 시험      | `-- --project=webkit-desktop -g "퍼센트"` 또는 `yarn test:e2e -g …`                |
-| trace 열기               | `npx playwright show-trace test-results/e2e-artifacts/<시험>/trace.zip`            |
-| i18n 기준선 갱신         | `UPDATE_I18N_BASELINE=1 yarn test src/__tests__/i18n-parity.test.ts`               |
+| 하고 싶은 것             | 명령                                                                                                       |
+| ------------------------ | ---------------------------------------------------------------------------------------------------------- |
+| 전부(code + web)         | `yarn test:all`                                                                                            |
+| 한 층만                  | `scripts/test-suite.sh --layer code` / `--layer web` (`--layer` 여러 번 가능)                              |
+| 실제 앱 층 (미구현)      | `--layer app --platform linux\|windows\|android`                                                           |
+| 처음 한 번 브라우저 설치 | `scripts/test-suite.sh --setup` (chromium·webkit, sudo 없는 WebKit 우회 포함)                              |
+| 웹 빌드 강제 재빌드      | `--rebuild` (또는 `E2E_REBUILD=1`) — src 가 바뀌면 자동 재빌드됨                                           |
+| 플레이키 확인            | `scripts/test-suite.sh --layer web -- --repeat-each=3` (`--` 뒤는 playwright 인자)                         |
+| 한 프로젝트·한 시험      | `scripts/test-suite.sh --layer web -- --project=webkit-desktop -g "퍼센트"` 또는 `yarn test:e2e -g 퍼센트` |
+| trace 열기               | `npx playwright show-trace test-results/e2e-artifacts/<시험>/trace.zip`                                    |
+| i18n 기준선 갱신         | `UPDATE_I18N_BASELINE=1 yarn test src/__tests__/i18n-parity.test.ts`                                       |
 
 층: `code` = lint · vue-tsc · vitest(i18n 패리티 포함) · cargo test / `web` = Playwright 3개 프로젝트
 (chromium-desktop · webkit-desktop · chromium-mobile). 종료 코드: 실패 층이 있으면 1.
 
 ## 결과 읽는 순서
 
-1. **`test-results/summary.md` 를 먼저 읽는다**(20줄 이하: 돌린/안 돌린 층, 층·프로젝트별 숫자, 실패 목록).
+1. **`test-results/summary.md` 를 먼저 읽는다**(30줄 이하: 돌린/안 돌린 층, 층·프로젝트별 숫자, 실패 목록).
 2. trace·스크린샷·로그는 **실패한 시험만** 연다. 단계별 로그는 `test-results/<층>-<단계>.log`, 전체는 `summary.json`.
 3. 통과한 시험의 상세는 읽지 않는다.
 
@@ -36,10 +36,12 @@ description: QCalc 자동 테스트(code·web E2E·app 층)를 돌리고 결과�
 2. **플레이키** — `--repeat-each=3` 으로 재현이 갈리면. 고정 sleep 대신 `eventually` 로 기다리게 고친다(재시도 `retries` 로 덮지 않는다).
 3. **진짜 회귀** — 같은 시험이 3번 다 실패. 변경 diff 와 대조해 앱 버그면 앱을 고친다. **시험을 약하게 고치지 않는다.**
 4. **known-bug 뒤집힘** — 메시지가 `bug fixed — remove the known-bug mark` 이면 버그가 고쳐진 것: 아래 절차로 표시를 지운다.
+   그 밖의 known-bug 는 **summary.md 의 known-bug 줄에서 실제 오류가 그 버그의 증상과 맞는지 확인**한다 — 시나리오의 `symptom` 과
+   안 맞는 실패는 `known-bug 의 증상이 아닌 실패` 로 빨갛게 뜬다(다른 원인의 진짜 실패).
 
 ## known-bug(알려진 앱 버그)
 
-- 시나리오의 `knownBug: '<설명>'` 이 표시. 시나리오는 그대로 실행되고 **실패하면 통과**(요약 `known-bug` 칸에 따로 집계),
+- 시나리오의 `knownBug: '<설명>'` + `symptom: /오류 모양 정규식/`(필수) 이 표시. 시나리오는 그대로 실행되고 **실패하면 통과**(요약 `known-bug` 칸에 따로 집계),
   **통과하면 빨강**(버그가 고쳐짐). `fixme`/`skip` 은 안 돌아서 고쳐도 모르므로 쓰지 않는다.
 - 목록: `grep -rn knownBug e2e/scenarios` (사유는 summary.json 의 `knownBugs`).
 - **졸업시키기**: 앱을 고침 → 해당 시나리오가 빨개짐 → `knownBug` 줄 삭제 → 다시 돌려 초록 확인.
@@ -48,7 +50,7 @@ description: QCalc 자동 테스트(code·web E2E·app 층)를 돌리고 결과�
 
 ## 시나리오 추가
 
-`e2e/scenarios/<그룹>.ts` 에 `{ title, needs?, seed?, knownBug?, run(app) }` 추가 — 드라이버 중립(Playwright import 금지),
+`e2e/scenarios/<그룹>.ts` 에 `{ title, needs?, seed?, knownBug?+symptom?, run(app) }` 추가 — 드라이버 중립(Playwright import 금지),
 화면 단언은 `eventually`/`expectMain` 등 기다리는 것만, 기대값은 코드를 읽고 근거 주석. 자세히는 `e2e/README.md` 「시나리오 쓰는 법」.
 새 시나리오는 3개 프로젝트에서 `--repeat-each=3` 으로 안정을 확인한 뒤 커밋.
 

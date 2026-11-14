@@ -28,8 +28,15 @@ export function runGroup(group: ScenarioGroup): void {
         } catch (error) {
           failure = error;
         }
+        if (!scenario.symptom) throw new Error('knownBug 에는 symptom(기대하는 오류 모양)이 함께 있어야 한다');
         if (failure === undefined) {
           throw new Error(`bug fixed — remove the known-bug mark (scenario.knownBug): ${scenario.knownBug}`);
+        }
+        const message = String((failure as Error)?.message ?? failure);
+        if (!scenario.symptom.test(message)) {
+          throw new Error(
+            `known-bug 의 증상이 아닌 실패 — 기대 ${scenario.symptom} / 실제: ${message.split('\n')[0]!.slice(0, 200)}`,
+          );
         }
         test
           .info()

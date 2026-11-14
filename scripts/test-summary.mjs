@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * scripts/test-suite.sh 가 남긴 결과를 모아 test-results/summary.md(20줄 이하)와 summary.json 을 쓴다.
+ * scripts/test-suite.sh 가 남긴 결과를 모아 test-results/summary.md(30줄 이하)와 summary.json 을 쓴다.
  *
  * 입력 (있는 것만 읽는다)
  * - test-results/.steps.jsonl   : 단계별 {layer, step, status, seconds, detail, log}
@@ -8,11 +8,12 @@
  * - test-results/e2e-report.json: Playwright JSON 보고서
  * 종료 코드: 실패한 단계가 하나라도 있으면 1
  */
-import { existsSync, readFileSync, writeFileSync } from 'node:fs';
+import { existsSync, readFileSync, statSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 
 const out = process.argv[2] || 'test-results';
 const ranLayers = (process.argv[3] || '').split(/\s+/).filter(Boolean);
+const MAX_LINES = 30;
 const ALL_LAYERS = ['code', 'web', 'app'];
 const read = (file) => {
   const p = path.join(out, file);
@@ -119,6 +120,14 @@ for (const s of steps) {
   if (report && total === 0) s.detail = 'no tests ran';
 }
 
+const producedThisRun = (file) => {
+  try {
+    return statSync(file).mtimeMs >= statSync(path.join(out, '.started')).mtimeMs;
+  } catch {
+    return false;
+  }
+};
+
 const failed = steps.some((s) => s.status === 'fail');
 const totalSeconds = steps.reduce((n, s) => n + (s.seconds || 0), 0);
 const summary = {
@@ -130,12 +139,13 @@ const summary = {
   steps,
   reports: {
     junit: existsSync(path.join(out, 'e2e-junit.xml')) ? path.join(out, 'e2e-junit.xml') : null,
-    html: existsSync('playwright-report/index.html') ? 'playwright-report/index.html' : null,
+    // 이번 실행이 만든 보고서만 링크한다(Playwright 가 죽었으면 이전 실행의 것이 남아 있을 수 있다)
+    html: producedThisRun('playwright-report/index.html') ? 'playwright-report/index.html' : null,
   },
 };
 writeFileSync(path.join(out, 'summary.json'), JSON.stringify(summary, null, 2) + '\n');
 
-// summary.md — 20줄 이하
+// summary.md — 30줄 이하
 const lines = [
   `# QCalc 테스트 요약 — ${summary.result} (${totalSeconds}s)`,
   `돌린 층: ${ranLayers.join(', ') || '(없음)'} · 안 돌린 층: ${summary.layersNotRun.join(', ') || '(없음)'}`,
@@ -169,7 +179,13 @@ const allFailures = [
   ...e2eFailures.map((f) => `- [${f.project}] ${f.title} — ${f.error}${f.trace ? ` — trace: ${f.trace}` : ''}`),
 ];
 const footer = `보고서: ${[summary.reports.junit, summary.reports.html, path.join(out, 'summary.json')].filter(Boolean).join(' · ')}`;
-const room = 20 - lines.length - 3; // 빈 줄 + 제목 + footer
+// 알려진 버그(기대된 실패): 증상 확인용으로 실제 오류 첫 줄을 보인다 — 시험별 한 줄(프로젝트 중복 제거)
+const bugLines = [...new Map(knownBugs.map((b) => [b.title, b])).values()].map(
+  (b) => `- ${b.title.slice(0, 50)} — ${b.error.replace(/^Error: /, '').slice(0, 90)}`,
+);
+if (bugLines.length)
+  lines.push('', `known-bug ${bugLines.length}건 (기대된 실패 — 오류가 증상과 맞는지 확인):`, ...bugLines);
+const room = MAX_LINES - lines.length - 3; // 빈 줄 + 제목 + footer
 if (allFailures.length && room > 0) {
   lines.push('', `실패 ${allFailures.length}건:`);
   const shown = allFailures.slice(0, Math.max(1, room - 1));
@@ -177,6 +193,6 @@ if (allFailures.length && room > 0) {
   if (allFailures.length > shown.length) lines.push(`- … 외 ${allFailures.length - shown.length}건 (summary.json)`);
 }
 lines.push('', footer);
-writeFileSync(path.join(out, 'summary.md'), lines.slice(0, 20).join('\n') + '\n');
-process.stdout.write(lines.slice(0, 20).join('\n') + '\n');
+writeFileSync(path.join(out, 'summary.md'), lines.slice(0, MAX_LINES).join('\n') + '\n');
+process.stdout.write(lines.slice(0, MAX_LINES).join('\n') + '\n');
 process.exit(failed ? 1 : 0);

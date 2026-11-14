@@ -8,7 +8,16 @@
  * 의존성 없이 node 내장 모듈만 쓴다. 빌드 로그는 test-results/e2e-build.log 로 남긴다.
  */
 import { spawnSync } from 'node:child_process';
-import { createReadStream, existsSync, mkdirSync, openSync, readdirSync, statSync } from 'node:fs';
+import {
+  createReadStream,
+  existsSync,
+  mkdirSync,
+  openSync,
+  readdirSync,
+  rmSync,
+  statSync,
+  writeFileSync,
+} from 'node:fs';
 import http from 'node:http';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -97,4 +106,12 @@ http
     });
     createReadStream(file).pipe(res);
   })
-  .listen(port, '127.0.0.1', () => console.error(`[e2e] serving dist/spa at http://127.0.0.1:${port}`));
+  .listen(port, '127.0.0.1', () => {
+    // Playwright 가 SIGKILL 로 죽으면 이 서버는 고아로 남는다 — test-suite.sh 가 다음 실행 전에 이 pid 파일로 정리한다
+    mkdirSync(path.join(root, 'test-results'), { recursive: true });
+    writeFileSync(path.join(root, 'test-results', '.e2e-server.pid'), String(process.pid));
+    console.error(`[e2e] serving dist/spa at http://127.0.0.1:${port}`);
+  });
+const cleanPid = () => rmSync(path.join(root, 'test-results', '.e2e-server.pid'), { force: true });
+process.on('exit', cleanPid);
+for (const sig of ['SIGINT', 'SIGTERM']) process.on(sig, () => process.exit(0));

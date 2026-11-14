@@ -15,7 +15,7 @@
 #   --rebuild               dist/spa 를 강제로 다시 빌드 (E2E_REBUILD=1)
 #   -- <args>               뒤의 인자는 그대로 playwright test 에 넘긴다
 #
-# 결과: test-results/summary.md(20줄 이하, 시작할 때 지우고 끝에 새로 씀 — 어떤 층을 돌렸는지 포함), summary.json, e2e-junit.xml, 단계별 *.log
+# 결과: test-results/summary.md(30줄 이하, 시작할 때 지우고 끝에 새로 씀 — 어떤 층을 돌렸는지 포함), summary.json, e2e-junit.xml, 단계별 *.log
 # 종료 코드: 실패한 층이 하나라도 있으면 1
 set -euo pipefail
 
@@ -108,8 +108,24 @@ fi
 mkdir -p "$OUT"
 STEPS="$OUT/.steps.jsonl"
 : >"$STEPS"
+touch "$OUT/.started"
 # 낡은 결과가 이번 실행의 요약으로 남지 않게 모두 지운다 (summary 는 맨 마지막에 새로 쓴다)
 rm -f "$OUT/vitest.json" "$OUT/e2e-report.json" "$OUT/e2e-junit.xml" "$OUT/summary.md" "$OUT/summary.json"
+
+# 이전 실행이 SIGKILL 로 죽어 남긴 e2e 서버(serve.mjs)만 정리한다 — pid 파일의 PID 이고 cmdline 이 serve.mjs 일 때만
+PIDFILE="$OUT/.e2e-server.pid"
+kill_stale_server() {
+  local pid
+  [[ -f "$PIDFILE" ]] || return 0
+  pid=$(cat "$PIDFILE" 2>/dev/null || true)
+  if [[ "$pid" =~ ^[0-9]+$ && -r "/proc/$pid/cmdline" ]] && tr '\0' ' ' <"/proc/$pid/cmdline" 2>/dev/null | grep -q 'e2e/support/serve.mjs'; then
+    echo "[web] 이전 실행이 남긴 e2e 서버(pid $pid)를 정리한다"
+    kill "$pid" 2>/dev/null || true
+    sleep 1
+  fi
+  rm -f "$PIDFILE"
+}
+trap kill_stale_server EXIT
 
 # record <layer> <step> <pass|fail|skip> <seconds> <detail> <log>
 record() {
@@ -143,6 +159,7 @@ for layer in "${LAYERS[@]}"; do
       fi
       ;;
     web)
+      kill_stale_server
       run_step web playwright npx playwright test ${PW_ARGS[@]+"${PW_ARGS[@]}"}
       if grep -q "Executable doesn't exist\|Host system is missing dependencies" "$OUT/web-playwright.log" 2>/dev/null; then
         echo "  ! 브라우저가 준비되지 않았다 — scripts/test-suite.sh --setup 을 먼저 실행" >&2

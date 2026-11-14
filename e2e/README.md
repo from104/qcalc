@@ -13,7 +13,7 @@ yarn test:e2e -g "퍼센트"                       # playwright 직접
 npx playwright show-trace test-results/e2e-artifacts/<시험>/trace.zip   # 실패 추적 열기
 ```
 
-결과는 `test-results/summary.md`(20줄 이하, 실행 시작 때 지우고 끝에 새로 씀 — 돌린 층/안 돌린 층 표시) · `summary.json` · `e2e-junit.xml` · 단계별 `*.log`,
+결과는 `test-results/summary.md`(30줄 이하, 실행 시작 때 지우고 끝에 새로 씀 — 돌린 층/안 돌린 층 표시) · `summary.json` · `e2e-junit.xml` · 단계별 `*.log`,
 HTML 보고서는 `playwright-report/`. 추적(trace)·스크린샷은 **실패한 시험만** 남는다. 실패가 있으면 종료 코드 1.
 
 ## 층(layer)
@@ -73,7 +73,7 @@ scripts/test-suite.sh         층 실행기,  scripts/test-summary.mjs  요약 �
 9. 드라이버에 기능이 더 필요하면(예: 요청 한 번 끊기, 보이는 텍스트 모으기) `CalcApp` 에 메서드를 더하고
    `PlaywrightApp` 에 구현한다. 드라이버 고유 기능이면 Capability 를 하나 더 만든다.
 
-**앱 버그로 실패하면 시험을 약하게 고치지 않는다.** 시나리오에 `knownBug: '<버그 설명>'` 을 적는다(known-bug 표시).
+**앱 버그로 실패하면 시험을 약하게 고치지 않는다.** 시나리오에 `knownBug: '<버그 설명>'` 과 `symptom: /<오류 메시지 정규식>/` 을 함께 적는다(known-bug 표시). symptom 과 안 맞는 실패는 진짜 실패로 취급된다.
 시나리오는 **그대로 실행**되고 — 실패하면 기대된 실패라 통과(요약에 `known-bug` 로 따로 집계, 사유는 summary.json),
 **통과하면 빨갛게** `bug fixed — remove the known-bug mark` 로 알린다. 버그를 고친 사람은 그때 `knownBug` 줄을
 지우면 끝이다(`fixme` 처럼 안 돌아서 고쳐도 모르는 일이 없다). `i18n.ts` 의 `KNOWN_UNNAMED`(언어별 점검에서 뺀 두 컨트롤)도

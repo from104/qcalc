@@ -170,6 +170,7 @@ export default defineGroup('convert', [
     knownBug:
       '진법 탭 Control+v(메인 붙여넣기)가 보조 붙여넣기와 같은 코드(ResultField.vue handlePaste)를 타서 ' +
       '원본 진법이 아니라 대상 진법(16진)으로 읽는다 — 10진 메인에 255 를 붙이면 597(0x255)이 된다',
+    symptom: /메인 결과: .*"255".*마지막 값 "597"/,
     run: async (app) => {
       await app.tab('radix');
       await app.setClipboard('255');

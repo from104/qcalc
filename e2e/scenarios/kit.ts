@@ -25,6 +25,8 @@ export interface Scenario {
    * "bug fixed — remove the known-bug mark" 로 빨갛게 만든다. 그때 이 줄(과 관련 예외 처리)을 지운다.
    */
   knownBug?: string;
+  /** knownBug 와 함께 필수 — 그 버그로 생기는 오류 메시지의 모양. 메시지가 맞지 않는 실패는 "기대된 실패"가 아니라 진짜 실패다 */
+  symptom?: RegExp;
   /** 아직 안 만든 시나리오 — 무엇을 다룰지 적어 두면 실행기가 건너뛰고 보고한다 */
   todo?: string;
   run(app: CalcApp): Promise<void>;
