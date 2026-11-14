@@ -1,7 +1,7 @@
 # QCalc 자동 테스트 (e2e)
 
 LLM 없이 한 명령으로 무인 실행한다. 같은 **시나리오**를 웹 빌드·Tauri·Android 에서 돌리는 것이 목표이고,
-지금(Phase 1)은 웹 빌드 위의 Playwright 드라이버가 있다.
+지금은 웹 빌드 위의 Playwright 드라이버(Phase 1)와 실제 Tauri 앱(Linux) 위의 WebdriverIO 드라이버(Phase 2)가 있다.
 
 ```bash
 yarn test:all                                  # = scripts/test-suite.sh : code + web
@@ -11,10 +11,12 @@ scripts/test-suite.sh --layer web -- --repeat-each=3 --project=webkit-desktop   
 scripts/test-suite.sh --rebuild                # dist/spa 강제 재빌드
 yarn test:e2e -g "퍼센트"                       # playwright 직접
 npx playwright show-trace test-results/e2e-artifacts/<시험>/trace.zip   # 실패 추적 열기
+scripts/test-suite.sh --layer app              # 실제 Tauri 앱 (이 기계의 OS — 지금은 Linux 만)
+yarn test:e2e:app -g "클립보드"                  # app 층 playwright 직접 (바이너리: node e2e/app/build.mjs)
 ```
 
-결과는 `test-results/summary.md`(30줄 이하, 실행 시작 때 지우고 끝에 새로 씀 — 돌린 층/안 돌린 층 표시) · `summary.json` · `e2e-junit.xml` · 단계별 `*.log`,
-HTML 보고서는 `playwright-report/`. 추적(trace)·스크린샷은 **실패한 시험만** 남는다. 실패가 있으면 종료 코드 1.
+결과는 `test-results/summary.md`(30줄 이하, 실행 시작 때 지우고 끝에 새로 씀 — 돌린 층/안 돌린 층 표시) · `summary.json` · `e2e-junit.xml`(app 층은 `app-junit.xml`) · 단계별 `*.log`,
+HTML 보고서는 `playwright-report/`(app 층은 `test-results/app-html-report/`). 추적(trace)·스크린샷은 **실패한 시험만** 남는다. 실패가 있으면 종료 코드 1.
 
 ## 층(layer)
 
@@ -22,7 +24,7 @@ HTML 보고서는 `playwright-report/`. 추적(trace)·스크린샷은 **실패�
 | ------ | -------------------------------------------------------------------------------------------------- |
 | `code` | `yarn lint` · `vue-tsc --noEmit` · `yarn test`(vitest) · `cargo test`(src-tauri, cargo 가 있을 때) |
 | `web`  | 운영 웹 빌드(`quasar build -m spa` → `dist/spa`)를 정적 서버로 띄워 Playwright 3개 프로젝트        |
-| `app`  | 실제 앱 — 아직 없음 (`--platform linux\|windows\|android` 는 "not implemented yet")                |
+| `app`  | 실제 앱 — Linux: Tauri 디버그 바이너리를 Xvfb 에서 tauri-driver + WebdriverIO 로 (아래 「app 층」) |
 
 웹 프로젝트
 
@@ -51,7 +53,21 @@ e2e/
   fixtures/seed.ts            localStorage 시드 (buildSeed/applySeed, APP_VERSION, LANGS)
   fixtures/network.ts         환율 API 고정(FIXED_RATES) + 외부 요청 차단
   fixtures/clipboard.ts       native/stub 클립보드, setClipboard/getClipboard
-  support/serve.mjs           빌드(필요할 때) + dist/spa 정적 서버
+  support/serve.mjs           빌드(필요할 때) + dist/spa 정적 서버 (`--build-only` = 빌드만)
+  drivers/WdioApp.ts          WebDriver(WebdriverIO) 구현 — 실제 앱용
+  drivers/page-functions.ts   페이지 안에서 도는 함수(snapshotUi 등) — 두 드라이버가 공유
+  app/                        app 층 (playwright.app.config.ts 가 러너)
+    build.mjs                 디버그 바이너리(웹 빌드 내장)를 필요할 때만 빌드 → src-tauri/target/e2e-app/qcalc
+    env-linux.ts              격리 데스크톱: Xvfb · 사설 D-Bus · 임시 HOME/XDG · tauri-driver
+    procs.ts                  실행 표지(QCALC_E2E_RUN) 로 우리 프로세스만 찾고 끝낸다
+    global-setup.ts           격리 데스크톱을 한 번 띄우고 teardown 에서 정리
+    session.ts                WebDriver 세션 = 앱 프로세스 하나 (relaunch · 프로필 초기화)
+    tauri-app.ts              TauriApp = WdioApp + invoke · X 창 · 프로필 파일 · 종료 · AT-SPI
+    helpers.ts                클립보드 도우미 · AT-SPI 리스너 (support/*.py 를 자식 프로세스로)
+    fixtures.ts · run.ts      Playwright 픽스처(앱 하나를 시험끼리 재사용) · 그룹 → 시험
+    shared.spec.ts            e2e/scenarios/* 6개 그룹 그대로
+    native.ts · native.spec.ts  앱 전용 시나리오 13개
+playwright.app.config.ts      app 층 러너 설정 (workers 1, 프로젝트 tauri-linux)
 scripts/test-suite.sh         층 실행기,  scripts/test-summary.mjs  요약 작성
 ```
 
@@ -74,6 +90,8 @@ scripts/test-suite.sh         층 실행기,  scripts/test-summary.mjs  요약 �
    `PlaywrightApp` 에 구현한다. 드라이버 고유 기능이면 Capability 를 하나 더 만든다.
 
 **앱 버그로 실패하면 시험을 약하게 고치지 않는다.** 시나리오에 `knownBug: '<버그 설명>'` 과 `symptom: /<오류 메시지 정규식>/` 을 함께 적는다(known-bug 표시). symptom 과 안 맞는 실패는 진짜 실패로 취급된다.
+한 플랫폼에서만 나는 버그는 `knownBugOn: { 'tauri-linux': { bug, symptom } }` — 그 플랫폼(`CalcApp.platform`)에서만 기대된 실패이고
+다른 플랫폼에서는 평소처럼 통과해야 한다(예: keyboard 의 Control+c 복사).
 시나리오는 **그대로 실행**되고 — 실패하면 기대된 실패라 통과(요약에 `known-bug` 로 따로 집계, 사유는 summary.json),
 **통과하면 빨갛게** `bug fixed — remove the known-bug mark` 로 알린다. 버그를 고친 사람은 그때 `knownBug` 줄을
 지우면 끝이다(`fixme` 처럼 안 돌아서 고쳐도 모르는 일이 없다). `i18n.ts` 의 `KNOWN_UNNAMED`(언어별 점검에서 뺀 두 컨트롤)도
@@ -108,7 +126,7 @@ scripts/test-suite.sh         층 실행기,  scripts/test-summary.mjs  요약 �
 
 AdMob: `src/boot/admob.ts` 가 비어 있어 웹/앱 어디서도 광고를 띄우지 않는다 — 끌 것이 없다. 광고를 다시 붙이면
 `$g.isE2E` 일 때 초기화하지 않도록 한다. 플래그가 없으면 위 동작은 하나도 바뀌지 않는다.
-Tauri·Android 드라이버도 같은 주소(`…/?e2e=1#/`)로 이동시키면 된다.
+Tauri 드라이버(WdioApp)도 같은 주소(`tauri://localhost/?e2e=1#/`)로 이동시킨다. Android 도 같은 방식.
 
 ## 시드 · 네트워크 · 클립보드
 
@@ -134,8 +152,54 @@ Ubuntu 에서 Playwright WebKit 은 `libmanette-0.2-0`(+`libhidapi-hidraw0`)이 
   App.vue 의 `validateAndCorrect*` 가 "고친" 것으로 셈한다. 다른 시험은 시드로 피하고, 이 결함은 basic 의 knownBug
   시나리오(`stores: { unit: null, … }` = 시드 제외)가 따로 지킨다.
 
+## app 층 (실제 Tauri 앱, Linux)
+
+```
+scripts/test-suite.sh --layer app        # = --platform <이 기계의 OS>. linux 외에는 "not implemented on this host" 로 skip
+  1. app build   node e2e/app/build.mjs  — dist/spa(serve.mjs --build-only) + `tauri build --debug --no-bundle`
+                 (beforeBuildCommand 끔). 입력(src·public·src-tauri/src·Cargo.*·tauri.conf.json…)이 바이너리보다
+                 새로울 때만. 첫 빌드 수 분, 그 뒤 재사용 0초 · 변경 시 ~20초. 강제: --rebuild. 로그 app-build-tauri.log
+  2. app linux   npx playwright test -c playwright.app.config.ts  (-- 뒤 인자 전달)
+  3. app cleanup 이번 실행 표지를 가진 프로세스가 남았는지 확인 — 남았으면 끝내고 fail
+```
+
+- **바이너리**: `cargo build` 만으로는 `custom-protocol` 기능이 빠져 devUrl(localhost:9000)을 연다 — 그래서 `tauri build`.
+  결과는 `src-tauri/target/e2e-app/qcalc` 로 하드링크한다(`yarn dev:tauri` 가 target/debug/qcalc 를 devUrl 판으로 덮어써도 무관).
+- **격리**(env-linux.ts): Xvfb(2560×1440, `-displayfd` 로 빈 번호) · 사설 D-Bus 세션 · 임시 `HOME`/`XDG_CONFIG_HOME`/
+  `XDG_DATA_HOME`/`XDG_CACHE_HOME`/`XDG_RUNTIME_DIR`(`/tmp/qcalc-e2e-app-*`, 끝나면 삭제 — 남기려면 `E2E_KEEP_PROFILE=1`).
+  `WAYLAND_DISPLAY` 를 지우고 `GDK_BACKEND=x11` → 사용자 데스크톱에 아무것도 안 뜨고, 사용자 프로필(`~/.config/io.github.from104.qcalc` 등)·
+  사용자 D-Bus(Orca 포함)에 닿지 않는다. `GTK_IM_MODULE=wayland` 같은 Wayland 입력기 설정은 지운다(아래 발견 사항).
+  NVIDIA 강제 GPU 경로는 `QCALC_NO_GPU_FORCE=1` 로 끈다(Xvfb 에는 GPU 가 없다).
+- **프로세스**: 모두 `QCALC_E2E_RUN=<토큰>` 을 물려받는다. 정리는 이름·패턴이 아니라 이 토큰을 가진 프로세스만(`pkill` 금지).
+  러너가 죽어도 다음 실행/같은 실행 끝의 `app cleanup` 이 `test-results/.app-run.json` 의 토큰으로 쓸어 낸다.
+- **세션 하나 = 앱 프로세스 하나**를 시험끼리 재사용(workers 1). 시험마다 `seed` 는 같은 출처의 정적 파일
+  (`/icons/favicon-16x16.png`)로 가서 localStorage 를 채우고 `tauri://localhost/?e2e=1#/` 로 연다. 시험이 앱을 끄거나 창 크기를
+  바꾸면 픽스처가 다음 시험 전에 새 프로필로 다시 띄운다.
+- **능력**: `keyboard`(WebDriver 키 동작 — WebKit 이 GTK 이벤트로 합성, Shift 오염 없음) · `clipboard`(진짜 X CLIPBOARD 를
+  앱 **밖** 프로세스 `support/clipboard.py` 가 소유·읽기) · `reload` · `atspi`(호스트 ATK 2.46+ 일 때만). `netMock` 없음(요청 가로채기
+  불가 → 환율·청크 차단 시나리오는 이유를 남기고 skip), `touch` 없음.
+- **앱 종료**: WebDriver 세션 종료는 앱을 죽인다(RunEvent::Exit 없음 → 창 크기 저장 안 됨). 저장을 시험할 때는 `app.quit('key')`(q 키)
+  또는 `app.quit('command')`(quit_app) 로 정상 종료한다.
+- **실패 읽기**: summary.md → `test-results/app-html-report/`(실패 시험의 스크린샷 + 앱 로그 끝부분 첨부) → 환경 로그
+  `test-results/app-{xvfb,dbus,driver,driver-stderr}.log`(앱의 stderr 는 driver-stderr). `app-exited` 주석 = 시험 뒤 앱이 죽어 있었다.
+- **필요한 것**: `Xvfb` · `dbus-daemon` · `WebKitWebDriver`(apt `webkitgtk-webdriver`, 22.04/24.04 는 `webkit2gtk-driver`) ·
+  `tauri-driver`(`cargo install tauri-driver --locked`) · `python3-gi`(Gtk 3, Atk, Atspi) · `xwininfo`/`xprop`(x11-utils). 없으면 globalSetup 이
+  무엇이 없는지 말하고 실패한다.
+- **CI**: `.github/workflows/e2e-app.yml` — 야간(03:30 KST)·수동·`workflow_call`, linux 잡(ubuntu-24.04). PR 게이트에는 없다.
+
+## 발견 사항 (Phase 2, 앱 층)
+
+- **Control+c 복사가 클립보드를 비운다(Tauri Linux)** — "복사되었습니다" 알림은 뜨지만 클립보드에 텍스트가 없다. 단축키가 keydown 기본
+  동작을 막지 않아 WebKitGTK 의 기본 "복사"(선택 없음)가 앱의 `writeText` 를 덮는다(preventDefault 하면 정상). Shift+Control+c 는 정상.
+  known-bug: native 「Control+c」 + keyboard 2개(`knownBugOn['tauri-linux']`).
+- **q 로 끝내면 다음 실행에 키패드가 shift 고정** — 'q' 가 앱 종료이면서 shift 기능 `sin` 단축키라 종료 직전 shift 고정이 켜져 저장된다.
+  known-bug: native 「'q' 로 끝내고 다시 켜도 키패드는 평상 상태다」.
+- (앱 버그 아님) Wayland 세션의 `GTK_IM_MODULE=wayland` 가 X11 디스플레이로 새면 GTK 가 im-wayland.so 를 올려
+  `gdk_wayland_display_get_wl_display` 단언 실패 후 웹뷰 생성 중 SIGSEGV. 시험 환경은 이 변수를 지운다. 예전 XWayland 강제(GDK_BACKEND=x11)
+  크래시와 같은 함수 이름이라 그 원인 후보이기도 하다.
+
 ## 로드맵
 
-- Tauri: WebdriverIO + tauri-driver 로 `CalcApp` 구현 (`seed` = execute 로 localStorage 채우고 새로고침).
-- Android: Playwright `_android` 로 WebView 에 붙어 `CalcApp` 구현 (`touch` 능력, keyboard 는 기기 따라).
-- 두 드라이버 모두 `e2e/scenarios/*` 를 그대로 import 한다.
+- Windows(Phase 3): 같은 WdioApp + tauri-driver(msedgedriver) — e2e-app.yml 에 windows 잡을 더한다. 출처는 `http://tauri.localhost`.
+- Android(Phase 4): Playwright `_android` 로 WebView 에 붙어 `CalcApp` 구현 (`touch` 능력, keyboard 는 기기 따라).
+- 모든 드라이버가 `e2e/scenarios/*` 를 그대로 import 한다.
