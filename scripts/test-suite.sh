@@ -156,7 +156,9 @@ sweep_app_leftovers() {
   fi
   if [[ -f "$APP_RUN" ]]; then
     profile=$(node -e 'process.stdout.write(JSON.parse(require("fs").readFileSync(process.argv[1], "utf8")).profile || "")' "$APP_RUN" 2>/dev/null || true)
-    if [[ -n "$profile" && -d "$profile" && "$(basename "$profile")" == qcalc-e2e-app-* && -z "${E2E_KEEP_PROFILE:-}" ]]; then
+    # 임시 폴더 바로 아래의 qcalc-e2e-app-* 만 지운다 (.app-run.json 이 이상해도 다른 곳은 건드리지 않게)
+    if [[ -n "$profile" && -d "$profile" && "$(basename "$profile")" == qcalc-e2e-app-* &&
+      "$(cd "$(dirname "$profile")" && pwd -P)" == "$(cd "${TMPDIR:-/tmp}" && pwd -P)" && -z "${E2E_KEEP_PROFILE:-}" ]]; then
       rm -rf -- "$profile"
     fi
   fi
@@ -184,7 +186,8 @@ run_step() {
   local layer="$1" step="$2" log="$OUT/$1-$2.log" start=$SECONDS status
   shift 2
   printf '[%s] %-10s … ' "$layer" "$step"
-  if "$@" >"$log" 2>&1; then status=pass; else status=fail; fi
+  # 9>&- : 자식이 앱 층 락을 물려받지 않게 (고아가 락을 쥐면 다음 실행이 정리도 못 한다)
+  if "$@" >"$log" 2>&1 9>&-; then status=pass; else status=fail; fi
   printf '%s (%ss)\n' "$status" "$((SECONDS - start))"
   record "$layer" "$step" "$status" "$((SECONDS - start))" "" "$log"
 }
@@ -216,6 +219,13 @@ for layer in "${LAYERS[@]}"; do
         # Windows 는 Phase 3(gh workflow — e2e-app.yml), Android 는 Phase 4
         echo "[app] $plat … not implemented on this host ($(host_platform))"
         record app "$plat" skip 0 "not implemented on this host ($(host_platform))" ""
+        continue
+      fi
+      # 같은 체크아웃에서 앱 층이 동시에 두 번 돌면 앞의 정리가 뒤 실행의 프로세스를 죽인다 — 하나만 허용
+      exec 9>"$OUT/.app-layer.lock"
+      if ! flock -n 9; then
+        echo "[app] 다른 앱 층 실행이 진행 중이다 — 이번 실행은 건너뛴다" >&2
+        record app "$plat" fail 0 "another app-layer run holds $OUT/.app-layer.lock" ""
         continue
       fi
       stale=$(sweep_app_leftovers)
