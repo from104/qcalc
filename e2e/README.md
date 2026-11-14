@@ -13,7 +13,7 @@ yarn test:e2e -g "퍼센트"                       # playwright 직접
 npx playwright show-trace test-results/e2e-artifacts/<시험>/trace.zip   # 실패 추적 열기
 ```
 
-결과는 `test-results/summary.md`(20줄 이하) · `summary.json` · `e2e-junit.xml` · 단계별 `*.log`,
+결과는 `test-results/summary.md`(20줄 이하, 실행 시작 때 지우고 끝에 새로 씀 — 돌린 층/안 돌린 층 표시) · `summary.json` · `e2e-junit.xml` · 단계별 `*.log`,
 HTML 보고서는 `playwright-report/`. 추적(trace)·스크린샷은 **실패한 시험만** 남는다. 실패가 있으면 종료 코드 1.
 
 ## 층(layer)
@@ -44,9 +44,9 @@ e2e/
   drivers/CalcApp.ts          드라이버 중립 인터페이스 + Capability (시나리오는 이것만 안다)
   drivers/PlaywrightApp.ts    Playwright Page 구현
   scenarios/kit.ts            시나리오 형식 · 키패드 표(KEY/SHIFT) · tapKeys/typeKeys · eventually/expect*
-  scenarios/<그룹>.ts         시나리오 그룹 (basic, keyboard = 참조 구현 / convert formula history i18n = TODO)
+  scenarios/<그룹>.ts         시나리오 그룹 (basic keyboard convert formula history i18n)
   web/<그룹>.spec.ts          3줄짜리 스펙 — runGroup(그룹)
-  web/run.ts                  그룹 → Playwright 시험 (needs 검사·skip·fixme·seed)
+  web/run.ts                  그룹 → Playwright 시험 (needs 검사·skip·knownBug·seed)
   fixtures/test.ts            Playwright test 확장: clipboardMode·capabilities 옵션, app 픽스처
   fixtures/seed.ts            localStorage 시드 (buildSeed/applySeed, APP_VERSION, LANGS)
   fixtures/network.ts         환율 API 고정(FIXED_RATES) + 외부 요청 차단
@@ -73,8 +73,24 @@ scripts/test-suite.sh         층 실행기,  scripts/test-summary.mjs  요약 �
 9. 드라이버에 기능이 더 필요하면(예: 요청 한 번 끊기, 보이는 텍스트 모으기) `CalcApp` 에 메서드를 더하고
    `PlaywrightApp` 에 구현한다. 드라이버 고유 기능이면 Capability 를 하나 더 만든다.
 
-**앱 버그로 실패하면 시험을 약하게 고치지 않는다.** 시나리오에 `fixme: '<버그 설명>'` 을 적으면 fixme 로
-보고되고, 버그가 고쳐지면 그 줄만 지운다.
+**앱 버그로 실패하면 시험을 약하게 고치지 않는다.** 시나리오에 `knownBug: '<버그 설명>'` 을 적는다(known-bug 표시).
+시나리오는 **그대로 실행**되고 — 실패하면 기대된 실패라 통과(요약에 `known-bug` 로 따로 집계, 사유는 summary.json),
+**통과하면 빨갛게** `bug fixed — remove the known-bug mark` 로 알린다. 버그를 고친 사람은 그때 `knownBug` 줄을
+지우면 끝이다(`fixme` 처럼 안 돌아서 고쳐도 모르는 일이 없다). `i18n.ts` 의 `KNOWN_UNNAMED`(언어별 점검에서 뺀 두 컨트롤)도
+같은 때 함께 지운다. 알려진 버그 목록은 `grep -rn knownBug e2e/scenarios`.
+
+## 앱이 스스로 새로고침할 때
+
+지연 로드(청크)가 실패하면 `router/index.ts` 의 `vite:preloadError` 리스너가 페이지를 한 번 새로 연다(10초 안 재시도 없음).
+청크를 끊는 시나리오는 `app.reload()` 뒤에 `app.settleSelfReload()` 로 그 새로고침이 끝나기를 기다린 다음 입력한다.
+
+## 층별 보충
+
+- `code` 층의 vitest 에는 `src/__tests__/i18n-parity.test.ts` 가 있다 — `fallbackLocale: 'en'` 이 가리는 언어별 번역 누락을
+  전역 메시지·SFC `<i18n>` 전부에서 ko 기준으로 비교한다. 기존 빈틈은 `i18n-parity-baseline.json`(지금은 0건), 새 빈틈만 실패.
+  의도적으로 늘릴 때 `UPDATE_I18N_BASELINE=1 yarn test src/__tests__/i18n-parity.test.ts`.
+- CI(`.github/workflows/ci.yml`): PR 게이트 = lint-test(lint·vue-tsc·vitest 커버리지·번들 예산) + cargo-test + web-e2e
+  (`scripts/test-suite.sh --layer web`, 요약을 `$GITHUB_STEP_SUMMARY` 에, 실패 시 보고서·trace 업로드).
 
 ## 선택자 규칙
 
@@ -115,7 +131,8 @@ Ubuntu 에서 Playwright WebKit 은 `libmanette-0.2-0`(+`libhidapi-hidraw0`)이 
 ## 발견 사항 (Phase 1)
 
 - 새로 설치한 첫 실행에서 "앱 업데이트로 인해 일부 저장된 설정이 초기화되었습니다" 토스트가 뜬다 — 빈 스토어를
-  App.vue 의 `validateAndCorrect*` 가 "고친" 것으로 셈한다. 시험은 시드로 피하고 있다.
+  App.vue 의 `validateAndCorrect*` 가 "고친" 것으로 셈한다. 다른 시험은 시드로 피하고, 이 결함은 basic 의 knownBug
+  시나리오(`stores: { unit: null, … }` = 시드 제외)가 따로 지킨다.
 
 ## 로드맵
 
