@@ -116,7 +116,8 @@ export class PlaywrightApp implements CalcApp {
 
   async choose(field: SelectField, option: string): Promise<void> {
     await this.activate(this.visible(`[data-testid="${field}"]`));
-    const menu = this.page.locator('.q-menu').filter({ visible: true });
+    // behavior 를 정하지 않은 선택 상자는 모바일에서 메뉴 대신 대화상자(.q-select__dialog)로 열린다
+    const menu = this.page.locator('.q-menu, .q-select__dialog').filter({ visible: true });
     await menu.waitFor();
     // 입력으로 거르는 선택 상자(통화)는 목록이 길어 가상 스크롤이므로 이름을 쳐서 좁힌다
     const field_ = this.visible(`[data-testid="${field}"]`);
@@ -140,7 +141,12 @@ export class PlaywrightApp implements CalcApp {
       location.hash = h;
     }, hash);
     if (screen === 'calc') await this.visible('[data-testid="result-main"]').waitFor();
-    else await this.visible('.sub-page').waitFor();
+    // 화면 전환 중에는 옛 화면과 새 화면이 잠깐 함께 있다
+    else await this.visible('.sub-page').first().waitFor();
+  }
+
+  documentLang(): Promise<string> {
+    return this.page.evaluate(() => document.documentElement.lang);
   }
 
   async notices(): Promise<string[]> {

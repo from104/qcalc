@@ -710,6 +710,7 @@
         <q-space />
         <q-select
           v-model="settingsStore.userLocale"
+          data-testid="setting-language"
           :disable="settingsStore.useSystemLocale"
           :options="languageOptions"
           role="combobox"

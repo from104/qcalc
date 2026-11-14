@@ -32,7 +32,8 @@ export type SelectField =
   | 'radix-source'
   | 'radix-target'
   | 'currency-source'
-  | 'currency-target';
+  | 'currency-target'
+  | 'setting-language';
 
 /** 화면의 조작 요소 하나 — 접근 가능한 이름이 비어 있으면 스크린리더가 읽을 것이 없다 */
 export interface UiControl {
@@ -92,6 +93,8 @@ export interface CalcApp {
   swap(panel: 'unit' | 'radix' | 'currency'): Promise<void>;
   /** 화면을 연다 — 기록·설정·도움말·정보 (해시 주소로 이동) */
   openScreen(screen: ScreenName): Promise<void>;
+  /** `<html lang>` 값 */
+  documentLang(): Promise<string>;
   /** 지금 떠 있는 알림(토스트)의 글 */
   notices(): Promise<string[]>;
   /** 지금 화면의 조작 요소와 보이는 글자 — 번역 누락 탐지용 */
