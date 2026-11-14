@@ -9,8 +9,9 @@
 #   --layer code|web|app    여러 번 줄 수 있다 (기본: code + web)
 #                           code = yarn lint + vue-tsc + vitest + cargo test(src-tauri)
 #                           web  = Playwright (운영 웹 빌드, 3개 프로젝트)
-#                           app  = 실제 Tauri 앱 (Linux: Xvfb + tauri-driver + WebdriverIO, playwright.app.config.ts)
-#   --platform linux|windows|android   app 층의 대상 (기본: 이 기계의 OS). 지금은 linux 만 — 나머지는 skip
+#                           app  = 실제 Tauri 앱 (Linux: Xvfb + tauri-driver + WebdriverIO, Windows: tauri-driver + msedgedriver; playwright.app.config.ts)
+#   --platform linux|windows|android   app 층의 대상 (기본: 이 기계의 OS). linux·windows 만 — windows 는 Windows 호스트(Git Bash)에서만
+#                           돌고(CI 의 windows-latest, .github/workflows/e2e-app.yml), 다른 호스트에서는 skip. android 는 아직 없음
 #   --setup                 브라우저 설치 후 끝낸다 (다른 층은 돌지 않음)
 #   --rebuild               dist/spa 와 app 층 바이너리를 강제로 다시 빌드 (E2E_REBUILD=1)
 #   -- <args>               뒤의 인자는 그대로 playwright test 에 넘긴다 (web·app 층 모두)
@@ -129,6 +130,8 @@ kill_stale_server() {
 trap kill_stale_server EXIT
 
 # ─── app 층 정리 — 이름·패턴이 아니라 이번 실행의 고유 표지로만 ─────────────────────
+# (Windows 는 환경변수를 읽을 수 없어서 e2e/app/env-windows.ts 가 시작한 PID 를 .app-run.json 에 적고,
+#  e2e/app/sweep-windows.mjs 가 그 PID 만 — 이미지 이름까지 맞을 때 — taskkill 한다.)
 # e2e/app/env-linux.ts 가 띄우는 모든 프로세스(Xvfb·dbus·tauri-driver → WebKitWebDriver → 앱 → WebKit 하위
 # 프로세스)는 환경변수 QCALC_E2E_RUN=<토큰> 을 물려받는다. 토큰은 test-results/.app-run.json 에 있다.
 # 러너가 SIGKILL 등으로 정리를 못 하고 죽었을 때를 대비해, 앱 층 앞뒤로 그 토큰을 가진 프로세스만 찾아 끝낸다.
@@ -148,6 +151,10 @@ app_marked_pids() {
 # 남은 표지 프로세스를 끝내고 그 수를 출력한다. 임시 프로필(qcalc-e2e-app-*)도 남았으면 지운다.
 sweep_app_leftovers() {
   local pids profile
+  if [[ "$(host_platform)" == windows ]]; then
+    node e2e/app/sweep-windows.mjs "$APP_RUN" 2>/dev/null || echo 0
+    return 0
+  fi
   mapfile -t pids < <(app_marked_pids)
   if [[ ${#pids[@]} -gt 0 ]]; then
     kill "${pids[@]}" 2>/dev/null || true
@@ -215,26 +222,35 @@ for layer in "${LAYERS[@]}"; do
       ;;
     app)
       plat="${PLATFORM:-$(host_platform)}"
-      if [[ "$plat" != linux || "$(host_platform)" != linux ]]; then
-        # Windows 는 Phase 3(gh workflow — e2e-app.yml), Android 는 Phase 4
-        echo "[app] $plat … not implemented on this host ($(host_platform))"
-        record app "$plat" skip 0 "not implemented on this host ($(host_platform))" ""
+      if [[ "$plat" != "$(host_platform)" || ( "$plat" != linux && "$plat" != windows ) ]]; then
+        if [[ "$plat" == windows ]]; then
+          # Windows 앱은 Windows 에서만 뜬다 — CI 의 windows-latest 잡이 돌린다
+          echo "[app] windows … skip on this host ($(host_platform)): runs in CI — 'gh workflow run e2e-app.yml' (수동) 또는 feature/e2e-suite 로 push"
+          record app "$plat" skip 0 "windows app layer runs in CI only (gh workflow run e2e-app.yml); host is $(host_platform)" ""
+        else
+          # Android 는 Phase 4
+          echo "[app] $plat … not implemented on this host ($(host_platform))"
+          record app "$plat" skip 0 "not implemented on this host ($(host_platform))" ""
+        fi
         continue
       fi
-      # 같은 체크아웃에서 앱 층이 동시에 두 번 돌면 앞의 정리가 뒤 실행의 프로세스를 죽인다 — 하나만 허용
-      exec 9>"$OUT/.app-layer.lock"
-      if ! flock -n 9; then
-        echo "[app] 다른 앱 층 실행이 진행 중이다 — 이번 실행은 건너뛴다" >&2
-        record app "$plat" fail 0 "another app-layer run holds $OUT/.app-layer.lock" ""
-        continue
+      # 같은 체크아웃에서 앱 층이 동시에 두 번 돌면 앞의 정리가 뒤 실행의 프로세스를 죽인다 — 하나만 허용.
+      # flock 이 없는 호스트(Git Bash 등)에서는 락 없이 간다 — CI 러너는 한 번에 하나만 돈다.
+      if command -v flock >/dev/null; then
+        exec 9>"$OUT/.app-layer.lock"
+        if ! flock -n 9; then
+          echo "[app] 다른 앱 층 실행이 진행 중이다 — 이번 실행은 건너뛴다" >&2
+          record app "$plat" fail 0 "another app-layer run holds $OUT/.app-layer.lock" ""
+          continue
+        fi
       fi
       stale=$(sweep_app_leftovers)
       [[ "$stale" == 0 ]] || echo "[app] 이전 실행이 남긴 프로세스 ${stale}개를 정리했다"
       run_step app build node e2e/app/build.mjs
       if grep -q '"step":"build","status":"fail"' "$STEPS"; then
-        record app linux skip 0 "app build failed — test-results/app-build.log" ""
+        record app "$plat" skip 0 "app build failed — test-results/app-build.log" ""
       else
-        run_step app linux npx playwright test -c playwright.app.config.ts ${PW_ARGS[@]+"${PW_ARGS[@]}"}
+        run_step app "$plat" npx playwright test -c playwright.app.config.ts ${PW_ARGS[@]+"${PW_ARGS[@]}"}
       fi
       # 정상이면 globalSetup 의 teardown 이 이미 다 끝냈다 — 여기서 찾으면 정리 실패다
       start=$SECONDS
