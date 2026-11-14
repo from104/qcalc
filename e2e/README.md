@@ -178,6 +178,9 @@ scripts/test-suite.sh --layer app        # = --platform <이 기계의 OS>. linu
 - **능력**: `keyboard`(WebDriver 키 동작 — WebKit 이 GTK 이벤트로 합성, Shift 오염 없음) · `clipboard`(진짜 X CLIPBOARD 를
   앱 **밖** 프로세스 `support/clipboard.py` 가 소유·읽기) · `reload` · `atspi`(호스트 ATK 2.46+ 일 때만). `netMock` 없음(요청 가로채기
   불가 → 환율·청크 차단 시나리오는 이유를 남기고 skip), `touch` 없음.
+- **막 뜬 앱에서 다른 주소로 갈 때**: 부팅 중인 문서는 끊긴 청크 import 를 보고 스스로 `location.reload()` 한다(router `reloadOnce`) —
+  그 새로고침이 WebDriver 의 이동을 덮어써 `?e2e=1` 없는 주소에 남는다. `browser.url()` 을 직접 부르지 말고 `WdioApp.navigate()`
+  (reloadOnce 의 sessionStorage 표시를 먼저 찍는다) 를 거치는 `seed()` · `openE2E()` 를 쓴다.
 - **앱 종료**: WebDriver 세션 종료는 앱을 죽인다(RunEvent::Exit 없음 → 창 크기 저장 안 됨). 저장을 시험할 때는 `app.quit('key')`(q 키)
   또는 `app.quit('command')`(quit_app) 로 정상 종료한다.
 - **실패 읽기**: summary.md → `test-results/app-html-report/`(실패 시험의 스크린샷 + 앱 로그 끝부분 첨부) → 환경 로그
@@ -193,7 +196,8 @@ scripts/test-suite.sh --layer app        # = --platform <이 기계의 OS>. linu
   동작을 막지 않아 WebKitGTK 의 기본 "복사"(선택 없음)가 앱의 `writeText` 를 덮는다(preventDefault 하면 정상). Shift+Control+c 는 정상.
   known-bug: native 「Control+c」 + keyboard 2개(`knownBugOn['tauri-linux']`).
 - **q 로 끝내면 다음 실행에 키패드가 shift 고정** — 'q' 가 앱 종료이면서 shift 기능 `sin` 단축키라 종료 직전 shift 고정이 켜져 저장된다.
-  known-bug: native 「'q' 로 끝내고 다시 켜도 키패드는 평상 상태다」.
+  native 「'q' 로 끝내고 다시 켜도 키패드는 평상 상태다」는 known-bug 가 아니라 **todo(건너뜀)** 다 — shift 고정이 5ms 뒤 스스로 풀려서
+  종료·저장이 그 전이냐 뒤냐에 따라 증상이 났다 안 났다 한다(경쟁 조건 → 기대된 실패로 고정할 수 없다). 앱을 고친 뒤 todo 를 지운다.
 - (앱 버그 아님) Wayland 세션의 `GTK_IM_MODULE=wayland` 가 X11 디스플레이로 새면 GTK 가 im-wayland.so 를 올려
   `gdk_wayland_display_get_wl_display` 단언 실패 후 웹뷰 생성 중 SIGSEGV. 시험 환경은 이 변수를 지운다. 예전 XWayland 강제(GDK_BACKEND=x11)
   크래시와 같은 함수 이름이라 그 원인 후보이기도 하다.

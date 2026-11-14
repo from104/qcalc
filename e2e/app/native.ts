@@ -188,10 +188,12 @@ export default defineGroup<TauriApp>('native', [
   },
   {
     title: "'q' 로 끝내고 다시 켜도 키패드는 평상 상태다 (shift 고정 아님)",
-    knownBug:
-      "'q' 가 앱 종료(App.vue)이면서 shift 기능 sin 의 단축키(CalcButtonSet.ts a3 ['q'])라서, 끝내기 직전에 " +
-      'triggerButtonClickByKey 가 shift 고정을 켜고 그 상태가 저장된다 — 다시 켜면 숫자 키가 Pi·phi·e… 로 눌린다',
-    symptom: /메인 결과: .*"12".*마지막 값 "1\.618/,
+    // 앱 버그: 'q' 가 앱 종료(App.vue)이면서 shift 기능 sin 의 단축키(CalcButtonSet.ts a3 ['q'])라서, 끝내기 직전에
+    // triggerButtonClickByKey 가 shift 고정을 켜고 그 상태가 저장된다 — 다시 켜면 숫자 키가 Pi·phi·e… 로 눌린다.
+    // known-bug 로 두지 않는 까닭: 증상이 경쟁 조건이다. shift 고정은 5ms 뒤 스스로 풀리고(useCalcButtonActions),
+    // 그 전에 종료·저장되느냐에 따라 버그가 났다 안 났다 한다 (2026-11-15 실측: 9회 중 1회 "bug fixed" 로 빨강).
+    // 앱에서 'q' 중복 바인딩을 고친 뒤 todo 를 지우면 그대로 회귀 시험이 된다.
+    todo: "'q' 종료 직전 shift 고정이 저장되는 앱 버그 — 증상이 경쟁 조건이라 known-bug 로 고정할 수 없다",
     run: async (app) => {
       await tapKeys(app, 'C5');
       await expectMain(app, '5');

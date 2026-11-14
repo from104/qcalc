@@ -158,8 +158,11 @@ export class TauriApp extends WdioApp {
 
   /** open the e2e URL on the current launch without touching storage */
   async openE2E(): Promise<void> {
-    await this.browser.url(this.url('/?e2e=1#/'));
+    // right after a launch the first document is still booting — navigate() keeps it from reloading over us
+    await this.navigate('/?e2e=1#/');
     await this.waitReady();
+    // the stamp travelled to the new document; drop it so the app's reload guard works as usual from here
+    await this.browser.execute(() => sessionStorage.removeItem('qcalc-chunk-reload-at'));
   }
 
   startAnnouncementListener(): Promise<AnnouncementListener> {

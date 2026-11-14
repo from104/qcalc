@@ -12,7 +12,7 @@ import path from 'node:path';
 import { remote } from 'webdriverio';
 
 import type { ProfileDirs } from './env-linux';
-import { descendants, terminate, waitExit } from './procs';
+import { descendants, isAlive, terminate, waitExit } from './procs';
 
 export interface SessionOptions {
   driverPort: number;
@@ -74,6 +74,8 @@ export class AppSession {
   /** end the session — WebKitWebDriver kills the app (not a graceful exit: nothing is saved on the way out) */
   async close(): Promise<void> {
     const pid = this.appPid();
+    // WebKit's network/web processes: they outlive the app for a moment and keep writing to the profile
+    const helpers = pid ? descendants(pid) : [];
     try {
       await this.current?.deleteSession();
     } catch {
@@ -81,6 +83,9 @@ export class AppSession {
     }
     this.current = null;
     if (pid && !(await waitExit(pid, 5000))) await terminate([pid]);
+    const deadline = Date.now() + 2000;
+    while (helpers.some(isAlive) && Date.now() < deadline) await new Promise((resolve) => setTimeout(resolve, 50));
+    await terminate(helpers);
   }
 
   /** the app quit by itself (q key, quit_app): wait for the process to end and drop the dead session */
@@ -105,7 +110,10 @@ export class AppSession {
       throw new Error(`refusing to wipe ${root}: not an e2e temp profile`);
     }
     for (const dir of [this.options.profile.config, this.options.profile.data, this.options.profile.cache]) {
-      for (const entry of readdirSync(dir)) rmSync(path.join(dir, entry), { recursive: true, force: true });
+      // WebKit's helper processes can outlive the app by a moment and still write storage files (ENOTEMPTY)
+      for (const entry of readdirSync(dir)) {
+        rmSync(path.join(dir, entry), { recursive: true, force: true, maxRetries: 10, retryDelay: 100 });
+      }
     }
   }
 }

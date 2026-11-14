@@ -15,6 +15,8 @@ import { findVisibleInPage, snapshotUiInPage, visibleTextsInPage } from './page-
 import { applySeed, buildSeed, type LangCode, type SeedState } from '../fixtures/seed';
 
 export const APP_PATH = '/?e2e=1#/';
+/** sessionStorage stamp of the app's self-reload guard (src/router/index.ts RELOAD_KEY) */
+const RELOAD_KEY = 'qcalc-chunk-reload-at';
 
 export interface ClipboardAccess {
   set(text: string): Promise<void>;
@@ -126,6 +128,21 @@ export class WdioApp implements CalcApp {
   }
 
   protected async waitReady(timeout = 15_000): Promise<void> {
+    try {
+      await this.waitReadyOnce(timeout);
+    } catch (error) {
+      // say where the app actually is — "not ready" alone does not tell a wrong URL from a slow boot
+      const where = await this.browser
+        .execute(
+          () =>
+            `${location.href} · readyState ${document.readyState} · html.${document.documentElement.className || '(no class)'}`,
+        )
+        .catch((e: unknown) => `(page not reachable: ${String(e).slice(0, 120)})`);
+      throw new Error(`${(error as Error).message} — ${where}`, { cause: error });
+    }
+  }
+
+  private async waitReadyOnce(timeout: number): Promise<void> {
     await this.browser.waitUntil(
       async () => {
         try {
@@ -149,9 +166,43 @@ export class WdioApp implements CalcApp {
     );
   }
 
+  /**
+   * Leave the current document for another URL — and make sure we got there. An app document that is still booting
+   * (right after a launch) fights a WebDriver navigation in two ways:
+   *  - it answers the aborted chunk imports with its own `location.reload()` (router/index.ts reloadOnce), which
+   *    overrides our navigation → the app sits on the plain URL without `?e2e=1`. reloadOnce does nothing while its
+   *    sessionStorage stamp is fresh, so stamp first;
+   *  - WebKitWebDriver may report the navigation done while the first document is still the one showing.
+   * So: stamp, navigate, check the address, try again.
+   */
+  protected async navigate(pathAndQuery: string): Promise<void> {
+    const want = pathAndQuery.split('#')[0];
+    for (let attempt = 1; ; attempt++) {
+      await this.browser
+        .execute((key: string) => sessionStorage.setItem(key, String(Date.now())), RELOAD_KEY)
+        .catch(() => undefined); // no storage on this document — then there is no app script either
+      await this.browser.url(this.url(pathAndQuery));
+      const at = await this.currentPath();
+      if (at === want) return;
+      if (attempt >= 5) throw new Error(`navigate(${pathAndQuery}): still on ${at} after ${attempt} tries`);
+      await sleep(100);
+    }
+  }
+
+  /** pathname + query of the document that is showing right now (null while navigating) */
+  private currentPath(): Promise<string | null> {
+    return this.browser.execute(() => location.pathname + location.search).catch(() => null);
+  }
+
   async seed(state?: SeedState): Promise<void> {
-    await this.browser.url(this.url(this.options.blankPath));
-    await this.browser.execute(applySeed, buildSeed(state));
+    const entries = buildSeed(state);
+    for (let attempt = 1; ; attempt++) {
+      await this.navigate(this.options.blankPath);
+      // applySeed clears sessionStorage (the stamp too) — that is only safe on the blank page, which runs no app script
+      await this.browser.execute(applySeed, entries);
+      if ((await this.currentPath()) === this.options.blankPath) break;
+      if (attempt >= 3) throw new Error('seed: the app kept navigating away from the blank page');
+    }
     await this.browser.url(this.url(APP_PATH));
     await this.waitReady();
   }
@@ -168,7 +219,7 @@ export class WdioApp implements CalcApp {
 
   async settleSelfReload(): Promise<void> {
     // see PlaywrightApp.settleSelfReload — router/index.ts writes this key right before location.reload()
-    const key = 'qcalc-chunk-reload-at';
+    const key = RELOAD_KEY;
     const fired = await this.browser
       .waitUntil(
         async () => {
