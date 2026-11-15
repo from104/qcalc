@@ -67,9 +67,13 @@ export class AppSession {
     this.cachedPid = null;
     if (isWindows) {
       const pid = this.appPid();
-      if (pid) recordPids(path.resolve('test-results'), [pid, ...descendants(pid)]);
+      this.webviewHelpers = pid ? descendants(pid) : [];
+      if (pid) recordPids(path.resolve('test-results'), [pid, ...this.webviewHelpers]);
     }
   }
+
+  /** Windows: the WebView2 browser processes under the app at launch (they hold localStorage until they shut down) */
+  private webviewHelpers: number[] = [];
 
   /** PID of the app process (child of WebKitWebDriver, under our tauri-driver), or null */
   appPid(): number | null {
@@ -117,6 +121,19 @@ export class AppSession {
   async awaitExit(timeoutMs = 10_000): Promise<boolean> {
     const pid = this.appPid();
     const exited = pid === null || (await waitExit(pid, timeoutMs));
+    if (exited && isWindows) {
+      // WebView2 writes localStorage to disk on its own shutdown, after the app process is gone; ending the
+      // session first can take those processes down before they flush (second Windows CI run: the next launch
+      // came back as a first run). Let them finish by themselves.
+      const started = Date.now();
+      while (this.webviewHelpers.some(isAlive) && Date.now() - started < 15_000) {
+        await new Promise((resolve) => setTimeout(resolve, 100));
+      }
+      const left = this.webviewHelpers.filter(isAlive);
+      process.stderr.write(
+        `[e2e] WebView2 after app exit: ${left.length ? `${left.length} still running` : 'all exited'} after ${Date.now() - started}ms\n`,
+      );
+    }
     if (exited) await this.close();
     return exited;
   }
