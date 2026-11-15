@@ -20,7 +20,7 @@ High-precision calculations, unit/currency/radix conversion, and formula evaluat
 
 - **How to Access**: Ctrl+1 or select the top tab
 - **Basic Operations**: Enter numbers 0-9, +, -, \*, / keys
-- **Advanced Functions**: Trigonometric functions (q, w, e), square (u), square root (i), constants (z: π, x: φ, c: e)
+- **Advanced Functions**: Trigonometric functions (S-q, S-w, S-e), square (u), square root (i), constants (z: π, x: φ, c: e)
 - **Memory Functions**: Ctrl+Enter (MS), Ctrl+Backspace (MR), Ctrl+Delete (MC)
 - **Percentage Calculation**: 'number, /, number, %(k)' calculates percentage
 - **Apply Percentage**: 'number, \*, number, %(k)' applies percentage
@@ -40,7 +40,7 @@ High-precision calculations, unit/currency/radix conversion, and formula evaluat
 - **340 Currencies**: Fiat, cryptocurrencies, and precious metals — no API key needed
 - **Latest Exchange Rates**: Real-time rates (built-in snapshot used when offline)
 - **Favorites**: Set frequently used currencies as favorites for quick access
-- **Quick Calculation**: +5/+10/+100 (f/g/h), -5/-10/-100 (q/w/e)
+- **Quick Calculation**: +5/+10/+100 (f/g/h), -5/-10/-100 (S-q/S-w/S-e)
 - **Swap Currencies**: Use '\' key to swap original/converted currencies
 - **Currency Symbol**: Toggle currency symbol display/hide with Alt+\ key
 
@@ -109,7 +109,7 @@ High-precision calculations, unit/currency/radix conversion, and formula evaluat
 #### Math Functions
 
 - **N-th Power/N-th Root**: Calculate with r/t keys
-- **Trigonometric Functions**: q/w/e keys in shift mode
+- **Trigonometric Functions**: S-q/S-w/S-e keys in shift mode
 - **Extract Integer/Decimal**: Calculate with v/b keys
 - **Factorial**: Calculate with h key
 
@@ -123,7 +123,7 @@ High-precision calculations, unit/currency/radix conversion, and formula evaluat
 #### Using Bit Operations
 
 - **Bit Operations**: AND (j), OR (k), XOR (l), NOT (h), shift operations (r/t/u/i)
-- **Logic Extension**: Use NAND/NOR/XNOR operations with q/w/e keys
+- **Logic Extension**: Use NAND/NOR/XNOR operations with S-q/S-w/S-e keys
 - **Shift Operations**: Move bit positions by 1 bit/4 bits
 - **Set Bit Size**: Bit operations according to the set size
 
