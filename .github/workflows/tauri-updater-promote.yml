@@ -5,13 +5,13 @@ name: tauri-updater-promote
 # 버전 릴리스(v*)의 draft/publish 상태나 GitHub의 `releases/latest` 승격과
 # updater 조회 URL 이 충돌하는 문제를 피한다.
 #
-# 사전 조건: release 워크플로가 만든 draft 버전 릴리스를 검증한 뒤 Publish 해야 한다.
-#   latest.json 내부의 다운로드 URL 이 해당 버전 릴리스 에셋을 가리키므로,
-#   버전 릴리스를 먼저 Publish 하지 않으면 업데이트 다운로드가 404 가 된다.
-#
-# 실행: Actions 탭 > tauri-updater-promote > Run workflow > tag 입력 (예: v0.13.0)
+# 실행: 버전 릴리스(v*)를 Publish 하면 자동으로 돈다(0.13.7 때 수동 실행을 빠뜨려 자동 업데이트가
+#   멈췄다). latest.json 의 다운로드 URL 이 버전 릴리스 에셋을 가리키므로 Publish 뒤에만 돌아야
+#   한다 — draft 는 published 이벤트를 내지 않는다. 다시 돌릴 때는 Actions 탭 > Run workflow > tag.
 
 on:
+  release:
+    types: [published]
   workflow_dispatch:
     inputs:
       tag:
@@ -23,13 +23,20 @@ permissions:
 
 jobs:
   promote:
+    # 롤링 'tauri-updater' 릴리스 자신이나 v* 가 아닌 릴리스는 건너뛴다
+    if: github.event_name == 'workflow_dispatch' || startsWith(github.event.release.tag_name, 'v')
     runs-on: ubuntu-latest
     env:
       GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       GH_REPO: ${{ github.repository }}
+      TAG: ${{ inputs.tag || github.event.release.tag_name }}
     steps:
       - name: Download latest.json from version release
-        run: gh release download "${{ inputs.tag }}" --pattern latest.json --clobber
+        run: |
+          gh release download "$TAG" --pattern latest.json --clobber
+          # 매니페스트 버전이 태그와 다르면 올리지 않는다
+          got=$(jq -r .version latest.json)
+          [ "$got" = "${TAG#v}" ] || { echo "::error::latest.json version $got != $TAG"; exit 1; }
 
       - name: Ensure rolling 'tauri-updater' release exists
         run: |
@@ -41,3 +48,8 @@ jobs:
 
       - name: Upload latest.json to rolling release
         run: gh release upload tauri-updater latest.json --clobber
+
+      - name: Verify the rolling manifest
+        run: |
+          gh release download tauri-updater --pattern latest.json --output promoted.json --clobber
+          [ "$(jq -r .version promoted.json)" = "${TAG#v}" ]

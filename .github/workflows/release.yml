@@ -110,6 +110,19 @@ jobs:
           chmod 755 ~/.cache/tauri/AppRun-x86_64
           ls -l ~/.cache/tauri/AppRun-x86_64
 
+      # 릴리스 본문 = 영어 CHANGELOG.md 의 해당 버전 섹션 그대로(지난 릴리스 전부 이 형식).
+      # 태그 push 인데 섹션이 없으면 실패시킨다 — 빈 본문으로 공개되는 것을 막는다.
+      - name: Release notes from CHANGELOG
+        id: notes
+        shell: bash
+        run: |
+          version="${GITHUB_REF_NAME#v}"
+          body=$(awk -v h="## [${version}]" 'index($0,h)==1{f=1;next} /^## \[/{if(f)exit} f' CHANGELOG.md | sed '/./,$!d')
+          if [[ "$GITHUB_REF" == refs/tags/v* && -z "$body" ]]; then
+            echo "::error::CHANGELOG.md has no '## [${version}]' section"; exit 1
+          fi
+          { echo 'body<<QCALC_NOTES_EOF'; echo "$body"; echo 'QCALC_NOTES_EOF'; } >> "$GITHUB_OUTPUT"
+
       - name: Build Tauri bundle
         id: tauri
         uses: tauri-apps/tauri-action@v0
@@ -124,7 +137,7 @@ jobs:
           # 태그 push일 때만 릴리스 생성 — 그 외(workflow_dispatch·브랜치 push)는 빌드만 하는 테스트 모드.
           tagName: ${{ startsWith(github.ref, 'refs/tags/v') && github.ref_name || '' }}
           releaseName: 'QCalc ${{ github.ref_name }}'
-          releaseBody: 'Tauri 2 데스크톱 빌드. 전체 변경 이력은 CHANGELOG를 참조하세요.'
+          releaseBody: ${{ steps.notes.outputs.body }}
           releaseDraft: true
           prerelease: false
           # deb/rpm/AppImage(Linux)·NSIS(Windows) 번들 타깃은 matrix.platform.args 로 지정.
