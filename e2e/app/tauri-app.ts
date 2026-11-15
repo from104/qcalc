@@ -132,12 +132,12 @@ export class TauriApp extends WdioApp {
 
   /**
    * Quit gracefully (RunEvent::Exit runs → window size saved, WebKit flushes storage) and wait for the process to end.
-   * - 'key': the user's way — App.vue binds Control+q → quit_app
+   * - 'key': the user's way — App.vue binds 'q' → quit_app
    * - 'command': invoke quit_app directly
    */
   async quit(via: 'key' | 'command'): Promise<void> {
     try {
-      if (via === 'key') await this.key('Control+q');
+      if (via === 'key') await this.key('q');
       else await this.invoke('quit_app');
     } catch (error) {
       // the session dies with the app, sometimes before the call returns

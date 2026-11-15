@@ -83,8 +83,8 @@
     [['Alt+,'], () => settingsStore.toggleGroupingUnit()],
     [['['], settingsStore.decrementDecimalPlaces],
     [[']'], settingsStore.incrementDecimalPlaces],
-    // 'q' alone is the shift function sin (CalcButtonSet a3) — quitting on it raced the shift lock into storage
-    [['Control+q'], quitApp],
+    // shift functions (sin·÷2·NAND…) are Shift+letter, so bare 'q' only quits
+    [['q'], quitApp],
   ]);
 
   // ── 라이프사이클 ──
