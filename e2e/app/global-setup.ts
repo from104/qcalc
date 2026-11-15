@@ -7,12 +7,13 @@ import { existsSync, readFileSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 
 import { missingTools as missingLinux, startLinuxEnv } from './env-linux';
+import { keepAppLogs, probeApp, sampleWhile } from './diag-windows';
 import { missingTools as missingWindows, startWindowsEnv } from './env-windows';
 import { DEFAULT_BINARY, isWindows, type AppEnv } from './platform';
 import { AppSession } from './session';
 
 /** last lines of a log in test-results/, for the error message */
-function tail(file: string, lines = 15): string {
+function tail(file: string, lines = 25): string {
   try {
     const text = readFileSync(file, 'utf8').trimEnd();
     return text ? text.split(/\r?\n/).slice(-lines).join('\n') : '(empty)';
@@ -34,13 +35,29 @@ async function smokeSession(env: AppEnv, binary: string, out: string): Promise<v
     profile: env.profile,
   });
   const started = Date.now();
+  const diagLog = path.join(out, 'app-diag.log');
+  const launching = session.launch();
+  // Windows: watch the processes and DevToolsActivePort files while msedgedriver waits for the WebView2 (diag-windows.ts)
+  const sampling = isWindows ? sampleWhile(launching, diagLog) : Promise.resolve();
   try {
-    await session.launch();
+    await launching;
+    await sampling;
   } catch (error) {
+    await sampling.catch(() => undefined);
     const logs = isWindows
-      ? ['app-driver.log', 'app-driver-stderr.log', 'app-msedgedriver.log']
+      ? ['app-driver.log', 'app-driver-stderr.log', 'app-msedgedriver.log', 'app-diag.log']
       : ['app-driver.log', 'app-driver-stderr.log'];
     await session.close().catch(() => undefined);
+    if (isWindows) {
+      await probeApp(binary, env.env, out, diagLog).catch((e: unknown) =>
+        console.warn(`[app] probe failed: ${String(e)}`),
+      );
+      try {
+        keepAppLogs(out);
+      } catch (e) {
+        console.warn(`[app] could not copy the app logs: ${String(e)}`);
+      }
+    }
     await env.stop().catch(() => undefined);
     throw new Error(
       `[app] smoke check: could not open a WebDriver session (launch the app) in ${Math.round((Date.now() - started) / 1000)}s — ` +

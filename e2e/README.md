@@ -219,6 +219,8 @@ scripts/test-suite.sh --layer app        # = --platform <이 기계의 OS>. wind
 - **읽기**: Actions 실행 화면의 Job summary(summary.md) → 아티팩트 `app-e2e-windows`(성공해도 올린다): `app-html-report/`(실패 스크린샷·앱 로그),
   `app-driver.log`·`app-driver-stderr.log`(tauri-driver·msedgedriver·앱 stderr), `app-msedgedriver.log`(msedgedriver `--verbose` —
   tauri-driver 는 msedgedriver 의 stdout 을 버리고 로그 옵션도 안 주므로 `test-results/msedgedriver-logged.cmd` 로 감싸 넘긴다), `app-build-tauri.log`.
+  스모크 확인이 실패하면 `app-diag.log`(세션을 기다리는 동안의 프로세스·명령줄·DevToolsActivePort 파일, 그리고 msedgedriver 없이
+  `--remote-debugging-port` 만 주고 앱을 띄운 시험 결과)·`app-probe.log`·`app-diag/`(앱 자체 로그)도 남긴다.
 
 ## 발견 사항 (Phase 2, 앱 층)
 
