@@ -108,3 +108,12 @@ export function visibleTextsInPage(selector: string): string[] {
     })
     .map((el) => (el.textContent ?? '').replace(/\s+/g, ' ').trim());
 }
+
+/**
+ * Vue/Quasar transitions still running in the app tree (#q-app — portals such as tooltips and toasts live outside it).
+ * While a tab panel or a page slides, the leaving one is still in the DOM and visible, with the same button ids
+ * (`btn-c1` exists in every calculator panel) — a click aimed at "the first visible #btn-c1" can land on it.
+ */
+export function transitionsInPage(): number {
+  return document.querySelectorAll('#q-app [class*="-enter-active"], #q-app [class*="-leave-active"]').length;
+}

@@ -11,7 +11,7 @@
  * The session can be replaced (app relaunch), so the browser and origin are read through getters.
  */
 import type { ButtonId, CalcApp, Capability, ScreenName, SelectField, TabName, UiSnapshot } from './CalcApp';
-import { findVisibleInPage, snapshotUiInPage, visibleTextsInPage } from './page-functions';
+import { findVisibleInPage, snapshotUiInPage, transitionsInPage, visibleTextsInPage } from './page-functions';
 import { applySeed, buildSeed, type LangCode, type SeedState } from '../fixtures/seed';
 
 export const APP_PATH = '/?e2e=1#/';
@@ -124,6 +124,18 @@ export class WdioApp implements CalcApp {
       timeout,
       interval: 50,
       timeoutMsg: `${selector} still visible after ${timeout}ms`,
+    });
+  }
+
+  /**
+   * Wait until no tab-panel or page transition is running. Until then the leaving panel is still visible and owns
+   * the same button ids, so the first presses after app.tab() went to it (CI: "C255" on the radix tab → "55").
+   */
+  protected async settled(timeout = 5000): Promise<void> {
+    await this.browser.waitUntil(async () => (await this.browser.execute(transitionsInPage)) === 0, {
+      timeout,
+      interval: 50,
+      timeoutMsg: `a tab/page transition was still running after ${timeout}ms`,
     });
   }
 
@@ -290,6 +302,7 @@ export class WdioApp implements CalcApp {
     }
     // tab panels are lazy-loaded the first time
     await this.visible(`#panel-${name} [data-testid="result-main"]`, { timeout: 10_000 });
+    await this.settled();
   }
 
   async setLang(code: LangCode): Promise<void> {
@@ -345,6 +358,8 @@ export class WdioApp implements CalcApp {
     }, hash);
     if (screen === 'calc') await this.visible('[data-testid="result-main"]');
     else await this.visible('.sub-page');
+    // the page slides in: until it stops, its items sit outside the viewport ("move target out of bounds")
+    await this.settled();
   }
 
   documentLang(): Promise<string> {
@@ -367,6 +382,7 @@ export class WdioApp implements CalcApp {
     await this.openRecordMenu(index);
     await this.click('[data-testid="record-load-main"]');
     await this.visible('[data-testid="result-main"]');
+    await this.settled();
   }
 
   async deleteRecord(index: number): Promise<void> {
