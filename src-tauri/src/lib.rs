@@ -158,7 +158,7 @@ fn announce_a11y(window: tauri::WebviewWindow, text: String) {
   }
 }
 
-/// 클립보드의 텍스트를 GTK에서 직접 읽는다 (Linux 전용, #109).
+/// 클립보드의 텍스트를 플랫폼 API로 직접 읽는다 (Linux: GTK #109, Windows: Win32).
 ///
 /// WebKitGTK 안의 `navigator.clipboard.readText()`는 Tauri에서 거부되어 붙여넣기가 늘
 /// "클립보드가 비어 있음"으로 끝났다. GTK 클립보드는 Wayland·X11 어느 쪽에서도 창이 포커스를

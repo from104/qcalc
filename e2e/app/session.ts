@@ -6,15 +6,14 @@
  * of the worker uses the same profile, so "relaunch" really tests persistence. `wipeProfile()` gives a
  * first-install state.
  */
-import { spawnSync } from 'node:child_process';
-import { cpSync, existsSync, readFileSync, readlinkSync, readdirSync, rmSync, statSync } from 'node:fs';
+import { readlinkSync, readdirSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 
 import { remote } from 'webdriverio';
 
-import { recordPids, webviewDataDir, wipeAppData } from './env-windows';
-import { IDENTIFIER, isWindows, type ProfileDirs } from './platform';
+import { recordPids, wipeAppData } from './env-windows';
+import { isWindows, type ProfileDirs } from './platform';
 import { descendants, isAlive, terminate, waitExit } from './procs';
 import { treeOf } from './procs-win';
 
@@ -51,12 +50,7 @@ export class AppSession {
       // a shorter client timeout only ever shows "Request timed out" and hides that error (first Windows CI run)
       connectionRetryTimeout: isWindows ? 120_000 : 30_000,
       capabilities: {
-        'tauri:options': {
-          application: this.options.binary,
-          // Windows: tauri-driver passes these to msedgedriver (ms:edgeOptions.args); a user-data-dir keeps the same
-          // WebView2 profile across relaunches instead of a new temp one per session
-          ...(isWindows ? { args: [`--user-data-dir=${webviewDataDir()}`] } : {}),
-        },
+        'tauri:options': { application: this.options.binary },
         // classic WebDriver only — WebKitWebDriver's BiDi support is partial (msedgedriver: not needed either)
         'wdio:enforceWebDriverClassic': true,
       } as WebdriverIO.Capabilities,
@@ -68,14 +62,9 @@ export class AppSession {
     this.cachedPid = null;
     if (isWindows) {
       const pid = this.appPid();
-      this.webviewHelpers = pid ? descendants(pid) : [];
-      if (pid) recordPids(path.resolve('test-results'), [pid, ...this.webviewHelpers]);
-      logWebviewProfile(this.webviewHelpers);
+      if (pid) recordPids(path.resolve('test-results'), [pid, ...descendants(pid)]);
     }
   }
-
-  /** Windows: the WebView2 browser processes under the app at launch (they hold localStorage until they shut down) */
-  private webviewHelpers: number[] = [];
 
   /** PID of the app process (child of WebKitWebDriver, under our tauri-driver), or null */
   appPid(): number | null {
@@ -123,44 +112,14 @@ export class AppSession {
   async awaitExit(timeoutMs = 10_000): Promise<boolean> {
     const pid = this.appPid();
     const exited = pid === null || (await waitExit(pid, timeoutMs));
-    if (exited && isWindows) {
-      // WebView2 writes localStorage to disk on its own shutdown, after the app process is gone; ending the
-      // session first can take those processes down before they flush (second Windows CI run: the next launch
-      // came back as a first run). Let them finish by themselves.
-      const started = Date.now();
-      while (this.webviewHelpers.some(isAlive) && Date.now() - started < 15_000) {
-        await new Promise((resolve) => setTimeout(resolve, 100));
-      }
-      const left = this.webviewHelpers.filter(isAlive);
-      process.stderr.write(
-        `[e2e] WebView2 after app exit: ${left.length ? `${left.length} still running` : 'all exited'} after ${Date.now() - started}ms\n`,
-      );
-    }
-    if (!exited) return false;
-    // Windows: msedgedriver's Quit takes the WebView2 profile with it, so a relaunch came back as a first run
-    // (the profile folder was gone after the session). Keep a copy across the session end.
-    const saved = isWindows ? saveWebviewData() : null;
-    if (isWindows) {
-      windowsStorageDiag('after app exit (session still open)', this.options.profile);
-      findLocalStorage([tmpdir(), path.dirname(path.resolve(this.options.binary))]);
-    }
-    await this.close();
-    if (isWindows) windowsStorageDiag('after session end', this.options.profile);
-    if (saved) restoreWebviewData(saved);
-    return true;
+    if (exited) await this.close();
+    return exited;
   }
 
   async relaunch({ fresh = false } = {}): Promise<void> {
     await this.close();
     if (fresh) this.wipeProfile();
-    else if (isWindows) windowsStorageDiag('after quit', this.options.profile);
     await this.launch();
-    if (!fresh && isWindows) {
-      const seen = await this.current!.execute(
-        () => `${location.origin} · ${localStorage.length} keys: ${Object.keys(localStorage).join(',').slice(0, 200)}`,
-      );
-      process.stderr.write(`[e2e] storage after relaunch: ${seen}\n`);
-    }
   }
 
   /** first-install state: empty config, data (WebKit storage) and cache. Only while the app is not running. */
@@ -178,112 +137,4 @@ export class AppSession {
       }
     }
   }
-}
-
-/**
- * Windows relaunch diagnostics (the relaunched app came back as a first run): where WebView2 keeps Local Storage
- * under the app's data folder, how big and how fresh the files are, and whether the e2e seed ("showTips") is in them.
- */
-function windowsStorageDiag(label: string, profile: ProfileDirs): void {
-  const root = path.join(profile.data, IDENTIFIER);
-  const lines: string[] = [];
-  const walk = (dir: string, depth: number): void => {
-    let entries;
-    try {
-      entries = readdirSync(dir, { withFileTypes: true });
-    } catch {
-      return;
-    }
-    for (const entry of entries) {
-      const full = path.join(dir, entry.name);
-      const rel = path.relative(root, full);
-      if (entry.isDirectory()) {
-        if (depth < 3) lines.push(`${rel}\\`);
-        if (depth < 8) walk(full, depth + 1);
-      } else if (/Local Storage/i.test(rel)) {
-        try {
-          const stat = statSync(full);
-          const seeded = readFileSync(full).includes('showTips') ? ' [has showTips]' : '';
-          lines.push(`${rel} ${stat.size}B ${stat.mtime.toISOString()}${seeded}`);
-        } catch (error) {
-          lines.push(`${rel} (unreadable: ${String(error).slice(0, 80)})`);
-        }
-      }
-    }
-  };
-  walk(root, 0);
-  process.stderr.write(`[e2e] storage ${label} (${root}):\n  ${lines.join('\n  ') || '(empty)'}\n`);
-}
-
-/** copy the app's WebView2 profile aside (null when there is none) */
-function saveWebviewData(): string | null {
-  const source = webviewDataDir();
-  if (!existsSync(source)) return null;
-  const copy = path.join(tmpdir(), `qcalc-e2e-webview-${process.pid}`);
-  rmSync(copy, { recursive: true, force: true });
-  // lock files of a profile that is still being closed are skipped, the data files are what matters
-  cpSync(source, copy, { recursive: true, force: true, filter: (from) => !/[\\/](lockfile|LOCK)$/i.test(from) });
-  return copy;
-}
-
-/** put a saved WebView2 profile back where the next launch will look for it */
-function restoreWebviewData(copy: string): void {
-  const target = webviewDataDir();
-  rmSync(target, { recursive: true, force: true, maxRetries: 20, retryDelay: 250 });
-  cpSync(copy, target, { recursive: true });
-  rmSync(copy, { recursive: true, force: true });
-}
-
-/** diagnostics: every "Local Storage" folder a few levels under these roots (where WebView2 really keeps its profile) */
-function findLocalStorage(roots: string[]): void {
-  const found: string[] = [];
-  const walk = (dir: string, depth: number): void => {
-    let entries;
-    try {
-      entries = readdirSync(dir, { withFileTypes: true });
-    } catch {
-      return;
-    }
-    for (const entry of entries) {
-      if (!entry.isDirectory()) continue;
-      const full = path.join(dir, entry.name);
-      if (entry.name === 'Local Storage') {
-        let seeded = false;
-        try {
-          const leveldb = path.join(full, 'leveldb');
-          seeded = readdirSync(leveldb).some((name) => readFileSync(path.join(leveldb, name)).includes('showTips'));
-        } catch {
-          // unreadable or still locked
-        }
-        found.push(`${full}${seeded ? ' [has showTips]' : ''}`);
-      } else if (depth < 5) walk(full, depth + 1);
-    }
-  };
-  for (const root of roots) walk(root, 0);
-  process.stderr.write(
-    `[e2e] Local Storage folders under ${roots.join(' | ')}:\n  ${found.join('\n  ') || '(none)'}\n`,
-  );
-}
-
-/** diagnostics: the profile folder the WebView2 browser processes really run with (their --user-data-dir) */
-function logWebviewProfile(pids: number[]): void {
-  if (!pids.length) return;
-  const filter = pids.map((pid) => `ProcessId=${pid}`).join(' OR ');
-  const r = spawnSync(
-    'powershell.exe',
-    [
-      '-NoProfile',
-      '-NonInteractive',
-      '-Command',
-      `Get-CimInstance Win32_Process -Filter "${filter}" | ForEach-Object { $_.CommandLine }`,
-    ],
-    { encoding: 'utf8', timeout: 20_000, windowsHide: true },
-  );
-  const out = `${r.stdout ?? ''}`;
-  const dirs = [...new Set(out.match(/--user-data-dir=("[^"]+"|\S+)/g) ?? [])];
-  const browser =
-    out.split(/\r?\n/).find((line) => line.includes('--user-data-dir') && !line.includes('--type=')) ?? '';
-  process.stderr.write(
-    `[e2e] WebView2 profile: ${dirs.join(' | ') || '(no --user-data-dir)'}\n[e2e] WebView2 browser command line: ${browser.slice(0, 700) || (r.stderr ?? '').slice(0, 300)}\n`,
-  );
 }

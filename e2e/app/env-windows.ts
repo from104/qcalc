@@ -46,16 +46,6 @@ export function windowsProfile(): ProfileDirs {
   return { root: config, home: homedir(), config, data, cache: data, runtime: tmpdir() };
 }
 
-/**
- * The WebView2 user data folder for every session: the app's own %LOCALAPPDATA%\<identifier>\EBWebView (Tauri's
- * default). Without it msedgedriver hands each new session a fresh temp folder, so a relaunch inside one scenario
- * lost localStorage and came back as a first run (first Windows CI run: Quick Tips dialog over the keypad).
- * wipeAppData() clears it with the rest of the identifier folder.
- */
-export function webviewDataDir(profile: ProfileDirs = windowsProfile()): string {
-  return path.join(profile.data, IDENTIFIER, 'EBWebView');
-}
-
 /** delete the app's own folders (nothing else in %APPDATA% / %LOCALAPPDATA%). Only while the app is not running. */
 export function wipeAppData(profile: ProfileDirs = windowsProfile()): void {
   assertDisposableMachine();
