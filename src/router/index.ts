@@ -86,8 +86,10 @@ export default defineRouter(function (/* { store, ssrContext } */) {
     try {
       const last = Number(sessionStorage.getItem(RELOAD_KEY) ?? 0);
       // 이 문서가 바로 그 새로고침으로 열린 문서면 다시 열지 않는다 — 새 index 로도 못 받았으니 또 열어도 소용없고,
-      // 수식 '=' 재시도처럼 사용자가 건 재시도가 실패 안내를 띄운 화면을 통째로 날린다(10초 규칙만으로는 10초 뒤 '=' 에 새로고침됐다)
-      if (last && performance.timeOrigin >= last) return false;
+      // 수식 '=' 재시도처럼 사용자가 건 재시도가 실패 안내를 띄운 화면을 통째로 날린다(10초 규칙만으로는 10초 뒤 '=' 에 새로고침됐다).
+      // 그 새로고침 직후(10초 안)에 열린 문서만 해당 — 나중에 손으로 다시 연 문서는 다음 배포 때 다시 자동 새로고침할 수 있다
+      const openedByThatReload = last > 0 && performance.timeOrigin >= last && performance.timeOrigin - last < 10_000;
+      if (openedByThatReload) return false;
       if (Date.now() - last < 10_000) return false;
       sessionStorage.setItem(RELOAD_KEY, String(Date.now()));
     } catch {
