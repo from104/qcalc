@@ -12,11 +12,12 @@ Tous les changements notables de ce projet sont enregistrés dans ce fichier.
 
 Le format est basé sur [Keep a Changelog] et ce projet suit le [Versionnage sémantique].
 
-## [0.13.7] 2026-11-15
+## [0.13.7] 2026-11-16
 
 ### Modifié
 
 - Les fonctions du mode Maj de la rangée q·w·e (sin/cos/tan, ÷2/÷3/÷5, -5/-10/-100, NAND/NOR/XNOR) utilisent désormais Maj+q/w/e ; q seul quitte l'application
+- Sous Windows, coller lit désormais directement le presse-papiers du système au lieu de passer par la vérification d'autorisation du presse-papiers de la WebView
 
 ### Corrigé
 

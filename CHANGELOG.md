@@ -4,11 +4,12 @@ All notable changes to this project are recorded in this file.
 
 The format is based on [Keep a Changelog] and this project follows [Semantic Versioning].
 
-## [0.13.7] 2026-11-15
+## [0.13.7] 2026-11-16
 
 ### Changed
 
 - The q, w, e row of shift-mode functions (sin/cos/tan, ÷2/÷3/÷5, -5/-10/-100, NAND/NOR/XNOR) now uses Shift+q/w/e; q alone quits
+- On Windows, paste now reads the system clipboard directly instead of going through the webview's clipboard permission check
 
 ### Fixed
 

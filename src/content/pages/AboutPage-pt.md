@@ -12,11 +12,12 @@ Todas as alterações notáveis deste projeto são registradas neste arquivo.
 
 O formato é baseado no [Keep a Changelog] e este projeto segue o [Versionamento Semântico].
 
-## [0.13.7] 2026-11-15
+## [0.13.7] 2026-11-16
 
 ### Alterado
 
 - As funções do modo Shift da linha q·w·e (sin/cos/tan, ÷2/÷3/÷5, -5/-10/-100, NAND/NOR/XNOR) agora usam Shift+q/w/e; q sozinho fecha o aplicativo
+- No Windows, colar agora lê diretamente a área de transferência do sistema, em vez de passar pela verificação de permissão da área de transferência do WebView
 
 ### Corrigido
 

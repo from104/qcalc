@@ -12,11 +12,12 @@ Alle wichtigen Änderungen an diesem Projekt werden in dieser Datei festgehalten
 
 Das Format basiert auf [Keep a Changelog] und dieses Projekt folgt der [Semantischen Versionierung].
 
-## [0.13.7] 2026-11-15
+## [0.13.7] 2026-11-16
 
 ### Geändert
 
 - Die Shift-Modus-Funktionen der Tastenreihe q·w·e (sin/cos/tan, ÷2/÷3/÷5, -5/-10/-100, NAND/NOR/XNOR) liegen jetzt auf Shift+q/w/e; q allein beendet die App
+- Unter Windows liest Einfügen die Systemzwischenablage jetzt direkt statt über die Zwischenablage-Berechtigungsprüfung der WebView
 
 ### Behoben
 
