@@ -9,21 +9,21 @@ description: QCalc 자동 테스트(code·web E2E·app 층)를 돌리고 결과�
 
 ## 명령
 
-| 하고 싶은 것               | 명령                                                                                                                            |
-| -------------------------- | ------------------------------------------------------------------------------------------------------------------------------- |
-| 전부(code + web)           | `yarn test:all`                                                                                                                 |
-| 한 층만                    | `scripts/test-suite.sh --layer code` / `--layer web` (`--layer` 여러 번 가능)                                                   |
-| 실제 앱 층 (Tauri Linux)   | `scripts/test-suite.sh --layer app` (이 기계의 OS — linux 만 로컬에서 돈다. `--platform windows` 는 Linux 에서 skip)            |
-| 실제 앱 층 (Tauri Windows) | **CI 에서만**: `gh workflow run e2e-app.yml` 또는 `feature/e2e-suite` 로 push → 잡 `windows`. 결과는 아티팩트 `app-e2e-windows` |
-| app 층 한 시험·직접        | `yarn test:e2e:app -g "클립보드"` (바이너리 먼저: `node e2e/app/build.mjs`)                                                     |
-| app 층 강제 재빌드         | `scripts/test-suite.sh --layer app --rebuild`                                                                                   |
-| app 층 프로필 남기기       | `E2E_KEEP_PROFILE=1 scripts/test-suite.sh --layer app` (`/tmp/qcalc-e2e-app-*` 를 지우지 않음)                                  |
-| 처음 한 번 브라우저 설치   | `scripts/test-suite.sh --setup` (chromium·webkit, sudo 없는 WebKit 우회 포함)                                                   |
-| 웹 빌드 강제 재빌드        | `--rebuild` (또는 `E2E_REBUILD=1`) — src 가 바뀌면 자동 재빌드됨                                                                |
-| 플레이키 확인              | `scripts/test-suite.sh --layer web -- --repeat-each=3` (`--` 뒤는 playwright 인자)                                              |
-| 한 프로젝트·한 시험        | `scripts/test-suite.sh --layer web -- --project=webkit-desktop -g "퍼센트"` 또는 `yarn test:e2e -g 퍼센트`                      |
-| trace 열기                 | `npx playwright show-trace test-results/e2e-artifacts/<시험>/trace.zip`                                                         |
-| i18n 기준선 갱신           | `UPDATE_I18N_BASELINE=1 yarn test src/__tests__/i18n-parity.test.ts`                                                            |
+| 하고 싶은 것               | 명령                                                                                                                                                     |
+| -------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 전부(code + web)           | `yarn test:all`                                                                                                                                          |
+| 한 층만                    | `scripts/test-suite.sh --layer code` / `--layer web` (`--layer` 여러 번 가능)                                                                            |
+| 실제 앱 층 (Tauri Linux)   | `scripts/test-suite.sh --layer app` (이 기계의 OS — linux 만 로컬에서 돈다. `--platform windows` 는 Linux 에서 skip)                                     |
+| 실제 앱 층 (Tauri Windows) | **CI 에서만**: nightly 또는 `gh workflow run e2e-app.yml --ref <브랜치>`(워크플로가 main 에 있어야 함) → 잡 `windows`. 결과는 아티팩트 `app-e2e-windows` |
+| app 층 한 시험·직접        | `yarn test:e2e:app -g "클립보드"` (바이너리 먼저: `node e2e/app/build.mjs`)                                                                              |
+| app 층 강제 재빌드         | `scripts/test-suite.sh --layer app --rebuild`                                                                                                            |
+| app 층 프로필 남기기       | `E2E_KEEP_PROFILE=1 scripts/test-suite.sh --layer app` (`/tmp/qcalc-e2e-app-*` 를 지우지 않음)                                                           |
+| 처음 한 번 브라우저 설치   | `scripts/test-suite.sh --setup` (chromium·webkit, sudo 없는 WebKit 우회 포함)                                                                            |
+| 웹 빌드 강제 재빌드        | `--rebuild` (또는 `E2E_REBUILD=1`) — src 가 바뀌면 자동 재빌드됨                                                                                         |
+| 플레이키 확인              | `scripts/test-suite.sh --layer web -- --repeat-each=3` (`--` 뒤는 playwright 인자)                                                                       |
+| 한 프로젝트·한 시험        | `scripts/test-suite.sh --layer web -- --project=webkit-desktop -g "퍼센트"` 또는 `yarn test:e2e -g 퍼센트`                                               |
+| trace 열기                 | `npx playwright show-trace test-results/e2e-artifacts/<시험>/trace.zip`                                                                                  |
+| i18n 기준선 갱신           | `UPDATE_I18N_BASELINE=1 yarn test src/__tests__/i18n-parity.test.ts`                                                                                     |
 
 층: `code` = lint · vue-tsc · vitest(i18n 패리티 포함) · cargo test / `web` = Playwright 3개 프로젝트
 (chromium-desktop · webkit-desktop · chromium-mobile) / `app` = 실제 Tauri 앱(프로젝트 tauri-linux: 공유 시나리오 + native 13개,

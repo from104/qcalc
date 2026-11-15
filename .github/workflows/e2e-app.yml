@@ -11,10 +11,6 @@ on:
     - cron: '30 18 * * *' # 매일 03:30 KST (기본 브랜치)
   workflow_dispatch:
   workflow_call:
-  # TEMP: validate before merge — remove before merging to develop
-  # (이 워크플로가 기본 브랜치에 아직 없어서 workflow_dispatch 로는 돌릴 수 없다)
-  push:
-    branches: [feature/e2e-suite]
 
 # 토큰은 읽기 전용 — 이 워크플로는 쓰기 권한이 필요 없다
 permissions:

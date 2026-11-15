@@ -198,8 +198,7 @@ scripts/test-suite.sh --layer app        # = --platform <이 기계의 OS>. wind
 ## app 층 — Windows (CI 전용)
 
 `.github/workflows/e2e-app.yml` 의 `windows` 잡(windows-latest) 이 `scripts/test-suite.sh --layer app --platform windows` 를 Git Bash 에서 돌린다.
-로컬(Linux)에서는 skip 되고 CI 안내만 나온다. 실행: `gh workflow run e2e-app.yml` (기본 브랜치에 워크플로가 올라간 뒤) — 그 전에는
-`feature/e2e-suite` 로 push 하면 도는 **임시 push 트리거**(`# TEMP: … remove before merging to develop`)를 쓴다.
+로컬(Linux)에서는 skip 되고 CI 안내만 나온다. 실행: 매일 밤 schedule(기본 브랜치 main), 또는 `gh workflow run e2e-app.yml --ref <브랜치>` — 둘 다 워크플로가 main 에 올라간 뒤에만 된다.
 
 - **구성**: tauri-driver `--native-driver msedgedriver.exe` → 앱(WebView2). msedgedriver 는 WebView2 런타임과 **같은 버전**이어야 해서
   워크플로가 [Tauri CI 가이드](https://v2.tauri.app/develop/tests/webdriver/ci/) 대로 `msedgedriver-tool` 로 받아 `QCALC_E2E_NATIVE_DRIVER` 에 경로를 넣는다
