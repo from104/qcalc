@@ -62,6 +62,10 @@ export default defineConfig<E2EOptions>({
       use: {
         ...devices['Desktop Safari'],
         viewport: DESKTOP_VIEWPORT,
+        // GPU 없는 러너(CI)에서 WPE WebKit 은 Skia GPU 래스터를 Mesa llvmpipe(소프트웨어 GL)로 돌려 초당 1프레임 남짓으로
+        // 그린다 → Playwright 의 rAF 기반 '안정' 확인이 클릭마다 ~1.6초 걸려 30초 시간 초과. CPU 래스터로 고정하면
+        // GPU 유무와 상관없이 같은 경로로 그린다(llvmpipe 재현: 사칙연산과 소수 30.6s → 6.3s)
+        launchOptions: { env: { ...process.env, WEBKIT_SKIA_ENABLE_CPU_RENDERING: '1' } },
         clipboardMode: 'stub',
         capabilities: ['keyboard', 'clipboard', 'netMock', 'reload'],
       },
