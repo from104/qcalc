@@ -20,6 +20,7 @@ import {
   linkSync,
   mkdirSync,
   openSync,
+  readFileSync,
   readdirSync,
   rmSync,
   statSync,
@@ -50,6 +51,8 @@ const INPUTS = [
   'src-tauri/Cargo.toml',
   'src-tauri/Cargo.lock',
   'src-tauri/tauri.conf.json',
+  'src-tauri/tauri.windows.conf.json',
+  'e2e/app/build.mjs', // the config override below is part of the binary
 ];
 
 function newerThan(target, time) {
@@ -71,6 +74,44 @@ function run(cmd, args, log) {
     console.error(`[app] ${cmd} ${args.join(' ')} failed (exit ${r.status}) — see test-results/app-build-tauri.log`);
     process.exit(1);
   }
+}
+
+/**
+ * The e2e binary's config override (compiled in; release builds never see it).
+ *
+ * Windows: msedgedriver starts the app with WEBVIEW2_USER_DATA_FOLDER = its temp dir and
+ * WEBVIEW2_ADDITIONAL_BROWSER_ARGUMENTS = "… --remote-debugging-port=0 …", then waits for <UDF>\EBWebView\DevToolsActivePort.
+ * The folder override works, the arguments one does not: wry always passes AdditionalBrowserArguments in the
+ * environment options (its defaults when the app sets none), and WebView2 then ignores the environment variable.
+ * CI run 3 (test-results/app-diag.log): the WebView2 browser process ran in msedgedriver's scoped_dir with exactly
+ * wry's "--autoplay-policy=no-user-gesture-required --disable-features=msWebOOUI,msPdfOOUI,msSmartScreenProtection"
+ * and no --remote-debugging-port; qcalc.exe alone with the variable set opened no port either. So the e2e build
+ * carries the switches itself: wry's defaults (an explicit value replaces them) + msedgedriver's automation switches.
+ * Port 0 → Chromium picks one and writes DevToolsActivePort into the UDF, where msedgedriver looks.
+ * JSON merge patch replaces arrays whole, so the window list is tauri.windows.conf.json's, with the switches added.
+ */
+function configOverride() {
+  const override = { build: { beforeBuildCommand: '' } };
+  if (process.platform !== 'win32') return override;
+  const winConf = JSON.parse(readFileSync(path.join(root, 'src-tauri/tauri.windows.conf.json'), 'utf8'));
+  const additionalBrowserArgs = [
+    // wry's defaults (wry src/webview2/mod.rs create_environment) — Tauri turns autoplay on
+    '--disable-features=msWebOOUI,msPdfOOUI,msSmartScreenProtection',
+    '--autoplay-policy=no-user-gesture-required',
+    // what msedgedriver would have added (its WEBVIEW2_ADDITIONAL_BROWSER_ARGUMENTS, CI run 2 app-msedgedriver.log)
+    '--remote-debugging-port=0',
+    '--enable-automation',
+    '--allow-pre-commit-input',
+    '--disable-background-timer-throttling',
+    '--disable-backgrounding-occluded-windows',
+    '--disable-hang-monitor',
+    '--disable-popup-blocking',
+    '--disable-prompt-on-repost',
+    '--no-first-run',
+    '--test-type=webdriver',
+  ].join(' ');
+  override.app = { windows: winConf.app.windows.map((w) => ({ ...w, additionalBrowserArgs })) };
+  return override;
 }
 
 // 1. frontend (prints its own reuse/build line)
@@ -100,7 +141,7 @@ console.log(
 const started = Date.now();
 // the config override goes in as a file: JSON on a Windows command line loses its quotes in cmd.exe
 const overrideFile = path.join(root, 'test-results/app-tauri-config.json');
-writeFileSync(overrideFile, JSON.stringify({ build: { beforeBuildCommand: '' } }));
+writeFileSync(overrideFile, JSON.stringify(configOverride()));
 // (with a shell, node joins the args with plain spaces — quote the path for cmd.exe)
 const configArg = process.platform === 'win32' ? `"${overrideFile}"` : overrideFile;
 run('yarn', ['tauri', 'build', '--debug', '--no-bundle', '--config', configArg], log);
