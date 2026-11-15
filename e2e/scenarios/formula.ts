@@ -192,10 +192,6 @@ export default defineGroup('formula', [
     title: '수식 엔진 로드 실패 토스트에 영어 내부 메시지가 새지 않는다',
     needs: ['netMock', 'reload'],
     blockFromStart: '/assets/math-',
-    knownBug:
-      '토스트가 "수식을 평가할 수 없습니다: formula engine not loaded" 로 내부 영어 예외 메시지를 그대로 붙인다' +
-      ' (errors.evaluation 의 {detail} — classifyFormulaError 가 예외 message 를 넘김)',
-    symptom: /내부 영어 메시지가 노출됨/,
     run: async (app) => {
       await app.settleSelfReload();
       await app.tab('formula');

@@ -50,4 +50,5 @@ formula:
   syntax: 'Die Syntax des Ausdrucks ist ungültig. Bitte überprüfen Sie den Ausdruck.'
   not_finite: 'Das Ergebnis ist unendlich oder undefiniert (z.B. Division durch null).'
   evaluation: 'Der Ausdruck kann nicht ausgewertet werden: {detail}'
+  engine_not_loaded: 'Der Ausdruck kann nicht ausgewertet werden. Die Formel-Engine konnte nicht geladen werden – bitte erneut versuchen.'
 unknown: 'Ein unbekannter Fehler ist aufgetreten: {error}'
