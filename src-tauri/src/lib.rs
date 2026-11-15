@@ -121,20 +121,97 @@ fn get_package_env() -> PackageEnv {
 
 #[tauri::command]
 fn quit_app(app: tauri::AppHandle) {
-  // Windows: app.exit()는 WebView2 컨트롤러를 연 채로 프로세스를 끝낸다. WebView2는 localStorage를
-  // 몇 초 늦게 디스크에 쓰므로, q로 끄면 직전 기록·설정이 사라졌다(Windows 실앱 E2E: 다시 켜면 첫 실행).
-  // 창을 먼저 닫아 제목 표시줄 ×와 같은 정상 종료 경로를 탄다 — 마지막 창이 닫히면 Tauri가 앱을 끝낸다.
-  #[cfg(windows)]
-  {
-    let windows = app.webview_windows();
-    if !windows.is_empty() {
-      for window in windows.values() {
-        let _ = window.close();
-      }
-      return;
-    }
-  }
   app.exit(0);
+}
+
+/// Windows: 종료 직전 WebView2가 localStorage를 디스크에 쓰도록 기다린다.
+///
+/// WebView2는 localStorage 변경을 몇 초 늦게 디스크에 쓰고, 남은 것은 브라우저 프로세스가 정상
+/// 종료할 때 쓴다. 앱 프로세스가 먼저 끝나면 브라우저 프로세스도 그 자리에서 끝나서, q·×로 끈
+/// 직후 다시 켜면 직전 계산 기록·설정이 없었다(Windows 실앱 E2E — 창을 먼저 닫아도 같았다).
+/// 그래서 첫 종료 요청을 막고 → 창을 닫고 → 브라우저 프로세스(우리 자식 msedgewebview2.exe)가
+/// 끝나길 최대 3초 기다린 뒤 끝낸다. 재시작(업데이터)은 건드리지 않는다.
+#[cfg(windows)]
+mod windows_exit {
+  use std::sync::atomic::{AtomicU8, Ordering};
+  use std::time::{Duration, Instant};
+
+  use tauri::Manager;
+  use windows::Win32::Foundation::{CloseHandle, WAIT_OBJECT_0};
+  use windows::Win32::System::Diagnostics::ToolHelp::{
+    CreateToolhelp32Snapshot, Process32FirstW, Process32NextW, PROCESSENTRY32W, TH32CS_SNAPPROCESS,
+  };
+  use windows::Win32::System::Threading::{GetCurrentProcessId, OpenProcess, WaitForSingleObject, PROCESS_SYNCHRONIZE};
+
+  const IDLE: u8 = 0;
+  const WAITING: u8 = 1;
+  const DONE: u8 = 2;
+  static STATE: AtomicU8 = AtomicU8::new(IDLE);
+
+  /// `RunEvent::ExitRequested`에서 부른다. true면 이번 종료 요청을 막아야 한다.
+  pub fn intercept(app: &tauri::AppHandle, code: Option<i32>) -> bool {
+    if code == Some(tauri::RESTART_EXIT_CODE) {
+      return false;
+    }
+    match STATE.compare_exchange(IDLE, WAITING, Ordering::SeqCst, Ordering::SeqCst) {
+      Ok(_) => {}
+      Err(DONE) => return false,
+      // 이미 기다리는 중 — 창이 닫히며 다시 온 종료 요청
+      Err(_) => return true,
+    }
+    for window in app.webview_windows().values() {
+      let _ = window.close();
+    }
+    let app = app.clone();
+    std::thread::spawn(move || {
+      let started = Instant::now();
+      // 창 닫기가 이벤트 루프에서 처리돼 WebView가 놓일 틈
+      std::thread::sleep(Duration::from_millis(50));
+      let result = wait_for_webview_browser(Duration::from_secs(3));
+      log::info!("WebView2 browser process before exit: {result} ({} ms)", started.elapsed().as_millis());
+      STATE.store(DONE, Ordering::SeqCst);
+      app.exit(0);
+    });
+    true
+  }
+
+
+  /// 이 프로세스의 직계 자식 msedgewebview2.exe(WebView2 브라우저 프로세스)가 모두 끝나길 기다린다.
+  fn wait_for_webview_browser(timeout: Duration) -> &'static str {
+    let me = unsafe { GetCurrentProcessId() };
+    let mut handles = Vec::new();
+    unsafe {
+      let Ok(snapshot) = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0) else { return "no snapshot" };
+      let mut entry = PROCESSENTRY32W { dwSize: std::mem::size_of::<PROCESSENTRY32W>() as u32, ..Default::default() };
+      let mut ok = Process32FirstW(snapshot, &mut entry).is_ok();
+      while ok {
+        let len = entry.szExeFile.iter().position(|&c| c == 0).unwrap_or(entry.szExeFile.len());
+        let exe = String::from_utf16_lossy(&entry.szExeFile[..len]);
+        if entry.th32ParentProcessID == me && exe.eq_ignore_ascii_case("msedgewebview2.exe") {
+          if let Ok(handle) = OpenProcess(PROCESS_SYNCHRONIZE, false, entry.th32ProcessID) {
+            handles.push(handle);
+          }
+        }
+        ok = Process32NextW(snapshot, &mut entry).is_ok();
+      }
+      let _ = CloseHandle(snapshot);
+    }
+    if handles.is_empty() {
+      return "not running";
+    }
+    let deadline = Instant::now() + timeout;
+    let mut all_exited = true;
+    for handle in handles {
+      let left = deadline.saturating_duration_since(Instant::now()).as_millis() as u32;
+      unsafe {
+        if WaitForSingleObject(handle, left) != WAIT_OBJECT_0 {
+          all_exited = false;
+        }
+        let _ = CloseHandle(handle);
+      }
+    }
+    if all_exited { "exited" } else { "timed out" }
+  }
 }
 
 /// 스크린리더에게 텍스트를 직접 낭독시킨다 (Linux 전용, 그 외 플랫폼은 no-op).
@@ -719,7 +796,13 @@ pub fn run() {
           }
         }
       }
-      #[cfg(not(target_os = "linux"))]
+      #[cfg(windows)]
+      if let tauri::RunEvent::ExitRequested { code, api, .. } = &event {
+        if windows_exit::intercept(app, *code) {
+          api.prevent_exit();
+        }
+      }
+      #[cfg(not(any(target_os = "linux", windows)))]
       let _ = (app, event);
     });
 }

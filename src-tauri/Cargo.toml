@@ -37,3 +37,5 @@ gtk = "0.18"
 # read_clipboard_text 커맨드의 Windows 경로 — WebView2 readText()의 권한 요청을 거치지 않는다.
 [target."cfg(windows)".dependencies]
 clipboard-win = "5"
+# 종료 직전 WebView2 브라우저 프로세스를 기다리는 데 사용(windows_exit). webview2-com과 같은 0.61이라 새로 빌드되는 것은 없다.
+windows = { version = "0.61", features = ["Win32_Foundation", "Win32_System_Diagnostics_ToolHelp", "Win32_System_Threading"] }
