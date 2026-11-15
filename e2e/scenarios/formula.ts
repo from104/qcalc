@@ -211,11 +211,6 @@ export default defineGroup('formula', [
     title: '수식 엔진 청크 로드가 한 번 실패해도 다음 시도에 불러와져 계산된다',
     needs: ['netMock', 'reload'],
     blockFromStart: '/assets/math-',
-    knownBug:
-      '로드 실패 뒤 다시 시도되지 않는다 — router/index.ts 의 vite:preloadError 리스너가 preventDefault() 를 불러 Vite 의 ' +
-      'preload 헬퍼가 오류를 삼키고, loadFormulaMath()(FormulaMath.ts)는 undefined 로 resolve 되며 loading 이 비워지지 않고, ' +
-      'ensureMath(formulaStore.ts)는 인스턴스 없이 mathReady = true 로 만들어 이후 호출이 계속 일찍 반환한다',
-    symptom: /메인 결과: .*"3".*마지막 값 "0"/,
     run: async (app) => {
       await app.settleSelfReload();
       await app.tab('formula');
