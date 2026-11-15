@@ -854,14 +854,8 @@
         showMessage(t('pastedFromClipboardToSubPanel'));
       } else {
         if (currentTab.value === 'radix') {
-          // 진법 탭 스왑
-          radixStore.swapRadixes();
-          // 버퍼에 붙여넣기
-          setTimeout(() => {
-            calc.pasteToBuffer(clipboardText.replace(/\((?:2|8|10|16)\)/g, ''));
-            // 진법 탭 스왑
-            radixStore.swapRadixes();
-          }, 10);
+          // 메인 칸은 원본 진법 그대로 읽는다 (스왑은 보조 칸=대상 진법일 때만)
+          calc.pasteToBuffer(clipboardText.replace(/\((?:2|8|10|16)\)/g, ''));
         } else {
           // 버퍼에 붙여넣기
           calc.pasteToBuffer(pasteText);
