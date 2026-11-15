@@ -111,7 +111,11 @@ export const useFormulaStore = defineStore('formula', {
 
       // mathjs 평가 (실패 시 throw) — 엔진 로드 전이면 평가하지 않는다
       const math = getFormulaMath();
-      if (!math) throw new Error('formula engine not loaded');
+      if (!math) {
+        // 안내가 "다시 시도"라고 하니, 이 '=' 가 다음 시도의 엔진 로드를 건다 (탭을 나갔다 오지 않아도 된다)
+        void this.ensureMath().catch(() => undefined);
+        throw new Error('formula engine not loaded');
+      }
       const raw: unknown = math.evaluate(resolved, createFormulaTrigScope(math));
 
       // BigNumber / 일반 number → string 변환

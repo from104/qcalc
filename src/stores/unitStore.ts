@@ -85,8 +85,10 @@ export const useUnitStore = defineStore('unit', {
       let wasMutated = false;
       const availableCategories = UnitConverter.getCategories();
 
-      // 1. selectedCategory 유효성 검사
-      if (!this.selectedCategory || !availableCategories.includes(this.selectedCategory)) {
+      // 1. selectedCategory 유효성 검사 — 빈 값은 아직 고른 적 없는 것(새로 설치)이라 기본값만 채우고 "보정"으로 세지 않는다
+      if (!this.selectedCategory) {
+        this.selectedCategory = availableCategories[0] || '';
+      } else if (!availableCategories.includes(this.selectedCategory)) {
         this.selectedCategory = availableCategories[0] || '';
         wasMutated = true;
       }

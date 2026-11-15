@@ -42,6 +42,11 @@ export default defineBoot(async () => {
     }
   }
 
+  // e2e 모드면 애니메이션·트랜지션을 0으로 줄인다(app.scss 의 html.motion-reduced 재사용).
+  // 자동 업데이트 확인도 건너뛴다(AutoUpdate.vue). 플래그가 없으면 아무 것도 바뀌지 않는다.
+  const isE2E = new URLSearchParams(window.location.search).get('e2e') === '1';
+  if (isE2E) document.documentElement.classList.add('motion-reduced', 'e2e');
+
   // globalVars 객체 생성
   const globalVars = {
     // 개발 모드 여부
@@ -76,6 +81,9 @@ export default defineBoot(async () => {
 
     // 버전 정보
     version: version,
+
+    // 자동 테스트(e2e) 모드: 주소에 ?e2e=1 이 붙어 있을 때만 켜진다 — e2e/README.md 참고
+    isE2E,
   };
 
   // Capacitor 환경에서 자바스크립트 인터페이스 추가

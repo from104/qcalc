@@ -21,7 +21,7 @@ unit:
   invalid_category: "Catégorie d'unité invalide : {category}"
   invalid_unit: 'Unité invalide : {unit}'
   invalid_format: 'Format d''élément invalide. Utilisez "category.unit"'
-  no_units_found: "Aucune unité trouvée pour la catégorie : {category}"
+  no_units_found: 'Aucune unité trouvée pour la catégorie : {category}'
   conversion_failed: "Échec de la conversion d'unité"
   invalid_base_value: 'Échec du calcul de la valeur de base'
 component:
@@ -42,7 +42,7 @@ math:
   negative_root: "La racine d'un nombre négatif n'est pas autorisée"
   negative_root_index: 'Les racines négatives ne sont pas prises en charge'
   negative_bit_operation: 'Les nombres négatifs ne sont pas autorisés dans les opérations sur les bits'
-  overflow: 'Le résultat de l''opération dépasse la plage autorisée'
+  overflow: "Le résultat de l'opération dépasse la plage autorisée"
   invalid_operation: 'Opération mathématique invalide'
 formula:
   paren_mismatch: 'Les parenthèses ne correspondent pas. Vérifiez les parenthèses ouvrantes et fermantes.'
@@ -50,4 +50,5 @@ formula:
   syntax: "La syntaxe de l'expression est invalide. Veuillez vérifier votre expression."
   not_finite: 'Le résultat est infini ou indéfini (par ex. division par zéro).'
   evaluation: "Impossible d'évaluer l'expression : {detail}"
+  engine_not_loaded: "Impossible d'évaluer l'expression. Le moteur de formules n'a pas pu être chargé ; veuillez réessayer."
 unknown: 'Une erreur inconnue est survenue : {error}'

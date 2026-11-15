@@ -99,3 +99,8 @@ snap/local/
 
 # 릴리스/CI 감시 출력 로그 (gh run watch 등)
 /.*.log
+
+# Playwright e2e (scripts/test-suite.sh, yarn test:e2e)
+/test-results
+/playwright-report
+/blob-report

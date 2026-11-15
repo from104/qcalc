@@ -28,6 +28,7 @@ declare global {
       readonly isTauri: boolean; // Tauri 환경 여부
       readonly isSnap: boolean; // Snap 패키지 여부
       readonly isFlatpak: boolean; // Flatpak 패키지 여부
+      readonly isE2E?: boolean; // 자동 테스트 모드(?e2e=1) 여부
 
       /**
        * 디바이스 타입 정보

@@ -165,8 +165,8 @@
     if (($g.isElectron || $g.isTauri) && !$g.isSnap) {
       window.electronUpdater.onUpdateStatus(handleUpdateStatus);
 
-      // 개발 모드가 아닐 때만 업데이트 확인
-      if (!$g.isDev) {
+      // 개발 모드·자동 테스트(e2e) 모드가 아닐 때만 업데이트 확인
+      if (!$g.isDev && !$g.isE2E) {
         window.electronUpdater.checkForUpdates();
       }
     }

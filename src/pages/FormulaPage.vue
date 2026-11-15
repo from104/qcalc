@@ -12,8 +12,11 @@
   import FormulaField from 'components/calc/FormulaField.vue';
   import { useFormulaStore } from 'stores/formulaStore';
 
-  // 수식 엔진(mathjs 전체) 지연 로드 — 유휴 프리페치가 끝났으면 즉시 반환
-  void useFormulaStore().ensureMath();
+  // 수식 엔진(mathjs 전체) 지연 로드 — 유휴 프리페치가 끝났으면 즉시 반환.
+  // 실패하면 '=' 가 안내를 띄우고, 다음에 이 화면에 들어올 때 다시 불러온다
+  void useFormulaStore()
+    .ensureMath()
+    .catch(() => undefined);
 </script>
 
 <template>

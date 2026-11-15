@@ -854,14 +854,8 @@
         showMessage(t('pastedFromClipboardToSubPanel'));
       } else {
         if (currentTab.value === 'radix') {
-          // 진법 탭 스왑
-          radixStore.swapRadixes();
-          // 버퍼에 붙여넣기
-          setTimeout(() => {
-            calc.pasteToBuffer(clipboardText.replace(/\((?:2|8|10|16)\)/g, ''));
-            // 진법 탭 스왑
-            radixStore.swapRadixes();
-          }, 10);
+          // 메인 칸은 원본 진법 그대로 읽는다 (스왑은 보조 칸=대상 진법일 때만)
+          calc.pasteToBuffer(clipboardText.replace(/\((?:2|8|10|16)\)/g, ''));
         } else {
           // 버퍼에 붙여넣기
           calc.pasteToBuffer(pasteText);
@@ -877,15 +871,28 @@
     }
   };
 
+  /**
+   * 복사 단축키 — 앱이 쓴 클립보드를 브라우저 기본 "복사"가 덮지 않게 keydown 기본 동작을 막는다
+   * (WebKitGTK 는 선택이 없어도 기본 복사가 클립보드를 비운다). 사용자가 글자를 선택해 두었거나
+   * 입력칸 안이면 앱 복사를 하지 않고 기본 복사에 맡긴다.
+   */
+  const onCopyKey = (event: KeyboardEvent) => {
+    const target = event.target as HTMLElement | null;
+    if (target?.closest('input, textarea, [contenteditable]:not([contenteditable="false"])')) return;
+    if ((window.getSelection()?.toString() ?? '') !== '') return;
+    event.preventDefault();
+    handleCopy();
+  };
+
   // 키 바인딩 설정
   const { subscribe, unsubscribe } =
     props.field === 'main'
       ? useKeyBinding([
-          [['Control+c', 'Control+Insert', 'Copy'], handleCopy],
+          [['Control+c', 'Control+Insert', 'Copy'], onCopyKey],
           [['Control+v', 'Shift+Insert', 'Paste'], () => handlePaste('main')],
         ])
       : useKeyBinding([
-          [['Shift+Control+c', 'Alt+Control+Insert', 'Shift+Copy'], handleCopy],
+          [['Shift+Control+c', 'Alt+Control+Insert', 'Shift+Copy'], onCopyKey],
           [['Shift+Control+v', 'Alt+Shift+Insert', 'Shift+Paste'], () => handlePaste('sub')],
         ]);
 
@@ -967,6 +974,7 @@
       <template v-if="isMainField" #prepend>
         <div
           v-if="!isMemoryEmpty"
+          data-testid="memory-indicator"
           class="noselect full-height q-mt-xs q-pt-sm"
           role="button"
           tabindex="0"
@@ -1024,7 +1032,7 @@
         >
           <span v-if="currentTab === 'radix'" id="radixPrefix">{{ radixPrefix }}</span>
           <span v-if="currentTab === 'currency'" id="symbol">{{ symbol }}</span>
-          <span :id="isMainField ? 'result' : 'subResult'">
+          <span :id="isMainField ? 'result' : 'subResult'" :data-testid="isMainField ? 'result-main' : 'result-sub'">
             {{ calcStore.isMemoryVisible ? memoryValue : result }}
           </span>
           <span v-if="currentTab === 'unit'" id="unit">{{ unit }}</span>

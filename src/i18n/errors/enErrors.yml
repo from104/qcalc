@@ -50,4 +50,5 @@ formula:
   syntax: 'The expression syntax is invalid. Please review your expression.'
   not_finite: 'The result is infinite or undefined (e.g. division by zero).'
   evaluation: 'Unable to evaluate the expression: {detail}'
+  engine_not_loaded: 'Unable to evaluate the expression. The formula engine could not be loaded; please try again.'
 unknown: 'An unknown error occurred: {error}'

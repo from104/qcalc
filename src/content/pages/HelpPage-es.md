@@ -164,18 +164,18 @@ Cálculos de alta precisión, conversión de unidades/divisas/bases numéricas y
 
 ### Funciones Matemáticas Avanzadas (Modo Shift)
 
-| Atajo | Función                      |
-| ----- | ---------------------------- |
-| r     | Potencia (xⁿ)                |
-| t     | Raíz (ⁿ√x)                   |
-| f     | Potencia de 10 (10ⁿ)         |
-| g     | Módulo (x%y)                 |
-| h     | Factorial (x!)               |
-| q,w,e | Trig (sin, cos, tan)         |
-| a,s,d | Constantes (Pi/2, ln10, ln2) |
-| z,x,c | Constantes (Pi, phi, e)      |
-| v     | Parte entera                 |
-| b     | Parte fraccionaria           |
+| Atajo       | Función                      |
+| ----------- | ---------------------------- |
+| r           | Potencia (xⁿ)                |
+| t           | Raíz (ⁿ√x)                   |
+| f           | Potencia de 10 (10ⁿ)         |
+| g           | Módulo (x%y)                 |
+| h           | Factorial (x!)               |
+| S-q,S-w,S-e | Trig (sin, cos, tan)         |
+| a,s,d       | Constantes (Pi/2, ln10, ln2) |
+| z,x,c       | Constantes (Pi, phi, e)      |
+| v           | Parte entera                 |
+| b           | Parte fraccionaria           |
 
 ### Operaciones de Memoria
 
@@ -191,30 +191,30 @@ Cálculos de alta precisión, conversión de unidades/divisas/bases numéricas y
 
 ### Modo de Conversión de Unidades/Divisas (Modo Shift)
 
-| Atajo | Función                              |
-| ----- | ------------------------------------ |
-| f,g,h | ×2/×3/×5 o +5/+10/+100               |
-| q,w,e | ÷2/÷3/÷5 o -5/-10/-100               |
-| a,s,d | ×10/×100/×1000                       |
-| z,x,c | ÷10/÷100/÷1000                       |
-| \     | Intercambiar origen y destino        |
-| A-\   | Alternar visualización unidad/divisa |
+| Atajo       | Función                              |
+| ----------- | ------------------------------------ |
+| f,g,h       | ×2/×3/×5 o +5/+10/+100               |
+| S-q,S-w,S-e | ÷2/÷3/÷5 o -5/-10/-100               |
+| a,s,d       | ×10/×100/×1000                       |
+| z,x,c       | ÷10/÷100/÷1000                       |
+| \           | Intercambiar origen y destino        |
+| A-\         | Alternar visualización unidad/divisa |
 
 ### Modo Conversor de Bases Numéricas
 
-| Atajo | Función                               |
-| ----- | ------------------------------------- |
-| r,t   | Desplazamiento de 1 bit (x<<1, x>>1)  |
-| u,i   | Desplazamiento izq./der. (x<<y, x>>y) |
-| f,g   | Desplazamiento de 4 bits (x<<4, x>>4) |
-| h     | Operación NOT                         |
-| j,k,l | Operaciones de bits (AND, OR, XOR)    |
-| q,w,e | NAND, NOR, XNOR                       |
-| z,x,c | Entrada hexadecimal (A, B, C)         |
-| a,s,d | Entrada hexadecimal (D, E, F)         |
-| \     | Intercambiar origen y destino         |
-| A-\   | Alternar visualización de base        |
-| AC-\  | Alternar posición de base (pre/post)  |
+| Atajo       | Función                               |
+| ----------- | ------------------------------------- |
+| r,t         | Desplazamiento de 1 bit (x<<1, x>>1)  |
+| u,i         | Desplazamiento izq./der. (x<<y, x>>y) |
+| f,g         | Desplazamiento de 4 bits (x<<4, x>>4) |
+| h           | Operación NOT                         |
+| j,k,l       | Operaciones de bits (AND, OR, XOR)    |
+| S-q,S-w,S-e | NAND, NOR, XNOR                       |
+| z,x,c       | Entrada hexadecimal (A, B, C)         |
+| a,s,d       | Entrada hexadecimal (D, E, F)         |
+| \           | Intercambiar origen y destino         |
+| A-\         | Alternar visualización de base        |
+| AC-\        | Alternar posición de base (pre/post)  |
 
 ### Calculadora de Fórmulas (Modo Edición)
 

@@ -171,7 +171,7 @@ Hochpräzise Berechnungen, Einheiten-/Währungs-/Zahlensystemumrechnung und Form
 | f                 | Zehnerpotenz (10ⁿ)           |
 | g                 | Modulo (x%y)                 |
 | h                 | Fakultät (x!)                |
-| q,w,e             | Trig. (sin, cos, tan)        |
+| S-q,S-w,S-e       | Trig. (sin, cos, tan)        |
 | a,s,d             | Konstanten (Pi/2, ln10, ln2) |
 | z,x,c             | Konstanten (Pi, phi, e)      |
 | v                 | Ganzzahlanteil               |
@@ -194,7 +194,7 @@ Hochpräzise Berechnungen, Einheiten-/Währungs-/Zahlensystemumrechnung und Form
 | Tastenkombination | Funktion                              |
 | ----------------- | ------------------------------------- |
 | f,g,h             | ×2/×3/×5 oder +5/+10/+100             |
-| q,w,e             | ÷2/÷3/÷5 oder -5/-10/-100             |
+| S-q,S-w,S-e       | ÷2/÷3/÷5 oder -5/-10/-100             |
 | a,s,d             | ×10/×100/×1000                        |
 | z,x,c             | ÷10/÷100/÷1000                        |
 | \                 | Quelle und Ziel tauschen              |
@@ -209,7 +209,7 @@ Hochpräzise Berechnungen, Einheiten-/Währungs-/Zahlensystemumrechnung und Form
 | f,g               | 4-Bit-Verschiebung (x<<4, x>>4)            |
 | h                 | NOT-Operation                              |
 | j,k,l             | Bit-Operationen (AND, OR, XOR)             |
-| q,w,e             | NAND, NOR, XNOR                            |
+| S-q,S-w,S-e       | NAND, NOR, XNOR                            |
 | z,x,c             | Hex-Eingabe (A, B, C)                      |
 | a,s,d             | Hex-Eingabe (D, E, F)                      |
 | \                 | Quelle und Ziel tauschen                   |
