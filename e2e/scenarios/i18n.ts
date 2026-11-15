@@ -36,8 +36,6 @@ const isLegit = (piece: string) => LEGIT.some(({ pattern }) => pattern.test(piec
 
 /** 기록 화면의 글꼴 크기 FAB(q-fab) 버튼 — 스냅숏의 where 에 아이콘 클래스로 잡힌다 */
 const FONT_SIZE_FAB = /q-fab__icon/;
-/** 알려진 앱 결함 — 기록 항목 ⋮ 메뉴 버튼에 이름이 없다(아래 knownBug). 고쳐지면 이 예외도 지운다 */
-const KNOWN_UNNAMED = /record-menu-btn/;
 
 interface Finding {
   lang: string;
@@ -49,7 +47,7 @@ interface Finding {
 function inspect(lang: string, screen: string, snapshot: UiSnapshot): Finding[] {
   const found: Finding[] = [];
   for (const control of snapshot.controls) {
-    if (control.name.trim() === '' && !KNOWN_UNNAMED.test(control.where)) {
+    if (control.name.trim() === '') {
       found.push({ lang, screen, what: `빈 이름의 ${control.kind} (${control.where || '표지 없음'})` });
     }
   }
@@ -146,9 +144,6 @@ export default defineGroup('i18n', [
   {
     title: '기록 항목 ⋮ 메뉴 버튼에 접근 가능한 이름이 있다',
     needs: ['touch'],
-    knownBug:
-      '기록 항목의 ⋮(more_vert) 메뉴 버튼(RecordCard.vue)에 aria-label 이 없다 — 터치 기기에서는 항상 보이는데 이름이 비어 있다(모든 언어)',
-    symptom: /⋮ 버튼: .*마지막 값 ""/,
     seed: { history: [{ previousNumber: '1', operator: '+', argumentNumber: '2', resultNumber: '3' }] },
     run: async (app) => {
       await app.openScreen('record');

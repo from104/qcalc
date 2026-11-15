@@ -623,6 +623,7 @@
                     data-testid="record-menu-btn"
                     :class="themesStore.darkMode ? 'body--dark' : 'body--light'"
                     icon="more_vert"
+                    :aria-label="t('ariaLabel.recordMenu')"
                     size="sm"
                     flat
                     rounded
@@ -1087,6 +1088,7 @@ ko:
     dragHandle: '검색창 이동'
     closeSearch: '검색창 닫기'
     fontSizeMenu: '글자 크기'
+    recordMenu: '기록 메뉴'
 en:
   record: 'record'
   noRecord: 'No record.'
@@ -1121,6 +1123,7 @@ en:
     dragHandle: 'Move search window'
     closeSearch: 'Close search window'
     fontSizeMenu: 'Font size'
+    recordMenu: 'Record menu'
 ja:
   record: '計算記録'
   noRecord: '計算記録がありません。'
@@ -1155,6 +1158,7 @@ ja:
     dragHandle: '検索ウィンドウを移動'
     closeSearch: '検索ウィンドウを閉じる'
     fontSizeMenu: '文字サイズ'
+    recordMenu: '記録メニュー'
 zh:
   record: '计算记录'
   noRecord: '没有计算记录。'
@@ -1189,6 +1193,7 @@ zh:
     dragHandle: '移动搜索窗口'
     closeSearch: '关闭搜索窗口'
     fontSizeMenu: '字体大小'
+    recordMenu: '记录菜单'
 hi:
   record: 'गणना रिकॉर्ड'
   noRecord: 'कोई गणना रिकॉर्ड नहीं।'
@@ -1223,6 +1228,7 @@ hi:
     dragHandle: 'खोज विंडो ले जाएं'
     closeSearch: 'खोज विंडो बंद करें'
     fontSizeMenu: 'फ़ॉन्ट आकार'
+    recordMenu: 'रिकॉर्ड मेनू'
 de:
   record: 'Berechnungsverlauf'
   noRecord: 'Kein Berechnungsverlauf.'
@@ -1257,6 +1263,7 @@ de:
     dragHandle: 'Suchfenster verschieben'
     closeSearch: 'Suchfenster schließen'
     fontSizeMenu: 'Schriftgröße'
+    recordMenu: 'Eintragsmenü'
 es:
   record: 'Historial de cálculos'
   noRecord: 'No hay historial de cálculos.'
@@ -1291,6 +1298,7 @@ es:
     dragHandle: 'Mover ventana de búsqueda'
     closeSearch: 'Cerrar ventana de búsqueda'
     fontSizeMenu: 'Tamaño de letra'
+    recordMenu: 'Menú del registro'
 fr:
   record: 'Historique des calculs'
   noRecord: 'Aucun historique de calculs.'
@@ -1325,6 +1333,7 @@ fr:
     dragHandle: 'Déplacer la fenêtre de recherche'
     closeSearch: 'Fermer la fenêtre de recherche'
     fontSizeMenu: 'Taille du texte'
+    recordMenu: 'Menu de l’entrée'
 pt:
   record: 'Histórico de cálculos'
   noRecord: 'Nenhum histórico de cálculos.'
@@ -1359,6 +1368,7 @@ pt:
     dragHandle: 'Mover janela de pesquisa'
     closeSearch: 'Fechar janela de pesquisa'
     fontSizeMenu: 'Tamanho da fonte'
+    recordMenu: 'Menu do registro'
 ru:
   record: 'История вычислений'
   noRecord: 'Нет истории вычислений.'
@@ -1393,4 +1403,5 @@ ru:
     dragHandle: 'Переместить окно поиска'
     closeSearch: 'Закрыть окно поиска'
     fontSizeMenu: 'Размер шрифта'
+    recordMenu: 'Меню записи'
 </i18n>
