@@ -50,4 +50,5 @@ formula:
   syntax: '表达式语法无效。请重新检查您的表达式。'
   not_finite: '计算结果为无穷大或未定义。（例如：除以零）'
   evaluation: '无法求值表达式: {detail}'
+  engine_not_loaded: '无法求值表达式。未能加载公式引擎，请重试。'
 unknown: '发生未知错误：{error}'

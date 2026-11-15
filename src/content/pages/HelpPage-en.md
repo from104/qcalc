@@ -164,18 +164,18 @@ High-precision calculations, unit/currency/radix conversion, and formula evaluat
 
 ### Advanced Math Functions (Shift Mode)
 
-| Shortcut | Function                    |
-| -------- | --------------------------- |
-| r        | Power (xⁿ)                  |
-| t        | Root (ⁿ√x)                  |
-| f        | Power of 10 (10ⁿ)           |
-| g        | Modulo (x%y)                |
-| h        | Factorial (x!)              |
-| q,w,e    | Trig (sin, cos, tan)        |
-| a,s,d    | Constants (Pi/2, ln10, ln2) |
-| z,x,c    | Constants (Pi, phi, e)      |
-| v        | Integer part                |
-| b        | Fractional part             |
+| Shortcut    | Function                    |
+| ----------- | --------------------------- |
+| r           | Power (xⁿ)                  |
+| t           | Root (ⁿ√x)                  |
+| f           | Power of 10 (10ⁿ)           |
+| g           | Modulo (x%y)                |
+| h           | Factorial (x!)              |
+| S-q,S-w,S-e | Trig (sin, cos, tan)        |
+| a,s,d       | Constants (Pi/2, ln10, ln2) |
+| z,x,c       | Constants (Pi, phi, e)      |
+| v           | Integer part                |
+| b           | Fractional part             |
 
 ### Memory Operations
 
@@ -191,30 +191,30 @@ High-precision calculations, unit/currency/radix conversion, and formula evaluat
 
 ### Unit/Currency Conversion Mode (Shift Mode)
 
-| Shortcut | Function                     |
-| -------- | ---------------------------- |
-| f,g,h    | ×2/×3/×5 or +5/+10/+100      |
-| q,w,e    | ÷2/÷3/÷5 or -5/-10/-100      |
-| a,s,d    | ×10/×100/×1000               |
-| z,x,c    | ÷10/÷100/÷1000               |
-| \        | Swap source and target       |
-| A-\      | Toggle unit/currency display |
+| Shortcut    | Function                     |
+| ----------- | ---------------------------- |
+| f,g,h       | ×2/×3/×5 or +5/+10/+100      |
+| S-q,S-w,S-e | ÷2/÷3/÷5 or -5/-10/-100      |
+| a,s,d       | ×10/×100/×1000               |
+| z,x,c       | ÷10/÷100/÷1000               |
+| \           | Swap source and target       |
+| A-\         | Toggle unit/currency display |
 
 ### Radix Converter Mode
 
-| Shortcut | Function                         |
-| -------- | -------------------------------- |
-| r,t      | 1-bit shift (x<<1, x>>1)         |
-| u,i      | Left/right shift (x<<y, x>>y)    |
-| f,g      | 4-bit shift (x<<4, x>>4)         |
-| h        | NOT operation                    |
-| j,k,l    | Bit operations (AND, OR, XOR)    |
-| q,w,e    | NAND, NOR, XNOR                  |
-| z,x,c    | Hex input (A, B, C)              |
-| a,s,d    | Hex input (D, E, F)              |
-| \        | Swap source and target           |
-| A-\      | Toggle radix display             |
-| AC-\     | Toggle radix position (pre/post) |
+| Shortcut    | Function                         |
+| ----------- | -------------------------------- |
+| r,t         | 1-bit shift (x<<1, x>>1)         |
+| u,i         | Left/right shift (x<<y, x>>y)    |
+| f,g         | 4-bit shift (x<<4, x>>4)         |
+| h           | NOT operation                    |
+| j,k,l       | Bit operations (AND, OR, XOR)    |
+| S-q,S-w,S-e | NAND, NOR, XNOR                  |
+| z,x,c       | Hex input (A, B, C)              |
+| a,s,d       | Hex input (D, E, F)              |
+| \           | Swap source and target           |
+| A-\         | Toggle radix display             |
+| AC-\        | Toggle radix position (pre/post) |
 
 ### Formula Calculator (Edit Mode)
 

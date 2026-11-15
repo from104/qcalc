@@ -25,6 +25,9 @@ export function classifyFormulaError(rawMessage: string): FormulaErrorInfo {
   // 앱 내부 throw: 메모리 비어 있음 → 기존 키 재사용
   if (/memory is empty/i.test(msg)) return { key: 'error.calc.no_memory' };
 
+  // 앱 내부 throw: 수식 엔진(mathjs 청크)을 아직 못 불러옴 — 내부 영어 문구를 붙이지 않는다
+  if (/formula engine not loaded/i.test(msg)) return { key: 'error.formula.engine_not_loaded' };
+
   // 앱 내부 throw: 비유한 결과 (0으로 나누기 등)
   if (/non-finite result|infinit/i.test(msg)) return { key: 'error.formula.not_finite' };
 

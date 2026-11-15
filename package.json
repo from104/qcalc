@@ -1,6 +1,6 @@
 {
   "name": "qcalc",
-  "version": "0.13.6",
+  "version": "0.13.7",
   "description": "A multi-purpose calculator for productivity and accessibility",
   "productName": "QCalc",
   "desktopName": "io.github.from104.qcalc.desktop",
@@ -22,11 +22,14 @@
   "type": "module",
   "scripts": {
     "postinstall": "quasar prepare",
-    "lint": "eslint -c ./eslint.config.js \"./src*/**/*.{ts,js,cjs,mjs,vue}\"",
+    "lint": "eslint -c ./eslint.config.js \"./src*/**/*.{ts,js,cjs,mjs,vue}\" \"./e2e/**/*.{ts,mjs}\" ./playwright.config.ts ./playwright.app.config.ts",
     "format": "prettier --write \"**/*.{js,mjs,cjs,ts,vue,scss,html,md,json}\" --ignore-path .gitignore",
     "test": "vitest run",
     "test:watch": "vitest",
     "test:coverage": "vitest run --coverage",
+    "test:e2e": "playwright test",
+    "test:e2e:app": "playwright test -c playwright.app.config.ts",
+    "test:all": "bash scripts/test-suite.sh",
     "perf:budget": "node scripts/measure-bundle.mjs dist/spa --budget-js=330 --budget-css=40",
     "perf:startup": "node scripts/measure-startup.mjs",
     "fetch-rates": "tsx scripts/fetch-fallback-rates.ts",
@@ -84,6 +87,7 @@
     "@eslint/js": "10.0.1",
     "@modyfi/vite-plugin-yaml": "1.1.1",
     "@pinia/testing": "^1.0.3",
+    "@playwright/test": "^1.65.1",
     "@quasar/app-vite": "2.5.2",
     "@quasar/cli": "2.5.0",
     "@quasar/quasar-app-extension-qmarkdown": "^2.0.5",
@@ -121,7 +125,9 @@
     "vitest": "4.1.0",
     "vitest-axe": "^0.1.0",
     "vue-eslint-parser": "10.4.0",
-    "vue-tsc": "3.2.6"
+    "vue-tsc": "3.2.6",
+    "webdriverio": "9.32.0",
+    "yaml": "^2.8.2"
   },
   "engines": {
     "node": ">=20",
@@ -138,5 +144,13 @@
   "lint-staged": {
     "*.{ts,js,cjs,mjs,vue}": ["eslint -c ./eslint.config.js --fix"],
     "*.{ts,js,cjs,mjs,vue,scss,html,md,json}": ["prettier --write"]
+  },
+  "dependenciesMeta": {
+    "edgedriver": {
+      "built": false
+    },
+    "geckodriver": {
+      "built": false
+    }
   }
 }

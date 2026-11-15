@@ -12,6 +12,25 @@ Tous les changements notables de ce projet sont enregistrés dans ce fichier.
 
 Le format est basé sur [Keep a Changelog] et ce projet suit le [Versionnage sémantique].
 
+## [0.13.7] 2026-11-15
+
+### Modifié
+
+- Les fonctions du mode Maj de la rangée q·w·e (sin/cos/tan, ÷2/÷3/÷5, -5/-10/-100, NAND/NOR/XNOR) utilisent désormais Maj+q/w/e ; q seul quitte l'application
+
+### Corrigé
+
+- Correction : le collage depuis le presse-papiers ne faisait rien sous Linux
+- Correction : après avoir quitté avec q, le pavé restait bloqué en mode Maj au lancement suivant
+- Correction : une étiquette en coréen manquait dans le convertisseur de devises
+- Correction : les lecteurs d'écran annonçaient sans nom le bouton de taille de police de l'historique
+- Correction : les lecteurs d'écran annonçaient sans nom le bouton de menu ⋮ de chaque entrée de l'historique
+- Correction : une nouvelle installation affichait « Certains paramètres enregistrés ont été réinitialisés suite à une mise à jour de l'application. » au premier lancement
+- Correction : dans le convertisseur de bases, coller dans le champ principal lisait le nombre dans la base cible (255 devenait 597)
+- Correction : si le moteur de formules échouait une fois au chargement, la calculatrice de formules restait inutilisable jusqu'au redémarrage de l'application
+- Correction : le message d'erreur en cas d'échec de chargement du moteur de formules se terminait par du texte anglais non traduit
+- Correction : sous Linux, Ctrl+C affichait « Copié » mais laissait le presse-papiers vide
+
 ## [0.13.6] 2026-10-03
 
 ### Ajouté

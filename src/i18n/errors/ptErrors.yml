@@ -50,4 +50,5 @@ formula:
   syntax: 'A sintaxe da expressão é inválida. Revise sua expressão.'
   not_finite: 'O resultado é infinito ou indefinido (ex.: divisão por zero).'
   evaluation: 'Não é possível avaliar a expressão: {detail}'
+  engine_not_loaded: 'Não é possível avaliar a expressão. Não foi possível carregar o mecanismo de fórmulas; tente novamente.'
 unknown: 'Ocorreu um erro desconhecido: {error}'

@@ -164,18 +164,18 @@ Calculs de haute précision, conversion d'unités/devises/bases numériques et �
 
 ### Fonctions mathématiques avancées (Mode Shift)
 
-| Raccourci | Fonction                     |
-| --------- | ---------------------------- |
-| r         | Puissance (xⁿ)               |
-| t         | Racine (ⁿ√x)                 |
-| f         | Puissance de 10 (10ⁿ)        |
-| g         | Modulo (x%y)                 |
-| h         | Factorielle (x!)             |
-| q,w,e     | Trigo (sin, cos, tan)        |
-| a,s,d     | Constantes (Pi/2, ln10, ln2) |
-| z,x,c     | Constantes (Pi, phi, e)      |
-| v         | Partie entière               |
-| b         | Partie décimale              |
+| Raccourci   | Fonction                     |
+| ----------- | ---------------------------- |
+| r           | Puissance (xⁿ)               |
+| t           | Racine (ⁿ√x)                 |
+| f           | Puissance de 10 (10ⁿ)        |
+| g           | Modulo (x%y)                 |
+| h           | Factorielle (x!)             |
+| S-q,S-w,S-e | Trigo (sin, cos, tan)        |
+| a,s,d       | Constantes (Pi/2, ln10, ln2) |
+| z,x,c       | Constantes (Pi, phi, e)      |
+| v           | Partie entière               |
+| b           | Partie décimale              |
 
 ### Opérations mémoire
 
@@ -191,30 +191,30 @@ Calculs de haute précision, conversion d'unités/devises/bases numériques et �
 
 ### Mode de conversion d'unités/devises (Mode Shift)
 
-| Raccourci | Fonction                          |
-| --------- | --------------------------------- |
-| f,g,h     | ×2/×3/×5 ou +5/+10/+100           |
-| q,w,e     | ÷2/÷3/÷5 ou -5/-10/-100           |
-| a,s,d     | ×10/×100/×1000                    |
-| z,x,c     | ÷10/÷100/÷1000                    |
-| \         | Échanger source et cible          |
-| A-\       | Basculer l'affichage unité/devise |
+| Raccourci   | Fonction                          |
+| ----------- | --------------------------------- |
+| f,g,h       | ×2/×3/×5 ou +5/+10/+100           |
+| S-q,S-w,S-e | ÷2/÷3/÷5 ou -5/-10/-100           |
+| a,s,d       | ×10/×100/×1000                    |
+| z,x,c       | ÷10/÷100/÷1000                    |
+| \           | Échanger source et cible          |
+| A-\         | Basculer l'affichage unité/devise |
 
 ### Mode convertisseur de bases
 
-| Raccourci | Fonction                                   |
-| --------- | ------------------------------------------ |
-| r,t       | Décalage de 1 bit (x<<1, x>>1)             |
-| u,i       | Décalage gauche/droite (x<<y, x>>y)        |
-| f,g       | Décalage de 4 bits (x<<4, x>>4)            |
-| h         | Opération NOT                              |
-| j,k,l     | Opérations sur les bits (AND, OR, XOR)     |
-| q,w,e     | NAND, NOR, XNOR                            |
-| z,x,c     | Saisie hexadécimale (A, B, C)              |
-| a,s,d     | Saisie hexadécimale (D, E, F)              |
-| \         | Échanger source et cible                   |
-| A-\       | Basculer l'affichage de la base            |
-| AC-\      | Basculer la position de la base (pré/post) |
+| Raccourci   | Fonction                                   |
+| ----------- | ------------------------------------------ |
+| r,t         | Décalage de 1 bit (x<<1, x>>1)             |
+| u,i         | Décalage gauche/droite (x<<y, x>>y)        |
+| f,g         | Décalage de 4 bits (x<<4, x>>4)            |
+| h           | Opération NOT                              |
+| j,k,l       | Opérations sur les bits (AND, OR, XOR)     |
+| S-q,S-w,S-e | NAND, NOR, XNOR                            |
+| z,x,c       | Saisie hexadécimale (A, B, C)              |
+| a,s,d       | Saisie hexadécimale (D, E, F)              |
+| \           | Échanger source et cible                   |
+| A-\         | Basculer l'affichage de la base            |
+| AC-\        | Basculer la position de la base (pré/post) |
 
 ### Calculatrice de formules (Mode édition)
 

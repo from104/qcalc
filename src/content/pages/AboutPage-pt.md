@@ -12,6 +12,25 @@ Todas as alterações notáveis deste projeto são registradas neste arquivo.
 
 O formato é baseado no [Keep a Changelog] e este projeto segue o [Versionamento Semântico].
 
+## [0.13.7] 2026-11-15
+
+### Alterado
+
+- As funções do modo Shift da linha q·w·e (sin/cos/tan, ÷2/÷3/÷5, -5/-10/-100, NAND/NOR/XNOR) agora usam Shift+q/w/e; q sozinho fecha o aplicativo
+
+### Corrigido
+
+- Corrigido: colar da área de transferência não fazia nada no Linux
+- Corrigido: ao sair com q, o teclado ficava preso no modo Shift na próxima abertura
+- Corrigido: faltava um rótulo em coreano no conversor de moedas
+- Corrigido: leitores de tela liam sem nome o botão de tamanho da fonte do histórico
+- Corrigido: leitores de tela liam sem nome o botão de menu ⋮ de cada item do histórico
+- Corrigido: uma instalação nova mostrava "Algumas configurações salvas foram redefinidas devido a uma atualização do aplicativo." na primeira abertura
+- Corrigido: no conversor de bases, ao colar no campo principal o número era lido na base de destino (255 virava 597)
+- Corrigido: se o mecanismo de fórmulas falhasse uma vez ao carregar, a calculadora de fórmulas ficava quebrada até reiniciar o aplicativo
+- Corrigido: a mensagem de erro quando o mecanismo de fórmulas não podia ser carregado terminava com texto em inglês sem tradução
+- Corrigido: no Linux, Ctrl+C mostrava "Copiado" mas deixava a área de transferência vazia
+
 ## [0.13.6] 2026-10-03
 
 ### Adicionado

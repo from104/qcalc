@@ -1,4 +1,5 @@
 ko:
+  currency: '통화'
   currencyDesc:
     1INCH: '1인치'
     AAVE: '아베'

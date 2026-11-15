@@ -235,6 +235,7 @@
     <!-- 원본 통화 -->
     <q-select
       v-model="currencyStore.sourceCurrency"
+      data-testid="currency-source"
       :options="filteredSourceCurrencyOptions"
       :label="currencyDescriptions[currencyStore.sourceCurrency]"
       role="combobox"
@@ -323,6 +324,7 @@
     <!-- 대상 통화 -->
     <q-select
       v-model="currencyStore.targetCurrency"
+      data-testid="currency-target"
       :options="filteredTargetCurrencyOptions"
       :label="currencyDescriptions[currencyStore.targetCurrency]"
       role="combobox"

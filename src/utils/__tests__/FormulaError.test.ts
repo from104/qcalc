@@ -39,6 +39,10 @@ describe('classifyFormulaError (UX-06)', () => {
     expect(classifyFormulaError('non-finite result').key).toBe('error.formula.not_finite');
   });
 
+  it('엔진 미로드는 원문(영어) detail 없이 지역화된 키로만 분류한다', () => {
+    expect(classifyFormulaError('formula engine not loaded')).toEqual({ key: 'error.formula.engine_not_loaded' });
+  });
+
   it('매핑 불가한 메시지는 error.formula.evaluation과 원문 detail로 fallback한다', () => {
     const r = classifyFormulaError('some weird message');
     expect(r.key).toBe('error.formula.evaluation');

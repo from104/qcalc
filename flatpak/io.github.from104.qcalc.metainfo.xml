@@ -59,6 +59,11 @@
   <content_rating type="oars-1.1" />
 
   <releases>
+    <release version="0.13.7" date="2026-11-15">
+      <description>
+        <p>The shift-mode q, w, e row (sin, cos, tan and friends) now uses Shift+q/w/e so a bare q always quits, plus fixes for clipboard paste and copy on Linux, screen-reader labels, pasting into the radix converter, and recovery when the formula engine fails to load.</p>
+      </description>
+    </release>
     <release version="0.13.6" date="2026-10-03">
       <description>
         <p>Faster startup with a new startup screen, smoother animations and layout switching, and better display performance on Linux with NVIDIA graphics.</p>

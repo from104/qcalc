@@ -2,7 +2,8 @@ import { onUnmounted } from 'vue';
 import { tinykeys } from 'tinykeys';
 import type { KeyBindingMap } from 'tinykeys';
 
-export type KeyBindings = [string[], () => void][];
+/** 핸들러는 keydown 이벤트를 받는다 — 기본 동작을 막아야 하는 단축키(복사 등)용 */
+export type KeyBindings = [string[], (event: KeyboardEvent) => void][];
 
 export function useKeyBinding(keybindings: KeyBindings) {
   let unsubscribe: (() => void) | null = null;

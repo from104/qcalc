@@ -1,0 +1,292 @@
+/**
+ * PlaywrightApp — CalcApp 을 Playwright Page 위에 구현한 드라이버 (웹 빌드용).
+ *
+ * 앱 주소에는 항상 `?e2e=1` 을 붙인다 → 애니메이션 0, 자동 업데이트 확인 끔 (e2e/README.md).
+ * 선택자는 data-testid 와 키패드 id(`btn-<id>`)만 쓴다. aria-label 은 번역되므로 쓰지 않는다.
+ */
+import { test, type Locator, type Page, type Route } from '@playwright/test';
+
+import type { ButtonId, CalcApp, Capability, ScreenName, SelectField, TabName, UiSnapshot } from './CalcApp';
+import { applySeed, buildSeed, type LangCode, type SeedState } from '../fixtures/seed';
+import { getClipboard, setClipboard } from '../fixtures/clipboard';
+import { snapshotUiInPage } from './page-functions';
+
+export const APP_PATH = '/?e2e=1#/';
+/** 같은 출처의 빈 문서 — 앱을 띄우기 전에 저장소를 심는 자리 (e2e/support/serve.mjs 가 404 로 내준다) */
+const BLANK_PATH = '/__e2e__/blank';
+
+export interface PlaywrightAppOptions {
+  platform: string;
+  capabilities: Iterable<Capability>;
+}
+
+/** 표시 텍스트 정리 — 줄바꿈·NBSP(\\s 에 포함)·연속 공백을 한 칸으로 */
+const normalize = (text: string | null) => (text ?? '').replace(/\s+/g, ' ').trim();
+
+export class PlaywrightApp implements CalcApp {
+  readonly platform: string;
+  readonly capabilities: ReadonlySet<Capability>;
+
+  constructor(
+    readonly page: Page,
+    options: PlaywrightAppOptions,
+  ) {
+    this.platform = options.platform;
+    this.capabilities = new Set(options.capabilities);
+  }
+
+  private get touch(): boolean {
+    return this.capabilities.has('touch');
+  }
+
+  /** 지금 보이는 요소 하나 — 탭 패널 전환 중 잠깐 겹치는 옛 패널은 제외 */
+  private visible(selector: string): Locator {
+    return this.page.locator(selector).filter({ visible: true });
+  }
+
+  private async activate(target: Locator): Promise<void> {
+    if (this.touch) await target.tap();
+    else await target.click();
+  }
+
+  private async waitReady(): Promise<void> {
+    await this.page.waitForFunction(() => document.documentElement.classList.contains('e2e'));
+    await this.visible('[data-testid="result-main"]').waitFor();
+    await this.visible('#btn-d6').waitFor();
+  }
+
+  async seed(state?: SeedState): Promise<void> {
+    await this.page.goto(BLANK_PATH);
+    await this.page.evaluate(applySeed, buildSeed(state));
+    await this.page.goto(APP_PATH);
+    await this.waitReady();
+  }
+
+  async reload(): Promise<void> {
+    try {
+      await this.page.reload();
+    } catch (error) {
+      // 청크를 끊어 둔 채면 앱이 로드 중에 스스로 한 번 더 새로고침해(router/index.ts reloadOnce) 이 호출을 끊을 수 있다(WebKit)
+      if (!/interrupted|navigation/i.test(String(error))) throw error;
+    }
+    await this.waitReadyAfterNavigation();
+  }
+
+  /** 새로고침 도중에는 실행 문맥이 사라져 예외가 날 수 있다 — 앱이 뜰 때까지 다시 시도 */
+  private async waitReadyAfterNavigation(): Promise<void> {
+    for (let attempt = 0; ; attempt++) {
+      try {
+        await this.page.waitForLoadState('load');
+        await this.waitReady();
+        return;
+      } catch (error) {
+        if (attempt >= 5) throw error;
+        await this.page.waitForTimeout(200);
+      }
+    }
+  }
+
+  async settleSelfReload(): Promise<void> {
+    // router/index.ts reloadOnce: 지연 로드 실패 → sessionStorage 에 시각을 적고 곧바로 location.reload().
+    // 시각이 적히기를 (유휴 프리페치 최대 3초 + 여유) 기다리고, 적혔다면 새 문서가 앱을 다시 띄울 때까지 기다린다.
+    const key = 'qcalc-chunk-reload-at';
+    const fired = await this.page
+      .waitForFunction((k) => sessionStorage.getItem(k) !== null, key, { timeout: 5000 })
+      .then(() => true)
+      .catch(() => false);
+    if (!fired) return;
+    // 새 문서인지는 시간 추측(옛 500ms 대기) 대신 문서가 열린 시각으로 가린다 — reloadOnce 가 적은 시각 뒤에 열린 문서가 새 문서다.
+    // 부하가 걸리면 이동이 늦게 시작돼 옛 문서에서 '준비됨'을 보고 돌아오던 틈을 막는다. waitForFunction 은 이동을 건너 계속 기다린다.
+    for (let attempt = 0; ; attempt++) {
+      try {
+        await this.page.waitForFunction((k) => performance.timeOrigin >= Number(sessionStorage.getItem(k)), key, {
+          timeout: 10_000,
+        });
+        break;
+      } catch (error) {
+        if (attempt >= 5 || /Timeout/.test(String(error))) throw error;
+        await this.page.waitForTimeout(200); // 이동 중 실행 문맥이 사라진 경우 — 다시 기다린다
+      }
+    }
+    await this.waitReadyAfterNavigation();
+  }
+
+  async press(id: ButtonId): Promise<void> {
+    await this.activate(this.visible(`[id="btn-${id}"]`));
+  }
+
+  async key(chord: string): Promise<void> {
+    await this.page.keyboard.press(chord);
+  }
+
+  async main(): Promise<string> {
+    return normalize(await this.visible('[data-testid="result-main"]').textContent());
+  }
+
+  async formulaExpression(): Promise<string> {
+    return normalize(await this.visible('[data-testid="formula-expression"]').textContent());
+  }
+
+  async sub(): Promise<string> {
+    return normalize(await this.visible('[data-testid="result-sub"]').textContent());
+  }
+
+  async hasMemory(): Promise<boolean> {
+    return (await this.visible('[data-testid="memory-indicator"]').count()) > 0;
+  }
+
+  async tab(name: TabName): Promise<void> {
+    const tab = this.visible(`[data-testid="tab-${name}"]`);
+    if ((await tab.count()) > 0) {
+      await this.activate(tab);
+    } else {
+      // 좁은 화면에서 넘치는 탭은 ▾ 메뉴 안에 있다
+      await this.activate(this.visible('[data-testid="tab-overflow"]'));
+      await this.activate(this.visible(`[data-testid="tab-menu-${name}"]`));
+    }
+    // 탭 화면은 처음 열 때 따로 불러온다(지연 로딩) — 그 화면의 결과 칸이 보일 때까지 기다린다
+    await this.visible(`#panel-${name} [data-testid="result-main"]`).waitFor();
+    // 전환 애니메이션(180ms) 동안은 옛 패널도 보여 같은 id 의 버튼이 둘이 된다 — 부하가 걸리면 길어진다. 옛 패널이 사라질 때까지
+    await this.page
+      .locator(`[role="tabpanel"][id^="panel-"]:not(#panel-${name})`)
+      .filter({ visible: true })
+      .first()
+      .waitFor({ state: 'detached' });
+  }
+
+  async setLang(code: LangCode): Promise<void> {
+    await this.page.evaluate((lang) => {
+      const settings = JSON.parse(localStorage.getItem('settings') ?? '{}') as Record<string, unknown>;
+      localStorage.setItem(
+        'settings',
+        JSON.stringify({ ...settings, useSystemLocale: false, locale: lang, userLocale: lang }),
+      );
+    }, code);
+    await this.reload();
+  }
+
+  async choose(field: SelectField, option: string): Promise<void> {
+    await this.activate(this.visible(`[data-testid="${field}"]`));
+    // behavior 를 정하지 않은 선택 상자는 모바일에서 메뉴 대신 대화상자(.q-select__dialog)로 열린다
+    const menu = this.page.locator('.q-menu, .q-select__dialog').filter({ visible: true });
+    await menu.waitFor();
+    // 입력으로 거르는 선택 상자(통화)는 목록이 길어 가상 스크롤이므로 이름을 쳐서 좁힌다
+    const field_ = this.visible(`[data-testid="${field}"]`);
+    if ((await field_.evaluate((el) => el.tagName)) === 'INPUT') await field_.fill(option);
+    // 항목은 설명(caption)과 이름 두 줄 — 이름 줄만 맞춘다. 통화 이름 줄은 'JPY, 160.0000' 처럼 환율이 붙는다
+    const escaped = option.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    const label = menu
+      .locator('.q-item__label:not(.q-item__label--caption)')
+      .filter({ hasText: new RegExp(`^${escaped}(,|$)`) });
+    await this.activate(label.first());
+    await menu.waitFor({ state: 'hidden' });
+  }
+
+  async swap(panel: 'unit' | 'radix' | 'currency'): Promise<void> {
+    await this.activate(this.visible(`#btn-swap-${panel}`));
+  }
+
+  async openScreen(screen: ScreenName): Promise<void> {
+    const hash = screen === 'calc' ? '#/' : `#/${screen}`;
+    await this.page.evaluate((h) => {
+      location.hash = h;
+    }, hash);
+    if (screen === 'calc') await this.visible('[data-testid="result-main"]').waitFor();
+    // 화면 전환 중에는 옛 화면과 새 화면이 잠깐 함께 있다
+    else await this.visible('.sub-page').first().waitFor();
+  }
+
+  documentLang(): Promise<string> {
+    return this.page.evaluate(() => document.documentElement.lang);
+  }
+
+  async notices(): Promise<string[]> {
+    const texts = await this.visible('.q-notification').allTextContents();
+    return texts.map((text) => normalize(text));
+  }
+
+  snapshotUi(): Promise<UiSnapshot> {
+    return this.page.evaluate(snapshotUiInPage);
+  }
+
+  async recordTexts(): Promise<string[]> {
+    const items = this.visible('[data-testid="record-text"]');
+    const texts = await items.allTextContents();
+    return texts.map((text) => normalize(text));
+  }
+
+  async restoreRecord(index: number): Promise<void> {
+    await this.openRecordMenu(index);
+    await this.activate(this.visible('[data-testid="record-load-main"]'));
+    // 좁은 화면은 불러온 뒤 계산기 화면으로 돌아간다
+    await this.visible('[data-testid="result-main"]').waitFor();
+  }
+
+  async deleteRecord(index: number): Promise<void> {
+    if (this.touch) {
+      // 터치 기기에는 메뉴 항목이 없고 항목을 왼쪽에서 오른쪽으로 밀어 지운다 (q-slide-item @left)
+      const box = await this.visible('[data-testid="record-item"]').nth(index).boundingBox();
+      if (!box) throw new Error(`기록 ${index} 이(가) 보이지 않는다`);
+      const y = box.y + box.height / 2;
+      await this.page.mouse.move(box.x + 10, y);
+      await this.page.mouse.down();
+      await this.page.mouse.move(box.x + box.width * 0.6, y, { steps: 8 });
+      await this.page.mouse.move(box.x + box.width - 4, y, { steps: 8 });
+      await this.page.mouse.up();
+      return;
+    }
+    await this.openRecordMenu(index);
+    await this.activate(this.visible('[data-testid="record-delete"]'));
+  }
+
+  async deleteAllRecords(): Promise<void> {
+    await this.activate(this.visible('[data-testid="subpage-delete_outline"]'));
+    // 확인 다이얼로그(Quasar $q.dialog) — 두 번째 버튼이 '예'(ok) 이다
+    const dialog = this.page.locator('.q-dialog').filter({ visible: true });
+    await dialog.waitFor();
+    await this.activate(dialog.locator('.q-card__actions .q-btn').last());
+    await dialog.waitFor({ state: 'hidden' });
+  }
+
+  /** 기록 한 건의 메뉴를 연다 — 데스크톱은 ⋮ 버튼, 터치 기기는 항목 길게 누르기(touch-hold) */
+  private async openRecordMenu(index: number): Promise<void> {
+    if (this.touch) {
+      const box = await this.visible('[data-testid="record-item"]').nth(index).boundingBox();
+      if (!box) throw new Error(`기록 ${index} 이(가) 보이지 않는다`);
+      await this.page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
+      await this.page.mouse.down();
+      await this.page.waitForTimeout(900);
+      await this.page.mouse.up();
+    } else {
+      // ⋮ 버튼은 항목에 마우스를 올려야 보인다(visibility: hidden → hover)
+      await this.visible('[data-testid="record-item"]').nth(index).hover();
+      await this.page.locator('[data-testid="record-menu-btn"]').nth(index).click();
+    }
+    await this.visible('.q-menu [role="menuitem"]').first().waitFor();
+  }
+
+  private blocker: { matches: (url: URL) => boolean; handler: (route: Route) => Promise<void> } | null = null;
+
+  async blockRequests(match: string | null): Promise<void> {
+    if (this.blocker) await this.page.unroute(this.blocker.matches, this.blocker.handler);
+    this.blocker = null;
+    if (match === null) return;
+    this.blocker = {
+      matches: (url) => url.pathname.includes(match),
+      handler: (route) => route.abort('connectionrefused'),
+    };
+    await this.page.route(this.blocker.matches, this.blocker.handler);
+  }
+
+  setClipboard(text: string): Promise<void> {
+    return setClipboard(this.page, text);
+  }
+
+  getClipboard(): Promise<string> {
+    return getClipboard(this.page);
+  }
+
+  step<T>(title: string, body: () => Promise<T>): Promise<T> {
+    return test.step(title, body);
+  }
+}

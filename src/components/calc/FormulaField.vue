@@ -300,6 +300,7 @@
             -->
             <div
               ref="innerText"
+              data-testid="formula-expression"
               class="col no-outline text-right noselect formula-expression-text"
               :class="[isExpressionEmpty ? 'formula-expression-placeholder' : '', `text-${fieldTextColor}`]"
               role="button"

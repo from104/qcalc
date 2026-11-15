@@ -175,6 +175,7 @@
     <!-- 원본 진법 -->
     <q-select
       v-model="radixStore.sourceRadix"
+      data-testid="radix-source"
       :options="sourceSelectOptions"
       role="combobox"
       :aria-label="t('ariaLabel.sourceRadix')"
@@ -222,6 +223,7 @@
     <!-- 대상 진법 -->
     <q-select
       v-model="radixStore.targetRadix"
+      data-testid="radix-target"
       :options="targetSelectOptions"
       role="combobox"
       :aria-label="t('ariaLabel.targetRadix')"
