@@ -20,7 +20,7 @@ Cálculos de alta precisão, conversão de unidades/moedas/bases numéricas e av
 
 - **Como Acessar**: Ctrl+1 ou selecione a aba superior
 - **Operações Básicas**: Insira números 0-9, teclas +, -, \*, /
-- **Funções Avançadas**: Funções trigonométricas (q, w, e), quadrado (u), raiz quadrada (i), constantes (z: π, x: φ, c: e)
+- **Funções Avançadas**: Funções trigonométricas (S-q, S-w, S-e), quadrado (u), raiz quadrada (i), constantes (z: π, x: φ, c: e)
 - **Funções de Memória**: Ctrl+Enter (MS), Ctrl+Backspace (MR), Ctrl+Delete (MC)
 - **Cálculo de Porcentagem**: 'número, /, número, %(k)' calcula porcentagem
 - **Aplicar Porcentagem**: 'número, \*, número, %(k)' aplica porcentagem
@@ -40,7 +40,7 @@ Cálculos de alta precisão, conversão de unidades/moedas/bases numéricas e av
 - **340 Moedas**: Fiduciárias, criptomoedas e metais preciosos — sem necessidade de chave de API
 - **Taxas de Câmbio Atualizadas**: Taxas em tempo real (snapshot integrado usado quando offline)
 - **Favoritos**: Defina moedas usadas frequentemente como favoritos para acesso rápido
-- **Cálculo Rápido**: +5/+10/+100 (f/g/h), -5/-10/-100 (q/w/e)
+- **Cálculo Rápido**: +5/+10/+100 (f/g/h), -5/-10/-100 (S-q/S-w/S-e)
 - **Trocar Moedas**: Use a tecla '\' para trocar moedas de origem/destino
 - **Símbolo da Moeda**: Alternar exibição/ocultação do símbolo da moeda com a tecla Alt+\
 
@@ -109,7 +109,7 @@ Cálculos de alta precisão, conversão de unidades/moedas/bases numéricas e av
 #### Funções Matemáticas
 
 - **Enésima Potência/Enésima Raiz**: Calcular com as teclas r/t
-- **Funções Trigonométricas**: Teclas q/w/e no modo shift
+- **Funções Trigonométricas**: Teclas S-q/S-w/S-e no modo shift
 - **Extrair Parte Inteira/Decimal**: Calcular com as teclas v/b
 - **Fatorial**: Calcular com a tecla h
 
@@ -123,7 +123,7 @@ Cálculos de alta precisão, conversão de unidades/moedas/bases numéricas e av
 #### Usando Operações de Bits
 
 - **Operações de Bits**: AND (j), OR (k), XOR (l), NOT (h), operações de deslocamento (r/t/u/i)
-- **Extensão Lógica**: Use operações NAND/NOR/XNOR com as teclas q/w/e
+- **Extensão Lógica**: Use operações NAND/NOR/XNOR com as teclas S-q/S-w/S-e
 - **Operações de Deslocamento**: Mover posições de bits em 1 bit/4 bits
 - **Definir Tamanho de Bits**: Operações de bits de acordo com o tamanho definido
 

@@ -20,7 +20,7 @@ Calculs de haute précision, conversion d'unités/devises/bases numériques et �
 
 - **Comment y accéder** : Ctrl+1 ou sélectionner l'onglet supérieur
 - **Opérations de base** : Entrez les chiffres 0-9, +, -, \*, / touches
-- **Fonctions avancées** : Fonctions trigonométriques (q, w, e), carré (u), racine carrée (i), constantes (z : π, x : φ, c : e)
+- **Fonctions avancées** : Fonctions trigonométriques (S-q, S-w, S-e), carré (u), racine carrée (i), constantes (z : π, x : φ, c : e)
 - **Fonctions mémoire** : Ctrl+Enter (MS), Ctrl+Backspace (MR), Ctrl+Delete (MC)
 - **Calcul de pourcentage** : 'nombre, /, nombre, %(k)' calcule le pourcentage
 - **Appliquer un pourcentage** : 'nombre, \*, nombre, %(k)' applique le pourcentage
@@ -40,7 +40,7 @@ Calculs de haute précision, conversion d'unités/devises/bases numériques et �
 - **340 devises** : Fiduciaires, cryptomonnaies et métaux précieux — aucune clé API requise
 - **Derniers taux de change** : Taux en temps réel (snapshot intégré utilisé hors ligne)
 - **Favoris** : Définissez les devises fréquemment utilisées comme favoris pour un accès rapide
-- **Calcul rapide** : +5/+10/+100 (f/g/h), -5/-10/-100 (q/w/e)
+- **Calcul rapide** : +5/+10/+100 (f/g/h), -5/-10/-100 (S-q/S-w/S-e)
 - **Échanger les devises** : Utilisez la touche '\' pour échanger les devises source/cible
 - **Symbole de devise** : Basculer l'affichage/masquage du symbole de devise avec la touche Alt+\
 
@@ -109,7 +109,7 @@ Calculs de haute précision, conversion d'unités/devises/bases numériques et �
 #### Fonctions mathématiques
 
 - **Puissance N-ième/Racine N-ième** : Calculer avec les touches r/t
-- **Fonctions trigonométriques** : Touches q/w/e en mode shift
+- **Fonctions trigonométriques** : Touches S-q/S-w/S-e en mode shift
 - **Extraire la partie entière/décimale** : Calculer avec les touches v/b
 - **Factorielle** : Calculer avec la touche h
 
@@ -123,7 +123,7 @@ Calculs de haute précision, conversion d'unités/devises/bases numériques et �
 #### Utiliser les opérations sur les bits
 
 - **Opérations sur les bits** : AND (j), OR (k), XOR (l), NOT (h), opérations de décalage (r/t/u/i)
-- **Extension logique** : Utilisez les opérations NAND/NOR/XNOR avec les touches q/w/e
+- **Extension logique** : Utilisez les opérations NAND/NOR/XNOR avec les touches S-q/S-w/S-e
 - **Opérations de décalage** : Déplacer les positions de bits de 1 bit/4 bits
 - **Définir la taille des bits** : Opérations sur les bits selon la taille définie
 
