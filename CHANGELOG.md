@@ -10,6 +10,7 @@ The format is based on [Keep a Changelog] and this project follows [Semantic Ver
 
 - Paste from the clipboard did nothing on Linux
 - Quitting with q left the keypad stuck in shift mode on the next launch
+- A Korean label was missing in the currency converter
 
 ### Changed
 
