@@ -70,6 +70,18 @@ export function tauriDriverPath(): string | null {
   return which('tauri-driver') ?? (existsSync(cargoBin) ? cargoBin : null);
 }
 
+/**
+ * tauri-driver starts msedgedriver with stdout → null and no log flags, so a hanging new-session request leaves no
+ * trace (first CI run: 65 × "Request timed out" on POST /session, empty driver logs). Hand it a .cmd wrapper that adds
+ * `--verbose --log-path` instead — the whole msedgedriver ↔ WebView2 conversation lands in test-results/.
+ */
+function loggedNativeDriver(nativeDriver: string, logDir: string): string {
+  const wrapper = path.join(logDir, 'msedgedriver-logged.cmd');
+  const log = path.join(logDir, 'app-msedgedriver.log');
+  writeFileSync(wrapper, `@"${nativeDriver}" %* --verbose "--log-path=${log}"\r\n`);
+  return wrapper;
+}
+
 export function missingTools(): string[] {
   const missing: string[] = [];
   if (!tauriDriverPath()) missing.push('tauri-driver (cargo install tauri-driver --locked)');
@@ -127,7 +139,14 @@ export async function startWindowsEnv({ logDir }: { logDir: string }): Promise<A
   const [driverPort, nativePort] = [await freePort(), await freePort()];
   const driver = spawn(
     driverBin,
-    ['--port', String(driverPort), '--native-port', String(nativePort), '--native-driver', nativeDriver],
+    [
+      '--port',
+      String(driverPort),
+      '--native-port',
+      String(nativePort),
+      '--native-driver',
+      loggedNativeDriver(nativeDriver, logDir),
+    ],
     { env, stdio: ['ignore', log('driver'), log('driver-stderr')], windowsHide: true },
   );
   if (!driver.pid) throw new Error('tauri-driver did not start');

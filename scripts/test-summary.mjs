@@ -135,7 +135,9 @@ for (const s of steps) {
   e2eFailures.push(...parsed.failures);
   knownBugs.push(...parsed.knownBugs);
   const total = Object.values(parsed.projects).reduce((n, p) => n + p.passed + p.failed + p.flaky + p.skipped, 0);
-  if (report && total === 0) s.detail = 'no tests ran';
+  // globalSetup failed (app layer: the smoke check could not open a session) → say why, not just "no tests ran"
+  const setupError = report?.errors?.[0]?.message?.split('\n')[0];
+  if (report && total === 0) s.detail = setupError ? `no tests ran — ${setupError.slice(0, 300)}` : 'no tests ran';
 }
 
 const producedThisRun = (file) => {

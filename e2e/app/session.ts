@@ -46,7 +46,9 @@ export class AppSession {
       logLevel: 'silent', // failures surface as thrown errors; expected ones (app quitting) would only be noise
       // never resend a command: a retried "actions" would press keys twice
       connectionRetryCount: 0,
-      connectionRetryTimeout: 30_000,
+      // msedgedriver gives WebView2 60s to come up before it answers the new-session request with its own error;
+      // a shorter client timeout only ever shows "Request timed out" and hides that error (first Windows CI run)
+      connectionRetryTimeout: isWindows ? 120_000 : 30_000,
       capabilities: {
         'tauri:options': { application: this.options.binary },
         // classic WebDriver only — WebKitWebDriver's BiDi support is partial (msedgedriver: not needed either)

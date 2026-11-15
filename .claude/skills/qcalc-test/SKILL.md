@@ -82,6 +82,6 @@ app 층 준비물(Linux): `Xvfb` · `dbus-daemon` · `WebKitWebDriver`(apt webki
 
 ## 로드맵
 
-- Windows(Phase 3): e2e-app.yml 의 `windows` 잡 구현됨(첫 CI 실행 전 — 결과를 보고 known-bug·기대값을 다듬는다). 읽는 법: Actions 실행의 Job summary(= summary.md) → 아티팩트 `app-e2e-windows`(test-results/: app-html-report·app-driver\*.log·app-build-tauri.log). 로컬에서 못 돌림 — 앱 데이터를 격리할 수 없어 CI=true 가 아니면 거부한다.
+- Windows(Phase 3): e2e-app.yml 의 `windows` 잡 구현됨(첫 CI 실행 전 — 결과를 보고 known-bug·기대값을 다듬는다). 읽는 법: Actions 실행의 Job summary(= summary.md) → 아티팩트 `app-e2e-windows`(test-results/: app-html-report·app-driver\*.log·app-msedgedriver.log·app-build-tauri.log). 세션을 못 열면 globalSetup 스모크 확인이 층 전체를 바로 멈춘다(`smoke check: could not open a WebDriver session`). 로컬에서 못 돌림 — 앱 데이터를 격리할 수 없어 CI=true 가 아니면 거부한다.
 - Phase 4 Android: 에뮬레이터 `qcalc35` + Playwright `_android`, `touch` 능력.
 - 드라이버만 새로 쓰면 `e2e/scenarios/*` 는 그대로 재사용.
