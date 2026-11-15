@@ -121,6 +121,19 @@ fn get_package_env() -> PackageEnv {
 
 #[tauri::command]
 fn quit_app(app: tauri::AppHandle) {
+  // Windows: app.exit()는 WebView2 컨트롤러를 연 채로 프로세스를 끝낸다. WebView2는 localStorage를
+  // 몇 초 늦게 디스크에 쓰므로, q로 끄면 직전 기록·설정이 사라졌다(Windows 실앱 E2E: 다시 켜면 첫 실행).
+  // 창을 먼저 닫아 제목 표시줄 ×와 같은 정상 종료 경로를 탄다 — 마지막 창이 닫히면 Tauri가 앱을 끝낸다.
+  #[cfg(windows)]
+  {
+    let windows = app.webview_windows();
+    if !windows.is_empty() {
+      for window in windows.values() {
+        let _ = window.close();
+      }
+      return;
+    }
+  }
   app.exit(0);
 }
 
