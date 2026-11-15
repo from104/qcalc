@@ -6,7 +6,7 @@
  * of the worker uses the same profile, so "relaunch" really tests persistence. `wipeProfile()` gives a
  * first-install state.
  */
-import { readFileSync, readlinkSync, readdirSync, rmSync, statSync } from 'node:fs';
+import { cpSync, existsSync, readFileSync, readlinkSync, readdirSync, rmSync, statSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 
@@ -134,8 +134,18 @@ export class AppSession {
         `[e2e] WebView2 after app exit: ${left.length ? `${left.length} still running` : 'all exited'} after ${Date.now() - started}ms\n`,
       );
     }
-    if (exited) await this.close();
-    return exited;
+    if (!exited) return false;
+    // Windows: msedgedriver's Quit takes the WebView2 profile with it, so a relaunch came back as a first run
+    // (the profile folder was gone after the session). Keep a copy across the session end.
+    const saved = isWindows ? saveWebviewData() : null;
+    if (isWindows) {
+      windowsStorageDiag('after app exit (session still open)', this.options.profile);
+      findLocalStorage([tmpdir(), path.dirname(path.resolve(this.options.binary))]);
+    }
+    await this.close();
+    if (isWindows) windowsStorageDiag('after session end', this.options.profile);
+    if (saved) restoreWebviewData(saved);
+    return true;
   }
 
   async relaunch({ fresh = false } = {}): Promise<void> {
@@ -201,4 +211,54 @@ function windowsStorageDiag(label: string, profile: ProfileDirs): void {
   };
   walk(root, 0);
   process.stderr.write(`[e2e] storage ${label} (${root}):\n  ${lines.join('\n  ') || '(empty)'}\n`);
+}
+
+/** copy the app's WebView2 profile aside (null when there is none) */
+function saveWebviewData(): string | null {
+  const source = webviewDataDir();
+  if (!existsSync(source)) return null;
+  const copy = path.join(tmpdir(), `qcalc-e2e-webview-${process.pid}`);
+  rmSync(copy, { recursive: true, force: true });
+  // lock files of a profile that is still being closed are skipped, the data files are what matters
+  cpSync(source, copy, { recursive: true, force: true, filter: (from) => !/[\\/](lockfile|LOCK)$/i.test(from) });
+  return copy;
+}
+
+/** put a saved WebView2 profile back where the next launch will look for it */
+function restoreWebviewData(copy: string): void {
+  const target = webviewDataDir();
+  rmSync(target, { recursive: true, force: true, maxRetries: 20, retryDelay: 250 });
+  cpSync(copy, target, { recursive: true });
+  rmSync(copy, { recursive: true, force: true });
+}
+
+/** diagnostics: every "Local Storage" folder a few levels under these roots (where WebView2 really keeps its profile) */
+function findLocalStorage(roots: string[]): void {
+  const found: string[] = [];
+  const walk = (dir: string, depth: number): void => {
+    let entries;
+    try {
+      entries = readdirSync(dir, { withFileTypes: true });
+    } catch {
+      return;
+    }
+    for (const entry of entries) {
+      if (!entry.isDirectory()) continue;
+      const full = path.join(dir, entry.name);
+      if (entry.name === 'Local Storage') {
+        let seeded = false;
+        try {
+          const leveldb = path.join(full, 'leveldb');
+          seeded = readdirSync(leveldb).some((name) => readFileSync(path.join(leveldb, name)).includes('showTips'));
+        } catch {
+          // unreadable or still locked
+        }
+        found.push(`${full}${seeded ? ' [has showTips]' : ''}`);
+      } else if (depth < 5) walk(full, depth + 1);
+    }
+  };
+  for (const root of roots) walk(root, 0);
+  process.stderr.write(
+    `[e2e] Local Storage folders under ${roots.join(' | ')}:\n  ${found.join('\n  ') || '(none)'}\n`,
+  );
 }
