@@ -16,12 +16,14 @@ import { DEFAULT_SIZE, TauriApp } from './tauri-app';
 
 /**
  * keyboard: WebDriver key actions · clipboard: the real system clipboard via an outside process (Linux: X CLIPBOARD
- * owner script, Windows: PowerShell) · reload: refresh/relaunch · xwindow: Xvfb's X windows (Linux only — the
+ * owner script, Windows: PowerShell) · reload: refresh within the session · relaunch: storage survives a new app
+ * process (Linux only — on Windows msedgedriver points WebView2 at a fresh %SystemTemp%\scoped_dir…\EBWebView for every
+ * session and deletes it on quit, whatever --user-data-dir says) · xwindow: Xvfb's X windows (Linux only — the
  * Windows runner's screen size and DPI are not ours to set, so exact window sizes are not asserted there)
  */
 export const TAURI_CAPABILITIES: Capability[] = isWindows
   ? ['keyboard', 'clipboard', 'reload']
-  : ['keyboard', 'clipboard', 'reload', 'xwindow'];
+  : ['keyboard', 'clipboard', 'reload', 'relaunch', 'xwindow'];
 
 /**
  * 'atspi' only where the app can actually announce: announce_a11y emits ATK's `announcement` signal, which exists

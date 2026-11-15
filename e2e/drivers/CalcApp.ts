@@ -17,11 +17,12 @@ import type { LangCode, SeedState } from '../fixtures/seed';
  * - clipboard : 시스템(또는 대역) 클립보드를 시험 코드에서 읽고 쓸 수 있다
  * - netMock   : HTTP 요청을 가로채 고정 응답을 주거나 실패시킬 수 있다(환율·수식 엔진 청크)
  * - reload    : 저장소를 유지한 채 앱을 다시 띄울 수 있다(기록 영속성)
+ * - relaunch  : 앱 프로세스를 끄고 새로 띄워도 웹뷰 저장소가 남는다 (Linux 실제 앱 — Windows 는 msedgedriver 가 세션마다 새 WebView2 프로필을 준다)
  * - touch     : 탭·스와이프 같은 터치 입력을 보낸다
  * - atspi     : 접근성 버스(AT-SPI)에서 스크린리더가 듣는 알림을 들을 수 있다 (Linux 실제 앱, 호스트 ATK 2.46+)
  * - xwindow   : X 창(xwininfo/xprop)으로 네이티브 창 크기·제목을 읽고, 창 크기를 알려진 가상 화면에서 시험할 수 있다 (Linux 실제 앱)
  */
-export type Capability = 'keyboard' | 'clipboard' | 'netMock' | 'reload' | 'touch' | 'atspi' | 'xwindow';
+export type Capability = 'keyboard' | 'clipboard' | 'netMock' | 'reload' | 'relaunch' | 'touch' | 'atspi' | 'xwindow';
 
 /** 주소(해시)로 여는 화면 — 'calc' 는 계산기 본 화면으로 돌아간다 */
 export type ScreenName = 'calc' | 'record' | 'settings' | 'help' | 'about';

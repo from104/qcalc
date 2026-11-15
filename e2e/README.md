@@ -210,11 +210,14 @@ scripts/test-suite.sh --layer app        # = --platform <이 기계의 OS>. wind
 - **프로세스**: `/proc` 도 환경 표지도 없다. tauri-driver(와 그 아래 msedgedriver·앱·WebView2 보조)를 PID 로 추적하고 `taskkill /T /F /PID` 로
   끝낸다(이름으로는 절대 안 끝냄). PID 는 `test-results/.app-run.json` 에 적히고, 러너가 죽었을 때는 `e2e/app/sweep-windows.mjs` 가 그 PID 를
   (아직 살아 있고 이미지 이름이 우리 것일 때만) 정리한다. `flock` 이 없으면 단일 실행 락은 건너뛴다.
-- **능력**: `keyboard`·`clipboard`(PowerShell `Set-Clipboard`/`Get-Clipboard`, base64 로 전달)·`reload`. **`xwindow`·`atspi` 없음** →
-  X 창 크기·제목 시나리오 4개와 스크린리더 알림 시나리오는 "드라이버(tauri-windows)에 없는 능력" 으로 skip. 러너의 화면 크기·DPI 를 정할 수 없어
+- **능력**: `keyboard`·`clipboard`(PowerShell `Set-Clipboard`/`Get-Clipboard`, base64 로 전달 · 빈 값은 `Clipboard.Clear()`)·`reload`.
+  **`xwindow`·`atspi`·`relaunch` 없음** → X 창 크기·제목 시나리오 4개, 스크린리더 알림 시나리오, 끄고 다시 켜는 저장 시나리오 2개는
+  "드라이버(tauri-windows)에 없는 능력" 으로 skip. `relaunch` 가 없는 이유: msedgedriver 는 세션마다 WebView2 를
+  `%SystemTemp%\scoped_dir…\EBWebView` 새 프로필로 띄우고(WEBVIEW2_USER_DATA_FOLDER — `--user-data-dir` 를 줘도 앱 명령줄로만 간다)
+  끝낼 때 지운다(CI 실측: 브라우저 프로세스 명령줄). 그래서 새 세션 = 첫 실행이다. 실사용자 환경과는 무관하다. 러너의 화면 크기·DPI 를 정할 수 없어
   정확한 창 크기는 단언하지 않는다 — 픽스처는 첫 실행에서 잰 크기를 "기본 창" 기준으로 쓴다. 출처는 `http://tauri.localhost`.
-- **Control+v**: `read_clipboard_text` 는 Linux 전용(`Err("unsupported")`)이라 WebView2 의 `navigator.clipboard.readText()` 로 돌아간다 —
-  권한 프롬프트 등으로 결과가 Linux 와 다를 수 있다. Windows 의 known-bug 는 **첫 CI 결과를 본 뒤** 증거와 함께 붙인다(`knownBugOn['tauri-windows']`).
+- **Control+v**: `read_clipboard_text` 는 Windows 에서 Win32 클립보드를 직접 읽는다(clipboard-win). 처음엔 Linux 전용이라 WebView2 의
+  `navigator.clipboard.readText()` 로 돌아갔는데, 권한을 묻느라 붙여넣기가 늘 빈손이었다(첫 Windows CI — 17건 실패).
 - **읽기**: Actions 실행 화면의 Job summary(summary.md) → 아티팩트 `app-e2e-windows`(성공해도 올린다): `app-html-report/`(실패 스크린샷·앱 로그),
   `app-driver.log`·`app-driver-stderr.log`(tauri-driver·msedgedriver·앱 stderr), `app-msedgedriver.log`(msedgedriver `--verbose` —
   tauri-driver 는 msedgedriver 의 stdout 을 버리고 로그 옵션도 안 주므로 `test-results/msedgedriver-logged.cmd` 로 감싸 넘긴다), `app-build-tauri.log`.
