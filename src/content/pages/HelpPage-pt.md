@@ -166,16 +166,16 @@ Cálculos de alta precisão, conversão de unidades/moedas/bases numéricas e av
 
 | Atalho      | Função                       |
 | ----------- | ---------------------------- |
-| S-r         | Potência (xⁿ)                |
-| S-t         | Raiz (ⁿ√x)                   |
-| S-f         | Potência de 10 (10ⁿ)         |
-| S-g         | Módulo (x%y)                 |
-| S-h         | Fatorial (x!)                |
+| r           | Potência (xⁿ)                |
+| t           | Raiz (ⁿ√x)                   |
+| f           | Potência de 10 (10ⁿ)         |
+| g           | Módulo (x%y)                 |
+| h           | Fatorial (x!)                |
 | S-q,S-w,S-e | Trig (sin, cos, tan)         |
-| S-a,S-s,S-d | Constantes (Pi/2, ln10, ln2) |
-| S-z,S-x,S-c | Constantes (Pi, phi, e)      |
-| S-v         | Parte inteira                |
-| S-b         | Parte fracionária            |
+| a,s,d       | Constantes (Pi/2, ln10, ln2) |
+| z,x,c       | Constantes (Pi, phi, e)      |
+| v           | Parte inteira                |
+| b           | Parte fracionária            |
 
 ### Operações de Memória
 
@@ -193,10 +193,10 @@ Cálculos de alta precisão, conversão de unidades/moedas/bases numéricas e av
 
 | Atalho      | Função                             |
 | ----------- | ---------------------------------- |
-| S-f,S-g,S-h | ×2/×3/×5 ou +5/+10/+100            |
+| f,g,h       | ×2/×3/×5 ou +5/+10/+100            |
 | S-q,S-w,S-e | ÷2/÷3/÷5 ou -5/-10/-100            |
-| S-a,S-s,S-d | ×10/×100/×1000                     |
-| S-z,S-x,S-c | ÷10/÷100/÷1000                     |
+| a,s,d       | ×10/×100/×1000                     |
+| z,x,c       | ÷10/÷100/÷1000                     |
 | \           | Trocar origem e destino            |
 | A-\         | Alternar exibição de unidade/moeda |
 
@@ -204,14 +204,14 @@ Cálculos de alta precisão, conversão de unidades/moedas/bases numéricas e av
 
 | Atalho      | Função                              |
 | ----------- | ----------------------------------- |
-| S-r,S-t     | Deslocamento de 1 bit (x<<1, x>>1)  |
+| r,t         | Deslocamento de 1 bit (x<<1, x>>1)  |
 | u,i         | Deslocamento esq./dir. (x<<y, x>>y) |
-| S-f,S-g     | Deslocamento de 4 bits (x<<4, x>>4) |
-| S-h         | Operação NOT                        |
+| f,g         | Deslocamento de 4 bits (x<<4, x>>4) |
+| h           | Operação NOT                        |
 | j,k,l       | Operações de bits (AND, OR, XOR)    |
 | S-q,S-w,S-e | NAND, NOR, XNOR                     |
-| S-z,S-x,S-c | Entrada hexadecimal (A, B, C)       |
-| S-a,S-s,S-d | Entrada hexadecimal (D, E, F)       |
+| z,x,c       | Entrada hexadecimal (A, B, C)       |
+| a,s,d       | Entrada hexadecimal (D, E, F)       |
 | \           | Trocar origem e destino             |
 | A-\         | Alternar exibição de base           |
 | AC-\        | Alternar posição da base (pré/pós)  |

@@ -13,7 +13,7 @@ The format is based on [Keep a Changelog] and this project follows [Semantic Ver
 
 ### Changed
 
-- Shift-mode functions (sin, cos, tan, xⁿ, constants, ÷2, NAND, hex digits…) now use Shift + the letter; q alone quits
+- The q, w, e row of shift-mode functions (sin/cos/tan, ÷2/÷3/÷5, -5/-10/-100, NAND/NOR/XNOR) now uses Shift+q/w/e; q alone quits
 
 ## [0.13.6] 2026-10-03
 

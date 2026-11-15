@@ -166,16 +166,16 @@ Hochpräzise Berechnungen, Einheiten-/Währungs-/Zahlensystemumrechnung und Form
 
 | Tastenkombination | Funktion                     |
 | ----------------- | ---------------------------- |
-| S-r               | Potenz (xⁿ)                  |
-| S-t               | Wurzel (ⁿ√x)                 |
-| S-f               | Zehnerpotenz (10ⁿ)           |
-| S-g               | Modulo (x%y)                 |
-| S-h               | Fakultät (x!)                |
+| r                 | Potenz (xⁿ)                  |
+| t                 | Wurzel (ⁿ√x)                 |
+| f                 | Zehnerpotenz (10ⁿ)           |
+| g                 | Modulo (x%y)                 |
+| h                 | Fakultät (x!)                |
 | S-q,S-w,S-e       | Trig. (sin, cos, tan)        |
-| S-a,S-s,S-d       | Konstanten (Pi/2, ln10, ln2) |
-| S-z,S-x,S-c       | Konstanten (Pi, phi, e)      |
-| S-v               | Ganzzahlanteil               |
-| S-b               | Dezimalanteil                |
+| a,s,d             | Konstanten (Pi/2, ln10, ln2) |
+| z,x,c             | Konstanten (Pi, phi, e)      |
+| v                 | Ganzzahlanteil               |
+| b                 | Dezimalanteil                |
 
 ### Speicheroperationen
 
@@ -193,10 +193,10 @@ Hochpräzise Berechnungen, Einheiten-/Währungs-/Zahlensystemumrechnung und Form
 
 | Tastenkombination | Funktion                              |
 | ----------------- | ------------------------------------- |
-| S-f,S-g,S-h       | ×2/×3/×5 oder +5/+10/+100             |
+| f,g,h             | ×2/×3/×5 oder +5/+10/+100             |
 | S-q,S-w,S-e       | ÷2/÷3/÷5 oder -5/-10/-100             |
-| S-a,S-s,S-d       | ×10/×100/×1000                        |
-| S-z,S-x,S-c       | ÷10/÷100/÷1000                        |
+| a,s,d             | ×10/×100/×1000                        |
+| z,x,c             | ÷10/÷100/÷1000                        |
 | \                 | Quelle und Ziel tauschen              |
 | A-\               | Einheiten-/Währungsanzeige umschalten |
 
@@ -204,14 +204,14 @@ Hochpräzise Berechnungen, Einheiten-/Währungs-/Zahlensystemumrechnung und Form
 
 | Tastenkombination | Funktion                                   |
 | ----------------- | ------------------------------------------ |
-| S-r,S-t           | 1-Bit-Verschiebung (x<<1, x>>1)            |
+| r,t               | 1-Bit-Verschiebung (x<<1, x>>1)            |
 | u,i               | Links-/Rechtsverschiebung (x<<y, x>>y)     |
-| S-f,S-g           | 4-Bit-Verschiebung (x<<4, x>>4)            |
-| S-h               | NOT-Operation                              |
+| f,g               | 4-Bit-Verschiebung (x<<4, x>>4)            |
+| h                 | NOT-Operation                              |
 | j,k,l             | Bit-Operationen (AND, OR, XOR)             |
 | S-q,S-w,S-e       | NAND, NOR, XNOR                            |
-| S-z,S-x,S-c       | Hex-Eingabe (A, B, C)                      |
-| S-a,S-s,S-d       | Hex-Eingabe (D, E, F)                      |
+| z,x,c             | Hex-Eingabe (A, B, C)                      |
+| a,s,d             | Hex-Eingabe (D, E, F)                      |
 | \                 | Quelle und Ziel tauschen                   |
 | A-\               | Zahlensystemanzeige umschalten             |
 | AC-\              | Zahlensystemposition umschalten (vor/nach) |

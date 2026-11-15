@@ -166,16 +166,16 @@ Calculs de haute précision, conversion d'unités/devises/bases numériques et �
 
 | Raccourci   | Fonction                     |
 | ----------- | ---------------------------- |
-| S-r         | Puissance (xⁿ)               |
-| S-t         | Racine (ⁿ√x)                 |
-| S-f         | Puissance de 10 (10ⁿ)        |
-| S-g         | Modulo (x%y)                 |
-| S-h         | Factorielle (x!)             |
+| r           | Puissance (xⁿ)               |
+| t           | Racine (ⁿ√x)                 |
+| f           | Puissance de 10 (10ⁿ)        |
+| g           | Modulo (x%y)                 |
+| h           | Factorielle (x!)             |
 | S-q,S-w,S-e | Trigo (sin, cos, tan)        |
-| S-a,S-s,S-d | Constantes (Pi/2, ln10, ln2) |
-| S-z,S-x,S-c | Constantes (Pi, phi, e)      |
-| S-v         | Partie entière               |
-| S-b         | Partie décimale              |
+| a,s,d       | Constantes (Pi/2, ln10, ln2) |
+| z,x,c       | Constantes (Pi, phi, e)      |
+| v           | Partie entière               |
+| b           | Partie décimale              |
 
 ### Opérations mémoire
 
@@ -193,10 +193,10 @@ Calculs de haute précision, conversion d'unités/devises/bases numériques et �
 
 | Raccourci   | Fonction                          |
 | ----------- | --------------------------------- |
-| S-f,S-g,S-h | ×2/×3/×5 ou +5/+10/+100           |
+| f,g,h       | ×2/×3/×5 ou +5/+10/+100           |
 | S-q,S-w,S-e | ÷2/÷3/÷5 ou -5/-10/-100           |
-| S-a,S-s,S-d | ×10/×100/×1000                    |
-| S-z,S-x,S-c | ÷10/÷100/÷1000                    |
+| a,s,d       | ×10/×100/×1000                    |
+| z,x,c       | ÷10/÷100/÷1000                    |
 | \           | Échanger source et cible          |
 | A-\         | Basculer l'affichage unité/devise |
 
@@ -204,14 +204,14 @@ Calculs de haute précision, conversion d'unités/devises/bases numériques et �
 
 | Raccourci   | Fonction                                   |
 | ----------- | ------------------------------------------ |
-| S-r,S-t     | Décalage de 1 bit (x<<1, x>>1)             |
+| r,t         | Décalage de 1 bit (x<<1, x>>1)             |
 | u,i         | Décalage gauche/droite (x<<y, x>>y)        |
-| S-f,S-g     | Décalage de 4 bits (x<<4, x>>4)            |
-| S-h         | Opération NOT                              |
+| f,g         | Décalage de 4 bits (x<<4, x>>4)            |
+| h           | Opération NOT                              |
 | j,k,l       | Opérations sur les bits (AND, OR, XOR)     |
 | S-q,S-w,S-e | NAND, NOR, XNOR                            |
-| S-z,S-x,S-c | Saisie hexadécimale (A, B, C)              |
-| S-a,S-s,S-d | Saisie hexadécimale (D, E, F)              |
+| z,x,c       | Saisie hexadécimale (A, B, C)              |
+| a,s,d       | Saisie hexadécimale (D, E, F)              |
 | \           | Échanger source et cible                   |
 | A-\         | Basculer l'affichage de la base            |
 | AC-\        | Basculer la position de la base (pré/post) |

@@ -225,8 +225,8 @@ scripts/test-suite.sh --layer app        # = --platform <이 기계의 OS>. wind
 - **Control+c 복사가 클립보드를 비운다(Tauri Linux)** — "복사되었습니다" 알림은 뜨지만 클립보드에 텍스트가 없다. 단축키가 keydown 기본
   동작을 막지 않아 WebKitGTK 의 기본 "복사"(선택 없음)가 앱의 `writeText` 를 덮는다(preventDefault 하면 정상). Shift+Control+c 는 정상.
   known-bug: native 「Control+c」 + keyboard 2개(`knownBugOn['tauri-linux']`).
-- ~~**q 로 끝내면 다음 실행에 키패드가 shift 고정**~~ — 고침(2026-11-15): 'q' 가 앱 종료이면서 shift 기능 `sin` 단축키였다. shift 기능 단축키를
-  전부 Shift+글자로 옮겼고(q 단독 = 종료) native 「'q' 로 끝내고 다시 켜도 키패드는 평상 상태다」가 회귀 시험이다.
+- ~~**q 로 끝내면 다음 실행에 키패드가 shift 고정**~~ — 고침(2026-11-15): 'q' 가 앱 종료이면서 shift 기능 `sin` 단축키였다. shift 기능 q·w·e 줄을
+  Shift+q/w/e 로 옮겼고(q 단독 = 종료) native 「'q' 로 끝내고 다시 켜도 키패드는 평상 상태다」가 회귀 시험이다.
 - (앱 버그 아님) Wayland 세션의 `GTK_IM_MODULE=wayland` 가 X11 디스플레이로 새면 GTK 가 im-wayland.so 를 올려
   `gdk_wayland_display_get_wl_display` 단언 실패 후 웹뷰 생성 중 SIGSEGV. 시험 환경은 이 변수를 지운다. 예전 XWayland 강제(GDK_BACKEND=x11)
   크래시와 같은 함수 이름이라 그 원인 후보이기도 하다.

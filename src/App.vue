@@ -83,7 +83,7 @@
     [['Alt+,'], () => settingsStore.toggleGroupingUnit()],
     [['['], settingsStore.decrementDecimalPlaces],
     [[']'], settingsStore.incrementDecimalPlaces],
-    // shift functions (sin·÷2·NAND…) are Shift+letter, so bare 'q' only quits
+    // the shift-function q·w·e row (sin·÷2·-5·NAND…) is Shift+q/w/e, so bare 'q' only quits
     [['q'], quitApp],
   ]);
 

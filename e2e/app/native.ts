@@ -202,7 +202,7 @@ export default defineGroup<TauriApp>('native', [
     title: "'q' 로 끝내고 다시 켜도 키패드는 평상 상태다 · Shift+q(sin)는 앱을 끄지 않는다",
     // 회귀 시험: 예전에는 'q' 가 앱 종료(App.vue)이면서 shift 기능 sin(CalcButtonSet.ts a3)의 단축키라, 끝내기 직전
     // triggerButtonClickByKey 가 켠 shift 고정이 저장돼 다시 켜면 숫자 키가 Pi·phi·e… 로 눌렸다.
-    // 이제 shift 기능은 전부 Shift+글자이고 'q' 단독은 종료만 한다.
+    // 이제 shift 기능 q·w·e 줄은 Shift+q/w/e 이고 'q' 단독은 종료만 한다.
     run: async (app) => {
       await app.step('Shift+q 는 sin 이고 앱을 끄지 않는다', async () => {
         await tapKeys(app, 'C5');
