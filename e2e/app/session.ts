@@ -6,14 +6,14 @@
  * of the worker uses the same profile, so "relaunch" really tests persistence. `wipeProfile()` gives a
  * first-install state.
  */
-import { readlinkSync, readdirSync, rmSync } from 'node:fs';
+import { readFileSync, readlinkSync, readdirSync, rmSync, statSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 
 import { remote } from 'webdriverio';
 
 import { recordPids, webviewDataDir, wipeAppData } from './env-windows';
-import { isWindows, type ProfileDirs } from './platform';
+import { IDENTIFIER, isWindows, type ProfileDirs } from './platform';
 import { descendants, isAlive, terminate, waitExit } from './procs';
 import { treeOf } from './procs-win';
 
@@ -141,7 +141,14 @@ export class AppSession {
   async relaunch({ fresh = false } = {}): Promise<void> {
     await this.close();
     if (fresh) this.wipeProfile();
+    else if (isWindows) windowsStorageDiag('after quit', this.options.profile);
     await this.launch();
+    if (!fresh && isWindows) {
+      const seen = await this.current!.execute(
+        () => `${location.origin} · ${localStorage.length} keys: ${Object.keys(localStorage).join(',').slice(0, 200)}`,
+      );
+      process.stderr.write(`[e2e] storage after relaunch: ${seen}\n`);
+    }
   }
 
   /** first-install state: empty config, data (WebKit storage) and cache. Only while the app is not running. */
@@ -159,4 +166,39 @@ export class AppSession {
       }
     }
   }
+}
+
+/**
+ * Windows relaunch diagnostics (the relaunched app came back as a first run): where WebView2 keeps Local Storage
+ * under the app's data folder, how big and how fresh the files are, and whether the e2e seed ("showTips") is in them.
+ */
+function windowsStorageDiag(label: string, profile: ProfileDirs): void {
+  const root = path.join(profile.data, IDENTIFIER);
+  const lines: string[] = [];
+  const walk = (dir: string, depth: number): void => {
+    let entries;
+    try {
+      entries = readdirSync(dir, { withFileTypes: true });
+    } catch {
+      return;
+    }
+    for (const entry of entries) {
+      const full = path.join(dir, entry.name);
+      const rel = path.relative(root, full);
+      if (entry.isDirectory()) {
+        if (depth < 3) lines.push(`${rel}\\`);
+        if (depth < 8) walk(full, depth + 1);
+      } else if (/Local Storage/i.test(rel)) {
+        try {
+          const stat = statSync(full);
+          const seeded = readFileSync(full).includes('showTips') ? ' [has showTips]' : '';
+          lines.push(`${rel} ${stat.size}B ${stat.mtime.toISOString()}${seeded}`);
+        } catch (error) {
+          lines.push(`${rel} (unreadable: ${String(error).slice(0, 80)})`);
+        }
+      }
+    }
+  };
+  walk(root, 0);
+  process.stderr.write(`[e2e] storage ${label} (${root}):\n  ${lines.join('\n  ') || '(empty)'}\n`);
 }
