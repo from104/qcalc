@@ -6,6 +6,7 @@
  * of the worker uses the same profile, so "relaunch" really tests persistence. `wipeProfile()` gives a
  * first-install state.
  */
+import { spawnSync } from 'node:child_process';
 import { cpSync, existsSync, readFileSync, readlinkSync, readdirSync, rmSync, statSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
@@ -69,6 +70,7 @@ export class AppSession {
       const pid = this.appPid();
       this.webviewHelpers = pid ? descendants(pid) : [];
       if (pid) recordPids(path.resolve('test-results'), [pid, ...this.webviewHelpers]);
+      logWebviewProfile(this.webviewHelpers);
     }
   }
 
@@ -260,5 +262,28 @@ function findLocalStorage(roots: string[]): void {
   for (const root of roots) walk(root, 0);
   process.stderr.write(
     `[e2e] Local Storage folders under ${roots.join(' | ')}:\n  ${found.join('\n  ') || '(none)'}\n`,
+  );
+}
+
+/** diagnostics: the profile folder the WebView2 browser processes really run with (their --user-data-dir) */
+function logWebviewProfile(pids: number[]): void {
+  if (!pids.length) return;
+  const filter = pids.map((pid) => `ProcessId=${pid}`).join(' OR ');
+  const r = spawnSync(
+    'powershell.exe',
+    [
+      '-NoProfile',
+      '-NonInteractive',
+      '-Command',
+      `Get-CimInstance Win32_Process -Filter "${filter}" | ForEach-Object { $_.CommandLine }`,
+    ],
+    { encoding: 'utf8', timeout: 20_000, windowsHide: true },
+  );
+  const out = `${r.stdout ?? ''}`;
+  const dirs = [...new Set(out.match(/--user-data-dir=("[^"]+"|\S+)/g) ?? [])];
+  const browser =
+    out.split(/\r?\n/).find((line) => line.includes('--user-data-dir') && !line.includes('--type=')) ?? '';
+  process.stderr.write(
+    `[e2e] WebView2 profile: ${dirs.join(' | ') || '(no --user-data-dir)'}\n[e2e] WebView2 browser command line: ${browser.slice(0, 700) || (r.stderr ?? '').slice(0, 300)}\n`,
   );
 }
