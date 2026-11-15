@@ -33,3 +33,7 @@ tauri-plugin-updater = "2"
 # tauri(tao/wry)가 이미 같은 0.18 계열을 끌어오므로 새 네이티브 의존성은 아니다.
 [target."cfg(target_os = \"linux\")".dependencies]
 gtk = "0.18"
+
+# read_clipboard_text 커맨드의 Windows 경로 — WebView2 readText()의 권한 요청을 거치지 않는다.
+[target."cfg(windows)".dependencies]
+clipboard-win = "5"

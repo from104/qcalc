@@ -12,11 +12,12 @@ Copyright © 2022 Seo Kihyun. MIT License.
 
 フォーマットは[Keep a Changelog]に基づいており、このプロジェクトは[Semantic Versioning]に従っています。
 
-## [0.13.7] 2026-11-15
+## [0.13.7] 2026-11-16
 
 ### 変更
 
 - シフトモードの q・w・e 列の機能 (sin/cos/tan、÷2/÷3/÷5、-5/-10/-100、NAND/NOR/XNOR) は Shift+q/w/e に変更。q 単独ではアプリを終了
+- Windows で貼り付けが WebView のクリップボード権限確認を経ず、システムのクリップボードを直接読むように変更
 
 ### 修正
 

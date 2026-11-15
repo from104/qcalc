@@ -12,11 +12,12 @@ Todos los cambios notables de este proyecto se registran en este archivo.
 
 El formato se basa en [Keep a Changelog] y este proyecto sigue [Versionado Semántico].
 
-## [0.13.7] 2026-11-15
+## [0.13.7] 2026-11-16
 
 ### Cambiado
 
 - Las funciones del modo Shift de la fila q·w·e (sin/cos/tan, ÷2/÷3/÷5, -5/-10/-100, NAND/NOR/XNOR) ahora usan Shift+q/w/e; q solo cierra la aplicación
+- En Windows, pegar ahora lee directamente el portapapeles del sistema en lugar de pasar por la comprobación de permisos del portapapeles del WebView
 
 ### Corregido
 

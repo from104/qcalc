@@ -133,6 +133,9 @@ export class AppSession {
     for (const dir of [this.options.profile.config, this.options.profile.data, this.options.profile.cache]) {
       // WebKit's helper processes can outlive the app by a moment and still write storage files (ENOTEMPTY)
       for (const entry of readdirSync(dir)) {
+        // Mesa's GPU shader cache is not app state, and a renderer that is still shutting down can keep adding to it
+        // (CI: ENOTEMPTY on cache/mesa_shader_cache after the retries) — a fresh profile does not need it gone
+        if (dir === this.options.profile.cache && entry.startsWith('mesa_shader_cache')) continue;
         rmSync(path.join(dir, entry), { recursive: true, force: true, maxRetries: 10, retryDelay: 100 });
       }
     }

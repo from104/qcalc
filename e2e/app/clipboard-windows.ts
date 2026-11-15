@@ -28,6 +28,11 @@ export class WindowsClipboard implements AppClipboard {
   }
 
   async set(text: string): Promise<void> {
+    // Set-Clipboard refuses an empty value ("Value cannot be null"); an empty clipboard is a cleared one
+    if (text === '') {
+      run('Add-Type -AssemblyName System.Windows.Forms; [System.Windows.Forms.Clipboard]::Clear()');
+      return;
+    }
     run(
       '$t = [Text.Encoding]::UTF8.GetString([Convert]::FromBase64String($env:QCALC_E2E_CLIP)); Set-Clipboard -Value $t',
       { QCALC_E2E_CLIP: Buffer.from(text, 'utf8').toString('base64') },

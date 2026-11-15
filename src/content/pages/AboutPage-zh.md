@@ -12,11 +12,12 @@ Copyright © 2022 Seo Kihyun. MIT License.
 
 格式基于 [Keep a Changelog]，本项目遵循[语义化版本]。
 
-## [0.13.7] 2026-11-15
+## [0.13.7] 2026-11-16
 
 ### 变更
 
 - Shift 模式下 q·w·e 一行的功能 (sin/cos/tan、÷2/÷3/÷5、-5/-10/-100、NAND/NOR/XNOR) 改为 Shift+q/w/e；单独按 q 退出应用
+- Windows 上粘贴改为直接读取系统剪贴板，不再经过 WebView 的剪贴板权限检查
 
 ### 修复
 

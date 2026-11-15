@@ -20,7 +20,7 @@ Hochpräzise Berechnungen, Einheiten-/Währungs-/Zahlensystemumrechnung und Form
 
 - **Zugriff**: Ctrl+1 oder oberen Tab auswählen
 - **Grundrechenarten**: Zahlen 0-9, +, -, \*, / Tasten eingeben
-- **Erweiterte Funktionen**: Trigonometrische Funktionen (q, w, e), Quadrat (u), Quadratwurzel (i), Konstanten (z: π, x: φ, c: e)
+- **Erweiterte Funktionen**: Trigonometrische Funktionen (S-q, S-w, S-e), Quadrat (u), Quadratwurzel (i), Konstanten (z: π, x: φ, c: e)
 - **Speicherfunktionen**: Ctrl+Enter (MS), Ctrl+Backspace (MR), Ctrl+Delete (MC)
 - **Prozentrechnung**: 'Zahl, /, Zahl, %(k)' berechnet den Prozentsatz
 - **Prozent anwenden**: 'Zahl, \*, Zahl, %(k)' wendet den Prozentsatz an
@@ -40,7 +40,7 @@ Hochpräzise Berechnungen, Einheiten-/Währungs-/Zahlensystemumrechnung und Form
 - **340 Währungen**: Fiat, Kryptowährungen und Edelmetalle — kein API-Schlüssel erforderlich
 - **Aktuelle Wechselkurse**: Echtzeit-Kurse (bei Offline-Nutzung wird ein integrierter Snapshot verwendet)
 - **Favoriten**: Häufig verwendete Währungen als Favoriten für schnellen Zugriff festlegen
-- **Schnellberechnung**: +5/+10/+100 (f/g/h), -5/-10/-100 (q/w/e)
+- **Schnellberechnung**: +5/+10/+100 (f/g/h), -5/-10/-100 (S-q/S-w/S-e)
 - **Währungen tauschen**: '\' Taste zum Tauschen von Ausgangs-/Zielwährung verwenden
 - **Währungssymbol**: Anzeige des Währungssymbols mit Alt+\ Taste ein-/ausblenden
 
@@ -109,7 +109,7 @@ Hochpräzise Berechnungen, Einheiten-/Währungs-/Zahlensystemumrechnung und Form
 #### Mathematische Funktionen
 
 - **N-te Potenz/N-te Wurzel**: Berechnung mit r/t Tasten
-- **Trigonometrische Funktionen**: q/w/e Tasten im Shift-Modus
+- **Trigonometrische Funktionen**: S-q/S-w/S-e Tasten im Shift-Modus
 - **Ganzzahl-/Dezimalteil extrahieren**: Berechnung mit v/b Tasten
 - **Fakultät**: Berechnung mit h Taste
 
@@ -123,7 +123,7 @@ Hochpräzise Berechnungen, Einheiten-/Währungs-/Zahlensystemumrechnung und Form
 #### Bit-Operationen verwenden
 
 - **Bit-Operationen**: AND (j), OR (k), XOR (l), NOT (h), Shift-Operationen (r/t/u/i)
-- **Logische Erweiterung**: NAND/NOR/XNOR-Operationen mit q/w/e Tasten verwenden
+- **Logische Erweiterung**: NAND/NOR/XNOR-Operationen mit S-q/S-w/S-e Tasten verwenden
 - **Shift-Operationen**: Bit-Positionen um 1 Bit/4 Bits verschieben
 - **Bit-Größe festlegen**: Bit-Operationen entsprechend der eingestellten Größe
 

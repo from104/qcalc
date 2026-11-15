@@ -12,11 +12,12 @@ Copyright © 2022 Seo Kihyun. MIT License.
 
 형식은 [Keep a Changelog (korean)]를 기반으로 하며 이 프로젝트는 [Semantic Versioning (korean)]을 따릅니다.
 
-## [0.13.7] 2026-11-15
+## [0.13.7] 2026-11-16
 
 ### 변경됨
 
 - 시프트 모드의 q·w·e 줄 기능(sin·cos·tan, ÷2·÷3·÷5, -5·-10·-100, NAND·NOR·XNOR) 단축키를 Shift+q/w/e로 변경, q 단독은 앱 종료
+- Windows에서 붙여넣기가 웹뷰의 클립보드 권한 확인 없이 시스템 클립보드를 직접 읽도록 변경
 
 ### 수정됨
 

@@ -1,9 +1,9 @@
 /**
  * native — what only the real desktop app can show: Tauri commands, the native window, the app process,
  * the on-disk profile, the system clipboard and the accessibility bus. App layer only.
- * Linux: Xvfb, runs everything. Windows (CI): the scenarios that need X windows ('xwindow') or AT-SPI ('atspi') skip
- * with that reason; the rest run against WebView2 — the clipboard through PowerShell, and Control+v through
- * navigator.clipboard (read_clipboard_text is Linux-only, lib.rs), so Windows outcomes there are unmeasured until CI says.
+ * Linux: Xvfb, runs everything. Windows (CI): the scenarios that need X windows ('xwindow'), AT-SPI ('atspi') or storage
+ * that survives a new app process ('relaunch' — msedgedriver gives every session a fresh WebView2 profile) skip with that
+ * reason; the rest run against WebView2, the outside clipboard through PowerShell.
  *
  * Expected values come from the code:
  * - window: tauri.conf.json width/height 480×756; lib.rs BASE_MIN 384×604 × UI scale (1.0 under Xvfb: no
@@ -192,17 +192,21 @@ export default defineGroup<TauriApp>('native', [
     },
   },
   {
-    title: "'q' 로 끝내고 다시 켜도 키패드는 평상 상태다 · Shift+q(sin)는 앱을 끄지 않는다",
+    title: 'Shift+q 는 sin 이고 앱을 끄지 않는다 (bare q 만 종료)',
+    // shift 기능 q·w·e 줄은 Shift+q/w/e 이고 'q' 단독은 종료만 한다 (App.vue · CalcButtonSet.ts a3)
+    run: async (app) => {
+      await tapKeys(app, 'C5');
+      await app.key('Shift+q');
+      await tapKeys(app, 'C7');
+      await expectMain(app, '7');
+    },
+  },
+  {
+    title: "'q' 로 끝내고 다시 켜도 키패드는 평상 상태다",
     // 회귀 시험: 예전에는 'q' 가 앱 종료(App.vue)이면서 shift 기능 sin(CalcButtonSet.ts a3)의 단축키라, 끝내기 직전
     // triggerButtonClickByKey 가 켠 shift 고정이 저장돼 다시 켜면 숫자 키가 Pi·phi·e… 로 눌렸다.
-    // 이제 shift 기능 q·w·e 줄은 Shift+q/w/e 이고 'q' 단독은 종료만 한다.
+    needs: ['relaunch'],
     run: async (app) => {
-      await app.step('Shift+q 는 sin 이고 앱을 끄지 않는다', async () => {
-        await tapKeys(app, 'C5');
-        await app.key('Shift+q');
-        await tapKeys(app, 'C7');
-        await expectMain(app, '7');
-      });
       await app.step("'q' 로 끝내고 다시 켠다", async () => {
         await tapKeys(app, 'C5');
         await expectMain(app, '5');
@@ -218,6 +222,7 @@ export default defineGroup<TauriApp>('native', [
   },
   {
     title: '저장소: 계산 기록과 설정이 앱을 끄고 켠 뒤에도 남는다 (WebKit localStorage 디스크 저장)',
+    needs: ['relaunch'],
     run: async (app) => {
       await app.step('7*6= 계산 · 천 단위 구분 끄기(,)', async () => {
         await tapKeys(app, '7*6=');

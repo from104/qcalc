@@ -320,7 +320,14 @@ export class WdioApp implements CalcApp {
     await this.click(`[data-testid="${field}"]`);
     const control = await this.visible(`[data-testid="${field}"]`);
     const menu = '.q-menu, .q-select__dialog';
-    await this.visible(menu);
+    try {
+      await this.visible(menu, { timeout: 2000 });
+    } catch {
+      // the first click can land while the screen is still arriving and open nothing (Linux CI: no menu within 5s,
+      // twice in a row on the language select); the menu is not open, so one more click opens rather than toggles it
+      await this.click(`[data-testid="${field}"]`);
+      await this.visible(menu);
+    }
     // the currency select filters by typing (virtual-scrolled list)
     if ((await control.getTagName()).toUpperCase() === 'INPUT') await control.setValue(option);
     // item = caption + name lines; match the name line only. Currency names read like 'JPY, 160.0000'
