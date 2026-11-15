@@ -4,7 +4,7 @@ All notable changes to this project are recorded in this file.
 
 The format is based on [Keep a Changelog] and this project follows [Semantic Versioning].
 
-## [Unreleased]
+## [0.13.7] 2026-11-15
 
 ### Fixed
 
