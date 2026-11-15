@@ -15,7 +15,6 @@
  * - '=' → ResultField.vue announce → announce_a11y → ATK `announcement` → AT-SPI object:announcement.
  * - theme applied → themesStore.updateTheme → set_boot_background → boot-bg.txt in the config dir.
  */
-import { TAURI_LINUX_COPY_BUG } from '../scenarios/keyboard';
 import { defineGroup, eventually, expectClipboard, expectMain, expectSub, tapKeys, typeKeys } from '../scenarios/kit';
 import { SCREEN } from './env-linux';
 import { DEFAULT_SIZE, MIN_SIZE, type TauriApp } from './tauri-app';
@@ -118,12 +117,6 @@ export default defineGroup<TauriApp>('native', [
   },
   {
     title: 'Control+c: 메인 칸 표시값이 시스템 클립보드로 간다 (밖에서 읽기)',
-    knownBugOn: {
-      'tauri-linux': {
-        bug: TAURI_LINUX_COPY_BUG,
-        symptom: /클립보드: .*"1,234\.5".*마지막 값 ""/,
-      },
-    },
     run: async (app) => {
       await tapKeys(app, 'C1234.5');
       await expectMain(app, '1,234.5');

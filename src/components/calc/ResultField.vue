@@ -871,15 +871,28 @@
     }
   };
 
+  /**
+   * 복사 단축키 — 앱이 쓴 클립보드를 브라우저 기본 "복사"가 덮지 않게 keydown 기본 동작을 막는다
+   * (WebKitGTK 는 선택이 없어도 기본 복사가 클립보드를 비운다). 사용자가 글자를 선택해 두었거나
+   * 입력칸 안이면 앱 복사를 하지 않고 기본 복사에 맡긴다.
+   */
+  const onCopyKey = (event: KeyboardEvent) => {
+    const target = event.target as HTMLElement | null;
+    if (target?.closest('input, textarea, [contenteditable]:not([contenteditable="false"])')) return;
+    if ((window.getSelection()?.toString() ?? '') !== '') return;
+    event.preventDefault();
+    handleCopy();
+  };
+
   // 키 바인딩 설정
   const { subscribe, unsubscribe } =
     props.field === 'main'
       ? useKeyBinding([
-          [['Control+c', 'Control+Insert', 'Copy'], handleCopy],
+          [['Control+c', 'Control+Insert', 'Copy'], onCopyKey],
           [['Control+v', 'Shift+Insert', 'Paste'], () => handlePaste('main')],
         ])
       : useKeyBinding([
-          [['Shift+Control+c', 'Alt+Control+Insert', 'Shift+Copy'], handleCopy],
+          [['Shift+Control+c', 'Alt+Control+Insert', 'Shift+Copy'], onCopyKey],
           [['Shift+Control+v', 'Alt+Shift+Insert', 'Shift+Paste'], () => handlePaste('sub')],
         ]);
 
