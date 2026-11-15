@@ -15,10 +15,6 @@ const AFTER_MEMORY_DISPLAY = { timeout: 6000 };
 export default defineGroup('basic', [
   {
     title: '완전히 새로 설치한 첫 실행에는 "설정이 초기화되었습니다" 토스트가 뜨지 않는다',
-    knownBug:
-      '빈 저장소에서 App.vue(~118-121)가 비어 있는 sourceUnits: {} 를 "고친 것"으로 세어 첫 실행에 ' +
-      '"앱 업데이트로 인해 일부 저장된 설정이 초기화되었습니다" 토스트를 띄운다',
-    symptom: /첫 실행에 토스트가 떴다/,
     // 단위·통화·진법 스토어를 시드하지 않는다 (null = 시드 제외)
     seed: { stores: { unit: null, currency: null, radix: null } },
     run: async (app) => {

@@ -13,6 +13,7 @@ The format is based on [Keep a Changelog] and this project follows [Semantic Ver
 - A Korean label was missing in the currency converter
 - Screen readers announced the font-size button on the history screen with no name
 - Screen readers announced the ⋮ menu button of each history entry with no name
+- A fresh install showed “some saved settings were reset due to an app update” on first launch
 
 ### Changed
 
