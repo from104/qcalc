@@ -43,7 +43,10 @@ function prefetchPages(): void {
   const next = () => {
     const load = queue.shift();
     if (!load) return;
-    void load().finally(() => schedule());
+    // 미리 불러오기 실패는 조용히 넘긴다 — 그 화면을 실제로 열 때 라우터가 다시 시도한다
+    void load()
+      .catch(() => undefined)
+      .finally(() => schedule());
   };
   const schedule = () =>
     'requestIdleCallback' in window ? requestIdleCallback(next, { timeout: 4000 }) : setTimeout(next, 300);
