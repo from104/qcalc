@@ -1,0 +1,6 @@
+[Flatpak Repo]
+Title=QCalc
+Url=https://from104.github.io/qcalc/flatpak/repo
+Homepage=https://github.com/from104/qcalc
+Comment=QCalc self-hosted Flatpak repository
+GPGKey=mDMEaqbxCBYJKwYBBAHaRw8BAQdAAGm91CSMd0jkvy7KNG4DuJj0E6YLt/9jQCczSGWaAsG0JlFDYWxjIEZsYXRwYWsgUmVwbyA8ZnJvbTEwNEBnbWFpbC5jb20+iJAEExYKADgWIQQ1JKRn13+qWb39S68D44Vs4DB7nAUCaqbxCAIbAwULCQgHAgYVCgkICwIEFgIDAQIeAQIXgAAKCRAD44Vs4DB7nLNhAQCHemzL+DUrIfH2feZbofYty/aoRU0jwhYACC3snv9gpgD8CxyPIEBoPsDO3z+ZSQGMOnXFuBjoHxgou7xAE6Eojw0=
