@@ -12,6 +12,25 @@ Todos los cambios notables de este proyecto se registran en este archivo.
 
 El formato se basa en [Keep a Changelog] y este proyecto sigue [Versionado Semántico].
 
+## [0.13.7] 2026-11-15
+
+### Cambiado
+
+- Las funciones del modo Shift de la fila q·w·e (sin/cos/tan, ÷2/÷3/÷5, -5/-10/-100, NAND/NOR/XNOR) ahora usan Shift+q/w/e; q solo cierra la aplicación
+
+### Corregido
+
+- Corregido: pegar desde el portapapeles no hacía nada en Linux
+- Corregido: al salir con q, el teclado numérico quedaba atascado en modo Shift en el siguiente inicio
+- Corregido: faltaba una etiqueta en coreano en el conversor de divisas
+- Corregido: los lectores de pantalla leían sin nombre el botón de tamaño de fuente del historial
+- Corregido: los lectores de pantalla leían sin nombre el botón de menú ⋮ de cada entrada del historial
+- Corregido: una instalación nueva mostraba «Algunas configuraciones guardadas se han restablecido debido a una actualización de la aplicación.» en el primer inicio
+- Corregido: en el conversor de bases, al pegar en el campo principal el número se leía en la base de destino (255 pasaba a ser 597)
+- Corregido: si el motor de fórmulas fallaba una vez al cargar, la calculadora de fórmulas quedaba inutilizable hasta reiniciar la aplicación
+- Corregido: el mensaje de error al no poder cargar el motor de fórmulas terminaba con texto en inglés sin traducir
+- Corregido: en Linux, Ctrl+C mostraba «Copiado» pero dejaba el portapapeles vacío
+
 ## [0.13.6] 2026-10-03
 
 ### Añadido

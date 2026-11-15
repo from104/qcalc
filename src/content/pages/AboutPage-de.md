@@ -12,6 +12,25 @@ Alle wichtigen Änderungen an diesem Projekt werden in dieser Datei festgehalten
 
 Das Format basiert auf [Keep a Changelog] und dieses Projekt folgt der [Semantischen Versionierung].
 
+## [0.13.7] 2026-11-15
+
+### Geändert
+
+- Die Shift-Modus-Funktionen der Tastenreihe q·w·e (sin/cos/tan, ÷2/÷3/÷5, -5/-10/-100, NAND/NOR/XNOR) liegen jetzt auf Shift+q/w/e; q allein beendet die App
+
+### Behoben
+
+- Einfügen aus der Zwischenablage unter Linux ohne Wirkung behoben
+- Beenden mit q ließ das Tastenfeld beim nächsten Start im Shift-Modus hängen – behoben
+- Fehlende koreanische Beschriftung im Währungsrechner behoben
+- Die Schriftgrößen-Schaltfläche im Verlauf wurde von Screenreadern ohne Namen vorgelesen – behoben
+- Die ⋮-Menüschaltfläche jedes Verlaufseintrags wurde von Screenreadern ohne Namen vorgelesen – behoben
+- Nach einer Neuinstallation erschien beim ersten Start „Einige gespeicherte Einstellungen wurden aufgrund eines App-Updates zurückgesetzt.“ – behoben
+- Im Zahlensystem-Umrechner wurde beim Einfügen ins Hauptfeld die Zahl im Zielsystem gelesen (255 wurde zu 597) – behoben
+- Wenn die Formel-Engine einmal nicht geladen werden konnte, blieb der Formelrechner bis zum Neustart der App defekt – behoben
+- Die Fehlermeldung bei nicht ladbarer Formel-Engine endete mit unübersetztem englischem Text – behoben
+- Unter Linux zeigte Strg+C „Kopiert“ an, ließ die Zwischenablage aber leer – behoben
+
 ## [0.13.6] 2026-10-03
 
 ### Hinzugefügt

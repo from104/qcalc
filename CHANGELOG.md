@@ -6,6 +6,10 @@ The format is based on [Keep a Changelog] and this project follows [Semantic Ver
 
 ## [0.13.7] 2026-11-15
 
+### Changed
+
+- The q, w, e row of shift-mode functions (sin/cos/tan, ÷2/÷3/÷5, -5/-10/-100, NAND/NOR/XNOR) now uses Shift+q/w/e; q alone quits
+
 ### Fixed
 
 - Paste from the clipboard did nothing on Linux
@@ -18,10 +22,6 @@ The format is based on [Keep a Changelog] and this project follows [Semantic Ver
 - If the formula engine failed to load once, the formula calculator stayed broken until the app was restarted
 - When the formula engine could not be loaded, the error message ended with untranslated English text
 - On Linux, Ctrl+C showed “copied” but left the clipboard empty
-
-### Changed
-
-- The q, w, e row of shift-mode functions (sin/cos/tan, ÷2/÷3/÷5, -5/-10/-100, NAND/NOR/XNOR) now uses Shift+q/w/e; q alone quits
 
 ## [0.13.6] 2026-10-03
 

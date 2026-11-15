@@ -12,6 +12,25 @@ All notable changes to this project are recorded in this file.
 
 The format is based on [Keep a Changelog] and this project follows [Semantic Versioning].
 
+## [0.13.7] 2026-11-15
+
+### Changed
+
+- The q, w, e row of shift-mode functions (sin/cos/tan, ÷2/÷3/÷5, -5/-10/-100, NAND/NOR/XNOR) now uses Shift+q/w/e; q alone quits
+
+### Fixed
+
+- Paste from the clipboard did nothing on Linux
+- Quitting with q left the keypad stuck in shift mode on the next launch
+- A Korean label was missing in the currency converter
+- Screen readers announced the font-size button on the history screen with no name
+- Screen readers announced the ⋮ menu button of each history entry with no name
+- A fresh install showed “some saved settings were reset due to an app update” on first launch
+- In the radix converter, pasting into the main field read the number in the target base (255 became 597)
+- If the formula engine failed to load once, the formula calculator stayed broken until the app was restarted
+- When the formula engine could not be loaded, the error message ended with untranslated English text
+- On Linux, Ctrl+C showed “copied” but left the clipboard empty
+
 ## [0.13.6] 2026-10-03
 
 ### Added
