@@ -747,11 +747,14 @@
         vertical-actions-align="center"
         color="primary"
         icon="format_size"
+        :label="t('ariaLabel.fontSizeMenu')"
+        hide-label
         direction="up"
         padding="sm"
       >
         <q-fab-action
           icon="remove"
+          :aria-label="t('fontSize.decrease')"
           :disable="settingsStore.recordFontSize <= 0"
           padding="xs"
           :color="selectBackgroundColor"
@@ -761,6 +764,7 @@
         />
         <q-fab-action
           icon="add"
+          :aria-label="t('fontSize.increase')"
           :disable="settingsStore.recordFontSize >= 2"
           padding="xs"
           :color="selectBackgroundColor"
@@ -1082,6 +1086,7 @@ ko:
     searchInput: '검색'
     dragHandle: '검색창 이동'
     closeSearch: '검색창 닫기'
+    fontSizeMenu: '글자 크기'
 en:
   record: 'record'
   noRecord: 'No record.'
@@ -1115,6 +1120,7 @@ en:
     searchInput: 'Search'
     dragHandle: 'Move search window'
     closeSearch: 'Close search window'
+    fontSizeMenu: 'Font size'
 ja:
   record: '計算記録'
   noRecord: '計算記録がありません。'
@@ -1148,6 +1154,7 @@ ja:
     searchInput: '検索'
     dragHandle: '検索ウィンドウを移動'
     closeSearch: '検索ウィンドウを閉じる'
+    fontSizeMenu: '文字サイズ'
 zh:
   record: '计算记录'
   noRecord: '没有计算记录。'
@@ -1181,6 +1188,7 @@ zh:
     searchInput: '搜索'
     dragHandle: '移动搜索窗口'
     closeSearch: '关闭搜索窗口'
+    fontSizeMenu: '字体大小'
 hi:
   record: 'गणना रिकॉर्ड'
   noRecord: 'कोई गणना रिकॉर्ड नहीं।'
@@ -1214,6 +1222,7 @@ hi:
     searchInput: 'खोजें'
     dragHandle: 'खोज विंडो ले जाएं'
     closeSearch: 'खोज विंडो बंद करें'
+    fontSizeMenu: 'फ़ॉन्ट आकार'
 de:
   record: 'Berechnungsverlauf'
   noRecord: 'Kein Berechnungsverlauf.'
@@ -1247,6 +1256,7 @@ de:
     searchInput: 'Suche'
     dragHandle: 'Suchfenster verschieben'
     closeSearch: 'Suchfenster schließen'
+    fontSizeMenu: 'Schriftgröße'
 es:
   record: 'Historial de cálculos'
   noRecord: 'No hay historial de cálculos.'
@@ -1280,6 +1290,7 @@ es:
     searchInput: 'Buscar'
     dragHandle: 'Mover ventana de búsqueda'
     closeSearch: 'Cerrar ventana de búsqueda'
+    fontSizeMenu: 'Tamaño de letra'
 fr:
   record: 'Historique des calculs'
   noRecord: 'Aucun historique de calculs.'
@@ -1313,6 +1324,7 @@ fr:
     searchInput: 'Rechercher'
     dragHandle: 'Déplacer la fenêtre de recherche'
     closeSearch: 'Fermer la fenêtre de recherche'
+    fontSizeMenu: 'Taille du texte'
 pt:
   record: 'Histórico de cálculos'
   noRecord: 'Nenhum histórico de cálculos.'
@@ -1346,6 +1358,7 @@ pt:
     searchInput: 'Pesquisar'
     dragHandle: 'Mover janela de pesquisa'
     closeSearch: 'Fechar janela de pesquisa'
+    fontSizeMenu: 'Tamanho da fonte'
 ru:
   record: 'История вычислений'
   noRecord: 'Нет истории вычислений.'
@@ -1379,4 +1392,5 @@ ru:
     searchInput: 'Поиск'
     dragHandle: 'Переместить окно поиска'
     closeSearch: 'Закрыть окно поиска'
+    fontSizeMenu: 'Размер шрифта'
 </i18n>

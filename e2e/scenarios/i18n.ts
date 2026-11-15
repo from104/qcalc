@@ -34,13 +34,10 @@ const LEGIT: { pattern: RegExp; why: string }[] = [
 
 const isLegit = (piece: string) => LEGIT.some(({ pattern }) => pattern.test(piece));
 
-/**
- * 알려진 앱 결함 — 기록 화면의 글꼴 크기 FAB(q-fab)과 기록 항목 ⋮ 메뉴 버튼(RecordCard.vue)에 aria-label 이 없다.
- * 아래 전용 시나리오(knownBug)가 이 결함을 따로 보고하므로, 언어별 점검에서는 이 두 컨트롤만 빈 이름 검사에서 뺀다.
- * 다른 빈 이름은 그대로 걸린다. 앱이 고쳐지면 전용 시나리오가 "bug fixed" 로 빨개지므로 그때 이 예외(KNOWN_UNNAMED)와
- * 아래 knownBug 표시를 함께 지운다 — 예외를 남겨 두면 이 두 컨트롤에서 다시 생긴 빈 이름을 못 잡는다.
- */
-const KNOWN_UNNAMED = /q-fab__icon|record-menu-btn/;
+/** 기록 화면의 글꼴 크기 FAB(q-fab) 버튼 — 스냅숏의 where 에 아이콘 클래스로 잡힌다 */
+const FONT_SIZE_FAB = /q-fab__icon/;
+/** 알려진 앱 결함 — 기록 항목 ⋮ 메뉴 버튼에 이름이 없다(아래 knownBug). 고쳐지면 이 예외도 지운다 */
+const KNOWN_UNNAMED = /record-menu-btn/;
 
 interface Finding {
   lang: string;
@@ -133,16 +130,13 @@ export default defineGroup('i18n', [
   },
   {
     title: '기록 화면 글꼴 크기 버튼에 접근 가능한 이름이 있다',
-    knownBug:
-      '기록 화면의 글꼴 크기 FAB(q-fab, RecordCard.vue) 버튼에 aria-label 이 없어 스크린리더가 읽을 이름이 비어 있다(모든 언어)',
-    symptom: /글꼴 크기 버튼: .*마지막 값 ""/,
     seed: { history: [{ previousNumber: '1', operator: '+', argumentNumber: '2', resultNumber: '3' }] },
     run: async (app) => {
       await app.openScreen('record');
       await eventually(
         '글꼴 크기 버튼',
         async () => {
-          const fab = (await app.snapshotUi()).controls.find((c) => KNOWN_UNNAMED.test(c.where));
+          const fab = (await app.snapshotUi()).controls.find((c) => FONT_SIZE_FAB.test(c.where));
           return fab ? fab.name : null;
         },
         (name) => typeof name === 'string' && name.trim() !== '',
