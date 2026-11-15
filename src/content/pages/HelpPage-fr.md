@@ -253,7 +253,7 @@ Calculs de haute précision, conversion d'unités/devises/bases numériques et �
 | ,         | Basculer le groupement des nombres                 |
 | A-,       | Changer l'unité de groupement (3/4)                |
 | [, ]      | Ajuster les décimales (∞~16)                       |
-| q         | Quitter l'application                              |
+| C-q       | Quitter l'application                              |
 
 ### Opérations du presse-papiers
 

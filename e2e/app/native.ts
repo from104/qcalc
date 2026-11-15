@@ -10,7 +10,7 @@
  *   XSETTINGS → gtk-xft-dpi unset); max = (work width / 2, work height × 2/3) on a landscape screen
  *   → 1280×960 on the 2560×1440 Xvfb screen (env-linux.ts SCREEN).
  * - window size is saved by lib.rs linux_geometry on RunEvent::Exit (window-size.json) — only a graceful exit
- *   (App.vue 'q' → quit_app → app.exit(0)) gets there; a WebDriver session end kills the process.
+ *   (App.vue Control+q → quit_app → app.exit(0)) gets there; a WebDriver session end kills the process.
  * - Control+v / Shift+Control+v → ResultField.vue handlePaste('main' | 'sub') → read_clipboard_text (#109).
  * - '=' → ResultField.vue announce → announce_a11y → ATK `announcement` → AT-SPI object:announcement.
  * - theme applied → themesStore.updateTheme → set_boot_background → boot-bg.txt in the config dir.
@@ -175,14 +175,14 @@ export default defineGroup<TauriApp>('native', [
     },
   },
   {
-    title: '창 크기: q 로 끝내고 다시 켜면 그 크기로 뜬다 (window-size.json)',
+    title: '창 크기: Control+q 로 끝내고 다시 켜면 그 크기로 뜬다 (window-size.json)',
     needs: ['xwindow'],
     run: async (app) => {
       await app.relaunch({ fresh: true });
-      await app.seed(); // e2e page without first-run dialogs, so 'q' reaches the app's key binding
+      await app.seed(); // e2e page without first-run dialogs, so Control+q reaches the app's key binding
       await app.requestWindowSize(520, 800);
       await expectInner(app, { width: 520, height: 800 });
-      await app.step("'q' → 앱이 스스로 끝난다 (quit_app)", () => app.quit('key'));
+      await app.step('Control+q → 앱이 스스로 끝난다 (quit_app)', () => app.quit('key'));
       await app.step('window-size.json 에 내용 크기가 저장됐다', async () => {
         const saved = JSON.parse(app.configFile('window-size.json') ?? 'null') as {
           width: number;
@@ -199,22 +199,27 @@ export default defineGroup<TauriApp>('native', [
     },
   },
   {
-    title: "'q' 로 끝내고 다시 켜도 키패드는 평상 상태다 (shift 고정 아님)",
-    // 앱 버그: 'q' 가 앱 종료(App.vue)이면서 shift 기능 sin 의 단축키(CalcButtonSet.ts a3 ['q'])라서, 끝내기 직전에
-    // triggerButtonClickByKey 가 shift 고정을 켜고 그 상태가 저장된다 — 다시 켜면 숫자 키가 Pi·phi·e… 로 눌린다.
-    // known-bug 로 두지 않는 까닭: 증상이 경쟁 조건이다. shift 고정은 5ms 뒤 스스로 풀리고(useCalcButtonActions),
-    // 그 전에 종료·저장되느냐에 따라 버그가 났다 안 났다 한다 (2026-11-15 실측: 9회 중 1회 "bug fixed" 로 빨강).
-    // 앱에서 'q' 중복 바인딩을 고친 뒤 todo 를 지우면 그대로 회귀 시험이 된다.
-    todo: "'q' 종료 직전 shift 고정이 저장되는 앱 버그 — 증상이 경쟁 조건이라 known-bug 로 고정할 수 없다",
+    title: "Control+q 로 끝내고 다시 켜도 키패드는 평상 상태다 · 'q' 는 sin 일 뿐 앱을 끄지 않는다",
+    // 회귀 시험: 예전에는 'q' 가 앱 종료(App.vue)이면서 shift 기능 sin(CalcButtonSet.ts a3 ['q'])이라, 끝내기 직전
+    // triggerButtonClickByKey 가 켠 shift 고정이 저장돼 다시 켜면 숫자 키가 Pi·phi·e… 로 눌렸다. 종료를 Control+q 로 옮겼다.
     run: async (app) => {
-      await tapKeys(app, 'C5');
-      await expectMain(app, '5');
-      await app.quit('key');
-      await app.relaunch();
-      await app.openE2E();
-      // shift-locked keypad: C → MC, 1 → Pi, 2 → phi (1.618…)
-      await tapKeys(app, 'C12');
-      await expectMain(app, '12');
+      await app.step("'q' 는 앱을 끄지 않는다 (sin 만 한다)", async () => {
+        await tapKeys(app, 'C5');
+        await app.key('q');
+        await tapKeys(app, 'C7');
+        await expectMain(app, '7');
+      });
+      await app.step('Control+q 로 끝내고 다시 켠다', async () => {
+        await tapKeys(app, 'C5');
+        await expectMain(app, '5');
+        await app.quit('key');
+        await app.relaunch();
+        await app.openE2E();
+      });
+      await app.step('키패드는 shift 고정이 아니다 (C → MC, 1 → Pi 가 아니다)', async () => {
+        await tapKeys(app, 'C12');
+        await expectMain(app, '12');
+      });
     },
   },
   {
@@ -227,7 +232,6 @@ export default defineGroup<TauriApp>('native', [
         await tapKeys(app, 'C1234');
         await expectMain(app, '1234');
       });
-      // quit_app directly: the 'q' key has its own bug (scenario above)
       await app.step('quit_app 으로 끝내고 시드 없이 다시 켠다', async () => {
         await app.quit('command');
         await app.relaunch();

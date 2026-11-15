@@ -253,7 +253,7 @@ Hochpräzise Berechnungen, Einheiten-/Währungs-/Zahlensystemumrechnung und Form
 | ,                 | Zahlengruppierung umschalten                   |
 | A-,               | Gruppierungseinheit ändern (3/4)               |
 | [, ]              | Dezimalstellen anpassen (∞~16)                 |
-| q                 | Anwendung beenden                              |
+| C-q               | Anwendung beenden                              |
 
 ### Zwischenablage-Operationen
 

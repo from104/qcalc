@@ -9,6 +9,7 @@ The format is based on [Keep a Changelog] and this project follows [Semantic Ver
 ### Fixed
 
 - Paste from the clipboard did nothing on Linux
+- Quitting with q left the keypad stuck in shift mode on the next launch (quit is now Ctrl+Q; q stays sin)
 
 ## [0.13.6] 2026-10-03
 

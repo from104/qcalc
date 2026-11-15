@@ -253,7 +253,7 @@ Cálculos de alta precisión, conversión de unidades/divisas/bases numéricas y
 | ,     | Alternar agrupación de números              |
 | A-,   | Cambiar unidad de agrupación (3/4)          |
 | [, ]  | Ajustar lugares decimales (∞~16)            |
-| q     | Salir de la aplicación                      |
+| C-q   | Salir de la aplicación                      |
 
 ### Operaciones del Portapapeles
 

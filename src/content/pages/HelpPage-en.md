@@ -253,7 +253,7 @@ High-precision calculations, unit/currency/radix conversion, and formula evaluat
 | ,        | Toggle number grouping              |
 | A-,      | Change grouping unit (3/4)          |
 | [, ]     | Adjust decimal places (∞~16)        |
-| q        | Quit application                    |
+| C-q      | Quit application                    |
 
 ### Clipboard Operations
 

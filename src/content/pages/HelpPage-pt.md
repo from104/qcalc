@@ -253,7 +253,7 @@ Cálculos de alta precisão, conversão de unidades/moedas/bases numéricas e av
 | ,      | Alternar agrupamento numérico                |
 | A-,    | Alterar unidade de agrupamento (3/4)         |
 | [, ]   | Ajustar casas decimais (∞~16)                |
-| q      | Sair do aplicativo                           |
+| C-q    | Sair do aplicativo                           |
 
 ### Operações da Área de Transferência
 
