@@ -12,7 +12,7 @@ import path from 'node:path';
 
 import { remote } from 'webdriverio';
 
-import { recordPids, wipeAppData } from './env-windows';
+import { recordPids, webviewDataDir, wipeAppData } from './env-windows';
 import { isWindows, type ProfileDirs } from './platform';
 import { descendants, isAlive, terminate, waitExit } from './procs';
 import { treeOf } from './procs-win';
@@ -50,7 +50,12 @@ export class AppSession {
       // a shorter client timeout only ever shows "Request timed out" and hides that error (first Windows CI run)
       connectionRetryTimeout: isWindows ? 120_000 : 30_000,
       capabilities: {
-        'tauri:options': { application: this.options.binary },
+        'tauri:options': {
+          application: this.options.binary,
+          // Windows: tauri-driver passes these to msedgedriver (ms:edgeOptions.args); a user-data-dir keeps the same
+          // WebView2 profile across relaunches instead of a new temp one per session
+          ...(isWindows ? { args: [`--user-data-dir=${webviewDataDir()}`] } : {}),
+        },
         // classic WebDriver only — WebKitWebDriver's BiDi support is partial (msedgedriver: not needed either)
         'wdio:enforceWebDriverClassic': true,
       } as WebdriverIO.Capabilities,

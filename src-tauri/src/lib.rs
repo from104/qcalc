@@ -163,7 +163,9 @@ fn announce_a11y(window: tauri::WebviewWindow, text: String) {
 /// WebKitGTK 안의 `navigator.clipboard.readText()`는 Tauri에서 거부되어 붙여넣기가 늘
 /// "클립보드가 비어 있음"으로 끝났다. GTK 클립보드는 Wayland·X11 어느 쪽에서도 창이 포커스를
 /// 가진 동안 읽을 수 있고, gtk 크레이트는 이미 announce_a11y 때문에 의존성에 있다.
-/// 텍스트가 없으면 `None`, Linux가 아니면 `Err` — 프론트엔드는 Err일 때 웹 API로 되돌아간다.
+/// Windows는 Win32 클립보드를 직접 읽는다 — WebView2의 `readText()`는 클립보드 읽기 권한을 물어
+/// 자동 테스트에선 붙여넣기가 늘 빈손이었다(첫 Windows 실앱 CI).
+/// 텍스트가 없으면 `None`, 그 밖의 플랫폼이면 `Err` — 프론트엔드는 Err일 때 웹 API로 되돌아간다.
 #[tauri::command]
 async fn read_clipboard_text(window: tauri::WebviewWindow) -> Result<Option<String>, String> {
   #[cfg(target_os = "linux")]
@@ -183,7 +185,20 @@ async fn read_clipboard_text(window: tauri::WebviewWindow) -> Result<Option<Stri
       .map_err(|e| e.to_string())?
       .map_err(|e| e.to_string())
   }
-  #[cfg(not(target_os = "linux"))]
+  #[cfg(windows)]
+  {
+    let _ = window;
+    tauri::async_runtime::spawn_blocking(|| {
+      // 다른 프로그램이 클립보드를 잠깐 열고 있으면 여러 번 다시 시도한다(get_clipboard_string 내부)
+      if !clipboard_win::is_format_avail(clipboard_win::formats::CF_UNICODETEXT) {
+        return Ok(None);
+      }
+      clipboard_win::get_clipboard_string().map(Some).map_err(|e| e.to_string())
+    })
+    .await
+    .map_err(|e| e.to_string())?
+  }
+  #[cfg(not(any(target_os = "linux", windows)))]
   {
     let _ = window;
     Err("unsupported".into())
