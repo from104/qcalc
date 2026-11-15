@@ -30,6 +30,12 @@ export interface Scenario<A extends CalcApp = CalcApp> {
   /** 앱을 띄울 때의 저장소 상태 (기본: 한국어, 첫 실행 안내 없음) */
   seed?: SeedState;
   /**
+   * 앱을 처음 띄우기(seed) **전부터** 끊어 둘 요청 — 주소에 이 문자열이 든 요청(CalcApp.blockRequests, needs: netMock).
+   * 앱이 뜬 뒤에 끊으면 안 된다: 그 사이 유휴 프리페치가 받아 둔 청크를 WebKit 이 새로고침 뒤에도 메모리 캐시에서 꺼내 써서
+   * (가로채기를 거치지 않는다, no-store 여도) 끊기가 듣지 않는다. 부하가 걸려 프리페치가 앞당겨질 때만 나는 흔들림이었다.
+   */
+  blockFromStart?: string;
+  /**
    * 알려진 앱 버그 — 이 시나리오는 지금 **실패해야 정상**이다(버그 설명을 적는다. 시험을 약하게 고치지 말 것).
    * 실행기가 시나리오를 그대로 돌려, 실패하면 "known-bug"(기대된 실패)로 보고하고, 통과하면 버그가 고쳐진 것이므로
    * "bug fixed — remove the known-bug mark" 로 빨갛게 만든다. 그때 이 줄(과 관련 예외 처리)을 지운다.

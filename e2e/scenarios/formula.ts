@@ -11,7 +11,10 @@
  *   formulaStore.ensureMath() 를 부른다(FormulaPage.vue). 엔진이 없을 때 '=' 는 'formula engine not loaded' 예외를 던지고
  *   앱은 이를 "수식을 평가할 수 없습니다" 토스트로 바꾼다.
  * - 지연 로드가 실패하면 router/index.ts 의 vite:preloadError 리스너가 reloadOnce() 로 페이지를 한 번 새로 연다(10초 안에는 안 함).
- *   그래서 청크를 끊고 reload() 한 직후 앱이 스스로 한 번 더 새로고침할 수 있다 — 입력 전에 settleSelfReload() 로 기다린다.
+ *   첫 화면 뒤 유휴 프리페치(App.vue, 최대 3초)가 엔진을 부르므로 청크를 끊은 앱은 반드시 한 번 스스로 새로고침한다 —
+ *   입력 전에 settleSelfReload() 로 기다린다.
+ * - 청크는 앱을 띄우기 전부터 끊는다(Scenario.blockFromStart). 뜬 뒤에 끊고 reload() 하면, 그 사이 프리페치가 받아 둔 청크를
+ *   WebKit 이 메모리 캐시에서 꺼내 써(가로채기를 안 거친다) 엔진이 그대로 로드된다 — 부하 걸린 전체 실행에서만 나던 흔들림.
  */
 import type { ButtonId, CalcApp } from '../drivers/CalcApp';
 import { KEY, SHIFT, defineGroup, eventually, expectMain, shifted, tapKeys } from './kit';
@@ -168,13 +171,15 @@ export default defineGroup('formula', [
   {
     title: '수식 엔진 청크를 끊으면 실패 안내를 보이고 결과는 그대로다',
     needs: ['netMock', 'reload'],
+    blockFromStart: '/assets/math-',
     run: async (app) => {
-      await app.step('엔진 청크(assets/math-*.js) 요청을 끊고 앱을 다시 띄운다', async () => {
-        await app.blockRequests('/assets/math-');
-        await app.reload();
-        await app.settleSelfReload();
-        await app.tab('formula');
-      });
+      await app.step(
+        '엔진 청크(assets/math-*.js)를 처음부터 끊은 앱이 스스로 새로고침을 마친 뒤 수식 탭으로',
+        async () => {
+          await app.settleSelfReload();
+          await app.tab('formula');
+        },
+      );
       await app.step('1+2= → 엔진이 없어 실패 안내, 결과는 그대로, 번역 키 노출 없음', async () => {
         await tapFormula(app, 'C1+2=');
         await expectNotice(app, '수식을 평가할 수 없습니다');
@@ -186,13 +191,12 @@ export default defineGroup('formula', [
   {
     title: '수식 엔진 로드 실패 토스트에 영어 내부 메시지가 새지 않는다',
     needs: ['netMock', 'reload'],
+    blockFromStart: '/assets/math-',
     knownBug:
       '토스트가 "수식을 평가할 수 없습니다: formula engine not loaded" 로 내부 영어 예외 메시지를 그대로 붙인다' +
       ' (errors.evaluation 의 {detail} — classifyFormulaError 가 예외 message 를 넘김)',
     symptom: /내부 영어 메시지가 노출됨/,
     run: async (app) => {
-      await app.blockRequests('/assets/math-');
-      await app.reload();
       await app.settleSelfReload();
       await app.tab('formula');
       await tapFormula(app, 'C1+2=');
@@ -206,14 +210,13 @@ export default defineGroup('formula', [
   {
     title: '수식 엔진 청크 로드가 한 번 실패해도 다음 시도에 불러와져 계산된다',
     needs: ['netMock', 'reload'],
+    blockFromStart: '/assets/math-',
     knownBug:
       '로드 실패 뒤 다시 시도되지 않는다 — router/index.ts 의 vite:preloadError 리스너가 preventDefault() 를 불러 Vite 의 ' +
       'preload 헬퍼가 오류를 삼키고, loadFormulaMath()(FormulaMath.ts)는 undefined 로 resolve 되며 loading 이 비워지지 않고, ' +
       'ensureMath(formulaStore.ts)는 인스턴스 없이 mathReady = true 로 만들어 이후 호출이 계속 일찍 반환한다',
     symptom: /메인 결과: .*"3".*마지막 값 "0"/,
     run: async (app) => {
-      await app.blockRequests('/assets/math-');
-      await app.reload();
       await app.settleSelfReload();
       await app.tab('formula');
       await tapFormula(app, 'C1+2=');

@@ -100,7 +100,8 @@ scripts/test-suite.sh         층 실행기,  scripts/test-summary.mjs  요약 �
 ## 앱이 스스로 새로고침할 때
 
 지연 로드(청크)가 실패하면 `router/index.ts` 의 `vite:preloadError` 리스너가 페이지를 한 번 새로 연다(10초 안 재시도 없음).
-청크를 끊는 시나리오는 `app.reload()` 뒤에 `app.settleSelfReload()` 로 그 새로고침이 끝나기를 기다린 다음 입력한다.
+청크를 끊는 시나리오는 `blockFromStart` 로 앱을 띄우기 **전부터** 끊고(뜬 뒤에 끊으면 WebKit 이 이미 받은 청크를
+메모리 캐시에서 꺼내 써 가로채기를 건너뛴다), 입력 전에 `app.settleSelfReload()` 로 그 새로고침이 끝나기를 기다린다.
 
 ## 층별 보충
 
@@ -185,6 +186,10 @@ scripts/test-suite.sh --layer app        # = --platform <이 기계의 OS>. wind
   또는 `app.quit('command')`(quit_app) 로 정상 종료한다.
 - **실패 읽기**: summary.md → `test-results/app-html-report/`(실패 시험의 스크린샷 + 앱 로그 끝부분 첨부) → 환경 로그
   `test-results/app-{xvfb,dbus,driver,driver-stderr}.log`(앱의 stderr 는 driver-stderr). `app-exited` 주석 = 시험 뒤 앱이 죽어 있었다.
+- **스모크 확인**: globalSetup 이 시험 전에 세션을 한 번 열어 본다(= 앱 한 번 실행, 끝나면 프로필을 다시 비운다). 못 열면 층 전체가 바로
+  멈추고 `smoke check: could not open a WebDriver session` + 드라이버 로그 끝부분을 보인다(시험마다 같은 타임아웃으로 줄줄이 실패하지 않게).
+- **화면 전환**: 탭·화면을 바꾼 직후에는 떠나는 패널이 아직 보이고 같은 버튼 id(`btn-c1` 등)를 가진다. 드라이버의 `tab()`·`openScreen()`·
+  `restoreRecord()` 는 전환이 끝날 때까지(`#q-app` 안에 `-enter-active`/`-leave-active` 없음) 기다린 뒤 돌아온다.
 - **필요한 것**: `Xvfb` · `dbus-daemon` · `WebKitWebDriver`(apt `webkitgtk-webdriver`, 22.04/24.04 는 `webkit2gtk-driver`) ·
   `tauri-driver`(`cargo install tauri-driver --locked`) · `python3-gi`(Gtk 3, Atk, Atspi) · `xwininfo`/`xprop`(x11-utils). 없으면 globalSetup 이
   무엇이 없는지 말하고 실패한다.
@@ -212,7 +217,8 @@ scripts/test-suite.sh --layer app        # = --platform <이 기계의 OS>. wind
 - **Control+v**: `read_clipboard_text` 는 Linux 전용(`Err("unsupported")`)이라 WebView2 의 `navigator.clipboard.readText()` 로 돌아간다 —
   권한 프롬프트 등으로 결과가 Linux 와 다를 수 있다. Windows 의 known-bug 는 **첫 CI 결과를 본 뒤** 증거와 함께 붙인다(`knownBugOn['tauri-windows']`).
 - **읽기**: Actions 실행 화면의 Job summary(summary.md) → 아티팩트 `app-e2e-windows`(성공해도 올린다): `app-html-report/`(실패 스크린샷·앱 로그),
-  `app-driver.log`·`app-driver-stderr.log`(tauri-driver·msedgedriver·앱 stderr), `app-build-tauri.log`.
+  `app-driver.log`·`app-driver-stderr.log`(tauri-driver·msedgedriver·앱 stderr), `app-msedgedriver.log`(msedgedriver `--verbose` —
+  tauri-driver 는 msedgedriver 의 stdout 을 버리고 로그 옵션도 안 주므로 `test-results/msedgedriver-logged.cmd` 로 감싸 넘긴다), `app-build-tauri.log`.
 
 ## 발견 사항 (Phase 2, 앱 층)
 

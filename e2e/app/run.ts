@@ -16,6 +16,7 @@ export function runGroup<A extends CalcApp>(group: ScenarioGroup<A>, { seed = tr
         const missing = missingCapabilities(scenario, typed);
         test.skip(missing.length > 0, `드라이버(${app.platform})에 없는 능력: ${missing.join(', ')}`);
 
+        if (scenario.blockFromStart) await app.blockRequests(scenario.blockFromStart); // 앱이 받기 전에 — Scenario.blockFromStart
         if (seed) await app.step('앱 띄우기 (seed)', () => app.seed(scenario.seed));
         await executeScenario(typed, scenario, (type, description) =>
           test.info().annotations.push({ type, description }),

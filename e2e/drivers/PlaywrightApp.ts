@@ -95,7 +95,19 @@ export class PlaywrightApp implements CalcApp {
       .then(() => true)
       .catch(() => false);
     if (!fired) return;
-    await this.page.waitForTimeout(500); // 시각을 적은 뒤 실제 이동이 시작될 때까지
+    // 새 문서인지는 시간 추측(옛 500ms 대기) 대신 문서가 열린 시각으로 가린다 — reloadOnce 가 적은 시각 뒤에 열린 문서가 새 문서다.
+    // 부하가 걸리면 이동이 늦게 시작돼 옛 문서에서 '준비됨'을 보고 돌아오던 틈을 막는다. waitForFunction 은 이동을 건너 계속 기다린다.
+    for (let attempt = 0; ; attempt++) {
+      try {
+        await this.page.waitForFunction((k) => performance.timeOrigin >= Number(sessionStorage.getItem(k)), key, {
+          timeout: 10_000,
+        });
+        break;
+      } catch (error) {
+        if (attempt >= 5 || /Timeout/.test(String(error))) throw error;
+        await this.page.waitForTimeout(200); // 이동 중 실행 문맥이 사라진 경우 — 다시 기다린다
+      }
+    }
     await this.waitReadyAfterNavigation();
   }
 
@@ -134,6 +146,12 @@ export class PlaywrightApp implements CalcApp {
     }
     // 탭 화면은 처음 열 때 따로 불러온다(지연 로딩) — 그 화면의 결과 칸이 보일 때까지 기다린다
     await this.visible(`#panel-${name} [data-testid="result-main"]`).waitFor();
+    // 전환 애니메이션(180ms) 동안은 옛 패널도 보여 같은 id 의 버튼이 둘이 된다 — 부하가 걸리면 길어진다. 옛 패널이 사라질 때까지
+    await this.page
+      .locator(`[role="tabpanel"][id^="panel-"]:not(#panel-${name})`)
+      .filter({ visible: true })
+      .first()
+      .waitFor({ state: 'detached' });
   }
 
   async setLang(code: LangCode): Promise<void> {
